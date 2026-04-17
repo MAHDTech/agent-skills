@@ -20,7 +20,7 @@ Every skill MUST have a `SKILL.md` file in its own directory under `skills/`.
 
 The `SKILL.md` MUST start with YAML frontmatter:
 
-````yaml
+```yaml
 ---
 name: kebab-case-name
 description: A concise summary of what the skill does.
@@ -29,7 +29,7 @@ triggers:
   - "trigger phrase 2"
 category: coding -- utility -- custom
 ---
-```text
+```
 
 ## Structure
 
@@ -39,7 +39,7 @@ skills/<skill-name>/
   scripts/        # Optional: any automation scripts (Bun, Shell, etc.)
   assets/         # Optional: images, icons, etc.
   references/     # Optional: extended documentation
-```text
+```
 
 ## Best Practices
 
@@ -47,5 +47,4 @@ skills/<skill-name>/
 2. **Clear Triggers**: Triggers help agents understand when to invoke the skill.
 3. **Non-Interactive Scripts**: Ensure all scripts in `scripts/` can run without user input.
 4. **Validation**: Run `bun run sync-skills` after creating a skill to verify it's correctly integrated.
-````
 
