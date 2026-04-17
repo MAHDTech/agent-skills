@@ -1,0 +1,41 @@
+name: Setup Devenv
+description: Install Nix + devenv.
+
+inputs:
+  github-token:
+    description: "GitHub token"
+    required: true
+  cachix-cache-name:
+    description: "Cachix cache name"
+    required: false
+  cachix-auth-token:
+    description: "Cachix auth token"
+    required: false
+  skip-push:
+    description: "Whether to skip pushing to cachix"
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - id: free_disk_space
+      name: Free Disk Space
+      uses: ./.github/actions/free-disk-space
+
+    - id: install_nix
+      name: Install Nix
+      uses: cachix/install-nix-action@v30
+      with:
+        github_access_token: ${{ inputs.github-token }}
+
+    - id: install_devenv
+      name: Install Devenv
+      shell: bash
+      run: |
+        nix profile add --accept-flake-config nixpkgs#devenv
+
+    - id: version_check
+      name: Version Check
+      shell: bash
+      run: |
+        devenv version

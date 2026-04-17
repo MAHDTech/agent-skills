@@ -1,0 +1,194 @@
+@import "tailwindcss";
+@import "../../../../../static/styles/foundation.css";
+
+/* ── Archive-only: Prose (rendered markdown styling) ───────────── */
+
+@layer utilities {
+    .prose {
+        @apply leading-normal;
+    }
+    .prose > * + * {
+        @apply mt-4;
+    }
+    .prose strong {
+        @apply font-bold;
+        color: var(--color-text-main);
+    }
+    .prose h1 {
+        @apply text-2xl font-bold mt-8;
+        color: var(--color-primary);
+    }
+    .prose h2 {
+        @apply text-xl font-bold mt-8;
+        color: var(--color-text-main);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.25rem;
+    }
+    .prose h3 {
+        @apply text-lg font-bold mt-6;
+        color: var(--color-text-main);
+    }
+    .prose h4 {
+        @apply text-base font-bold mt-4;
+        color: var(--color-muted);
+    }
+    .prose p {
+        @apply mt-4;
+    }
+    .prose a {
+        color: var(--color-primary);
+        text-decoration: none;
+    }
+    .prose a:hover {
+        text-decoration: underline;
+        text-shadow: var(--shadow-glow-cyan);
+    }
+    .prose blockquote {
+        @apply pl-4 italic;
+        border-left: 3px solid var(--color-primary);
+        color: var(--color-muted);
+    }
+    .prose kbd,
+    .prose p code,
+    .prose ol code,
+    .prose ul code,
+    .prose blockquote code,
+    .prose h1 code,
+    .prose h2 code,
+    .prose h3 code,
+    .prose h4 code {
+        @apply mx-0.5 px-1.5 py-0.5 font-mono text-sm;
+        background: var(--color-surface);
+        color: var(--color-primary);
+        border: 1px solid var(--color-border);
+    }
+    .prose pre:not(.mermaid) {
+        @apply block my-4 p-4 font-mono text-sm overflow-x-auto;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+    }
+    .prose pre.mermaid {
+        @apply block my-4 font-mono text-sm overflow-x-auto;
+    }
+    .prose ul {
+        @apply pl-6 list-disc;
+    }
+    .prose ol {
+        @apply pl-6 list-decimal;
+    }
+    .prose li + li {
+        @apply mt-1;
+    }
+    .prose td,
+    .prose th {
+        @apply px-3 py-2;
+        border: 1px solid var(--color-border);
+    }
+    .prose th {
+        background: var(--color-surface);
+        color: var(--color-primary);
+        @apply font-bold text-left;
+    }
+    .prose tbody tr:nth-child(odd) {
+        background: rgba(21, 27, 35, 0.5);
+    }
+    .prose table {
+        @apply my-4 w-full;
+    }
+    .prose img {
+        @apply my-4;
+        border: 1px solid var(--color-border);
+    }
+    .prose details {
+        @apply my-4;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+    }
+    .prose summary {
+        @apply cursor-pointer select-none px-3 py-2 font-medium;
+        color: var(--color-primary);
+    }
+    .prose details > *:not(summary) {
+        @apply px-3 pb-3;
+    }
+    .prose hr {
+        @apply my-8 h-0 p-0;
+        border: 0;
+        border-top: 1px solid var(--color-border);
+    }
+    .prose mark {
+        @apply mx-0.5 px-1 py-0.5;
+        background: rgba(0, 240, 255, 0.15);
+        color: var(--color-primary);
+    }
+    .prose del {
+        color: var(--color-muted);
+    }
+    .prose dl {
+        @apply my-4;
+    }
+    .prose dt {
+        @apply font-semibold;
+        color: var(--color-text-main);
+    }
+    .prose dd {
+        @apply ml-4;
+        color: var(--color-muted);
+    }
+    .prose .footnote-definition:first-of-type {
+        @apply mt-4 border-0 pt-0;
+    }
+    .prose .footnote-definition {
+        @apply mt-2 text-sm grid grid-cols-[max-content_1fr] gap-x-2 items-start;
+        color: var(--color-muted);
+    }
+    .prose .footnote-definition-label {
+        @apply text-xs col-start-1;
+        color: var(--color-primary);
+    }
+    .prose .footnote-definition p {
+        @apply m-0 col-start-2;
+    }
+    .prose .footnote-reference {
+        @apply text-xs align-text-top;
+    }
+
+    /* TOC sidebar */
+    .toc ul {
+        @apply list-disc ml-4;
+    }
+    .toc li + li {
+        @apply mt-1;
+    }
+    .toc a {
+        color: var(--color-muted);
+        text-decoration: none;
+        @apply text-sm;
+    }
+    .toc a:hover {
+        color: var(--color-primary);
+    }
+}
+
+/* ── Archive-only: Mermaid ─────────────────────────────────────── */
+
+.mermaid {
+    background: transparent !important;
+}
+
+/* ── Archive-only: Collapsible sidebar ─────────────────────────── */
+
+.sidebar-summary::-webkit-details-marker,
+.sidebar-summary::marker {
+    display: none;
+}
+
+.sidebar-section[open] > .sidebar-summary .sidebar-chevron {
+    transform: rotate(90deg);
+}
+
+.sidebar-chevron {
+    transition: transform 150ms ease;
+    display: inline-block;
+    font-size: 0.6rem;
+}

@@ -1,0 +1,27 @@
+<nav class="sticky top-8 overflow-y-auto max-h-[calc(100vh-4rem)] pr-2 pb-8 custom-scrollbar">
+  {% set root = get_section(path="_index.md") %}
+
+  {% set_global _root_subs = [] %}
+  {% for subpath in root.subsections %}
+    {% set_global _root_subs = _root_subs | concat(with=get_section(path=subpath)) %}
+  {% endfor %}
+  {% set sorted_root_subs = _root_subs | sort(attribute="title") %}
+
+  <div class="space-y-4 text-sm">
+    {% for sub in sorted_root_subs %}
+      {{ sidebar_macros::render_section(section_path=sub.relative_path, current_path=current_path | default(value="")) }}
+    {% endfor %}
+  </div>
+</nav>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Wait for a tiny bit to ensure fonts and layout have calculated
+    setTimeout(() => {
+      const activeItem = document.getElementById("sidebar-active-item");
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 50);
+  });
+</script>

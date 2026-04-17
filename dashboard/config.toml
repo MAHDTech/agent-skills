@@ -1,0 +1,13 @@
+base_url = "https://MAHDTech.github.io/agent-skills"
+title = "Agent Skills"
+description = "A collection of AI agent skills"
+theme = "tars-dashboards"
+output_dir = "public"
+
+[markdown]
+insert_anchor_links = "heading"
+# highlighting = { code = true }
+
+[extra]
+author = "MAHDTech"
+github = "https://github.com/MAHDTech/agent-skills"

@@ -1,0 +1,107 @@
+/*
+ * TARS Design Foundation
+ *
+ * Single source of truth for all shared Tailwind design tokens.
+ * Both the Station (Trunk) and Archive (Zola) canisters import this file.
+ *
+ * CANISTER-SPECIFIC styles belong in their own entry points:
+ *   - Station: static/styles/tailwind.css   (animations, .md-* classes)
+ *   - Archive: themes/tars/css/main.css     (.prose, .toc, mermaid)
+ */
+
+@import "./themes.css";
+
+/* ── Design Tokens ─────────────────────────────────────────────── */
+
+@theme inline {
+    --color-primary: var(--theme-primary);
+    --color-background: var(--theme-bg-dark);
+    --color-background-light: #f5f8f8;
+    --color-background-dark: var(--theme-bg-dark);
+    --color-surface: var(--theme-surface);
+    --color-text-main: var(--theme-text-main);
+    --color-muted: var(--theme-muted);
+    --color-accent: var(--theme-accent);
+    --color-border: var(--theme-border-color);
+    --color-border-color: var(--theme-border-color);
+    --color-status-green: var(--theme-status-green);
+    --color-status-yellow: var(--theme-status-yellow);
+    --color-status-red: var(--theme-status-red);
+
+    --font-display: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+    --radius-2xl: 0px;
+    --radius-3xl: 0px;
+
+    --shadow-glow-cyan: 0 0 10px rgba(0, 240, 255, 0.3);
+    --shadow-glow-green: 0 0 10px rgba(0, 255, 102, 0.5);
+    --shadow-glow-red: 0 0 10px rgba(255, 42, 42, 0.5);
+    --shadow-glow-yellow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* ── Font Faces ────────────────────────────────────────────────── */
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/jetbrainsmono-regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/jetbrainsmono-bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ── Base Styles ───────────────────────────────────────────────── */
+
+:root {
+    background-color: var(--color-background);
+}
+
+body {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--color-text-main);
+    background-color: var(--color-background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+
+html {
+    scroll-padding-top: 4rem;
+    scrollbar-color: var(--color-border) var(--color-background);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
+}

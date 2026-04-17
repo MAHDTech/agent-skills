@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "partials/children_macros.html" as children_macros %}
+
+{% block content %}
+<div class="prose max-w-none" data-pagefind-body>
+  <h1 class="!text-3xl !mb-2" style="color: var(--color-primary)">{{ section.title }}</h1>
+
+  {% if config.extra.description is defined %}
+    <p style="color: var(--color-muted)" class="!text-base !mt-0">{{ config.extra.description }}</p>
+  {% endif %}
+
+  <hr>
+
+  {{ section.content | safe }}
+
+  {{ children_macros::render_children(section=section) }}
+</div>
+{% endblock content %}

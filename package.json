@@ -1,0 +1,31 @@
+{
+    "name": "agent-skills",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "setup": "bun run bin/skills-install.ts",
+        "sync-skills": "bun run bin/skills-sync.ts",
+        "lint": "bun run bin/skills-lint.ts",
+        "build:css": "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css",
+        "build:dashboard": "bun run sync-skills && bun run build:css && zola --root dashboard build && pagefind --site dashboard/public"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "@types/fs-extra": "11.0.4",
+        "@types/glob": "8.1.0",
+        "@types/js-yaml": "4.0.9",
+        "@types/node": "25.6.0"
+    },
+    "peerDependencies": {
+        "typescript": "6.0.3"
+    },
+    "dependencies": {
+        "@clack/prompts": "1.2.0",
+        "@tailwindcss/cli": "^4.2.2",
+        "fs-extra": "11.3.4",
+        "glob": "13.0.6",
+        "js-yaml": "4.1.1",
+        "tailwindcss": "^4.2.2"
+    }
+}

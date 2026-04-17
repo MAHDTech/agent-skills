@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "./foundation.css";
+
+/* ── Station-only: Animations ──────────────────────────────────── */
+
+@theme inline {
+    --animate-blink: blink 1s step-end infinite;
+    --animate-neon-flash: flash 0.6s ease-out;
+    --animate-breathe: breathe 3s ease-in-out infinite;
+    --animate-bullet-hit: bullet-hit 700ms ease-out forwards;
+
+    @keyframes blink {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes bullet-hit {
+        /* invisible, offset left */
+        0% {
+            opacity: 0;
+            transform: translateX(-14px);
+            text-shadow: none;
+        }
+        /* IMPACT — zero-blur shadow paints glyphs hot pink;
+		   offset shadows = spark splatter in all directions;
+		   outer rings = corona bloom */
+        2% {
+            opacity: 1;
+            transform: translateX(-14px);
+            text-shadow:
+				/* zero-blur: paints over glyph pixels in hot pink */
+                0 0 0px rgba(255, 0, 220, 1),
+                /* tight glow ring */ 0 0 6px rgba(255, 0, 220, 1),
+                0 0 14px rgba(255, 0, 220, 1),
+                /* corona rings expanding outward */ 0 0 35px
+                    rgba(240, 0, 255, 0.9),
+                0 0 80px rgba(200, 0, 255, 0.7),
+                0 0 150px rgba(180, 0, 255, 0.4),
+                0 0 260px rgba(160, 0, 255, 0.2),
+                /* spark splatter — offset shadows scattered at angles */
+                    5px -6px 8px rgba(255, 0, 220, 0.95),
+                -7px 4px 7px rgba(255, 20, 200, 0.9),
+                10px 3px 12px rgba(200, 0, 255, 0.85),
+                -4px -8px 9px rgba(255, 0, 240, 0.9),
+                8px 7px 11px rgba(180, 0, 255, 0.8),
+                -10px -2px 13px rgba(220, 0, 255, 0.75),
+                6px -10px 15px rgba(255, 0, 200, 0.7),
+                -3px 9px 10px rgba(200, 0, 255, 0.7);
+        }
+        /* recoil — sparks dying, outer bloom still large */
+        16% {
+            transform: translateX(4px);
+            text-shadow:
+                0 0 4px rgba(255, 0, 220, 0.8),
+                0 0 18px rgba(240, 0, 255, 0.6),
+                0 0 60px rgba(200, 0, 255, 0.35),
+                0 0 130px rgba(180, 0, 255, 0.15),
+                5px -6px 8px rgba(255, 0, 220, 0.3),
+                -7px 4px 7px rgba(255, 20, 200, 0.25),
+                10px 3px 12px rgba(200, 0, 255, 0.2);
+        }
+        /* settling — inner pink ring almost gone, underlying colour emerging */
+        45% {
+            transform: translateX(0);
+            text-shadow:
+                0 0 4px rgba(255, 0, 220, 0.25),
+                0 0 16px rgba(200, 0, 255, 0.1);
+        }
+        /* fully settled — real text colour (grey/cyan) fully visible, clean */
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+            text-shadow: none;
+        }
+    }
+
+    @keyframes breathe {
+        0%,
+        100% {
+            opacity: 0.45;
+            box-shadow: none;
+        }
+        50% {
+            opacity: 1;
+            box-shadow: 0 0 14px rgba(0, 240, 255, 0.5);
+        }
+    }
+
+    @keyframes flash {
+        0% {
+            opacity: 0;
+            transform: scale(0.99);
+            border-color: transparent;
+        }
+        10% {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 20px rgba(255, 0, 230, 0.4);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(1.01);
+            border-color: transparent;
+        }
+    }
+}
+
+/* ── Station-only: Markdown Placeholder Styles ─────────────────── */
+
+.md-h1 {
+    @apply text-primary border-border-color mb-4 border-b pb-2 text-2xl font-bold;
+}
+.md-h2 {
+    @apply text-text-main mt-6 mb-3 text-xl font-bold;
+}
+.md-list {
+    @apply text-text-main my-1 flex items-start gap-2;
+}
+.md-p {
+    @apply text-text-main my-2 text-sm leading-relaxed;
+}

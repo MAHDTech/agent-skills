@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - trunk
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout_repository
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: setup_devenv
+        name: Setup Devenv
+        uses: ./.github/actions/setup-devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: run_lint
+        name: Run Lint
+        shell: bash
+        run: devenv shell lint
+
+      - id: build_dashboard
+        name: Build Dashboard
+        uses: ./.github/actions/build-dashboard

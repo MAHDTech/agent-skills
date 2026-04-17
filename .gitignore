@@ -1,0 +1,24 @@
+# Ignore WIP.
+TEMP/
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Dependencies
+node_modules/
+bun.lock
+
+# Dashboard Build
+dashboard/public/
+dashboard/static/build/
+
+# OS specific
+.DS_Store
