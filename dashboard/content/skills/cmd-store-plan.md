@@ -57,9 +57,9 @@ Present the draft to the user before writing.
 
 **Step 3a — Write the file:**
 
-````bash
+```bash
 mkdir -p plans/
-```text
+```
 
 Write to the path defined in [Output Path](#output-path).
 
@@ -71,7 +71,7 @@ Present the file path and a brief summary to the user. Ask if they want to adjus
 
 ```text
 plans/{YYYY}_{MM}_{DD}_{description}.md
-```text
+```
 
 Examples:
 
@@ -90,7 +90,7 @@ Date: YYYY-MM-DD
 Source: conversation with Claude
 
 - [Table of Contents entries...]
-```text
+```
 
 Always include a Table of Contents. Omit the top-level heading from the ToC using `<!-- omit in toc -->`.
 
@@ -168,7 +168,7 @@ _One-line italicized summary of what this phase achieves._
 **Key files:**
 
 - `path/to/file.py`: What changes
-```text
+```
 
 Only include phases that were actually discussed. Don't invent phases.
 
@@ -305,6 +305,5 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 - 🟡 **Open question**: Should fingerprint include excluded_files.json? **Impact**: Correctness. **Owner**: Decide during implementation.
 
 > 🔴 High risk · 🟡 Medium / open question · ⚪ Low / informational
-```text
-````
+```
 

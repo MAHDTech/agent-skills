@@ -152,6 +152,8 @@ in
                 "nobr"
                 "pre"
                 "sup"
+                "summary"
+                "details"
               ];
             };
           };

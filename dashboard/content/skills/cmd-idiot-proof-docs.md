@@ -59,22 +59,22 @@ Correct pattern:
 
 Start the server:
 
-````bash
+```bash
 make start_server
-```text
+```
 
 Run a command:
 
 ```bash
 make run_command
-```text
+```
 
 Incorrect pattern (separate steps combined in one unlabeled block):
 
 ```bash
 make start_server
 make run_command
-```text
+```
 
 ## Section Defaults
 
@@ -104,11 +104,10 @@ Move long explanations, implementation notes, and low-priority reference materia
 Detailed explanation here.
 
 </details>
-```text
+```
 
 ## Deliverable
 
 - Return the final output as Markdown (`.md`).
 - Keep all important content, but simplify, reorder, and prioritize for quick execution.
-````
 

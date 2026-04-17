@@ -24,7 +24,7 @@ Create or refactor repo-local skills and agent instructions that work across Cla
 
 ## Architecture
 
-````text
+```text
 repo-root/
 ├── .agents/
 │   ├── AGENTS.md                                           # Canonical agent instructions
@@ -37,7 +37,7 @@ repo-root/
 ├── .codex/skills/<name> → ../../.agents/skills/<name>      # Per-skill symlink
 ├── .codex-home/skills/<name> → ../../.agents/skills/<name> # Per-skill symlink
 └── .gitignore                                              # Whitelist entries for all paths
-```text
+```
 
 Key rules:
 
@@ -58,7 +58,7 @@ ls .claude/commands/ 2>/dev/null
 cat CLAUDE.md 2>/dev/null -- head -5
 cat AGENTS.md 2>/dev/null -- head -5
 grep -n "^skills/" .gitignore 2>/dev/null
-```text
+```
 
 Present what you found, then use `AskUserQuestion` with these questions (max 4 per call):
 
@@ -75,7 +75,7 @@ Set up `.agents/AGENTS.md` as the canonical agent instruction file with symlinks
 
 ```bash
 mkdir -p .agents
-```text
+```
 
 - If `AGENTS.md` exists at repo root and is a regular file, move it: `mv AGENTS.md .agents/AGENTS.md`
 - If `CLAUDE.md` exists at repo root and is a regular file (not a symlink), move it: `mv CLAUDE.md .agents/AGENTS.md`
@@ -90,7 +90,7 @@ ln -sf .agents/AGENTS.md CLAUDE.md
 mkdir -p .codex .gemini
 ln -sf ../.agents/AGENTS.md .codex/AGENTS.md
 ln -sf ../.agents/AGENTS.md .gemini/GEMINI.md
-```text
+```
 
 **Step 3 — Verify all symlinks resolve:**
 
@@ -100,7 +100,7 @@ readlink CLAUDE.md
 readlink .codex/AGENTS.md
 readlink .gemini/GEMINI.md
 head -3 CLAUDE.md
-```text
+```
 
 **Step 4 — Update .gitignore:**
 
@@ -108,7 +108,7 @@ Check if entries already exist, then add as needed:
 
 ```bash
 grep -n "AGENTS.md\|CLAUDE.md\|GEMINI.md" .gitignore 2>/dev/null
-```text
+```
 
 Append the agent instructions block from the [gitignore template](#gitignore-block-template) if not present.
 
@@ -122,7 +122,7 @@ Create the canonical directory:
 
 ```bash
 mkdir -p .agents/skills/<name>
-```text
+```
 
 **If creating new:**
 
@@ -144,13 +144,13 @@ mkdir -p .claude/skills .codex/skills .codex-home/skills
 ln -sf ../../.agents/skills/<name> .claude/skills/<name>
 ln -sf ../../.agents/skills/<name> .codex/skills/<name>
 ln -sf ../../.agents/skills/<name> .codex-home/skills/<name>
-```text
+```
 
 Check that the symlinks resolve correctly:
 
 ```bash
 test -f .claude/skills/<name>/SKILL.md && echo "OK" || echo "BROKEN"
-```text
+```
 
 If a repo already uses a directory-level symlink (`.claude/skills → ../.agents/skills`), migrate to per-skill symlinks first:
 
@@ -163,7 +163,7 @@ for skill in .agents/skills/*/; do
   ln -s "../../.agents/skills/$name" ".codex/skills/$name"
   ln -s "../../.agents/skills/$name" ".codex-home/skills/$name"
 done
-```text
+```
 
 ### Update .gitignore
 
@@ -173,13 +173,13 @@ The gitignore must be updated carefully to preserve existing entries.
 
 ```bash
 grep -n "^skills/" .gitignore
-```text
+```
 
 **Step 2 — Check if entries for this skill already exist:**
 
 ```bash
 grep "<name>" .gitignore
-```text
+```
 
 **Step 3 — Append or insert the whitelist block.**
 
@@ -191,7 +191,7 @@ If a `skills/` section already exists (adding a 2nd+ skill), only add the NEW sk
 !.agents/skills/<name>/
 !.agents/skills/<name>/SKILL.md
 .agents/skills/<name>/evals/
-```text
+```
 
 Never duplicate a line that already exists in `.gitignore`.
 
@@ -206,7 +206,7 @@ readlink CLAUDE.md
 readlink .codex/AGENTS.md
 readlink .gemini/GEMINI.md
 head -1 CLAUDE.md
-```text
+```
 
 If skills were scaffolded:
 
@@ -223,7 +223,7 @@ head -3 .codex-home/skills/<name>/SKILL.md
 
 # Verify git tracks the canonical skill file
 git status .agents/skills/<name>/SKILL.md
-```text
+```
 
 If refactoring, ask: "The original command file at `.claude/commands/<file>` still exists. Should I delete it now that the skill has been migrated?"
 
@@ -244,7 +244,7 @@ Skill: <name>
   .codex-home/skills/<name> → ../../.agents/skills/<name>  → ✅
 
 Gitignore: ✅ updated
-```text
+```
 
 ## Templates
 
@@ -258,11 +258,11 @@ Gitignore: ✅ updated
  ---
 
  # Skill Title <!-- omit in toc -->
-```text
+```
 
 ### AGENTS.md skeleton template <!-- omit in toc -->
 
-```markdown
+````markdown
 # AGENTS.md <!-- omit in toc -->
 
 ## Project Overview
@@ -272,7 +272,6 @@ Gitignore: ✅ updated
 ## Development
 
 - Key commands and workflows
-```text
 
 ### Gitignore block template <!-- omit in toc -->
 
@@ -283,7 +282,7 @@ Full block for agent instructions (add once per repo):
 # Canonical source: .agents/AGENTS.md — tool-specific files are symlinks
 !.agents/
 !.agents/AGENTS.md
-```text
+```
 
 Full block for the first skill in a repo (replace `<name>` with the skill name):
 
@@ -303,7 +302,7 @@ skills/
 !.codex/skills/<name>
 !.codex-home/skills/
 !.codex-home/skills/<name>
-```text
+```
 
 For additional skills, append only the new skill-specific lines:
 
@@ -314,7 +313,7 @@ For additional skills, append only the new skill-specific lines:
 !.claude/skills/<name>
 !.codex/skills/<name>
 !.codex-home/skills/<name>
-```text
+```
 
 ### Symlink commands template <!-- omit in toc -->
 
@@ -326,7 +325,7 @@ ln -sf .agents/AGENTS.md AGENTS.md
 ln -sf .agents/AGENTS.md CLAUDE.md
 ln -sf ../.agents/AGENTS.md .codex/AGENTS.md
 ln -sf ../.agents/AGENTS.md .gemini/GEMINI.md
-```text
+```
 
 Per-skill setup (run for each new skill):
 
@@ -335,6 +334,6 @@ mkdir -p .agents/skills/<name> .claude/skills .codex/skills .codex-home/skills
 ln -sf ../../.agents/skills/<name> .claude/skills/<name>
 ln -sf ../../.agents/skills/<name> .codex/skills/<name>
 ln -sf ../../.agents/skills/<name> .codex-home/skills/<name>
-```text
+```
 ````
 

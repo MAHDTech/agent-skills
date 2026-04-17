@@ -62,13 +62,13 @@ Review branch changes for logic correctness. This skill finds what breaks, not w
 
 For each dimension, output:
 
-````text
+```text
 ### [Dimension Name]
 
 - **[file:line]** — Finding description
   Risk: [what could go wrong]
   Suggestion: [how to address it]
-```text
+```
 
 If a dimension has no findings, output: `No issues found.`
 
@@ -78,5 +78,4 @@ End with:
 
 1. **Top 3-5 risks** ranked by severity (what is most likely to cause a production incident?)
 2. **Recommended test cases** to add before merging
-````
 

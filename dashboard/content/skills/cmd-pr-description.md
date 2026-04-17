@@ -42,21 +42,21 @@ Copy to clipboard: `cat PR_DESCRIPTION.md -- pbcopy`
 
 **Method 1 - GitHub CLI**
 
-````bash
+```bash
 BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
-```text
+```
 
 **Method 2 - Git remote**
 
 ```bash
 BASE_BRANCH=$(git remote show origin 2>/dev/null -- grep "HEAD branch" -- cut -d: -f2 -- xargs)
-```text
+```
 
 **Method 3 - Git symbolic-ref**
 
 ```bash
 BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null -- sed 's@^refs/remotes/origin/@@')
-```text
+```
 
 **IMPORTANT:** Do NOT assume `master` or `main` as a fallback. If all methods fail, ask the user which branch to use as the base.
 
@@ -64,7 +64,7 @@ BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null -- sed 's@^r
 
 ```bash
 git rev-parse --verify "$BASE_BRANCH" 2>/dev/null || git rev-parse --verify "origin/$BASE_BRANCH" 2>/dev/null
-```text
+```
 
 If the branch does not exist locally or on the remote, stop and ask the user to confirm the branch name.
 
@@ -73,7 +73,7 @@ If the branch does not exist locally or on the remote, stop and ask the user to 
 ```bash
 git diff $BASE_BRANCH --stat -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml" ":(exclude)package.json"
 git log $BASE_BRANCH..HEAD --oneline
-```text
+```
 
 ### 3. Generate the title and description using the format below
 
@@ -99,7 +99,7 @@ Once the user approves, execute the following steps in order:
 
 ```bash
 git add -A && git commit -m "<generated title>"
-```text
+```
 
 If there are no unstaged/staged changes, skip this step.
 
@@ -107,7 +107,7 @@ If there are no unstaged/staged changes, skip this step.
 
 ```bash
 git push -u origin HEAD
-```text
+```
 
 **Step 5c — Create or update the PR:**
 
@@ -115,19 +115,19 @@ Check if a PR already exists for the current branch:
 
 ```bash
 gh pr view --json number 2>/dev/null
-```text
+```
 
 If a PR exists, update it:
 
 ```bash
 gh pr edit --title "<generated title>" --body "$(cat PR_DESCRIPTION.md)"
-```text
+```
 
 If no PR exists, create one. Always pass `--base` so the PR targets the correct branch (especially important when the base is not the repo default):
 
 ```bash
 gh pr create --base "$BASE_BRANCH" --title "<generated title>" --body "$(cat PR_DESCRIPTION.md)"
-```text
+```
 
 ## Title Format
 
@@ -135,7 +135,7 @@ PR titles must follow this format:
 
 ```text
 [KEYWORD] Summary
-```text
+```
 
 **Rules:**
 
@@ -187,7 +187,7 @@ S -- Component -- Before -- After
 - ...
 
 </details>
-```text
+```
 
 ## GitHub Admonitions
 
@@ -210,7 +210,7 @@ Use [GitHub admonitions](https://docs.github.com/en/get-started/writing-on-githu
 
 > [!CAUTION]
 > Advises about risks or negative outcomes of certain actions.
-```text
+```
 
 **When to use each type:**
 
@@ -327,6 +327,5 @@ S -- Component -- Before -- After
 - Add index on `expires_at` for cleanup job performance
 
 </details>
-```text
-````
+```
 

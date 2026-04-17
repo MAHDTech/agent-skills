@@ -20,14 +20,14 @@ Transform development code into production-ready applications through systematic
 
 ## Usage Patterns
 
-````bash
+```bash
 /cmd-productionize                          # Auto-detect framework, general production prep
 /cmd-productionize flutter testflight       # Flutter app for TestFlight
 /cmd-productionize react vercel            # React app for Vercel deployment
 /cmd-productionize nodejs docker           # Node.js app for Docker deployment
 /cmd-productionize python heroku           # Python app for Heroku
 /cmd-productionize vue netlify             # Vue app for Netlify
-```text
+```
 
 ## Workflow
 
@@ -139,7 +139,7 @@ Execute improvements systematically with methodical attention to detail, updatin
 
 Create comprehensive production-ready documentation:
 
-#### **README.md Structure** (based on proven patterns):
+#### **README.md Structure** (based on proven patterns)
 
 ```markdown
 # Project Name - Production Ready
@@ -175,7 +175,7 @@ _Brief compelling description with value proposition_
 - High-level system overview
 - Key design decisions
 - Production considerations
-```text
+```
 
 #### **Additional Documentation**
 
@@ -273,7 +273,7 @@ Provide a prioritized, concrete list of post-productionization actions:
 2. [ ] Implement A/B testing framework if applicable
 3. [ ] Create comprehensive user documentation
 4. [ ] Plan for scaling based on usage growth projections
-```text
+```
 
 ### 9. **Framework Detection Logic**
 
@@ -327,5 +327,4 @@ The application is production-ready when:
 - **Always conclude with proactive question analysis and actionable next steps** - This is not optional
 - Consider broader architectural implications and related systems impact
 - Quality over speed - production readiness cannot be rushed
-````
 

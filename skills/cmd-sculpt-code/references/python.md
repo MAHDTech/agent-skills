@@ -18,7 +18,7 @@ Additional patterns to apply when sculpting Python codebases. These supplement t
 
 ## Nesting Patterns
 
-````python
+```python
 # Before: deep nesting
 def process(data, type, config, user_id, db):
     if type == "a":
@@ -59,7 +59,7 @@ def _should_process(config: ProcessConfig) -> bool:
 
 def _fetch_entities(items: list[Item], db: Database) -> list[Entity]:
     return [entity for item in items if (entity := db.get(item.id))]
-```text
+```
 
 **What improved:**
 
@@ -86,4 +86,3 @@ def _fetch_entities(items: list[Item], db: Database) -> list[Entity]:
 - `__init__.py` re-exports public API only
 - Keep models/types in dedicated files, not mixed with business logic
 - Test file mirrors source file: `services/auth.py` → `tests/services/test_auth.py`
-````

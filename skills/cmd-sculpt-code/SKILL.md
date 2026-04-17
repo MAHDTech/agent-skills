@@ -103,13 +103,13 @@ Add missing TODOs for: known shortcuts, deferred work, temporary workarounds, an
 
 For each file changed, show:
 
-````text
+```text
 ### file_path
 
 **Changes made:**
 - [dimension] description of change (line X)
 - [dimension] description of change (line Y)
-```text
+```
 
 End with a summary: files touched, lines removed, TODOs added/removed, helpers extracted.
 
@@ -120,4 +120,3 @@ End with a summary: files touched, lines removed, TODOs added/removed, helpers e
 - Test code (unless explicitly asked)
 - Forward-looking base classes if second implementation is likely soon
 - Domain-specific patterns the team uses intentionally
-````

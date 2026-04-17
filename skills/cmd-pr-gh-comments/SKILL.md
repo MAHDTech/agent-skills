@@ -23,9 +23,9 @@ Verify the environment is ready.
 
 **Check authentication:**
 
-````bash
+```bash
 gh auth status
-```text
+```
 
 If not authenticated, stop and tell the user to run `gh auth login`.
 
@@ -33,7 +33,7 @@ If not authenticated, stop and tell the user to run `gh auth login`.
 
 ```bash
 git branch --show-current
-```text
+```
 
 Confirm you are not on the default branch. If you are, stop and ask the user to check out their feature branch.
 
@@ -43,7 +43,7 @@ Confirm you are not on the default branch. If you are, stop and ask the user to 
 
 ```bash
 gh pr view --json number,url,headRefName,baseRefName
-```text
+```
 
 If no PR exists for the current branch, stop and tell the user.
 
@@ -51,7 +51,7 @@ If no PR exists for the current branch, stop and tell the user.
 
 ```bash
 gh repo view --json nameWithOwner -q '.nameWithOwner'
-```text
+```
 
 Parse this into `{owner}` and `{repo}` for API calls below.
 
@@ -63,25 +63,25 @@ Fetch three types of comments and combine them.
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --paginate
-```text
+```
 
 **Review-level comments:**
 
 ```bash
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews --paginate
-```text
+```
 
 **General PR conversation comments:**
 
 ```bash
 gh api repos/{owner}/{repo}/issues/{pr_number}/comments --paginate
-```text
+```
 
 **Get current user for filtering:**
 
 ```bash
 gh api user -q '.login'
-```text
+```
 
 For each comment, extract: `id`, `node_id`, `user.login`, `body`, `path`, `line`/`original_line`, `diff_hunk`, `in_reply_to_id`, `created_at`.
 
@@ -143,7 +143,7 @@ Category -- Description -- Example
 ### Outdated ({count})
 
 - {comment summary} — code has changed, will resolve
-```text
+```
 
 Ask the user:
 
@@ -176,7 +176,7 @@ File -- Line -- Category -- Action Taken
 ... -- ... -- Fix -- Changed X to Y
 ... -- ... -- Investigate -- Found Z, no change needed
 ... -- ... -- Discuss -- User decided to defer
-```text
+```
 
 ## 7. Resolve Comment Threads
 
@@ -198,7 +198,7 @@ query($nodeId: ID!) {
     }
   }
 }' -f nodeId="{comment_node_id}"
-```text
+```
 
 Then resolve:
 
@@ -211,7 +211,7 @@ mutation($threadId: ID!) {
     }
   }
 }' -f threadId="{thread_id}"
-```text
+```
 
 ## 8. Wrap Up
 
@@ -230,15 +230,15 @@ Ask the user:
 
 ```bash
 git add <specific changed files>
-```text
+```
 
 ```bash
 git commit -m "Tended to github comments"
-```text
+```
 
 ```bash
 git push
-```text
+```
 
 **Report final status:**
 
@@ -249,5 +249,4 @@ git push
 - {M} threads resolved on GitHub
 - Commit: {short_sha}
 - PR: {pr_url}
-```text
-````
+```

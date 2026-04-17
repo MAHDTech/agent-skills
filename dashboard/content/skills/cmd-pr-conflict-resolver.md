@@ -37,9 +37,9 @@ Assume I already ran `git merge` and there are unresolved conflicts.
 - Identify the merge target via `git rev-parse MERGE_HEAD` (or `REBASE_HEAD` / `CHERRY_PICK_HEAD` as applicable)
 - Run a baseline diff between both sides, excluding lock/generated files:
 
-````bash
+```bash
 git diff MERGE_HEAD...HEAD -- ":(exclude)*.lock" ":(exclude)package-lock.json" ":(exclude)pnpm-lock.yaml"
-```text
+```
 
 This gives you the big picture before touching individual conflicts.
 
@@ -49,11 +49,11 @@ Inventory every conflict before resolving any of them.
 
 ```bash
 git diff --name-only --diff-filter=U
-```text
+```
 
 ```bash
 rg "<<<<<<< " --line-number
-```text
+```
 
 - Create a task list with one entry per conflict chunk, grouped by file
 - Note patterns across the conflict set:
@@ -73,7 +73,7 @@ Not just the markers. Understand the function/block's role in the file.
 ```bash
 git log --oneline MERGE_HEAD -- <file>
 git log --oneline HEAD -- <file>
-```text
+```
 
 Read commit messages and diffs to understand **intent** on each side.
 
@@ -92,7 +92,7 @@ If the conflict is in a signature, type, constant, or export:
 
 ```bash
 rg "<symbol_name>" --type-add 'src:*.{ts,py,go,rs,java}' -t src
-```text
+```
 
 Find all usages to identify downstream impact.
 
@@ -181,7 +181,7 @@ After all conflicts are resolved:
 
 ```bash
 rg "<<<<<<< "
-```text
+```
 
 Confirm zero remaining conflict markers.
 
@@ -223,5 +223,4 @@ After the table, list flags grouped by severity. Each flag MUST start with its e
 - `⚠️` Files that weren't in the conflict set but may be affected by the merge
 
 Closing question: **Are there areas of the codebase this merge could affect that aren't in the conflict markers?**
-````
 

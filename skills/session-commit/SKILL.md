@@ -21,21 +21,21 @@ Analyze the current coding session, propose improvements to `AGENTS.md`, and app
 
 1. Run preflight checks:
 
-````bash
+```bash
 bash scripts/preflight.sh
-```text
+```
 
-2. If preflight fails and user approves repairs, run:
+1. If preflight fails and user approves repairs, run:
 
 ```bash
 bash scripts/preflight.sh --fix
-```text
+```
 
-3. Read the current `AGENTS.md` and build a mental map of existing sections.
-4. Extract only durable learnings from the current session.
-5. Propose changes using the format in `references/change-proposal-format.md`.
-6. Wait for explicit user approval before applying any edits.
-7. Apply approved changes and merge with existing content.
+1. Read the current `AGENTS.md` and build a mental map of existing sections.
+1. Extract only durable learnings from the current session.
+1. Propose changes using the format in `references/change-proposal-format.md`.
+1. Wait for explicit user approval before applying any edits.
+1. Apply approved changes and merge with existing content.
 
 ## What to capture
 
@@ -61,4 +61,3 @@ If `CLAUDE.md`, `CODEX.md`, or `GEMINI.md` are missing or empty, create symlinks
 - Proposal stage: output only proposed changes with explicit add/modify/remove counts.
 - Apply stage: update `AGENTS.md` only after explicit approval.
 - Completion stage: summarize what changed and where.
-````

@@ -18,13 +18,13 @@ Generate a manual test plan for the changes in the current branch. The plan shou
 
 Try these methods in order:
 
-````bash
+```bash
 BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
-```text
+```
 
 ```bash
 BASE_BRANCH=$(git remote show origin 2>/dev/null -- grep "HEAD branch" -- cut -d: -f2 -- xargs)
-```text
+```
 
 If both fail, ask the user.
 
@@ -36,7 +36,7 @@ Run all of these and capture the results:
 git diff $BASE_BRANCH...HEAD --name-only
 git diff $BASE_BRANCH...HEAD --stat
 git log $BASE_BRANCH..HEAD --oneline
-```text
+```
 
 ### Step 3: Detect project tooling
 
@@ -72,7 +72,7 @@ I found 3 change areas in this branch:
 3. Test fixes -- E2E test stability improvements (4 test files)
 
 Should I generate the test plan for all 3, or would you like to adjust?
-```text
+```
 
 ### Step 5: Generate the test plan
 
@@ -140,7 +140,7 @@ Wrote TEST_PLAN.md with 4 sections:
   4. Quick Smoke Test -- 3 commands
 
 Run `cat TEST_PLAN.md` to view the full plan.
-```text
+```
 
 ## Style Reference
 
@@ -150,5 +150,4 @@ Follow the same style used in `cmd-pr-description`:
 - No fluff -- every step must verify something real that a human needs to see
 - Copy-paste ready -- a reviewer should never need to edit a command
 - Separate code blocks -- one command per block, bold header above it
-````
 

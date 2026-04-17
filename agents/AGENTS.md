@@ -5,7 +5,6 @@ description: Single source of truth for agent instructions
 
 # Available Skills
 
-- **cmd-email-md**: Convert markdown to email-safe HTML with inline styles and cross-client compatibility. Use when writing newsletters, transactional emails, or any HTML email from markdown source.
 - **cmd-follow-up**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 - **cmd-gh-issue**: Create structured GitHub issues from conversation context using gh CLI
 - **cmd-idiot-proof-docs**: Simplify documentation for clarity and readability with approval-gated edits

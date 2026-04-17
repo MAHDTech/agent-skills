@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD033 -->
+
 > [!TIP]
 > Close the loop after every coding session with one skill.
 > Keep `AGENTS.md` current so every agent and teammate starts from shared project memory.
@@ -22,9 +24,9 @@
 
 ## Quickstart
 
-````bash
+```bash
 npx skills add olshansk/agent-skills
-```text
+```
 
 Then ask your agent to "close the loop" or "run session commit" at the end of each coding session.
 
@@ -41,7 +43,7 @@ flowchart LR
     classDef run fill:#90CAF9,color:#0D47A1,stroke:#64B5F6
     classDef review fill:#FFCC80,color:#E65100,stroke:#FFB74D
     classDef value fill:#CE93D8,color:#4A148C,stroke:#BA68C8
-```text
+```
 
 ## Manual Install Fallback
 
@@ -60,13 +62,13 @@ Install:
 
 ```bash
 npx skills add olshansk/agent-skills
-```text
+```
 
 Run:
 
 ```bash
 /session-commit
-```text
+```
 
 </details>
 
@@ -77,32 +79,32 @@ Add marketplace:
 
 ```bash
 /plugin marketplace add olshansk/agent-skills
-```text
+```
 
 Install plugin:
 
 ```bash
 /plugin install agent-skills@olshansk
-```text
+```
 
 Run:
 
 ```bash
 /agent-skills:session-commit
-```text
+```
 
 Update:
 
 ```bash
 /plugin update agent-skills@olshansk
-```text
+```
 
 Remove:
 
 ```bash
 /plugin uninstall agent-skills
 /plugin marketplace remove olshansk
-```text
+```
 
 </details>
 
@@ -113,25 +115,25 @@ Install:
 
 ```bash
 gemini extensions install https://github.com/olshansk/agent-skills
-```text
+```
 
 Run:
 
 ```bash
 /session-commit
-```text
+```
 
 Update:
 
 ```bash
 gemini extensions install https://github.com/olshansk/agent-skills
-```text
+```
 
 Remove:
 
 ```bash
 gemini extensions uninstall agent-skills
-```text
+```
 
 </details>
 
@@ -142,13 +144,12 @@ Install:
 
 ```bash
 npx skills add olshansk/agent-skills
-```text
+```
 
 Run:
 
 ```bash
 /session-commit
-```text
+```
 
 </details>
-````

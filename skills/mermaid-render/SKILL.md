@@ -27,20 +27,20 @@ Every time you generate or modify mermaid code, immediately render and display i
 
 **Write the mermaid code:**
 
-````bash
+```bash
 cat > /tmp/mermaid-diagram.mmd << 'MERMAID'
 graph TD
     A[Start] --> B{Decision}
     B -->|Yes| C[Action]
     B -->|No| D[End]
 MERMAID
-```text
+```
 
 **Render:**
 
 ```bash
 "${CLAUDE_SKILL_DIR}/scripts/render.sh" /tmp/mermaid-diagram.mmd
-```text
+```
 
 The script outputs `Rendered: <path>` and `View: <command>`. **Always print the `View:` command for the user** so they can copy-paste it to see the diagram inline. Claude Code's Bash tool captures stdout, so inline images won't display automatically.
 
@@ -52,7 +52,7 @@ On first use, check that `mmdc` is available:
 
 ```bash
 which mmdc || echo "MISSING: Run 'npm install -g @mermaid-js/mermaid-cli'"
-```text
+```
 
 The display command (`imgcat` or `kitten icat`) is detected automatically based on `$TERM_PROGRAM`. No manual setup needed — the script falls back to `open` if neither is available.
 
@@ -70,15 +70,15 @@ The `render.sh` script handles rendering with sensible defaults. It supports the
 
 ```bash
 "${CLAUDE_SKILL_DIR}/scripts/render.sh" /tmp/mermaid-diagram.mmd --theme dark
-```text
+```
 
 ```bash
 "${CLAUDE_SKILL_DIR}/scripts/render.sh" /tmp/mermaid-diagram.mmd --width 2400
-```text
+```
 
 ```bash
 "${CLAUDE_SKILL_DIR}/scripts/render.sh" /tmp/mermaid-diagram.mmd --output ~/Desktop/diagram.png
-```text
+```
 
 ## Iteration Rules
 
@@ -100,7 +100,7 @@ The `render.sh` script handles rendering with sensible defaults. It supports the
 A[Rectangle]    B(Rounded)    C{Diamond}
 D((Circle))     E[[Subroutine]]   F[(Database)]
 G>Asymmetric]   H{{Hexagon}}  I[/Parallelogram/]
-```text
+```
 
 ### Link Styles
 
@@ -111,7 +111,7 @@ A -.-> B          Dotted arrow
 A ==> B           Thick arrow
 A -->|label| B    Arrow with label
 A -- text --> B   Arrow with text (alternate)
-```text
+```
 
 ### Subgraphs
 
@@ -119,7 +119,7 @@ A -- text --> B   Arrow with text (alternate)
 subgraph Title
     A --> B
 end
-```text
+```
 
 ### Styling
 
@@ -127,7 +127,7 @@ end
 style A fill:#f9f,stroke:#333,stroke-width:2px
 classDef highlight fill:#ff0,stroke:#333
 class A,B highlight
-```text
+```
 
 ### Themes
 
@@ -146,7 +146,7 @@ sequenceDiagram
     A->>+B: Request
     B-->>-A: Response
     Note over A,B: Handshake complete
-```text
+```
 
 ### State Diagram
 
@@ -156,13 +156,13 @@ stateDiagram-v2
     Idle --> Processing: start
     Processing --> Done: finish
     Done --> [*]
-```text
+```
 
 ### Entity Relationship
 
 ```text
 erDiagram
-```text
+```
 
 ### Class Diagram
 
@@ -172,5 +172,4 @@ classDiagram
         +String name
         +makeSound()
     }
-```text
-````
+```

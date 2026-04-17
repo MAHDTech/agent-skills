@@ -10,12 +10,6 @@ My personal and public agent skills.
 
 ## Available Skills
 
-### [cmd-email-md](skills/cmd-email-md/SKILL.md)
-
-**Description**: Convert markdown to email-safe HTML with inline styles and cross-client compatibility. Use when writing newsletters, transactional emails, or any HTML email from markdown source.
-
-**Triggers**: -
-
 ### [cmd-follow-up](skills/cmd-follow-up/SKILL.md)
 
 **Description**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
