@@ -12,7 +12,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - id: setup_devenv
         name: Setup Devenv
