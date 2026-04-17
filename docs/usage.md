@@ -16,13 +16,12 @@ Example triggers:
 
 If you add or modify skills, run the sync script to update `README.md` and `AGENTS.md`:
 
-````bash
+```bash
 bun run sync-skills
-```text
+```
 
 This is also enforced as a pre-commit hook if you use `devenv`.
 
 ## Development
 
 Use `devenv shell` to enter the development environment with all required tools (Bun, Zola, etc.).
-````
