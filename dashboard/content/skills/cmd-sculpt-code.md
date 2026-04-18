@@ -1,7 +1,7 @@
 +++
 title = "cmd-sculpt-code"
 description = "Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false

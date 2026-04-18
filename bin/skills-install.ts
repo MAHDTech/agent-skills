@@ -12,11 +12,13 @@ import fs from "fs-extra"
 import path from "path"
 import os from "os"
 import {execSync} from "child_process"
+import {glob} from "glob"
 
 async function install() {
     intro("🥒 Agent Skills Installer")
 
-    const AGENT_SKILLS_HOME = process.cwd()
+    const AGENT_SKILLS_HOME =
+        process.env.AGENT_SKILLS_HOME || path.resolve(__dirname, "..")
     const shell = process.env.SHELL || "/bin/bash"
     const rcFile = shell.includes("zsh") ? ".zshrc" : ".bashrc"
     const rcPath = path.join(os.homedir(), rcFile)
@@ -57,21 +59,27 @@ async function install() {
     s.start("Linking skills...")
 
     const skillsDir = path.join(AGENT_SKILLS_HOME, "skills")
-    const skillFolders = await fs.readdir(skillsDir)
+    const skillFiles = await glob("**/SKILL.md", {cwd: skillsDir})
 
     const targets: Record<string, string> = {
-        gemini: path.join(os.homedir(), ".agents", "skills"),
-        claude: path.join(os.homedir(), ".claude", "skills"),
-        opencode: path.join(os.homedir(), ".config", "opencode", "skills"),
+        gemini:
+            process.env.AGENT_SKILLS_HOME_GEMINI_CLI ||
+            path.join(os.homedir(), ".agents", "skills"),
+        claude:
+            process.env.AGENT_SKILLS_HOME_CLAUDE_CODE ||
+            path.join(os.homedir(), ".claude", "skills"),
+        opencode:
+            process.env.AGENT_SKILLS_HOME_OPENCODE ||
+            path.join(os.homedir(), ".config", "opencode", "skills"),
     }
 
     for (const cli of selectedCLIs) {
         const targetBase = targets[cli]
         await fs.ensureDir(targetBase)
 
-        for (const skillName of skillFolders) {
-            const skillPath = path.join(skillsDir, skillName)
-            if (!(await fs.stat(skillPath)).isDirectory()) continue
+        for (const skillFile of skillFiles) {
+            const skillPath = path.dirname(path.join(skillsDir, skillFile))
+            const skillName = path.basename(skillPath)
 
             const targetPath = path.join(targetBase, skillName)
 

@@ -1,14 +1,16 @@
 +++
 title = "cmd-latest-msg"
 description = "Store or retrieve the latest agent message to /tmp/agents/{agent}/"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Latest Message <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Latest Message
 
 Persist the last agent message to disk for cross-agent visibility.
 

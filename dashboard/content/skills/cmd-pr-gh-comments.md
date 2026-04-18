@@ -1,14 +1,16 @@
 +++
 title = "cmd-pr-gh-comments"
 description = "Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Tend to GitHub PR Comments <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Tend to GitHub PR Comments
 
 Pull all review comments from the current branch's PR, build a plan to address each one, align with the developer, then execute.
 

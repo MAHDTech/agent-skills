@@ -1,14 +1,16 @@
 +++
 title = "cmd-pr-description"
 description = "Generate a PR title and description, then commit, create/update the PR on approval"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Quick PR Description <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Quick PR Description
 
 Generate a concise PR description by analyzing the diff against a base branch.
 

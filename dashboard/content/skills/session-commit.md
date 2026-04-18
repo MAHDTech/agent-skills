@@ -1,7 +1,7 @@
 +++
 title = "session-commit"
 description = "Capture learnings from the current coding session and update AGENTS.md. Use when the user asks to close the loop, run session-commit, record best practices, or update agent instructions based on recent work."
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false

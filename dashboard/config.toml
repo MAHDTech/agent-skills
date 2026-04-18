@@ -6,7 +6,12 @@ output_dir = "public"
 
 [markdown]
 insert_anchor_links = "heading"
-# highlighting = { code = true }
+render_emoji = true
+smart_punctuation = true
+
+[markdown.highlighting]
+code = true
+theme = "dracula"
 
 [extra]
 author = "MAHDTech"

@@ -4,7 +4,9 @@ description: Generate a PR title and description, then commit, create/update the
 disable-model-invocation: false
 ---
 
-# Quick PR Description <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Quick PR Description
 
 Generate a concise PR description by analyzing the diff against a base branch.
 

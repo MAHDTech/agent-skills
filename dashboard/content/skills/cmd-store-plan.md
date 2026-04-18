@@ -1,14 +1,16 @@
 +++
 title = "cmd-store-plan"
 description = "Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on \"store this plan\", \"save this plan for later\", \"document this for later\", \"write up what we discussed\", \"create a plan file\", or \"/cmd-store-plan\"."
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Store Plan <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Store Plan
 
 Capture the current conversation into a structured, reviewable plan file.
 
@@ -84,7 +86,9 @@ Examples:
 ### Header Block
 
 ```markdown
-# {Title} <!-- omit in toc -->
+<!-- omit in toc -->
+
+# {Title}
 
 Date: YYYY-MM-DD
 Source: conversation with Claude
@@ -217,7 +221,9 @@ Use colored circles consistently as indicators in lists:
 ## Example Output
 
 ```markdown
-# QC Cache Redesign <!-- omit in toc -->
+<!-- omit in toc -->
+
+# QC Cache Redesign
 
 Date: 2026-04-02
 Source: conversation with Claude

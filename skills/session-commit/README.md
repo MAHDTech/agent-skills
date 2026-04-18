@@ -1,10 +1,9 @@
-<!-- markdownlint-disable MD033 -->
-
 > [!TIP]
 > Close the loop after every coding session with one skill.
 > Keep `AGENTS.md` current so every agent and teammate starts from shared project memory.
 
-# session-commit <!-- omit in toc -->
+<!-- omit in toc -->
+# session-commit
 
 > [!NOTE]
 > **Early traction:** Teams using multi-agent workflows report less repeated
@@ -12,7 +11,8 @@
 >
 > "We made this part of our end-of-session routine and handoffs got cleaner." - Maya L., OSS maintainer
 
-## Table of Contents <!-- omit in toc -->
+<!-- omit in toc -->
+## Table of Contents
 
 - [Quickstart](#quickstart)
 - [At A Glance](#at-a-glance)
@@ -56,7 +56,7 @@ Gemini CLI -- `gemini extensions install https://github.com/olshansk/agent-skill
 OpenCode -- `npx skills add olshansk/agent-skills` -- `/session-commit`
 
 <details>
-<summary><h3 id="codex-cli">Codex CLI</h3></summary>
+<summary><b>Codex CLI</b></summary>
 
 Install:
 
@@ -73,7 +73,7 @@ Run:
 </details>
 
 <details>
-<summary><h3 id="claude-code">Claude Code</h3></summary>
+<summary><b>Claude Code</b></summary>
 
 Add marketplace:
 
@@ -109,7 +109,7 @@ Remove:
 </details>
 
 <details>
-<summary><h3 id="gemini-cli">Gemini CLI</h3></summary>
+<summary><b>Gemini CLI</b></summary>
 
 Install:
 
@@ -138,7 +138,7 @@ gemini extensions uninstall agent-skills
 </details>
 
 <details>
-<summary><h3 id="opencode">OpenCode</h3></summary>
+<summary><b>OpenCode</b></summary>
 
 Install:
 

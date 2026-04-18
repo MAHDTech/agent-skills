@@ -148,7 +148,9 @@ in
             MD033 = {
               allowed_elements = [
                 "a"
+                "b"
                 "br"
+                "h3"
                 "nobr"
                 "pre"
                 "sup"

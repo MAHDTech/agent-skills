@@ -4,7 +4,9 @@ description: Prime the agent with a behavioral persona for the conversation
 disable-model-invocation: false
 ---
 
-# Persona <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Persona
 
 Adopt a behavioral persona for this conversation. Changes how you communicate, what you prioritize, and what you avoid.
 

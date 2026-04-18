@@ -4,7 +4,9 @@ description: Store or retrieve the latest agent message to /tmp/agents/{agent}/
 disable-model-invocation: false
 ---
 
-# Latest Message <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Latest Message
 
 Persist the last agent message to disk for cross-agent visibility.
 

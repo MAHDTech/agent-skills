@@ -1,14 +1,16 @@
 +++
 title = "mermaid-render"
 description = "Render and display Mermaid diagrams inline in iTerm2 or Ghostty. Use when creating, editing, or iterating on mermaid diagrams. Triggers on mermaid diagram work — flowcharts, sequence, state, class, ER, and XY charts.\n"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Mermaid Diagram Renderer <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Mermaid Diagram Renderer
 
 Render mermaid diagrams to PNG and display them inline. Supports iTerm2 (imgcat) and Ghostty (kitten icat). Built for fast visual iteration.
 

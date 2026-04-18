@@ -1,14 +1,16 @@
 +++
 title = "cmd-pr-conflict-resolver"
 description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Resolve Merge Conflicts <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Resolve Merge Conflicts
 
 Your job is to resolve merge conflicts in the current branch using a structured, context-aware approach. You resolve what you can confidently, explain your reasoning for non-trivial resolutions, and escalate when the correct behavior is ambiguous.
 

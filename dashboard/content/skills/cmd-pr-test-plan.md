@@ -1,7 +1,7 @@
 +++
 title = "cmd-pr-test-plan"
 description = "Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false

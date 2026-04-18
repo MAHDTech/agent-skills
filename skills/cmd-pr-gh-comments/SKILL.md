@@ -4,7 +4,9 @@ description: Triage and resolve GitHub PR review comments with categorized actio
 disable-model-invocation: false
 ---
 
-# Tend to GitHub PR Comments <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Tend to GitHub PR Comments
 
 Pull all review comments from the current branch's PR, build a plan to address each one, align with the developer, then execute.
 

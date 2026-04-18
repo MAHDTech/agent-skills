@@ -3,7 +3,10 @@ import path from "path"
 import yaml from "js-yaml"
 import {glob} from "glob"
 
-const SKILLS_DIR = path.join(process.cwd(), "skills")
+const SKILLS_DIR = path.join(
+    process.env.AGENT_SKILLS_HOME || path.resolve(__dirname, ".."),
+    "skills"
+)
 
 async function lint() {
     console.log("Linting skills...")
@@ -37,11 +40,11 @@ async function lint() {
             const folderName = path.dirname(file)
             if (folderName !== "." && folderName !== metadata.name) {
                 // If it's in a subdirectory, the folder name should match the skill name
-                // but we have a flat-ish structure now: skills/name/SKILL.md
-                // so dirname(file) is 'name'
-                if (folderName !== metadata.name) {
+                // For nested: dirname could be "category/name" so we need basename!
+                const baseName = path.basename(folderName)
+                if (baseName !== metadata.name) {
                     console.warn(
-                        `⚠️ ${file}: Folder name '${folderName}' does not match skill name '${metadata.name}'.`
+                        `⚠️ ${file}: Folder base name '${baseName}' does not match skill name '${metadata.name}'.`
                     )
                 }
             }

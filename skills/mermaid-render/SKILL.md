@@ -7,7 +7,9 @@ description: >
 allowed-tools: Read Write Edit Bash
 ---
 
-# Mermaid Diagram Renderer <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Mermaid Diagram Renderer
 
 Render mermaid diagrams to PNG and display them inline. Supports iTerm2 (imgcat) and Ghostty (kitten icat). Built for fast visual iteration.
 

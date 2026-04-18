@@ -1,7 +1,7 @@
 +++
 title = "cmd-scope-sweep"
 description = "Final pass to identify missed items, edge cases, and risks before considering a scope done"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false

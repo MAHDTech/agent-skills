@@ -1,14 +1,16 @@
 +++
 title = "cmd-local-repo-skills"
 description = "Scaffold cross-tool repo-local skills and agent instructions with canonical source in .agents/ and symlinks for Claude, Codex, Gemini, and Codex-home"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false
 +++
 
 
-# Repo-Local Skill Manager <!-- omit in toc -->
+<!-- omit in toc -->
+
+# Repo-Local Skill Manager
 
 Create or refactor repo-local skills and agent instructions that work across Claude, Codex, Gemini, and Codex-home using a single canonical source in `.agents/`.
 
@@ -110,7 +112,7 @@ Check if entries already exist, then add as needed:
 grep -n "AGENTS.md\|CLAUDE.md\|GEMINI.md" .gitignore 2>/dev/null
 ```
 
-Append the agent instructions block from the [gitignore template](#gitignore-block-template) if not present.
+Append the agent instructions block from the **Gitignore block template** below if not present.
 
 ## Phase 2b: Scaffold the Skill
 
@@ -183,7 +185,7 @@ grep "<name>" .gitignore
 
 **Step 3 — Append or insert the whitelist block.**
 
-If NO `skills/` section exists, append the full block from the [gitignore template](#gitignore-block-template).
+If NO `skills/` section exists, append the full block from the **Gitignore block template** below.
 
 If a `skills/` section already exists (adding a 2nd+ skill), only add the NEW skill-specific lines. The base rules (`skills/`, `!.agents/skills/`, `!.claude/skills`, `!.codex/skills`, `!.codex-home/skills`) already exist — do NOT duplicate them. Insert the new lines after the last entry:
 
@@ -246,9 +248,11 @@ Skill: <name>
 Gitignore: ✅ updated
 ```
 
+<!-- omit in toc -->
+
 ## Templates
 
-### SKILL.md frontmatter template <!-- omit in toc -->
+### SKILL.md frontmatter template
 
 ```text
  ---
@@ -260,10 +264,14 @@ Gitignore: ✅ updated
  # Skill Title <!-- omit in toc -->
 ```
 
-### AGENTS.md skeleton template <!-- omit in toc -->
+<!-- omit in toc -->
+
+### AGENTS.md skeleton template
 
 ````markdown
-# AGENTS.md <!-- omit in toc -->
+<!-- omit in toc -->
+
+# AGENTS.md
 
 ## Project Overview
 
@@ -273,13 +281,15 @@ Gitignore: ✅ updated
 
 - Key commands and workflows
 
-### Gitignore block template <!-- omit in toc -->
+### Gitignore block template
 
 Full block for agent instructions (add once per repo):
 
 ```gitignore
 # Agent instructions
+
 # Canonical source: .agents/AGENTS.md — tool-specific files are symlinks
+
 !.agents/
 !.agents/AGENTS.md
 ```
@@ -288,14 +298,18 @@ Full block for the first skill in a repo (replace `<name>` with the skill name):
 
 ```gitignore
 # Skills
+
 # Default: ignore generic skills/ trees from external skill repos.
+
 # Exception: keep repo-local cross-tool skills tracked via per-skill symlinks.
+
 skills/
 !.agents/skills/
 !.agents/skills/<name>/
 !.agents/skills/<name>/SKILL.md
 .agents/skills/<name>/evals/
 # Per-skill symlinks — track each symlink so all tools discover the skill
+
 !.claude/skills/
 !.claude/skills/<name>
 !.codex/skills/
@@ -315,7 +329,9 @@ For additional skills, append only the new skill-specific lines:
 !.codex-home/skills/<name>
 ```
 
-### Symlink commands template <!-- omit in toc -->
+<!-- omit in toc -->
+
+### Symlink commands template
 
 Agent instructions setup (run once per repo):
 

@@ -1,5 +1,5 @@
-# Ignore WIP.
-TEMP/
+# Ignore scratch files
+scratch/
 
 # Devenv
 .devenv*

@@ -30,6 +30,7 @@ iseconds
 jetbrainsmono
 mahd
 makefiles
+misconfig
 mmdc
 mocharc
 mtimes

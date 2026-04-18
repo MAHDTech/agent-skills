@@ -1,7 +1,7 @@
 +++
 title = "cmd-pr-build-context"
 description = "Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions"
-date = 2026-04-17
+date = 2026-04-18
 [extra]
 triggers = []
 mermaid = false

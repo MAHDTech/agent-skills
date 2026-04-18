@@ -4,7 +4,8 @@ import yaml from "js-yaml"
 import {glob} from "glob"
 import {execSync} from "child_process"
 
-const AGENT_SKILLS_HOME = process.env.AGENT_SKILLS_HOME || process.cwd()
+const AGENT_SKILLS_HOME =
+    process.env.AGENT_SKILLS_HOME || path.resolve(__dirname, "..")
 const SKILLS_DIR = path.join(AGENT_SKILLS_HOME, "skills")
 const AGENTS_FILE = path.join(AGENT_SKILLS_HOME, "agents", "AGENTS.md")
 const README_FILE = path.join(AGENT_SKILLS_HOME, "README.md")
