@@ -256,6 +256,10 @@ in
       description = "Build dashboard";
       exec = "bun run build:dashboard";
     };
+    serve-dashboard = {
+      description = "Serve dashboard locally";
+      exec = "bun run serve:dashboard";
+    };
     codeql-run = {
       package = pkgs.bash;
       description = "Run CodeQL static analysis locally.";
