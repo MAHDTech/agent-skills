@@ -5,6 +5,7 @@ description: Single source of truth for agent instructions
 
 # Available Skills
 
+- **cmd-devenv**: Strict guidelines for using devenv for shell and dependency management
 - **cmd-follow-up**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 - **cmd-gh-issue**: Create structured GitHub issues from conversation context using gh CLI
 - **cmd-idiot-proof-docs**: Simplify documentation for clarity and readability with approval-gated edits

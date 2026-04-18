@@ -4,6 +4,7 @@
     "type": "module",
     "private": true,
     "scripts": {
+        "setup": "bun run bin/skills-install.ts",
         "skills-install": "bun run bin/skills-install.ts",
         "skills-sync": "bun run bin/skills-sync.ts",
         "skills-lint": "bun run bin/skills-lint.ts",
@@ -13,8 +14,6 @@
     },
     "devDependencies": {
         "@types/bun": "latest",
-        "@types/fs-extra": "11.0.4",
-        "@types/glob": "9.0.0",
         "@types/js-yaml": "4.0.9",
         "@types/node": "25.6.0"
     },

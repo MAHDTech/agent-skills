@@ -10,6 +10,12 @@ My personal and public agent skills.
 
 ## Available Skills
 
+### [cmd-devenv](skills/cmd-devenv/SKILL.md)
+
+**Description**: Strict guidelines for using devenv for shell and dependency management
+
+**Triggers**: when using devenv, when running commands in a devenv environment, when you see a devenv.nix or devenv.yaml file
+
 ### [cmd-follow-up](skills/cmd-follow-up/SKILL.md)
 
 **Description**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements

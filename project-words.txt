@@ -5,6 +5,7 @@ antipatterns
 arcsize
 blockquotes
 bluf
+bunx
 cachix
 checkboxed
 cheatsheet
