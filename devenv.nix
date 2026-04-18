@@ -12,6 +12,7 @@ let
 
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [
+    codeql
     figlet
     git
     hello
