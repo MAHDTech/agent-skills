@@ -38,7 +38,6 @@ in
       "nix-community"
       "pre-commit-hooks"
     ];
-    push = "salt-labs";
   };
 
   devenv = lib.mkIf isNative {
