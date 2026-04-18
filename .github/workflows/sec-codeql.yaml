@@ -99,3 +99,13 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "CI Results"
+          jobs: |
+            Init CodeQL|${{ steps.init_codeql.outcome }}
+            Analyze CodeQL (${{ matrix.language }})|${{ steps.analyze_codeql.outcome }}

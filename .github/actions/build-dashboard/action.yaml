@@ -7,7 +7,7 @@ runs:
     - id: sync_skills
       name: Sync Skills
       shell: bash
-      run: devenv shell sync-skills
+      run: devenv shell skills-sync
 
     - id: build_css
       name: Build CSS

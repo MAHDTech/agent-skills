@@ -46,4 +46,4 @@ skills/<skill-name>/
 1. **Concise Description**: The description is used in the README and dashboard. Keep it under 200 characters.
 2. **Clear Triggers**: Triggers help agents understand when to invoke the skill.
 3. **Non-Interactive Scripts**: Ensure all scripts in `scripts/` can run without user input.
-4. **Validation**: Run `bun run sync-skills` after creating a skill to verify it's correctly integrated.
+4. **Validation**: Run `bun run skills-sync` after creating a skill to verify it's correctly integrated.

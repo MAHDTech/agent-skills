@@ -115,3 +115,13 @@ jobs:
           repository: ${{ github.repository }}
           sha: ${{ github.sha }}
           run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "CI Results"
+          jobs: |
+            Trivy Scan|${{ steps.trivy_scan.outcome }}
+            SARIF Upload|${{ steps.trivy_upload.outcome }}

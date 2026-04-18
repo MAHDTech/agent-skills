@@ -8,7 +8,7 @@ The project follows the "Agent Skills" pattern, using Markdown files with YAML f
 
 ```text
 agents/                       # Global agent instructions (AGENTS.md, MEMORIES.md)
-bin/                          # Core scripts (sync-skills.ts, install.ts)
+bin/                          # Core scripts (skills-sync.ts, skills-install.ts, skills-lint.ts)
 dashboard/                    # Zola source for the skills dashboard
   content/                    # Automatically generated from skills/
   themes/tars-dashboards/     # Custom Zola theme with Tailwind CSS v4
@@ -34,10 +34,10 @@ skills/                       # Individual skill directories (flat structure)
 ## Quick Commands
 
 ```bash
-bun run sync-skills           # Update AGENTS.md and README.md manifests
-bun run lint                  # Verify skill frontmatter and structure
+bun run skills-sync           # Update AGENTS.md and README.md manifests
+bun run skills-lint           # Verify skill frontmatter and structure
 bun run build:dashboard       # Sync, build CSS, and generate Zola site
-bun run setup                 # Interactive TUI for local installation
+bun run skills-install        # Interactive TUI for local installation
 ```
 
 ## Skill Standards

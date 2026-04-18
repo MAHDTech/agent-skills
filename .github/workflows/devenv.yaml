@@ -99,27 +99,27 @@ jobs:
         run: |
           devenv test
 
-      - id: devenv_status
-        name: Devenv status
+      - id: report_status
+        name: Report Status
         if: always()
-        shell: devenv shell --quiet bash -- -e {0}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [[ ${{ steps.devenv_test.outcome }} == 'success' ]];
-          then
-            RESULT="success"
-            DESCRIPTION="Devenv test passed!"
-          else
-            RESULT="failure"
-            DESCRIPTION="Devenv test failed!"
-          fi
-          gh api \
-            repos/${{ github.repository }}/statuses/${{ github.sha }} \
-            -f state=${RESULT} \
-            -f context="${{ github.workflow }}" \
-            -f description="${DESCRIPTION}" \
-            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || {
-              echo "Failed to report devenv status!"
-              exit 1
-            }
+        uses: ./.github/actions/report-status
+        with:
+          result: ${{ steps.devenv_test.outcome }}
+          success-message: "Devenv test passed!"
+          failure-message: "Devenv test failed!"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-name: ${{ github.workflow }}
+          repository: ${{ github.repository }}
+          sha: ${{ github.sha }}
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "CI Results"
+          jobs: |
+            Install Nix|${{ steps.install_nix.outcome }}
+            Devenv Install|${{ steps.devenv_install.outcome }}
+            Devenv Test|${{ steps.devenv_test.outcome }}

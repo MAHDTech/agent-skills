@@ -18,6 +18,7 @@ direnv
 dockerfiles
 edgecase
 endmacro
+esac
 evals
 flexbox
 frontmatter

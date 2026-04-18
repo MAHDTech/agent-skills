@@ -17,7 +17,7 @@ Example triggers:
 If you add or modify skills, run the sync script to update `README.md` and `AGENTS.md`:
 
 ```bash
-bun run sync-skills
+bun run skills-sync
 ```
 
 This is also enforced as a pre-commit hook if you use `devenv`.

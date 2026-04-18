@@ -1,0 +1,71 @@
+name: Step Summary
+description: Write a standardized step summary to GITHUB_STEP_SUMMARY.
+
+inputs:
+  title:
+    description: "The title of the summary"
+    required: false
+    default: "CI Results"
+  jobs:
+    description: "A multiline string of 'Step Name|outcome' pairs"
+    required: true
+  footer:
+    description: "Markdown string to append below the table"
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - id: write_summary
+      name: Write Results Summary
+      shell: bash
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_HEAD: ${{ github.head_ref }}
+        PR_BASE: ${{ github.base_ref }}
+        TITLE: ${{ inputs.title }}
+        JOBS: ${{ inputs.jobs }}
+        FOOTER: ${{ inputs.footer }}
+      run: |
+        status_emoji() {
+          case "$1" in
+            success)   echo "✅" ;;
+            failure)   echo "❌" ;;
+            cancelled) echo "⛔" ;;
+            skipped)   echo "⏭️" ;;
+            *)         echo "⏳" ;;
+          esac
+        }
+
+        {
+          echo "## $TITLE"
+          echo ""
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "> **PR #${PR_NUMBER}** — ${PR_TITLE}"
+            echo "> _${PR_HEAD} → ${PR_BASE}_"
+            echo ""
+          fi
+
+          if [ -n "$JOBS" ]; then
+            echo "| Step | Status |"
+            echo "|-----|--------|"
+
+            echo "$JOBS" | while IFS='|' read -r step_name status; do
+              # Trim whitespace
+              step_name=$(echo "$step_name" | xargs)
+              status=$(echo "$status" | xargs)
+
+              if [[ -z "$step_name" ]]; then continue; fi
+              emoji=$(status_emoji "$status")
+              echo "| $step_name | $emoji $status |"
+            done
+          fi
+
+          if [ -n "$FOOTER" ]; then
+            echo ""
+            echo "---"
+            echo -e "$FOOTER"
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"

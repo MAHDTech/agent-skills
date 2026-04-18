@@ -230,15 +230,15 @@ in
   };
 
   scripts = {
-    sync-skills = {
+    skills-sync = {
       description = "Synchronize skill files";
       exec = "bun run bin/skills-sync.ts";
     };
-    install-skills = {
+    skills-install = {
       description = "Install skills";
       exec = "bun run bin/skills-install.ts";
     };
-    lint = {
+    skills-lint = {
       description = "Lint skills";
       exec = "bun run bin/skills-lint.ts";
     };

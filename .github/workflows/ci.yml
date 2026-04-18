@@ -6,6 +6,12 @@ on:
       - trunk
       - main
 
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+  statuses: write
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -28,3 +34,28 @@ jobs:
       - id: build_dashboard
         name: Build Dashboard
         uses: ./.github/actions/build-dashboard
+
+      - id: report_status
+        name: Report Status
+        if: always()
+        uses: ./.github/actions/report-status
+        with:
+          result: ${{ job.status }}
+          success-message: "CI validation passed"
+          failure-message: "CI validation failed"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-name: ${{ github.workflow }}
+          repository: ${{ github.repository }}
+          sha: ${{ github.sha }}
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "CI Results"
+          jobs: |
+            Setup Devenv|${{ steps.setup_devenv.outcome }}
+            Run Lint|${{ steps.run_lint.outcome }}
+            Build Dashboard|${{ steps.build_dashboard.outcome }}
