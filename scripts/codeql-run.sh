@@ -27,7 +27,7 @@ DB_DIR="${PROJECT_ROOT}/.codeql-db"
 RESULTS_DIR="${PROJECT_ROOT}/.codeql-results"
 
 # Languages to scan (matching CI matrix, minus 'actions' which is GitHub-only)
-ALL_LANGUAGES=("javascript-typescript" "rust")
+ALL_LANGUAGES=("javascript-typescript")
 
 # Colors
 RED='\033[0;31m'

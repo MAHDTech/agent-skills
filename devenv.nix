@@ -18,8 +18,9 @@ let
     hello
     jq
     pagefind
-    tailwindcss_4
     ripgrep
+    tailwindcss_4
+    trivy
     zola
   ];
 in
@@ -194,6 +195,11 @@ in
         pass_filenames = false;
       };
       trim-trailing-whitespace = {
+        enable = true;
+        excludes = [
+        ];
+      };
+      trufflehog = {
         enable = true;
         excludes = [
         ];

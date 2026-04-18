@@ -2,7 +2,7 @@ import fs from "fs-extra"
 import path from "path"
 import yaml from "js-yaml"
 import {glob} from "glob"
-import {execSync} from "child_process"
+import {execFileSync} from "child_process"
 
 const AGENT_SKILLS_HOME =
     process.env.AGENT_SKILLS_HOME || path.resolve(__dirname, "..")
@@ -144,8 +144,9 @@ And select the skill from the interactive prompt.
 
     // 4. Git Add
     try {
-        execSync(
-            `git add ${AGENTS_FILE} ${README_FILE} ${DASHBOARD_CONTENT_DIR}`,
+        execFileSync(
+            "git",
+            ["add", AGENTS_FILE, README_FILE, DASHBOARD_CONTENT_DIR],
             {stdio: "inherit"}
         )
         console.log("Changes staged to git.")

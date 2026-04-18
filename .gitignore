@@ -5,9 +5,11 @@ scratch/
 .devenv*
 devenv.local.nix
 devenv.local.yaml
-
-# direnv
 .direnv
+
+# CodeQL
+.codeql-db/
+.codeql-results/
 
 # pre-commit
 .pre-commit-config.yaml
