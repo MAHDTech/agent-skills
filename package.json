@@ -13,7 +13,7 @@
     "devDependencies": {
         "@types/bun": "latest",
         "@types/fs-extra": "11.0.4",
-        "@types/glob": "8.1.0",
+        "@types/glob": "9.0.0",
         "@types/js-yaml": "4.0.9",
         "@types/node": "25.6.0"
     },
@@ -22,10 +22,8 @@
     },
     "dependencies": {
         "@clack/prompts": "1.2.0",
-        "@tailwindcss/cli": "^4.2.2",
         "fs-extra": "11.3.4",
         "glob": "13.0.6",
-        "js-yaml": "4.1.1",
-        "tailwindcss": "^4.2.2"
+        "js-yaml": "4.1.1"
     }
 }

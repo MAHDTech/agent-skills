@@ -16,9 +16,10 @@ let
     git
     hello
     jq
+    pagefind
+    tailwindcss_4
     ripgrep
     zola
-    pagefind
   ];
 in
 {
@@ -84,6 +85,9 @@ in
       enable = isNative;
       bun = {
         enable = true;
+        install = {
+          enable = true;
+        };
       };
       npm = {
         enable = false;
