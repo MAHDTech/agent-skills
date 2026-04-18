@@ -6,15 +6,15 @@ runs:
   steps:
     - id: sync_skills
       name: Sync Skills
-      shell: bash
-      run: devenv shell skills-sync
+      shell: devenv shell --quiet bash -- -e {0}
+      run: skills-sync
 
     - id: build_css
       name: Build CSS
-      shell: bash
-      run: devenv shell build-css
+      shell: devenv shell --quiet bash -- -e {0}
+      run: build-css
 
     - id: build_zola
       name: Build Zola
-      shell: bash
-      run: devenv shell build-dashboard
+      shell: devenv shell --quiet bash -- -e {0}
+      run: build-dashboard
