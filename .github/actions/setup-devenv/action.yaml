@@ -32,7 +32,7 @@ runs:
       name: Install Devenv
       shell: bash
       run: |
-        nix profile add --accept-flake-config nixpkgs#devenv
+        nix profile install --accept-flake-config nixpkgs#devenv
 
     - id: version_check
       name: Version Check
