@@ -249,6 +249,13 @@ in
       description = "Build dashboard";
       exec = "bun run build:dashboard";
     };
+    codeql-run = {
+      package = pkgs.bash;
+      description = "Run CodeQL static analysis locally.";
+      exec = ''
+        ./scripts/codeql-run.sh "$@"
+      '';
+    };
   };
 
   enterTest = ''
