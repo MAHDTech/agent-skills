@@ -1,7 +1,7 @@
 +++
 title = "cmd-idiot-proof-docs"
 description = "Simplify documentation for clarity and readability with approval-gated edits"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

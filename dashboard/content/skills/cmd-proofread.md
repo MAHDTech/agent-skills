@@ -1,7 +1,7 @@
 +++
 title = "cmd-proofread"
 description = "Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

@@ -1,9 +1,9 @@
 +++
 title = "cmd-devenv"
 description = "Strict guidelines for using devenv for shell and dependency management"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
-triggers = ["when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
+triggers = ["devenv","developer environment","when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
 mermaid = false
 +++
 
@@ -28,7 +28,6 @@ When working in a repository that utilizes `devenv`, you must strictly adhere to
   - It can be accessed via `devenv mcp` to run locally.
   - Or via the remote URL: `https://mcp.devenv.sh`
 - When no MCP server is available, use the LLMs text file at `https://devenv.sh/llms.txt` as a backup. This text file contains all the reference URLs to get the right information.
-- Additionally, check `.agents/*.txt` for relevant local documentation if needed.
 
 ## References
 

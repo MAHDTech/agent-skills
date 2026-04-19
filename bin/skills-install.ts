@@ -7,7 +7,10 @@ import {
     confirm,
     spinner,
     note,
+    isCancel,
+    cancel,
 } from "@clack/prompts"
+import {MultiSelectPrompt} from "@clack/core"
 import fs from "fs-extra"
 import path from "path"
 import os from "os"
@@ -41,7 +44,7 @@ async function install() {
         s.stop("Shell config updated.")
     }
 
-    const selectedCLIs = (await multiselect({
+    const p = new MultiSelectPrompt({
         message: "Select the CLIs you want to link these skills to:",
         options: [
             {value: "gemini", label: "Gemini CLI", hint: "~/.agents/skills"},
@@ -53,7 +56,51 @@ async function install() {
             },
         ],
         required: true,
-    })) as string[]
+        render() {
+            if (this.state === "submit") {
+                const selectedLabels = this.options
+                    .filter((o) => this.value.includes(o.value))
+                    .map((o) => o.label)
+                    .join(", ")
+                return `\x1b[32m✔\x1b[0m Select the CLIs you want to link these skills to:\n   \x1b[90m${selectedLabels}\x1b[0m`
+            }
+            if (this.state === "cancel") {
+                return `\x1b[31m✖\x1b[0m Select the CLIs you want to link these skills to:\n   \x1b[90mCancelled\x1b[0m`
+            }
+
+            let out = `\x1b[36m?\x1b[0m Select the CLIs you want to link these skills to:\n`
+            out += this.options
+                .map((opt, i) => {
+                    const isSelected = this.value.includes(opt.value)
+                    const isHovered = this.cursor === i
+                    let label = opt.label
+                    let hint = opt.hint ? ` \x1b[90m(${opt.hint})\x1b[0m` : ""
+
+                    let prefix = ""
+                    if (isSelected) {
+                        prefix = `\x1b[32m✔\x1b[0m` // Green check
+                        label = `\x1b[32m${label}\x1b[0m` // Green label text
+                    } else {
+                        prefix = `\x1b[90m☐\x1b[0m` // Gray box
+                        label = `\x1b[90m${label}\x1b[0m` // Gray label text
+                    }
+
+                    const activeCursor = isHovered ? "\x1b[36m❯\x1b[0m " : "  "
+                    return `│ ${activeCursor}${prefix} ${label}${hint}`
+                })
+                .join("\n")
+
+            out += `\n│ \x1b[90mPress <space> to select, <enter> to submit\x1b[0m`
+            return out
+        },
+    })
+
+    const selectedCLIs = (await p.prompt()) as string[] | symbol
+
+    if (isCancel(selectedCLIs)) {
+        cancel("Installation cancelled.")
+        process.exit(1)
+    }
 
     const s = spinner()
     s.start("Linking skills...")

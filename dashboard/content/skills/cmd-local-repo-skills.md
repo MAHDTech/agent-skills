@@ -1,7 +1,7 @@
 +++
 title = "cmd-local-repo-skills"
 description = "Scaffold cross-tool repo-local skills and agent instructions with canonical source in .agents/ and symlinks for Claude, Codex, Gemini, and Codex-home"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

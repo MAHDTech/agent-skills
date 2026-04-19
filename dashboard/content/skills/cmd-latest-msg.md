@@ -1,7 +1,7 @@
 +++
 title = "cmd-latest-msg"
 description = "Store or retrieve the latest agent message to /tmp/agents/{agent}/"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

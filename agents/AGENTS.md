@@ -23,6 +23,7 @@ description: Single source of truth for agent instructions
 - **cmd-proofread**: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
 - **cmd-rfc-review**: Review RFCs for problem clarity, compliance, security, and performance using SCQA framework
 - **cmd-scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done
+- **cmd-scratchpad**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
 - **cmd-sculpt-code**: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
 - **cmd-store-plan**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
 - **mermaid-render**: Render and display Mermaid diagrams inline in iTerm2 or Ghostty. Use when creating, editing, or iterating on mermaid diagrams. Triggers on mermaid diagram work — flowcharts, sequence, state, class, ER, and XY charts.

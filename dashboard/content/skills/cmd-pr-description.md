@@ -1,7 +1,7 @@
 +++
 title = "cmd-pr-description"
 description = "Generate a PR title and description, then commit, create/update the PR on approval"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

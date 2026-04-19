@@ -1,7 +1,7 @@
 +++
 title = "cmd-productionize"
 description = "Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

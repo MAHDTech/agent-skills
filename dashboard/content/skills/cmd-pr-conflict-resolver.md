@@ -1,7 +1,7 @@
 +++
 title = "cmd-pr-conflict-resolver"
 description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

@@ -14,7 +14,7 @@ My personal and public agent skills.
 
 **Description**: Strict guidelines for using devenv for shell and dependency management
 
-**Triggers**: when using devenv, when running commands in a devenv environment, when you see a devenv.nix or devenv.yaml file
+**Triggers**: devenv, developer environment, when using devenv, when running commands in a devenv environment, when you see a devenv.nix or devenv.yaml file
 
 ### [cmd-follow-up](skills/cmd-follow-up/SKILL.md)
 
@@ -117,6 +117,12 @@ My personal and public agent skills.
 **Description**: Final pass to identify missed items, edge cases, and risks before considering a scope done
 
 **Triggers**: -
+
+### [cmd-scratchpad](skills/cmd-scratchpad/SKILL.md)
+
+**Description**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
+
+**Triggers**: create a temporary file, run a quick test, make a scratch script, create a test script, experiment with
 
 ### [cmd-sculpt-code](skills/cmd-sculpt-code/SKILL.md)
 

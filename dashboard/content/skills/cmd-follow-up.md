@@ -1,7 +1,7 @@
 +++
 title = "cmd-follow-up"
 description = "Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false

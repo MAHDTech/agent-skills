@@ -1,7 +1,7 @@
 +++
 title = "cmd-persona"
 description = "Prime the agent with a behavioral persona for the conversation"
-date = 2026-04-18
+date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false
