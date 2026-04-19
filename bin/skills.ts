@@ -287,10 +287,163 @@ async function linkSkills(quiet = false) {
 
     // We do NOT link commands here. OpenCode commands are meant to be injected via _config.command in a plugin.
 
+    await updateOpenCodeConfig()
+
     if (!quiet) {
         console.log(
             `✅ Synced skills to OpenCode (${added} linked, ${removed} old links removed).`
         )
+    }
+}
+
+interface OpenCodeConfig {
+    instructions?: string[]
+    [key: string]: any
+}
+
+interface AgentSkillsState {
+    current_home: string
+    historical_homes: string[]
+    managed_instructions: string[]
+}
+
+const STATE_FILE = path.join(
+    os.homedir(),
+    ".config",
+    "opencode",
+    "agent-skills.json"
+)
+const OPENCODE_CONFIG_FILE = path.join(
+    os.homedir(),
+    ".config",
+    "opencode",
+    "opencode.json"
+)
+
+async function getState(): Promise<AgentSkillsState> {
+    if (await fs.pathExists(STATE_FILE)) {
+        try {
+            return await fs.readJson(STATE_FILE)
+        } catch (e) {
+            // Ignore parse error, return default
+        }
+    }
+    return {
+        current_home: AGENT_SKILLS_HOME,
+        historical_homes: [],
+        managed_instructions: [],
+    }
+}
+
+async function saveState(state: AgentSkillsState) {
+    await fs.ensureDir(path.dirname(STATE_FILE))
+    await fs.writeJson(STATE_FILE, state, {spaces: 2})
+}
+
+async function updateOpenCodeConfig() {
+    const state = await getState()
+    const targetAgentsFile = path.join(AGENT_SKILLS_HOME, "agents", "AGENTS.md")
+
+    // Detect if the repo was moved
+    if (state.current_home !== AGENT_SKILLS_HOME) {
+        if (!state.historical_homes.includes(state.current_home)) {
+            state.historical_homes.push(state.current_home)
+        }
+        state.current_home = AGENT_SKILLS_HOME
+    }
+
+    const newInstructions = [targetAgentsFile]
+
+    // Update opencode.json
+    if (await fs.pathExists(OPENCODE_CONFIG_FILE)) {
+        try {
+            const configContent = await fs.readFile(
+                OPENCODE_CONFIG_FILE,
+                "utf8"
+            )
+            // simple read to preserve comments/formatting as much as possible if user used comments?
+            // standard JSON.parse is safer for modification
+            let config: OpenCodeConfig = {}
+            try {
+                config = JSON.parse(configContent)
+            } catch (e) {
+                console.warn(
+                    `⚠️ Could not parse ${OPENCODE_CONFIG_FILE}. Skipping instruction sync.`
+                )
+                return
+            }
+
+            let instructions = config.instructions || []
+
+            // Remove any instructions that we previously managed or that belong to historical homes
+            instructions = instructions.filter((inst) => {
+                if (state.managed_instructions.includes(inst)) return false
+                for (const historical of state.historical_homes) {
+                    if (inst.startsWith(historical)) return false
+                }
+                return true
+            })
+
+            // Add the new instructions if they aren't already there
+            for (const inst of newInstructions) {
+                if (!instructions.includes(inst)) {
+                    instructions.push(inst)
+                }
+            }
+
+            config.instructions = instructions
+            await fs.writeJson(OPENCODE_CONFIG_FILE, config, {spaces: 2})
+
+            // Update state
+            state.managed_instructions = newInstructions
+            await saveState(state)
+        } catch (e) {
+            console.error(`❌ Failed to update opencode.json`, e)
+        }
+    } else {
+        // If config doesn't exist, create a baseline
+        await fs.ensureDir(path.dirname(OPENCODE_CONFIG_FILE))
+        await fs.writeJson(
+            OPENCODE_CONFIG_FILE,
+            {
+                instructions: newInstructions,
+            },
+            {spaces: 2}
+        )
+        state.managed_instructions = newInstructions
+        await saveState(state)
+    }
+}
+
+async function cleanOpenCodeConfig() {
+    const state = await getState()
+
+    if (await fs.pathExists(OPENCODE_CONFIG_FILE)) {
+        try {
+            const config: OpenCodeConfig =
+                await fs.readJson(OPENCODE_CONFIG_FILE)
+            if (config.instructions) {
+                const filtered = config.instructions.filter((inst) => {
+                    if (state.managed_instructions.includes(inst)) return false
+                    if (inst.startsWith(AGENT_SKILLS_HOME)) return false
+                    for (const historical of state.historical_homes) {
+                        if (inst.startsWith(historical)) return false
+                    }
+                    return true
+                })
+
+                config.instructions = filtered
+                await fs.writeJson(OPENCODE_CONFIG_FILE, config, {spaces: 2})
+            }
+        } catch (e) {
+            console.warn(
+                `⚠️ Could not update instructions in ${OPENCODE_CONFIG_FILE}`
+            )
+        }
+    }
+
+    if (await fs.pathExists(STATE_FILE)) {
+        await fs.remove(STATE_FILE)
     }
 }
 
@@ -331,8 +484,10 @@ async function unlinkSkills() {
         }
     }
 
+    await cleanOpenCodeConfig()
+
     console.log(
-        `✅ Uninstalled ${removed} skills from OpenCode and legacy agent targets.`
+        `✅ Uninstalled ${removed} skills and cleaned global instructions.`
     )
 }
 
