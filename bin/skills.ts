@@ -241,7 +241,7 @@ async function linkSkills(quiet = false) {
     let removed = 0
     let added = 0
 
-    // Cleanup old symlinks
+    // Cleanup ALL symlinks in the opencode skills directory that point to ANY folder inside AGENT_SKILLS_HOME
     const existingEntries = await fs.readdir(opencodeTarget)
     for (const entry of existingEntries) {
         const entryPath = path.join(opencodeTarget, entry)
@@ -253,11 +253,8 @@ async function linkSkills(quiet = false) {
                     path.dirname(entryPath),
                     linkTarget
                 )
-                if (
-                    absoluteTarget.startsWith(SKILLS_DIR + path.sep) ||
-                    absoluteTarget === SKILLS_DIR ||
-                    absoluteTarget.startsWith(COMMANDS_DIR + path.sep)
-                ) {
+                // If the symlink points anywhere inside AGENT_SKILLS_HOME, remove it
+                if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
                     await fs.remove(entryPath)
                     removed++
                 }
@@ -312,11 +309,7 @@ async function unlinkSkills() {
                     path.dirname(entryPath),
                     linkTarget
                 )
-                if (
-                    absoluteTarget.startsWith(SKILLS_DIR + path.sep) ||
-                    absoluteTarget === SKILLS_DIR ||
-                    absoluteTarget.startsWith(COMMANDS_DIR + path.sep)
-                ) {
+                if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
                     await fs.remove(entryPath)
                     removed++
                 }
