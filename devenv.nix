@@ -209,6 +209,13 @@ in
         excludes = [
         ];
       };
+      tsc = {
+        enable = true;
+        name = "TypeScript Type Check";
+        entry = "bunx tsc --noEmit --project tsconfig.json";
+        files = "\\.ts$";
+        pass_filenames = false;
+      };
       yamllint = {
         enable = true;
         settings = {
