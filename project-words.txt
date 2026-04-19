@@ -12,6 +12,7 @@ cheatsheet
 colour
 contextlib
 contextmanager
+criticalthink
 dataclass
 dataclasses
 devenv
