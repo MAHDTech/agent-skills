@@ -129,7 +129,7 @@ async function sync() {
 
     // 1. Update agents/AGENTS.md
     if (await fs.pathExists(AGENTS_FILE)) {
-        let agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
+        const agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
         const agentsFrontmatterMatch = agentsContent.match(
             /^---\n([\s\S]*?)\n---\n/
         )
