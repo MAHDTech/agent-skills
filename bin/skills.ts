@@ -236,30 +236,38 @@ async function linkSkills(quiet = false) {
     const opencodeTarget =
         process.env.AGENT_SKILLS_HOME_OPENCODE ||
         path.join(os.homedir(), ".config", "opencode", "skills")
+
+    // Support cleaning up legacy ~/.agents/skills folder during sync as well
+    const legacyTarget = path.join(os.homedir(), ".agents", "skills")
+
     await fs.ensureDir(opencodeTarget)
 
     let removed = 0
     let added = 0
 
-    // Cleanup ALL symlinks in the opencode skills directory that point to ANY folder inside AGENT_SKILLS_HOME
-    const existingEntries = await fs.readdir(opencodeTarget)
-    for (const entry of existingEntries) {
-        const entryPath = path.join(opencodeTarget, entry)
-        try {
-            const stat = await fs.lstat(entryPath)
-            if (stat.isSymbolicLink()) {
-                const linkTarget = await fs.readlink(entryPath)
-                const absoluteTarget = path.resolve(
-                    path.dirname(entryPath),
-                    linkTarget
-                )
-                // If the symlink points anywhere inside AGENT_SKILLS_HOME, remove it
-                if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
-                    await fs.remove(entryPath)
-                    removed++
+    // Cleanup ALL symlinks in the opencode skills directory and legacy .agents directory that point to ANY folder inside AGENT_SKILLS_HOME
+    for (const target of [opencodeTarget, legacyTarget]) {
+        if (!(await fs.pathExists(target))) continue
+
+        const existingEntries = await fs.readdir(target)
+        for (const entry of existingEntries) {
+            const entryPath = path.join(target, entry)
+            try {
+                const stat = await fs.lstat(entryPath)
+                if (stat.isSymbolicLink()) {
+                    const linkTarget = await fs.readlink(entryPath)
+                    const absoluteTarget = path.resolve(
+                        path.dirname(entryPath),
+                        linkTarget
+                    )
+                    // If the symlink points anywhere inside AGENT_SKILLS_HOME, remove it
+                    if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
+                        await fs.remove(entryPath)
+                        removed++
+                    }
                 }
-            }
-        } catch (err) {}
+            } catch (err) {}
+        }
     }
 
     // Link Skills
@@ -287,37 +295,45 @@ async function linkSkills(quiet = false) {
 }
 
 async function unlinkSkills() {
+    // Opencode target
     const opencodeTarget =
         process.env.AGENT_SKILLS_HOME_OPENCODE ||
         path.join(os.homedir(), ".config", "opencode", "skills")
 
-    if (!(await fs.pathExists(opencodeTarget))) {
-        console.log("No OpenCode skills directory found.")
-        return
-    }
+    // Legacy agents target
+    const agentsTarget = path.join(os.homedir(), ".agents", "skills")
 
+    const targets = [opencodeTarget, agentsTarget]
     let removed = 0
 
-    const existingEntries = await fs.readdir(opencodeTarget)
-    for (const entry of existingEntries) {
-        const entryPath = path.join(opencodeTarget, entry)
-        try {
-            const stat = await fs.lstat(entryPath)
-            if (stat.isSymbolicLink()) {
-                const linkTarget = await fs.readlink(entryPath)
-                const absoluteTarget = path.resolve(
-                    path.dirname(entryPath),
-                    linkTarget
-                )
-                if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
-                    await fs.remove(entryPath)
-                    removed++
+    for (const target of targets) {
+        if (!(await fs.pathExists(target))) {
+            continue
+        }
+
+        const existingEntries = await fs.readdir(target)
+        for (const entry of existingEntries) {
+            const entryPath = path.join(target, entry)
+            try {
+                const stat = await fs.lstat(entryPath)
+                if (stat.isSymbolicLink()) {
+                    const linkTarget = await fs.readlink(entryPath)
+                    const absoluteTarget = path.resolve(
+                        path.dirname(entryPath),
+                        linkTarget
+                    )
+                    if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
+                        await fs.remove(entryPath)
+                        removed++
+                    }
                 }
-            }
-        } catch (err) {}
+            } catch (err) {}
+        }
     }
 
-    console.log(`✅ Uninstalled ${removed} skills from OpenCode.`)
+    console.log(
+        `✅ Uninstalled ${removed} skills from OpenCode and legacy agent targets.`
+    )
 }
 
 async function syncAction() {
