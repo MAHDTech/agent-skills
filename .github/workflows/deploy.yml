@@ -44,7 +44,7 @@ jobs:
 
       - id: deploy_to_gh_pages
         name: Deploy to GH Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - id: write_summary
         name: Write Results Summary
