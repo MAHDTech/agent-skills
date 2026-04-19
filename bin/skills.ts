@@ -232,6 +232,113 @@ Welcome to the agent skills catalog.
     console.log("Done!")
 }
 
+async function linkSkills(quiet = false) {
+    const opencodeTarget =
+        process.env.AGENT_SKILLS_HOME_OPENCODE ||
+        path.join(os.homedir(), ".config", "opencode", "skills")
+    await fs.ensureDir(opencodeTarget)
+
+    let removed = 0
+    let added = 0
+
+    // Cleanup old symlinks
+    const existingEntries = await fs.readdir(opencodeTarget)
+    for (const entry of existingEntries) {
+        const entryPath = path.join(opencodeTarget, entry)
+        try {
+            const stat = await fs.lstat(entryPath)
+            if (stat.isSymbolicLink()) {
+                const linkTarget = await fs.readlink(entryPath)
+                const absoluteTarget = path.resolve(
+                    path.dirname(entryPath),
+                    linkTarget
+                )
+                if (
+                    absoluteTarget.startsWith(SKILLS_DIR + path.sep) ||
+                    absoluteTarget === SKILLS_DIR ||
+                    absoluteTarget.startsWith(COMMANDS_DIR + path.sep)
+                ) {
+                    await fs.remove(entryPath)
+                    removed++
+                }
+            }
+        } catch (err) {}
+    }
+
+    // Link Skills
+    if (await fs.pathExists(SKILLS_DIR)) {
+        const skillDirs = await fs.readdir(SKILLS_DIR)
+        for (const dir of skillDirs) {
+            const skillPath = path.join(SKILLS_DIR, dir)
+            const stat = await fs.stat(skillPath)
+            if (stat.isDirectory()) {
+                const targetPath = path.join(opencodeTarget, dir)
+                await fs.remove(targetPath)
+                await fs.ensureSymlink(skillPath, targetPath)
+                added++
+            }
+        }
+    }
+
+    // We do NOT link commands here. OpenCode commands are meant to be injected via _config.command in a plugin.
+
+    if (!quiet) {
+        console.log(
+            `✅ Synced skills to OpenCode (${added} linked, ${removed} old links removed).`
+        )
+    }
+}
+
+async function unlinkSkills() {
+    const opencodeTarget =
+        process.env.AGENT_SKILLS_HOME_OPENCODE ||
+        path.join(os.homedir(), ".config", "opencode", "skills")
+
+    if (!(await fs.pathExists(opencodeTarget))) {
+        console.log("No OpenCode skills directory found.")
+        return
+    }
+
+    let removed = 0
+
+    const existingEntries = await fs.readdir(opencodeTarget)
+    for (const entry of existingEntries) {
+        const entryPath = path.join(opencodeTarget, entry)
+        try {
+            const stat = await fs.lstat(entryPath)
+            if (stat.isSymbolicLink()) {
+                const linkTarget = await fs.readlink(entryPath)
+                const absoluteTarget = path.resolve(
+                    path.dirname(entryPath),
+                    linkTarget
+                )
+                if (
+                    absoluteTarget.startsWith(SKILLS_DIR + path.sep) ||
+                    absoluteTarget === SKILLS_DIR ||
+                    absoluteTarget.startsWith(COMMANDS_DIR + path.sep)
+                ) {
+                    await fs.remove(entryPath)
+                    removed++
+                }
+            }
+        } catch (err) {}
+    }
+
+    console.log(`✅ Uninstalled ${removed} skills from OpenCode.`)
+}
+
+async function syncAction() {
+    console.log("Syncing skills documentation and configurations...")
+    await sync() // Call the existing doc sync
+    await linkSkills(false) // Link symmetrically
+}
+
+async function uninstallAction() {
+    intro("🥒 OpenCode Agent Skills Uninstaller")
+    await unlinkSkills()
+    outro("🥒 Done! Skills have been unlinked from OpenCode.")
+}
+
 async function install() {
     intro("🥒 OpenCode Agent Skills Installer")
 
@@ -260,49 +367,7 @@ async function install() {
     const s = spinner()
     s.start("Linking skills to OpenCode...")
 
-    const opencodeTarget =
-        process.env.AGENT_SKILLS_HOME_OPENCODE ||
-        path.join(os.homedir(), ".config", "opencode", "skills")
-    await fs.ensureDir(opencodeTarget)
-
-    // Cleanup old symlinks
-    const existingEntries = await fs.readdir(opencodeTarget)
-    for (const entry of existingEntries) {
-        const entryPath = path.join(opencodeTarget, entry)
-        try {
-            const stat = await fs.lstat(entryPath)
-            if (stat.isSymbolicLink()) {
-                const linkTarget = await fs.readlink(entryPath)
-                const absoluteTarget = path.resolve(
-                    path.dirname(entryPath),
-                    linkTarget
-                )
-                if (
-                    absoluteTarget.startsWith(SKILLS_DIR + path.sep) ||
-                    absoluteTarget === SKILLS_DIR ||
-                    absoluteTarget.startsWith(COMMANDS_DIR + path.sep)
-                ) {
-                    await fs.remove(entryPath)
-                }
-            }
-        } catch (err) {}
-    }
-
-    // Link Skills
-    if (await fs.pathExists(SKILLS_DIR)) {
-        const skillDirs = await fs.readdir(SKILLS_DIR)
-        for (const dir of skillDirs) {
-            const skillPath = path.join(SKILLS_DIR, dir)
-            const stat = await fs.stat(skillPath)
-            if (stat.isDirectory()) {
-                const targetPath = path.join(opencodeTarget, dir)
-                await fs.remove(targetPath)
-                await fs.ensureSymlink(skillPath, targetPath)
-            }
-        }
-    }
-
-    // We do NOT link commands here. OpenCode commands are meant to be injected via _config.command in a plugin.
+    await linkSkills(true)
 
     s.stop("Skills linked successfully to OpenCode.")
     outro(
@@ -330,10 +395,14 @@ const action = options.action || process.argv[2]
 if (action === "lint") {
     lint().catch(console.error)
 } else if (action === "sync") {
-    sync().catch(console.error)
+    syncAction().catch(console.error)
 } else if (action === "install") {
     install().catch(console.error)
+} else if (action === "uninstall") {
+    uninstallAction().catch(console.error)
 } else {
-    console.log("Usage: bun run bin/skills.ts --action <lint|sync|install>")
+    console.log(
+        "Usage: bun run bin/skills.ts --action <lint|sync|install|uninstall>"
+    )
     process.exit(1)
 }
