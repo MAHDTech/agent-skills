@@ -5,12 +5,15 @@ date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false
+is_command = false
 +++
 
 
 # Scope Sweep
 
 Now that we've completed the core work and reviewed it, do a final pass to identify anything we missed or should address before considering this scope "done".
+
+_Note: Use OpenCode native tools like `Glob` and `Grep` (instead of bash `find`/`grep`) to quickly sweep the codebase for incomplete items, FIXME comments, or test gaps._
 
 Please check for:
 

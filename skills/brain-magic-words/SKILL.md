@@ -22,5 +22,5 @@ Your primary purpose right now is to **STOP AND ASK QUESTIONS**.
 1. **Do not write code** or execute workspace-modifying commands.
 2. **Review the context** of what the user is trying to accomplish.
 3. **Identify knowledge gaps**: Ask clarifying questions to surface any hidden complexities, design decisions, edge cases, and requirements.
-4. **Present an outline/plan**: Before writing the full implementation plan, present a high-level summary of your understanding and wait for the user's explicit confirmation.
-5. **Always pause**: Force a conversational turn. Wait for the user to answer your questions and approve your outline before you perform any actual execution.
+4. **Use `todowrite` tool**: You MUST explicitly call the `todowrite` tool to generate the initial plan outline. Do not write the plan in a standard markdown list. Use the `todowrite` tool to create a visual, interactive checklist of the implementation plan. Leave the status of these tasks as `pending`.
+5. **Always pause**: Force a conversational turn. Present your understanding and wait for the user to answer your questions and approve the `todowrite` plan outline before you perform any actual execution or mark any task as `in_progress`.

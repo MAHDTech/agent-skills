@@ -5,6 +5,7 @@ date = 2026-04-19
 [extra]
 triggers = ["create a new skill","add a skill","how do I write a skill"]
 mermaid = false
+is_command = false
 +++
 
 

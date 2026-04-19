@@ -75,3 +75,5 @@ toolsdirectory
 unitless
 verdana
 webmail
+todowrite
+webfetch

@@ -183,15 +183,15 @@ in
       skills-lint = {
         enable = true;
         name = "Skills Linter";
-        entry = "bun run bin/skills-lint.ts";
-        files = "SKILL\\.md$";
+        entry = "skills --action lint";
+        files = "(SKILL|COMMAND)\\.md$";
         pass_filenames = false;
       };
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "bun run bin/skills-sync.ts";
-        files = "SKILL\\.md$";
+        entry = "skills --action sync";
+        files = "(SKILL|COMMAND)\\.md$";
         pass_filenames = false;
       };
       trim-trailing-whitespace = {
@@ -236,17 +236,13 @@ in
   };
 
   scripts = {
-    skills-sync = {
-      description = "Synchronize skill files";
-      exec = "bun run bin/skills-sync.ts";
+    setup = {
+      description = "Set up the agent skills environment";
+      exec = "bun run setup";
     };
-    skills-install = {
-      description = "Install skills";
-      exec = "bun run bin/skills-install.ts";
-    };
-    skills-lint = {
-      description = "Lint skills";
-      exec = "bun run bin/skills-lint.ts";
+    skills = {
+      description = "Manage agent skills (usage: skills --action <lint|sync|install>)";
+      exec = "bun run skills \"$@\"";
     };
     build-css = {
       description = "Build CSS";

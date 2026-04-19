@@ -32,7 +32,7 @@ jobs:
       - id: run_lint
         name: Run Lint
         shell: devenv shell --quiet bash -- -e {0}
-        run: skills-lint
+        run: skills --action lint
 
       - id: build_dashboard
         name: Build Dashboard

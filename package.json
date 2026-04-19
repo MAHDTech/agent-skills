@@ -4,12 +4,10 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "setup": "bun run bin/skills-install.ts",
-        "skills-install": "bun run bin/skills-install.ts",
-        "skills-sync": "bun run bin/skills-sync.ts",
-        "skills-lint": "bun run bin/skills-lint.ts",
+        "setup": "bun run bin/skills.ts --action install",
+        "skills": "bun run bin/skills.ts",
         "build:css": "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css",
-        "build:dashboard": "bun run skills-sync && bun run build:css && zola --root dashboard build && pagefind --site dashboard/public",
+        "build:dashboard": "bun run skills --action sync && bun run build:css && zola --root dashboard build && pagefind --site dashboard/public",
         "serve:dashboard": "bun run build:dashboard && zola --root dashboard serve"
     },
     "devDependencies": {

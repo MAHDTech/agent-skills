@@ -5,6 +5,7 @@ date = 2026-04-19
 [extra]
 triggers = []
 mermaid = false
+is_command = false
 +++
 
 

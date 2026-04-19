@@ -29,6 +29,4 @@ dashboard/static/build/
 # AI Agent project configuration
 .cursor/
 .windsurf/
-.claude/
-.gemini/
 .opencode/

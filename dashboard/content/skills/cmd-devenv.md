@@ -5,6 +5,7 @@ date = 2026-04-19
 [extra]
 triggers = ["devenv","developer environment","when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
 mermaid = false
+is_command = false
 +++
 
 
