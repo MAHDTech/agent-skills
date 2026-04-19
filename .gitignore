@@ -7,9 +7,10 @@ devenv.local.nix
 devenv.local.yaml
 .direnv
 
-# CodeQL
+# Security analysis results
 .codeql-db/
 .codeql-results/
+trivy-results.sarif
 
 # pre-commit
 .pre-commit-config.yaml
@@ -24,3 +25,10 @@ dashboard/static/build/
 
 # OS specific
 .DS_Store
+
+# AI Agent project configuration
+.cursor/
+.windsurf/
+.claude/
+.gemini/
+.opencode/

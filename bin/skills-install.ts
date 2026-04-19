@@ -75,7 +75,34 @@ async function install() {
 
     for (const cli of selectedCLIs) {
         const targetBase = targets[cli]
+        if (!targetBase) continue
         await fs.ensureDir(targetBase)
+
+        // Declarative cleanup: remove any symlink in the target folder that points back to our skills directory
+        // This ensures that renamed or deleted skills are automatically purged from the target CLI
+        const existingEntries = await fs.readdir(targetBase)
+        for (const entry of existingEntries) {
+            const entryPath = path.join(targetBase, entry)
+            try {
+                const stat = await fs.lstat(entryPath)
+                if (stat.isSymbolicLink()) {
+                    const linkTarget = await fs.readlink(entryPath)
+                    const absoluteTarget = path.resolve(
+                        path.dirname(entryPath),
+                        linkTarget
+                    )
+                    // If it points inside our local skills repository, remove it
+                    if (
+                        absoluteTarget.startsWith(skillsDir + path.sep) ||
+                        absoluteTarget === skillsDir
+                    ) {
+                        await fs.remove(entryPath)
+                    }
+                }
+            } catch (err) {
+                // Ignore errors reading bad links
+            }
+        }
 
         for (const skillFile of skillFiles) {
             const skillPath = path.dirname(path.join(skillsDir, skillFile))
@@ -83,7 +110,7 @@ async function install() {
 
             const targetPath = path.join(targetBase, skillName)
 
-            // Remove existing link or directory
+            // Because of the declarative sweep above, we don't strictly need this, but it's safe to keep
             await fs.remove(targetPath)
 
             // Create symlink
