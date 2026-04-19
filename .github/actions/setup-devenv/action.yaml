@@ -36,6 +36,7 @@ runs:
         name: ${{ inputs.cachix-cache-name }}
         authToken: ${{ inputs.cachix-auth-token }}
         skipPush: ${{ inputs.skip-push }}
+        pushFilter: '(-source$|nixpkgs\.tar\.gz$|\.tar\.gz$|\.zip$)'
 
     - id: cachix_warning
       name: Cachix Warning
@@ -68,3 +69,9 @@ runs:
       shell: bash
       run: |
         devenv version
+
+    - id: warmup_devenv
+      name: Warm up Devenv shell
+      shell: bash
+      run: |
+        devenv shell -- hello --greeting "devenv cache warm-up complete!"
