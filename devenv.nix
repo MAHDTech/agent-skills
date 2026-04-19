@@ -136,7 +136,12 @@ in
       };
       deadnix.enable = true;
       editorconfig-checker.enable = true;
-      eslint.enable = true;
+      eslint = {
+        enable = true;
+        settings = {
+          extensions = "\\.js$|\\.ts$";
+        };
+      };
       markdownlint = {
         enable = true;
         excludes = [
