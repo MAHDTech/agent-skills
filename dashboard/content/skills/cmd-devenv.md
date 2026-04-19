@@ -14,13 +14,26 @@ is_command = false
 When working in a repository that utilizes `devenv`, you must strictly adhere to the following rules for environment consistency:
 
 - **Devenv is Mandatory:** For projects containing a `devenv.nix` and/or `devenv.yaml` file, strict use of `devenv` for dependency and shell environment management is required.
-- **DO NOT Run Bare Commands:** ALL standard CLI operations MUST run via the devenv shell.
+- **DO NOT Run Bare Commands:** ALL standard CLI operations MUST run via the devenv shell. To do this use
+
+```bash
+devenv shell -- <command>
+```
+
 - **Root Execution Only:** You must ONLY run `devenv shell` commands from the root of the repository where the `devenv.nix` file is located.
   - Never run it from a sub-directory.
   - Looking for the `devenv.nix` is how you know you are in the right place.
   - Correct: `devenv shell -- cargo check`
 - **Dash-Dash is Mandatory (`--`):** NEVER use `devenv shell -c <command>`. This is an incredibly common mistake. The `-c` argument is used for a "clean" environment and using it gives unexpected results.
   - Use `devenv shell -- <command>` - this is the right way.
+
+## Testing
+
+- Devenv includes a single command that can execute all pre-commit hooks against the codebase. To use this run;
+
+```bash
+devenv test
+```
 
 ## MCP Servers & Skills
 
