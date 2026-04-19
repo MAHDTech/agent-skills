@@ -46,7 +46,7 @@ async function getItems(): Promise<Skill[]> {
             const fullPath = path.join(SKILLS_DIR, file)
             const rawContent = await fs.readFile(fullPath, "utf-8")
             const match = rawContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
-            if (match) {
+            if (match && match[1] && match[2]) {
                 const metadata = yaml.load(match[1]) as SkillMetadata
                 items.push({
                     path: `skills/${file}`,
@@ -67,7 +67,7 @@ async function getItems(): Promise<Skill[]> {
             const fullPath = path.join(COMMANDS_DIR, file)
             const rawContent = await fs.readFile(fullPath, "utf-8")
             const match = rawContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
-            if (match) {
+            if (match && match[1] && match[2]) {
                 const metadata = yaml.load(match[1]) as SkillMetadata
                 items.push({
                     path: `commands/${file}`,

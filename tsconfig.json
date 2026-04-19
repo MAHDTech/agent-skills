@@ -20,7 +20,8 @@
 
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "noPropertyAccessFromIndexSignature": false
+        "noPropertyAccessFromIndexSignature": false,
+        "types": ["bun"]
     },
     "exclude": ["scratch", "node_modules", "dashboard", "dist"]
 }
