@@ -1,11 +1,12 @@
 ---
 name: sys-skill-creator
 description: Guide for creating effective skills that follow the Agent Skills standards. Use this when the user wants to create a new skill or update an existing one.
-triggers:
-  - "create a new skill"
-  - "add a skill"
-  - "how do I write a skill"
-category: utility
+custom:
+  triggers:
+    - create a new skill
+    - add a skill
+    - how do I write a skill
+  category: utility
 ---
 
 # Skill Creator

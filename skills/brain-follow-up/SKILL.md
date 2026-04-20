@@ -1,7 +1,8 @@
 ---
 name: brain-follow-up
 description: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # Follow-Up

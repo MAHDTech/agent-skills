@@ -1,7 +1,8 @@
 ---
 name: brain-rfc-review
 description: Review RFCs for problem clarity, compliance, security, and performance using SCQA framework
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # Request for Comments (RFC) Review

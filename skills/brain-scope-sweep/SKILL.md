@@ -1,7 +1,8 @@
 ---
 name: brain-scope-sweep
 description: Final pass to identify missed items, edge cases, and risks before considering a scope done
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # Scope Sweep

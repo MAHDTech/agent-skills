@@ -1,7 +1,7 @@
 +++
 title = "brain-persona"
 description = "Prime the agent with a behavioral persona for the conversation"
-date = 2026-04-19
+date = 2026-04-20
 [extra]
 triggers = []
 mermaid = false

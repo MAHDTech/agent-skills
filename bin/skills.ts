@@ -23,9 +23,17 @@ const DASHBOARD_CONTENT_DIR = path.join(
 interface SkillMetadata {
     name: string
     description: string
-    triggers?: string[]
-    category?: string
-    type?: string
+    license?: string
+    compatibility?: string
+    metadata?: Record<string, string>
+    custom?: {
+        triggers?: string[]
+        category?: string
+        type?: string
+        agent?: string
+        context?: string
+        [key: string]: any
+    }
     [key: string]: any
 }
 
@@ -62,13 +70,16 @@ async function getItems(): Promise<Skill[]> {
 
     // Process commands
     if (await fs.pathExists(COMMANDS_DIR)) {
-        const commandFiles = await glob("**/COMMAND.md", {cwd: COMMANDS_DIR})
+        const commandFiles = await glob("*.md", {cwd: COMMANDS_DIR})
         for (const file of commandFiles) {
             const fullPath = path.join(COMMANDS_DIR, file)
             const rawContent = await fs.readFile(fullPath, "utf-8")
             const match = rawContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
             if (match && match[1] && match[2]) {
                 const metadata = yaml.load(match[1]) as SkillMetadata
+                if (!metadata.name) {
+                    metadata.name = path.basename(file, ".md")
+                }
                 items.push({
                     path: `commands/${file}`,
                     metadata,
@@ -102,12 +113,14 @@ async function lint() {
                 }
             }
 
-            // Check if folder name matches metadata name
-            const folderName = path.dirname(file).split(path.sep).pop()
-            if (folderName && folderName !== item.metadata.name) {
-                console.warn(
-                    `⚠️ ${file}: Folder base name '${folderName}' does not match skill name '${item.metadata.name}'.`
-                )
+            // Check if folder name matches metadata name (only for skills)
+            if (!item.isCommand) {
+                const folderName = path.dirname(file).split(path.sep).pop()
+                if (folderName && folderName !== item.metadata.name) {
+                    console.warn(
+                        `⚠️ ${file}: Folder base name '${folderName}' does not match skill name '${item.metadata.name}'.`
+                    )
+                }
             }
         } catch (e) {
             console.error(`❌ ${file}: Error validating frontmatter.`, e)
@@ -149,7 +162,7 @@ async function sync() {
     // 2. Update README.md
     if (await fs.pathExists(DOCS_DIR)) {
         const docsFiles = await glob("*.md", {cwd: DOCS_DIR})
-        let readmeContent = `# 🥒 Agent Skills\n\n`
+        let readmeContent = `# Agent Skills\n\n`
         readmeContent += `My personal and public agent skills.\n\n`
 
         readmeContent += `## Table of Contents\n\n`
@@ -161,8 +174,8 @@ async function sync() {
 
         readmeContent += `## Available Skills\n\n`
         items.forEach((item) => {
-            const triggers = item.metadata.triggers
-                ? item.metadata.triggers.join(", ")
+            const triggers = item.metadata.custom?.triggers
+                ? item.metadata.custom.triggers.join(", ")
                 : "-"
             readmeContent += `### [${item.metadata.name}](${item.path})\n\n`
             const desc = item.metadata.description
@@ -191,7 +204,7 @@ title = ${JSON.stringify(item.metadata.name)}
 description = ${JSON.stringify(item.metadata.description)}
 date = ${new Date().toISOString().split("T")[0]}
 [extra]
-triggers = ${JSON.stringify(item.metadata.triggers || [])}
+triggers = ${JSON.stringify(item.metadata.custom?.triggers || [])}
 mermaid = ${hasMermaid}
 is_command = ${item.isCommand}
 +++
@@ -240,13 +253,25 @@ async function linkSkills(quiet = false) {
     // Support cleaning up legacy ~/.agents/skills folder during sync as well
     const legacyTarget = path.join(os.homedir(), ".agents", "skills")
 
+    const opencodeCommandsTarget = path.join(
+        os.homedir(),
+        ".config",
+        "opencode",
+        "commands"
+    )
+
     await fs.ensureDir(opencodeTarget)
+    await fs.ensureDir(opencodeCommandsTarget)
 
     let removed = 0
     let added = 0
 
-    // Cleanup ALL symlinks in the opencode skills directory and legacy .agents directory that point to ANY folder inside AGENT_SKILLS_HOME
-    for (const target of [opencodeTarget, legacyTarget]) {
+    // Cleanup ALL symlinks in the opencode skills directory, legacy .agents directory, and commands directory that point to ANY folder inside AGENT_SKILLS_HOME
+    for (const target of [
+        opencodeTarget,
+        legacyTarget,
+        opencodeCommandsTarget,
+    ]) {
         if (!(await fs.pathExists(target))) continue
 
         const existingEntries = await fs.readdir(target)
@@ -285,7 +310,22 @@ async function linkSkills(quiet = false) {
         }
     }
 
-    // We do NOT link commands here. OpenCode commands are meant to be injected via _config.command in a plugin.
+    // Link Commands
+    if (await fs.pathExists(COMMANDS_DIR)) {
+        const commandFiles = await fs.readdir(COMMANDS_DIR)
+        for (const file of commandFiles) {
+            if (file.endsWith(".md")) {
+                const cmdPath = path.join(COMMANDS_DIR, file)
+                const stat = await fs.stat(cmdPath)
+                if (stat.isFile()) {
+                    const targetPath = path.join(opencodeCommandsTarget, file)
+                    await fs.remove(targetPath)
+                    await fs.ensureSymlink(cmdPath, targetPath)
+                    added++
+                }
+            }
+        }
+    }
 
     await updateOpenCodeConfig()
 
@@ -456,7 +496,15 @@ async function unlinkSkills() {
     // Legacy agents target
     const agentsTarget = path.join(os.homedir(), ".agents", "skills")
 
-    const targets = [opencodeTarget, agentsTarget]
+    // Commands target
+    const commandsTarget = path.join(
+        os.homedir(),
+        ".config",
+        "opencode",
+        "commands"
+    )
+
+    const targets = [opencodeTarget, agentsTarget, commandsTarget]
     let removed = 0
 
     for (const target of targets) {
@@ -498,13 +546,13 @@ async function syncAction() {
 }
 
 async function uninstallAction() {
-    intro("🥒 OpenCode Agent Skills Uninstaller")
+    intro("OpenCode Agent Skills Uninstaller")
     await unlinkSkills()
-    outro("🥒 Done! Skills have been unlinked from OpenCode.")
+    outro("Done! Skills have been unlinked from OpenCode.")
 }
 
 async function install() {
-    intro("🥒 OpenCode Agent Skills Installer")
+    intro("OpenCode Agent Skills Installer")
 
     const shell = process.env.SHELL || "/bin/bash"
     const rcFile = shell.includes("zsh") ? ".zshrc" : ".bashrc"
@@ -535,9 +583,7 @@ async function install() {
 
     s.stop("Skills linked successfully to OpenCode.")
     outro(
-        "🥒 Done! Restart your terminal or run `source " +
-            rcPath +
-            "` to finish."
+        "Done! Restart your terminal or run `source " + rcPath + "` to finish."
     )
 }
 

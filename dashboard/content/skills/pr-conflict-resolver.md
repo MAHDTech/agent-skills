@@ -1,7 +1,7 @@
 +++
 title = "pr-conflict-resolver"
 description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
-date = 2026-04-19
+date = 2026-04-20
 [extra]
 triggers = []
 mermaid = false

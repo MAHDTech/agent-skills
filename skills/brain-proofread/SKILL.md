@@ -1,7 +1,8 @@
 ---
 name: brain-proofread
 description: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # Proofread

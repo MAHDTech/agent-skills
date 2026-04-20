@@ -1,4 +1,4 @@
-# 🥒 Agent Skills
+# Agent Skills
 
 My personal and public agent skills.
 
@@ -14,7 +14,7 @@ My personal and public agent skills.
 
 **Description**: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
 
-**Triggers**: apply critical thinking, critique your response, /criticalthink, analyze your last response
+**Triggers**: /criticalthink, analyze your last response, apply critical thinking, critical thinking, critical-thinking, critique your response
 
 ### [brain-follow-up](skills/brain-follow-up/SKILL.md)
 
@@ -70,49 +70,61 @@ My personal and public agent skills.
 
 **Triggers**: devenv, developer environment, when using devenv, when running commands in a devenv environment, when you see a devenv.nix or devenv.yaml file
 
+### [cmd-opencode](skills/cmd-opencode/SKILL.md)
+
+**Description**: This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
+
+**Triggers**: opencode
+
+### [cmd-opencode-acp](skills/cmd-opencode-acp/SKILL.md)
+
+**Description**: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
+
+**Triggers**: opencode acp, acp, agent control protocol
+
 ### [cmd-scratchpad](skills/cmd-scratchpad/SKILL.md)
 
 **Description**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
 
 **Triggers**: create a temporary file, run a quick test, make a scratch script, create a test script, experiment with
 
-### [gh-issue](commands/gh-issue/COMMAND.md)
+### [gh-issue](commands/gh-issue.md)
 
 **Description**: Create structured GitHub issues from conversation context using gh CLI
 
-### [pr-build-context](commands/pr-build-context/COMMAND.md)
+### [pr-build-context](commands/pr-build-context.md)
 
 **Description**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
 
-### [pr-conflict-resolver](commands/pr-conflict-resolver/COMMAND.md)
+### [pr-conflict-resolver](commands/pr-conflict-resolver.md)
 
 **Description**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
 
-### [pr-description](commands/pr-description/COMMAND.md)
+### [pr-description](commands/pr-description.md)
 
 **Description**: Generate a PR title and description, then commit, create/update the PR on approval
 
-### [pr-gh-comments](commands/pr-gh-comments/COMMAND.md)
+### [pr-gh-comments](commands/pr-gh-comments.md)
 
 **Description**: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
 
-### [pr-review-prepare](commands/pr-review-prepare/COMMAND.md)
+### [pr-review-prepare](commands/pr-review-prepare.md)
 
 **Description**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
 
-### [pr-test-plan](commands/pr-test-plan/COMMAND.md)
+### [pr-test-plan](commands/pr-test-plan.md)
 
 **Description**: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
 
-### [productionize](commands/productionize/COMMAND.md)
+### [productionize](commands/productionize.md)
 
 **Description**: Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization
 
-### [sculpt-code](commands/sculpt-code/COMMAND.md)
+### [sculpt-code](commands/sculpt-code.md)
 
 **Description**: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
 
-### [store-plan](commands/store-plan/COMMAND.md)
+### [store-plan](commands/store-plan.md)
 
 **Description**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
 

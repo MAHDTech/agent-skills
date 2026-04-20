@@ -1,7 +1,7 @@
 +++
 title = "cmd-devenv"
 description = "Strict guidelines for using devenv for shell and dependency management"
-date = 2026-04-19
+date = 2026-04-20
 [extra]
 triggers = ["devenv","developer environment","when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
 mermaid = false
@@ -29,10 +29,16 @@ devenv shell -- <command>
 
 ## Testing
 
-- Devenv includes a single command that can execute all pre-commit hooks against the codebase. To use this run;
+- Devenv includes a command to execute tests which automatically triggers pre-commit hooks against the codebase:
 
 ```bash
 devenv test
+```
+
+- Alternatively, if you need to manually trigger all pre-commit hooks directly, you MUST use the `prek` alias (which resolves to `pre-commit`) via the devenv shell:
+
+```bash
+devenv shell -- prek run -a
 ```
 
 ## MCP Servers & Skills

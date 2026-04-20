@@ -1,7 +1,8 @@
 ---
 name: brain-pr-edgecase
 description: Review branch changes for test gaps, logic edge cases, failure modes, and integration risks
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # PR Edge Case Review

@@ -1,12 +1,15 @@
 ---
 name: brain-critical-thinking
 description: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
-triggers:
-  - "apply critical thinking"
-  - "critique your response"
-  - "/criticalthink"
-  - "analyze your last response"
-category: cognitive
+custom:
+  triggers:
+    - /criticalthink
+    - analyze your last response
+    - apply critical thinking
+    - critical thinking
+    - critical-thinking
+    - critique your response
+  category: cognitive
 ---
 
 # Critical Thinking

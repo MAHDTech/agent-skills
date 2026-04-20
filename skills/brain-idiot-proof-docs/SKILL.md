@@ -1,7 +1,8 @@
 ---
 name: brain-idiot-proof-docs
 description: Simplify documentation for clarity and readability with approval-gated edits
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 # Simple Docs for Humans and Agents

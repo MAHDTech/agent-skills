@@ -1,13 +1,14 @@
 ---
 name: cmd-scratchpad
 description: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
-triggers:
-  - "create a temporary file"
-  - "run a quick test"
-  - "make a scratch script"
-  - "create a test script"
-  - "experiment with"
-category: utility
+custom:
+  triggers:
+    - create a temporary file
+    - run a quick test
+    - make a scratch script
+    - create a test script
+    - experiment with
+  category: utility
 ---
 
 # Scratchpad Policy

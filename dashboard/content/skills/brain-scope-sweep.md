@@ -1,7 +1,7 @@
 +++
 title = "brain-scope-sweep"
 description = "Final pass to identify missed items, edge cases, and risks before considering a scope done"
-date = 2026-04-19
+date = 2026-04-20
 [extra]
 triggers = []
 mermaid = false

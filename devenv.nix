@@ -127,8 +127,14 @@ in
       check-symlinks.enable = true;
       check-yaml.enable = true;
       commitizen.enable = true;
+      convco.enable = true;
       cspell = {
         enable = true;
+        excludes = [
+          "skills/cmd-opencode-acp/.*\\.md$"
+          "dashboard/content/skills/cmd-opencode-acp\\.md$"
+          "\\.versionrc$"
+        ];
         args = [
           "lint"
           "--no-must-find-files"
@@ -147,6 +153,7 @@ in
         excludes = [
           "dashboard/content/skills/.*\\.md$"
           "dashboard/content/_index\\.md$"
+          "skills/cmd-opencode-acp/.*\\.md$"
         ];
         settings = {
           configuration = {
@@ -166,6 +173,18 @@ in
                 "sup"
                 "summary"
                 "details"
+                "ParamField"
+                "Expandable"
+                "Warning"
+                "ResponseField"
+                "span"
+                "Card"
+                "Note"
+                "Info"
+                "Steps"
+                "Step"
+                "Icon"
+                "img"
               ];
             };
           };

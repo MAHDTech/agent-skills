@@ -1,7 +1,7 @@
 +++
 title = "sculpt-code"
 description = "Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language"
-date = 2026-04-19
+date = 2026-04-20
 [extra]
 triggers = []
 mermaid = false

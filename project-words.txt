@@ -42,7 +42,6 @@ nonblock
 olshansk
 olshansk's
 oneline
-opencode
 pagefind
 pathlib
 peaceiris
@@ -60,6 +59,24 @@ sarifv
 scannability
 scqa
 secretspec
+mcpc
+mdns
+mksquashfs
+nixfmt
+nixos
+opencode
+prek
+projectid
+projectroot
+qcow
+sculpt
+sidequery
+sqfs
+tars
+tailwind
+tailwindcss
+todoread
+tidewave
 Signups
 skimmability
 skimmable
@@ -77,3 +94,4 @@ verdana
 webmail
 todowrite
 webfetch
+convco

@@ -1,14 +1,15 @@
 ---
 name: brain-magic-words
 description: Intercepts requests to ensure the AI agent and human work back and forth to create an implementation plan before diving into code.
-triggers:
-  - "magic words"
-  - "magic-words"
-  - "about iterating"
-  - "discussing the plan"
-  - "work back and forth"
-  - "before jumping to code"
-category: cognitive
+custom:
+  triggers:
+    - magic words
+    - magic-words
+    - about iterating
+    - discussing the plan
+    - work back and forth
+    - before jumping to code
+  category: cognitive
 ---
 
 # Magic Words (Iterative Planning)

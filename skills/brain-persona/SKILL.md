@@ -1,7 +1,8 @@
 ---
 name: brain-persona
 description: Prime the agent with a behavioral persona for the conversation
-disable-model-invocation: false
+custom:
+  disable-model-invocation: false
 ---
 
 <!-- omit in toc -->

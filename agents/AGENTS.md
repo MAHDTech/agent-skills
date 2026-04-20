@@ -15,6 +15,8 @@ description: Single source of truth for agent instructions
 - **brain-rfc-review**: Review RFCs for problem clarity, compliance, security, and performance using SCQA framework
 - **brain-scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done
 - **cmd-devenv**: Strict guidelines for using devenv for shell and dependency management
+- **cmd-opencode**: This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
+- **cmd-opencode-acp**: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
 - **cmd-scratchpad**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
 - **gh-issue**: Create structured GitHub issues from conversation context using gh CLI
 - **pr-build-context**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
