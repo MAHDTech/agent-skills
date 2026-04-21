@@ -1,13 +1,9 @@
-+++
-title = "pr-description"
-description = "Generate a PR title and description, then commit, create/update the PR on approval"
-date = 2026-04-20
-[extra]
-triggers = []
-mermaid = false
-is_command = true
-+++
-
+---
+name: gh-create-pr
+description: Generate a PR title and description, then commit, create/update the PR on approval
+custom:
+  type: command
+---
 
 <!-- omit in toc -->
 
@@ -331,4 +327,3 @@ S -- Component -- Before -- After
 
 </details>
 ```
-

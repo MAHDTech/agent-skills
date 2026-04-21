@@ -1,5 +1,5 @@
 ---
-name: gh-issue
+name: gh-create-issue
 description: Create structured GitHub issues from conversation context using gh CLI
 custom:
   type: command

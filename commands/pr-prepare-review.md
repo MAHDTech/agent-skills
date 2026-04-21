@@ -1,13 +1,9 @@
-+++
-title = "pr-review-prepare"
-description = "Prepare branch for code review by building context, identifying issues, and suggesting improvements"
-date = 2026-04-20
-[extra]
-triggers = []
-mermaid = false
-is_command = true
-+++
-
+---
+name: pr-prepare-review
+description: Prepare branch for code review by building context, identifying issues, and suggesting improvements
+custom:
+  type: command
+---
 
 # Code Review Preparation Agent
 
@@ -68,4 +64,3 @@ Make sure:
 3. Build a plan and share it
 4. Ask questions for clarity
 5. Don't make these changes without my approval
-

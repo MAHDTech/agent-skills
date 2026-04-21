@@ -1,7 +1,7 @@
 +++
 title = "cmd-scratchpad"
 description = "Enforces the use of a \"scratch/\" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion."
-date = 2026-04-20
+date = 2026-04-21
 [extra]
 triggers = ["create a temporary file","run a quick test","make a scratch script","create a test script","experiment with"]
 mermaid = false

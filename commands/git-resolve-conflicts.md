@@ -1,5 +1,5 @@
 ---
-name: pr-conflict-resolver
+name: git-resolve-conflicts
 description: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
 custom:
   type: command

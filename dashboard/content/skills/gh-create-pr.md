@@ -1,9 +1,13 @@
----
-name: pr-description
-description: Generate a PR title and description, then commit, create/update the PR on approval
-custom:
-  type: command
----
++++
+title = "gh-create-pr"
+description = "Generate a PR title and description, then commit, create/update the PR on approval"
+date = 2026-04-21
+[extra]
+triggers = []
+mermaid = false
+is_command = true
++++
+
 
 <!-- omit in toc -->
 
@@ -327,3 +331,4 @@ S -- Component -- Before -- After
 
 </details>
 ```
+

@@ -1,7 +1,7 @@
 +++
 title = "brain-proofread"
 description = "Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability"
-date = 2026-04-20
+date = 2026-04-21
 [extra]
 triggers = []
 mermaid = false

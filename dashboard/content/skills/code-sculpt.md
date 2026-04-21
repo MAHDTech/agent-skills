@@ -1,9 +1,13 @@
----
-name: sculpt-code
-description: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
-custom:
-  type: command
----
++++
+title = "code-sculpt"
+description = "Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language"
+date = 2026-04-21
+[extra]
+triggers = []
+mermaid = false
+is_command = true
++++
+
 
 # Sculpt Code
 
@@ -121,3 +125,4 @@ End with a summary: files touched, lines removed, TODOs added/removed, helpers e
 - Test code (unless explicitly asked)
 - Forward-looking base classes if second implementation is likely soon
 - Domain-specific patterns the team uses intentionally
+

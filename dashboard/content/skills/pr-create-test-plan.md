@@ -1,11 +1,13 @@
----
-name: pr-test-plan
-description: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
-custom:
-  type: command
-  context: fork
-  agent: general-purpose
----
++++
+title = "pr-create-test-plan"
+description = "Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases"
+date = 2026-04-21
+[extra]
+triggers = []
+mermaid = false
+is_command = true
++++
+
 
 # PR Test Plan
 
@@ -149,3 +151,4 @@ Follow the same style used in `cmd-pr-description`:
 - No fluff -- every step must verify something real that a human needs to see
 - Copy-paste ready -- a reviewer should never need to edit a command
 - Separate code blocks -- one command per block, bold header above it
+

@@ -1,7 +1,7 @@
 +++
 title = "cmd-opencode-acp"
 description = "Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates."
-date = 2026-04-20
+date = 2026-04-21
 [extra]
 triggers = ["opencode acp","acp","agent control protocol"]
 mermaid = false

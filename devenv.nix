@@ -61,7 +61,7 @@ in
       # showfigfonts 2>/dev/null | less
       figlet -f slant -w 180 "$(echo "$PROJECT" | tr '[:lower:]-' '[:upper:] ')"
 
-      hello --greeting="Hello ''${USER:-user}, welcome to the $PROJECT project!"
+      hello --greeting="🤖 Hello ''${USER:-user}, welcome to the $PROJECT project!"
 
       echo -e "\nAGENT_SKILLS_HOME is set to ''${AGENT_SKILLS_HOME:-(not set!)}"
 
@@ -103,15 +103,18 @@ in
         enable = true;
       };
     };
-    shell.enable = isNative;
+    shell = {
+      enable = isNative;
+    };
   };
 
   git-hooks = lib.mkIf isNative {
     excludes = [
+      ".agents/"
       ".devenv/"
       ".git/"
       "^.vscode/"
-      ".agents/"
+      "^node_modules/"
     ];
     hooks = {
       action-validator.enable = true;

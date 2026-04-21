@@ -1,13 +1,9 @@
-+++
-title = "store-plan"
-description = "Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on \"store this plan\", \"save this plan for later\", \"document this for later\", \"write up what we discussed\", \"create a plan file\", or \"/cmd-store-plan\"."
-date = 2026-04-20
-[extra]
-triggers = []
-mermaid = false
-is_command = true
-+++
-
+---
+name: plan-store
+description: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
+custom:
+  type: command
+---
 
 <!-- omit in toc -->
 
@@ -313,4 +309,3 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 
 > 🔴 High risk · 🟡 Medium / open question · ⚪ Low / informational
 ```
-

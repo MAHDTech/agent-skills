@@ -4,7 +4,21 @@ import os from "os"
 import yaml from "js-yaml"
 import {glob} from "glob"
 import {execFileSync} from "child_process"
-import {intro, outro, confirm, spinner, note, cancel} from "@clack/prompts"
+import {intro, outro, confirm, spinner, note, cancel, log} from "@clack/prompts"
+
+function logTask(msg: string) {
+    log.step(`✅ ${msg}`)
+}
+
+function printSummary(
+    title: string,
+    metrics: {label: string; value: number | string}[]
+) {
+    log.message(`  ═══ 📊  ${title}  ═══`)
+    metrics.forEach((m) => {
+        log.message(`      ✨ ${m.label}: ${m.value}`)
+    })
+}
 
 const AGENT_SKILLS_HOME =
     process.env.AGENT_SKILLS_HOME || path.resolve(import.meta.dir, "..")
@@ -96,7 +110,7 @@ async function getItems(): Promise<Skill[]> {
 }
 
 async function lint() {
-    console.log("Linting skills and commands...")
+    intro("Linting Skills and Commands")
     const items = await getItems()
     let errors = 0
 
@@ -106,7 +120,7 @@ async function lint() {
             const required = ["name", "description"]
             for (const field of required) {
                 if (!item.metadata[field]) {
-                    console.error(
+                    log.error(
                         `❌ ${file}: Missing mandatory field '${field}' in frontmatter.`
                     )
                     errors++
@@ -117,27 +131,27 @@ async function lint() {
             if (!item.isCommand) {
                 const folderName = path.dirname(file).split(path.sep).pop()
                 if (folderName && folderName !== item.metadata.name) {
-                    console.warn(
+                    log.warn(
                         `⚠️ ${file}: Folder base name '${folderName}' does not match skill name '${item.metadata.name}'.`
                     )
                 }
             }
         } catch (e) {
-            console.error(`❌ ${file}: Error validating frontmatter.`, e)
+            log.error(`❌ ${file}: Error validating frontmatter.`)
             errors++
         }
     }
 
     if (errors > 0) {
-        console.error(`\nFound ${errors} errors.`)
+        log.error(`\nFound ${errors} errors.`)
         process.exit(1)
     } else {
-        console.log("✅ All skills and commands passed linting!")
+        logTask("All skills and commands passed linting!")
+        outro("Done!")
     }
 }
 
 async function sync() {
-    console.log("Syncing skills and commands...")
     const items = await getItems()
 
     // 1. Update agents/AGENTS.md
@@ -157,6 +171,7 @@ async function sync() {
                 newAgentsBody += `- **${item.metadata.name}**: ${item.metadata.description}\n`
             })
         await fs.writeFile(AGENTS_FILE, agentsFrontmatter + newAgentsBody)
+        logTask("Updated AGENTS.md documentation.")
     }
 
     // 2. Update README.md
@@ -187,6 +202,7 @@ async function sync() {
         })
 
         await fs.writeFile(README_FILE, readmeContent.trim() + "\n")
+        logTask("Updated README.md catalog.")
     }
 
     // 3. Sync Zola content
@@ -227,6 +243,7 @@ Welcome to the agent skills catalog.
         path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
         sectionIndexContent
     )
+    logTask("Generated Dashboard content.")
 
     // 4. Git Add
     try {
@@ -235,23 +252,18 @@ Welcome to the agent skills catalog.
             ["add", AGENTS_FILE, README_FILE, DASHBOARD_CONTENT_DIR],
             {stdio: "inherit"}
         )
-        console.log("Changes staged to git.")
+        logTask("Staged changes to git.")
     } catch (e) {
-        console.warn(
+        log.warn(
             "Could not stage changes to git (maybe not a git repo or no changes)."
         )
     }
-
-    console.log("Done!")
 }
 
-async function linkSkills(quiet = false) {
+async function linkSkills() {
     const opencodeTarget =
         process.env.AGENT_SKILLS_HOME_OPENCODE ||
         path.join(os.homedir(), ".config", "opencode", "skills")
-
-    // Support cleaning up legacy ~/.agents/skills folder during sync as well
-    const legacyTarget = path.join(os.homedir(), ".agents", "skills")
 
     const opencodeCommandsTarget = path.join(
         os.homedir(),
@@ -263,15 +275,19 @@ async function linkSkills(quiet = false) {
     await fs.ensureDir(opencodeTarget)
     await fs.ensureDir(opencodeCommandsTarget)
 
-    let removed = 0
-    let added = 0
+    let removedSkills = 0
+    let removedCommands = 0
+    let addedSkills = 0
+    let addedCommands = 0
 
-    // Cleanup ALL symlinks in the opencode skills directory, legacy .agents directory, and commands directory that point to ANY folder inside AGENT_SKILLS_HOME
-    for (const target of [
-        opencodeTarget,
-        legacyTarget,
-        opencodeCommandsTarget,
-    ]) {
+    const cleanTargets = [
+        {path: opencodeTarget, type: "skills"},
+        {path: opencodeCommandsTarget, type: "commands"},
+    ]
+
+    // Cleanup ALL symlinks in the opencode skills directory and commands directory that point to ANY folder inside AGENT_SKILLS_HOME
+    for (const targetObj of cleanTargets) {
+        const target = targetObj.path
         if (!(await fs.pathExists(target))) continue
 
         const existingEntries = await fs.readdir(target)
@@ -288,7 +304,8 @@ async function linkSkills(quiet = false) {
                     // If the symlink points anywhere inside AGENT_SKILLS_HOME, remove it
                     if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
                         await fs.remove(entryPath)
-                        removed++
+                        if (targetObj.type === "commands") removedCommands++
+                        else removedSkills++
                     }
                 }
             } catch (err) {}
@@ -305,7 +322,7 @@ async function linkSkills(quiet = false) {
                 const targetPath = path.join(opencodeTarget, dir)
                 await fs.remove(targetPath)
                 await fs.ensureSymlink(skillPath, targetPath)
-                added++
+                addedSkills++
             }
         }
     }
@@ -321,19 +338,15 @@ async function linkSkills(quiet = false) {
                     const targetPath = path.join(opencodeCommandsTarget, file)
                     await fs.remove(targetPath)
                     await fs.ensureSymlink(cmdPath, targetPath)
-                    added++
+                    addedCommands++
                 }
             }
         }
     }
 
     await updateOpenCodeConfig()
-
-    if (!quiet) {
-        console.log(
-            `✅ Synced skills to OpenCode (${added} linked, ${removed} old links removed).`
-        )
-    }
+    logTask("Updated OpenCode config instructions.")
+    return {addedSkills, addedCommands, removedSkills, removedCommands}
 }
 
 interface OpenCodeConfig {
@@ -493,10 +506,6 @@ async function unlinkSkills() {
         process.env.AGENT_SKILLS_HOME_OPENCODE ||
         path.join(os.homedir(), ".config", "opencode", "skills")
 
-    // Legacy agents target
-    const agentsTarget = path.join(os.homedir(), ".agents", "skills")
-
-    // Commands target
     const commandsTarget = path.join(
         os.homedir(),
         ".config",
@@ -504,10 +513,15 @@ async function unlinkSkills() {
         "commands"
     )
 
-    const targets = [opencodeTarget, agentsTarget, commandsTarget]
-    let removed = 0
+    const targets = [
+        {path: opencodeTarget, type: "skills"},
+        {path: commandsTarget, type: "commands"},
+    ]
+    let removedSkills = 0
+    let removedCommands = 0
 
-    for (const target of targets) {
+    for (const targetObj of targets) {
+        const target = targetObj.path
         if (!(await fs.pathExists(target))) {
             continue
         }
@@ -525,7 +539,8 @@ async function unlinkSkills() {
                     )
                     if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
                         await fs.remove(entryPath)
-                        removed++
+                        if (targetObj.type === "commands") removedCommands++
+                        else removedSkills++
                     }
                 }
             } catch (err) {}
@@ -533,21 +548,30 @@ async function unlinkSkills() {
     }
 
     await cleanOpenCodeConfig()
-
-    console.log(
-        `✅ Uninstalled ${removed} skills and cleaned global instructions.`
-    )
+    logTask("Cleaned global instructions from OpenCode config.")
+    return {removedSkills, removedCommands}
 }
 
 async function syncAction() {
-    console.log("Syncing skills documentation and configurations...")
-    await sync() // Call the existing doc sync
-    await linkSkills(false) // Link symmetrically
+    intro("OpenCode Agent Skills Synchronizer")
+    await sync()
+    const metrics = await linkSkills()
+
+    printSummary("Sync Summary", [
+        {label: "Skills linked", value: metrics.addedSkills},
+        {label: "Commands linked", value: metrics.addedCommands},
+    ])
+    outro("Done! Synchronization complete.")
 }
 
 async function uninstallAction() {
     intro("OpenCode Agent Skills Uninstaller")
-    await unlinkSkills()
+    const metrics = await unlinkSkills()
+
+    printSummary("Uninstallation Summary", [
+        {label: "Skills removed", value: metrics.removedSkills},
+        {label: "Commands removed", value: metrics.removedCommands},
+    ])
     outro("Done! Skills have been unlinked from OpenCode.")
 }
 
@@ -573,15 +597,21 @@ async function install() {
         s.start("Updating shell config...")
         const exportLine = `\nexport AGENT_SKILLS_HOME="${AGENT_SKILLS_HOME}"\n`
         await fs.appendFile(rcPath, exportLine)
-        s.stop("Shell config updated.")
+        s.stop("Updated shell configuration.")
     }
 
     const s = spinner()
     s.start("Linking skills to OpenCode...")
+    const metrics = await linkSkills()
+    s.stop("Linked skills successfully to OpenCode.")
 
-    await linkSkills(true)
+    printSummary("Installation Summary", [
+        {label: "Skills linked", value: metrics.addedSkills},
+        {label: "Commands linked", value: metrics.addedCommands},
+        {label: "Old skills removed", value: metrics.removedSkills},
+        {label: "Old commands removed", value: metrics.removedCommands},
+    ])
 
-    s.stop("Skills linked successfully to OpenCode.")
     outro(
         "Done! Restart your terminal or run `source " + rcPath + "` to finish."
     )

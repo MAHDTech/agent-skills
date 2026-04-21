@@ -1,7 +1,7 @@
 +++
-title = "pr-conflict-resolver"
+title = "git-resolve-conflicts"
 description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
-date = 2026-04-20
+date = 2026-04-21
 [extra]
 triggers = []
 mermaid = false

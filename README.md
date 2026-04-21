@@ -34,12 +34,6 @@ My personal and public agent skills.
 
 **Triggers**: magic words, magic-words, about iterating, discussing the plan, work back and forth, before jumping to code
 
-### [brain-persona](skills/brain-persona/SKILL.md)
-
-**Description**: Prime the agent with a behavioral persona for the conversation
-
-**Triggers**: -
-
 ### [brain-pr-edgecase](skills/brain-pr-edgecase/SKILL.md)
 
 **Description**: Review branch changes for test gaps, logic edge cases, failure modes, and integration risks
@@ -88,45 +82,51 @@ My personal and public agent skills.
 
 **Triggers**: create a temporary file, run a quick test, make a scratch script, create a test script, experiment with
 
-### [gh-issue](commands/gh-issue.md)
+### [code-productionize](commands/code-productionize.md)
+
+**Description**: Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization
+
+### [code-sculpt](commands/code-sculpt.md)
+
+**Description**: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
+
+### [gh-create-issue](commands/gh-create-issue.md)
 
 **Description**: Create structured GitHub issues from conversation context using gh CLI
+
+### [gh-create-pr](commands/gh-create-pr.md)
+
+**Description**: Generate a PR title and description, then commit, create/update the PR on approval
+
+### [gh-reply-pr-comments](commands/gh-reply-pr-comments.md)
+
+**Description**: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
+
+### [git-resolve-conflicts](commands/git-resolve-conflicts.md)
+
+**Description**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
+
+### [plan-store](commands/plan-store.md)
+
+**Description**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
 
 ### [pr-build-context](commands/pr-build-context.md)
 
 **Description**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
 
-### [pr-conflict-resolver](commands/pr-conflict-resolver.md)
-
-**Description**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
-
-### [pr-description](commands/pr-description.md)
-
-**Description**: Generate a PR title and description, then commit, create/update the PR on approval
-
-### [pr-gh-comments](commands/pr-gh-comments.md)
-
-**Description**: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
-
-### [pr-review-prepare](commands/pr-review-prepare.md)
-
-**Description**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
-
-### [pr-test-plan](commands/pr-test-plan.md)
+### [pr-create-test-plan](commands/pr-create-test-plan.md)
 
 **Description**: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
 
-### [productionize](commands/productionize.md)
+### [pr-prepare-review](commands/pr-prepare-review.md)
 
-**Description**: Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization
+**Description**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
 
-### [sculpt-code](commands/sculpt-code.md)
+### [sys-command-creator](skills/sys-command-creator/SKILL.md)
 
-**Description**: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
+**Description**: Guide for creating effective commands that follow the Agent Commands standards. Use this when the user wants to create a new command or update an existing one.
 
-### [store-plan](commands/store-plan.md)
-
-**Description**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
+**Triggers**: create a new command, add a command, how do I write a command
 
 ### [sys-skill-creator](skills/sys-skill-creator/SKILL.md)
 

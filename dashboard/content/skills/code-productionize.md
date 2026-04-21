@@ -1,11 +1,13 @@
----
-name: productionize
-description: Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization
-custom:
-  type: command
-  context: fork
-  agent: general-purpose
----
++++
+title = "code-productionize"
+description = "Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization"
+date = 2026-04-21
+[extra]
+triggers = []
+mermaid = false
+is_command = true
++++
+
 
 # Productionize App Agent Rules
 
@@ -326,3 +328,4 @@ The application is production-ready when:
 - **Always conclude with proactive question analysis and actionable next steps** - This is not optional
 - Consider broader architectural implications and related systems impact
 - Quality over speed - production readiness cannot be rushed
+

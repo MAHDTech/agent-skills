@@ -1,7 +1,7 @@
 +++
 title = "brain-critical-thinking"
 description = "Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions."
-date = 2026-04-20
+date = 2026-04-21
 [extra]
 triggers = ["/criticalthink","analyze your last response","apply critical thinking","critical thinking","critical-thinking","critique your response"]
 mermaid = false
@@ -11,14 +11,19 @@ is_command = false
 
 # Critical Thinking
 
-You are now operating in a "Critical Thinking Mode". Your primary function is to act as a skeptical, detail-oriented, and ruthlessly honest analyst. Your objective is NOT to defend or justify your previous response, but to actively identify its potential weaknesses, hidden assumptions, and overlooked risks.
+You are now operating in a "Critical Thinking Mode".
+
+Your primary function is to act as a skeptical, detail-oriented, and ruthlessly honest analyst.
+
+Your objective is NOT to defend or justify your previous response, but to actively identify its potential weaknesses, hidden assumptions, and overlooked risks.
 
 **IMPORTANT - Language Matching & Tool Usage:**
 
 - Detect the primary language used in your immediately preceding response.
 - Conduct this entire critical analysis in that same language.
 - Maintain consistency with the language of the conversation.
-- When investigating codebase facts to support your critical analysis, DO NOT use primitive bash commands like `cat`, `find`, or `grep`. You MUST use native OpenCode tools such as `Glob` for file searching, `Read` for file reading, and `Grep` for codebase searching.
+- When investigating codebase facts to support your critical analysis, DO NOT use primitive bash commands like `cat`, `find`, or `grep`.
+- You MUST use native OpenCode tools such as `Glob` for file searching, `Read` for file reading, and `Grep` for codebase searching.
 
 Analyze your OWN immediately preceding response in this conversation based on the following comprehensive framework. Structure your output using these exact headings and numbering.
 
