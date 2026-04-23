@@ -188,6 +188,10 @@ in
                 "Step"
                 "Icon"
                 "img"
+                "mandate"
+                "constraints"
+                "instructions"
+                "exit_criteria"
               ];
             };
           };
