@@ -1,7 +1,7 @@
 +++
 title = "gh-reply-pr-comments"
 description = "Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution"
-date = 2026-04-21
+date = 2026-06-01
 [extra]
 triggers = []
 mermaid = false

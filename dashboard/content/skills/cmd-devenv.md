@@ -1,7 +1,7 @@
 +++
 title = "cmd-devenv"
 description = "Strict guidelines for using devenv for shell and dependency management"
-date = 2026-04-21
+date = 2026-06-01
 [extra]
 triggers = ["devenv","developer environment","when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
 mermaid = false
@@ -27,19 +27,11 @@ devenv shell -- <command>
 - **Dash-Dash is Mandatory (`--`):** NEVER use `devenv shell -c <command>`. This is an incredibly common mistake. The `-c` argument is used for a "clean" environment and using it gives unexpected results.
   - Use `devenv shell -- <command>` - this is the right way.
 
-## Testing
+## Pre-commit Hooks and Testing
 
-- Devenv includes a command to execute tests which automatically triggers pre-commit hooks against the codebase:
-
-```bash
-devenv test
-```
-
-- Alternatively, if you need to manually trigger all pre-commit hooks directly, you MUST use the `prek` alias (which resolves to `pre-commit`) via the devenv shell:
-
-```bash
-devenv shell -- prek run -a
-```
+Devenv gives us the ability to run tests and linters seamlessly:
+- `devenv test`: This triggers all pre-commit hooks and other defined tests and is **mandatory** as part of testing.
+- `devenv shell -- prek run -a`: As a fallback, this can also be used to just run the pre-commit hooks.
 
 ## MCP Servers & Skills
 

@@ -106,6 +106,12 @@ My personal and public agent skills.
 
 **Description**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
 
+### [guidelines](skills/guidelines/SKILL.md)
+
+**Description**: Behaviour Guidelines for AI Agents.
+
+**Triggers**: /guidelines, follow the guidelines, verify against the guidelines
+
 ### [plan-store](commands/plan-store.md)
 
 **Description**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".

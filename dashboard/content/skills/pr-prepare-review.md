@@ -1,7 +1,7 @@
 +++
 title = "pr-prepare-review"
 description = "Prepare branch for code review by building context, identifying issues, and suggesting improvements"
-date = 2026-04-21
+date = 2026-06-01
 [extra]
 triggers = []
 mermaid = false

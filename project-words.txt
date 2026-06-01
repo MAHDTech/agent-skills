@@ -94,4 +94,6 @@ verdana
 webmail
 todowrite
 webfetch
-convco
+convcoAndrej
+Karpathy
+Andrej

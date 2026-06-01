@@ -1,7 +1,7 @@
 +++
 title = "brain-magic-words"
 description = "Intercepts requests to ensure the AI agent and human work back and forth to create an implementation plan before diving into code."
-date = 2026-04-21
+date = 2026-06-01
 [extra]
 triggers = ["magic words","magic-words","about iterating","discussing the plan","work back and forth","before jumping to code"]
 mermaid = false

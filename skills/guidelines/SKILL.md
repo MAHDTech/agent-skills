@@ -1,32 +1,21 @@
-# Agent Skills Repository
+---
+name: guidelines
+description: Behaviour Guidelines for AI Agents.
+custom:
+  triggers:
+    - /guidelines
+    - follow the guidelines
+    - verify against the guidelines
+  category: cognitive
+---
 
-## Overview
+# Guidelines
 
-This repository house AI Agent skills for use with _OpenCode_.
-
-See the [README.md](./README.md) for an overview of the project and available skills.
-
-## Development
-
-- Environment: This project requires `devenv`. Always check if `devenv` is active. Run ad-hoc commands inside the devenv shell with `devenv shell -- <command>`.
-  - **CRITICAL LINTING RULE:** NEVER run individual linters directly (e.g., `devenv shell -- markdownlint .`). All linters and pre-commit hooks MUST be configured and run inside `devenv.nix`.
-  - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv test` or the `run-tests` wrappers. This is the single guaranteed path.
-  - If a specific linter or pre-commit check doesn't exist, check the devenv MCP server or devenv agent docs. If you STILL don't find it, ask the user for confirmation.
-- Runtime: `bun`. Use `bun` for all scripts.
-- CLI Skills Tool: `bun run bin/skills.ts`. Use this to manage skills.
-
-## Dashboard
-
-- To build/sync: `bun run build:dashboard`.
-- To serve: `bun run serve:dashboard`. (Uses Zola & Tailwind).
-
-## Behaviour
-
-Behavioural guidelines to reduce common LLM coding mistakes.
+Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-### 1. Think Before Coding
+## 1. Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
@@ -37,7 +26,7 @@ Before implementing:
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
 
-### 2. Simplicity First
+## 2. Simplicity First
 
 **Minimum code that solves the problem. Nothing speculative.**
 
@@ -49,7 +38,7 @@ Before implementing:
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
-### 3. Surgical Changes
+## 3. Surgical Changes
 
 **Touch only what you must. Clean up only your own mess.**
 
@@ -67,7 +56,7 @@ When your changes create orphans:
 
 The test: Every changed line should trace directly to the user's request.
 
-### 4. Goal-Driven Execution
+## 4. Goal-Driven Execution
 
 **Define success criteria. Loop until verified.**
 
@@ -86,7 +75,3 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to over-complication, and clarifying questions come before implementation rather than after mistakes.

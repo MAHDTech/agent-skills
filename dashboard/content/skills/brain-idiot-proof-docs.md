@@ -1,7 +1,7 @@
 +++
 title = "brain-idiot-proof-docs"
 description = "Simplify documentation for clarity and readability with approval-gated edits"
-date = 2026-04-21
+date = 2026-06-01
 [extra]
 triggers = []
 mermaid = false

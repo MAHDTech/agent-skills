@@ -23,6 +23,7 @@ description: Single source of truth for agent instructions
 - **gh-create-pr**: Generate a PR title and description, then commit, create/update the PR on approval
 - **gh-reply-pr-comments**: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
 - **git-resolve-conflicts**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
+- **guidelines**: Behaviour Guidelines for AI Agents.
 - **plan-store**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
 - **pr-build-context**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
 - **pr-create-test-plan**: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
