@@ -1,7 +1,7 @@
 +++
 title = "sys-skill-creator"
 description = "Guide for creating effective skills that follow the Agent Skills standards. Use this when the user wants to create a new skill or update an existing one."
-date = 2026-06-01
+date = 2026-06-04
 [extra]
 triggers = ["create a new skill","add a skill","how do I write a skill"]
 mermaid = false

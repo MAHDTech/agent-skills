@@ -1,7 +1,7 @@
 +++
 title = "guidelines"
 description = "Behaviour Guidelines for AI Agents."
-date = 2026-06-01
+date = 2026-06-04
 [extra]
 triggers = ["/guidelines","follow the guidelines","verify against the guidelines"]
 mermaid = false

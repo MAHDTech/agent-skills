@@ -30,6 +30,7 @@ dist/
 .vscode/
 .cursor/
 .windsurf/
+.antigravitycli/
 
 # Dashboard Build
 dashboard/public/

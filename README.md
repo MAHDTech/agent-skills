@@ -10,6 +10,12 @@ My personal and public agent skills.
 
 ## Available Skills
 
+### [bevy-expert](skills/bevy-expert/SKILL.md)
+
+**Description**: Expert developer guidance on Bevy, Rust's data-driven game engine, covering ECS structure, input, assets, events, states, system scheduling, and performance tuning.
+
+**Triggers**: bevy, bevy game engine, bevy-expert, Rust game engine, Rust gamedev
+
 ### [brain-critical-thinking](skills/brain-critical-thinking/SKILL.md)
 
 **Description**: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
@@ -127,6 +133,12 @@ My personal and public agent skills.
 ### [pr-prepare-review](commands/pr-prepare-review.md)
 
 **Description**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
+
+### [refactor-codebase](skills/refactor-codebase/SKILL.md)
+
+**Description**: Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior.
+
+**Triggers**: refactor, refactor codebase, refactor code, remove dead code, modernize legacy patterns, clean up codebase
 
 ### [sys-command-creator](skills/sys-command-creator/SKILL.md)
 

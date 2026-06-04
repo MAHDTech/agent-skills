@@ -1,7 +1,7 @@
 +++
 title = "brain-follow-up"
 description = "Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements"
-date = 2026-06-01
+date = 2026-06-04
 [extra]
 triggers = []
 mermaid = false

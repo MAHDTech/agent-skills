@@ -5,6 +5,7 @@ description: Single source of truth for agent instructions
 
 # Available Skills & Commands
 
+- **bevy-expert**: Expert developer guidance on Bevy, Rust's data-driven game engine, covering ECS structure, input, assets, events, states, system scheduling, and performance tuning.
 - **brain-critical-thinking**: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
 - **brain-follow-up**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 - **brain-idiot-proof-docs**: Simplify documentation for clarity and readability with approval-gated edits
@@ -28,5 +29,6 @@ description: Single source of truth for agent instructions
 - **pr-build-context**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
 - **pr-create-test-plan**: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
 - **pr-prepare-review**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
+- **refactor-codebase**: Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior.
 - **sys-command-creator**: Guide for creating effective commands that follow the Agent Commands standards. Use this when the user wants to create a new command or update an existing one.
 - **sys-skill-creator**: Guide for creating effective skills that follow the Agent Skills standards. Use this when the user wants to create a new skill or update an existing one.

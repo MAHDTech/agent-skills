@@ -1,7 +1,7 @@
 +++
 title = "brain-critical-thinking"
 description = "Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions."
-date = 2026-06-01
+date = 2026-06-04
 [extra]
 triggers = ["/criticalthink","analyze your last response","apply critical thinking","critical thinking","critical-thinking","critique your response"]
 mermaid = false
