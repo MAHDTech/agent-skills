@@ -1,7 +1,7 @@
 +++
 title = "cmd-opencode"
 description = "This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected."
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = ["opencode"]
 mermaid = false

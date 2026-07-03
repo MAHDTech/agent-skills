@@ -94,9 +94,9 @@ verdana
 webmail
 todowrite
 webfetch
-convcoAndrej
-Karpathy
+convco
 Andrej
+Karpathy
 gamedev
 println
 Fire

@@ -1,7 +1,7 @@
 +++
 title = "bevy-expert"
 description = "Expert developer guidance on Bevy, Rust's data-driven game engine, covering ECS structure, input, assets, events, states, system scheduling, and performance tuning."
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = ["bevy","bevy game engine","bevy-expert","Rust game engine","Rust gamedev"]
 mermaid = false

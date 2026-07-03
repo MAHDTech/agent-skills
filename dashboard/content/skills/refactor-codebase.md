@@ -1,7 +1,7 @@
 +++
 title = "refactor-codebase"
 description = "Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior."
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = ["refactor","refactor codebase","refactor code","remove dead code","modernize legacy patterns","clean up codebase"]
 mermaid = false

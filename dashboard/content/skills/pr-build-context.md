@@ -1,7 +1,7 @@
 +++
 title = "pr-build-context"
 description = "Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions"
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = []
 mermaid = false

@@ -1,7 +1,7 @@
 +++
 title = "gh-create-issue"
 description = "Create structured GitHub issues from conversation context using gh CLI"
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = []
 mermaid = false

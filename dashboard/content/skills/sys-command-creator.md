@@ -1,7 +1,7 @@
 +++
 title = "sys-command-creator"
 description = "Guide for creating effective commands that follow the Agent Commands standards. Use this when the user wants to create a new command or update an existing one."
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = ["create a new command","add a command","how do I write a command"]
 mermaid = false

@@ -1,7 +1,7 @@
 +++
 title = "cmd-devenv"
 description = "Strict guidelines for using devenv for shell and dependency management"
-date = 2026-06-04
+date = 2026-07-03
 [extra]
 triggers = ["devenv","developer environment","when using devenv","when running commands in a devenv environment","when you see a devenv.nix or devenv.yaml file"]
 mermaid = false
