@@ -130,7 +130,12 @@ in
       check-symlinks.enable = true;
       check-yaml.enable = true;
       commitizen.enable = true;
-      convco.enable = true;
+      convco = {
+        enable = true;
+        settings = {
+          configPath = ".versionrc";
+        };
+      };
       cspell = {
         enable = true;
         excludes = [
@@ -206,6 +211,8 @@ in
           "dashboard/content/skills/.*\\.md$"
           "dashboard/content/_index\\.md$"
           "README\\.md$"
+          "\\.devcontainer\\.json$"
+          "\\.devcontainer/devcontainer\\.json$"
         ];
       };
       ripsecrets.enable = true;
