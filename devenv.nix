@@ -138,8 +138,10 @@ in
       cspell = {
         enable = true;
         excludes = [
-          "skills/cmd-opencode-acp/.*\\.md$"
-          "dashboard/content/skills/cmd-opencode-acp\\.md$"
+          "skills/tooling/opencode-acp/.*\\.md$"
+          "dashboard/content/.*\\.md$"
+          "^README\\.md$"
+          "^agents/AGENTS\\.md$"
           "\\.versionrc$"
         ];
         args = [
@@ -158,9 +160,10 @@ in
       markdownlint = {
         enable = true;
         excludes = [
-          "dashboard/content/skills/.*\\.md$"
-          "dashboard/content/_index\\.md$"
-          "skills/cmd-opencode-acp/.*\\.md$"
+          "dashboard/content/.*\\.md$"
+          "skills/tooling/opencode-acp/.*\\.md$"
+          "^README\\.md$"
+          "^agents/AGENTS\\.md$"
         ];
         settings = {
           configuration = {
@@ -207,9 +210,10 @@ in
         enable = true;
         excludes = [
           "\\.html$"
-          "dashboard/content/skills/.*\\.md$"
-          "dashboard/content/_index\\.md$"
+          "dashboard/content/.*\\.md$"
           "README\\.md$"
+          "^agents/AGENTS\\.md$"
+          "^skills\\.sh\\.json$"
           "\\.devcontainer\\.json$"
           "\\.devcontainer/devcontainer\\.json$"
         ];
@@ -221,14 +225,14 @@ in
         enable = true;
         name = "Skills Linter";
         entry = "skills --action lint";
-        files = "(SKILL|COMMAND)\\.md$";
+        files = "SKILL\\.md$";
         pass_filenames = false;
       };
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "skills --action sync";
-        files = "(SKILL|COMMAND)\\.md$";
+        entry = "env SKILLS_REPO_ONLY=1 skills --action sync";
+        files = "SKILL\\.md$";
         pass_filenames = false;
       };
       trim-trailing-whitespace = {
@@ -280,12 +284,8 @@ in
   };
 
   scripts = {
-    setup = {
-      description = "Set up the agent skills environment";
-      exec = "bun run setup";
-    };
     skills = {
-      description = "Manage agent skills (usage: skills --action <lint|sync|install>)";
+      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall>)";
       exec = "bun run skills \"$@\"";
     };
     build-css = {

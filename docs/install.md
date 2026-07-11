@@ -1,8 +1,12 @@
 # Installation Guide
 
-## Consumer
+These skills are cross-compatible with Claude Code, OpenCode, Goose, and Antigravity CLI. All four read the same Anthropic-style `skills/<name>/SKILL.md` format.
 
-To install these skills, use the following method:
+## For users
+
+Install with the [skills.sh](https://skills.sh) CLI:
+
+[![skills.sh](https://skills.sh/b/MAHDTech/agent-skills)](https://skills.sh/MAHDTech/agent-skills)
 
 ```bash
 # NPM users
@@ -12,39 +16,45 @@ npx skills add MAHDTech/agent-skills
 bunx skills add MAHDTech/agent-skills
 ```
 
-When you want to update the skills, run the following command:
+The installer auto-detects which agents you have installed (Claude Code, OpenCode, Goose, Antigravity), then lets you pick the skills and the agents you want. Selected skills are installed by symlink, so updates flow through automatically.
+
+To update later:
 
 ```bash
-bunx skills update
+npx skills update
 ```
 
-## Developer
+## For developers
 
-To install these skills locally, for use during local development, follow these steps:
+If you are working on the skills in this repository, install them from your local working tree so you can iterate live.
 
-1. **Clone the repository**:
+1. Clone the repository:
 
-```bash
-git clone https://github.com/MAHDTech/agent-skills.git
-cd agent-skills
-```
+   ```bash
+   git clone https://github.com/MAHDTech/agent-skills.git
+   cd agent-skills
+   ```
 
-1. **Checkout a branch**:
+2. Install the skills into your agent tools:
 
-```bash
-git checkout feat/add-my-new-skill
-```
+   ```bash
+   bun run skills --action install
+   ```
 
-1. **Run the TUI Installer**:
+3. Verify the install by checking an agent's skills location (for example `~/.agents/skills/`) to confirm the symlinks were created, then trigger a skill from your agent to see it run.
 
-```bash
-bun run setup
-```
+`skills --action install` symlinks the working tree into each detected agent's skills location:
 
-Follow the interactive prompts to link the skills to your preferred AI agent CLIs (Gemini, Claude, or OpenCode).
+- `~/.agents/skills/` for OpenCode and Goose
+- `~/.claude/skills/` for Claude Code
+- the Antigravity registry at `~/.gemini/config/skills.json`
 
-This will give you live running skills in the environment allowing you to test your changes live.
+It auto-detects which tools are installed and only wires those. It is idempotent: re-run it any time you add, rename, or remove a skill — it cleans up its own stale links (from renames or deletions) while leaving any skills you hand-copied for testing untouched. Because everything is symlinked, edits to a `SKILL.md` in your clone take effect immediately in every agent, with no reinstall needed.
 
-1. **Verify Installation**:
+The three commands you will use:
 
-Check your CLI's skills directory (e.g., `~/.agents/skills`) to ensure the symlinks were created.
+| Command                     | What it does                                                                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `skills --action install`   | Wire the skills into your machine's agent tools (idempotent)                                                                                    |
+| `skills --action uninstall` | Remove every symlink this repo owns                                                                                                             |
+| `skills --action sync`      | Do both of the above **and** regenerate the README, `agents/AGENTS.md`, `skills.sh.json`, and dashboard — the "make everything current" command |

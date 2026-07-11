@@ -2,9 +2,15 @@
 
 ## Overview
 
-This repository house AI Agent skills for use with _OpenCode_.
+This repository houses AI Agent skills that work across multiple agent tools: _Claude Code_, _OpenCode_, _Goose_, and _Antigravity CLI_. They all read the same Anthropic-style `skills/<name>/SKILL.md` format, so a single skill runs everywhere.
 
 See the [README.md](./README.md) for an overview of the project and available skills.
+
+## Structure
+
+- Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
+- Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
+- Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details.
 
 ## Development
 
@@ -13,7 +19,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
   - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv test` or the `run-tests` wrappers. This is the single guaranteed path.
   - If a specific linter or pre-commit check doesn't exist, check the devenv MCP server or devenv agent docs. If you STILL don't find it, ask the user for confirmation.
 - Runtime: `bun`. Use `bun` for all scripts.
-- CLI Skills Tool: `bun run bin/skills.ts`. Use this to manage skills.
+- CLI Skills Tool: `bun run bin/skills.ts` (also `bun run skills`). Use this to lint and sync skills, and to symlink them for local development.
 
 ## Dashboard
 
