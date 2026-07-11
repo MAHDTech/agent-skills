@@ -54,30 +54,29 @@ in
   packages = packages ++ lib.optionals isNative devPackages;
 
   enterShell = ''
-    if [[ "${"CI:-false"}" == "true" ]];
-    then
+    if [[ "${"CI:-false"}" == "true" ]]; then
       echo "devenv running in CI"
     else
-      # showfigfonts 2>/dev/null | less
       figlet -f slant -w 180 "$(echo "$PROJECT" | tr '[:lower:]-' '[:upper:] ')"
 
-      hello --greeting="🤖 Hello ''${USER:-user}, welcome to the $PROJECT project!"
+      hello --greeting="Hello ''${USER:-user}, welcome to the $PROJECT project."
 
-      echo -e "\nAGENT_SKILLS_HOME is set to ''${AGENT_SKILLS_HOME:-(not set!)}"
-
-      echo ""
-      echo "#########################"
-      echo "#### Helper scripts #####"
-      echo "#########################"
-      echo "🦾"
-      ${lib.concatStrings (
-        lib.mapAttrsToList (
-          name: value: "printf '🦾 %-20s  %s\\n' '${name}' '${value.description or ""}'\n"
-        ) config.scripts
-      )}
-      echo "🦾"
-      echo "#########################"
+      ${lib.optionalString (config.scripts != { }) ''
+        echo ""
+        echo "#########################"
+        echo "#### Helper scripts #####"
+        echo "#########################"
+        echo "🦾"
+        ${lib.concatStrings (
+          lib.mapAttrsToList (
+            name: value: "printf '🦾 %-20s  %s\\n' '${name}' '${value.description}'\n"
+          ) config.scripts
+        )}
+        echo "🦾"
+        echo "#########################"
+      ''}
     fi
+    echo -e "\nAGENT_SKILLS_HOME is set to ''${AGENT_SKILLS_HOME:-(not set!)}"
   '';
 
   languages = {
