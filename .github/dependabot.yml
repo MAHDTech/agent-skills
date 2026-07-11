@@ -28,6 +28,7 @@ updates:
 
   - package-ecosystem: "bun"
     directory: "/"
+    versioning-strategy: increase
     schedule:
       interval: "weekly"
       day: "sunday"
