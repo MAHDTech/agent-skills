@@ -35,11 +35,9 @@ in
   cachix = lib.mkIf isNative {
     enable = true;
     pull = [
-      "MAHDTech"
-      "devenv"
-      "nix-community"
-      "pre-commit-hooks"
+      "mahdtech"
     ];
+    push = "mahdtech";
   };
 
   devenv = lib.mkIf isNative {
