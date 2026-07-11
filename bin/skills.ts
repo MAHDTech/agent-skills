@@ -1,0 +1,648 @@
+import fs from "fs-extra"
+import path from "path"
+import os from "os"
+import yaml from "js-yaml"
+import {glob} from "glob"
+import {execFileSync} from "child_process"
+import {intro, outro, confirm, spinner, note, cancel, log} from "@clack/prompts"
+
+function logTask(msg: string) {
+    log.step(`✅ ${msg}`)
+}
+
+function printSummary(
+    title: string,
+    metrics: {label: string; value: number | string}[]
+) {
+    log.message(`  ═══ 📊  ${title}  ═══`)
+    metrics.forEach((m) => {
+        log.message(`      ✨ ${m.label}: ${m.value}`)
+    })
+}
+
+const AGENT_SKILLS_HOME =
+    process.env.AGENT_SKILLS_HOME || path.resolve(import.meta.dir, "..")
+const SKILLS_DIR = path.join(AGENT_SKILLS_HOME, "skills")
+const COMMANDS_DIR = path.join(AGENT_SKILLS_HOME, "commands")
+const AGENTS_FILE = path.join(AGENT_SKILLS_HOME, "agents", "AGENTS.md")
+const README_FILE = path.join(AGENT_SKILLS_HOME, "README.md")
+const DOCS_DIR = path.join(AGENT_SKILLS_HOME, "docs")
+const DASHBOARD_CONTENT_DIR = path.join(
+    AGENT_SKILLS_HOME,
+    "dashboard",
+    "content",
+    "skills"
+)
+
+interface SkillMetadata {
+    name: string
+    description: string
+    license?: string
+    compatibility?: string
+    metadata?: Record<string, string>
+    custom?: {
+        triggers?: string[]
+        category?: string
+        type?: string
+        agent?: string
+        context?: string
+        [key: string]: any
+    }
+    [key: string]: any
+}
+
+interface Skill {
+    path: string
+    metadata: SkillMetadata
+    content: string
+    isCommand: boolean
+}
+
+async function getItems(): Promise<Skill[]> {
+    const items: Skill[] = []
+
+    // Process skills
+    if (await fs.pathExists(SKILLS_DIR)) {
+        const skillFiles = await glob("**/SKILL.md", {cwd: SKILLS_DIR})
+        for (const file of skillFiles) {
+            const fullPath = path.join(SKILLS_DIR, file)
+            const rawContent = await fs.readFile(fullPath, "utf-8")
+            const match = rawContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
+            if (match && match[1] && match[2]) {
+                const metadata = yaml.load(match[1]) as SkillMetadata
+                items.push({
+                    path: `skills/${file}`,
+                    metadata,
+                    content: match[2],
+                    isCommand: false,
+                })
+            } else {
+                console.warn(`Skill at ${file} is missing YAML frontmatter.`)
+            }
+        }
+    }
+
+    // Process commands
+    if (await fs.pathExists(COMMANDS_DIR)) {
+        const commandFiles = await glob("*.md", {cwd: COMMANDS_DIR})
+        for (const file of commandFiles) {
+            const fullPath = path.join(COMMANDS_DIR, file)
+            const rawContent = await fs.readFile(fullPath, "utf-8")
+            const match = rawContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
+            if (match && match[1] && match[2]) {
+                const metadata = yaml.load(match[1]) as SkillMetadata
+                if (!metadata.name) {
+                    metadata.name = path.basename(file, ".md")
+                }
+                items.push({
+                    path: `commands/${file}`,
+                    metadata,
+                    content: match[2],
+                    isCommand: true,
+                })
+            } else {
+                console.warn(`Command at ${file} is missing YAML frontmatter.`)
+            }
+        }
+    }
+
+    return items
+}
+
+async function lint() {
+    intro("Linting Skills and Commands")
+    const items = await getItems()
+    let errors = 0
+
+    for (const item of items) {
+        const file = item.path
+        try {
+            const required = ["name", "description"]
+            for (const field of required) {
+                if (!item.metadata[field]) {
+                    log.error(
+                        `❌ ${file}: Missing mandatory field '${field}' in frontmatter.`
+                    )
+                    errors++
+                }
+            }
+
+            // Check if folder name matches metadata name (only for skills)
+            if (!item.isCommand) {
+                const folderName = path.dirname(file).split(path.sep).pop()
+                if (folderName && folderName !== item.metadata.name) {
+                    log.warn(
+                        `⚠️ ${file}: Folder base name '${folderName}' does not match skill name '${item.metadata.name}'.`
+                    )
+                }
+            }
+        } catch (e) {
+            log.error(`❌ ${file}: Error validating frontmatter.`)
+            errors++
+        }
+    }
+
+    if (errors > 0) {
+        log.error(`\nFound ${errors} errors.`)
+        process.exit(1)
+    } else {
+        logTask("All skills and commands passed linting!")
+        outro("Done!")
+    }
+}
+
+async function sync() {
+    const items = await getItems()
+
+    // 1. Update agents/AGENTS.md
+    if (await fs.pathExists(AGENTS_FILE)) {
+        const agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
+        const agentsFrontmatterMatch = agentsContent.match(
+            /^---\n([\s\S]*?)\n---\n/
+        )
+        const agentsFrontmatter = agentsFrontmatterMatch
+            ? agentsFrontmatterMatch[0]
+            : ""
+
+        let newAgentsBody = `\n# Available Skills & Commands\n\n`
+        items
+            .sort((a, b) => a.metadata.name.localeCompare(b.metadata.name))
+            .forEach((item) => {
+                newAgentsBody += `- **${item.metadata.name}**: ${item.metadata.description}\n`
+            })
+        await fs.writeFile(AGENTS_FILE, agentsFrontmatter + newAgentsBody)
+        logTask("Updated AGENTS.md documentation.")
+    }
+
+    // 2. Update README.md
+    if (await fs.pathExists(DOCS_DIR)) {
+        const docsFiles = await glob("*.md", {cwd: DOCS_DIR})
+        let readmeContent = `# Agent Skills\n\n`
+        readmeContent += `My personal and public agent skills.\n\n`
+
+        readmeContent += `## Table of Contents\n\n`
+        docsFiles.sort().forEach((doc) => {
+            const name = doc.replace(".md", "")
+            readmeContent += `- [${name}](docs/${doc})\n`
+        })
+        readmeContent += `- [Skills](#available-skills)\n\n`
+
+        readmeContent += `## Available Skills\n\n`
+        items.forEach((item) => {
+            const triggers = item.metadata.custom?.triggers
+                ? item.metadata.custom.triggers.join(", ")
+                : "-"
+            readmeContent += `### [${item.metadata.name}](${item.path})\n\n`
+            const desc = item.metadata.description
+                ? item.metadata.description.trim()
+                : ""
+            readmeContent += `**Description**: ${desc}\n\n`
+            if (!item.isCommand)
+                readmeContent += `**Triggers**: ${triggers}\n\n`
+        })
+
+        await fs.writeFile(README_FILE, readmeContent.trim() + "\n")
+        logTask("Updated README.md catalog.")
+    }
+
+    // 3. Sync Zola content
+    await fs.ensureDir(DASHBOARD_CONTENT_DIR)
+    await fs.emptyDir(DASHBOARD_CONTENT_DIR)
+
+    for (const item of items) {
+        const hasMermaid = item.content.includes("```mermaid")
+        const zolaPath = path.join(
+            DASHBOARD_CONTENT_DIR,
+            `${item.metadata.name}.md`
+        )
+        const zolaContent = `+++
+title = ${JSON.stringify(item.metadata.name)}
+description = ${JSON.stringify(item.metadata.description)}
+date = ${new Date().toISOString().split("T")[0]}
+[extra]
+triggers = ${JSON.stringify(item.metadata.custom?.triggers || [])}
+mermaid = ${hasMermaid}
+is_command = ${item.isCommand}
++++
+
+${item.content}
+`
+        await fs.writeFile(zolaPath, zolaContent)
+    }
+
+    const sectionIndexContent = `+++
+title = "Skills Catalog"
+sort_by = "title"
+template = "section.html"
+weight = 1
++++
+
+Welcome to the agent skills catalog.
+`
+    await fs.writeFile(
+        path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
+        sectionIndexContent
+    )
+    logTask("Generated Dashboard content.")
+
+    // 4. Git Add
+    try {
+        execFileSync(
+            "git",
+            ["add", AGENTS_FILE, README_FILE, DASHBOARD_CONTENT_DIR],
+            {stdio: "inherit"}
+        )
+        logTask("Staged changes to git.")
+    } catch (e) {
+        log.warn(
+            "Could not stage changes to git (maybe not a git repo or no changes)."
+        )
+    }
+}
+
+async function linkSkills() {
+    const opencodeTarget =
+        process.env.AGENT_SKILLS_HOME_OPENCODE ||
+        path.join(os.homedir(), ".config", "opencode", "skills")
+
+    const opencodeCommandsTarget = path.join(
+        os.homedir(),
+        ".config",
+        "opencode",
+        "commands"
+    )
+
+    await fs.ensureDir(opencodeTarget)
+    await fs.ensureDir(opencodeCommandsTarget)
+
+    let removedSkills = 0
+    let removedCommands = 0
+    let addedSkills = 0
+    let addedCommands = 0
+
+    const cleanTargets = [
+        {path: opencodeTarget, type: "skills"},
+        {path: opencodeCommandsTarget, type: "commands"},
+    ]
+
+    // Cleanup ALL symlinks in the opencode skills directory and commands directory that point to ANY folder inside AGENT_SKILLS_HOME
+    for (const targetObj of cleanTargets) {
+        const target = targetObj.path
+        if (!(await fs.pathExists(target))) continue
+
+        const existingEntries = await fs.readdir(target)
+        for (const entry of existingEntries) {
+            const entryPath = path.join(target, entry)
+            try {
+                const stat = await fs.lstat(entryPath)
+                if (stat.isSymbolicLink()) {
+                    const linkTarget = await fs.readlink(entryPath)
+                    const absoluteTarget = path.resolve(
+                        path.dirname(entryPath),
+                        linkTarget
+                    )
+                    // If the symlink points anywhere inside AGENT_SKILLS_HOME, remove it
+                    if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
+                        await fs.remove(entryPath)
+                        if (targetObj.type === "commands") removedCommands++
+                        else removedSkills++
+                    }
+                }
+            } catch (err) {}
+        }
+    }
+
+    // Link Skills
+    if (await fs.pathExists(SKILLS_DIR)) {
+        const skillDirs = await fs.readdir(SKILLS_DIR)
+        for (const dir of skillDirs) {
+            const skillPath = path.join(SKILLS_DIR, dir)
+            const stat = await fs.stat(skillPath)
+            if (stat.isDirectory()) {
+                const targetPath = path.join(opencodeTarget, dir)
+                await fs.remove(targetPath)
+                await fs.ensureSymlink(skillPath, targetPath)
+                addedSkills++
+            }
+        }
+    }
+
+    // Link Commands
+    if (await fs.pathExists(COMMANDS_DIR)) {
+        const commandFiles = await fs.readdir(COMMANDS_DIR)
+        for (const file of commandFiles) {
+            if (file.endsWith(".md")) {
+                const cmdPath = path.join(COMMANDS_DIR, file)
+                const stat = await fs.stat(cmdPath)
+                if (stat.isFile()) {
+                    const targetPath = path.join(opencodeCommandsTarget, file)
+                    await fs.remove(targetPath)
+                    await fs.ensureSymlink(cmdPath, targetPath)
+                    addedCommands++
+                }
+            }
+        }
+    }
+
+    await updateOpenCodeConfig()
+    logTask("Updated OpenCode config instructions.")
+    return {addedSkills, addedCommands, removedSkills, removedCommands}
+}
+
+interface OpenCodeConfig {
+    instructions?: string[]
+    [key: string]: any
+}
+
+interface AgentSkillsState {
+    current_home: string
+    historical_homes: string[]
+    managed_instructions: string[]
+}
+
+const STATE_FILE = path.join(
+    os.homedir(),
+    ".config",
+    "opencode",
+    "agent-skills.json"
+)
+const OPENCODE_CONFIG_FILE = path.join(
+    os.homedir(),
+    ".config",
+    "opencode",
+    "opencode.json"
+)
+
+async function getState(): Promise<AgentSkillsState> {
+    if (await fs.pathExists(STATE_FILE)) {
+        try {
+            return await fs.readJson(STATE_FILE)
+        } catch (e) {
+            // Ignore parse error, return default
+        }
+    }
+    return {
+        current_home: AGENT_SKILLS_HOME,
+        historical_homes: [],
+        managed_instructions: [],
+    }
+}
+
+async function saveState(state: AgentSkillsState) {
+    await fs.ensureDir(path.dirname(STATE_FILE))
+    await fs.writeJson(STATE_FILE, state, {spaces: 2})
+}
+
+async function updateOpenCodeConfig() {
+    const state = await getState()
+    const targetAgentsFile = path.join(AGENT_SKILLS_HOME, "agents", "AGENTS.md")
+
+    // Detect if the repo was moved
+    if (state.current_home !== AGENT_SKILLS_HOME) {
+        if (!state.historical_homes.includes(state.current_home)) {
+            state.historical_homes.push(state.current_home)
+        }
+        state.current_home = AGENT_SKILLS_HOME
+    }
+
+    const newInstructions = [targetAgentsFile]
+
+    // Update opencode.json
+    if (await fs.pathExists(OPENCODE_CONFIG_FILE)) {
+        try {
+            const configContent = await fs.readFile(
+                OPENCODE_CONFIG_FILE,
+                "utf8"
+            )
+            // simple read to preserve comments/formatting as much as possible if user used comments?
+            // standard JSON.parse is safer for modification
+            let config: OpenCodeConfig = {}
+            try {
+                config = JSON.parse(configContent)
+            } catch (e) {
+                console.warn(
+                    `⚠️ Could not parse ${OPENCODE_CONFIG_FILE}. Skipping instruction sync.`
+                )
+                return
+            }
+
+            let instructions = config.instructions || []
+
+            // Remove any instructions that we previously managed or that belong to historical homes
+            instructions = instructions.filter((inst) => {
+                if (state.managed_instructions.includes(inst)) return false
+                for (const historical of state.historical_homes) {
+                    if (inst.startsWith(historical)) return false
+                }
+                return true
+            })
+
+            // Add the new instructions if they aren't already there
+            for (const inst of newInstructions) {
+                if (!instructions.includes(inst)) {
+                    instructions.push(inst)
+                }
+            }
+
+            config.instructions = instructions
+            await fs.writeJson(OPENCODE_CONFIG_FILE, config, {spaces: 2})
+
+            // Update state
+            state.managed_instructions = newInstructions
+            await saveState(state)
+        } catch (e) {
+            console.error(`❌ Failed to update opencode.json`, e)
+        }
+    } else {
+        // If config doesn't exist, create a baseline
+        await fs.ensureDir(path.dirname(OPENCODE_CONFIG_FILE))
+        await fs.writeJson(
+            OPENCODE_CONFIG_FILE,
+            {
+                instructions: newInstructions,
+            },
+            {spaces: 2}
+        )
+        state.managed_instructions = newInstructions
+        await saveState(state)
+    }
+}
+
+async function cleanOpenCodeConfig() {
+    const state = await getState()
+
+    if (await fs.pathExists(OPENCODE_CONFIG_FILE)) {
+        try {
+            const config: OpenCodeConfig =
+                await fs.readJson(OPENCODE_CONFIG_FILE)
+            if (config.instructions) {
+                const filtered = config.instructions.filter((inst) => {
+                    if (state.managed_instructions.includes(inst)) return false
+                    if (inst.startsWith(AGENT_SKILLS_HOME)) return false
+                    for (const historical of state.historical_homes) {
+                        if (inst.startsWith(historical)) return false
+                    }
+                    return true
+                })
+
+                config.instructions = filtered
+                await fs.writeJson(OPENCODE_CONFIG_FILE, config, {spaces: 2})
+            }
+        } catch (e) {
+            console.warn(
+                `⚠️ Could not update instructions in ${OPENCODE_CONFIG_FILE}`
+            )
+        }
+    }
+
+    if (await fs.pathExists(STATE_FILE)) {
+        await fs.remove(STATE_FILE)
+    }
+}
+
+async function unlinkSkills() {
+    // Opencode target
+    const opencodeTarget =
+        process.env.AGENT_SKILLS_HOME_OPENCODE ||
+        path.join(os.homedir(), ".config", "opencode", "skills")
+
+    const commandsTarget = path.join(
+        os.homedir(),
+        ".config",
+        "opencode",
+        "commands"
+    )
+
+    const targets = [
+        {path: opencodeTarget, type: "skills"},
+        {path: commandsTarget, type: "commands"},
+    ]
+    let removedSkills = 0
+    let removedCommands = 0
+
+    for (const targetObj of targets) {
+        const target = targetObj.path
+        if (!(await fs.pathExists(target))) {
+            continue
+        }
+
+        const existingEntries = await fs.readdir(target)
+        for (const entry of existingEntries) {
+            const entryPath = path.join(target, entry)
+            try {
+                const stat = await fs.lstat(entryPath)
+                if (stat.isSymbolicLink()) {
+                    const linkTarget = await fs.readlink(entryPath)
+                    const absoluteTarget = path.resolve(
+                        path.dirname(entryPath),
+                        linkTarget
+                    )
+                    if (absoluteTarget.startsWith(AGENT_SKILLS_HOME)) {
+                        await fs.remove(entryPath)
+                        if (targetObj.type === "commands") removedCommands++
+                        else removedSkills++
+                    }
+                }
+            } catch (err) {}
+        }
+    }
+
+    await cleanOpenCodeConfig()
+    logTask("Cleaned global instructions from OpenCode config.")
+    return {removedSkills, removedCommands}
+}
+
+async function syncAction() {
+    intro("OpenCode Agent Skills Synchronizer")
+    await sync()
+    const metrics = await linkSkills()
+
+    printSummary("Sync Summary", [
+        {label: "Skills linked", value: metrics.addedSkills},
+        {label: "Commands linked", value: metrics.addedCommands},
+    ])
+    outro("Done! Synchronization complete.")
+}
+
+async function uninstallAction() {
+    intro("OpenCode Agent Skills Uninstaller")
+    const metrics = await unlinkSkills()
+
+    printSummary("Uninstallation Summary", [
+        {label: "Skills removed", value: metrics.removedSkills},
+        {label: "Commands removed", value: metrics.removedCommands},
+    ])
+    outro("Done! Skills have been unlinked from OpenCode.")
+}
+
+async function install() {
+    intro("OpenCode Agent Skills Installer")
+
+    const shell = process.env.SHELL || "/bin/bash"
+    const rcFile = shell.includes("zsh") ? ".zshrc" : ".bashrc"
+    const rcPath = path.join(os.homedir(), rcFile)
+
+    note(
+        `Installing from: ${AGENT_SKILLS_HOME}\nTarget RC file: ${rcPath}`,
+        "Context"
+    )
+
+    const setEnv = await confirm({
+        message: `Do you want to add AGENT_SKILLS_HOME to your ${rcFile}?`,
+        initialValue: true,
+    })
+
+    if (setEnv) {
+        const s = spinner()
+        s.start("Updating shell config...")
+        const exportLine = `\nexport AGENT_SKILLS_HOME="${AGENT_SKILLS_HOME}"\n`
+        await fs.appendFile(rcPath, exportLine)
+        s.stop("Updated shell configuration.")
+    }
+
+    const s = spinner()
+    s.start("Linking skills to OpenCode...")
+    const metrics = await linkSkills()
+    s.stop("Linked skills successfully to OpenCode.")
+
+    printSummary("Installation Summary", [
+        {label: "Skills linked", value: metrics.addedSkills},
+        {label: "Commands linked", value: metrics.addedCommands},
+        {label: "Old skills removed", value: metrics.removedSkills},
+        {label: "Old commands removed", value: metrics.removedCommands},
+    ])
+
+    outro(
+        "Done! Restart your terminal or run `source " + rcPath + "` to finish."
+    )
+}
+
+import {parseArgs} from "util"
+
+const {values: options} = parseArgs({
+    args: process.argv.slice(2),
+    options: {
+        action: {
+            type: "string",
+            short: "a",
+        },
+    },
+    strict: false,
+})
+
+const action = options.action || process.argv[2]
+
+if (action === "lint") {
+    lint().catch(console.error)
+} else if (action === "sync") {
+    syncAction().catch(console.error)
+} else if (action === "install") {
+    install().catch(console.error)
+} else if (action === "uninstall") {
+    uninstallAction().catch(console.error)
+} else {
+    console.log(
+        "Usage: bun run bin/skills.ts --action <lint|sync|install|uninstall>"
+    )
+    process.exit(1)
+}

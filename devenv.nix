@@ -54,30 +54,29 @@ in
   packages = packages ++ lib.optionals isNative devPackages;
 
   enterShell = ''
-    if [[ "${"CI:-false"}" == "true" ]];
-    then
+    if [[ "${"CI:-false"}" == "true" ]]; then
       echo "devenv running in CI"
     else
-      # showfigfonts 2>/dev/null | less
       figlet -f slant -w 180 "$(echo "$PROJECT" | tr '[:lower:]-' '[:upper:] ')"
 
-      hello --greeting="Hello ''${USER:-user}, welcome to the $PROJECT project!"
+      hello --greeting="Hello ''${USER:-user}, welcome to the $PROJECT project."
 
-      echo -e "\nAGENT_SKILLS_HOME is set to ''${AGENT_SKILLS_HOME:-(not set!)}"
-
-      echo ""
-      echo "#########################"
-      echo "#### Helper scripts #####"
-      echo "#########################"
-      echo "🦾"
-      ${lib.concatStrings (
-        lib.mapAttrsToList (
-          name: value: "printf '🦾 %-20s  %s\\n' '${name}' '${value.description or ""}'\n"
-        ) config.scripts
-      )}
-      echo "🦾"
-      echo "#########################"
+      ${lib.optionalString (config.scripts != { }) ''
+        echo ""
+        echo "#########################"
+        echo "#### Helper scripts #####"
+        echo "#########################"
+        echo "🦾"
+        ${lib.concatStrings (
+          lib.mapAttrsToList (
+            name: value: "printf '🦾 %-20s  %s\\n' '${name}' '${value.description}'\n"
+          ) config.scripts
+        )}
+        echo "🦾"
+        echo "#########################"
+      ''}
     fi
+    echo -e "\nAGENT_SKILLS_HOME is set to ''${AGENT_SKILLS_HOME:-(not set!)}"
   '';
 
   languages = {
@@ -103,15 +102,18 @@ in
         enable = true;
       };
     };
-    shell.enable = isNative;
+    shell = {
+      enable = isNative;
+    };
   };
 
   git-hooks = lib.mkIf isNative {
     excludes = [
+      ".agents/"
       ".devenv/"
       ".git/"
       "^.vscode/"
-      ".agents/"
+      "^node_modules/"
     ];
     hooks = {
       action-validator.enable = true;
@@ -127,8 +129,19 @@ in
       check-symlinks.enable = true;
       check-yaml.enable = true;
       commitizen.enable = true;
+      convco = {
+        enable = true;
+        settings = {
+          configPath = ".versionrc";
+        };
+      };
       cspell = {
         enable = true;
+        excludes = [
+          "skills/cmd-opencode-acp/.*\\.md$"
+          "dashboard/content/skills/cmd-opencode-acp\\.md$"
+          "\\.versionrc$"
+        ];
         args = [
           "lint"
           "--no-must-find-files"
@@ -136,12 +149,18 @@ in
       };
       deadnix.enable = true;
       editorconfig-checker.enable = true;
-      eslint.enable = true;
+      eslint = {
+        enable = true;
+        settings = {
+          extensions = "\\.js$|\\.ts$";
+        };
+      };
       markdownlint = {
         enable = true;
         excludes = [
           "dashboard/content/skills/.*\\.md$"
           "dashboard/content/_index\\.md$"
+          "skills/cmd-opencode-acp/.*\\.md$"
         ];
         settings = {
           configuration = {
@@ -161,6 +180,22 @@ in
                 "sup"
                 "summary"
                 "details"
+                "ParamField"
+                "Expandable"
+                "Warning"
+                "ResponseField"
+                "span"
+                "Card"
+                "Note"
+                "Info"
+                "Steps"
+                "Step"
+                "Icon"
+                "img"
+                "mandate"
+                "constraints"
+                "instructions"
+                "exit_criteria"
               ];
             };
           };
@@ -175,6 +210,8 @@ in
           "dashboard/content/skills/.*\\.md$"
           "dashboard/content/_index\\.md$"
           "README\\.md$"
+          "\\.devcontainer\\.json$"
+          "\\.devcontainer/devcontainer\\.json$"
         ];
       };
       ripsecrets.enable = true;
@@ -183,15 +220,15 @@ in
       skills-lint = {
         enable = true;
         name = "Skills Linter";
-        entry = "bun run bin/skills-lint.ts";
-        files = "SKILL\\.md$";
+        entry = "skills --action lint";
+        files = "(SKILL|COMMAND)\\.md$";
         pass_filenames = false;
       };
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "bun run bin/skills-sync.ts";
-        files = "SKILL\\.md$";
+        entry = "skills --action sync";
+        files = "(SKILL|COMMAND)\\.md$";
         pass_filenames = false;
       };
       trim-trailing-whitespace = {
@@ -203,6 +240,13 @@ in
         enable = true;
         excludes = [
         ];
+      };
+      tsc = {
+        enable = true;
+        name = "TypeScript Type Check";
+        entry = "tsc --noEmit --project tsconfig.json";
+        files = "\\.ts$";
+        pass_filenames = false;
       };
       yamllint = {
         enable = true;
@@ -236,17 +280,13 @@ in
   };
 
   scripts = {
-    skills-sync = {
-      description = "Synchronize skill files";
-      exec = "bun run bin/skills-sync.ts";
+    setup = {
+      description = "Set up the agent skills environment";
+      exec = "bun run setup";
     };
-    skills-install = {
-      description = "Install skills";
-      exec = "bun run bin/skills-install.ts";
-    };
-    skills-lint = {
-      description = "Lint skills";
-      exec = "bun run bin/skills-lint.ts";
+    skills = {
+      description = "Manage agent skills (usage: skills --action <lint|sync|install>)";
+      exec = "bun run skills \"$@\"";
     };
     build-css = {
       description = "Build CSS";

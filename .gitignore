@@ -7,28 +7,32 @@ devenv.local.nix
 devenv.local.yaml
 .direnv
 
+# pre-commit
+.pre-commit-config.yaml
+
 # Security analysis results
 .codeql-db/
 .codeql-results/
 trivy-results.sarif
 
-# pre-commit
-.pre-commit-config.yaml
-
-# Dependencies
+# Node and build output
 node_modules/
-bun.lock
+dist/
+
+# Env & Config
+.env
+.devenv/
+
+# OS specific
+.DS_Store
+
+# Editor
+.vscode/
+.cursor/
+.windsurf/
+.antigravitycli/
 
 # Dashboard Build
 dashboard/public/
 dashboard/static/build/
 
-# OS specific
-.DS_Store
-
-# AI Agent project configuration
-.cursor/
-.windsurf/
-.claude/
-.gemini/
-.opencode/
