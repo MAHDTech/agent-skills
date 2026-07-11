@@ -3,11 +3,10 @@
     "module": "index.ts",
     "type": "module",
     "private": true,
+    "license": "MIT",
     "scripts": {
         "skills": "bun run bin/skills.ts",
-        "build:css": "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css",
-        "build:dashboard": "SKILLS_REPO_ONLY=1 bun run skills --action sync && bun run build:css && zola --root dashboard build && pagefind --site dashboard/public",
-        "serve:dashboard": "bun run build:dashboard && zola --root dashboard serve"
+        "dashboard": "bun run bin/dashboard.ts"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",

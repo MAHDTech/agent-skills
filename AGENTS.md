@@ -23,8 +23,9 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Dashboard
 
-- To build/sync: `bun run build:dashboard`.
-- To serve: `bun run serve:dashboard`. (Uses Zola & Tailwind).
+- To build: `dashboard --action build` — syncs content, builds CSS, renders the site, indexes it (all-in-one).
+- To serve: `dashboard --action serve` — builds once, then serves with live reload. (Uses Zola & Tailwind.)
+- CSS only: `dashboard --action css` (escape hatch; `build` already does this).
 
 ## Behaviour
 

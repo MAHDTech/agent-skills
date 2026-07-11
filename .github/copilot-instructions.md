@@ -40,7 +40,8 @@ bun run skills --action install         # Symlink the working tree into your age
 bun run skills --action uninstall       # Remove every symlink this repo owns
 bun run skills --action sync            # Relink AND regenerate README, agents/AGENTS.md, dashboard, skills.sh.json
 bun run skills --action lint            # Verify skill frontmatter and structure
-bun run build:dashboard                 # Regenerate, build CSS, and generate the Zola site
+bun run dashboard --action build        # Sync content, build CSS, and generate the Zola site
+bun run dashboard --action serve        # Build once, then serve locally with live reload
 ```
 
 ## Skill Standards

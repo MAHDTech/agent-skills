@@ -288,17 +288,9 @@ in
       description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall>)";
       exec = "bun run skills \"$@\"";
     };
-    build-css = {
-      description = "Build CSS";
-      exec = "bun run build:css";
-    };
-    build-dashboard = {
-      description = "Build dashboard";
-      exec = "bun run build:dashboard";
-    };
-    serve-dashboard = {
-      description = "Serve dashboard locally";
-      exec = "bun run serve:dashboard";
+    dashboard = {
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css>)";
+      exec = "bun run dashboard \"$@\"";
     };
     codeql-run = {
       package = pkgs.bash;
