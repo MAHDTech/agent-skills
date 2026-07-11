@@ -1,7 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import os from "os"
-import yaml from "js-yaml"
+import * as yaml from "js-yaml"
 import {glob} from "glob"
 import {execFileSync} from "child_process"
 import {intro, outro, log} from "@clack/prompts"
