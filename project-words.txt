@@ -127,3 +127,7 @@ ousterhout
 prefactoring
 shortcutting
 wayfinding
+minto
+nygard
+vercel
+evans
