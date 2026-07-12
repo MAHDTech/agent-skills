@@ -524,18 +524,16 @@ function detectTools(): Detected {
  * one checkout must still be reclaimable when `sync` runs from the other, so
  * "uninstall all" is a true reset regardless of which copy is active.
  */
-const REPO_SKILLS_MARKER = `${path.sep}${path.basename(AGENT_SKILLS_HOME)}${path.sep}skills${path.sep}`
-
-/**
- * Remove symlinks in `dir` that resolve to this repo's `skills/` tree (in any
- * checkout). Real directories/files (skills you hand-copy to test) and symlinks
- * pointing anywhere else are left untouched — this only reclaims links we own,
- * so it is safe to run repeatedly.
- */
 async function cleanStaleLinks(dir: string): Promise<number> {
     if (!(await fs.pathExists(dir))) return 0
     let removed = 0
-    for (const entry of await fs.readdir(dir)) {
+    let entries: string[]
+    try {
+        entries = await fs.readdir(dir)
+    } catch {
+        return 0
+    }
+    for (const entry of entries) {
         const entryPath = path.join(dir, entry)
         try {
             const stat = await fs.lstat(entryPath)
@@ -544,15 +542,42 @@ async function cleanStaleLinks(dir: string): Promise<number> {
                 path.dirname(entryPath),
                 await fs.readlink(entryPath)
             )
-            const owned =
-                target.startsWith(AGENT_SKILLS_HOME + path.sep) ||
-                target.includes(REPO_SKILLS_MARKER)
-            if (owned) {
-                await fs.remove(entryPath)
-                removed++
+
+            const normalizedTarget = path.normalize(target)
+            const skillsMarker = `${path.sep}skills${path.sep}`
+            const skillsIdx = normalizedTarget.lastIndexOf(skillsMarker)
+            if (skillsIdx === -1) continue
+
+            const repoRoot = normalizedTarget.slice(0, skillsIdx)
+            const relativePath = normalizedTarget.slice(
+                skillsIdx + skillsMarker.length
+            )
+
+            const parts = relativePath.split(/[\\/]/)
+            if (parts.length !== 2) continue
+            const [category, name] = parts
+            if (
+                !category ||
+                !name ||
+                !CATEGORIES[category] ||
+                !NAME_RE.test(name)
+            )
+                continue
+
+            const pkgPath = path.join(repoRoot, "package.json")
+            if (await fs.pathExists(pkgPath)) {
+                try {
+                    const pkg = await fs.readJson(pkgPath)
+                    if (pkg && pkg.name === "agent-skills") {
+                        await fs.remove(entryPath)
+                        removed++
+                    }
+                } catch {
+                    // Ignore parsing errors
+                }
             }
         } catch {
-            // Ignore unreadable entries.
+            // Ignore unreadable entries
         }
     }
     return removed
