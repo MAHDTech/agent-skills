@@ -449,6 +449,7 @@ title = ${JSON.stringify(file.replace(/\.md$/, ""))}
 skill = false
 category = ${JSON.stringify(key)}
 mermaid = ${sibMermaid}
+skill_name = ${JSON.stringify(s.dirName)}
 +++
 
 ${body}

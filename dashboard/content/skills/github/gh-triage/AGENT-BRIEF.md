@@ -4,6 +4,7 @@ title = "AGENT-BRIEF"
 skill = false
 category = "github"
 mermaid = false
+skill_name = "gh-triage"
 +++
 
 # Writing Agent Briefs

@@ -4,6 +4,7 @@ title = "GLOSSARY"
 skill = false
 category = "authoring"
 mermaid = false
+skill_name = "skill-creator"
 +++
 
 # Glossary — Authoring a Skill

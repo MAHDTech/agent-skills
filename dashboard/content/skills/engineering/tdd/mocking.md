@@ -4,6 +4,7 @@ title = "mocking"
 skill = false
 category = "engineering"
 mermaid = false
+skill_name = "tdd"
 +++
 
 # When to Mock

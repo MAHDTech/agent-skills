@@ -4,6 +4,7 @@ title = "code-smells"
 skill = false
 category = "review"
 mermaid = false
+skill_name = "code-review"
 +++
 
 <!-- cspell:ignore Fowler -->
