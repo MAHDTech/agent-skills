@@ -15,8 +15,10 @@
 
   {% if page and page.description %}
     <meta name="description" content="{{ page.description }}">
-  {% elif config.extra.description is defined %}
-    <meta name="description" content="{{ config.extra.description }}">
+  {% elif section and section.description %}
+    <meta name="description" content="{{ section.description }}">
+  {% elif config.description is defined %}
+    <meta name="description" content="{{ config.description }}">
   {% endif %}
 
   <link rel="preload" href="{{ get_url(path='fonts/jetbrainsmono-regular.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -24,7 +26,7 @@
   <link href="{{ config.base_url }}pagefind/pagefind-component-ui.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ get_url(path='/build/css/generated.css') }}">
 
-  {% if page and page.extra.mermaid is defined and page.extra.mermaid %}
+  {% if (page and page.extra.mermaid is defined and page.extra.mermaid) or (section and section.extra.mermaid is defined and section.extra.mermaid) %}
     <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
@@ -85,7 +87,8 @@
 
       // Listen for instant swaps from parent
       window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'THEME_UPDATE') {
+        const allowedThemes = ['tars', 'tars-light', 'tars-dark', 'tars-synthwave'];
+        if (event.data && event.data.type === 'THEME_UPDATE' && allowedThemes.includes(event.data.theme)) {
           applyTheme(event.data.theme);
         }
       });

@@ -1,4 +1,4 @@
-base_url = "https://MAHDTech.github.io/agent-skills"
+base_url = "https://MAHDTech.github.io/agent-skills/"
 title = "Agent Skills"
 description = "A collection of AI agent skills"
 theme = "tars-dashboards"
