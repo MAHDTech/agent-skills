@@ -160,14 +160,17 @@ async function getSkills(): Promise<Skill[]> {
     const files = await glob("**/SKILL.md", {cwd: SKILLS_DIR})
     for (const file of files.sort()) {
         const fullPath = path.join(SKILLS_DIR, file)
-        const raw = await fs.readFile(fullPath, "utf-8")
+        const raw = (await fs.readFile(fullPath, "utf-8")).replace(
+            /\r\n/g,
+            "\n"
+        )
         const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
         if (!match || !match[1] || !match[2]) {
             console.warn(`Skill at ${file} is missing YAML frontmatter.`)
             continue
         }
         const metadata = (yaml.load(match[1]) as SkillMetadata) || {}
-        const parts = file.split(path.sep)
+        const parts = file.split("/")
         // Expected shape: <category>/<name>/SKILL.md
         const category = parts.length >= 3 ? parts[0]! : "uncategorized"
         const dirName = parts[parts.length - 2]!
@@ -273,7 +276,10 @@ async function sync() {
 
     // 1. agents/AGENTS.md — regenerate the skill index, preserve frontmatter.
     if (await fs.pathExists(AGENTS_FILE)) {
-        const agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
+        const agentsContent = (await fs.readFile(AGENTS_FILE, "utf-8")).replace(
+            /\r\n/g,
+            "\n"
+        )
         const fm = agentsContent.match(/^---\n[\s\S]*?\n---\n/)
         const frontmatter = fm ? fm[0] : ""
 
@@ -385,10 +391,9 @@ ${skillBody}
                 (f) => f.endsWith(".md") && f !== "SKILL.md"
             )
             for (const file of siblings.sort()) {
-                const raw = await fs.readFile(
-                    path.join(skillSrcDir, file),
-                    "utf-8"
-                )
+                const raw = (
+                    await fs.readFile(path.join(skillSrcDir, file), "utf-8")
+                ).replace(/\r\n/g, "\n")
                 const body = rewriteSkillLinks(raw, contentBase, skillSrcDir)
                 const sibMermaid = body.includes("```mermaid")
                 await fs.writeFile(
