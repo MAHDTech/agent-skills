@@ -52,7 +52,7 @@ in
   packages = packages ++ lib.optionals isNative devPackages;
 
   enterShell = ''
-    if [[ "${"CI:-false"}" == "true" ]]; then
+    if [[ "''${CI:-false}" == "true" ]]; then
       echo "devenv running in CI"
     else
       figlet -f slant -w 180 "$(echo "$PROJECT" | tr '[:lower:]-' '[:upper:] ')"
@@ -67,7 +67,10 @@ in
         echo "🦾"
         ${lib.concatStrings (
           lib.mapAttrsToList (
-            name: value: "printf '🦾 %-20s  %s\\n' '${name}' '${value.description}'\n"
+            name: value:
+            "printf '🦾 %-20s  %s\\n' '${name}' '${
+              if value.description != null then value.description else ""
+            }'\n"
           ) config.scripts
         )}
         echo "🦾"
