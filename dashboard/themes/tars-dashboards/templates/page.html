@@ -35,7 +35,7 @@
         {% if dates_data.dates[skill_key] is defined %}
           <hr>
           <p class="text-sm !mt-4" style="color: var(--color-muted)">
-            Last updated {{ dates_data.dates[skill_key] }}
+            Last updated {{ dates_data.dates[skill_key] | date(format="%b %d, %Y") }}
           </p>
         {% endif %}
       {% endif %}
