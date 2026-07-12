@@ -142,15 +142,40 @@ function rewriteSkillLinks(
     contentBase: string,
     srcDir: string
 ): string {
-    return content.replace(
+    const placeholders: string[] = []
+    const placeholderPrefix = "\x00_CODE_SPAN_PLACEHOLDER_"
+    let protectedContent = content.replace(
+        /(```[\s\S]*?```|``[\s\S]*?``|`[^`\r\n]*?`)/g,
+        (match) => {
+            const id = placeholders.length
+            placeholders.push(match)
+            return `${placeholderPrefix}${id}\x00`
+        }
+    )
+
+    protectedContent = protectedContent.replace(
         /\]\((?!https?:\/\/|@\/|#|mailto:|\/)([^)#\s]+\.md)(#[^)\s]*)?\)/g,
         (match, relPath: string, anchor?: string) => {
-            if (!fs.existsSync(path.join(srcDir, relPath))) return match
+            const targetFullPath = path.join(srcDir, relPath)
+            if (!fs.existsSync(targetFullPath)) return match
+
+            const relToSkills = path.relative(SKILLS_DIR, targetFullPath)
+            const parts = relToSkills.split(/[\\/]/)
+            const category = parts.length >= 2 ? parts[0]! : ""
+            if (CATEGORIES[category]?.lifecycle) {
+                return match
+            }
+
             const rel = path.posix
                 .normalize(path.posix.join(contentBase, relPath))
                 .replace(/\/SKILL\.md$/, "/_index.md")
             return `](@/${rel}${anchor || ""})`
         }
+    )
+
+    return protectedContent.replace(
+        new RegExp(`${placeholderPrefix}(\\d+)\\x00`, "g"),
+        (_, id) => placeholders[parseInt(id, 10)]!
     )
 }
 
