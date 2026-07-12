@@ -474,7 +474,7 @@ ${body}
             {stdio: "inherit"}
         )
         logTask("Staged generated files to git.")
-    } catch (e) {
+    } catch {
         log.warn("Could not stage changes to git (no repo or no changes).")
     }
 }
