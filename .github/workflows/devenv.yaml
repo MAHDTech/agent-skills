@@ -97,6 +97,8 @@ jobs:
       - id: devenv_test
         name: Devenv test
         run: |
+          # TODO: Remove prek after testing.
+          devenv shell --verbose -- prek run -a
           # TODO: remove verbose after diagnosing issue.
           devenv test --verbose
 
