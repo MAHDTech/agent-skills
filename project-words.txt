@@ -140,3 +140,4 @@ microbenchmark
 timebox
 timeboxed
 xclip
+Syncthing

@@ -468,10 +468,19 @@ function detectTools(): Detected {
 }
 
 /**
- * Remove symlinks in `dir` that resolve to somewhere inside this repo.
- * Real directories/files (skills you hand-copy to test) and symlinks pointing
- * anywhere else are left untouched — this only reclaims links we own, so it is
- * safe to run repeatedly.
+ * Marker that identifies a symlink target as one this repo owns, matching ANY
+ * checkout — not just the current `AGENT_SKILLS_HOME`. This matters when the
+ * same repo is checked out twice (e.g. a Syncthing mirror): links created from
+ * one checkout must still be reclaimable when `sync` runs from the other, so
+ * "uninstall all" is a true reset regardless of which copy is active.
+ */
+const REPO_SKILLS_MARKER = `${path.sep}${path.basename(AGENT_SKILLS_HOME)}${path.sep}skills${path.sep}`
+
+/**
+ * Remove symlinks in `dir` that resolve to this repo's `skills/` tree (in any
+ * checkout). Real directories/files (skills you hand-copy to test) and symlinks
+ * pointing anywhere else are left untouched — this only reclaims links we own,
+ * so it is safe to run repeatedly.
  */
 async function cleanStaleLinks(dir: string): Promise<number> {
     if (!(await fs.pathExists(dir))) return 0
@@ -485,7 +494,10 @@ async function cleanStaleLinks(dir: string): Promise<number> {
                 path.dirname(entryPath),
                 await fs.readlink(entryPath)
             )
-            if (target.startsWith(AGENT_SKILLS_HOME)) {
+            const owned =
+                target.startsWith(AGENT_SKILLS_HOME + path.sep) ||
+                target.includes(REPO_SKILLS_MARKER)
+            if (owned) {
                 await fs.remove(entryPath)
                 removed++
             }
@@ -626,11 +638,11 @@ async function syncAction() {
         process.env.SKILLS_REPO_ONLY
     )
     if (!repoOnly) {
-        await unlinkSkills()
+        const un = await unlinkSkills()
         const m = await linkSkills()
         printSummary("Machine Sync", [
             {label: "Skills linked", value: m.linked},
-            {label: "Stale links removed", value: m.removed},
+            {label: "Stale links removed", value: un.removed + m.removed},
             {label: "Tools", value: toolList(m.tools)},
         ])
     }
