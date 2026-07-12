@@ -558,25 +558,77 @@ async function cleanStaleLinks(dir: string): Promise<number> {
     return removed
 }
 
-async function registerAntigravity() {
-    await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
-    let config: {entries?: {path: string}[]; [k: string]: any} = {}
-    if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+const ANTIGRAVITY_LOCK_FILE = `${ANTIGRAVITY_SKILLS_JSON}.lock`
+
+async function acquireLock() {
+    const timeout = 10000
+    const start = Date.now()
+    while (Date.now() - start < timeout) {
         try {
-            config = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            if (await fs.pathExists(ANTIGRAVITY_LOCK_FILE)) {
+                const stat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
+                if (Date.now() - stat.mtimeMs > 10000) {
+                    await fs.remove(ANTIGRAVITY_LOCK_FILE)
+                }
+            }
+            await fs.writeFile(ANTIGRAVITY_LOCK_FILE, String(process.pid), {
+                flag: "wx",
+            })
+            return
         } catch {
-            config = {}
+            await new Promise((resolve) => setTimeout(resolve, 100))
         }
     }
-    const entries = config.entries || []
-    if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
-        entries.push({path: AGENTS_HUB})
+    throw new Error("Timeout acquiring skills.json.lock file lock.")
+}
+
+async function releaseLock() {
+    try {
+        await fs.remove(ANTIGRAVITY_LOCK_FILE)
+    } catch {
+        // Ignore
     }
-    config.entries = entries
-    if (!config.$schema) {
-        config.$schema = "https://skills.sh/schemas/skills.sh.schema.json"
+}
+
+async function registerAntigravity() {
+    await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+    await acquireLock()
+    try {
+        let config: {entries?: {path: string}[]; [k: string]: any} = {}
+        if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+            const rawContent = await fs.readFile(
+                ANTIGRAVITY_SKILLS_JSON,
+                "utf-8"
+            )
+            if (rawContent.trim() !== "") {
+                try {
+                    config = JSON.parse(rawContent)
+                } catch (e: any) {
+                    log.error(
+                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`
+                    )
+                    process.exit(1)
+                }
+            }
+        }
+        const entries = config.entries || []
+        if (!Array.isArray(entries)) {
+            log.error(
+                `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} 'entries' is not an array.`
+            )
+            process.exit(1)
+        }
+        if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
+            entries.push({path: AGENTS_HUB})
+        }
+        config.entries = entries
+        if (!config.$schema) {
+            config.$schema = "https://skills.sh/schemas/skills.sh.schema.json"
+        }
+        await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
+    } finally {
+        await releaseLock()
     }
-    await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
 }
 
 async function linkSkills() {
@@ -631,16 +683,33 @@ async function unlinkSkills() {
 
     // De-register the Antigravity hub entry.
     if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+        await acquireLock()
         try {
-            const config = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
-            if (Array.isArray(config.entries)) {
-                config.entries = config.entries.filter(
-                    (e: {path: string}) => path.resolve(e.path) !== AGENTS_HUB
-                )
-                await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
+            const rawContent = await fs.readFile(
+                ANTIGRAVITY_SKILLS_JSON,
+                "utf-8"
+            )
+            if (rawContent.trim() !== "") {
+                let config: any
+                try {
+                    config = JSON.parse(rawContent)
+                    if (config && Array.isArray(config.entries)) {
+                        config.entries = config.entries.filter(
+                            (e: {path: string}) =>
+                                path.resolve(e.path) !== AGENTS_HUB
+                        )
+                        await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {
+                            spaces: 2,
+                        })
+                    }
+                } catch (e: any) {
+                    log.warn(
+                        `⚠️ Warning: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`
+                    )
+                }
             }
-        } catch {
-            // Ignore malformed config.
+        } finally {
+            await releaseLock()
         }
     }
     return {removed}
