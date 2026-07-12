@@ -19,34 +19,33 @@
     <meta name="description" content="{{ config.extra.description }}">
   {% endif %}
 
-  <link rel="preload" href="/fonts/jetbrainsmono-regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/fonts/jetbrainsmono-bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet">
+  <link rel="preload" href="{{ get_url(path='fonts/jetbrainsmono-regular.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ get_url(path='fonts/jetbrainsmono-bold.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link href="{{ config.base_url }}pagefind/pagefind-component-ui.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ get_url(path='/build/css/generated.css') }}">
 
   {% if page and page.extra.mermaid is defined and page.extra.mermaid %}
     <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-    <script src="/build/js/log.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
-        tars_cloud_log.debug("[TARS] Mermaid DOM mutation script running...");
+        console.debug("[TARS] Mermaid DOM mutation script running...");
         const blocks = document.querySelectorAll('code[data-lang="mermaid"]');
-        tars_cloud_log.debug(`[TARS] Found ${blocks.length} raw mermaid blocks.`);
+        console.debug(`[TARS] Found ${blocks.length} raw mermaid blocks.`);
 
         blocks.forEach(el => {
           let pre = el.tagName === 'PRE' ? el : el.closest('pre');
           if (pre && !pre.classList.contains('mermaid-processed')) {
-            tars_cloud_log.debug("[TARS] Processing mermaid block:", pre);
+            console.debug("[TARS] Processing mermaid block:", pre);
             pre.className = 'mermaid mermaid-processed';
             pre.removeAttribute('data-lang');
             pre.removeAttribute('style'); // Remove Zola's syntax highlighting background
             let rawText = pre.textContent || pre.innerText;
-            tars_cloud_log.debug(`[TARS] Extracted graph text:\n${rawText.substring(0, 50)}...`);
+            console.debug(`[TARS] Extracted graph text:\n${rawText.substring(0, 50)}...`);
             pre.textContent = rawText; // Set safe text node without HTML tags
           }
         });
 
-        tars_cloud_log.debug("[TARS] Initializing mermaid library config...");
+        console.debug("[TARS] Initializing mermaid library config...");
         mermaid.initialize({
           startOnLoad: false,
           theme: "dark",
@@ -62,11 +61,11 @@
         });
 
         try {
-          tars_cloud_log.debug("[TARS] Explicitly running mermaid.run()...");
+          console.debug("[TARS] Explicitly running mermaid.run()...");
           await mermaid.run({ querySelector: '.mermaid' });
-          tars_cloud_log.debug("[TARS] Mermaid rendering complete.");
+          console.debug("[TARS] Mermaid rendering complete.");
         } catch (e) {
-          tars_cloud_log.error("[TARS] Mermaid rendering failed:", e);
+          console.error("[TARS] Mermaid rendering failed:", e);
         }
       });
     </script>
@@ -117,8 +116,8 @@
 
   {% include "partials/footer.html" %}
 
-  <pagefind-modal reset-on-close></pagefind-modal>
+  <pagefind-modal reset-on-close bundle-path="{{ config.base_url }}pagefind/"></pagefind-modal>
 
-  <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
+  <script src="{{ config.base_url }}pagefind/pagefind-component-ui.js" type="module"></script>
 </body>
 </html>
