@@ -37,3 +37,6 @@ dashboard/public/
 dashboard/static/build/
 dashboard/skill_dates.toml
 
+# Backlog Tickets (TARS)
+.tars/
+

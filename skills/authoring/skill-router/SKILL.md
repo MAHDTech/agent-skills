@@ -55,6 +55,15 @@ Before the main flow — deciding _what_ to build and _how big_ it is:
 - `/prioritize-backlog` — reach for this when a pile of work needs ordering, cutting, and sequencing by value against cost so the next thing to do is obvious.
 - `/estimate-work` — reach for this when a plan or ticket set needs defensible sizing and estimates, with the uncertainty surfaced rather than hidden.
 
+## Backlog loop automation
+
+Orchestrating the lifecycle of codebase issues in a continuous loop:
+
+- `/backlog-loop` — reach for this when you want to run a complete loop of auditing the codebase, triaging tickets, and executing implementations.
+- `/backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
+- `/backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
+- `/backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
+
 ## Changing existing code safely
 
 Not new features — working on code that already exists:
