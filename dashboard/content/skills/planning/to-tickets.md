@@ -1,7 +1,7 @@
 +++
 title = "to-tickets"
 description = "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker — as one file per ticket locally, or as native blocking links on a real tracker."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

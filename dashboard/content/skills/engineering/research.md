@@ -1,7 +1,7 @@
 +++
 title = "research"
 description = "Investigate a question against high-trust primary sources — official docs, source code, specs, first-party APIs — and capture the findings as a cited Markdown file in the repo. Use when you want a topic researched, docs or API facts gathered and verified, or the reading legwork delegated to a background agent while you keep working."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false

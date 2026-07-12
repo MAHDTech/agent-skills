@@ -1,7 +1,7 @@
 +++
 title = "triage"
 description = "Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if needed, and write agent-ready briefs."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

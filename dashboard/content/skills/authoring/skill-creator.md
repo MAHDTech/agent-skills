@@ -1,7 +1,7 @@
 +++
 title = "skill-creator"
 description = "Use when creating a new skill or editing an existing one in this repo — how to name it, place it in the right category, write its frontmatter and description, and structure it with progressive disclosure. Covers model-invoked vs user-invoked skills, the six skill failure modes, and the lint/sync workflow to run after adding or renaming a skill."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "authoring"
 mermaid = false

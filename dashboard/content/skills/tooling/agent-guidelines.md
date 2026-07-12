@@ -1,7 +1,7 @@
 +++
 title = "agent-guidelines"
 description = "Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use when asked to follow the guidelines or verify work against them."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "tooling"
 mermaid = false

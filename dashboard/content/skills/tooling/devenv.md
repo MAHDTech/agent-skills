@@ -1,7 +1,7 @@
 +++
 title = "devenv"
 description = "Strict guidelines for using devenv for shell and dependency management. Use when a repo contains a devenv.nix or devenv.yaml file, or when running commands in a devenv environment."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "tooling"
 mermaid = false

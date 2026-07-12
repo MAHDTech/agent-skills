@@ -97,7 +97,8 @@ jobs:
       - id: devenv_test
         name: Devenv test
         run: |
-          devenv test
+          # TODO: remove verbose after diagnosing issue.
+          devenv test --verbose
 
       - id: report_status
         name: Report Status

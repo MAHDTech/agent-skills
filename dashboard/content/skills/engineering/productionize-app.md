@@ -1,7 +1,7 @@
 +++
 title = "productionize-app"
 description = "Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization"
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false

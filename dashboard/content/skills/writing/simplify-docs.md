@@ -1,7 +1,7 @@
 +++
 title = "simplify-docs"
 description = "Simplify documentation for clarity and readability with approval-gated edits"
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "writing"
 mermaid = false

@@ -1,7 +1,7 @@
 +++
 title = "self-review"
 description = "Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements"
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "reflection"
 mermaid = false

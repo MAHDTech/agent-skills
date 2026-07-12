@@ -1,7 +1,7 @@
 +++
 title = "implement"
 description = "Implement a piece of work based on a spec or set of tickets."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false

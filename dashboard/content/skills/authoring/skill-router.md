@@ -1,7 +1,7 @@
 +++
 title = "skill-router"
 description = "Route to the right skill for the task at hand — a map of every skill in this collection and when to reach for it."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "authoring"
 mermaid = false

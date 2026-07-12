@@ -1,7 +1,7 @@
 +++
 title = "bevy-development"
 description = "Expert developer guidance on Bevy, Rust's data-driven game engine, covering ECS structure, input, assets, events, states, system scheduling, and performance tuning."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "tooling"
 mermaid = false

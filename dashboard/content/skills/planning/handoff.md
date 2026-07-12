@@ -1,7 +1,7 @@
 +++
 title = "handoff"
 description = "Compact the current conversation into a handoff document for another agent to pick up."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

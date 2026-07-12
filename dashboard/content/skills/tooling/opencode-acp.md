@@ -1,7 +1,7 @@
 +++
 title = "opencode-acp"
 description = "Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "tooling"
 mermaid = false

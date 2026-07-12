@@ -1,7 +1,7 @@
 +++
 title = "refactor-codebase"
 description = "Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior. Use when refactoring a codebase, removing dead code, or cleaning up stale abstractions."
-date = 2026-07-11
+date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false
