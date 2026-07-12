@@ -35,4 +35,5 @@ dist/
 # Dashboard Build
 dashboard/public/
 dashboard/static/build/
+dashboard/skill_dates.toml
 

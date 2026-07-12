@@ -103,6 +103,13 @@
     </aside>
 
     <main class="flex-1 py-8 overflow-x-hidden min-w-0">
+      {# Universal back/forward navigation — works from any page, incl. reference pages. #}
+      <div class="flex gap-2 mb-6 text-sm">
+        <button type="button" onclick="history.back()" aria-label="Go back"
+          class="px-2 py-1 rounded border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">‹ Back</button>
+        <button type="button" onclick="history.forward()" aria-label="Go forward"
+          class="px-2 py-1 rounded border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">Forward ›</button>
+      </div>
       {% block content %}{% endblock content %}
     </main>
   </div>

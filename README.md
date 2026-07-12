@@ -1,153 +1,111 @@
 # Agent Skills
 
-My personal and public agent skills.
+[![skills.sh](https://skills.sh/b/MAHDTech/agent-skills)](https://skills.sh/MAHDTech/agent-skills)
 
-## Table of Contents
+My personal and public agent skills — cross-compatible with Claude Code, OpenCode, Goose, and Antigravity CLI.
+
+## Install
+
+```bash
+npx skills add MAHDTech/agent-skills
+```
+
+## Documentation
 
 - [install](docs/install.md)
 - [usage](docs/usage.md)
-- [Skills](#available-skills)
 
 ## Available Skills
 
-### [bevy-expert](skills/bevy-expert/SKILL.md)
+### Engineering
 
-**Description**: Expert developer guidance on Bevy, Rust's data-driven game engine, covering ECS structure, input, assets, events, states, system scheduling, and performance tuning.
+The core build, debug, and delivery loop.
 
-**Triggers**: bevy, bevy game engine, bevy-expert, Rust game engine, Rust gamedev
+- **[characterization-tests](skills/engineering/characterization-tests/SKILL.md)** — Pin down the existing behaviour of untested or legacy code with characterization (golden-master / approval) tests before you change it, so refactors and upgrades stay safe. Use when you must modify, refactor, or upgrade code that has no tests, want to capture current behaviour as an oracle even where it looks wrong, or need a safety net before a risky change. Distinct from /tdd, which specifies new behaviour test-first; this tests around existing behaviour. Pairs with /sculpt-code and /upgrade-dependencies.
+- **[codebase-design](skills/engineering/codebase-design/SKILL.md)** — Shared vocabulary and principles for designing deep modules. Use when designing or improving a module's interface, hunting for deepening opportunities, deciding where a seam goes, making code more testable or easier for an agent to navigate, or when another skill needs the deep-module vocabulary.
+- **[diagnosing-bugs](skills/engineering/diagnosing-bugs/SKILL.md)** — A disciplined loop for hard bugs and performance regressions. Use when the user says debug or diagnose this, or reports something broken, throwing, failing, flaky, or slow. Insists on building a tight, red-capable feedback loop before hypothesising, then reproduces, minimises, ranks hypotheses, instruments, fixes with a regression test, and runs a post-mortem.
+- **[domain-modeling](skills/engineering/domain-modeling/SKILL.md)** — Build and sharpen a project's domain model as you design — pin down the ubiquitous language in a CONTEXT.md glossary and record hard-to-reverse architectural decisions as ADRs. Use when you want to nail down domain terminology, challenge fuzzy or conflicting terms, invent edge-case scenarios to stress-test the model, or record an architectural decision — or when another skill needs to maintain the domain model.
+- **[implement](skills/engineering/implement/SKILL.md)** — Implement a piece of work based on a spec or set of tickets.
+- **[optimize-performance](skills/engineering/optimize-performance/SKILL.md)** — Improve the performance of a hot path with measurement-first discipline — profile to find the real bottleneck, set a target, change one thing, re-measure, and stop when the target is met. Use when code is too slow, memory-hungry, or throughput-bound and you want to make it deliberately faster without ever guessing at the cause. For a performance regression — code that was fast and got slow — run /diagnosing-bugs instead, which treats the slowdown as a bug to bisect.
+- **[productionize-app](skills/engineering/productionize-app/SKILL.md)** — Transform an application into a production-ready deployment through systematic analysis, hardening, and framework-specific optimization. Use when preparing an app to ship — auditing readiness, tightening config, and getting it deployable to a target platform.
+- **[research](skills/engineering/research/SKILL.md)** — Investigate a question against high-trust primary sources — official docs, source code, specs, first-party APIs — and capture the findings as a cited Markdown file in the repo. Use when you want a topic researched, docs or API facts gathered and verified, or the reading legwork delegated to a background agent while you keep working.
+- **[sculpt-code](skills/engineering/sculpt-code/SKILL.md)** — Reshape code for readability, naming, structure, TODOs, and reduced surface area — and take on larger cleanups like removing engineering debt, untangling oversized modules, and collapsing duplicated logic — all without changing behaviour. Use when you want to clean up or refactor code, from a quick readability pass to a staged debt-reduction effort.
+- **[tdd](skills/engineering/tdd/SKILL.md)** — Test-driven development done red-green-refactor. Use when building a feature or fixing a bug test-first, writing integration tests, deciding what to test and where the test seams go, or avoiding brittle implementation-coupled tests. Covers what a good test is, the anti-patterns to avoid, and the rules of the red-green loop.
+- **[upgrade-dependencies](skills/engineering/upgrade-dependencies/SKILL.md)** — Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime — read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on /characterization-tests for the net and /diagnosing-bugs when an upgrade breaks something.
 
-### [brain-critical-thinking](skills/brain-critical-thinking/SKILL.md)
+### Game Development
 
-**Description**: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
+Game engines and game-development workflows.
 
-**Triggers**: /criticalthink, analyze your last response, apply critical thinking, critical thinking, critical-thinking, critique your response
+- **[bevy-development](skills/game-development/bevy-development/SKILL.md)** — Expert guidance for building 2D and 3D games in Bevy 0.19, Rust's data-driven ECS game engine — components, systems, scheduling, states, queries, input, assets, messages, and performance. Use when writing or modernizing Bevy code, laying out ECS data and systems, scheduling or gating systems, handling input/assets/messages, or migrating off deprecated Bevy APIs like bundles, delta_seconds, EventReader, or Parent.
 
-### [brain-follow-up](skills/brain-follow-up/SKILL.md)
+### Planning
 
-**Description**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
+Turn ideas into specs, tickets, and multi-session plans.
 
-**Triggers**: -
+- **[estimate-work](skills/planning/estimate-work/SKILL.md)** — Size and estimate a body of work to set expectations and sequence delivery — turn a plan or ticket set into defensible estimates with ranges, named assumptions, and surfaced risk instead of false-precise point numbers. Use when the user wants to estimate or size work, forecast how long something will take, choose between relative sizing and time-based estimates, calibrate against past delivery, or decide whether to spike before committing.
+- **[grilling](skills/planning/grilling/SKILL.md)** — Interview the user relentlessly, one question at a time, to stress-test a plan or design before any code is written. Use when the user wants to pressure-test an approach, resolve open design decisions, or asks you to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the decision tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
+- **[handoff](skills/planning/handoff/SKILL.md)** — Compact the current conversation into a handoff document for another agent to pick up.
+- **[prioritize-backlog](skills/planning/prioritize-backlog/SKILL.md)** — Groom and prioritise a backlog — order, cut, cluster, and sequence a pile of work by value against cost and risk so the next thing to do is obvious. Use when the user wants to prioritise or rank a backlog, decide what to build next, trim or triage a pile of ideas, apply a lens like value-vs-effort, RICE, or cost-of-delay/WSJF, or sequence work around dependencies.
+- **[store-plan](skills/planning/store-plan/SKILL.md)** — Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/store-plan".
+- **[to-spec](skills/planning/to-spec/SKILL.md)** — Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker — no interview, just synthesis of what you have already discussed.
+- **[to-tickets](skills/planning/to-tickets/SKILL.md)** — Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker — as one file per ticket locally, or as native blocking links on a real tracker.
+- **[wayfinder](skills/planning/wayfinder/SKILL.md)** — Plan a huge chunk of work — more than one agent session can hold — as a shared map of investigation tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.
 
-### [brain-idiot-proof-docs](skills/brain-idiot-proof-docs/SKILL.md)
+### Review
 
-**Description**: Simplify documentation for clarity and readability with approval-gated edits
+Review diffs, pull requests, and test plans.
 
-**Triggers**: -
+- **[code-review](skills/review/code-review/SKILL.md)** — Review the changes since a fixed point (a commit, branch, tag, or merge-base) along two axes — Standards, meaning does the code follow this repo's documented conventions plus a baseline of common code smells, and Spec, meaning does the code do what the originating issue, ticket, or PRD asked for. Runs both reviews as parallel sub-agents and reports them side by side without merging or reranking them. Use when the user wants to review a branch, a pull request, work-in-progress changes, or asks to review the diff since some point.
+- **[pr-build-context](skills/review/pr-build-context/SKILL.md)** — Build high-signal context for a pull request before review — diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
+- **[pr-create-test-plan](skills/review/pr-create-test-plan/SKILL.md)** — Generate a manual test plan for a branch's changes — hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
+- **[pr-edge-cases](skills/review/pr-edge-cases/SKILL.md)** — Review branch changes for test gaps, logic edge cases, failure modes, and integration risks. Use when you want the changes on a branch probed for what breaks — untested paths, boundary conditions, race conditions, and integration hazards — before merging.
+- **[rfc-review](skills/review/rfc-review/SKILL.md)** — Review an RFC or design doc for problem clarity (SCQA), compliance, security, and performance, and return the few most important issues. Use when reviewing someone's RFC or design proposal before it's approved.
 
-### [brain-magic-words](skills/brain-magic-words/SKILL.md)
+### GitHub
 
-**Description**: Intercepts requests to ensure the AI agent and human work back and forth to create an implementation plan before diving into code.
+GitHub and git workflows via the gh CLI.
 
-**Triggers**: magic words, magic-words, about iterating, discussing the plan, work back and forth, before jumping to code
+- **[gh-create-issue](skills/github/gh-create-issue/SKILL.md)** — Create structured GitHub issues from conversation context using gh CLI
+- **[gh-create-pr](skills/github/gh-create-pr/SKILL.md)** — Generate a PR title and description, then commit, create/update the PR on approval
+- **[gh-release-notes](skills/github/gh-release-notes/SKILL.md)** — Generate human-readable release notes for a version from the merged history and cut a GitHub release with the gh CLI — gather the commit and PR range since the last tag, group changes by type, write curated notes, and publish. Use when the user wants to cut a release, tag a version, write a changelog or release notes, or summarise what shipped since the last tag. Pairs well with conventional-commit history but does not require it.
+- **[gh-resolve-pr-comments](skills/github/gh-resolve-pr-comments/SKILL.md)** — Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
+- **[gh-submit-review](skills/github/gh-submit-review/SKILL.md)** — Post a completed code review to a GitHub PR via the gh CLI — pick the event (approve, request-changes, or comment), attach inline line comments, and a summary body. Use when you have finished reviewing someone else's PR and need to submit the verdict, when a review pass (e.g. /code-review or /pr-edge-cases) produced findings to publish, or when the user asks to approve, request changes on, or leave review comments on a pull request.
+- **[gh-triage](skills/github/gh-triage/SKILL.md)** — Triage a GitHub backlog — move issues and external PRs through a state machine of triage roles (categorise, verify, grill if needed, write agent-ready briefs) using the gh CLI and GitHub labels. Use when triaging your GitHub issues and PRs, deciding what's ready for an agent or a human, or turning a backlog into agent-ready briefs.
+- **[git-resolve-conflicts](skills/github/git-resolve-conflicts/SKILL.md)** — Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
+- **[git-update-branch](skills/github/git-update-branch/SKILL.md)** — Bring a feature branch up to date with its base branch safely — fetch first, detect the base, choose rebase vs merge deliberately, use --force-with-lease, and hand conflicts off cleanly. Use when a branch has fallen behind its base, when the user wants to rebase or merge in the latest from the base/default branch, when a PR reports merge conflicts or an out-of-date branch, or when deciding between rebase and merge for an update.
 
-### [brain-pr-edgecase](skills/brain-pr-edgecase/SKILL.md)
+### Reflection
 
-**Description**: Review branch changes for test gaps, logic edge cases, failure modes, and integration risks
+Self-critique and review of your own work.
 
-**Triggers**: -
+- **[critical-thinking](skills/reflection/critical-thinking/SKILL.md)** — Analyze your own immediately preceding response with rigorous, skeptical critical thinking — surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
+- **[scope-sweep](skills/reflection/scope-sweep/SKILL.md)** — Final pass to identify missed items, edge cases, and risks before considering a scope done
+- **[self-review](skills/reflection/self-review/SKILL.md)** — Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 
-### [brain-proofread](skills/brain-proofread/SKILL.md)
+### Writing
 
-**Description**: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
+Proofreading and documentation polish.
 
-**Triggers**: -
+- **[proofread](skills/writing/proofread/SKILL.md)** — Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
+- **[simplify-docs](skills/writing/simplify-docs/SKILL.md)** — Simplify documentation for clarity and readability with approval-gated edits
 
-### [brain-rfc-review](skills/brain-rfc-review/SKILL.md)
+### Authoring
 
-**Description**: Review RFCs for problem clarity, compliance, security, and performance using SCQA framework
+Create and maintain the skills themselves.
 
-**Triggers**: -
+- **[deprecate-skill](skills/authoring/deprecate-skill/SKILL.md)** — Retire a skill cleanly — move its directory into skills/deprecated/, add a note pointing to its replacement, purge or redirect every inbound /skill-name reference (the router included), then re-run lint and sync. Use when you want to deprecate, retire, remove, replace, or merge away a skill, or a /skill-audit flagged one for retirement. Covers when to deprecate vs delete vs merge and how to avoid dangling references. Cross-references /skill-creator and /skill-router.
+- **[skill-audit](skills/authoring/skill-audit/SKILL.md)** — Periodically audit the whole skill collection for health — validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /deprecate-skill to retire.
+- **[skill-creator](skills/authoring/skill-creator/SKILL.md)** — Use when creating a new skill or editing an existing one in this repo — how to name it, place it in the right category, write its frontmatter and description, and structure it with progressive disclosure. Covers model-invoked vs user-invoked skills, the six skill failure modes, and the lint/sync workflow to run after adding or renaming a skill.
+- **[skill-router](skills/authoring/skill-router/SKILL.md)** — Route to the right skill for the task at hand — a map of every skill in this collection and when to reach for it.
 
-### [brain-scope-sweep](skills/brain-scope-sweep/SKILL.md)
+### Tooling
 
-**Description**: Final pass to identify missed items, edge cases, and risks before considering a scope done
+Environments, CLIs, and agent conventions.
 
-**Triggers**: -
-
-### [cmd-devenv](skills/cmd-devenv/SKILL.md)
-
-**Description**: Strict guidelines for using devenv for shell and dependency management
-
-**Triggers**: devenv, developer environment, when using devenv, when running commands in a devenv environment, when you see a devenv.nix or devenv.yaml file
-
-### [cmd-opencode](skills/cmd-opencode/SKILL.md)
-
-**Description**: This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
-
-**Triggers**: opencode
-
-### [cmd-opencode-acp](skills/cmd-opencode-acp/SKILL.md)
-
-**Description**: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
-
-**Triggers**: opencode acp, acp, agent control protocol
-
-### [cmd-scratchpad](skills/cmd-scratchpad/SKILL.md)
-
-**Description**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
-
-**Triggers**: create a temporary file, run a quick test, make a scratch script, create a test script, experiment with
-
-### [code-productionize](commands/code-productionize.md)
-
-**Description**: Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization
-
-### [code-sculpt](commands/code-sculpt.md)
-
-**Description**: Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language
-
-### [gh-create-issue](commands/gh-create-issue.md)
-
-**Description**: Create structured GitHub issues from conversation context using gh CLI
-
-### [gh-create-pr](commands/gh-create-pr.md)
-
-**Description**: Generate a PR title and description, then commit, create/update the PR on approval
-
-### [gh-reply-pr-comments](commands/gh-reply-pr-comments.md)
-
-**Description**: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
-
-### [git-resolve-conflicts](commands/git-resolve-conflicts.md)
-
-**Description**: Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol
-
-### [guidelines](skills/guidelines/SKILL.md)
-
-**Description**: Behaviour Guidelines for AI Agents.
-
-**Triggers**: /guidelines, follow the guidelines, verify against the guidelines
-
-### [plan-store](commands/plan-store.md)
-
-**Description**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
-
-### [pr-build-context](commands/pr-build-context.md)
-
-**Description**: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
-
-### [pr-create-test-plan](commands/pr-create-test-plan.md)
-
-**Description**: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
-
-### [pr-prepare-review](commands/pr-prepare-review.md)
-
-**Description**: Prepare branch for code review by building context, identifying issues, and suggesting improvements
-
-### [refactor-codebase](skills/refactor-codebase/SKILL.md)
-
-**Description**: Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior.
-
-**Triggers**: refactor, refactor codebase, refactor code, remove dead code, modernize legacy patterns, clean up codebase
-
-### [sys-command-creator](skills/sys-command-creator/SKILL.md)
-
-**Description**: Guide for creating effective commands that follow the Agent Commands standards. Use this when the user wants to create a new command or update an existing one.
-
-**Triggers**: create a new command, add a command, how do I write a command
-
-### [sys-skill-creator](skills/sys-skill-creator/SKILL.md)
-
-**Description**: Guide for creating effective skills that follow the Agent Skills standards. Use this when the user wants to create a new skill or update an existing one.
-
-**Triggers**: create a new skill, add a skill, how do I write a skill
+- **[agent-guidelines](skills/tooling/agent-guidelines/SKILL.md)** — Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use when asked to follow the guidelines or verify work against them.
+- **[devenv](skills/tooling/devenv/SKILL.md)** — Strict guidelines for using devenv for shell and dependency management. Use when a repo contains a devenv.nix or devenv.yaml file, or when running commands in a devenv environment.
+- **[install-skills](skills/tooling/install-skills/SKILL.md)** — Install, update, and manage agent skills from a GitHub-hosted collection with the skills.sh CLI (`npx skills add <owner>/<repo>`), across every runtime the collection targets — Claude Code, OpenCode, Goose, and Antigravity CLI. Use when adding skills to an agent, updating a stale copy, verifying an install, wiring the same collection into another runtime, or troubleshooting a skill that will not show up or that collides by name.
+- **[opencode](skills/tooling/opencode/SKILL.md)** — This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
+- **[opencode-acp](skills/tooling/opencode-acp/SKILL.md)** — Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
+- **[scratchpad](skills/tooling/scratchpad/SKILL.md)** — Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.

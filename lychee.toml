@@ -1,0 +1,26 @@
+# lychee configuration file — link checker
+
+# Accept status codes from hosts that block/deny automated checkers.
+accept = ["200..=299", "403", "406", "429"]
+
+# Skip loopback/link-local/private IPs (localhost example URLs in templates).
+exclude_loopback = true
+
+# Paths lychee should not check at all:
+#   - opencode-acp/**  : vendored third-party docs (agentclientprotocol.com)
+#   - dashboard/**     : Zola site; links resolve at build time, not as local files
+#   - .out-of-scope/** : example/placeholder content
+exclude_path = [
+  "skills/tooling/opencode-acp",
+  "dashboard",
+  ".out-of-scope",
+]
+
+# URL patterns to ignore (regex):
+exclude = [
+  "http://127.0.0.1.*",
+  "https://10.0.0.10.*",
+  "http://localhost.*",
+  '.*\$.*',           # any URL with a literal $ = shell/template placeholder in code, not a real link
+  '.*skills\.sh.*',   # TODO: remove once the repo is published/indexed on skills.sh (404s until then)
+]

@@ -1,27 +1,37 @@
 # Usage Guide
 
-## Using Skills
+## Using skills
 
-Once installed, your AI agent can use these skills automatically.
-
-Trigger them by asking the agent to perform the task described in the skill.
+Once installed, your AI agent can use these skills automatically. Trigger them by asking the agent to perform the task a skill describes.
 
 Example triggers:
 
-- "Sync my skills manifest"
-- "Capture learnings from this session"
 - "Create a new skill"
+- "Capture learnings from this session"
+- "Resolve the conflicts on this branch"
 
-## Synchronizing Manifests
+## Discovering what is available
 
-If you add or modify skills, run the sync script to update `README.md` and `AGENTS.md`:
+Run the `/skill-router` skill to browse the catalog and find the right skill for the task at hand. It surfaces the installed skills and points you to the one that fits.
+
+## Category structure
+
+Skills are organised by topic under `skills/<category>/<name>/SKILL.md`. Categories include `engineering`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, and `tooling`, plus `in-progress/` and `deprecated/` lifecycle buckets. The category is the folder, not a frontmatter field.
+
+## Linting and syncing
+
+If you add or change a skill, use the CLI to validate and regenerate the derived files. Run it inside `devenv` so the toolchain is consistent:
 
 ```bash
-bun run skills-sync
+# Validate frontmatter and folder structure
+devenv shell -- skills --action lint
+
+# Regenerate the derived files from skills/
+devenv shell -- skills --action sync
 ```
 
-This is also enforced as a pre-commit hook if you use `devenv`.
+The `sync` action regenerates `README.md`, `agents/AGENTS.md`, the dashboard content, and `skills.sh.json`. Syncing is also enforced as a pre-commit hook when you use `devenv`, so these stay in step with the skills.
 
 ## Development
 
-Use `devenv shell` to enter the development environment with all required tools (Bun, Zola, etc.).
+Use `devenv shell` to enter the development environment with all required tools (Bun, Zola, and the rest) on your PATH.

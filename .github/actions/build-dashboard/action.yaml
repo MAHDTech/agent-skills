@@ -4,17 +4,7 @@ description: Build the Zola dashboard inside devenv.
 runs:
   using: composite
   steps:
-    - id: sync_skills
-      name: Sync Skills
+    - id: build_dashboard
+      name: Build Dashboard
       shell: devenv shell --quiet bash -- -e {0}
-      run: skills --action sync
-
-    - id: build_css
-      name: Build CSS
-      shell: devenv shell --quiet bash -- -e {0}
-      run: build-css
-
-    - id: build_zola
-      name: Build Zola
-      shell: devenv shell --quiet bash -- -e {0}
-      run: build-dashboard
+      run: dashboard --action build

@@ -1,6 +1,11 @@
 {% macro render_section(section_path, current_path="") %}
   {% set s = get_section(path=section_path) %}
 
+  {# A skill is a section (so its reference files can be sub-pages), but the
+     sidebar navigates skills only — render skills as leaf links and never list
+     their sibling reference pages here. #}
+  {% set is_skill = s.extra.skill | default(value=false) %}
+
   {# Check if this section or any descendant is the current page #}
   {% set_global is_ancestor = false %}
   {% if s.path == current_path %}
@@ -35,7 +40,7 @@
     {% endfor %}
   {% endfor %}
 
-  {% set has_children = s.pages | length > 0 or s.subsections | length > 0 %}
+  {% set has_children = (s.pages | length > 0 or s.subsections | length > 0) and not is_skill %}
   {% set is_section_active = s.path == current_path %}
 
   {% if has_children %}

@@ -1,0 +1,4 @@
+[install]
+# Pin exact versions (no ^ ranges) so installs are reproducible and
+# Dependabot bumps one exact pin to the next. Applies to bun add/install/update.
+exact = true

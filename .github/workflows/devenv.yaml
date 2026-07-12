@@ -94,9 +94,16 @@ jobs:
         run: |
           nix profile install --accept-flake-config nixpkgs#devenv
 
+      - id: prek_run
+        name: Run pre-commit hooks
+        run: |
+          echo "Running pre-commit hooks only"
+          devenv shell --verbose -- prek run -a
+
       - id: devenv_test
         name: Devenv test
         run: |
+          echo "Running full devenv test suite"
           devenv test
 
       - id: report_status

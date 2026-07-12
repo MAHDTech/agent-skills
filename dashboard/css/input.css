@@ -72,11 +72,16 @@
     .prose pre.mermaid {
         @apply block my-4 font-mono text-sm overflow-x-auto;
     }
+    /* pl-10, not pl-6: the dashboard font is monospace, so numeric markers are
+       wide, and some skills have 10-23 item lists (2-digit markers). With
+       list-style-position: outside, too little padding lets the marker overflow
+       the <main class="overflow-x-hidden"> clip edge and get cut on the left.
+       2.5rem clears a 2-digit monospace marker. */
     .prose ul {
-        @apply pl-6 list-disc;
+        @apply pl-10 list-disc;
     }
     .prose ol {
-        @apply pl-6 list-decimal;
+        @apply pl-10 list-decimal;
     }
     .prose li + li {
         @apply mt-1;

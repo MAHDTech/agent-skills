@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{# Skill page. A skill is a section (SKILL.md → _index.md) so its sibling
+   reference files can be pages beneath it. Mirrors page.html but for `section`. #}
+
+{% block content %}
+<div class="flex gap-8">
+  {# Main content #}
+  <article class="prose max-w-none flex-1 min-w-0" data-pagefind-body>
+    <h1>{{ section.title }}</h1>
+
+    {# Metadata bar #}
+    <div class="flex flex-wrap gap-4 text-sm !mt-1" style="color: var(--color-muted)">
+      {% if section.reading_time %}
+        <span>{{ section.reading_time }} min read</span>
+      {% endif %}
+    </div>
+
+    {% if section.description %}
+      <p style="color: var(--color-muted)">{{ section.description }}</p>
+    {% endif %}
+
+    <hr>
+
+    {{ section.content | safe }}
+
+    {# Reference files that live alongside this skill (kept out of the sidebar). #}
+    {% if section.pages | length > 0 %}
+      <hr>
+      <h3>Reference</h3>
+      <ul>
+        {% for p in section.pages | sort(attribute="title") %}
+          <li><a href="{{ p.permalink }}">{{ p.title }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {# Freshness: last-modified date computed from git at build time (see bin/dashboard.ts). #}
+    {% set dates_data = load_data(path="skill_dates.toml", required=false) %}
+    {% if dates_data %}
+      {% set skill_key = section.extra.category ~ "/" ~ section.title %}
+      {% if dates_data.dates[skill_key] is defined %}
+        <hr>
+        <p class="text-sm !mt-4" style="color: var(--color-muted)">
+          Last updated {{ dates_data.dates[skill_key] | date(format="%b %d, %Y") }}
+        </p>
+      {% endif %}
+    {% endif %}
+  </article>
+
+  {# TOC sidebar — desktop only #}
+  {% if section.toc %}
+    <aside class="hidden lg:block w-56 shrink-0 sticky top-8 self-start">
+      <nav class="toc">
+        <h3 class="text-sm font-bold mb-2" style="color: var(--color-muted)">ON THIS PAGE</h3>
+        <ul class="text-sm" style="list-style: none; padding-left: 0;">
+          {% for h in section.toc %}
+            <li class="mb-1">
+              <a href="#{{ h.id }}">{{ h.title }}</a>
+              {% if h.children %}
+                <ul style="padding-left: 1rem; list-style: none;">
+                  {% for child in h.children %}
+                    <li class="mt-1"><a href="#{{ child.id }}">{{ child.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+  {% endif %}
+</div>
+{% endblock content %}
