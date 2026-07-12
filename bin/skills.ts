@@ -113,6 +113,7 @@ interface Skill {
     promoted: boolean
     metadata: SkillMetadata
     content: string
+    yamlError?: string
 }
 
 function logTask(msg: string) {
@@ -169,7 +170,13 @@ async function getSkills(): Promise<Skill[]> {
             console.warn(`Skill at ${file} is missing YAML frontmatter.`)
             continue
         }
-        const metadata = (yaml.load(match[1]) as SkillMetadata) || {}
+        let metadata: SkillMetadata = {}
+        let yamlError: string | undefined
+        try {
+            metadata = (yaml.load(match[1]) as SkillMetadata) || {}
+        } catch (e: any) {
+            yamlError = e.message || String(e)
+        }
         const parts = file.split("/")
         // Expected shape: <category>/<name>/SKILL.md
         const category = parts.length >= 3 ? parts[0]! : "uncategorized"
@@ -182,6 +189,7 @@ async function getSkills(): Promise<Skill[]> {
             promoted,
             metadata,
             content: match[2],
+            yamlError,
         })
     }
     return skills
@@ -207,6 +215,13 @@ async function lint() {
 
     for (const skill of skills) {
         const file = skill.path
+        if (skill.yamlError) {
+            log.error(
+                `❌ ${file}: YAML frontmatter syntax error: ${skill.yamlError}`
+            )
+            errors++
+            continue
+        }
         const name = skill.metadata.name
 
         if (!name) {
@@ -272,6 +287,11 @@ function readmeBadge(): string {
 
 async function sync() {
     const skills = await getSkills()
+    if (skills.some((s) => s.yamlError)) {
+        throw new Error(
+            "Cannot sync: One or more skills contain YAML frontmatter errors."
+        )
+    }
     const grouped = groupByCategory(skills)
 
     // 1. agents/AGENTS.md — regenerate the skill index, preserve frontmatter.
@@ -539,7 +559,13 @@ async function linkSkills() {
     // Only promoted skills are installed; lifecycle buckets (in-progress /
     // deprecated) are excluded, mirroring sync's published output so a retired
     // skill stops being loadable once install is re-run.
-    const skills = (await getSkills()).filter((s) => s.promoted)
+    const allSkills = await getSkills()
+    if (allSkills.some((s) => s.yamlError)) {
+        throw new Error(
+            "Cannot install: One or more skills contain YAML frontmatter errors."
+        )
+    }
+    const skills = allSkills.filter((s) => s.promoted)
 
     // Which flattened hubs get real links.
     const linkTargets: string[] = []
@@ -669,14 +695,19 @@ const {values: options} = parseArgs({
 
 const action = (options.action as string) || process.argv[2]
 
+const handleException = (err: any) => {
+    console.error(err)
+    process.exit(1)
+}
+
 if (action === "lint") {
-    lint().catch(console.error)
+    lint().catch(handleException)
 } else if (action === "sync") {
-    syncAction().catch(console.error)
+    syncAction().catch(handleException)
 } else if (action === "install") {
-    install().catch(console.error)
+    install().catch(handleException)
 } else if (action === "uninstall") {
-    uninstallAction().catch(console.error)
+    uninstallAction().catch(handleException)
 } else {
     console.log(
         "Usage: bun run bin/skills.ts --action <lint|sync|install|uninstall>"
