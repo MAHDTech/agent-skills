@@ -26,6 +26,20 @@
     <hr>
 
     {{ page.content | safe }}
+
+    {# Freshness: last-modified date computed from git at build time (see bin/dashboard.ts). #}
+    {% if page.extra.category %}
+      {% set dates_data = load_data(path="skill_dates.toml", required=false) %}
+      {% if dates_data %}
+        {% set skill_key = page.extra.category ~ "/" ~ page.title %}
+        {% if dates_data.dates[skill_key] is defined %}
+          <hr>
+          <p class="text-sm !mt-4" style="color: var(--color-muted)">
+            Last updated {{ dates_data.dates[skill_key] }}
+          </p>
+        {% endif %}
+      {% endif %}
+    {% endif %}
   </article>
 
   {# TOC sidebar — desktop only #}
