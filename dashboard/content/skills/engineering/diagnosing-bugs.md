@@ -1,7 +1,6 @@
 +++
 title = "diagnosing-bugs"
 description = "A disciplined loop for hard bugs and performance regressions. Use when the user says debug or diagnose this, or reports something broken, throwing, failing, flaky, or slow. Insists on building a tight, red-capable feedback loop before hypothesising, then reproduces, minimises, ranks hypotheses, instruments, fixes with a regression test, and runs a post-mortem."
-date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false

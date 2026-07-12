@@ -311,7 +311,6 @@ async function sync() {
         path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
         `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
     )
-    const today = new Date().toISOString().split("T")[0]
     let weight = 1
     for (const [key, list] of grouped) {
         const catDir = path.join(DASHBOARD_CONTENT_DIR, key)
@@ -325,7 +324,6 @@ async function sync() {
             const page = `+++
 title = ${JSON.stringify(s.dirName)}
 description = ${JSON.stringify(s.metadata.description || "")}
-date = ${today}
 [extra]
 category = ${JSON.stringify(key)}
 mermaid = ${hasMermaid}

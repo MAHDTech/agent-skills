@@ -1,7 +1,6 @@
 +++
 title = "git-resolve-conflicts"
 description = "Resolve merge conflicts systematically with context-aware 3-tier classification and escalation protocol"
-date = 2026-07-12
 [extra]
 category = "github"
 mermaid = false

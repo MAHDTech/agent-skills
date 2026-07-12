@@ -1,7 +1,6 @@
 +++
 title = "grilling"
 description = "Interview the user relentlessly, one question at a time, to stress-test a plan or design before any code is written. Use when the user wants to pressure-test an approach, resolve open design decisions, or asks you to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the decision tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding."
-date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

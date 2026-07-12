@@ -1,7 +1,6 @@
 +++
 title = "plan-before-coding"
 description = "Intercepts requests to ensure the AI agent and human work back and forth to create an implementation plan before diving into code. Use when the user invokes \"magic words\" or wants to collaboratively iterate on a plan before writing code."
-date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

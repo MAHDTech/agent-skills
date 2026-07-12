@@ -1,7 +1,6 @@
 +++
 title = "codebase-design"
 description = "Shared vocabulary and principles for designing deep modules. Use when designing or improving a module's interface, hunting for deepening opportunities, deciding where a seam goes, making code more testable or easier for an agent to navigate, or when another skill needs the deep-module vocabulary."
-date = 2026-07-12
 [extra]
 category = "engineering"
 mermaid = false

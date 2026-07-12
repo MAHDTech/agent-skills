@@ -1,7 +1,6 @@
 +++
 title = "rfc-review"
 description = "Review RFCs for problem clarity, compliance, security, and performance using SCQA framework"
-date = 2026-07-12
 [extra]
 category = "reflection"
 mermaid = false

@@ -1,7 +1,6 @@
 +++
 title = "to-spec"
 description = "Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker — no interview, just synthesis of what you have already discussed."
-date = 2026-07-12
 [extra]
 category = "planning"
 mermaid = false

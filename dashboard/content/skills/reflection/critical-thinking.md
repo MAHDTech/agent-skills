@@ -1,7 +1,6 @@
 +++
 title = "critical-thinking"
 description = "Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions."
-date = 2026-07-12
 [extra]
 category = "reflection"
 mermaid = false

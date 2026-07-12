@@ -1,7 +1,6 @@
 +++
 title = "scratchpad"
 description = "Enforces the use of a \"scratch/\" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion."
-date = 2026-07-12
 [extra]
 category = "tooling"
 mermaid = false
