@@ -155,6 +155,11 @@ in
           extensions = "\\.js$|\\.ts$";
         };
       };
+      lychee = {
+        enable = true;
+        excludes = [
+        ];
+      };
       markdownlint = {
         enable = true;
         excludes = [

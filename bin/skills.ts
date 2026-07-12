@@ -125,6 +125,30 @@ function printSummary(
     })
 }
 
+/**
+ * Rewrite relative markdown links to sibling `.md` files into Zola internal
+ * (`@/…`) links so they resolve under Zola's pretty URLs on the dashboard.
+ * `SKILL.md` targets map to the skill section's `_index.md`. A link whose target
+ * doesn't exist in the source is left untouched, so the Zola build never breaks
+ * on an unknown `@/` path.
+ */
+function rewriteSkillLinks(
+    content: string,
+    contentBase: string,
+    srcDir: string
+): string {
+    return content.replace(
+        /\]\((?!https?:\/\/|@\/|#|mailto:|\/)([^)#\s]+\.md)(#[^)\s]*)?\)/g,
+        (match, relPath: string, anchor?: string) => {
+            if (!fs.existsSync(path.join(srcDir, relPath))) return match
+            const rel = path.posix
+                .normalize(path.posix.join(contentBase, relPath))
+                .replace(/\/SKILL\.md$/, "/_index.md")
+            return `](@/${rel}${anchor || ""})`
+        }
+    )
+}
+
 async function getSkills(): Promise<Skill[]> {
     const skills: Skill[] = []
     if (!(await fs.pathExists(SKILLS_DIR))) return skills
@@ -320,18 +344,63 @@ async function sync() {
             `+++\ntitle = ${JSON.stringify(CATEGORIES[key]!.title)}\ndescription = ${JSON.stringify(CATEGORIES[key]!.description)}\nsort_by = "title"\ntemplate = "section.html"\nweight = ${weight++}\n+++\n`
         )
         for (const s of list) {
-            const hasMermaid = s.content.includes("```mermaid")
-            const page = `+++
+            const skillSrcDir = path.join(SKILLS_DIR, key, s.dirName)
+            const contentBase = `skills/${key}/${s.dirName}`
+            const outDir = path.join(catDir, s.dirName)
+            await fs.ensureDir(outDir)
+
+            // Skill (SKILL.md) → section _index.md, rendered by skill.html and
+            // shown in the sidebar.
+            const skillBody = rewriteSkillLinks(
+                s.content,
+                contentBase,
+                skillSrcDir
+            )
+            const skillMermaid = skillBody.includes("```mermaid")
+            await fs.writeFile(
+                path.join(outDir, "_index.md"),
+                `+++
 title = ${JSON.stringify(s.dirName)}
 description = ${JSON.stringify(s.metadata.description || "")}
+sort_by = "title"
+template = "skill.html"
 [extra]
+skill = true
 category = ${JSON.stringify(key)}
-mermaid = ${hasMermaid}
+mermaid = ${skillMermaid}
 +++
 
-${s.content}
+${skillBody}
 `
-            await fs.writeFile(path.join(catDir, `${s.dirName}.md`), page)
+            )
+
+            // Sibling reference files (flat *.md) → pages in the skill section.
+            // Marked skill = false so the sidebar (skills-only) skips them; they
+            // remain reachable via in-content links and search.
+            const siblings = (await fs.readdir(skillSrcDir)).filter(
+                (f) => f.endsWith(".md") && f !== "SKILL.md"
+            )
+            for (const file of siblings.sort()) {
+                const raw = await fs.readFile(
+                    path.join(skillSrcDir, file),
+                    "utf-8"
+                )
+                const body = rewriteSkillLinks(raw, contentBase, skillSrcDir)
+                const sibMermaid = body.includes("```mermaid")
+                await fs.writeFile(
+                    path.join(outDir, file),
+                    `+++
+title = ${JSON.stringify(file.replace(/\.md$/, ""))}
+[extra]
+skill = false
+category = ${JSON.stringify(key)}
+mermaid = ${sibMermaid}
++++
+
+${body}
+`
+                )
+            }
         }
     }
     logTask("Generated dashboard content.")

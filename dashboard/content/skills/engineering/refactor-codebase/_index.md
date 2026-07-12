@@ -1,7 +1,14 @@
----
-name: refactor-codebase
-description: Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior. Use when refactoring a codebase, removing dead code, or cleaning up stale abstractions.
----
++++
+title = "refactor-codebase"
+description = "Remove engineering debt, untangle large modules, collapse duplicated logic, and modernize legacy patterns without changing behavior. Use when refactoring a codebase, removing dead code, or cleaning up stale abstractions."
+sort_by = "title"
+template = "skill.html"
+[extra]
+skill = true
+category = "engineering"
+mermaid = false
++++
+
 
 # Refactor your codebase
 
@@ -74,3 +81,4 @@ They're useful when the refactor spans more than one module or takes more than o
 
 [Skills](https://developers.openai.com/codex/skills) are useful when the same cleanup rules repeat across repos, services, or teams. Use framework-specific skills when available, add security and CI skills around risky cleanups, and create a team skill when you have a proven checklist for unused-code removal, module extraction, or legacy-pattern modernization.
 If you end up doing the same modernization pass across more than one codebase, Codex can help turn the first successful pass into a reusable skill.
+
