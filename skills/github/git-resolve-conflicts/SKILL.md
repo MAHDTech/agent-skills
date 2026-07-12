@@ -106,10 +106,11 @@ Answer three questions for each conflict:
 
 ## 4. Classify Each Conflict (3-Tier System)
 
-Tier -- When -- Action
-**Tier 1 -- Auto-resolve** -- Non-overlapping additions, formatting-only, one side is strict superset, lock/generated files -- Resolve immediately. No developer input needed.
-**Tier 2 -- Resolve + state rationale** -- Intent is inferable from context, combining both is clearly right but requires care, test file conflicts -- Resolve, then present rationale (see format below). Don't block on confirmation.
-**Tier 3 -- Escalate before resolving** -- Can't determine correct behavior from context, critical path code, silent behavior discard, architectural divergence, cascading multi-file implications -- **Stop.** Show conflict, explain both sides' intent, state the ambiguity, offer 2-3 options with trade-offs. Wait for developer direction.
+| Tier                                   | When                                                                                                                                                    | Action                                                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Tier 1 — Auto-resolve**              | Non-overlapping additions, formatting-only, one side is strict superset, lock/generated files                                                           | Resolve immediately. No developer input needed.                                                                                            |
+| **Tier 2 — Resolve + state rationale** | Intent is inferable from context, combining both is clearly right but requires care, test file conflicts                                                | Resolve, then present rationale (see format below). Don't block on confirmation.                                                           |
+| **Tier 3 — Escalate before resolving** | Can't determine correct behavior from context, critical path code, silent behavior discard, architectural divergence, cascading multi-file implications | **Stop.** Show conflict, explain both sides' intent, state the ambiguity, offer 2-3 options with trade-offs. Wait for developer direction. |
 
 **Tier 2 rationale format:**
 
@@ -193,17 +194,19 @@ Confirm zero remaining conflict markers.
 
 Provide a summary table with a **Status** emoji column so risky items are impossible to overlook:
 
-Status -- File -- Line(s) -- Tier -- Resolution
-... -- ... -- ... -- 1/2/3 -- Brief description
+| Status | File | Line(s) | Tier  | Resolution        |
+| ------ | ---- | ------- | ----- | ----------------- |
+| …      | …    | …       | 1/2/3 | Brief description |
 
 **Status emoji meanings** (use exactly these):
 
-Emoji -- Meaning -- When to use
-`✅` -- Safe / auto-resolved -- Tier 1 resolutions, trivial merges, no risk
-`🟢` -- Resolved with high confidence -- Tier 2 where intent was clear from context
-`🟡` -- Resolved but needs your eyes -- Tier 2 with lower confidence, subtle behavior changes, or dropped code
-`🔴` -- Escalated / blocked -- Tier 3, waiting for your direction
-`⚠️` -- Cascading risk -- Auto-merged files or downstream code that may be affected but wasn't in conflict set
+| Emoji | Meaning                       | When to use                                                                          |
+| ----- | ----------------------------- | ------------------------------------------------------------------------------------ |
+| `✅`  | Safe / auto-resolved          | Tier 1 resolutions, trivial merges, no risk                                          |
+| `🟢`  | Resolved with high confidence | Tier 2 where intent was clear from context                                           |
+| `🟡`  | Resolved but needs your eyes  | Tier 2 with lower confidence, subtle behavior changes, or dropped code               |
+| `🔴`  | Escalated / blocked           | Tier 3, waiting for your direction                                                   |
+| `⚠️`  | Cascading risk                | Auto-merged files or downstream code that may be affected but wasn't in conflict set |
 
 **Rules:**
 

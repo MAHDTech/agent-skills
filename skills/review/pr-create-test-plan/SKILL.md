@@ -1,6 +1,6 @@
 ---
 name: pr-create-test-plan
-description: Generate manual test plans for PR changes — focused on hands-on verification a developer would do, not unit-test edge cases
+description: Generate a manual test plan for a branch's changes — hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
 context: fork
 agent: general-purpose
 ---
@@ -20,7 +20,7 @@ BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2
 ```
 
 ```bash
-BASE_BRANCH=$(git remote show origin 2>/dev/null -- grep "HEAD branch" -- cut -d: -f2 -- xargs)
+BASE_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d: -f2 | xargs)
 ```
 
 If both fail, ask the user.
@@ -79,10 +79,11 @@ For each confirmed category, generate a test section following these rules:
 
 Tag every test step with one of these emojis in the step title:
 
-Emoji -- Meaning -- When to use
-🔴 -- **Critical** -- Core functionality — if this fails, the feature is broken
-🟢 -- **Expected** -- Standard behavior that should work — moderate confidence but worth verifying
-🔵 -- **Nice-to-have** -- Polish, UX, non-blocking — skip if short on time
+| Emoji | Meaning          | When to use                                                                  |
+| ----- | ---------------- | ---------------------------------------------------------------------------- |
+| 🔴    | **Critical**     | Core functionality — if this fails, the feature is broken                    |
+| 🟢    | **Expected**     | Standard behavior that should work — moderate confidence but worth verifying |
+| 🔵    | **Nice-to-have** | Polish, UX, non-blocking — skip if short on time                             |
 
 Example: `1a. 🔴 **Pre-register a profile end-to-end**`
 
@@ -141,7 +142,7 @@ Run `cat TEST_PLAN.md` to view the full plan.
 
 ## Style Reference
 
-Follow the same style used in `cmd-pr-description`:
+Follow the same style used in `/gh-create-pr`:
 
 - **Bold the what**, plain text the how
 - No fluff -- every step must verify something real that a human needs to see

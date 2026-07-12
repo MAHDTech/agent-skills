@@ -33,7 +33,7 @@ skills/<category>/<name>/SKILL.md
 
 The name is prefix-free kebab-case, and it must equal the directory basename (`skills/writing/proofread/` is named `proofread`).
 
-- **Verb-first for an action** the skill performs (`sculpt-code`, `resolve-conflicts`); **a noun for a body of knowledge** it holds (`tdd`, `agent-guidelines`).
+- **Verb-first for an action** the skill performs (`sculpt-code`, `git-resolve-conflicts`); **a noun for a body of knowledge** it holds (`tdd`, `agent-guidelines`).
 - **Keep only a genuine subject scope** as a prefix — `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on. Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
 - 1–64 characters, and it must not contain "anthropic" or "claude".
 

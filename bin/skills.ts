@@ -31,6 +31,10 @@ const CATEGORIES: Record<string, CategoryInfo> = {
         title: "Engineering",
         description: "The core build, debug, and delivery loop.",
     },
+    "game-development": {
+        title: "Game Development",
+        description: "Game engines and game-development workflows.",
+    },
     planning: {
         title: "Planning",
         description: "Turn ideas into specs, tickets, and multi-session plans.",
@@ -515,7 +519,10 @@ async function registerAntigravity() {
 
 async function linkSkills() {
     const tools = detectTools()
-    const skills = await getSkills()
+    // Only promoted skills are installed; lifecycle buckets (in-progress /
+    // deprecated) are excluded, mirroring sync's published output so a retired
+    // skill stops being loadable once install is re-run.
+    const skills = (await getSkills()).filter((s) => s.promoted)
 
     // Which flattened hubs get real links.
     const linkTargets: string[] = []

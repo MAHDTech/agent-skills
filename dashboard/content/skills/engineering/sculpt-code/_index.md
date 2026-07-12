@@ -1,6 +1,6 @@
 +++
 title = "sculpt-code"
-description = "Reshape code for readability, naming, structure, TODOs, and reduced surface area across any language"
+description = "Reshape code for readability, naming, structure, TODOs, and reduced surface area — and take on larger cleanups like removing engineering debt, untangling oversized modules, and collapsing duplicated logic — all without changing behaviour. Use when you want to clean up or refactor code, from a quick readability pass to a staged debt-reduction effort."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,7 +12,7 @@ mermaid = false
 
 # Sculpt Code
 
-Reshape code quality across eight dimensions. Scope to branch changes by default (`git diff main...HEAD`), or accept explicit file/directory targets.
+Reshape code quality across eight dimensions. Scope to branch changes by default (`git diff <base-branch>...HEAD`), or accept explicit file/directory targets.
 
 **Philosophy:** Write code for the next reader (human or agent). Minimize cognitive load. Prefer boring, obvious code over clever code. Every change must preserve business logic unless explicitly told otherwise.
 
@@ -23,9 +23,8 @@ Reshape code quality across eight dimensions. Scope to branch changes by default
    - Staged changes: `git diff --cached --name-only`
    - Explicit files: user-provided list
 2. **Read all changed files in full** before reviewing — understand existing patterns, not just the diff.
-3. **For Python codebases**, also load `references/python.md` for language-specific guidance.
-4. **Review each dimension** below. For each finding, cite `file_path:line_number`.
-5. **Apply fixes directly** — this is a sculpting tool, not a report generator. Make the changes, show what you did.
+3. **Review each dimension** below. For each finding, cite `file_path:line_number`.
+4. **Apply fixes directly** — this is a sculpting tool, not a report generator. Make the changes, show what you did.
 
 ## Dimensions
 
@@ -126,4 +125,13 @@ End with a summary: files touched, lines removed, TODOs added/removed, helpers e
 - Test code (unless explicitly asked)
 - Forward-looking base classes if second implementation is likely soon
 - Domain-specific patterns the team uses intentionally
+
+## Larger refactors
+
+For a bigger cleanup — removing accumulated engineering debt, untangling oversized modules, or collapsing duplicated logic across many files — work in small, reviewable passes rather than one sweeping diff:
+
+1. **Map before editing.** Survey the messy area first: noisy modules, duplicated logic, dead code, public contracts, and the tests around them. Know what you're touching before you touch it.
+2. **One theme per pass.** Pick a single cleanup theme at a time — delete dead code, simplify control flow, extract a helper, or modernise one stale pattern — not all at once.
+3. **State the behaviour and the check.** Before each pass, name the current behaviour, the structural improvement, and the smallest check that proves behaviour stayed stable. Run that check after every pass.
+4. **Keep migrations separate.** Framework migrations, dependency upgrades, and architecture moves are their own task — see `/upgrade-dependencies` — don't smuggle them into a refactor. Lean on a green test suite, or `/characterization-tests` when there isn't one, as the safety net.
 

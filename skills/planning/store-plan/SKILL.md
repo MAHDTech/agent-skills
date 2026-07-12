@@ -1,6 +1,6 @@
 ---
 name: store-plan
-description: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/cmd-store-plan".
+description: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/store-plan".
 disable-model-invocation: true
 ---
 
@@ -43,7 +43,7 @@ Scan the full conversation for:
 - **Risks and open questions** — unresolved items
 - **Phases or ordering** — any sequencing that was discussed
 
-If the user passed a description as an argument (e.g., `/cmd-store-plan auth refactor`), use it as `DESCRIPTION`. Otherwise, infer a 2-4 word slug from the conversation topic.
+If the user passed a description as an argument (e.g., `/store-plan auth refactor`), use it as `DESCRIPTION`. Otherwise, infer a 2-4 word slug from the conversation topic.
 
 ### 2. Generate the plan document
 

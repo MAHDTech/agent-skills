@@ -1,6 +1,6 @@
 ---
 name: critical-thinking
-description: Analyzes the agent's own previous response with rigorous critical thinking, looking for flaws, biases, and unstated assumptions.
+description: Analyze your own immediately preceding response with rigorous, skeptical critical thinking — surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
 ---
 
 # Critical Thinking
@@ -16,8 +16,7 @@ Your objective is NOT to defend or justify your previous response, but to active
 - Detect the primary language used in your immediately preceding response.
 - Conduct this entire critical analysis in that same language.
 - Maintain consistency with the language of the conversation.
-- When investigating codebase facts to support your critical analysis, DO NOT use primitive bash commands like `cat`, `find`, or `grep`.
-- You MUST use your agent's built-in tools such as `Glob` for file searching, `Read` for file reading, and `Grep` for codebase searching.
+- When investigating codebase facts to support your critical analysis, prefer your agent's built-in file-search and file-reading tools over ad-hoc shell commands like `cat`, `find`, or `grep` where they are available.
 
 Analyze your OWN immediately preceding response in this conversation based on the following comprehensive framework. Structure your output using these exact headings and numbering.
 

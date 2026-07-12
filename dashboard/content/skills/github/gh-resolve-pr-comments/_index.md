@@ -108,12 +108,13 @@ If zero comments remain after filtering, report "No open PR comments to address"
 
 For each comment or thread, read the comment body, the referenced file at the indicated line, and the diff hunk. Classify into one of these categories:
 
-Category -- Description -- Example
-**Fix** -- Clear, actionable code change requested -- "This should use `===` not `==`"
-**Investigate** -- Needs codebase exploration before deciding -- "Is this duplicated anywhere else?"
-**Discuss** -- Design question, trade-off, or needs clarification -- "Should we use strategy A or B here?"
-**Acknowledge** -- FYI or praise, no action needed -- "Nice refactor"
-**Outdated** -- Comment on code that has already changed -- Diff hunk no longer matches file
+| Category        | Description                                        | Example                               |
+| --------------- | -------------------------------------------------- | ------------------------------------- |
+| **Fix**         | Clear, actionable code change requested            | "This should use `===` not `==`"      |
+| **Investigate** | Needs codebase exploration before deciding         | "Is this duplicated anywhere else?"   |
+| **Discuss**     | Design question, trade-off, or needs clarification | "Should we use strategy A or B here?" |
+| **Acknowledge** | FYI or praise, no action needed                    | "Nice refactor"                       |
+| **Outdated**    | Comment on code that has already changed           | Diff hunk no longer matches file      |
 
 **Rules:**
 
@@ -180,10 +181,11 @@ After all items are addressed, show a summary:
 ```markdown
 ## Changes Made
 
-File -- Line -- Category -- Action Taken
-... -- ... -- Fix -- Changed X to Y
-... -- ... -- Investigate -- Found Z, no change needed
-... -- ... -- Discuss -- User decided to defer
+| File | Line | Category    | Action Taken              |
+| ---- | ---- | ----------- | ------------------------- |
+| …    | …    | Fix         | Changed X to Y            |
+| …    | …    | Investigate | Found Z, no change needed |
+| …    | …    | Discuss     | User decided to defer     |
 ```
 
 ## 7. Resolve Comment Threads

@@ -1,6 +1,6 @@
 ---
 name: pr-build-context
-description: Build high-signal PR context for review with diff analysis, risk assessment, and discussion questions
+description: Build high-signal context for a pull request before review — diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
 context: fork
 agent: general-purpose
 ---
@@ -13,7 +13,7 @@ You are an engineering agent named `build_pr_context`. Your job is to prepare hi
 
 1. Identify the repo's default branch (do not guess).
    - Prefer GitHub CLI: `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'`
-   - Fallback: `git remote show origin -- sed -n '/HEAD branch/s/.*: //p'`
+   - Fallback: `git remote show origin | sed -n '/HEAD branch/s/.*: //p'`
    - If still unclear, say so and ask the developer.
 
 2. Check if you're on the default branch.
@@ -45,7 +45,7 @@ You are an engineering agent named `build_pr_context`. Your job is to prepare hi
 When already on the default branch, build context around the whole repo instead:
 
 1. **Explore repo structure**
-   - `git ls-files -- head -100` to see tracked files
+   - `git ls-files | head -100` to see tracked files
    - Check for README.md, CLAUDE.md, AGENTS.md for project docs
    - Identify key directories and their purpose
 

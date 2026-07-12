@@ -1,6 +1,6 @@
 +++
 title = "pr-edge-cases"
-description = "Review branch changes for test gaps, logic edge cases, failure modes, and integration risks"
+description = "Review branch changes for test gaps, logic edge cases, failure modes, and integration risks. Use when you want the changes on a branch probed for what breaks — untested paths, boundary conditions, race conditions, and integration hazards — before merging."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,12 +12,12 @@ mermaid = false
 
 # PR Edge Case Review
 
-Review branch changes for logic correctness. This skill finds what breaks, not what looks bad — use `cmd-sculpt-code` for code quality.
+Review branch changes for logic correctness. This skill finds what breaks, not what looks bad — use `/sculpt-code` for code quality.
 
 ## Instructions
 
 1. **Identify the change scope** — ask if unclear:
-   - Branch diff: `git diff main...HEAD`
+   - Branch diff: `git diff <base-branch>...HEAD` (the branch your work targets)
    - Uncommitted: `git diff HEAD`
    - Specific files: user-provided list
 2. **Read all changed files in full** before reviewing — understand the context around the diff, not just the changed lines.

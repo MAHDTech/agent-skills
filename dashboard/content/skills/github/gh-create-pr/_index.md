@@ -18,7 +18,7 @@ Generate a concise PR description by analyzing the diff against a base branch.
 
 Output the result in a markdown file named `PR_DESCRIPTION.md`.
 
-Copy to clipboard: `cat PR_DESCRIPTION.md -- pbcopy`
+Copy to clipboard if handy — e.g. `pbcopy < PR_DESCRIPTION.md` (macOS) or `xclip -selection clipboard < PR_DESCRIPTION.md` (Linux).
 
 - [Instructions](#instructions)
   - [1. Determine the base branch](#1-determine-the-base-branch)
@@ -40,7 +40,7 @@ Copy to clipboard: `cat PR_DESCRIPTION.md -- pbcopy`
 
 ### 1. Determine the base branch
 
-**If the user passed a branch name as an argument** (e.g. `/cmd-pr-description feature-branch`), use that as `BASE_BRANCH`. Skip auto-detection entirely.
+**If the user passed a branch name as an argument** (e.g. `/gh-create-pr feature-branch`), use that as `BASE_BRANCH`. Skip auto-detection entirely.
 
 **Otherwise**, auto-detect the repository's default branch. Try these methods in order until one succeeds:
 
@@ -53,13 +53,13 @@ BASE_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2
 **Method 2 - Git remote**
 
 ```bash
-BASE_BRANCH=$(git remote show origin 2>/dev/null -- grep "HEAD branch" -- cut -d: -f2 -- xargs)
+BASE_BRANCH=$(git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d: -f2 | xargs)
 ```
 
 **Method 3 - Git symbolic-ref**
 
 ```bash
-BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null -- sed 's@^refs/remotes/origin/@@')
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 ```
 
 **IMPORTANT:** Do NOT assume `master` or `main` as a fallback. If all methods fail, ask the user which branch to use as the base.
@@ -87,7 +87,7 @@ Write the description to `PR_DESCRIPTION.md` and display both the title and desc
 
 ### 4. Ask user to approve, edit, or reject
 
-Use `AskUserQuestion` to present the generated title and description and ask the user to:
+Present the generated title and description to the user and ask them to:
 
 1. **Approve** as-is
 2. **Request changes** (provide feedback, re-generate)
@@ -169,9 +169,10 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 
 ## Feature Diff
 
-S -- Component -- Before -- After
-🟢/🔴/… -- 1-3 words describing the component -- 1 sentence describing how it worked before -- 1 sentence describing how it works after
-… -- ... -- ... -- ...
+| S       | Component                          | Before                                     | After                                    |
+| ------- | ---------------------------------- | ------------------------------------------ | ---------------------------------------- |
+| 🟢/🔴/… | 1-3 words describing the component | 1 sentence describing how it worked before | 1 sentence describing how it works after |
+| …       | …                                  | …                                          | …                                        |
 
 > 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
 
@@ -218,12 +219,13 @@ Use [GitHub admonitions](https://docs.github.com/en/get-started/writing-on-githu
 
 **When to use each type:**
 
-Type -- When to use
-`NOTE` -- PR is a follow-up/review of another PR, replaces a previous approach, or has non-obvious scope context
-`TIP` -- PR unlocks a workflow or has a recommended migration/adoption path reviewers should know
-`IMPORTANT` -- PR requires a specific merge order, has deployment prerequisites, or needs coordinated rollout
-`WARNING` -- PR includes a breaking change, requires a migration, or has a tight deadline
-`CAUTION` -- PR touches sensitive systems (auth, billing, data deletion) or has irreversible side effects
+| Type        | When to use                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------ |
+| `NOTE`      | PR is a follow-up/review of another PR, replaces a previous approach, or has non-obvious scope context |
+| `TIP`       | PR unlocks a workflow or has a recommended migration/adoption path reviewers should know               |
+| `IMPORTANT` | PR requires a specific merge order, has deployment prerequisites, or needs coordinated rollout         |
+| `WARNING`   | PR includes a breaking change, requires a migration, or has a tight deadline                           |
+| `CAUTION`   | PR touches sensitive systems (auth, billing, data deletion) or has irreversible side effects           |
 
 **Rules:**
 
@@ -266,13 +268,14 @@ Type -- When to use
 - **Legend**: Always include a one-line legend below the Feature Diff table as a blockquote: `> 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking`
 - **Severity column (S)**: Every row must have a severity emoji as the first column:
 
-Emoji -- Label -- When to use
-🔴 -- Critical fix -- Bug fix for broken/incorrect behavior
-🟡 -- Improvement -- Enhancement to existing behavior
-🟢 -- New feature -- Net-new capability
-⚪ -- Neutral -- Config, docs, chore, cleanup
-⚙️ -- Infra/tooling -- CI, build, dev tooling changes
-⚠️ -- Breaking -- Breaking change or deprecation
+| Emoji | Label         | When to use                           |
+| ----- | ------------- | ------------------------------------- |
+| 🔴    | Critical fix  | Bug fix for broken/incorrect behavior |
+| 🟡    | Improvement   | Enhancement to existing behavior      |
+| 🟢    | New feature   | Net-new capability                    |
+| ⚪    | Neutral       | Config, docs, chore, cleanup          |
+| ⚙️    | Infra/tooling | CI, build, dev tooling changes        |
+| ⚠️    | Breaking      | Breaking change or deprecation        |
 
 ### Details
 
@@ -301,13 +304,14 @@ _tl;dr Users can now log in with email/password and stay authenticated across br
 
 ## Feature Diff
 
-S -- Component -- Before -- After
-🟢 -- Auth method -- API key only -- Email/password + session cookie
-🟢 -- Session duration -- `N/A` -- 24 hours (default), 30 days (remember-me)
-🟢 -- `sessions` table -- `N/A` -- New table with `user_id`, `token`, `expires_at`
-🟡 -- Token lookup -- Full table scan on `users` -- Indexed lookup on `sessions.token`
-🟢 -- `/auth/login` -- `N/A` -- New endpoint
-🟢 -- `/auth/logout` -- `N/A` -- New endpoint
+| S   | Component        | Before                     | After                                           |
+| --- | ---------------- | -------------------------- | ----------------------------------------------- |
+| 🟢  | Auth method      | API key only               | Email/password + session cookie                 |
+| 🟢  | Session duration | `N/A`                      | 24 hours (default), 30 days (remember-me)       |
+| 🟢  | `sessions` table | `N/A`                      | New table with `user_id`, `token`, `expires_at` |
+| 🟡  | Token lookup     | Full table scan on `users` | Indexed lookup on `sessions.token`              |
+| 🟢  | `/auth/login`    | `N/A`                      | New endpoint                                    |
+| 🟢  | `/auth/logout`   | `N/A`                      | New endpoint                                    |
 
 > 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
 

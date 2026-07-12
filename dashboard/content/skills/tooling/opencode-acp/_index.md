@@ -14,6 +14,8 @@ mermaid = false
 
 Control OpenCode directly via the Agent Client Protocol (ACP).
 
+**See also:** `/opencode` — for driving the OpenCode CLI interactively (commands, agents, tools, MCP, config) rather than over ACP.
+
 ## Metadata
 
 - For ACP Protocol Docs (for Agents/LLMs): https://agentclientprotocol.com/llms.txt
@@ -298,12 +300,12 @@ Extract the version number (e.g., `1.1.13`).
 ### Step 2: Check Latest Version
 
 ```
-webfetch(url: "https://github.com/anomalyco/opencode/releases/latest", format: "text")
+webfetch(url: "https://github.com/sst/opencode/releases/latest", format: "text")
 ```
 
 The redirect URL contains the latest version tag:
 
-- Redirects to: `https://github.com/anomalyco/opencode/releases/tag/v1.2.0`
+- Redirects to: `https://github.com/sst/opencode/releases/tag/v1.2.0`
 - Extract version from the URL path (e.g., `1.2.0`)
 
 ### Step 3: Compare and Update
@@ -334,7 +336,7 @@ bash(command: "opencode --version")
 If version still doesn't match latest:
 
 - Inform user: "OpenCode auto-update may have failed. Current: X.X.X, Latest: Y.Y.Y"
-- Suggest manual update: `curl -fsSL https://opencode.dev/install | bash`
+- Suggest manual update: `curl -fsSL https://opencode.ai/install | bash`
 
 ### Update Workflow Summary
 
@@ -342,7 +344,7 @@ If version still doesn't match latest:
 function updateOpenCode():
     current = bash("opencode --version")  # e.g., "1.1.13"
 
-    latestPage = webfetch("https://github.com/anomalyco/opencode/releases/latest")
+    latestPage = webfetch("https://github.com/sst/opencode/releases/latest")
     latest = extractVersionFromRedirectUrl(latestPage)  # e.g., "1.2.0"
 
     if semverCompare(latest, current) > 0:

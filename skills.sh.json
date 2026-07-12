@@ -6,28 +6,37 @@
       "title": "Engineering",
       "description": "The core build, debug, and delivery loop.",
       "skills": [
+        "characterization-tests",
         "codebase-design",
         "diagnosing-bugs",
         "domain-modeling",
         "implement",
+        "optimize-performance",
         "productionize-app",
-        "refactor-codebase",
         "research",
         "sculpt-code",
-        "tdd"
+        "tdd",
+        "upgrade-dependencies"
+      ]
+    },
+    {
+      "title": "Game Development",
+      "description": "Game engines and game-development workflows.",
+      "skills": [
+        "bevy-development"
       ]
     },
     {
       "title": "Planning",
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
+        "estimate-work",
         "grilling",
         "handoff",
-        "plan-before-coding",
+        "prioritize-backlog",
         "store-plan",
         "to-spec",
         "to-tickets",
-        "triage",
         "wayfinder"
       ]
     },
@@ -39,7 +48,7 @@
         "pr-build-context",
         "pr-create-test-plan",
         "pr-edge-cases",
-        "pr-prepare-review"
+        "rfc-review"
       ]
     },
     {
@@ -48,8 +57,12 @@
       "skills": [
         "gh-create-issue",
         "gh-create-pr",
+        "gh-release-notes",
         "gh-resolve-pr-comments",
-        "git-resolve-conflicts"
+        "gh-submit-review",
+        "gh-triage",
+        "git-resolve-conflicts",
+        "git-update-branch"
       ]
     },
     {
@@ -57,7 +70,6 @@
       "description": "Self-critique and review of your own work.",
       "skills": [
         "critical-thinking",
-        "rfc-review",
         "scope-sweep",
         "self-review"
       ]
@@ -74,6 +86,8 @@
       "title": "Authoring",
       "description": "Create and maintain the skills themselves.",
       "skills": [
+        "deprecate-skill",
+        "skill-audit",
         "skill-creator",
         "skill-router"
       ]
@@ -83,8 +97,8 @@
       "description": "Environments, CLIs, and agent conventions.",
       "skills": [
         "agent-guidelines",
-        "bevy-development",
         "devenv",
+        "install-skills",
         "opencode",
         "opencode-acp",
         "scratchpad"

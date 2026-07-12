@@ -10,7 +10,7 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 ## Instructions
 
 1. **Determine scope** — use the current branch diff unless the user specifies otherwise:
-   - `git diff main...HEAD --name-only`
+   - `git diff <base-branch>...HEAD --name-only` (the branch your work targets)
    - Fall back to staged changes if no branch diff exists
 2. **Read all changed files in full** before reviewing.
 3. **Answer each question below.** For every finding, cite `file_path:line_number` and fix it directly.

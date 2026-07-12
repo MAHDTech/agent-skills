@@ -12,7 +12,7 @@ metadata:
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save it to the operating system's temporary directory — **not** the current workspace — so it isn't committed by accident.
 
-Include a **"Suggested skills"** section in the document, listing the skills the next agent should invoke (for example `/triage`, `/wayfinder`, or whichever fit the work ahead) and why each is relevant.
+Include a **"Suggested skills"** section in the document, listing the skills the next agent should invoke (for example `/gh-triage`, `/wayfinder`, or whichever fit the work ahead) and why each is relevant.
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead — the handoff points at the source of truth, it doesn't copy it.
 

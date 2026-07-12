@@ -87,7 +87,7 @@ Reporting them separately stops one axis from masking the other.
 `code-review` stands on its own, but it sits next to narrower passes worth reaching for:
 
 - `/pr-build-context` — gather high-signal context on a pull request before the review.
-- `/pr-prepare-review`, `/pr-create-test-plan`, `/pr-edge-cases` — prepare a branch, draft a manual test plan, or probe edge cases and failure modes.
+- `/pr-build-context`, `/pr-create-test-plan`, `/pr-edge-cases` — build reviewer context on a branch, draft a manual test plan, or probe edge cases and failure modes.
 - `/diagnosing-bugs` — when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

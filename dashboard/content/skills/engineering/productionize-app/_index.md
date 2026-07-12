@@ -1,6 +1,6 @@
 +++
 title = "productionize-app"
-description = "Transform applications into production-ready deployments with systematic analysis, improvement, and framework-specific optimization"
+description = "Transform an application into a production-ready deployment through systematic analysis, hardening, and framework-specific optimization. Use when preparing an app to ship — auditing readiness, tightening config, and getting it deployable to a target platform."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -23,19 +23,19 @@ Transform development code into production-ready applications through systematic
 ## Usage Patterns
 
 ```bash
-/cmd-productionize                          # Auto-detect framework, general production prep
-/cmd-productionize flutter testflight       # Flutter app for TestFlight
-/cmd-productionize react vercel            # React app for Vercel deployment
-/cmd-productionize nodejs docker           # Node.js app for Docker deployment
-/cmd-productionize python heroku           # Python app for Heroku
-/cmd-productionize vue netlify             # Vue app for Netlify
+/productionize-app                          # Auto-detect framework, general production prep
+/productionize-app flutter testflight       # Flutter app for TestFlight
+/productionize-app react vercel             # React app for Vercel deployment
+/productionize-app nodejs docker            # Node.js app for Docker deployment
+/productionize-app python heroku            # Python app for Heroku
+/productionize-app vue netlify              # Vue app for Netlify
 ```
 
 ## Workflow
 
 ### 1. **Initial Analysis & Planning**
 
-- **Always start with TodoWrite tool** to create a comprehensive task list
+- **Always start by drafting a comprehensive task list** to track the work (use your task-tracking tool if you have one)
 - **Breadth AND Depth Navigation**: Look beyond immediate scope to understand:
   - Related systems that might be affected
   - Broader architectural implications
