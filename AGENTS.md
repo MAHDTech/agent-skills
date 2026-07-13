@@ -10,7 +10,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 - Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
-- Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details.
+- Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details. Note that skills do not need to be published to the npm registry; the installer CLI fetches them directly from this GitHub repository.
 
 ## Development
 
