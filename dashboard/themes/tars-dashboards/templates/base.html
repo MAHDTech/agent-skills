@@ -121,8 +121,8 @@
 
   <pagefind-modal reset-on-close bundle-path="{{ config.base_url }}pagefind/"></pagefind-modal>
 
-  <script src="{{ config.base_url }}pagefind/pagefind-component-ui.js" type="module"></script>
-  <script type="module">
+  <script data-cfasync="false" src="{{ config.base_url }}pagefind/pagefind-component-ui.js" type="module"></script>
+  <script data-cfasync="false" type="module">
     document.addEventListener("DOMContentLoaded", () => {
       const trigger = document.getElementById("search-trigger");
       const modal = document.querySelector("pagefind-modal");
