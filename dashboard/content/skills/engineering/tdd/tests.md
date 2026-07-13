@@ -4,6 +4,7 @@ title = "tests"
 skill = false
 category = "engineering"
 mermaid = false
+skill_name = "tdd"
 +++
 
 # Good and Bad Tests

@@ -4,6 +4,7 @@ title = "DESIGN-IT-TWICE"
 skill = false
 category = "engineering"
 mermaid = false
+skill_name = "codebase-design"
 +++
 
 # Design It Twice

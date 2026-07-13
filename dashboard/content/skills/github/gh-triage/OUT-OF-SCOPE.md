@@ -4,6 +4,7 @@ title = "OUT-OF-SCOPE"
 skill = false
 category = "github"
 mermaid = false
+skill_name = "gh-triage"
 +++
 
 # Out-of-Scope Knowledge Base

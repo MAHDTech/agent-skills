@@ -192,3 +192,22 @@
     display: inline-block;
     font-size: 0.6rem;
 }
+
+/* ── Pagefind Component UI Overrides ────────────────────────────── */
+
+:root,
+pagefind-modal {
+    --pf-text: var(--color-text-main);
+    --pf-text-secondary: var(--color-muted);
+    --pf-text-muted: var(--color-muted);
+    --pf-background: var(--color-surface);
+    --pf-border: var(--color-border);
+    --pf-border-focus: var(--color-primary);
+    --pf-outline-focus: var(--color-primary);
+    --pf-font: var(--font-mono);
+    --pf-mark: var(--color-primary);
+    --pf-hover: rgba(255, 255, 255, 0.05);
+    --pf-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8);
+    --pf-modal-backdrop: rgba(0, 0, 0, 0.8);
+    --pf-border-radius: 0px;
+}

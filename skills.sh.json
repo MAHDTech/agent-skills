@@ -6,6 +6,7 @@
       "title": "Engineering",
       "description": "The core build, debug, and delivery loop.",
       "skills": [
+        "backlog-implement",
         "characterization-tests",
         "codebase-design",
         "diagnosing-bugs",
@@ -30,6 +31,9 @@
       "title": "Planning",
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
+        "backlog-audit",
+        "backlog-loop",
+        "backlog-triage",
         "estimate-work",
         "grilling",
         "handoff",

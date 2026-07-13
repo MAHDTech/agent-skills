@@ -4,6 +4,7 @@ title = "DEEPENING"
 skill = false
 category = "engineering"
 mermaid = false
+skill_name = "codebase-design"
 +++
 
 # Deepening

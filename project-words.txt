@@ -88,6 +88,7 @@ techdebt
 testflight
 thumbsdown
 thumbsup
+TOCTOU
 toolsdirectory
 unitless
 verdana
@@ -140,4 +141,6 @@ microbenchmark
 timebox
 timeboxed
 xclip
+worktree
+worktrees
 Syncthing

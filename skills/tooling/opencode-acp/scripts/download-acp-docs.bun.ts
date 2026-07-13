@@ -80,7 +80,7 @@ async function main() {
 
     if (failed.length > 0) {
         console.log(`\nFailed downloads:`)
-        failed.forEach((r, i) => {
+        failed.forEach((r) => {
             if (r.status === "rejected") {
                 console.log(`  ✗ ${r.reason}`)
             }

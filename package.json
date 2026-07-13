@@ -1,6 +1,5 @@
 {
     "name": "agent-skills",
-    "module": "index.ts",
     "type": "module",
     "private": true,
     "license": "MIT",

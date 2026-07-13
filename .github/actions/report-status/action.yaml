@@ -44,12 +44,22 @@ runs:
           RESULT="failure"
           DESCRIPTION="${{ inputs.failure-message }}"
         fi
-        gh api \
+        if ! ERR_MSG=$(gh api \
           repos/${{ inputs.repository }}/statuses/${{ inputs.sha }} \
-          -f state=${RESULT} \
+          -f state="${RESULT}" \
           -f context="${{ inputs.workflow-name }}" \
           -f description="${DESCRIPTION}" \
-          -f target_url="${{ inputs.run-url }}" || {
-            echo "Failed to report CI status!"
-            exit 1
-          }
+          -f target_url="${{ inputs.run-url }}" 2>&1 >/dev/null); then
+
+          echo "Failed to report CI status: $ERR_MSG"
+
+          case "$ERR_MSG" in
+            *403*|*"Resource not accessible by integration"*|*Forbidden*)
+              echo "::warning::Status reporting failed due to insufficient permissions."
+              exit 0
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
+        fi

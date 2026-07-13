@@ -113,6 +113,7 @@ interface Skill {
     promoted: boolean
     metadata: SkillMetadata
     content: string
+    yamlError?: string
 }
 
 function logTask(msg: string) {
@@ -141,15 +142,40 @@ function rewriteSkillLinks(
     contentBase: string,
     srcDir: string
 ): string {
-    return content.replace(
+    const placeholders: string[] = []
+    const placeholderPrefix = "\x00_CODE_SPAN_PLACEHOLDER_"
+    let protectedContent = content.replace(
+        /(```[\s\S]*?```|``[\s\S]*?``|`[^`\r\n]*?`)/g,
+        (match) => {
+            const id = placeholders.length
+            placeholders.push(match)
+            return `${placeholderPrefix}${id}\x00`
+        }
+    )
+
+    protectedContent = protectedContent.replace(
         /\]\((?!https?:\/\/|@\/|#|mailto:|\/)([^)#\s]+\.md)(#[^)\s]*)?\)/g,
         (match, relPath: string, anchor?: string) => {
-            if (!fs.existsSync(path.join(srcDir, relPath))) return match
+            const targetFullPath = path.join(srcDir, relPath)
+            if (!fs.existsSync(targetFullPath)) return match
+
+            const relToSkills = path.relative(SKILLS_DIR, targetFullPath)
+            const parts = relToSkills.split(/[\\/]/)
+            const category = parts.length >= 2 ? parts[0]! : ""
+            if (CATEGORIES[category]?.lifecycle) {
+                return match
+            }
+
             const rel = path.posix
                 .normalize(path.posix.join(contentBase, relPath))
                 .replace(/\/SKILL\.md$/, "/_index.md")
             return `](@/${rel}${anchor || ""})`
         }
+    )
+
+    return protectedContent.replace(
+        new RegExp(`${placeholderPrefix}(\\d+)\\x00`, "g"),
+        (_, id) => placeholders[parseInt(id, 10)]!
     )
 }
 
@@ -160,14 +186,23 @@ async function getSkills(): Promise<Skill[]> {
     const files = await glob("**/SKILL.md", {cwd: SKILLS_DIR})
     for (const file of files.sort()) {
         const fullPath = path.join(SKILLS_DIR, file)
-        const raw = await fs.readFile(fullPath, "utf-8")
+        const raw = (await fs.readFile(fullPath, "utf-8")).replace(
+            /\r\n/g,
+            "\n"
+        )
         const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
         if (!match || !match[1] || !match[2]) {
             console.warn(`Skill at ${file} is missing YAML frontmatter.`)
             continue
         }
-        const metadata = (yaml.load(match[1]) as SkillMetadata) || {}
-        const parts = file.split(path.sep)
+        let metadata: SkillMetadata = {}
+        let yamlError: string | undefined
+        try {
+            metadata = (yaml.load(match[1]) as SkillMetadata) || {}
+        } catch (e: any) {
+            yamlError = e.message || String(e)
+        }
+        const parts = file.split("/")
         // Expected shape: <category>/<name>/SKILL.md
         const category = parts.length >= 3 ? parts[0]! : "uncategorized"
         const dirName = parts[parts.length - 2]!
@@ -179,6 +214,7 @@ async function getSkills(): Promise<Skill[]> {
             promoted,
             metadata,
             content: match[2],
+            yamlError,
         })
     }
     return skills
@@ -204,6 +240,13 @@ async function lint() {
 
     for (const skill of skills) {
         const file = skill.path
+        if (skill.yamlError) {
+            log.error(
+                `❌ ${file}: YAML frontmatter syntax error: ${skill.yamlError}`
+            )
+            errors++
+            continue
+        }
         const name = skill.metadata.name
 
         if (!name) {
@@ -269,11 +312,19 @@ function readmeBadge(): string {
 
 async function sync() {
     const skills = await getSkills()
+    if (skills.some((s) => s.yamlError)) {
+        throw new Error(
+            "Cannot sync: One or more skills contain YAML frontmatter errors."
+        )
+    }
     const grouped = groupByCategory(skills)
 
     // 1. agents/AGENTS.md — regenerate the skill index, preserve frontmatter.
     if (await fs.pathExists(AGENTS_FILE)) {
-        const agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
+        const agentsContent = (await fs.readFile(AGENTS_FILE, "utf-8")).replace(
+            /\r\n/g,
+            "\n"
+        )
         const fm = agentsContent.match(/^---\n[\s\S]*?\n---\n/)
         const frontmatter = fm ? fm[0] : ""
 
@@ -385,10 +436,9 @@ ${skillBody}
                 (f) => f.endsWith(".md") && f !== "SKILL.md"
             )
             for (const file of siblings.sort()) {
-                const raw = await fs.readFile(
-                    path.join(skillSrcDir, file),
-                    "utf-8"
-                )
+                const raw = (
+                    await fs.readFile(path.join(skillSrcDir, file), "utf-8")
+                ).replace(/\r\n/g, "\n")
                 const body = rewriteSkillLinks(raw, contentBase, skillSrcDir)
                 const sibMermaid = body.includes("```mermaid")
                 await fs.writeFile(
@@ -399,6 +449,7 @@ title = ${JSON.stringify(file.replace(/\.md$/, ""))}
 skill = false
 category = ${JSON.stringify(key)}
 mermaid = ${sibMermaid}
+skill_name = ${JSON.stringify(s.dirName)}
 +++
 
 ${body}
@@ -423,7 +474,7 @@ ${body}
             {stdio: "inherit"}
         )
         logTask("Staged generated files to git.")
-    } catch (e) {
+    } catch {
         log.warn("Could not stage changes to git (no repo or no changes).")
     }
 }
@@ -474,18 +525,16 @@ function detectTools(): Detected {
  * one checkout must still be reclaimable when `sync` runs from the other, so
  * "uninstall all" is a true reset regardless of which copy is active.
  */
-const REPO_SKILLS_MARKER = `${path.sep}${path.basename(AGENT_SKILLS_HOME)}${path.sep}skills${path.sep}`
-
-/**
- * Remove symlinks in `dir` that resolve to this repo's `skills/` tree (in any
- * checkout). Real directories/files (skills you hand-copy to test) and symlinks
- * pointing anywhere else are left untouched — this only reclaims links we own,
- * so it is safe to run repeatedly.
- */
 async function cleanStaleLinks(dir: string): Promise<number> {
     if (!(await fs.pathExists(dir))) return 0
     let removed = 0
-    for (const entry of await fs.readdir(dir)) {
+    let entries: string[]
+    try {
+        entries = await fs.readdir(dir)
+    } catch {
+        return 0
+    }
+    for (const entry of entries) {
         const entryPath = path.join(dir, entry)
         try {
             const stat = await fs.lstat(entryPath)
@@ -494,39 +543,118 @@ async function cleanStaleLinks(dir: string): Promise<number> {
                 path.dirname(entryPath),
                 await fs.readlink(entryPath)
             )
-            const owned =
-                target.startsWith(AGENT_SKILLS_HOME + path.sep) ||
-                target.includes(REPO_SKILLS_MARKER)
-            if (owned) {
-                await fs.remove(entryPath)
-                removed++
+
+            const normalizedTarget = path.normalize(target)
+            const skillsMarker = `${path.sep}skills${path.sep}`
+            const skillsIdx = normalizedTarget.lastIndexOf(skillsMarker)
+            if (skillsIdx === -1) continue
+
+            const repoRoot = normalizedTarget.slice(0, skillsIdx)
+            const relativePath = normalizedTarget.slice(
+                skillsIdx + skillsMarker.length
+            )
+
+            const parts = relativePath.split(/[\\/]/)
+            if (parts.length !== 2) continue
+            const [category, name] = parts
+            if (
+                !category ||
+                !name ||
+                !CATEGORIES[category] ||
+                !NAME_RE.test(name)
+            )
+                continue
+
+            const pkgPath = path.join(repoRoot, "package.json")
+            if (await fs.pathExists(pkgPath)) {
+                try {
+                    const pkg = await fs.readJson(pkgPath)
+                    if (pkg && pkg.name === "agent-skills") {
+                        await fs.remove(entryPath)
+                        removed++
+                    }
+                } catch {
+                    // Ignore parsing errors
+                }
             }
         } catch {
-            // Ignore unreadable entries.
+            // Ignore unreadable entries
         }
     }
     return removed
 }
 
-async function registerAntigravity() {
-    await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
-    let config: {entries?: {path: string}[]; [k: string]: any} = {}
-    if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+const ANTIGRAVITY_LOCK_FILE = `${ANTIGRAVITY_SKILLS_JSON}.lock`
+
+async function acquireLock() {
+    const timeout = 10000
+    const start = Date.now()
+    while (Date.now() - start < timeout) {
         try {
-            config = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            if (await fs.pathExists(ANTIGRAVITY_LOCK_FILE)) {
+                const stat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
+                if (Date.now() - stat.mtimeMs > 10000) {
+                    await fs.remove(ANTIGRAVITY_LOCK_FILE)
+                }
+            }
+            await fs.writeFile(ANTIGRAVITY_LOCK_FILE, String(process.pid), {
+                flag: "wx",
+            })
+            return
         } catch {
-            config = {}
+            await new Promise((resolve) => setTimeout(resolve, 100))
         }
     }
-    const entries = config.entries || []
-    if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
-        entries.push({path: AGENTS_HUB})
+    throw new Error("Timeout acquiring skills.json.lock file lock.")
+}
+
+async function releaseLock() {
+    try {
+        await fs.remove(ANTIGRAVITY_LOCK_FILE)
+    } catch {
+        // Ignore
     }
-    config.entries = entries
-    if (!config.$schema) {
-        config.$schema = "https://skills.sh/schemas/skills.sh.schema.json"
+}
+
+async function registerAntigravity() {
+    await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+    await acquireLock()
+    try {
+        let config: {entries?: {path: string}[]; [k: string]: any} = {}
+        if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+            const rawContent = await fs.readFile(
+                ANTIGRAVITY_SKILLS_JSON,
+                "utf-8"
+            )
+            if (rawContent.trim() !== "") {
+                try {
+                    config = JSON.parse(rawContent)
+                } catch (e: any) {
+                    log.error(
+                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`
+                    )
+                    process.exit(1)
+                }
+            }
+        }
+        const entries = config.entries || []
+        if (!Array.isArray(entries)) {
+            log.error(
+                `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} 'entries' is not an array.`
+            )
+            process.exit(1)
+        }
+        if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
+            entries.push({path: AGENTS_HUB})
+        }
+        config.entries = entries
+        if (!config.$schema) {
+            config.$schema = "https://skills.sh/schemas/skills.sh.schema.json"
+        }
+        await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
+    } finally {
+        await releaseLock()
     }
-    await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
 }
 
 async function linkSkills() {
@@ -534,7 +662,13 @@ async function linkSkills() {
     // Only promoted skills are installed; lifecycle buckets (in-progress /
     // deprecated) are excluded, mirroring sync's published output so a retired
     // skill stops being loadable once install is re-run.
-    const skills = (await getSkills()).filter((s) => s.promoted)
+    const allSkills = await getSkills()
+    if (allSkills.some((s) => s.yamlError)) {
+        throw new Error(
+            "Cannot install: One or more skills contain YAML frontmatter errors."
+        )
+    }
+    const skills = allSkills.filter((s) => s.promoted)
 
     // Which flattened hubs get real links.
     const linkTargets: string[] = []
@@ -575,16 +709,33 @@ async function unlinkSkills() {
 
     // De-register the Antigravity hub entry.
     if (await fs.pathExists(ANTIGRAVITY_SKILLS_JSON)) {
+        await acquireLock()
         try {
-            const config = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
-            if (Array.isArray(config.entries)) {
-                config.entries = config.entries.filter(
-                    (e: {path: string}) => path.resolve(e.path) !== AGENTS_HUB
-                )
-                await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {spaces: 2})
+            const rawContent = await fs.readFile(
+                ANTIGRAVITY_SKILLS_JSON,
+                "utf-8"
+            )
+            if (rawContent.trim() !== "") {
+                let config: any
+                try {
+                    config = JSON.parse(rawContent)
+                    if (config && Array.isArray(config.entries)) {
+                        config.entries = config.entries.filter(
+                            (e: {path: string}) =>
+                                path.resolve(e.path) !== AGENTS_HUB
+                        )
+                        await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, config, {
+                            spaces: 2,
+                        })
+                    }
+                } catch (e: any) {
+                    log.warn(
+                        `⚠️ Warning: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`
+                    )
+                }
             }
-        } catch {
-            // Ignore malformed config.
+        } finally {
+            await releaseLock()
         }
     }
     return {removed}
@@ -664,14 +815,19 @@ const {values: options} = parseArgs({
 
 const action = (options.action as string) || process.argv[2]
 
+const handleException = (err: any) => {
+    console.error(err)
+    process.exit(1)
+}
+
 if (action === "lint") {
-    lint().catch(console.error)
+    lint().catch(handleException)
 } else if (action === "sync") {
-    syncAction().catch(console.error)
+    syncAction().catch(handleException)
 } else if (action === "install") {
-    install().catch(console.error)
+    install().catch(handleException)
 } else if (action === "uninstall") {
-    uninstallAction().catch(console.error)
+    uninstallAction().catch(handleException)
 } else {
     console.log(
         "Usage: bun run bin/skills.ts --action <lint|sync|install|uninstall>"

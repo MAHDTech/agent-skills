@@ -21,10 +21,12 @@ name: CodeQL
 on:
   pull_request:
     branches:
+      - main
       - trunk
 
   push:
     branches:
+      - main
       - trunk
 
   schedule:
