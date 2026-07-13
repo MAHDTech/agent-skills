@@ -211,10 +211,7 @@ in
         };
       };
       mixed-line-endings.enable = true;
-      nixfmt = {
-        enable = true;
-        package = pkgs.nixfmt-rfc-style;
-      };
+      nixfmt.enable = true;
       prettier = {
         enable = true;
         excludes = [
