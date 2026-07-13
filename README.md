@@ -2,7 +2,11 @@
 
 [![skills.sh](https://skills.sh/b/MAHDTech/agent-skills)](https://skills.sh/MAHDTech/agent-skills)
 
-My personal and public agent skills — cross-compatible with Claude Code, OpenCode, Goose, and Antigravity CLI.
+Working on my _skill issues_.
+
+![skill issues](./docs/images/skill-issues.png)
+
+These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.
 
 ## Install
 
