@@ -49,7 +49,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -141,7 +141,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -189,7 +189,7 @@ jobs:
 
       - id: checkout_repository
         name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -248,7 +248,7 @@ jobs:
       - id: checkout_repository
         name: Checkout Repository
         # Ensure we checkout the exact tag we're promoting
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.promote-release.outputs.tag }}
           fetch-depth: 0
@@ -290,7 +290,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - id: report_status_step
         name: Report Global Status
