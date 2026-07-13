@@ -11,7 +11,11 @@ These are my personal agent skills and attempt to be cross-compatible with Antig
 ## Install
 
 ```bash
+# Using npm
 npx skills add MAHDTech/agent-skills
+
+# Using Bun
+bunx skills add MAHDTech/agent-skills
 ```
 
 ## Documentation

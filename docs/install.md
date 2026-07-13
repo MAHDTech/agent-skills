@@ -21,7 +21,11 @@ The installer auto-detects which agents you have installed (Claude Code, OpenCod
 To update later:
 
 ```bash
+# Using npm
 npx skills update
+
+# Using Bun
+bunx skills update
 ```
 
 ## For developers

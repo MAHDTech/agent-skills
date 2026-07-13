@@ -377,7 +377,11 @@ These are my personal agent skills and attempt to be cross-compatible with Antig
 ## Install
 
 \`\`\`bash
+# Using npm
 npx skills add ${GITHUB_SOURCE}
+
+# Using Bun
+bunx skills add ${GITHUB_SOURCE}
 \`\`\`
 
 ${docsContent}## Available Skills
