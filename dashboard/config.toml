@@ -1,5 +1,5 @@
 # Use the CNAME for the Base URL.
-base_url = "https://skills.mahdtech.com/agent-skills/"
+base_url = "https://skills.mahdtech.com/"
 title = "Agent Skills"
 description = "A collection of AI agent skills"
 theme = "tars-dashboards"
