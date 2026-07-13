@@ -343,8 +343,10 @@ async function sync() {
     let readme = `# Agent Skills\n\n`
     readme += `${readmeBadge()}\n\n`
     readme +=
-        `My personal and public agent skills — cross-compatible with ` +
-        `Claude Code, OpenCode, Goose, and Antigravity CLI.\n\n`
+        `Working on my _skill issues_.` +
+        `\n\n` +
+        `These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.` +
+        `\n\n`
     readme += `## Install\n\n`
     readme += "```bash\n" + `npx skills add ${GITHUB_SOURCE}\n` + "```\n\n"
     if (await fs.pathExists(DOCS_DIR)) {
