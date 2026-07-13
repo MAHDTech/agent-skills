@@ -310,6 +310,9 @@ function readmeBadge(): string {
     return `[![skills.sh](https://skills.sh/b/${GITHUB_SOURCE})](https://skills.sh/${GITHUB_SOURCE})`
 }
 
+export function skillIssuesImage(): string {
+    return `![skill issues](./docs/images/skill-issues.png)`
+}
 async function sync() {
     const skills = await getSkills()
     if (skills.some((s) => s.yamlError)) {
@@ -340,34 +343,48 @@ async function sync() {
     }
 
     // 2. README.md — badge, install, and a categorised catalog.
-    let readme = `# Agent Skills\n\n`
-    readme += `${readmeBadge()}\n\n`
-    readme +=
-        `Working on my _skill issues_.` +
-        `\n\n` +
-        `These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.` +
-        `\n\n`
-    readme += `## Install\n\n`
-    readme += "```bash\n" + `npx skills add ${GITHUB_SOURCE}\n` + "```\n\n"
-    if (await fs.pathExists(DOCS_DIR)) {
-        const docsFiles = (await glob("*.md", {cwd: DOCS_DIR})).sort()
-        if (docsFiles.length) {
-            readme += `## Documentation\n\n`
-            for (const doc of docsFiles) {
-                readme += `- [${doc.replace(".md", "")}](docs/${doc})\n`
-            }
-            readme += `\n`
-        }
-    }
-    readme += `## Available Skills\n`
-    for (const [key, list] of grouped) {
-        readme += `\n### ${CATEGORIES[key]!.title}\n\n`
-        readme += `${CATEGORIES[key]!.description}\n\n`
-        for (const s of list) {
-            const desc = (s.metadata.description || "").trim()
-            readme += `- **[${s.dirName}](${s.path})** — ${desc}\n`
-        }
-    }
+    const docsList = (await fs.pathExists(DOCS_DIR))
+        ? (await glob("*.md", {cwd: DOCS_DIR})).sort()
+        : []
+    const docsContent = docsList.length
+        ? `## Documentation\n\n${docsList.map((doc) => `- [${doc.replace(".md", "")}](docs/${doc})`).join("\n")}\n\n`
+        : ""
+
+    const catalogContent = grouped
+        .map(([key, list]) => {
+            const title = CATEGORIES[key]!.title
+            const description = CATEGORIES[key]!.description
+            const skillsList = list
+                .map((s) => {
+                    const desc = (s.metadata.description || "").trim()
+                    return `- **[${s.dirName}](${s.path})** — ${desc}`
+                })
+                .join("\n")
+            return `### ${title}\n\n${description}\n\n${skillsList}`
+        })
+        .join("\n\n")
+
+    const readme = `# Agent Skills
+
+${readmeBadge()}
+
+Working on my _skill issues_.
+
+${skillIssuesImage()}
+
+These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.
+
+## Install
+
+\`\`\`bash
+npx skills add ${GITHUB_SOURCE}
+\`\`\`
+
+${docsContent}## Available Skills
+
+${catalogContent}
+`
+
     await fs.writeFile(README_FILE, readme.trimEnd() + "\n")
     logTask("Updated README.md catalog.")
 
