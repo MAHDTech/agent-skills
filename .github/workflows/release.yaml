@@ -6,15 +6,6 @@ on:
       - trunk
       - main
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "The pre-release tag to promote (e.g., v1.2.3)"
-        required: true
-        type: string
-      confirm:
-        description: "Type 'ship it' to confirm the promotion"
-        required: true
-        type: string
 
 concurrency:
   group: release-${{ github.ref }}
@@ -33,12 +24,8 @@ defaults:
     shell: bash
 
 jobs:
-  ##################################################
-  # PATH A: AUTOMATED PRE-RELEASE (ON PUSH)
-  ##################################################
-  pre-release:
-    name: Create Pre-Release
-    if: github.event_name == 'push'
+  release:
+    name: Create Release
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -70,7 +57,7 @@ jobs:
           # Auto-bump from conventional commits
           NEXT_VERSION=$(convco version --bump 2>/dev/null || echo "")
           if [[ -z "${NEXT_VERSION}" ]]; then
-            echo "No bump-worthy commits found. Skipping pre-release."
+            echo "No bump-worthy commits found. Skipping release."
             NEXT_VERSION=$(convco version 2>/dev/null || echo "0.0.1")
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
@@ -89,8 +76,8 @@ jobs:
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "Version: ${NEXT_VERSION}, Tag: ${TAG}"
 
-      - id: create_prerelease
-        name: Create Pre-Release
+      - id: create_release
+        name: Create Release
         if: steps.compute_version.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,9 +88,8 @@ jobs:
             echo "Release ${TAG} already exists, reusing"
           else
             gh release create "${TAG}" \
-              --title "Pre-Release ${TAG}" \
-              --notes "Pre-Release ${TAG}" \
-              --prerelease \
+              --title "Release ${TAG}" \
+              --notes "Release ${TAG}" \
               --target "${{ github.sha }}"
           fi
 
@@ -130,159 +116,10 @@ jobs:
           gh release edit "${TAG}" --notes-file /tmp/changelog.md
           echo "Updated release ${TAG} with changelog"
 
-  publish-dry-run:
-    name: Publish npm (Dry Run)
-    if: github.event_name == 'push' && needs.pre-release.outputs.skip != 'true'
-    needs:
-      - pre-release
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - id: checkout_repository
-        name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - id: setup_devenv
-        name: Setup Devenv
-        uses: ./.github/actions/setup-devenv
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          skip-push: "true"
-
-      - id: cache_bun
-        name: Cache Bun
-        uses: ./.github/actions/cache-bun
-
-      - id: publish_npm_dry
-        name: Publish npm Package (Dry Run)
-        uses: ./.github/actions/publish-npm
-        with:
-          dry-run: "true"
-          version: ${{ needs.pre-release.outputs.version }}
-
-  ##################################################
-  # PATH B: MANUAL PROMOTION (ON DISPATCH)
-  ##################################################
-  promote-release:
-    name: Promote Release
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    outputs:
-      version: ${{ steps.parse_version.outputs.version }}
-      tag: ${{ steps.parse_version.outputs.tag }}
-
-    steps:
-      - id: confirm_intent
-        name: Confirm Intent
-        run: |
-          if [[ "${{ inputs.confirm }}" != "ship it" ]]; then
-            echo "::error::Confirmation must be exactly \"ship it\". Got: \"${{ inputs.confirm }}\""
-            exit 1
-          fi
-          echo "✅ Confirmation accepted"
-
-      - id: checkout_repository
-        name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - id: parse_version
-        name: Parse Version
-        run: |
-          TAG="${{ inputs.tag }}"
-
-          # Remove 'v' namespace if included
-          SEMVER="${TAG#v}"
-
-          if ! [[ "${SEMVER}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+].+)?$ ]]; then
-            echo "::error::Invalid tag format '${TAG}'. Expected e.g. v1.2.3"
-            exit 1
-          fi
-
-          # Force the canonical format
-          CANONICAL_TAG="v${SEMVER}"
-
-          echo "version=${SEMVER}" >> "$GITHUB_OUTPUT"
-          echo "tag=${CANONICAL_TAG}" >> "$GITHUB_OUTPUT"
-          echo "Resolved format: Version=${SEMVER}, Tag=${CANONICAL_TAG}"
-
-      - id: verify_release
-        name: Promote GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG="${{ steps.parse_version.outputs.tag }}"
-
-          # Verify it exists
-          if ! gh release view "${TAG}" > /dev/null 2>&1; then
-            echo "::error::Release ${TAG} does not exist. Please check your spelling and ensure a pre-release was created."
-            exit 1
-          fi
-
-          # Remove pre-release flag and update title to remove 'Pre-Release' prefix if any
-          echo "Promoting release ${TAG} from pre-release to full release..."
-
-          # Strip the 'Pre-Release ' prefix from existing title if it exists
-          TITLE=$(gh release view "${TAG}" --json name -q '.name')
-          NEW_TITLE="${TITLE//Pre-Release /}"
-
-          gh release edit "${TAG}" --prerelease=false --title "${NEW_TITLE}"
-          echo "✅ Release ${TAG} promoted successfully!"
-
-  publish-live:
-    name: Publish npm (Live)
-    if: github.event_name == 'workflow_dispatch'
-    needs:
-      - promote-release
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - id: checkout_repository
-        name: Checkout Repository
-        # Ensure we checkout the exact tag we're promoting
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ needs.promote-release.outputs.tag }}
-          fetch-depth: 0
-
-      - id: setup_devenv
-        name: Setup Devenv
-        uses: ./.github/actions/setup-devenv
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          skip-push: "true"
-
-      - id: cache_bun
-        name: Cache Bun
-        uses: ./.github/actions/cache-bun
-
-      - id: publish_npm_live
-        name: Publish npm Package (LIVE)
-        uses: ./.github/actions/publish-npm
-        with:
-          dry-run: "false"
-          version: ${{ needs.promote-release.outputs.version }}
-
-  ##################################################
-  # Reports & Summaries
-  ##################################################
   status:
     name: Write Summary
     needs:
-      - pre-release
-      - publish-dry-run
-      - promote-release
-      - publish-live
+      - release
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -306,39 +143,25 @@ jobs:
           run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - id: write_summary_push
-        name: Push Results Summary
-        if: github.event_name == 'push' && needs.pre-release.outputs.skip != 'true'
+        name: Release Results Summary
+        if: needs.release.outputs.skip != 'true'
         uses: ./.github/actions/step-summary
         with:
-          title: "Pre-Release Results"
+          title: "Release Results"
           jobs: |
-            Pre-Release Setup|${{ needs.pre-release.result }}
-            npm Publish Dry Run|${{ needs.publish-dry-run.result }}
+            Release Setup|${{ needs.release.result }}
           footer: |
-            ### 🏷️ Pre-Release Tag
-            **Tag**: \`${{ needs.pre-release.outputs.tag }}\`
-            Go to [GitHub Releases](https://github.com/${{ github.repository }}/releases/tag/${{ needs.pre-release.outputs.tag }}) to review the changelog!
+            ### 🏷️ Release Tag
+            **Tag**: \`${{ needs.release.outputs.tag }}\`
+            Go to [GitHub Releases](https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.tag }}) to review the changelog!
 
       - id: write_summary_skip
         name: Skipped Summary
-        if: github.event_name == 'push' && needs.pre-release.outputs.skip == 'true'
+        if: needs.release.outputs.skip == 'true'
         uses: ./.github/actions/step-summary
         with:
-          title: "Pre-Release Skipped"
+          title: "Release Skipped"
           jobs: |
-            Pre-Release Setup|Skipped
+            Release Setup|Skipped
           footer: |
-            No feat/fix conventional commits were found. To trigger a pre-release, push an impactful commit!
-
-      - id: write_summary_dispatch
-        name: Promotion Results Summary
-        if: github.event_name == 'workflow_dispatch'
-        uses: ./.github/actions/step-summary
-        with:
-          title: "Live Promotion Results"
-          jobs: |
-            Promote to Release|${{ needs.promote-release.result }}
-            npm Publish LIVE|${{ needs.publish-live.result }}
-          footer: |
-            ### 🚀 Shipped!
-            Successfully promoted \`${{ needs.promote-release.outputs.tag }}\` to a full release and published to the npm registry!
+            No feat/fix conventional commits were found. To trigger a release, push an impactful commit!
