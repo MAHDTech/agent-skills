@@ -67,7 +67,7 @@ When a subagent completes:
    ```
 
 3. Save the file to disk (do **NOT** stage or commit).
-4. Clean up the subagent's worktree and branch immediately:
+4. **CRITICAL CLEANUP CONSTRAINT**: As the Hub, you MUST clean up each subagent's worktree and branch immediately, regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
 

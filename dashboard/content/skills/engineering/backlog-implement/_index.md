@@ -72,7 +72,7 @@ When all subagents in the batch complete:
 4. **Move Ticket**:
    - If the merge and subsequent tests pass: move the ticket file to `.tars/issues/done/`.
    - If the merge, tests, or pre-commit checks fail: abort the merge, restore the main branch state, move the ticket to `.tars/issues/failed/` (or back to `todo/` if it can be retried), and log the failure.
-5. **Worktree & Branch Cleanup**: Immediately after a branch is successfully merged or rejected, the Hub (and ONLY the Hub) must clean up its worktree and branch:
+5. **CRITICAL CLEANUP CONSTRAINT**: Immediately after a branch is successfully merged or rejected, the Hub (and ONLY the Hub) MUST clean up its worktree and branch. You must force-remove them regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
 

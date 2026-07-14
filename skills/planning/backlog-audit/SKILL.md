@@ -55,7 +55,7 @@ Once the subagents report back, collect all findings:
 4. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` using the standard format:
    - **Filename**: `XXX.md` (3-digit ID)
    - **Format**: YAML frontmatter + standard headings (see template below). Make sure to list the files/components touched in the frontmatter `files` list to assist in dynamic batching.
-5. **Cleanup**: As the Hub, clean up each subagent's worktree and branch immediately:
+5. **CRITICAL CLEANUP CONSTRAINT**: As the Hub, you MUST clean up each subagent's worktree and branch immediately, regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
 
