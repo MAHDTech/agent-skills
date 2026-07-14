@@ -102,11 +102,16 @@
       "description": "Environments, CLIs, and agent conventions.",
       "skills": [
         "agent-guidelines",
+        "antigravity",
         "devenv",
         "install-skills",
         "opencode",
         "opencode-acp",
-        "scratchpad"
+        "pagefind",
+        "scratchpad",
+        "tailwind",
+        "tauri",
+        "zola"
       ]
     }
   ]

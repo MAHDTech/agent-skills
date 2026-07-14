@@ -26,7 +26,7 @@
 
     {{ page.content | safe }}
 
-    {# Freshness: last-modified date computed from git at build time (see bin/dashboard.ts). #}
+    {# Freshness: last-modified date computed from git at build time (see bin/dashboard/lib.ts). #}
     {% if page.extra.category %}
       {% set dates_data = load_data(path="skill_dates.toml", required=false) %}
       {% if dates_data %}

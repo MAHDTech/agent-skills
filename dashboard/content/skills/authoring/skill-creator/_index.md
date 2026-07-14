@@ -87,9 +87,7 @@ A skill's content is ranked by how immediately the agent needs it — the **info
 ```text
 skills/<category>/<name>/
   SKILL.md        # entry point — steps and top-tier reference
-  scripts/        # optional: runnable, non-interactive automation
-  references/     # optional: disclosed reference reached by a pointer
-  assets/         # optional: images and other static files
+  resources/      # optional: unified directory for scripts, docs, references, and static files
 ```
 
 **Branching** is the disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A pointer's _wording_, not its target, decides when and how reliably the agent follows it — a must-have behind a weak pointer is a variance bug, so sharpen the wording before pulling material back inline.

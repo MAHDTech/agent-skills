@@ -145,3 +145,14 @@ xclip
 worktree
 worktrees
 Syncthing
+khtml
+KHTML
+pandoc
+Pandoc
+serde
+tauri
+Tauri
+navbars
+Tera
+
+

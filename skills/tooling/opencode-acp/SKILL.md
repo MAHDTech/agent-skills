@@ -6,6 +6,8 @@ metadata:
   author: Benjamin Jesuiter <bjesuiter@gmail.com>
   license: MIT
   github_url: https://github.com/bjesuiter/opencode-acp-skill
+resources:
+  - https://agentclientprotocol.com/llms.txt
 ---
 
 # OpenCode ACP Skill

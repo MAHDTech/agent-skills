@@ -123,10 +123,12 @@ Beyond `/code-review` on the main flow:
 ## Tooling
 
 - `/agent-guidelines` — reach for this when you want work checked against the behavioural guidelines for agents.
+- `/antigravity` — reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` — reach for this when a repo uses devenv for its shell and dependencies.
 - `/opencode` — reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
 - `/opencode-acp` — reach for this when controlling OpenCode over the Agent Client Protocol.
 - `/scratchpad` — reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` — reach for this when installing, updating, or managing skills from a collection across agent runtimes.
+- `/tauri` — reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

@@ -2,6 +2,8 @@
 name: gh-create-pr
 description: Generate a PR title and description, then commit, create/update the PR on approval
 disable-model-invocation: true
+resources:
+  - https://cli.github.com/manual/gh_pr
 ---
 
 <!-- omit in toc -->

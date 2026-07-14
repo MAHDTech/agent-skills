@@ -8,7 +8,7 @@ The project follows the "Agent Skills" pattern: Markdown files with YAML frontma
 
 ```text
 agents/                       # Global agent instructions (AGENTS.md is auto-generated, MEMORIES.md)
-bin/                          # Core scripts (skills.ts)
+bin/                          # Core scripts (skills/, dashboard/)
 dashboard/                    # Zola source for the skills dashboard
   content/                    # Automatically generated from skills/
   themes/tars-dashboards/     # Custom Zola theme with Tailwind CSS v4
@@ -17,8 +17,7 @@ skills/                       # Skill directories grouped by category
   <category>/                 # engineering, planning, review, github, reflection, writing, authoring, tooling
     <skill-name>/
       SKILL.md                # Main skill definition
-      scripts/                # Optional skill-specific scripts
-      assets/                 # Optional skill-specific assets
+      resources/              # Optional skill-specific resources (documentation, assets, scripts, etc.)
   in-progress/                # Lifecycle bucket for work in progress
   deprecated/                 # Lifecycle bucket for retired skills
 .github/actions/              # Composite actions for CI/CD

@@ -5,6 +5,8 @@ disable-model-invocation: true
 metadata:
   source: mattpocock/skills
   license: MIT
+resources:
+  - https://cli.github.com/manual/gh_issue
 ---
 
 # GitHub Backlog Triage
