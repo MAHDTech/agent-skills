@@ -48,13 +48,75 @@ export async function download(url: string): Promise<string> {
     return await response.text()
 }
 
-// Convert HTML content directly to Markdown using Pandoc via stdin/stdout
+// Clean HTML content by stripping scripts, styles, layout noise, and SVGs using HTMLRewriter
+export async function cleanHtml(htmlContent: string): Promise<string> {
+    const rewriter = new HTMLRewriter()
+        .on("script", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("style", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("svg", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("nav", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("header", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("footer", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("aside", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on(".sidebar", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("#sidebar", {
+            element(el) {
+                el.remove()
+            },
+        })
+        .on("a.anchor, a.hash-link, a.anchor-link, a.sl-anchor-link", {
+            element(el) {
+                el.remove()
+            },
+        })
+
+    const response = new Response(htmlContent, {
+        headers: {"Content-Type": "text/html; charset=utf-8"},
+    })
+    const transformedResponse = rewriter.transform(response)
+    return await transformedResponse.text()
+}
+
+// Convert HTML content directly to Markdown using Pandoc via stdin/stdout after cleaning
 export async function convertHtmlToMarkdown(
     htmlContent: string
 ): Promise<string> {
     try {
+        const cleaned = await cleanHtml(htmlContent)
         const mdContent =
-            await $`pandoc -f html -t gfm < ${new Response(htmlContent)}`.text()
+            await $`pandoc -f html -t gfm-raw_html < ${new Response(cleaned)}`.text()
         return mdContent
     } catch (err) {
         throw new Error(
@@ -276,6 +338,11 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
     let totalSuccess = 0
     let totalFailed = 0
     let totalSkipped = 0
+    const failedDownloads: Array<{
+        skillName: string
+        url: string
+        error: string
+    }> = []
 
     for (const skill of skillsWithDocs) {
         const skillName = skill.dirName
@@ -325,6 +392,11 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                     log.error(
                         `  Failed to process index ${urlStr}: ${err.message}`
                     )
+                    failedDownloads.push({
+                        skillName,
+                        url: urlStr,
+                        error: err.message,
+                    })
                     totalFailed++
                 }
             } else {
@@ -412,6 +484,11 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                 log.error(
                     `  [FAIL] Failed to download ${job.url}: ${err.message}`
                 )
+                failedDownloads.push({
+                    skillName: job.skillName,
+                    url: job.url,
+                    error: err.message,
+                })
                 totalFailed++
             }
         }
@@ -446,6 +523,26 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
     log.info(
         `Download completed: ${totalSuccess} succeeded, ${totalSkipped} skipped, ${totalFailed} failed.`
     )
+
+    if (failedDownloads.length > 0) {
+        log.error("\n❌ Failed Downloads Summary:")
+        const grouped: Record<string, typeof failedDownloads> = {}
+        for (const item of failedDownloads) {
+            let list = grouped[item.skillName]
+            if (!list) {
+                list = []
+                grouped[item.skillName] = list
+            }
+            list.push(item)
+        }
+        for (const [skill, items] of Object.entries(grouped)) {
+            log.error(`  ● Skill: ${skill}`)
+            for (const item of items) {
+                log.error(`    - URL: ${item.url}`)
+                log.error(`      Error: ${item.error}`)
+            }
+        }
+    }
 }
 
 export async function cleanAction(skills: Skill[], agentSkillsHome: string) {

@@ -187,14 +187,6 @@ theme={"theme":{"light":"github-light","dark":"dracula"}} function
 Div(props: {className: string;}) { const {className} = props; // without
 punning return
 
-<div classname="{className}">
-
-</div>
-
 ; // with punning return
-
-<div {classname}="">
-
-</div>
 
 ; } \`\`\`

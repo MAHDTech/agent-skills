@@ -2,7 +2,6 @@
 name: devenv
 description: Strict guidelines for using devenv for shell and dependency management. Use when a repo contains a devenv.nix or devenv.yaml file, or when running commands in a devenv environment.
 resources:
-  - https://secretspec.dev/llms-full.txt
   - https://secretspec.dev/llms.txt
 ---
 

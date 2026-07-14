@@ -16,10 +16,6 @@ to scan // the HTML for \`
 icon="file-code"
 theme={"theme":{"light":"github-light","dark":"dracula"}}
 
-<div id="root">
-
-</div>
-
 \`\`\` \## React Integration To use React in your client-side code,
 import \`react-dom/client\` and render your app. \`\`\`ts
 title="src/backend.ts"
@@ -37,23 +33,15 @@ createRoot(container!); root.render(); \`\`\` \`\`\`html
 title="public/dashboard.html" icon="file-code"
 theme={"theme":{"light":"github-light","dark":"dracula"}}
 
-<div id="root">
-
-</div>
-
 \`\`\` \`\`\`tsx title="src/app.tsx"
 icon="https://mintcdn.com/bun-1dd33a4e/JUhaF6Mf68z_zHyy/icons/typescript.svg?fit=max&auto=format&n=JUhaF6Mf68z_zHyy&q=85&s=7ac549adaea8d5487d8fbd58cc3ea35b"
 theme={"theme":{"light":"github-light","dark":"dracula"}} import {
 useState } from "react"; export default function App() { const \[count,
 setCount\] = useState(0); return (
 
-<div>
-
 # Dashboard
 
 setCount(count + 1)}\>Count: {count}
-
-</div>
 
 ); } \`\`\` \## Development Mode When building locally, enable
 development mode by setting \`development: true\` in \`Bun.serve()\`.
@@ -207,11 +195,10 @@ errors like \`ReferenceError: process is not defined\` in the browser.
 See \[HTML & static
 sites\](/bundler/html-static#inline-environment-variables) for
 build-time configuration and examples. \## How It Works Bun uses
-\`HTMLRewriter\` to scan for \`
-
-\`\`\` \* Processes CSS imports and \`\` tags \* Concatenates CSS files
-\* Rewrites url and asset paths to include content-addressable hashes in
-URLs \`\`\`html title="index.html" icon="file-code"
+\`HTMLRewriter\` to scan for \` \`\`\` \* Processes CSS imports and \`\`
+tags \* Concatenates CSS files \* Rewrites url and asset paths to
+include content-addressable hashes in URLs \`\`\`html title="index.html"
+icon="file-code"
 theme={"theme":{"light":"github-light","dark":"dracula"}} \`\`\` \*
 Links to assets are rewritten to include content-addressable hashes in
 URLs \* Small assets in CSS files are inlined into \`data:\` URLs,
@@ -244,8 +231,6 @@ response = await fetch(\`/api/users/\${id}\`, { method: "DELETE", }); if
 (response.ok) { await fetchUsers(); } } catch (error) { alert("Failed to
 delete user"); } }; useEffect(() =\> { fetchUsers(); }, \[\]); return (
 
-<div classname="container">
-
 # User Management
 
 setName(e.target.value)} required /\> setEmail(e.target.value)} required
@@ -253,30 +238,16 @@ setName(e.target.value)} required /\> setEmail(e.target.value)} required
 
 {loading ? "Creating..." : "Create User"}
 
-<div classname="users">
-
 ## Users ({users.length})
 
 {users.map(user =\> (
 
-<div key="{user.id}" classname="user-card">
-
-<div>
-
 **{user.name}**  
 {user.email}
 
-</div>
-
 deleteUser(user.id)} className="delete-btn"\> Delete
 
-</div>
-
 ))}
-
-</div>
-
-</div>
 
 ); } \`\`\` \`\`\`css title="src/styles.css" icon="file-code"
 theme={"theme":{"light":"github-light","dark":"dracula"}} \* { margin:

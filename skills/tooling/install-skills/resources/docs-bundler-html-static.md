@@ -38,10 +38,6 @@ HTML file, so your client-side router handles the navigation. \`\`\`html
 title="index.html" icon="file-code"
 theme={"theme":{"light":"github-light","dark":"dracula"}}
 
-<div id="root">
-
-</div>
-
 \`\`\` \## Multi-page apps (MPA) Some projects have several separate
 routes or HTML files as entry points. To support multiple entry points,
 pass them all to \`bun\`: \`\`\`bash terminal icon="terminal"
@@ -213,35 +209,3 @@ element.replace(element.text.toLowerCase()); }, }); onLoad({ filter:
 /\\html\$/ }, async args =\> { const html = await
 Bun.file(args.path).text(); return { // Bun's bundler will scan the HTML
 for
-
-tags, \<link rel="stylesheet"\> tags, and other assets // and bundle
-them automatically contents: rewriter.transform(html), loader: "html",
-}; }); }, }, \], }); \`\`\` \## What Gets Processed? Bun automatically
-handles all common web assets: \* \*\*Scripts\*\* (\`\<script src\>\`)
-are run through Bun's JavaScript/TypeScript/JSX bundler \*
-\*\*Stylesheets\*\* (\`\<link rel="stylesheet"\>\`) are run through
-Bun's CSS parser & bundler \* \*\*Images\*\* (\`\<img\>\`,
-\`\<picture\>\`) are copied and hashed \* \*\*Media\*\* (\`\<video\>\`,
-\`\<audio\>\`, \`\<source\>\`) are copied and hashed \* Any \`\<link\>\`
-tag with an \`href\` attribute pointing to a local file is rewritten to
-the new path, and hashed Bun resolves all paths relative to your HTML
-file, so you can organize your project however you want. \<Warning\>
-\*\*This is a work in progress\*\* \* Need more plugins \* Need more
-configuration options for things like asset handling \* Need a way to
-configure CORS, headers, etc. {/\* If you want to submit a PR, most of
-the code is
-\[here\](https://github.com/oven-sh/bun/blob/main/src/runtime/api/bun/html-rewriter.ts).
-You could even copy paste that file into your project and use it as a
-starting point. \*/} \</Warning\> \## How this works This is a small
-wrapper around Bun's support for \[HTML imports\](/bundler/fullstack) in
-JavaScript. \## Standalone HTML You can bundle your entire frontend into
-a \*\*single self-contained \`.html\` file\*\* with no external
-dependencies using \`--compile --target=browser\`. All JavaScript, CSS,
-and images are inlined directly into the HTML. \`\`\`bash terminal
-icon="terminal"
-theme={"theme":{"light":"github-light","dark":"dracula"}} bun build
---compile --target=browser ./index.html --outdir=dist \`\`\` Learn more
-in the \[Standalone HTML docs\](/bundler/standalone-html). \## Adding a
-backend to your frontend To add a backend to your frontend, use the
-\`routes\` option in \`Bun.serve\`. See the \[full-stack
-docs\](/bundler/fullstack).

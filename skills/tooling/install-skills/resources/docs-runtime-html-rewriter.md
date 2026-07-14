@@ -12,11 +12,10 @@ images with a rickroll const rewriter = new HTMLRewriter().on("img", {
 element(img) { // Famous rickroll video thumbnail
 img.setAttribute("src",
 "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"); // Wrap the
-image in a link to the video
-img.before('<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">',
-{ html: true, }); img.after("</a>", { html: true }); // Add some fun alt
-text img.setAttribute("alt", "Definitely not a rickroll"); }, }); // An
-example HTML document const html = \`
+image in a link to the video img.before('[', { html: true, });
+img.after("](https://www.youtube.com/watch?v=dQw4w9WgXcQ)", { html: true
+}); // Add some fun alt text img.setAttribute("alt", "Definitely not a
+rickroll"); }, }); // An example HTML document const html = \`
 
 ![](/cat.jpg) ![](dog.png) ![](https://example.com/bird.webp)
 
@@ -28,18 +27,12 @@ wraps each \`
 theme={"theme":{"light":"github-light","dark":"dracula"}}
 
 ![](/cat.jpg) ![](dog.png) ![](https://example.com/bird.webp)
-<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-target="_blank"><img
-src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
-alt="Definitely not a rickroll" /></a>
-<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-target="_blank"><img
-src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
-alt="Definitely not a rickroll" /></a>
-<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-target="_blank"><img
-src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
-alt="Definitely not a rickroll" /></a>
+[![Definitely not a
+rickroll](https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[![Definitely not a
+rickroll](https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[![Definitely not a
+rickroll](https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
 \`\`\` Clicking any image now leads to \[a very famous
 video\](https://www.youtube.com/watch?v=dQw4w9WgXcQ). \### Input types
@@ -47,36 +40,20 @@ HTMLRewriter can transform HTML from several input types: \`\`\`ts
 theme={"theme":{"light":"github-light","dark":"dracula"}} // From
 Response rewriter.transform(new Response("
 
-<div>
-
 content
-
-</div>
 
 ")); // From string rewriter.transform("
 
-<div>
-
 content
-
-</div>
 
 "); // From ArrayBuffer rewriter.transform(new TextEncoder().encode("
 
-<div>
-
 content
-
-</div>
 
 ").buffer); // From Blob (wrap in a Response) rewriter.transform(new
 Response(new Blob(\["
 
-<div>
-
 content
-
-</div>
 
 "\]))); // From File (wrap in a Response) rewriter.transform(new
 Response(Bun.file("index.html"))); \`\`\` The Cloudflare Workers
@@ -141,10 +118,6 @@ element and contents el.removeAndKeepContent(); // Remove only the
 element tags // Properties console.log(el.tagName); // Lowercase tag
 name console.log(el.namespaceURI); // Element's namespace URI
 console.log(el.selfClosing); // Whether element is self-closing (e.g.
-
-<div>
-
-</div>
 
 ) console.log(el.canHaveContent); // Whether element can contain content
 (false for void elements like  

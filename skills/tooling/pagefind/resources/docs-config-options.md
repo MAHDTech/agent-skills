@@ -1,13 +1,3 @@
-<div id="main-content" class="main-content" role="main">
-
-<div class="content-header">
-
-# Pagefind CLI configuration options
-
-</div>
-
-<div class="content-body">
-
 The Pagefind CLI has the following options. These can be set via any
 [configuration source](/docs/config-sources/).
 
@@ -23,14 +13,9 @@ The Pagefind CLI has the following options. These can be set via any
 
 The location of your built static site.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag        | ENV Variable    | Config Key |
 |-----------------|-----------------|------------|
 | `--site <PATH>` | `PAGEFIND_SITE` | `site`     |
-
-</div>
 
 ## Optional arguments
 
@@ -40,42 +25,27 @@ Serve the site directory after creating the search index. Useful for
 testing search on a local build of your site without having to serve the
 site directory manually.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag  | ENV Variable     | Config Key |
 |-----------|------------------|------------|
 | `--serve` | `PAGEFIND_SERVE` | `serve`    |
-
-</div>
 
 ### Output subdirectory
 
 The folder to output the search bundle into, relative to the processed
 site. Defaults to `pagefind`.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag                | ENV Variable             | Config Key      |
 |-------------------------|--------------------------|-----------------|
 | `--output-subdir <DIR>` | `PAGEFIND_OUTPUT_SUBDIR` | `output_subdir` |
-
-</div>
 
 ### Output path
 
 The folder to output the search bundle into, relative to the working
 directory. Overrides `output-subdir` if supplied.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag               | ENV Variable           | Config Key    |
 |------------------------|------------------------|---------------|
 | `--output-path <PATH>` | `PAGEFIND_OUTPUT_PATH` | `output_path` |
-
-</div>
 
 ### Root selector
 
@@ -87,21 +57,14 @@ detected, all Pagefind behaviour will be limited to this element and
 below. In most cases, you should use the `data-pagefind-body` attribute
 detailed in [Customizing the index](/docs/indexing/).
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag              | ENV Variable             | Config Key      |
 |-----------------------|--------------------------|-----------------|
 | `--root-selector <S>` | `PAGEFIND_ROOT_SELECTOR` | `root_selector` |
-
-</div>
 
 ### Exclude selectors
 
 Pass extra element selectors that Pagefind should ignore when indexing.
 For example, in `pagefind.yml`:
-
-<div class="highlight">
 
 ``` chroma
 exclude_selectors:
@@ -109,8 +72,6 @@ exclude_selectors:
   - "blockquote > span"
   - "[id^='prefix-']"
 ```
-
-</div>
 
 All children will also be ignored, so using a `#my_navigation *`
 selector is not required — in other words, the semantics are the same as
@@ -125,14 +86,9 @@ be supplied. The selector may be a comma-separated CSS selector though,
 so the above example can be passed as
 `--exclude-selectors "#my_navigation, blockquote > span, [id^='prefix-']"`.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag                  | ENV Variable                 | Config Key          |
 |---------------------------|------------------------------|---------------------|
 | `--exclude-selectors <S>` | `PAGEFIND_EXCLUDE_SELECTORS` | `exclude_selectors` |
-
-</div>
 
 ### Include characters
 
@@ -148,22 +104,13 @@ characters may be interpreted by your shell. Configure this via a
 [configuration file](/docs/config-sources/#config-files) if you
 encounter issues.
 
-<div class="highlight">
-
 ``` chroma
 include_characters: "<>$"
 ```
 
-</div>
-
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag | ENV Variable | Config Key |
 |----|----|----|
 | `--include-characters <S>` | `PAGEFIND_INCLUDE_CHARACTERS` | `include_characters` |
-
-</div>
 
 ### Glob
 
@@ -172,14 +119,9 @@ Configures the glob used by Pagefind to discover HTML files. Defaults to
 documentation](https://github.com/olson-sean-k/wax#patterns) for more
 details.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag        | ENV Variable    | Config Key |
 |-----------------|-----------------|------------|
 | `--glob <GLOB>` | `PAGEFIND_GLOB` | `glob`     |
-
-</div>
 
 ### Force language
 
@@ -189,14 +131,9 @@ or `pt`.
 
 See [Multilingual search](/docs/multilingual/) for more details.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag                  | ENV Variable              | Config Key       |
 |---------------------------|---------------------------|------------------|
 | `--force-language <LANG>` | `PAGEFIND_FORCE_LANGUAGE` | `force_language` |
-
-</div>
 
 ### Keep index URL
 
@@ -205,14 +142,9 @@ at `animals/cat/index.html` will be given the URL `/animals/cat/`.
 Setting this option to `true` will result in the URL
 `/animals/cat/index.html`.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag           | ENV Variable              | Config Key       |
 |--------------------|---------------------------|------------------|
 | `--keep-index-url` | `PAGEFIND_KEEP_INDEX_URL` | `keep_index_url` |
-
-</div>
 
 ### Write playground
 
@@ -224,107 +156,48 @@ This defaults to false, so playground files are not written to your live
 site. Playground files are always available when running Pagefind with
 `--serve`.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag             | ENV Variable                | Config Key         |
 |----------------------|-----------------------------|--------------------|
 | `--write-playground` | `PAGEFIND_WRITE_PLAYGROUND` | `write_playground` |
-
-</div>
 
 ### Verbose
 
 Prints extra logging while indexing the site. Only affects the CLI, does
 not impact web-facing search.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag    | ENV Variable       | Config Key |
 |-------------|--------------------|------------|
 | `--verbose` | `PAGEFIND_VERBOSE` | `verbose`  |
-
-</div>
 
 ### Quiet
 
 Only logs errors and warnings while indexing the site. Only affects the
 CLI, does not impact web-facing search.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag  | ENV Variable     | Config Key |
 |-----------|------------------|------------|
 | `--quiet` | `PAGEFIND_QUIET` | `quiet`    |
-
-</div>
 
 ### Silent
 
 Only logs errors while indexing the site. Only affects the CLI, does not
 impact web-facing search.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag   | ENV Variable      | Config Key |
 |------------|-------------------|------------|
 | `--silent` | `PAGEFIND_SILENT` | `silent`   |
-
-</div>
 
 ### Logfile
 
 Writes logs to the given logfile, in addition to the console. Replaces
 the file on each run.
 
-<div class="table-wrapper" role="region" aria-label="Scrollable table"
-tabindex="0">
-
 | CLI Flag           | ENV Variable       | Config Key |
 |--------------------|--------------------|------------|
 | `--logfile <PATH>` | `PAGEFIND_LOGFILE` | `logfile`  |
 
-</div>
-
-</div>
-
-<span pagefind-filter="section" style="display:none">References</span>
+References
 
 ------------------------------------------------------------------------
 
-![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdib3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Y29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjUuNSIgeT0iNS41IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMS41IiAvPjxwYXRoIGQ9Ik0zIDEwLjVIMi41QTEuNSAxLjUuMCAwMTEgOVYyLjVBMS41IDEuNS4wIDAxMi41IDFIOWExLjUgMS41LjAgMDExLjUgMS41VjMiIC8+PC9zdmc+)
-Copy as Markdown <span class="copy-tick">✓</span>
-
-<div class="toc">
-
-![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdib3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Y29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjUuNSIgeT0iNS41IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMS41IiAvPjxwYXRoIGQ9Ik0zIDEwLjVIMi41QTEuNSAxLjUuMCAwMTEgOVYyLjVBMS41IDEuNS4wIDAxMi41IDFIOWExLjUgMS41LjAgMDExLjUgMS41VjMiIC8+PC9zdmc+)
-Copy as Markdown <span class="copy-tick">✓</span>
-
-On this page
-
-<a href="#" class="toc-top-link">Pagefind CLI configuration options</a>
-
-- [Required arguments](#required-arguments)
-  - [Site](#site)
-- [Optional arguments](#optional-arguments)
-  - [Serve](#serve)
-  - [Output subdirectory](#output-subdirectory)
-  - [Output path](#output-path)
-  - [Root selector](#root-selector)
-  - [Exclude selectors](#exclude-selectors)
-  - [Include characters](#include-characters)
-  - [Glob](#glob)
-  - [Force language](#force-language)
-  - [Keep index URL](#keep-index-url)
-  - [Write playground](#write-playground)
-  - [Verbose](#verbose)
-  - [Quiet](#quiet)
-  - [Silent](#silent)
-  - [Logfile](#logfile)
-
-</div>
-
-</div>
+Copy as Markdown ✓

@@ -18,7 +18,7 @@ Guidelines and reference for developing Tauri v2+ cross-platform applications. A
 
 When deep context, precise API definitions, or config schemas are required, consult the full local Tauri documentation:
 
-- Read `resources/llms-full.txt` (local copy of the official v2 reference docs).
+- Consult the local Tauri documentation under `resources/` (granular pages fetched from the official v2 reference docs index).
 
 ## Constraints
 

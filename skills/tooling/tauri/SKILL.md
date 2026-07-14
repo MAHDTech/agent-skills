@@ -2,7 +2,7 @@
 name: tauri
 description: Expert reference and development guidelines for Tauri v2+ cross-platform desktop and mobile apps. Use when the user mentions Tauri, src-tauri, tauri v2, tauri.conf.json, or capabilities.json, or asks to build, modify, or debug Tauri application settings, IPC commands, or capabilities.
 resources:
-  - https://v2.tauri.app/llms-full.txt
+  - https://v2.tauri.app/llms.txt
 ---
 
 # Tauri Development
@@ -13,7 +13,7 @@ Guidelines and reference for developing Tauri v2+ cross-platform applications. A
 
 When deep context, precise API definitions, or config schemas are required, consult the full local Tauri documentation:
 
-- Read `resources/llms-full.txt` (local copy of the official v2 reference docs).
+- Consult the local Tauri documentation under `resources/` (granular pages fetched from the official v2 reference docs index).
 
 ## Constraints
 

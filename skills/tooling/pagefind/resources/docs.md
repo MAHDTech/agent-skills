@@ -1,13 +1,3 @@
-<div id="main-content" class="main-content" role="main">
-
-<div class="content-header">
-
-# Getting Started with Pagefind
-
-</div>
-
-<div class="content-body">
-
 Pagefind runs after your static generator, and outputs a static search
 bundle to your generated site. With Pagefind, you don’t need to build a
 search index by hand — the index is generated for you from your
@@ -20,8 +10,6 @@ exists on our built site when we go to index it.
 Pagefind provides a prebuilt search UI out of the box. Add the following
 snippet to a page of your choice:
 
-<div class="highlight">
-
 ``` chroma
 <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet">
 <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
@@ -29,8 +17,6 @@ snippet to a page of your choice:
 <pagefind-modal-trigger></pagefind-modal-trigger>
 <pagefind-modal></pagefind-modal>
 ```
-
-</div>
 
 > The `/pagefind/pagefind-component-ui.css` and
 > `/pagefind/pagefind-component-ui.js` assets will be created by
@@ -52,31 +38,15 @@ packages. If you don’t have Node or Python installed, or want to install
 Pagefind another way, see the [Installing Pagefind](/docs/installation/)
 guide.
 
-<div class="tabs" tabs="" tabs-label="Content options" tabs-id="tabs-0">
-
-<div class="tabs-list">
-
-</div>
-
-<div class="tabs-panel-raw" tab-label="npx" sync="sync-node">
-
 **npx**
 
 Run the following command from your terminal, where `--site` points to
 the output directory of your static site generator. We’ll also add
 `--serve` so that we can view our final site right away.
 
-<div class="highlight">
-
 ``` chroma
 npx -y pagefind --site public --serve
 ```
-
-</div>
-
-</div>
-
-<div class="tabs-panel-raw" tab-label="pip" sync="sync-python">
 
 **pip**
 
@@ -84,18 +54,10 @@ The Python wrapper requires an initial install, then you can run
 Pagefind with `--site` pointing to your output directory. We’ll also add
 `--serve` so that we can view our final site right away.
 
-<div class="highlight">
-
 ``` chroma
 python3 -m pip install 'pagefind[extended]'
 python3 -m pagefind --site public --serve
 ```
-
-</div>
-
-</div>
-
-<div class="tabs-panel-raw" tab-label="Download binary">
 
 **Download binary**
 
@@ -104,17 +66,9 @@ GitHub](https://github.com/pagefind/pagefind/releases) and run the
 binary directly, with `--site` pointing to your output directory. We’ll
 also add `--serve` so that we can view our final site right away.
 
-<div class="highlight">
-
 ``` chroma
 ./pagefind --site public --serve
 ```
-
-</div>
-
-</div>
-
-<div class="tabs-panel-raw" tab-label="Build from source">
 
 **Build from source**
 
@@ -124,18 +78,10 @@ installed, you can build and install Pagefind from source, then run it
 with `--site` pointing to your output directory. We’ll also add
 `--serve` so that we can view our final site right away.
 
-<div class="highlight">
-
 ``` chroma
 cargo install pagefind
 pagefind --site public --serve
 ```
-
-</div>
-
-</div>
-
-</div>
 
 Regardless of the command you choose, after Pagefind has downloaded you
 should see some output along the lines of:
@@ -175,27 +121,8 @@ out [Configuring the index](/docs/indexing/) for some next steps.
 > `html` element. See [Multilingual Search](/docs/multilingual/) for
 > more details.
 
-</div>
-
-<span pagefind-filter="section" style="display:none">Overview</span>
+Overview
 
 ------------------------------------------------------------------------
 
-![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdib3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Y29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjUuNSIgeT0iNS41IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMS41IiAvPjxwYXRoIGQ9Ik0zIDEwLjVIMi41QTEuNSAxLjUuMCAwMTEgOVYyLjVBMS41IDEuNS4wIDAxMi41IDFIOWExLjUgMS41LjAgMDExLjUgMS41VjMiIC8+PC9zdmc+)
-Copy as Markdown <span class="copy-tick">✓</span>
-
-<div class="toc">
-
-![](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdib3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Y29sb3IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjUuNSIgeT0iNS41IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMS41IiAvPjxwYXRoIGQ9Ik0zIDEwLjVIMi41QTEuNSAxLjUuMCAwMTEgOVYyLjVBMS41IDEuNS4wIDAxMi41IDFIOWExLjUgMS41LjAgMDExLjUgMS41VjMiIC8+PC9zdmc+)
-Copy as Markdown <span class="copy-tick">✓</span>
-
-On this page
-
-<a href="#" class="toc-top-link">Getting Started with Pagefind</a>
-
-- [Indexing your site](#indexing-your-site)
-- [Notes](#notes)
-
-</div>
-
-</div>
+Copy as Markdown ✓
