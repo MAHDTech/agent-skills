@@ -41,7 +41,7 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 
 1. Once the triage phase completes, call `backlog-implement` to execute the tickets.
 2. The Hub will dynamically group tickets into conflict-free batches, update their frontmatter `batch` number, and dispatch them to parallel sub-agents for implementation.
-3. The Hub will merge the completed branches back sequentially, run pre-commit checks and tests, and move the ticket files to `.tars/issues/done/` or `.tars/issues/failed/`.
+3. The Hub will merge the completed branches back sequentially, run pre-commit checks (using the [prek](@/skills/tooling/prek/_index.md) tool) and tests, and move the ticket files to `.tars/issues/done/` or `.tars/issues/failed/`.
 4. Wait for the implementation phase to run to completion.
 
 ## Convergence

@@ -30,8 +30,8 @@ SECRETSPEC_REASON="<reason>" devenv shell -- <command>
 
 ## Pre-commit Hooks and Testing
 
-Devenv gives us the ability to run tests and linters seamlessly:
-- `SECRETSPEC_REASON="running tests" devenv test`: This triggers all pre-commit hooks and other defined tests and is **mandatory** as part of testing.
+Devenv gives us the ability to run tests and linters seamlessly. The project-level hooks are run via `prek` (see the [prek](@/skills/tooling/prek/_index.md) skill).
+- `SECRETSPEC_REASON="running tests" devenv test`: This triggers all pre-commit hooks (managed by `prek`) and other defined tests and is **mandatory** as part of testing.
 
 **Verification Hook Run (ALL Repositories):**
 You must verify that all hooks (Prettier, CSpell, etc.) pass successfully. Check if `secretspec.toml` exists in the repository root:

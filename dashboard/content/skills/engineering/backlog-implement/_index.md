@@ -56,7 +56,7 @@ Equip each subagent with:
      - Detect if 'devenv.nix' or 'devenv/default.nix' is present in the workspace root. If so, run 'devenv test'.
      - Otherwise, check for standard project test configs (e.g., package.json -> 'npm test', cargo.toml -> 'cargo test', pytest, etc.) and execute them.
      - Ensure the test suite passes prior to returning.
-  4. Ensure all pre-commit hooks run and pass. Fix any failing checks before committing.
+  4. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
   5. Commit your changes using Conventional Commits.
   6. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
   7. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response.
@@ -67,11 +67,11 @@ Equip each subagent with:
 When all subagents in the batch complete:
 
 1. **Merge Sequentially**: Sequentially merge each subagent's branch back into the main/source branch one at a time. Never perform parallel merges.
-2. **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks are allowed to run and pass. **NEVER** use `--no-verify` or bypass hooks.
+2. **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](@/skills/tooling/prek/_index.md) skill). **NEVER** use `--no-verify` or bypass hooks.
 3. **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
 4. **Move Ticket**:
    - If the merge and subsequent tests pass: move the ticket file to `.tars/issues/done/`.
-   - If the merge, tests, or pre-commit checks fail: abort the merge, restore the main branch state, move the ticket to `.tars/issues/failed/` (or back to `todo/` if it can be retried), and log the failure.
+   - If the merge, tests, or `prek` checks fail: abort the merge, restore the main branch state, move the ticket to `.tars/issues/failed/` (or back to `todo/` if it can be retried), and log the failure.
 5. **CRITICAL CLEANUP CONSTRAINT**: Immediately after a branch is successfully merged or rejected, the Hub (and ONLY the Hub) MUST clean up its worktree and branch. You must force-remove them regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
