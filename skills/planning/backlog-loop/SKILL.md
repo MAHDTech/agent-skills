@@ -13,6 +13,11 @@ This is a meta-skill that chains `backlog-audit`, `backlog-triage`, and `backlog
 
 To run a full backlog loop, execute the following steps in sequence. Only run one backlog sub-loop at a time:
 
+### Step 0. Preparation Phase (`backlog-prepare`)
+
+1. Call `backlog-prepare` to ensure the repository is clean and ready.
+2. Wait for the preparation phase to run to completion.
+
 ### Step 1. Audit Phase (`backlog-audit`)
 
 1. Call `backlog-audit` to perform a comprehensive codebase audit.
