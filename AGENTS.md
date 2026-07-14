@@ -10,6 +10,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 - Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
+- Sibling directories under a skill's path (`skills/<category>/<name>/`) must use a unified `resources/` directory for any additional scripts, documentation, static assets, or reference files.
 - Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details. Note that skills do not need to be published to the npm registry; the installer CLI fetches them directly from this GitHub repository.
 
 ## Development
@@ -19,7 +20,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
   - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv test` or the `run-tests` wrappers. This is the single guaranteed path.
   - If a specific linter or pre-commit check doesn't exist, check the devenv MCP server or devenv agent docs. If you STILL don't find it, ask the user for confirmation.
 - Runtime: `bun`. Use `bun` for all scripts.
-- CLI Skills Tool: `bun run bin/skills.ts` (also `bun run skills`). Use this to lint and sync skills, and to symlink them for local development.
+- CLI Skills Tool: `bun run bin/skills/index.ts` (also `bun run skills`). Use this to lint and sync skills, and to symlink them for local development.
 
 ## Dashboard
 

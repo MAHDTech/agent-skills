@@ -35,7 +35,7 @@
       </ul>
     {% endif %}
 
-    {# Freshness: last-modified date computed from git at build time (see bin/dashboard.ts). #}
+    {# Freshness: last-modified date computed from git at build time (see bin/dashboard/lib.ts). #}
     {% set dates_data = load_data(path="skill_dates.toml", required=false) %}
     {% if dates_data %}
       {% set skill_key = section.extra.category ~ "/" ~ section.title %}

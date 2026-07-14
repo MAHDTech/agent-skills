@@ -32,11 +32,11 @@ these snippets. The migration cheat sheet below covers the churn since ~0.14.
 
 Load these for depth; the core below is enough for common work.
 
-- `references/ecs.md` — components, required components (bundle replacement), storage
+- `resources/ecs.md` — components, required components (bundle replacement), storage
   hints, relationships/hierarchy, batch spawning, custom spawn helpers.
-- `references/systems.md` — ordering, system sets, run conditions, fixed timestep,
+- `resources/systems.md` — ordering, system sets, run conditions, fixed timestep,
   states, `ParamSet`, change detection, parallel iteration.
-- `references/io.md` — input, asset loading, messages (buffered events), and observer
+- `resources/io.md` — input, asset loading, messages (buffered events), and observer
   events.
 
 ## Migration Cheat Sheet (older Bevy -> 0.19)
@@ -63,7 +63,7 @@ Old code you will meet in stale projects, and its current form:
 ## 1. ECS Fundamentals
 
 Components are plain data structs; systems are functions; resources are global
-singletons. See `references/ecs.md` for storage hints, required components, hierarchy,
+singletons. See `resources/ecs.md` for storage hints, required components, hierarchy,
 and spawn helpers.
 
 ```rust
@@ -124,7 +124,7 @@ impl Plugin for PlayerPlugin {
 ## 3. Scheduling & Ordering
 
 Systems run in parallel unless their accesses conflict. Add ordering only for real data
-dependencies. Full detail (system sets, states, fixed timestep) in `references/systems.md`.
+dependencies. Full detail (system sets, states, fixed timestep) in `resources/systems.md`.
 
 ```rust
 // Sequential chain.
@@ -141,7 +141,7 @@ app.add_systems(FixedUpdate, physics_step);
 ## 4. Queries & Change Detection
 
 Filter with `With` / `Without`; react to changes with `Changed<T>` / `Added<T>`. See
-`references/systems.md` for `ParamSet` and `Ref<T>`.
+`resources/systems.md` for `ParamSet` and `Ref<T>`.
 
 ```rust
 fn enemy_targeting(
@@ -158,7 +158,7 @@ fn on_transform_change(query: Query<&Transform, Changed<Transform>>) {
 
 Read input via `ButtonInput<T>`; load assets via `AssetServer`; use messages (buffered
 events, renamed from `EventReader`/`EventWriter` in 0.17) for decoupled communication.
-Full detail — including observer events — in `references/io.md`.
+Full detail — including observer events — in `resources/io.md`.
 
 ```rust
 fn player_input(keyboard: Res<ButtonInput<KeyCode>>) {
@@ -178,9 +178,9 @@ struct Scored(u32);
 
 - **Parallel iteration:** for large independent workloads, use `par_iter_mut()`.
 - **SparseSet storage:** for frequently added/removed components (buffs, statuses) —
-  see `references/ecs.md`.
+  see `resources/ecs.md`.
 - **Batch spawning:** `commands.spawn_batch(..)` beats a loop of `spawn` — see
-  `references/ecs.md`.
+  `resources/ecs.md`.
 - **Change filters:** put `Changed<T>` on reactive systems (UI, animation) to skip
   stable data.
 

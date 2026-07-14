@@ -18,6 +18,7 @@ let
     hello
     jq
     pagefind
+    pandoc
     ripgrep
     tailwindcss_4
     trivy
@@ -115,6 +116,7 @@ in
       ".git/"
       "^.vscode/"
       "^node_modules/"
+      "/resources/"
     ];
     hooks = {
       action-validator.enable = true;

@@ -110,7 +110,7 @@ _Avoid:_ workflow, instructions, choreography
 
 ### Reference
 
-Material the agent refers to on demand — definitions, facts, parameters, examples, conditional instructions. When a skill has **steps** it is secondary to them; when a skill has none it is the entire content. Reached via **context pointers**, and the prime candidate for **progressive disclosure** into a sibling file (`references/`, `GLOSSARY.md`).
+Material the agent refers to on demand — definitions, facts, parameters, examples, conditional instructions. When a skill has **steps** it is secondary to them; when a skill has none it is the entire content. Reached via **context pointers**, and the prime candidate for **progressive disclosure** into a sibling file (`resources/`, `GLOSSARY.md`).
 
 _Avoid:_ supporting material, docs, background
 

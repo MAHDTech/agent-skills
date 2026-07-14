@@ -4,8 +4,8 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "skills": "bun run bin/skills.ts",
-        "dashboard": "bun run bin/dashboard.ts"
+        "skills": "bun run bin/skills/index.ts",
+        "dashboard": "bun run bin/dashboard/index.ts"
     },
     "devDependencies": {
         "@eslint/js": "10.0.1",
