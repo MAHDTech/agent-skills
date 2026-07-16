@@ -140,7 +140,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.40**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.41**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -170,7 +170,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP adapter for OpenAI's coding assistant
 
-    **1.1.2**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
+    **1.1.4**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -284,7 +284,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.2.28**
+    **0.2.31**
   </Card>
 
   <Card
@@ -301,7 +301,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.4.16**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.4.17**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -313,7 +313,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.171.0**
+    **0.172.0**
   </Card>
 
   <Card
@@ -617,7 +617,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Code and build agents with comprehensive multi-provider support
 
-    **0.9.9**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
+    **0.9.10**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -673,7 +673,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A local, extensible, open source AI agent that automates engineering tasks
 
-    **1.42.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
+    **1.43.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -701,7 +701,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.15**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.18**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -731,7 +731,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.4.7**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.4.9**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -798,7 +798,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Mistral's open-source coding assistant
 
-    **2.19.1**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
+    **2.20.0**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -819,7 +819,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Nova by Compass AI - a fully-fledged software engineer at your command
 
-    **1.1.25**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
+    **1.1.26**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -833,7 +833,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.17.20**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.2**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -888,7 +888,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.19.9**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.19.10**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card

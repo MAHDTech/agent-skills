@@ -14,6 +14,8 @@ mermaid = false
 
 # Tend to GitHub PR Comments
 
+Consult the [gh pr manual](@/skills/github/gh-resolve-pr-comments/resources/manual-gh_pr.md) for more details.
+
 Pull all review comments from the current branch's PR, build a plan to address each one, align with the developer, then execute.
 
 - [1. Prerequisites](#1-prerequisites)

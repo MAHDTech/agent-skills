@@ -3,6 +3,8 @@ name: devenv
 description: Strict guidelines for using devenv for shell and dependency management. Use when a repo contains a devenv.nix or devenv.yaml file, or when running commands in a devenv environment.
 resources:
   - https://secretspec.dev/llms.txt
+  - https://devenv.sh/llms.txt
+  - https://devenv.sh
 ---
 
 # Devenv Integration
@@ -51,11 +53,11 @@ Devenv integrates with SecretSpec, a tool that manages secret resolution and aud
 - **Check all available MCP servers** for additional knowledge and skills.
 - Prioritize the use of the Devenv MCP server when it is available:
   - It can be accessed via `devenv mcp` to run locally.
-  - Or via the remote URL: `https://mcp.devenv.sh`
-- When no MCP server is available, use the LLMs text file at `https://devenv.sh/llms.txt` as a backup. This text file contains all the reference URLs to get the right information.
+  - Or via the remote URL: `https://mcp.devenv.sh` (Note: requires active internet connection).
+- When no MCP server is available, use the local [Devenv LLMs Backup Text](resources/secretspec-llms-full.txt) as a backup.
 
 ## References
 
-- [Devenv Documentation](https://devenv.sh)
-- [Devenv MCP Server](https://mcp.devenv.sh)
-- [Devenv LLMs Backup Text](https://devenv.sh/llms.txt)
+- [Devenv Documentation](resources/devenv-getting-started-index.md)
+- [Devenv MCP Server](https://mcp.devenv.sh) (Online-Only)
+- [Devenv LLMs Backup Text](resources/secretspec-llms-full.txt)

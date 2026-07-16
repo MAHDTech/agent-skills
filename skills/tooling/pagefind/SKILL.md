@@ -8,7 +8,7 @@ resources:
 
 # Pagefind Search Indexer
 
-Guidelines for indexing static websites and configuring search capabilities using Pagefind. Always consult local Pagefind documentation for full options reference.
+Guidelines for indexing static websites and configuring search capabilities using Pagefind. Always consult the local [Pagefind Docs](resources/docs.md) and [Pagefind Config Options](resources/docs-config-options.md) for full options reference.
 
 ## CLI & Core Indexing Commands
 

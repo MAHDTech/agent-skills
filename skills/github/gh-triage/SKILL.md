@@ -11,6 +11,8 @@ resources:
 
 # GitHub Backlog Triage
 
+Consult the [gh issue manual](resources/manual-gh_issue.md) for more details.
+
 Move the issues on a GitHub repository through a small state machine of triage roles, using the `gh` CLI and the repo's GitHub labels.
 
 If your project treats external pull requests as a request surface (per your project's conventions), triage covers them too: **a PR is an issue with attached code** — same roles, same states, same machine, with a few deltas marked "for a PR" below. Resolve a bare `#42` to a GitHub issue or PR via `gh` (e.g. `gh issue view 42` / `gh pr view 42`).

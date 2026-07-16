@@ -8,6 +8,8 @@ resources:
 
 # Create GitHub Issue from Conversation
 
+Consult the [gh issue manual](resources/manual-gh_issue.md) for more details.
+
 Create a well-structured GitHub issue using `gh` CLI, populated with context from the current conversation.
 
 ## Instructions

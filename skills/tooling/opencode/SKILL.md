@@ -1,6 +1,8 @@
 ---
 name: opencode
 description: This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
+resources:
+  - https://opencode.ai/docs
 ---
 
 # OpenCode Expert
@@ -267,6 +269,6 @@ Use `--continue` or `-c` to resume previous sessions and maintain context.
 
 ## References
 
-For the complete CLI reference, tool and permission details, and agent configuration, see the official OpenCode documentation at <https://opencode.ai/docs>.
+For the complete CLI reference, tool and permission details, and agent configuration, see the official OpenCode documentation at [docs.md](resources/docs.md).
 
 **See also:** `/opencode-acp` — drive OpenCode programmatically over the Agent Client Protocol (ACP) instead of through the interactive CLI.

@@ -12,7 +12,7 @@ mermaid = false
 
 # Zola Static Site Generator
 
-Guidelines for managing, compiling, and configuring Zola static sites. Always refer to local Zola documentation for details on configuration schemas, template syntax (Tera), or shortcodes.
+Guidelines for managing, compiling, and configuring Zola static sites. Always refer to the local [Zola Documentation](@/skills/tooling/zola/resources/documentation.md) for details on configuration schemas, template syntax (Tera), or shortcodes.
 
 ## CLI & Core Commands
 

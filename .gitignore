@@ -1,6 +1,3 @@
-# Ignore scratch files
-scratch/
-
 # Devenv
 .devenv*
 devenv.local.nix

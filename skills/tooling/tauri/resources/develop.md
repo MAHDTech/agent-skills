@@ -301,6 +301,8 @@ which work like regular `.gitignore` files:
 build/src/generated/*.rsdeny.toml
 ```
 
+.taurignore
+
 `.taurignore` files are usually put in the `src-tauri` directory or
 [cargo
 workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html)
