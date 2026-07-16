@@ -13,7 +13,7 @@ This skill operates in a Hub-and-Spoke topology using sub-agents to analyze code
 
 - All issue tickets are stored locally relative to the project root in `.tars/issues/todo/`
 - Standard ticket folders also include `.tars/issues/done/` and `.tars/issues/failed/`
-- Ticket files are saved only to disk. Since `.tars/` must be gitignored, do **NOT** stage or commit ticket files to git.
+- Ticket files are saved only to disk. Since `.tars/` must be gitignored, do **NOT** stage, commit, or force-add ticket files to git.
 
 ## Audit Workflow
 
@@ -51,9 +51,16 @@ Once the subagents report back, collect all findings:
 
 1. **Deduplicate**: Combine overlapping findings.
 2. **Filter**: Check against existing tickets in `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` to avoid duplicates.
-3. **Determine ID**: Scan those three folders to find the highest 3-digit sequential ID (e.g. `001`, `002`), and allocate subsequent numbers (e.g., `003.md`, `004.md`).
+3. **Determine ID (CRITICAL FOR COLLISION PREVENTION)**:
+   - Scan all three folders: `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` (if any folders do not exist, treat them as empty).
+   - Find all files in these directories that match the 3-digit pattern `XXX.md` (where `XXX` is a number like `001`, `042`, etc.).
+   - Extract the numeric ID from each file name (e.g., `042.md` corresponds to `42`).
+   - Find the absolute maximum ID used across all three folders.
+   - The ID for the first new issue must be `max_id + 1` (e.g., if the highest is `042.md`, the next must be `043.md`).
+   - **CRITICAL**: Never assume the backlog starts at `001` or overwrite existing issue files. Only start at `001` if all three folders are completely empty or do not exist.
+   - Allocate subsequent new tickets sequentially (e.g., `043.md`, `044.md`, `045.md`).
 4. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` following the guidelines and structure defined in the [backlog-create-issue](../backlog-create-issue/SKILL.md) skill.
-   - **Filename**: `XXX.md` (3-digit ID)
+   - **Filename**: `XXX.md` (3-digit ID, padded with leading zeros, e.g., `043.md`)
 5. **CRITICAL CLEANUP CONSTRAINT**: As the Hub, you MUST clean up each subagent's worktree and branch immediately, regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`

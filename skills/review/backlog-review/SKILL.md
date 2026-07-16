@@ -12,7 +12,7 @@ This skill is invoked by the Hub for each branch implemented by a subagent. It c
 ## Targets and Paths
 
 - Target Directory: `.tars/issues/todo/` relative to project root.
-- Ticket files are updated on disk only, never staged or committed in git (since `.tars/` is gitignored).
+- Ticket files are updated on disk only, never staged, committed, or force-added to git (since `.tars/` is gitignored).
 
 ## Inputs
 

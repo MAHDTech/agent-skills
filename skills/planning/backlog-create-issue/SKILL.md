@@ -10,7 +10,9 @@ This skill defines the canonical structure, format, and content expectations for
 ## Targets and Paths
 
 - All backlog tickets are stored in the `.tars/issues/todo/` directory relative to the project root.
-- File names must follow the format `XXX.md`, where `XXX` is a sequential 3-digit ID starting from `001`.
+- File names must follow the format `XXX.md`, where `XXX` is a sequential 3-digit ID (e.g., `001.md`, `002.md`, etc.).
+- When creating a new issue, check `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` to find the highest existing 3-digit ID. The new file must be named with the next sequential ID (`highest_id + 1`), padded to 3 digits. Do not assume `001` or overwrite existing issue files unless the directories are entirely empty or do not exist.
+- Ticket files are created locally on disk only. Since `.tars/` must be gitignored, do **NOT** stage, commit, or force-add ticket files to git.
 
 ## Canonical Ticket Format
 

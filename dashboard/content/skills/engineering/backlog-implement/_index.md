@@ -19,7 +19,7 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 ## Targets and Paths
 
 - Target Folders: `.tars/issues/{todo,done,failed}/` relative to project root.
-- Ticket status updates are written to disk only. Ticket files are never staged or committed in git.
+- Ticket status updates are written to disk only. Ticket files are never staged, committed, or force-added in git.
 
 ## Implementation Workflow
 
@@ -62,7 +62,7 @@ Equip each subagent with:
      - Otherwise, check for standard project test configs (e.g., package.json -> 'npm test', cargo.toml -> 'cargo test', pytest, etc.) and execute them.
      - Ensure the test suite passes prior to returning.
   5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
-  6. Commit your changes using Conventional Commits.
+  6. Commit your changes using Conventional Commits. STRICT GITIGNORE CONSTRAINT: You must NEVER stage, commit, or force-add any files under the `.tars/` directory (such as the ticket file `.tars/issues/todo/XXX.md`). These files must remain completely unstaged and uncommitted in git.
   7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
   8. Update the ticket file `.tars/issues/todo/XXX.md` (which has been copied to your worktree) to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
   ```
