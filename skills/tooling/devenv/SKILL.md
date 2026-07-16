@@ -4,7 +4,6 @@ description: Strict guidelines for using devenv for shell and dependency managem
 resources:
   - https://secretspec.dev/llms.txt
   - https://devenv.sh/llms.txt
-  - https://devenv.sh
 ---
 
 # Devenv Integration

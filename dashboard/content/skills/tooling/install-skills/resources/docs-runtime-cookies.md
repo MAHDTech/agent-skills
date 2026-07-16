@@ -465,6 +465,6 @@ class CookieMap implements Iterable<[string, string]> {
   keys(): IterableIterator<string>;
   values(): IterableIterator<string>;
   forEach(callback: (value: string, key: string, map: CookieMap) => void): void;
-  [Symbol.iterator](): IterableIterator<[string, string]>;
+  Symbol.iterator: IterableIterator<[string, string]>;
 }
 ```

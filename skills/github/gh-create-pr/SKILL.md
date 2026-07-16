@@ -3,8 +3,8 @@ name: gh-create-pr
 description: Generate a PR title and description, then commit, create/update the PR on approval
 disable-model-invocation: true
 resources:
-  - https://cli.github.com/manual/gh_pr
-  - https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+  - https://r.jina.ai/https://cli.github.com/manual/gh_pr
+  - https://r.jina.ai/https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
 ---
 
 <!-- omit in toc -->

@@ -35,7 +35,11 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 
 For each ticket in the selected batch, spawn an implementation subagent.
 
-Since `.tars/` is gitignored, the Hub must read the ticket content and pass it directly in the subagent's prompt.
+Since `.tars/` is gitignored, it will not exist in the subagent's new worktree workspace. To ensure the subagent can read, reference, and update the ticket file (e.g. check off tasks and add evidence relative to `.tars/issues/todo/XXX.md`), the Hub must:
+
+1. Create the `.tars/issues/todo/` directory in the subagent's worktree.
+2. Copy the specific ticket markdown file (`XXX.md`) into that directory.
+3. Pass the ticket content directly in the subagent's prompt as context.
 
 Equip each subagent with:
 
@@ -60,15 +64,16 @@ Equip each subagent with:
   5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
   6. Commit your changes using Conventional Commits.
   7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
-  8. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
+  8. Update the ticket file `.tars/issues/todo/XXX.md` (which has been copied to your worktree) to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
   ```
 
 ### 3. Sequential Merge-Back & Verification (Hub Only)
 
 When all subagents in the batch complete:
 
-1. **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each subagent's branch and ticket file to verify the implementation.
-2. **Handle Verdicts**:
+1. **Sync Ticket Updates**: For each subagent, copy the updated ticket markdown file from the subagent's worktree (e.g. `<subagent-worktree>/.tars/issues/todo/XXX.md`) back to the parent workspace's `.tars/issues/todo/XXX.md`. This ensures that all completed checklists and evidence recorded by the subagent are preserved.
+2. **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each subagent's branch and the synced ticket file to verify the implementation.
+3. **Handle Verdicts**:
    - **If Approved**:
      - **Merge Sequentially**: Sequentially merge the branch back into the main/source branch one at a time. Never perform parallel merges.
      - **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](@/skills/tooling/prek/_index.md) skill). **NEVER** use `--no-verify` or bypass hooks.

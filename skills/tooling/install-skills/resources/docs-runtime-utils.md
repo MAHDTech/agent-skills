@@ -661,7 +661,7 @@ The symbol Bun uses to implement `Bun.inspect`. Override it to customize how you
 
 ```ts theme={"theme":{"light":"github-light","dark":"dracula"}}
 class Foo {
-  [Bun.inspect.custom]() {
+  Bun.inspect.custom {
     return "foo";
   }
 }

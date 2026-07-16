@@ -26,7 +26,7 @@ Group them into parallel batches of at most 5 concurrent subagents. Ensure that 
 
 For each ticket to verify in the batch, spawn a `research` subagent in a dedicated, isolated workspace.
 
-Since `.tars/` is gitignored, the subagent's workspace will not have access to the ticket files. The Hub must read the ticket content and pass it directly in the subagent's prompt.
+Since `.tars/` is gitignored, the subagent's workspace will not have access to the ticket files. Because triage agents are read-only and return their findings directly to the Hub via message, the Hub only needs to pass the ticket content directly in the subagent's prompt (copying the file to the subagent workspace is not required).
 
 Equip each subagent with:
 

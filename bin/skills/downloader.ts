@@ -29,12 +29,25 @@ interface DownloadJob {
     candidates?: string[]
 }
 
+export function stripReaderProxy(urlStr: string): string {
+    const proxies = ["https://r.jina.ai/"]
+    for (const proxy of proxies) {
+        if (urlStr.startsWith(proxy)) {
+            return urlStr.slice(proxy.length)
+        }
+    }
+    return urlStr
+}
+
 // Download content using Bun-native fetch
-export async function download(url: string): Promise<string> {
+export async function download(
+    url: string
+): Promise<{content: string; isHtml: boolean}> {
     const response = await fetch(url, {
         headers: {
             "User-Agent":
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            Accept: "text/markdown, text/plain, text/html;q=0.9, */*;q=0.8",
         },
         signal: AbortSignal.timeout(HTTP_TIMEOUT * 1000),
     })
@@ -45,7 +58,10 @@ export async function download(url: string): Promise<string> {
         )
     }
 
-    return await response.text()
+    const contentType = response.headers.get("content-type") || ""
+    const isHtml = contentType.includes("text/html")
+    const content = await response.text()
+    return {content, isHtml}
 }
 
 // Clean HTML content by stripping scripts, styles, layout noise, and SVGs using HTMLRewriter
@@ -194,7 +210,8 @@ export function getCommonPrefix(urls: string[]): string {
 // Extract a short domain-specific prefix from a URL (e.g. "secretspec" from "secretspec.dev")
 export function getDomainPrefix(urlStr: string): string {
     try {
-        const url = new URL(urlStr)
+        const cleanUrl = stripReaderProxy(urlStr)
+        const url = new URL(cleanUrl)
         const parts = url.hostname.split(".")
         if (parts.length >= 2) {
             const domain = parts[parts.length - 2]
@@ -208,12 +225,12 @@ export function getDomainPrefix(urlStr: string): string {
 
 // Clean and format slug names for downloaded files
 export function smartSlugify(urlStr: string, commonPrefix?: string): string {
-    let pathStr = urlStr
-    if (commonPrefix && urlStr.startsWith(commonPrefix)) {
-        pathStr = urlStr.slice(commonPrefix.length)
+    let pathStr = stripReaderProxy(urlStr)
+    if (commonPrefix && pathStr.startsWith(commonPrefix)) {
+        pathStr = pathStr.slice(commonPrefix.length)
     } else {
         try {
-            const url = new URL(urlStr)
+            const url = new URL(pathStr)
             pathStr = url.pathname
         } catch {
             // Fallback
@@ -353,6 +370,7 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
         const urls = skill.metadata.resources || []
         const savedFiles = new Set<string>()
         const downloadJobs: DownloadJob[] = []
+        let hasFailure = false
 
         log.step(`Processing skill: ${skillName}`)
 
@@ -363,7 +381,7 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
             if (isIndex) {
                 log.info(`  Fetching index: ${urlStr}`)
                 try {
-                    const indexContent = await download(urlStr)
+                    const {content: indexContent} = await download(urlStr)
                     const childUrls = parseLlmsTxtLinks(indexContent, urlStr)
                     log.info(`  Found ${childUrls.length} links in index.`)
 
@@ -398,6 +416,7 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                         error: err.message,
                     })
                     totalFailed++
+                    hasFailure = true
                 }
             } else {
                 const filename = smartSlugify(urlStr)
@@ -428,15 +447,20 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
         const executeJob = async (job: DownloadJob) => {
             try {
                 let content = ""
+                let isResponseHtml = false
                 let fetchedFromCandidate = false
 
                 // Try raw asset candidates if available (e.g. for Google Antigravity SPA docs)
                 if (job.candidates && job.candidates.length > 0) {
                     for (const candidate of job.candidates) {
                         try {
-                            const res = await download(candidate)
-                            if (res.trim().length >= MIN_CONTENT_BYTES) {
-                                content = res
+                            const result = await download(candidate)
+                            if (
+                                result.content.trim().length >=
+                                MIN_CONTENT_BYTES
+                            ) {
+                                content = result.content
+                                isResponseHtml = result.isHtml
                                 fetchedFromCandidate = true
                                 break
                             }
@@ -448,7 +472,9 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
 
                 // If candidates are not available or they failed, try the main URL
                 if (!content) {
-                    content = await download(job.url)
+                    const result = await download(job.url)
+                    content = result.content
+                    isResponseHtml = result.isHtml
                 }
 
                 const trimmed = content.trim()
@@ -462,7 +488,8 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                 // Detect HTML format (only if not loaded from raw markdown candidates)
                 const isHtml =
                     !fetchedFromCandidate &&
-                    (trimmed.startsWith("<!") ||
+                    (isResponseHtml ||
+                        trimmed.startsWith("<!") ||
                         trimmed.startsWith("<html") ||
                         trimmed.includes("<body"))
 
@@ -477,6 +504,11 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                     }
                 }
 
+                // Clean up empty markdown links that cause Zola build failures (e.g. [text]())
+                finalContent = finalContent
+                    .replace(/\[([^\]]*)\]\(\)/g, "$1")
+                    .replace(/\[([^\]]*)\]\(#\)/g, "$1")
+
                 await fs.writeFile(job.destFile, finalContent, "utf-8")
                 savedFiles.add(path.basename(job.destFile))
                 totalSuccess++
@@ -490,6 +522,7 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                     error: err.message,
                 })
                 totalFailed++
+                hasFailure = true
             }
         }
 
@@ -501,13 +534,16 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
         )
 
         // Phase 3: Auto-prune orphaned files
-        if (await fs.pathExists(resourcesDir)) {
+        if (!hasFailure && (await fs.pathExists(resourcesDir))) {
             const existingFiles = await fs.readdir(resourcesDir)
             let prunedCount = 0
             for (const file of existingFiles) {
                 const filePath = path.join(resourcesDir, file)
                 const stats = await fs.stat(filePath)
-                if (stats.isFile() && !savedFiles.has(file)) {
+                const isConfigured = downloadJobs.some(
+                    (job) => path.basename(job.destFile) === file
+                )
+                if (stats.isFile() && !savedFiles.has(file) && !isConfigured) {
                     await fs.remove(filePath)
                     prunedCount++
                 }

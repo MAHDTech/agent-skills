@@ -39,6 +39,10 @@ async function syncResources(
 ) {
     if (!(await fs.pathExists(src))) return
     await fs.ensureDir(dest)
+    await fs.writeFile(
+        path.join(dest, "_index.md"),
+        `+++\nrender = false\n+++\n`
+    )
     const entries = await fs.readdir(src, {withFileTypes: true})
     for (const entry of entries) {
         const srcPath = path.join(src, entry.name)

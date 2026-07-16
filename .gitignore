@@ -37,3 +37,6 @@ dashboard/skill_dates.toml
 # Backlog Tickets (TARS)
 .tars/
 
+# Scratch directory for AI scripts
+scratch/
+

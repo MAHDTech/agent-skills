@@ -2,13 +2,12 @@
 name: pagefind
 description: Use when configuring, indexing, or troubleshooting Pagefind static search for websites. Covers config options, CLI flags, and client integrations.
 resources:
-  - https://pagefind.app/docs/
-  - https://pagefind.app/docs/config-options/
+  - https://pagefind.app/llms.txt
 ---
 
 # Pagefind Search Indexer
 
-Guidelines for indexing static websites and configuring search capabilities using Pagefind. Always consult the local [Pagefind Docs](resources/docs.md) and [Pagefind Config Options](resources/docs-config-options.md) for full options reference.
+Guidelines for indexing static websites and configuring search capabilities using Pagefind. Always consult the local [Pagefind Docs](resources/docs-index.md) and [Pagefind Config Options](resources/docs-config-options-index.md) for full options reference.
 
 ## CLI & Core Indexing Commands
 
