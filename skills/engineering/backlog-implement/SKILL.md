@@ -43,30 +43,39 @@ Equip each subagent with:
   <TICKET_CONTENT>
 
   Instructions:
-  1. Read the ticket details completely, including the Tasks, Acceptance Criteria (conforming to the guidelines in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md)), and the '## Review' section.
-  2. Implement the changes described.
-  3. Verify your implementation by running tests:
+  1. Read the ticket details completely, including the Tasks, Acceptance Criteria (conforming to the guidelines in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md)), the '## Review' section, and the '## Implementation Review' section (if it exists).
+  2. Branch Resumption: Check the ticket frontmatter. If a `branch` is specified (e.g., `branch: subagent-XXX`), ensure you checkout and resume work on that branch, then run `git merge main` to sync with the latest main branch. Otherwise, create a new branch from main.
+  3. Implement the changes described, addressing any feedback listed in the '## Implementation Review' section.
+  4. Verify your implementation by running tests:
      - Detect if 'devenv.nix' or 'devenv/default.nix' is present in the workspace root. If so, run 'devenv test'.
      - Otherwise, check for standard project test configs (e.g., package.json -> 'npm test', cargo.toml -> 'cargo test', pytest, etc.) and execute them.
      - Ensure the test suite passes prior to returning.
-  4. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
-  5. Commit your changes using Conventional Commits.
-  6. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
-  7. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
+  5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
+  6. Commit your changes using Conventional Commits.
+  7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
+  8. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
   ```
 
 ### 3. Sequential Merge-Back & Verification (Hub Only)
 
 When all subagents in the batch complete:
 
-1. **Merge Sequentially**: Sequentially merge each subagent's branch back into the main/source branch one at a time. Never perform parallel merges.
-2. **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). **NEVER** use `--no-verify` or bypass hooks.
-3. **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
-4. **Move Ticket**:
-   - If the merge and subsequent tests pass: move the ticket file to `.tars/issues/done/`.
-   - If the merge, tests, or `prek` checks fail: abort the merge, restore the main branch state, move the ticket to `.tars/issues/failed/` (or back to `todo/` if it can be retried), and log the failure.
-5. **CRITICAL CLEANUP CONSTRAINT**: Immediately after a branch is successfully merged or rejected, the Hub (and ONLY the Hub) MUST clean up its worktree and branch. You must force-remove them regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
-   - Run `git worktree remove --force <path>`
-   - Run `git branch -D <branch-name>`
+1. **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](../../review/backlog-review/SKILL.md)) on each subagent's branch and ticket file to verify the implementation.
+2. **Handle Verdicts**:
+   - **If Approved**:
+     - **Merge Sequentially**: Sequentially merge the branch back into the main/source branch one at a time. Never perform parallel merges.
+     - **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). **NEVER** use `--no-verify` or bypass hooks.
+     - **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
+     - **Move Ticket**: Move the ticket file to `.tars/issues/done/`.
+     - **CRITICAL CLEANUP CONSTRAINT**: Immediately clean up the worktree and branch.
+       - Run `git worktree remove --force <path>`
+       - Run `git branch -D <branch-name>`
+   - **If Request Rework**:
+     - Do **NOT** merge the branch.
+     - Increment the ticket's `attempts` count in the frontmatter.
+     - If `attempts >= 5`, move the ticket file to `.tars/issues/failed/` and clean up the worktree and branch.
+       - Run `git worktree remove --force <path>`
+       - Run `git branch -D <branch-name>`
+     - Otherwise, set `status: rework`, set `batch: null`, update `branch: <branch-name>` in the frontmatter, and append the review feedback under `## Implementation Review` following the format in [backlog-review](../../review/backlog-review/SKILL.md). The ticket remains in `.tars/issues/todo/` and the branch is **NOT** cleaned up.
 
 Repeat for subsequent batches until all batches are processed.

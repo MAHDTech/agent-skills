@@ -50,6 +50,7 @@
       "title": "Review",
       "description": "Review diffs, pull requests, and test plans.",
       "skills": [
+        "backlog-review",
         "code-review",
         "pr-build-context",
         "pr-create-test-plan",

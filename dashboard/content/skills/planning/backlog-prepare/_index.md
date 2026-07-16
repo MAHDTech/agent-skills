@@ -37,10 +37,11 @@ Clean up any leftover or orphaned git worktrees.
 
 ### 3. Clean Leftover Branches
 
-Force-delete all local branches that match the `subagent-*` pattern, as these are leftovers from past failed runs.
+Force-delete all local branches that match the `subagent-*` pattern, EXCEPT those currently referenced by active rework tickets in `.tars/issues/todo/`.
 
-- List branches: `git branch --list 'subagent-*'`
-- Force-delete them: `git branch -D <branch-name>`
+- Scan `.tars/issues/todo/*.md` files to extract the `branch` field from the frontmatter.
+- List all subagent branches: `git branch --list 'subagent-*'`
+- Force-delete only the branches that are NOT referenced in the active rework list: `git branch -D <branch-name>`
 
 Once these steps are complete and verified, the repository is ready for the `backlog-loop` skill.
 

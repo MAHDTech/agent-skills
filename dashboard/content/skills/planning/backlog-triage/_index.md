@@ -25,7 +25,7 @@ This skill runs in a Hub-and-Spoke topology using sub-agents to verify tickets i
 
 ### 1. Backlog Scan & Conflict-Free Grouping
 
-List all markdown files in `.tars/issues/todo/`. Identify the unreviewed tickets (those missing a `## Review` section).
+List all markdown files in `.tars/issues/todo/`. Identify the unreviewed tickets (those missing a `## Review` section and having `status: todo` or missing a status). Rework tickets (with `status: rework`) already contain review notes and should not be re-triaged.
 
 Group them into parallel batches of at most 5 concurrent subagents. Ensure that tickets within the same batch do not audit overlapping files to avoid git or environment conflicts.
 

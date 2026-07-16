@@ -37,15 +37,17 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 2. Sub-agents will check the tickets in parallel batches to ensure accuracy, verify file and line coordinates, eliminate hallucinations, check platform constraints, and append a detailed review section to each ticket.
 3. Wait for the triage phase to run to completion.
 
-### Step 3. Implementation Phase (`backlog-implement`)
+### Step 3. Implementation & Review Phase (`backlog-implement` & `backlog-review`)
 
 1. Once the triage phase completes, call `backlog-implement` to execute the tickets.
 2. The Hub will dynamically group tickets into conflict-free batches, update their frontmatter `batch` number, and dispatch them to parallel sub-agents for implementation.
-3. The Hub will merge the completed branches back sequentially, run pre-commit checks (using the [prek](@/skills/tooling/prek/_index.md) tool) and tests, and move the ticket files to `.tars/issues/done/` or `.tars/issues/failed/`.
-4. Wait for the implementation phase to run to completion.
+3. Once implementation completes, the Hub will call `backlog-review` (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each ticket branch to run a double-axis verification.
+4. For approved tickets, the Hub will merge the completed branches back sequentially, run pre-commit checks (using the [prek](@/skills/tooling/prek/_index.md) tool) and tests, and move the ticket files to `.tars/issues/done/`.
+5. For rejected tickets, the Hub will update their status to `rework`, append the review comments, and return them to the todo queue while preserving the implementation branch for the next attempt.
+6. Wait for the implementation and review phase to run to completion.
 
 ## Convergence
 
-- If any tickets fail implementation, they will reside in `.tars/issues/failed/` or be returned to `.tars/issues/todo/` (if retrying).
-- The loop continues until all tickets in `.tars/issues/todo/` are resolved, and the audit phase reports no further issues.
+- If any tickets fail implementation (exceeding 5 attempts), they will reside in `.tars/issues/failed/`.
+- The loop continues until all tickets in `.tars/issues/todo/` are resolved (moved to `done/` or `failed/`), and the audit phase reports no further issues.
 

@@ -33,7 +33,9 @@ priority: "low" | "medium" | "high"
 type: "bug" | "feature" | "refactor" | "security"
 estimation: "2h"
 dependencies: []
-status: todo
+status: "todo" | "rework" | "done" | "failed"
+attempts: 0
+branch: null
 batch: null
 files:
   - path/to/file1.ts
@@ -68,6 +70,10 @@ Must contain command logs, test runs, or code diffs demonstrating that all Accep
 ## Review
 
 _(This section is empty when the ticket is created. It is appended by the triage agent during backlog-triage.)_
+
+## Implementation Review
+
+_(This section is empty when the ticket is created. It is appended by the backlog-review agent upon completion of the implementation review.)_
 ```
 
 ## Review & Verification Guidelines
@@ -88,4 +94,14 @@ The implementation agent must:
 2. Run `devenv test` (or the project's test command) and verify the tests pass.
 3. Document terminal outputs or test run success under the `## Evidence` section.
 4. Conventional commits must be used when committing the changes.
+
+### During Backlog Review (`backlog-review`)
+
+The review agent will:
+
+1. Inspect the code diff between the target branch and the implementation branch.
+2. Verify that the implemented changes align with the ticket's `## Tasks` and `## Acceptance Criteria`.
+3. Check the authenticity of the test logs and terminal output provided in `## Evidence`.
+4. Ensure the changes adhere to codebase quality standards and conventions.
+5. Append a `## Implementation Review` section containing the final verdict (`Approved` or `Request Rework`) and detailed feedback if rework is required.
 

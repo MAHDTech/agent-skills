@@ -42,6 +42,7 @@ description: Single source of truth for agent instructions
 
 ## Review
 
+- **backlog-review**: Review the code implementation of a backlog ticket on a subagent branch, assessing compliance with spec/acceptance criteria and repo standards before merge. Reach for this during the implementation phase of the backlog loop.
 - **code-review**: Review the changes since a fixed point (a commit, branch, tag, or merge-base) along two axes — Standards, meaning does the code follow this repo's documented conventions plus a baseline of common code smells, and Spec, meaning does the code do what the originating issue, ticket, or PRD asked for. Runs both reviews as parallel sub-agents and reports them side by side without merging or reranking them. Use when the user wants to review a branch, a pull request, work-in-progress changes, or asks to review the diff since some point.
 - **pr-build-context**: Build high-signal context for a pull request before review — diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
 - **pr-create-test-plan**: Generate a manual test plan for a branch's changes — hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
