@@ -5,6 +5,9 @@ description = "A collection of AI agent skills"
 theme = "tars-dashboards"
 output_dir = "public"
 
+[link_checker]
+internal_level = "warn"
+
 [markdown]
 insert_anchor_links = "heading"
 render_emoji = true

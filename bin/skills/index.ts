@@ -24,6 +24,8 @@ if (action === "lint") {
     import("./uninstall.ts")
         .then((mod) => mod.uninstallAction())
         .catch(handleException)
+} else if (action === "test") {
+    import("./lint.ts").then((mod) => mod.lint()).catch(handleException)
 } else if (action === "download") {
     getSkills()
         .then(async (skills) => {
@@ -40,7 +42,7 @@ if (action === "lint") {
         .catch(handleException)
 } else {
     console.log(
-        "Usage: bun run bin/skills/index.ts --action <lint|sync|install|uninstall|download|clean>"
+        "Usage: bun run bin/skills/index.ts --action <lint|sync|install|uninstall|download|clean|test>"
     )
     process.exit(1)
 }

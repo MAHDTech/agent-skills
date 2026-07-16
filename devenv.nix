@@ -152,6 +152,13 @@ in
           "--no-must-find-files"
         ];
       };
+      dashboard-test = {
+        enable = true;
+        name = "Dashboard Test";
+        entry = "dashboard --action test";
+        files = "^(skills/|dashboard/|bin/)";
+        pass_filenames = false;
+      };
       deadnix.enable = true;
       editorconfig-checker.enable = true;
       eslint = {
@@ -229,11 +236,11 @@ in
       ripsecrets.enable = true;
       shellcheck.enable = true;
       shfmt.enable = true;
-      skills-lint = {
+      skills-test = {
         enable = true;
-        name = "Skills Linter";
-        entry = "skills --action lint";
-        files = "SKILL\\.md$";
+        name = "Skills Test";
+        entry = "skills --action test";
+        files = "^(skills/.*\\.md|bin/skills/)";
         pass_filenames = false;
       };
       skills-sync = {
@@ -293,11 +300,11 @@ in
 
   scripts = {
     skills = {
-      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall>)";
+      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|test>)";
       exec = "bun run skills \"$@\"";
     };
     dashboard = {
-      description = "Manage the dashboard (usage: dashboard --action <build|serve|css>)";
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test>)";
       exec = "bun run dashboard \"$@\"";
     };
     codeql-run = {

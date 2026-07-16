@@ -30,6 +30,56 @@ export function skillIssuesImage(): string {
     return `![skill issues](./docs/images/skill-issues.png)`
 }
 
+async function syncResources(
+    src: string,
+    dest: string,
+    contentBase: string,
+    key: string,
+    skillName: string
+) {
+    if (!(await fs.pathExists(src))) return
+    await fs.ensureDir(dest)
+    const entries = await fs.readdir(src, {withFileTypes: true})
+    for (const entry of entries) {
+        const srcPath = path.join(src, entry.name)
+        const destPath = path.join(dest, entry.name)
+        if (entry.isDirectory()) {
+            await syncResources(
+                srcPath,
+                destPath,
+                path.posix.join(contentBase, entry.name),
+                key,
+                skillName
+            )
+        } else if (entry.isFile()) {
+            if (entry.name.endsWith(".md")) {
+                const raw = (await fs.readFile(srcPath, "utf-8")).replace(
+                    /\r\n/g,
+                    "\n"
+                )
+                const body = rewriteSkillLinks(raw, contentBase, src)
+                const sibMermaid = body.includes("```mermaid")
+                await fs.writeFile(
+                    destPath,
+                    `+++
+title = ${JSON.stringify(entry.name.replace(/\.md$/, ""))}
+[extra]
+skill = false
+category = ${JSON.stringify(key)}
+mermaid = ${sibMermaid}
+skill_name = ${JSON.stringify(skillName)}
++++
+
+${body}
+`
+                )
+            } else {
+                await fs.copy(srcPath, destPath)
+            }
+        }
+    }
+}
+
 export async function sync() {
     const skills = await getSkills()
     if (skills.some((s) => s.yamlError)) {
@@ -191,6 +241,16 @@ ${body}
 `
                 )
             }
+
+            const resourcesSrc = path.join(skillSrcDir, "resources")
+            const resourcesDest = path.join(outDir, "resources")
+            await syncResources(
+                resourcesSrc,
+                resourcesDest,
+                path.posix.join(contentBase, "resources"),
+                key,
+                s.dirName
+            )
         }
     }
     logTask("Generated dashboard content.")
