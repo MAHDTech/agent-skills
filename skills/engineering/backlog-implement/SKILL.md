@@ -43,7 +43,7 @@ Equip each subagent with:
   <TICKET_CONTENT>
 
   Instructions:
-  1. Read the ticket details completely, including the Tasks, Acceptance Criteria, and the '## Review' section.
+  1. Read the ticket details completely, including the Tasks, Acceptance Criteria (conforming to the guidelines in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md)), and the '## Review' section.
   2. Implement the changes described.
   3. Verify your implementation by running tests:
      - Detect if 'devenv.nix' or 'devenv/default.nix' is present in the workspace root. If so, run 'devenv test'.
@@ -52,7 +52,7 @@ Equip each subagent with:
   4. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
   5. Commit your changes using Conventional Commits.
   6. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
-  7. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response.
+  7. Document command runs and outputs proving execution in the 'Evidence' section of the ticket file/response as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
   ```
 
 ### 3. Sequential Merge-Back & Verification (Hub Only)

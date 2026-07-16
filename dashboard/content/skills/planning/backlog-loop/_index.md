@@ -28,7 +28,7 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 ### Step 1. Audit Phase (`backlog-audit`)
 
 1. Call `backlog-audit` to perform a comprehensive codebase audit.
-2. The sub-agents will audit logical modules in parallel, and the Hub will synthesize their reports into structured ticket files saved to `.tars/issues/todo/`.
+2. The sub-agents will audit logical modules in parallel, and the Hub will synthesize their reports into structured ticket files saved to `.tars/issues/todo/` (following the guidelines in [backlog-create-issue](@/skills/planning/backlog-create-issue/_index.md)).
 3. Wait for the audit phase to run to completion.
 
 ### Step 2. Triage Phase (`backlog-triage`)

@@ -66,6 +66,7 @@ Orchestrating the lifecycle of codebase issues in a continuous loop:
 - `/backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
 - `/backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
 - `/backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
+- `/backlog-create-issue` — reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
 
 ## Changing existing code safely
 

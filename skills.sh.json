@@ -32,6 +32,7 @@
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
         "backlog-audit",
+        "backlog-create-issue",
         "backlog-loop",
         "backlog-prepare",
         "backlog-triage",

@@ -52,51 +52,8 @@ Once the subagents report back, collect all findings:
 1. **Deduplicate**: Combine overlapping findings.
 2. **Filter**: Check against existing tickets in `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` to avoid duplicates.
 3. **Determine ID**: Scan those three folders to find the highest 3-digit sequential ID (e.g. `001`, `002`), and allocate subsequent numbers (e.g., `003.md`, `004.md`).
-4. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` using the standard format:
+4. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` following the guidelines and structure defined in the [backlog-create-issue](../backlog-create-issue/SKILL.md) skill.
    - **Filename**: `XXX.md` (3-digit ID)
-   - **Format**: YAML frontmatter + standard headings (see template below). Make sure to list the files/components touched in the frontmatter `files` list to assist in dynamic batching.
 5. **CRITICAL CLEANUP CONSTRAINT**: As the Hub, you MUST clean up each subagent's worktree and branch immediately, regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
-
-## Ticket Format Template
-
-```markdown
----
-id: XXX
-name: "Short descriptive name"
-description: "Detailed description of the issue"
-component: "module/name"
-estimation: "2h"
-dependencies: []
-status: todo
-batch: null
-files:
-  - path/to/file1.ts
-  - path/to/file2.ts
----
-
-# XXX — Issue Name
-
-## Description
-
-Detailed description here.
-
-## Tasks
-
-- [ ] Task 1
-- [ ] Task 2
-
-## Acceptance Criteria
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-### Evidence
-
-(Will be filled in by implementation Spoke)
-
-## References
-
-- Specific files/lines/functions
-```

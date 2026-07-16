@@ -27,6 +27,7 @@ description: Single source of truth for agent instructions
 ## Planning
 
 - **backlog-audit**: Audit the codebase for bugs, features, security issues, or technical debt, and generate structured issue files in `.tars/issues/todo/`. Reach for this when requested to perform a codebase audit, search for bugs and tasks, or populate the backlog.
+- **backlog-create-issue**: Use when creating a new backlog issue/ticket in the `.tars/issues/todo/` directory, defining its YAML frontmatter, headings, tasks, acceptance criteria, evidence collection, and triage review expectations.
 - **backlog-loop**: Coordinate the full backlog lifecycle by sequentially executing backlog-audit, backlog-triage, and backlog-implement to resolve all issues. Reach for this when asked to run a full backlog loop, converge on a complete project goal, or manage the overall ticket pipeline.
 - **backlog-prepare**: Prepare to run the backlog-loop by cleaning up orphaned git worktrees and branches, and ensuring the working tree is clean. Reach for this to reset the environment before starting a full backlog loop.
 - **backlog-triage**: Triage pending backlog issues in `.tars/issues/todo/` to verify their accuracy, check for hallucinations, and add review notes. Reach for this when requested to triage tickets, verify backlog accuracy, or prepare issues for implementation.

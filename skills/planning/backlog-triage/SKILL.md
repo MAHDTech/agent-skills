@@ -5,7 +5,7 @@ description: Triage pending backlog issues in `.tars/issues/todo/` to verify the
 
 # Backlog Triage
 
-Triage pending issue tickets in `.tars/issues/todo/` to verify their accuracy, identify implementation gaps, check for hallucinations, and append a detailed review section to each.
+Triage pending issue tickets in `.tars/issues/todo/` (conforming to the template in [backlog-create-issue](../backlog-create-issue/SKILL.md)) to verify their accuracy, identify implementation gaps, check for hallucinations, and append a detailed review section to each.
 
 This skill runs in a Hub-and-Spoke topology using sub-agents to verify tickets in parallel.
 
@@ -44,6 +44,7 @@ Equip each subagent with:
   1. Source Code Verification: Locate the exact directories, files, functions, and line references mentioned in the ticket. Read those parts of the codebase to verify if the description and tasks match the actual code today.
   2. Implementation Readiness Check:
      - Does the ticket contain sufficient detail for a fresh agent with a small context window to implement the task?
+     - Are the YAML frontmatter, tasks, and acceptance criteria formatted according to the guidelines in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md)?
      - Are there any gaps? (e.g., missing package configurations, unmentioned side effects, compile-time type errors, build script modifications).
      - Are there any hallucinations? (e.g., non-existent files, deprecated APIs, incorrect function signatures, wrong line references).
   3. Assess Constraints: Check for platform compatibility concerns (Node vs Bun APIs, Windows path resolution/CRLF issues) and repository-specific guidelines.
