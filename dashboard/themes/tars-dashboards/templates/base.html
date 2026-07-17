@@ -21,10 +21,10 @@
     <meta name="description" content="{{ config.description }}">
   {% endif %}
 
-  <link rel="preload" href="{{ get_url(path='fonts/jetbrainsmono-regular.woff2') }}" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="{{ get_url(path='fonts/jetbrainsmono-bold.woff2') }}" as="font" type="font/woff2" crossorigin>
-  <link href="{{ config.base_url }}pagefind/pagefind-component-ui.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ get_url(path='/build/css/generated.css') }}">
+  <link rel="preload" href="/fonts/jetbrainsmono-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/jetbrainsmono-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet">
+  <link rel="stylesheet" href="/build/css/generated.css">
 
   {% if (page and page.extra.mermaid is defined and page.extra.mermaid) or (section and section.extra.mermaid is defined and section.extra.mermaid) %}
     <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
@@ -119,9 +119,9 @@
 
   {% include "partials/footer.html" %}
 
-  <pagefind-modal reset-on-close bundle-path="{{ config.base_url }}pagefind/"></pagefind-modal>
+  <pagefind-modal reset-on-close bundle-path="/pagefind/"></pagefind-modal>
 
-  <script data-cfasync="false" src="{{ config.base_url }}pagefind/pagefind-component-ui.js" type="module"></script>
+  <script data-cfasync="false" src="/pagefind/pagefind-component-ui.js" type="module"></script>
   <script data-cfasync="false" type="module">
     document.addEventListener("DOMContentLoaded", () => {
       const trigger = document.getElementById("search-trigger");

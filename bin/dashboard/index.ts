@@ -20,7 +20,13 @@ if (action === "build") {
 } else if (action === "css") {
     import("./css.ts").then((mod) => mod.cssAction()).catch(fail)
 } else if (action === "test") {
-    import("./build.ts").then((mod) => mod.buildAction()).catch(fail)
+    import("./lib.ts")
+        .then((lib) => {
+            lib.run("bun", ["test"])
+            return import("./build.ts")
+        })
+        .then((mod) => mod.buildAction())
+        .catch(fail)
 } else {
     console.log(
         "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test>"

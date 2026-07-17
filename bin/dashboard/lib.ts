@@ -71,12 +71,41 @@ export function writeSkillDates() {
     )
 }
 
+/** Manually clean output directory with retries to avoid race conditions with watchers / sync services. */
+export function cleanOutputDir(
+    publicDir: string = path.join(ROOT, "dashboard", "public")
+) {
+    if (!fs.existsSync(publicDir)) return
+
+    log.step("🧹 Cleaning output directory…")
+    const maxRetries = 5
+    const delayMs = 150
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            fs.rmSync(publicDir, {recursive: true, force: true})
+            return
+        } catch (err) {
+            if (attempt === maxRetries) {
+                log.warn(
+                    `⚠️ Failed to clean directory ${publicDir}: ${(err as Error).message}. Proceeding anyway…`
+                )
+                return
+            }
+            // Sleep/busy-wait before retrying
+            const start = Date.now()
+            while (Date.now() - start < delayMs) {}
+        }
+    }
+}
+
 /** Regenerate skill content, build CSS, render the site, index it. */
 export function build() {
     log.step("🔄 Syncing generated content…")
     run("bun", ["run", "skills", "--action", "sync"], {SKILLS_REPO_ONLY: "1"})
     buildCss()
     writeSkillDates()
+    cleanOutputDir()
     log.step("🏗️  Building Zola site…")
     run("zola", ["--root", "dashboard", "build"])
     log.step("🔍 Indexing with Pagefind…")
