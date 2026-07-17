@@ -8,7 +8,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Structure
 
-- Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
+- Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
 - Sibling directories under a skill's path (`skills/<category>/<name>/`) must use a unified `resources/` directory for any additional scripts, documentation, static assets, or reference files.
 - **CRITICAL LINKING RULE:** Never use absolute `file:///` URLs referencing local paths (e.g., `file:///home/...`). Always use relative paths for links referencing files within the repository (e.g., `../../tooling/prek/SKILL.md`). This ensures paths do not leak local user directories and resolve correctly in CI and other environments.
