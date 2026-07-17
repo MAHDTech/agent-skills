@@ -133,7 +133,7 @@ jobs:
         name: Report Global Status
         uses: ./.github/actions/report-status
         with:
-          result: ${{ job.status }}
+          result: ${{ needs.release.result }}
           success-message: "Release workflow completed successfully"
           failure-message: "Release workflow failed"
           github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -24,7 +24,7 @@ runs:
 
     - id: install_nix
       name: Install Nix
-      uses: cachix/install-nix-action@v30
+      uses: cachix/install-nix-action@v31
       with:
         github_access_token: ${{ inputs.github-token }}
         extra_nix_config: |
@@ -34,7 +34,7 @@ runs:
     - id: enable_cachix
       name: Enable Cachix
       if: inputs.cachix-cache-name != '' && inputs.cachix-auth-token != ''
-      uses: cachix/cachix-action@v16
+      uses: cachix/cachix-action@v17
       with:
         name: ${{ inputs.cachix-cache-name }}
         authToken: ${{ inputs.cachix-auth-token }}
