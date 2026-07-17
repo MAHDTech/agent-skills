@@ -60,9 +60,11 @@ Before the main flow — deciding _what_ to build and _how big_ it is:
 Orchestrating the lifecycle of codebase issues in a continuous loop:
 
 - `/backlog-loop` — reach for this when you want to run a complete loop of auditing the codebase, triaging tickets, and executing implementations.
+- [/backlog-prepare](../../planning/backlog-prepare/SKILL.md) — reach for this to reset the environment and prepare the workspace before starting a full backlog loop, cleaning up git worktrees and branches.
 - `/backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
 - `/backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
 - `/backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
+- [/backlog-review](../../review/backlog-review/SKILL.md) — reach for this during the implementation phase of the backlog loop to assess a subagent's code changes for compliance with the spec and repo standards.
 - `/backlog-create-issue` — reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
 
 ## Changing existing code safely
@@ -130,8 +132,11 @@ Beyond `/code-review` on the main flow:
 - `/prek` — reach for this when running, configuring, or troubleshooting pre-commit hooks.
 - `/opencode` — reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
 - `/opencode-acp` — reach for this when controlling OpenCode over the Agent Client Protocol.
+- [/pagefind](../../tooling/pagefind/SKILL.md) — reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` — reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` — reach for this when installing, updating, or managing skills from a collection across agent runtimes.
+- [/tailwind](../../tooling/tailwind/SKILL.md) — reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
 - `/tauri` — reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
+- [/zola](../../tooling/zola/SKILL.md) — reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
