@@ -25,7 +25,6 @@ permissions:
 env:
   # GitHub
   PROJECT: ${{ github.repository }}
-  BRANCH_NAME_CURRENT: ${{ github.head_ref || github.ref_name }}
   BRANCH_NAME_DEFAULT: ${{ github.event.repository.default_branch }}
 
   # Nix
