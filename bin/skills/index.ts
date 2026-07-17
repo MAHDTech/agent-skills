@@ -25,7 +25,15 @@ if (action === "lint") {
         .then((mod) => mod.uninstallAction())
         .catch(handleException)
 } else if (action === "test") {
-    import("./lint.ts").then((mod) => mod.lint()).catch(handleException)
+    import("child_process")
+        .then((cp) => {
+            try {
+                cp.execSync("bun test bin/skills", {stdio: "inherit"})
+            } catch (e) {
+                handleException(e)
+            }
+        })
+        .catch(handleException)
 } else if (action === "download") {
     getSkills()
         .then(async (skills) => {
