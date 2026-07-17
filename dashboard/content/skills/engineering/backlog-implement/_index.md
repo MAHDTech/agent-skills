@@ -23,6 +23,9 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 
 ## Implementation Workflow
 
+> [!IMPORTANT]
+> **Fresh Skill Reloading**: Prior to starting the backlog scan or executing any batch, the Hub **MUST** explicitly re-read and reload the `backlog-implement` skill by viewing this `SKILL.md` file. This ensures you do not use cached/outdated instructions from previous runs.
+
 ### 1. Backlog Scan & Conflict-Free Batching
 
 1. Scan the `.tars/issues/todo/` directory for ticket markdown files.
@@ -87,30 +90,35 @@ Equip each subagent with:
   6. Commit your changes using Conventional Commits. STRICT GITIGNORE CONSTRAINT: You must NEVER stage, commit, or force-add any files under the `.tars/` directory (such as the ticket file `.tars/issues/todo/XXX.md`). These files must remain completely unstaged and uncommitted in git.
   7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
   8. Update the ticket file `.tars/issues/todo/XXX.md` (which has been copied to your worktree) to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
+  9. **STRICT TOOL SYNTAX CONSTRAINT**: When calling filesystem or command execution tools, you must never wrap string argument values in nested, escaped, or literal double quotes (e.g., TargetFile: "/path/to/file" is correct, while TargetFile: "\"/path/to/file\"" is incorrect and will fail due to invalid characters).
   ```
 
-### 3. Sequential Merge-Back & Verification (Hub Only)
+### 3. Incremental Merge-Back, Liveness Checking & Verification (Hub Only)
 
-When all subagents in the batch complete:
+Rather than waiting passively for the entire batch to complete (which blocks progress if a single spoke gets stuck or dies), the Hub must monitor spokes dynamically and process them incrementally:
 
-1. **Sync Ticket Updates**: If the `.tars/` directory in the subagent's worktree was copied as a fallback instead of symlinked, copy the updated ticket markdown file from `<subagent-worktree>/.tars/issues/todo/XXX.md` back to the parent workspace's `.tars/issues/todo/XXX.md` to preserve the completed checklists and evidence. (If symlinking was successful, they share the same physical file, and copying is a harmless no-op).
-2. **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each subagent's branch and the synced ticket file to verify the implementation.
-3. **Handle Verdicts**:
-   - **If Approved**:
-     - **Merge Sequentially**: Sequentially merge the branch back into the main/source branch one at a time. Never perform parallel merges.
-     - **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](@/skills/tooling/prek/_index.md) skill). **NEVER** use `--no-verify` or bypass hooks.
-     - **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
-     - **Move Ticket**: Move the ticket file to `.tars/issues/done/`.
-     - **CRITICAL CLEANUP CONSTRAINT**: Immediately clean up the worktree and branch.
-       - Run `git worktree remove --force <path>`
-       - Run `git branch -D <branch-name>`
-   - **If Request Rework**:
-     - Do **NOT** merge the branch.
-     - Increment the ticket's `attempts` count in the frontmatter.
-     - If `attempts >= 5`, move the ticket file to `.tars/issues/failed/` and clean up the worktree and branch.
-       - Run `git worktree remove --force <path>`
-       - Run `git branch -D <branch-name>`
-     - Otherwise, set `status: rework`, set `batch: null`, update `branch: <branch-name>` in the frontmatter, and append the review feedback under `## Implementation Review` following the format in [backlog-review](@/skills/review/backlog-review/_index.md). The ticket remains in `.tars/issues/todo/` and the branch is **NOT** cleaned up.
+1. **Monitor Spoke Liveness & Revive Stopped Subagents**:
+   - Do **NOT** wait passively. Periodically check on the status of active subagents using the `manage_subagents list` tool.
+   - If a subagent has stopped (e.g., due to a server restart or crash) before completing its task, check its branch status. Revive it by sending it a follow-up query to resume its task, or restart the subagent on that branch if needed.
+2. **Process Completed Spokes Incrementally**: As soon as any individual subagent in the batch reports completion, immediately run the merge-back and verification workflow for that spoke:
+   - **Sync Ticket Updates**: If the `.tars/` directory in the subagent's worktree was copied as a fallback instead of symlinked, copy the updated ticket markdown file from `<subagent-worktree>/.tars/issues/todo/XXX.md` back to the parent workspace's `.tars/issues/todo/XXX.md` to preserve the completed checklists and evidence. (If symlinking was successful, they share the same physical file, and copying is a harmless no-op).
+   - **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on the subagent's branch and the synced ticket file to verify the implementation.
+   - **Handle Verdicts**:
+     - **If Approved**:
+       - **Merge Sequentially**: Sequentially merge the branch back into the main/source branch one at a time. Never perform parallel merges.
+       - **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](@/skills/tooling/prek/_index.md) skill). **NEVER** use `--no-verify` or bypass hooks.
+       - **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
+       - **Move Ticket**: Move the ticket file to `.tars/issues/done/`.
+       - **CRITICAL CLEANUP CONSTRAINT**: Immediately clean up the worktree and branch.
+         - Run `git worktree remove --force <path>`
+         - Run `git branch -D <branch-name>`
+     - **If Request Rework**:
+       - Do **NOT** merge the branch.
+       - Increment the ticket's `attempts` count in the frontmatter.
+       - If `attempts >= 5`, move the ticket file to `.tars/issues/failed/` and clean up the worktree and branch.
+         - Run `git worktree remove --force <path>`
+         - Run `git branch -D <branch-name>`
+       - Otherwise, set `status: rework`, set `batch: null`, update `branch: <branch-name>` in the frontmatter, and append the review feedback under `## Implementation Review` following the format in [backlog-review](@/skills/review/backlog-review/_index.md). The ticket remains in `.tars/issues/todo/` and the branch is **NOT** cleaned up.
 
-Repeat for subsequent batches until all batches are processed.
+Repeat monitoring and incremental merges until all spokes in the batch have been successfully merged or moved to rework/failed, then proceed to the next batch.
 

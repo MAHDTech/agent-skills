@@ -13,6 +13,9 @@ This is a meta-skill that chains `backlog-audit`, `backlog-triage`, and `backlog
 
 To run a full backlog loop, execute the following steps in sequence. Only run one backlog sub-loop at a time:
 
+> [!IMPORTANT]
+> **Fresh Skill Reloading**: To prevent context staleness (where the agent relies on cached, outdated versions of skills from the start of the session), the Hub **MUST** explicitly re-read and reload the relevant `SKILL.md` files (using the `view_file` tool) at the beginning of each step transition (e.g., before starting Step 0, Step 1, Step 2, and Step 3). Do not rely on cached memory of the skills.
+
 ### Step 0. Preparation Phase (`backlog-prepare`)
 
 1. Call `backlog-prepare` to ensure the repository is clean and ready.
