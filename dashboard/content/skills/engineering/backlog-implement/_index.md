@@ -31,15 +31,36 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 4. Update the ticket frontmatter with `batch: X` (starting with `batch: 1`) and write to disk so batches are remembered.
 5. Prior to executing a batch, the Hub must verify that all tickets in the current batch are indeed conflict-free.
 
-### 2. Spawn Implementation Spokes
+### 2. Spawn Implementation Spokes & Initialize Worktrees
 
-For each ticket in the selected batch, spawn an implementation subagent.
+For each ticket in the selected batch, spawn an implementation subagent in an isolated workspace (worktree).
 
-Since `.tars/` is gitignored, it will not exist in the subagent's new worktree workspace. To ensure the subagent can read, reference, and update the ticket file (e.g. check off tasks and add evidence relative to `.tars/issues/todo/XXX.md`), the Hub must:
+Since gitignored files/directories (like `.tars/` or `.pre-commit-config.yaml`) do not exist in the subagent's new worktree workspace, the Hub must initialize the worktree workspace and transfer the necessary files/directories before the subagent starts execution.
 
-1. Create the `.tars/issues/todo/` directory in the subagent's worktree.
-2. Copy the specific ticket markdown file (`XXX.md`) into that directory.
-3. Pass the ticket content directly in the subagent's prompt as context.
+#### Hub-to-Spoke Gitignore Transfer Logic
+
+1. **Locate Worktree Path**: Run `git worktree list` to retrieve the absolute path of the new subagent's worktree directory.
+2. **Read Configured Transfer Files**: Check if `.tars/config.yaml` exists and contains a `worktree.transfer_files` key configured.
+   - If configured, read the list of transfer patterns.
+   - If not configured, use these default patterns:
+
+     ```yaml
+     worktree:
+       transfer_files:
+         - ".pre-commit-config.yaml"
+         - ".env*"
+         - ".tars/"
+         - "devenv.local.nix"
+         - "devenv.local.yaml"
+     ```
+
+3. **Synchronize/Symlink Files**: For each matching file or directory in the parent workspace root:
+   - **Symlink Attempt (Preferred)**: Try to create a symlink in the subagent's worktree pointing to the corresponding item in the parent workspace root. (e.g., symlink `<subagent-worktree>/.tars/` to `<parent-workspace>/.tars/`).
+     > [!IMPORTANT]
+     > Symlinking `.tars/` allows the subagent to read and write directly to the shared issue queue, meaning you do not need to manually copy ticket updates back when the subagent finishes.
+   - **Copy Fallback**: If symlinking fails (e.g., on Windows without Developer Mode or due to a permissions error), fallback to copying the file or directory physically into the subagent's worktree root.
+     - Note: If `.tars/` is copied as a fallback, the Hub **MUST** copy the modified ticket file (`.tars/issues/todo/XXX.md`) back from the subagent's worktree to the parent workspace before cleaning up the worktree.
+4. **Pass Context**: Pass the ticket content directly in the subagent's prompt as context.
 
 Equip each subagent with:
 
@@ -72,7 +93,7 @@ Equip each subagent with:
 
 When all subagents in the batch complete:
 
-1. **Sync Ticket Updates**: For each subagent, copy the updated ticket markdown file from the subagent's worktree (e.g. `<subagent-worktree>/.tars/issues/todo/XXX.md`) back to the parent workspace's `.tars/issues/todo/XXX.md`. This ensures that all completed checklists and evidence recorded by the subagent are preserved.
+1. **Sync Ticket Updates**: If the `.tars/` directory in the subagent's worktree was copied as a fallback instead of symlinked, copy the updated ticket markdown file from `<subagent-worktree>/.tars/issues/todo/XXX.md` back to the parent workspace's `.tars/issues/todo/XXX.md` to preserve the completed checklists and evidence. (If symlinking was successful, they share the same physical file, and copying is a harmless no-op).
 2. **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each subagent's branch and the synced ticket file to verify the implementation.
 3. **Handle Verdicts**:
    - **If Approved**:
