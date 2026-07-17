@@ -74,6 +74,13 @@ export async function lint() {
                 `⚠️ ${file}: unknown category '${skill.category}' (not declared in CATEGORIES).`
             )
         }
+
+        if (/\]\(file:\/\/\/[^)]*\)/.test(skill.raw)) {
+            log.error(
+                `❌ ${file}: contains absolute file:/// URL. CRITICAL LINKING RULE violation: Never use absolute file:/// URLs referencing local paths.`
+            )
+            errors++
+        }
     }
 
     if (errors > 0) {

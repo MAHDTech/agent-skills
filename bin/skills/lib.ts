@@ -98,6 +98,7 @@ export interface Skill {
     metadata: SkillMetadata
     content: string
     yamlError?: string
+    raw: string
 }
 
 export function logTask(msg: string) {
@@ -191,6 +192,7 @@ export async function getSkills(): Promise<Skill[]> {
             metadata,
             content: match[2],
             yamlError,
+            raw,
         })
     }
     return skills

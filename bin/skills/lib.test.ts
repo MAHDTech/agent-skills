@@ -325,6 +325,80 @@ Some content`
                 )
             ).toBe(true)
         })
+
+        it("should fail linting when skill content contains absolute file:/// link", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A standard test skill
+---
+Some content with [link](file:///home/user/path)`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some(
+                    (err) =>
+                        err.includes("contains absolute file:/// URL") &&
+                        err.includes("CRITICAL LINKING RULE")
+                )
+            ).toBe(true)
+        })
+
+        it("should pass linting when file:/// is in a code block but not as a markdown link", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A standard test skill
+---
+Some code block:
+\`\`\`rust
+let path = "file:///foo/bar";
+\`\`\`
+`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBeUndefined()
+            expect(loggedErrors.length).toBe(0)
+        })
     })
 
     describe("registerAntigravity", () => {
