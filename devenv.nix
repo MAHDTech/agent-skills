@@ -238,8 +238,8 @@ in
       shfmt.enable = true;
       skills-test = {
         enable = true;
-        name = "Skills Test";
-        entry = "skills --action test";
+        name = "Skills Lint";
+        entry = "skills --action lint";
         files = "^(skills/.*\\.md|bin/skills/)";
         pass_filenames = false;
       };
@@ -317,6 +317,7 @@ in
   };
 
   enterTest = ''
-    echo "Running devenv tests..."
+    bun test bin/skills
+    bun test bin/dashboard
   '';
 }
