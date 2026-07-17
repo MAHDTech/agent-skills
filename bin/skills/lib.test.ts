@@ -21,8 +21,10 @@ const {
     releaseLock,
     cleanStaleLinks,
     rewriteSkillLinks,
+    registerAntigravity,
     ANTIGRAVITY_LOCK_FILE,
     ANTIGRAVITY_CONFIG_DIR,
+    ANTIGRAVITY_SKILLS_JSON,
     SKILLS_DIR,
 } = await import("./lib.ts")
 
@@ -182,6 +184,74 @@ describe("Skills unit tests", () => {
                 "Check [this](@/skills/engineering/target-skill/_index.md) out"
             )
             expect(output).toContain("[external](http://google.com)")
+        })
+    })
+
+    describe("registerAntigravity", () => {
+        it("should parse valid JSON config successfully", async () => {
+            await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+            const initialConfig = {entries: [], otherKey: "value"}
+            await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, initialConfig)
+
+            await registerAntigravity()
+
+            const updatedConfig = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            expect(updatedConfig.$schema).toBe(
+                "https://skills.sh/schemas/skills.sh.schema.json"
+            )
+            expect(Array.isArray(updatedConfig.entries)).toBe(true)
+        })
+
+        it("should throw a formatted corrupted configuration error for null config", async () => {
+            await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+            await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, "null")
+
+            await expect(registerAntigravity()).rejects.toThrow(
+                "Corrupted configuration"
+            )
+            await expect(registerAntigravity()).rejects.toThrow(
+                "parsed to a non-object value"
+            )
+        })
+
+        it("should throw a formatted corrupted configuration error for primitive values", async () => {
+            await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+
+            await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `"string value"`)
+            await expect(registerAntigravity()).rejects.toThrow(
+                "Corrupted configuration"
+            )
+            await expect(registerAntigravity()).rejects.toThrow(
+                "parsed to a non-object value"
+            )
+
+            await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `12345`)
+            await expect(registerAntigravity()).rejects.toThrow(
+                "Corrupted configuration"
+            )
+            await expect(registerAntigravity()).rejects.toThrow(
+                "parsed to a non-object value"
+            )
+
+            await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `true`)
+            await expect(registerAntigravity()).rejects.toThrow(
+                "Corrupted configuration"
+            )
+            await expect(registerAntigravity()).rejects.toThrow(
+                "parsed to a non-object value"
+            )
+        })
+
+        it("should throw a formatted corrupted configuration error for an array config", async () => {
+            await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+            await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, "[]")
+
+            await expect(registerAntigravity()).rejects.toThrow(
+                "Corrupted configuration"
+            )
+            await expect(registerAntigravity()).rejects.toThrow(
+                "parsed to a non-object value"
+            )
         })
     })
 })
