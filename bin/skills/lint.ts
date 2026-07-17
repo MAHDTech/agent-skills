@@ -8,6 +8,16 @@ export async function lint() {
 
     for (const skill of skills) {
         const file = skill.path
+        const relPath = file.startsWith("skills/") ? file.substring(7) : file
+        const pathParts = relPath.split(/[\\/]/)
+        if (pathParts.length !== 3) {
+            log.error(
+                `❌ ${file}: skill must reside exactly at skills/<category>/<name>/SKILL.md.`
+            )
+            errors++
+            continue
+        }
+
         if (skill.yamlError) {
             log.error(
                 `❌ ${file}: YAML frontmatter syntax error: ${skill.yamlError}`

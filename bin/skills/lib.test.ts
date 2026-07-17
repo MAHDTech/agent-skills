@@ -1,4 +1,4 @@
-import {describe, it, expect, afterAll} from "bun:test"
+import {describe, it, expect, afterAll, beforeAll, beforeEach} from "bun:test"
 import fs from "fs-extra"
 import path from "path"
 import os from "os"
@@ -182,6 +182,146 @@ describe("Skills unit tests", () => {
                 "Check [this](@/skills/engineering/target-skill/_index.md) out"
             )
             expect(output).toContain("[external](http://google.com)")
+        })
+    })
+
+    describe("lint", () => {
+        let originalExit: typeof process.exit
+        let originalLogError: any
+        let loggedErrors: string[] = []
+        let exitCode: number | undefined = undefined
+
+        class ExitError extends Error {
+            constructor(public code: number) {
+                super(`Exit called with \${code}`)
+            }
+        }
+
+        beforeAll(async () => {
+            originalExit = process.exit
+            process.exit = (code?: number) => {
+                throw new ExitError(code ?? 0)
+            }
+
+            const clack = await import("@clack/prompts")
+            originalLogError = clack.log.error
+            clack.log.error = (msg: string) => {
+                loggedErrors.push(msg)
+            }
+        })
+
+        afterAll(() => {
+            process.exit = originalExit
+            import("@clack/prompts").then((clack) => {
+                clack.log.error = originalLogError
+            })
+        })
+
+        beforeEach(async () => {
+            loggedErrors = []
+            exitCode = undefined
+            await fs.remove(SKILLS_DIR)
+            await fs.ensureDir(SKILLS_DIR)
+        })
+
+        it("should pass linting for standard skill paths", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A standard test skill
+---
+Some content`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBeUndefined()
+            expect(loggedErrors.length).toBe(0)
+        })
+
+        it("should fail linting for nested skill paths", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "nested",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A nested test skill
+---
+Some content`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some((err) =>
+                    err.includes("must reside exactly at skills/")
+                )
+            ).toBe(true)
+        })
+
+        it("should fail linting for shallow skill paths", async () => {
+            const skillPath = path.join(SKILLS_DIR, "SKILL.md")
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A shallow test skill
+---
+Some content`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some((err) =>
+                    err.includes("must reside exactly at skills/")
+                )
+            ).toBe(true)
         })
     })
 })
