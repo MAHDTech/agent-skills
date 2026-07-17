@@ -485,13 +485,18 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                 }
 
                 let finalContent = trimmed
-                // Detect HTML format (only if not loaded from raw markdown candidates)
+                // Detect HTML format
                 const isHtml =
-                    !fetchedFromCandidate &&
-                    (isResponseHtml ||
-                        trimmed.startsWith("<!") ||
-                        trimmed.startsWith("<html") ||
-                        trimmed.includes("<body"))
+                    isResponseHtml ||
+                    trimmed.startsWith("<!") ||
+                    trimmed.startsWith("<html") ||
+                    trimmed.includes("<body")
+
+                if (isHtml && fetchedFromCandidate) {
+                    log.warn(
+                        `  [WARN] HTML response detected from candidate URL for ${job.url}`
+                    )
+                }
 
                 if (isHtml) {
                     finalContent = await convertHtmlToMarkdown(trimmed)

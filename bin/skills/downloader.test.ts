@@ -1,0 +1,110 @@
+import {describe, it, expect, mock, afterEach, beforeEach} from "bun:test"
+import fs from "fs-extra"
+import path from "path"
+import os from "os"
+
+// Set up temp home and AGENT_SKILLS_HOME
+const tempHome = path.join(
+    os.tmpdir(),
+    `agent-skills-downloader-test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+)
+fs.ensureDirSync(tempHome)
+
+const fakeRepo = path.join(tempHome, "repo")
+fs.ensureDirSync(fakeRepo)
+
+// We want to dynamically import downloader.ts after setting env vars
+process.env.AGENT_SKILLS_HOME = fakeRepo
+
+const {downloadAction} = await import("./downloader.ts")
+
+describe("downloader unit tests", () => {
+    let originalFetch: typeof globalThis.fetch
+
+    beforeEach(() => {
+        originalFetch = globalThis.fetch
+    })
+
+    afterEach(() => {
+        globalThis.fetch = originalFetch
+        try {
+            fs.removeSync(tempHome)
+        } catch {
+            // ignore
+        }
+    })
+
+    it("should detect HTML responses from candidate URLs and convert them", async () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/test-skill/SKILL.md",
+                dirName: "test-skill",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "test-skill",
+                    description: "Test skill description",
+                    resources: ["https://antigravity.google/docs/llms.txt"],
+                },
+                content: "",
+            },
+        ]
+
+        // Mock fetch
+        globalThis.fetch = mock(async (url: any) => {
+            const urlStr = String(url)
+            if (urlStr.endsWith("/llms.txt")) {
+                // Return index content pointing to subpage
+                return new Response(
+                    `- [subpage](https://antigravity.google/docs/subpage)`,
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }
+            if (urlStr.includes("/assets/docs/")) {
+                // This is the candidate raw asset URL
+                return new Response(
+                    `<!DOCTYPE html><html><body><h1>404 Not Found (SPA fallback)</h1><p>This is some extra paragraphs to ensure that the content is long enough to pass the min content bytes check of fifty bytes.</p></body></html>`,
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/html"},
+                    }
+                )
+            }
+            // For other requests (main URL), return markdown (though candidate will be hit first)
+            return new Response(
+                `# Main URL Content\nThis is the markdown from main URL.`,
+                {
+                    status: 200,
+                    headers: {"content-type": "text/markdown"},
+                }
+            )
+        }) as any
+
+        // Run downloadAction
+        await downloadAction(mockSkills, fakeRepo)
+
+        // Verify the file was downloaded, converted to markdown (not saved as raw HTML)
+        const resourcesDir = path.join(
+            fakeRepo,
+            "skills/engineering/test-skill/resources"
+        )
+        const files = await fs.readdir(resourcesDir)
+        // The downloaded index itself is not saved as a child resource, only its linked resources
+        expect(files.length).toBe(1)
+
+        const filename = files[0]!
+        const downloadedContent = await fs.readFile(
+            path.join(resourcesDir, filename),
+            "utf8"
+        )
+        // It shouldn't contain raw HTML tags because we ran convertHtmlToMarkdown
+        expect(downloadedContent).not.toContain("<!DOCTYPE html>")
+        expect(downloadedContent).not.toContain("<html>")
+        // And it should have the converted text (via pandoc)
+        expect(downloadedContent).toContain("404 Not Found (SPA fallback)")
+        expect(downloadedContent).toContain("This is some extra paragraphs")
+    })
+})
