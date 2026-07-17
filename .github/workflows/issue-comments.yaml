@@ -34,6 +34,7 @@ jobs:
     steps:
       - id: giphy_search
         name: Search Giphy
+        if: ${{ env.GIPHY_TOKEN != '' }}
         uses: IAmHughes/giphy-generator@v1.0.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
