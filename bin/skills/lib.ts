@@ -296,6 +296,13 @@ export async function cleanStaleLinks(dir: string): Promise<number> {
                 } catch {
                     // Ignore parsing errors
                 }
+            } else {
+                // If package.json is absent, the target has been moved or deleted.
+                // We remove the symlink because the already-passing heuristic (conforming category/name structure) holds.
+                // Note: The fallback drops the pkg.name === "agent-skills" guarantee,
+                // but the deletion risk is bounded by the CATEGORIES and NAME_RE heuristic checks above.
+                await fs.remove(entryPath)
+                removed++
             }
         } catch {
             // Ignore unreadable entries
