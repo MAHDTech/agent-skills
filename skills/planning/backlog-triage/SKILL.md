@@ -16,11 +16,14 @@ This skill runs in a Hub-and-Spoke topology using sub-agents to verify tickets i
 
 ## Triage Workflow
 
-### 1. Backlog Scan & Conflict-Free Grouping
+### 1. Mode Detection & Backlog Scan
 
-List all markdown files in `.tars/issues/todo/`. Identify the unreviewed tickets (those missing a `## Review` section and having `status: todo` or missing a status). Rework tickets (with `status: rework`) already contain review notes and should not be re-triaged.
+Determine the triage mode based on the user's instructions/invocation:
 
-Group them into parallel batches of at most 5 concurrent subagents. Ensure that tickets within the same batch do not audit overlapping files to avoid git or environment conflicts.
+- **Normal Triage**: Triggered by default. To reduce token spend, identify only the unreviewed tickets (those missing a `## Review` section and having `status: todo` or missing a status). Tickets already having a `## Review` section or with `status: rework` must be skipped.
+- **Adversarial Triage (Double-Check)**: Triggered if the user request contains keywords like `adversarial`, `double-check`, `re-triage`, or `force` (e.g., `/backlog-triage perform an adversarial triage of the backlog`). In this mode, identify **all** tickets in `.tars/issues/todo/` (including those with existing `## Review` sections or `status: rework`) to be triaged/double-checked.
+
+Group the identified tickets into parallel batches of at most 5 concurrent subagents. Ensure that tickets within the same batch do not audit overlapping files to avoid git or environment conflicts.
 
 ### 2. Spawn Triage Spokes
 
@@ -34,6 +37,7 @@ Equip each subagent with:
 - **Role**: `Triage-<TICKET_ID>` (substitute the 3-digit ticket ID, e.g. `Triage-044`)
 - **Workspace**: `branch`
 - **Prompt**:
+  Adjust the prompt depending on the triage mode. If in **Adversarial Triage** mode, append instruction #5:
 
   ```text
   You are auditing a pending issue ticket to verify its readiness and accuracy against the codebase.
@@ -50,6 +54,7 @@ Equip each subagent with:
      - Are there any hallucinations? (e.g., non-existent files, deprecated APIs, incorrect function signatures, wrong line references).
   3. Assess Constraints: Check for platform compatibility concerns (Node vs Bun APIs, Windows path resolution/CRLF issues) and repository-specific guidelines.
   4. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must operate strictly within your local isolated workspace.
+  5. [Adversarial Mode Only] Double-Check/Adversarial Audit: The ticket content includes a `## Review` section from a previous review. Critically assess if those findings are correct and relevant. If any previous findings are incorrect or no longer apply, note that explicitly in your review. If new findings or gaps are discovered, list them.
 
   Formulate a detailed review of this ticket. If it is accurate and ready, state that. Otherwise, list the critical findings or gaps as bullet points.
   ```
@@ -59,7 +64,7 @@ Equip each subagent with:
 When a subagent completes:
 
 1. The Hub receives the subagent's review markdown.
-2. The Hub appends (or replaces) a `## Review` section at the bottom of the local ticket file in `.tars/issues/todo/` following this exact formatting:
+2. The Hub overwrites/replaces (or appends if missing) the `## Review` section at the bottom of the local ticket file in `.tars/issues/todo/` with the new findings, following this exact formatting:
 
    ```markdown
    ## Review
@@ -73,4 +78,4 @@ When a subagent completes:
    - Run `git worktree remove --force <path>`
    - Run `git branch -D <branch-name>`
 
-Repeat for subsequent batches until all tickets in `.tars/issues/todo/` have been triaged and contain a `## Review` section.
+Repeat for subsequent batches until all tickets in `.tars/issues/todo/` have been triaged/double-checked and contain an up-to-date `## Review` section.
