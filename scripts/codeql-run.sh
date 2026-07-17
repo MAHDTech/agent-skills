@@ -143,8 +143,7 @@ cmd_db() {
 			--language="${lang}" \
 			--source-root="${PROJECT_ROOT}" \
 			"${config_args[@]}" \
-			--overwrite \
-			2>&1 | tail -5
+			--overwrite
 
 		log_success "Database created: ${db_path}"
 	done
@@ -174,8 +173,7 @@ cmd_analyze() {
 		codeql database analyze "${db_path}" \
 			--format=sarifv2.1.0 \
 			--output="${sarif_file}" \
-			--sarif-include-query-help=always \
-			2>&1 | tail -10
+			--sarif-include-query-help=always
 
 		log_success "SARIF results: ${sarif_file}"
 
