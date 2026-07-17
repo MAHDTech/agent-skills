@@ -328,6 +328,11 @@ Some content`
     })
 
     describe("registerAntigravity", () => {
+        beforeEach(async () => {
+            await fs.remove(ANTIGRAVITY_SKILLS_JSON)
+            await fs.remove(`${ANTIGRAVITY_SKILLS_JSON}.bak`)
+        })
+
         it("should parse valid JSON config successfully", async () => {
             await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
             const initialConfig = {entries: [], otherKey: "value"}
@@ -340,58 +345,111 @@ Some content`
                 "https://skills.sh/schemas/skills.sh.schema.json"
             )
             expect(Array.isArray(updatedConfig.entries)).toBe(true)
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                false
+            )
         })
 
-        it("should throw a formatted corrupted configuration error for null config", async () => {
+        it("should backup and reset config for null config", async () => {
             await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
             await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, "null")
 
-            await expect(registerAntigravity()).rejects.toThrow(
-                "Corrupted configuration"
+            await registerAntigravity()
+
+            const updatedConfig = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            expect(updatedConfig.$schema).toBe(
+                "https://skills.sh/schemas/skills.sh.schema.json"
             )
-            await expect(registerAntigravity()).rejects.toThrow(
-                "parsed to a non-object value"
+            expect(Array.isArray(updatedConfig.entries)).toBe(true)
+
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
             )
+            const backupContent = await fs.readFile(
+                `${ANTIGRAVITY_SKILLS_JSON}.bak`,
+                "utf-8"
+            )
+            expect(backupContent).toBe("null")
         })
 
-        it("should throw a formatted corrupted configuration error for primitive values", async () => {
+        it("should backup and reset config for primitive values", async () => {
             await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
 
+            // Test string value
             await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `"string value"`)
-            await expect(registerAntigravity()).rejects.toThrow(
-                "Corrupted configuration"
+            await registerAntigravity()
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
             )
-            await expect(registerAntigravity()).rejects.toThrow(
-                "parsed to a non-object value"
-            )
+            expect(
+                await fs.readFile(`${ANTIGRAVITY_SKILLS_JSON}.bak`, "utf-8")
+            ).toBe(`"string value"`)
+            await fs.remove(`${ANTIGRAVITY_SKILLS_JSON}.bak`)
 
+            // Test number value
             await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `12345`)
-            await expect(registerAntigravity()).rejects.toThrow(
-                "Corrupted configuration"
+            await registerAntigravity()
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
             )
-            await expect(registerAntigravity()).rejects.toThrow(
-                "parsed to a non-object value"
-            )
+            expect(
+                await fs.readFile(`${ANTIGRAVITY_SKILLS_JSON}.bak`, "utf-8")
+            ).toBe(`12345`)
+            await fs.remove(`${ANTIGRAVITY_SKILLS_JSON}.bak`)
 
+            // Test boolean value
             await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, `true`)
-            await expect(registerAntigravity()).rejects.toThrow(
-                "Corrupted configuration"
+            await registerAntigravity()
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
             )
-            await expect(registerAntigravity()).rejects.toThrow(
-                "parsed to a non-object value"
-            )
+            expect(
+                await fs.readFile(`${ANTIGRAVITY_SKILLS_JSON}.bak`, "utf-8")
+            ).toBe(`true`)
         })
 
-        it("should throw a formatted corrupted configuration error for an array config", async () => {
+        it("should backup and reset config for an array config", async () => {
             await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
             await fs.writeFile(ANTIGRAVITY_SKILLS_JSON, "[]")
 
-            await expect(registerAntigravity()).rejects.toThrow(
-                "Corrupted configuration"
+            await registerAntigravity()
+
+            const updatedConfig = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            expect(updatedConfig.$schema).toBe(
+                "https://skills.sh/schemas/skills.sh.schema.json"
             )
-            await expect(registerAntigravity()).rejects.toThrow(
-                "parsed to a non-object value"
+            expect(Array.isArray(updatedConfig.entries)).toBe(true)
+
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
             )
+            const backupContent = await fs.readFile(
+                `${ANTIGRAVITY_SKILLS_JSON}.bak`,
+                "utf-8"
+            )
+            expect(backupContent).toBe("[]")
+        })
+
+        it("should backup and reset config when entries is not an array", async () => {
+            await fs.ensureDir(ANTIGRAVITY_CONFIG_DIR)
+            const invalidConfig = {entries: "not-an-array", otherKey: "value"}
+            await fs.writeJson(ANTIGRAVITY_SKILLS_JSON, invalidConfig)
+
+            await registerAntigravity()
+
+            const updatedConfig = await fs.readJson(ANTIGRAVITY_SKILLS_JSON)
+            expect(updatedConfig.$schema).toBe(
+                "https://skills.sh/schemas/skills.sh.schema.json"
+            )
+            expect(Array.isArray(updatedConfig.entries)).toBe(true)
+
+            expect(await fs.pathExists(`${ANTIGRAVITY_SKILLS_JSON}.bak`)).toBe(
+                true
+            )
+            const backupConfig = await fs.readJson(
+                `${ANTIGRAVITY_SKILLS_JSON}.bak`
+            )
+            expect(backupConfig.entries).toBe("not-an-array")
         })
     })
 })

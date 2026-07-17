@@ -33,7 +33,7 @@ To stop detached processes:
 $ devenv down
 ```
 
-New in devenv 2.1.3
+New in devenv 2.2
 
 `devenv down` is a shorthand for `devenv processes down`.
 

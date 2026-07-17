@@ -2,7 +2,7 @@ Title: Introduction
 
 URL Source: https://bevyengine.org/learn/migration-guides/
 
-Published Time: Thu, 16 Jul 2026 09:00:03 GMT
+Published Time: Fri, 17 Jul 2026 08:56:08 GMT
 
 Markdown Content:
 - [x] 

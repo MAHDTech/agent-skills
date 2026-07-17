@@ -92,19 +92,28 @@ describe("downloader unit tests", () => {
             "skills/engineering/test-skill/resources"
         )
         const files = await fs.readdir(resourcesDir)
-        // The downloaded index itself is not saved as a child resource, only its linked resources
-        expect(files.length).toBe(1)
+        // The downloaded index and its linked resources should be saved
+        expect(files.length).toBe(2)
+        expect(files).toContain("docs-llms.txt")
+        expect(files).toContain("subpage.md")
 
-        const filename = files[0]!
-        const downloadedContent = await fs.readFile(
-            path.join(resourcesDir, filename),
+        const indexContent = await fs.readFile(
+            path.join(resourcesDir, "docs-llms.txt"),
+            "utf-8"
+        )
+        expect(indexContent).toBe(
+            "- [subpage](https://antigravity.google/docs/subpage)"
+        )
+
+        const subpageContent = await fs.readFile(
+            path.join(resourcesDir, "subpage.md"),
             "utf8"
         )
         // It shouldn't contain raw HTML tags because we ran convertHtmlToMarkdown
-        expect(downloadedContent).not.toContain("<!DOCTYPE html>")
-        expect(downloadedContent).not.toContain("<html>")
+        expect(subpageContent).not.toContain("<!DOCTYPE html>")
+        expect(subpageContent).not.toContain("<html>")
         // And it should have the converted text (via pandoc)
-        expect(downloadedContent).toContain("404 Not Found (SPA fallback)")
-        expect(downloadedContent).toContain("This is some extra paragraphs")
+        expect(subpageContent).toContain("404 Not Found (SPA fallback)")
+        expect(subpageContent).toContain("This is some extra paragraphs")
     })
 })

@@ -385,6 +385,17 @@ export async function downloadAction(skills: Skill[], agentSkillsHome: string) {
                     const childUrls = parseLlmsTxtLinks(indexContent, urlStr)
                     log.info(`  Found ${childUrls.length} links in index.`)
 
+                    const indexFilename = smartSlugify(urlStr)
+                    const indexDestFile = checkPathTraversal(
+                        resourcesDir,
+                        indexFilename
+                    )
+                    downloadJobs.push({
+                        url: urlStr,
+                        destFile: indexDestFile,
+                        skillName,
+                    })
+
                     if (childUrls.length > 0) {
                         const commonPrefix = getCommonPrefix(childUrls)
                         for (const childUrl of childUrls) {

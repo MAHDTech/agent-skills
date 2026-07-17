@@ -149,7 +149,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.41**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.44**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -322,7 +322,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.172.0**
+    **0.174.0**
   </Card>
 
   <Card
@@ -626,7 +626,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Code and build agents with comprehensive multi-provider support
 
-    **0.9.10**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
+    **0.9.14**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -640,7 +640,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google's official CLI for Gemini
 
-    **0.50.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
+    **0.51.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -656,7 +656,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     GitHub's AI pair programmer
 
-    **1.0.70**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
+    **1.0.71**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -696,7 +696,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **0.2.101**
+    **0.2.102**
   </Card>
 
   <Card
@@ -710,7 +710,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.18**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.21**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -740,7 +740,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.4.9**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.4.11**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -754,7 +754,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Moonshot AI's coding assistant
 
-    **1.48.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
+    **1.49.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -828,7 +828,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Nova by Compass AI - a fully-fledged software engineer at your command
 
-    **1.1.26**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
+    **1.1.27**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -842,7 +842,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.18.2**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.3**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -897,7 +897,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.19.10**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.19.11**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card

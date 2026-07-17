@@ -208,7 +208,7 @@ export function groupByCategory(skills: Skill[]): [string, Skill[]][] {
     return groups
 }
 
-export const HOME = os.homedir()
+export const HOME = process.env.HOME || os.homedir()
 export const AGENTS_HUB =
     process.env.AGENT_SKILLS_AGENTS_DIR || path.join(HOME, ".agents", "skills")
 export const CLAUDE_SKILLS = path.join(HOME, ".claude", "skills")
@@ -360,31 +360,47 @@ export async function registerAntigravity() {
                 "utf-8"
             )
             if (rawContent.trim() !== "") {
+                let parsedConfig: any = null
+                let isCorrupted = false
+                let corruptionReason = ""
                 try {
-                    config = JSON.parse(rawContent)
+                    parsedConfig = JSON.parse(rawContent)
+                    if (
+                        parsedConfig === null ||
+                        typeof parsedConfig !== "object" ||
+                        Array.isArray(parsedConfig)
+                    ) {
+                        isCorrupted = true
+                        corruptionReason = "parsed to a non-object value"
+                    } else if (
+                        parsedConfig.entries !== undefined &&
+                        !Array.isArray(parsedConfig.entries)
+                    ) {
+                        isCorrupted = true
+                        corruptionReason = "'entries' is not an array"
+                    }
                 } catch (e: any) {
-                    throw new Error(
-                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`,
-                        {cause: e}
-                    )
+                    isCorrupted = true
+                    corruptionReason = `contains invalid JSON: ${e.message}`
                 }
-                if (
-                    config === null ||
-                    typeof config !== "object" ||
-                    Array.isArray(config)
-                ) {
-                    throw new Error(
-                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} parsed to a non-object value.`
+
+                if (isCorrupted) {
+                    const backupPath = `${ANTIGRAVITY_SKILLS_JSON}.bak`
+                    log.warn(
+                        `⚠️ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} ${corruptionReason}. Backing up to ${backupPath} and resetting config.`
                     )
+                    try {
+                        await fs.writeFile(backupPath, rawContent, "utf-8")
+                    } catch (err) {
+                        log.error(`❌ Failed to write backup file: ${err}`)
+                    }
+                    config = {}
+                } else {
+                    config = parsedConfig
                 }
             }
         }
         const entries = config.entries || []
-        if (!Array.isArray(entries)) {
-            throw new Error(
-                `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} 'entries' is not an array.`
-            )
-        }
         if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
             entries.push({path: AGENTS_HUB})
         }

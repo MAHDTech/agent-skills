@@ -8,8 +8,8 @@ skill_name = "zola"
 +++
 
 Title: Overview \| Zola URL Source:
-https://www.getzola.org/documentation/ Published Time: Mon, 13 Jul 2026
-13:44:16 GMT Markdown Content: \##
+https://www.getzola.org/documentation/ Published Time: Thu, 16 Jul 2026
+19:45:06 GMT Markdown Content: \##
 \[🔗\](https://www.getzola.org/documentation/#zola-at-a-glance)Zola at a
 Glance Zola is a static site generator (SSG), similar to
 \[Hugo\](https://gohugo.io/), \[Pelican\](https://blog.getpelican.com/),

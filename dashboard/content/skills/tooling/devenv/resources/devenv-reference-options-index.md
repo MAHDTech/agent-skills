@@ -2325,6 +2325,22 @@ A list of pre-installed VS Code extensions.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/devcontainer.nix>
 
+## devcontainer.settings.customizations.zed.extensions
+
+A list of pre-installed Zed extensions.
+
+*Type:* list of string
+
+*Default:*
+
+```
+[ ]
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/integrations/devcontainer.nix>
+
 ## devcontainer.settings.image
 
 The name of an image in a container registry.
