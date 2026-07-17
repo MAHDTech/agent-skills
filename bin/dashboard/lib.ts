@@ -92,9 +92,13 @@ export function cleanOutputDir(
                 )
                 return
             }
-            // Sleep/busy-wait before retrying
-            const start = Date.now()
-            while (Date.now() - start < delayMs) {}
+            // Sleep/block before retrying using a non-busy-waiting synchronous wait
+            Atomics.wait(
+                new Int32Array(new SharedArrayBuffer(4)),
+                0,
+                0,
+                delayMs
+            )
         }
     }
 }
