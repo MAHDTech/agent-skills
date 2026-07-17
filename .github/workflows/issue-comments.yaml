@@ -61,7 +61,6 @@ jobs:
             The ${{ github.event_name }} event was triggered in the ${{ github.repository }} repository.
             The comment is available to view [here](${{ github.event.comment.html_url }})
         run: |
-          sudo apt install jq --yes
           JSON_CONTENT=$(jq -n --arg 'content' "${PING} ${MESSAGE}" '$ARGS.named')
           curl \
           --verbose \
