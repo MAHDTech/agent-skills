@@ -24,6 +24,9 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 
 1. Call `backlog-prepare` to ensure the repository is clean and ready.
 2. Wait for the preparation phase to run to completion.
+3. Check the `.tars/issues/todo/` directory for any existing ticket files (`XXX.md` files where `XXX` is a 3-digit ID).
+   - **If existing issues are present**: Skip directly to **Step 2. Triage Phase** to triage them, then proceed to **Step 3. Implementation & Review Phase** to resolve them. Once all existing issues are implemented or resolved, proceed to **Step 1. Audit Phase** to scan the updated codebase for any new issues.
+   - **If no existing issues are present**: Proceed directly to **Step 1. Audit Phase**.
 
 ### Step 1. Audit Phase (`backlog-audit`)
 
@@ -33,13 +36,13 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 
 ### Step 2. Triage Phase (`backlog-triage`)
 
-1. Once the audit phase completes, call `backlog-triage` to verify the backlog.
+1. Call `backlog-triage` to verify the backlog.
 2. Sub-agents will check the tickets in parallel batches to ensure accuracy, verify file and line coordinates, eliminate hallucinations, check platform constraints, and append a detailed review section to each ticket.
 3. Wait for the triage phase to run to completion.
 
 ### Step 3. Implementation & Review Phase (`backlog-implement` & `backlog-review`)
 
-1. Once the triage phase completes, call `backlog-implement` to execute the tickets.
+1. Call `backlog-implement` to execute the tickets.
 2. The Hub will dynamically group tickets into conflict-free batches, update their frontmatter `batch` number, and dispatch them to parallel sub-agents for implementation.
 3. Once implementation completes, the Hub will call `backlog-review` (see [backlog-review](@/skills/review/backlog-review/_index.md)) on each ticket branch to run a double-axis verification.
 4. For approved tickets, the Hub will merge the completed branches back sequentially, run pre-commit checks (using the [prek](@/skills/tooling/prek/_index.md) tool) and tests, and move the ticket files to `.tars/issues/done/`.
