@@ -212,10 +212,60 @@ export function getDomainPrefix(urlStr: string): string {
     try {
         const cleanUrl = stripReaderProxy(urlStr)
         const url = new URL(cleanUrl)
-        const parts = url.hostname.split(".")
+        const hostname = url.hostname.toLowerCase()
+
+        // Check for IPv4 address (e.g. 127.0.0.1)
+        if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
+            return url.hostname
+        }
+
+        // Check for IPv6 address (e.g. [::1])
+        if (hostname.startsWith("[") && hostname.endsWith("]")) {
+            return url.hostname
+        }
+
+        const parts = hostname.split(".")
         if (parts.length >= 2) {
-            const domain = parts[parts.length - 2]
-            return domain || ""
+            const lastPart = parts[parts.length - 1]
+            const secondToLastPart = parts[parts.length - 2]
+
+            if (lastPart && secondToLastPart) {
+                // Common second-level labels used with country-code TLDs (which are 2 letters)
+                const COMMON_SUFFIXES = new Set([
+                    "co",
+                    "com",
+                    "org",
+                    "gov",
+                    "edu",
+                    "net",
+                    "ac",
+                    "asn",
+                    "id",
+                    "ne",
+                    "or",
+                    "pe",
+                    "ltd",
+                    "me",
+                    "sch",
+                    "plc",
+                    "nom",
+                    "gen",
+                    "mil",
+                    "ind",
+                    "web",
+                    "info",
+                ])
+
+                if (
+                    lastPart.length === 2 &&
+                    COMMON_SUFFIXES.has(secondToLastPart)
+                ) {
+                    if (parts.length >= 3) {
+                        return parts[parts.length - 3] || ""
+                    }
+                }
+                return secondToLastPart
+            }
         }
         return url.hostname
     } catch {

@@ -3,9 +3,11 @@ import fs from "fs"
 import path from "path"
 import {cleanOutputDir} from "./lib.ts"
 
+import os from "os"
+
 describe("cleanOutputDir", () => {
     it("should successfully delete a non-empty directory", () => {
-        const tempDir = path.join(import.meta.dir, "temp-test-dir")
+        const tempDir = path.join(os.tmpdir(), "temp-test-dir")
         if (fs.existsSync(tempDir)) {
             fs.rmSync(tempDir, {recursive: true, force: true})
         }
