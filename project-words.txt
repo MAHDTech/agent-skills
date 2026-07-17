@@ -150,9 +150,11 @@ KHTML
 pandoc
 Pandoc
 serde
+spacetimedb
+Commitlog
+commitlog
+primarykey
 tauri
 Tauri
 navbars
 Tera
-
-

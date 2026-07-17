@@ -108,9 +108,10 @@ Beyond `/code-review` on the main flow:
 - `/git-update-branch` — reach for this when a branch has fallen behind its base and needs a deliberate rebase or merge.
 - `/gh-release-notes` — reach for this when you want release notes or a changelog for a version and to cut a GitHub release.
 
-## Game development
+## Game and database development
 
 - `/bevy-development` — reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
+- `/spacetimedb` — reach for this when working with SpacetimeDB database modules (schemas, reducers, views) or real-time client subscriptions.
 
 ## Writing
 
