@@ -16,7 +16,7 @@ fs.ensureDirSync(fakeRepo)
 // We want to dynamically import downloader.ts after setting env vars
 process.env.AGENT_SKILLS_HOME = fakeRepo
 
-const {downloadAction} = await import("./downloader.ts")
+const {downloadAction, getDomainPrefix} = await import("./downloader.ts")
 
 describe("downloader unit tests", () => {
     let originalFetch: typeof globalThis.fetch
@@ -115,5 +115,40 @@ describe("downloader unit tests", () => {
         // And it should have the converted text (via pandoc)
         expect(subpageContent).toContain("404 Not Found (SPA fallback)")
         expect(subpageContent).toContain("This is some extra paragraphs")
+    })
+
+    describe("getDomainPrefix unit tests", () => {
+        it("should correctly handle standard TLDs", () => {
+            expect(getDomainPrefix("https:/" + "/example.com/bar")).toBe(
+                "example"
+            )
+            expect(getDomainPrefix("https:/" + "/sub.domain.org/path")).toBe(
+                "domain"
+            )
+        })
+
+        it("should correctly handle multi-part TLDs", () => {
+            expect(getDomainPrefix("https:/" + "/foo.co.uk/bar")).toBe("foo")
+            expect(getDomainPrefix("https:/" + "/sub.example.co.uk/bar")).toBe(
+                "example"
+            )
+            expect(getDomainPrefix("https:/" + "/example.com.cn/bar")).toBe(
+                "example"
+            )
+            expect(getDomainPrefix("https:/" + "/another.org.uk/test")).toBe(
+                "another"
+            )
+        })
+
+        it("should correctly handle IP addresses", () => {
+            expect(getDomainPrefix("https:/" + "/127.0.0.1/bar")).toBe(
+                "127.0.0.1"
+            )
+            expect(getDomainPrefix("https:/" + "/[::1]/bar")).toBe("[::1]")
+        })
+
+        it("should return empty string or fallback on invalid URLs", () => {
+            expect(getDomainPrefix("invalid-url")).toBe("")
+        })
     })
 })
