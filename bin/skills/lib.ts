@@ -368,6 +368,15 @@ export async function registerAntigravity() {
                         {cause: e}
                     )
                 }
+                if (
+                    config === null ||
+                    typeof config !== "object" ||
+                    Array.isArray(config)
+                ) {
+                    throw new Error(
+                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} parsed to a non-object value.`
+                    )
+                }
             }
         }
         const entries = config.entries || []
