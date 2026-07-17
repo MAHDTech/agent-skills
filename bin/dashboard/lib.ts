@@ -113,5 +113,5 @@ export function build() {
     log.step("🏗️  Building Zola site…")
     run("zola", ["--root", "dashboard", "build"])
     log.step("🔍 Indexing with Pagefind…")
-    run("pagefind", ["--site", "dashboard/public"])
+    run("pagefind", ["--site", "dashboard/public", "--bundle-dir", "pagefind"])
 }
