@@ -311,17 +311,23 @@ export async function acquireLock() {
     const start = Date.now()
     while (Date.now() - start < timeout) {
         try {
-            if (await fs.pathExists(ANTIGRAVITY_LOCK_FILE)) {
-                const stat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
-                if (Date.now() - stat.mtimeMs > 10000) {
-                    await fs.remove(ANTIGRAVITY_LOCK_FILE)
-                }
-            }
             await fs.writeFile(ANTIGRAVITY_LOCK_FILE, String(process.pid), {
                 flag: "wx",
             })
             return
-        } catch {
+        } catch (err: any) {
+            if (err.code === "EEXIST") {
+                try {
+                    const stat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
+                    if (Date.now() - stat.mtimeMs > 10000) {
+                        await fs.remove(ANTIGRAVITY_LOCK_FILE)
+                    }
+                } catch {
+                    // Ignore concurrent stat/remove failures
+                }
+            } else {
+                throw err
+            }
             await new Promise((resolve) => setTimeout(resolve, 100))
         }
     }
@@ -350,19 +356,18 @@ export async function registerAntigravity() {
                 try {
                     config = JSON.parse(rawContent)
                 } catch (e: any) {
-                    log.error(
-                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`
+                    throw new Error(
+                        `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} contains invalid JSON: ${e.message}`,
+                        {cause: e}
                     )
-                    process.exit(1)
                 }
             }
         }
         const entries = config.entries || []
         if (!Array.isArray(entries)) {
-            log.error(
+            throw new Error(
                 `❌ Corrupted configuration: ${ANTIGRAVITY_SKILLS_JSON} 'entries' is not an array.`
             )
-            process.exit(1)
         }
         if (!entries.some((e) => path.resolve(e.path) === AGENTS_HUB)) {
             entries.push({path: AGENTS_HUB})
