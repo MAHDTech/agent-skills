@@ -1,25 +1,141 @@
-import {describe, it, expect} from "bun:test"
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {describe, it, expect, beforeAll, afterAll, mock} from "bun:test"
 import fs from "fs"
 import path from "path"
-import {cleanOutputDir} from "./lib.ts"
+import os from "os"
 
-describe("cleanOutputDir", () => {
-    it("should successfully delete a non-empty directory", () => {
-        const tempDir = path.join(import.meta.dir, "temp-test-dir")
-        if (fs.existsSync(tempDir)) {
-            fs.rmSync(tempDir, {recursive: true, force: true})
+const mockExecFileSync = mock(
+    (cmd: string, _args?: string[], _options?: any) => {
+        if (cmd === "git") {
+            return "2026-07-17\n"
         }
-        fs.mkdirSync(tempDir)
-        fs.writeFileSync(path.join(tempDir, "file.txt"), "hello")
+        return ""
+    }
+)
 
-        const subDir = path.join(tempDir, "subdir")
-        fs.mkdirSync(subDir)
-        fs.writeFileSync(path.join(subDir, "another.txt"), "world")
+mock.module("child_process", () => ({
+    execFileSync: mockExecFileSync,
+}))
 
-        expect(fs.existsSync(tempDir)).toBe(true)
+const mockLogStep = mock(() => {})
+const mockLogWarn = mock(() => {})
 
-        cleanOutputDir(tempDir)
+mock.module("@clack/prompts", () => ({
+    log: {
+        step: mockLogStep,
+        warn: mockLogWarn,
+    },
+}))
 
-        expect(fs.existsSync(tempDir)).toBe(false)
+describe("Dashboard Lib Tests", () => {
+    let tempRootDir: string
+    let lib: any
+
+    beforeAll(async () => {
+        // Set up a temporary root directory to sandbox all tests
+        tempRootDir = fs.mkdtempSync(path.join(os.tmpdir(), "dashboard-test-"))
+        process.env.AGENT_SKILLS_HOME = tempRootDir
+
+        // Pre-create the directory layout that writeSkillDates expects
+        fs.mkdirSync(path.join(tempRootDir, "dashboard"), {recursive: true})
+        fs.mkdirSync(path.join(tempRootDir, "skills", "category", "name"), {
+            recursive: true,
+        })
+        fs.writeFileSync(
+            path.join(tempRootDir, "skills", "category", "name", "SKILL.md"),
+            "test skill content"
+        )
+
+        // Dynamically import lib.ts to ensure process.env.AGENT_SKILLS_HOME is used for ROOT definition
+        lib = await import("./lib.ts")
+    })
+
+    afterAll(() => {
+        // Clean up sandbox root directory
+        if (tempRootDir && fs.existsSync(tempRootDir)) {
+            fs.rmSync(tempRootDir, {recursive: true, force: true})
+        }
+    })
+
+    describe("cleanOutputDir", () => {
+        it("should successfully delete a non-empty directory with a custom path", () => {
+            const testCleanDir = path.join(tempRootDir, "test-clean-dir")
+            fs.mkdirSync(testCleanDir, {recursive: true})
+            fs.writeFileSync(path.join(testCleanDir, "file.txt"), "hello")
+
+            const subDir = path.join(testCleanDir, "subdir")
+            fs.mkdirSync(subDir)
+            fs.writeFileSync(path.join(subDir, "another.txt"), "world")
+
+            expect(fs.existsSync(testCleanDir)).toBe(true)
+
+            lib.cleanOutputDir(testCleanDir)
+
+            expect(fs.existsSync(testCleanDir)).toBe(false)
+        })
+
+        it("should clean the default public directory if no path is provided", () => {
+            const defaultPublicDir = path.join(
+                tempRootDir,
+                "dashboard",
+                "public"
+            )
+            fs.mkdirSync(defaultPublicDir, {recursive: true})
+            fs.writeFileSync(path.join(defaultPublicDir, "file.txt"), "hello")
+
+            expect(fs.existsSync(defaultPublicDir)).toBe(true)
+
+            lib.cleanOutputDir()
+
+            expect(fs.existsSync(defaultPublicDir)).toBe(false)
+        })
+    })
+
+    describe("writeSkillDates", () => {
+        it("should successfully generate skill_dates.toml from git dates", () => {
+            mockExecFileSync.mockClear()
+
+            lib.writeSkillDates()
+
+            // Verify writeSkillDates called git log
+            expect(mockExecFileSync).toHaveBeenCalled()
+            const gitCall = mockExecFileSync.mock.calls.find(
+                (call) => call[0] === "git"
+            )
+            expect(gitCall).toBeDefined()
+            expect(gitCall![1]).toContain("skills/category/name")
+
+            const tomlPath = path.join(
+                tempRootDir,
+                "dashboard",
+                "skill_dates.toml"
+            )
+            expect(fs.existsSync(tomlPath)).toBe(true)
+
+            const tomlContent = fs.readFileSync(tomlPath, "utf8")
+            expect(tomlContent).toContain("[dates]")
+            expect(tomlContent).toContain('"category/name" = "2026-07-17"')
+        })
+    })
+
+    describe("buildCss", () => {
+        it("should run tailwindcss with correct input and output paths", () => {
+            mockExecFileSync.mockClear()
+
+            lib.buildCss()
+
+            expect(mockExecFileSync).toHaveBeenCalled()
+            const tailwindCall = mockExecFileSync.mock.calls.find(
+                (call) => call[0] === "tailwindcss"
+            )
+            expect(tailwindCall).toBeDefined()
+            expect(tailwindCall![1]).toEqual([
+                "-i",
+                "dashboard/css/input.css",
+                "-o",
+                "dashboard/static/build/css/generated.css",
+            ])
+            expect(tailwindCall![2].cwd).toBe(tempRootDir)
+        })
     })
 })
