@@ -34,14 +34,14 @@ if (action === "lint") {
             }
         })
         .catch(handleException)
-} else if (action === "download") {
+} else if (action === "download-resources") {
     getSkills()
         .then(async (skills) => {
             const {downloadAction} = await import("./downloader.ts")
             await downloadAction(skills, AGENT_SKILLS_HOME)
         })
         .catch(handleException)
-} else if (action === "clean") {
+} else if (action === "clean-resources") {
     getSkills()
         .then(async (skills) => {
             const {cleanAction} = await import("./downloader.ts")
@@ -50,7 +50,7 @@ if (action === "lint") {
         .catch(handleException)
 } else {
     console.log(
-        "Usage: bun run bin/skills/index.ts --action <lint|sync|install|uninstall|download|clean|test>"
+        "Usage: bun run bin/skills/index.ts --action <lint|sync|install|uninstall|download-resources|clean-resources|test>"
     )
     process.exit(1)
 }

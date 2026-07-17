@@ -300,7 +300,7 @@ in
 
   scripts = {
     skills = {
-      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|test>)";
+      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|download-resources|clean-resources|test>)";
       exec = "bun run skills \"$@\"";
     };
     dashboard = {
