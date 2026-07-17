@@ -35,6 +35,7 @@ Spawn `research` subagents (up to a maximum of 5 in parallel) to audit each iden
 Equip each subagent with:
 
 - **TypeName**: `research`
+- **Role**: `Audit-<MODULE_NAME>` (substitute a short, alphanumeric descriptor of the audited module)
 - **Workspace**: `branch`
 - **Prompt**:
 

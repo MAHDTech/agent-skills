@@ -46,6 +46,7 @@ Spawn a `research` subagent to perform the double-axis review of the diff agains
 Equip the subagent with:
 
 - **TypeName**: `research`
+- **Role**: `Review-<TICKET_ID>` (substitute the 3-digit ticket ID, e.g. `Review-044`)
 - **Workspace**: `branch`
 - **Prompt**:
 

@@ -31,6 +31,7 @@ Since `.tars/` is gitignored, the subagent's workspace will not have access to t
 Equip each subagent with:
 
 - **TypeName**: `research`
+- **Role**: `Triage-<TICKET_ID>` (substitute the 3-digit ticket ID, e.g. `Triage-044`)
 - **Workspace**: `branch`
 - **Prompt**:
 

@@ -37,6 +37,7 @@ Since `.tars/` is gitignored, it will not exist in the subagent's new worktree w
 Equip each subagent with:
 
 - **TypeName**: `self` (or `case` if custom configured)
+- **Role**: `Implement-<TICKET_ID>` (substitute the 3-digit ticket ID, e.g. `Implement-044`)
 - **Workspace**: `branch`
 - **Prompt**:
 

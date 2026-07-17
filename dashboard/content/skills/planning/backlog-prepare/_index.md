@@ -33,7 +33,8 @@ Verify that the git working tree is completely clean (no unstaged changes, no un
 Clean up any leftover or orphaned git worktrees.
 
 - Run `git worktree prune`.
-- Check if `.system_generated/worktrees/` contains any `subagent-*` directories. If they are no longer tracked by git as worktrees, delete those directories.
+- Run `git worktree list` to retrieve all registered worktree paths.
+- Check each worktree path on disk: if the directory name contains `subagent-` and is no longer tracked by git (or marked as `prunable`), delete the directory.
 
 ### 3. Clean Leftover Branches
 
