@@ -63,7 +63,8 @@ Since gitignored files/directories (like `.tars/` or `.pre-commit-config.yaml`) 
      > Symlinking `.tars/` allows the subagent to read and write directly to the shared issue queue, meaning you do not need to manually copy ticket updates back when the subagent finishes.
    - **Copy Fallback**: If symlinking fails (e.g., on Windows without Developer Mode or due to a permissions error), fallback to copying the file or directory physically into the subagent's worktree root.
      - Note: If `.tars/` is copied as a fallback, the Hub **MUST** copy the modified ticket file (`.tars/issues/todo/XXX.md`) back from the subagent's worktree to the parent workspace before cleaning up the worktree.
-4. **Pass Context**: Pass the ticket content directly in the subagent's prompt as context.
+4. **Isolate Pre-commit Cache**: To prevent pre-commit cache folder permission blocks or hangs inside the subagent's sandboxed environment, the Hub **MUST** set the `PRE_COMMIT_HOME` environment variable to point to a local directory inside the worktree (e.g. set `process.env.PRE_COMMIT_HOME = path.join(worktreePath, ".cache", "pre-commit")` before spawning or symlinking).
+5. **Pass Context**: Pass the ticket content directly in the subagent's prompt as context.
 
 Equip each subagent with:
 
@@ -86,7 +87,7 @@ Equip each subagent with:
      - Detect if 'devenv.nix' or 'devenv/default.nix' is present in the workspace root. If so, run 'devenv test'.
      - Otherwise, check for standard project test configs (e.g., package.json -> 'npm test', cargo.toml -> 'cargo test', pytest, etc.) and execute them.
      - Ensure the test suite passes prior to returning.
-  5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). Fix any failing checks before committing.
+  5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). To avoid permission errors or hangs, prefix the execution command with the isolated cache environment: `PRE_COMMIT_HOME="<worktree-path>/.cache/pre-commit" prek run -a`. Fix any failing checks before committing.
   6. Commit your changes using Conventional Commits. STRICT GITIGNORE CONSTRAINT: You must NEVER stage, commit, or force-add any files under the `.tars/` directory (such as the ticket file `.tars/issues/todo/XXX.md`). These files must remain completely unstaged and uncommitted in git.
   7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the source/main branch, commit directly to the source/main branch, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
   8. Update the ticket file `.tars/issues/todo/XXX.md` (which has been copied to your worktree) to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [backlog-create-issue](../../planning/backlog-create-issue/SKILL.md).
@@ -97,10 +98,13 @@ Equip each subagent with:
 
 Rather than waiting passively for the entire batch to complete (which blocks progress if a single spoke gets stuck or dies), the Hub must monitor spokes dynamically and process them incrementally:
 
-1. **Monitor Spoke Liveness & Revive Stopped Subagents**:
-   - Do **NOT** wait passively. Periodically check on the status of active subagents using the `manage_subagents list` tool.
+1. **Monitor Spoke Liveness, Approvals & Revive**:
+   - Do **NOT** wait passively. Use the `schedule` timer tool to trigger a wakeup notification for yourself every 2 minutes while subagents are running. On each wakeup, run `manage_subagents list` to verify subagent liveness.
+   - **Detect blocked/approval-waiting subagents**: Subagents running commands inside sandboxed worktrees may call `run_command` which gets suspended waiting for user approval. Because subagent approval prompts do not bubble up automatically, you must read the last few lines of each active subagent's `transcript.jsonl` (located at `file:///home/mahdtech/.gemini/antigravity-cli/brain/<conversation-id>/.system_generated/logs/transcript.jsonl`). If the subagent's last log entry is a `PLANNER_RESPONSE` containing a `run_command` tool call, and there is no subsequent `RUN_COMMAND` response, the subagent is blocked. Output an explicit warning to the user:
+     `"⚠️ Subagent <role> (ID: <conversation-id>) is waiting for your approval to run command: <CommandLine>. Please switch to its chat or approve the command."`
    - If a subagent has stopped (e.g., due to a server restart or crash) before completing its task, check its branch status. Revive it by sending it a follow-up query to resume its task, or restart the subagent on that branch if needed.
 2. **Process Completed Spokes Incrementally**: As soon as any individual subagent in the batch reports completion, immediately run the merge-back and verification workflow for that spoke:
+   - **Reset Staged Side-Effects**: Running tests or git hooks in the parent repository can generate untracked or staged test files (e.g., `target-skill`) that block git merges. Before executing git merge, verify `git status --porcelain`. If any unstaged or staged changes exist in the parent repository, run `git reset --hard` and `git clean -fd` to completely clear the git index and working tree.
    - **Sync Ticket Updates**: If the `.tars/` directory in the subagent's worktree was copied as a fallback instead of symlinked, copy the updated ticket markdown file from `<subagent-worktree>/.tars/issues/todo/XXX.md` back to the parent workspace's `.tars/issues/todo/XXX.md` to preserve the completed checklists and evidence. (If symlinking was successful, they share the same physical file, and copying is a harmless no-op).
    - **Run Implementation Review**: Call the `backlog-review` skill (see [backlog-review](@/skills/review/backlog-review/_index.md)) on the subagent's branch and the synced ticket file to verify the implementation.
    - **Handle Verdicts**:
