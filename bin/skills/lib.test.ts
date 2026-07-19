@@ -317,6 +317,30 @@ describe("Skills unit tests", () => {
             )
             expect(output).toContain("[external](http://google.com)")
         })
+
+        it("should not rewrite relative links pointing outside of the skills directory", async () => {
+            const srcDir = path.join(SKILLS_DIR, "engineering", "my-skill")
+            await fs.ensureDir(srcDir)
+
+            const outsideFile = path.resolve(
+                SKILLS_DIR,
+                "..",
+                "docs",
+                "install.md"
+            )
+            await fs.ensureDir(path.dirname(outsideFile))
+            await fs.writeFile(outsideFile, "# Install Guide")
+
+            const inputContent = "Check [Guide](../../docs/install.md) out"
+
+            const output = rewriteSkillLinks(
+                inputContent,
+                "skills/engineering/my-skill",
+                srcDir
+            )
+
+            expect(output).toBe(inputContent)
+        })
     })
 
     describe("lint", () => {
