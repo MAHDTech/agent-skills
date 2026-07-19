@@ -231,51 +231,54 @@ ${catalogContent}
     }
 
     // 4. Zola dashboard content — mirror the category tree so the theme groups
-    //    skills into collapsible sections automatically.
-    await fs.ensureDir(DASHBOARD_CONTENT_DIR)
-    if (!hasFilter) {
-        await fs.emptyDir(DASHBOARD_CONTENT_DIR)
-        await fs.writeFile(
-            path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
-            `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
-        )
-    } else {
-        const skillsIndex = path.join(DASHBOARD_CONTENT_DIR, "_index.md")
-        if (!(await fs.pathExists(skillsIndex))) {
+    //    skills into collapsible sections automatically. Skipped when
+    //    SKILLS_SKIP_DASHBOARD is set: dashboard content is owned by the
+    //    dashboard build/lint, not the skills-sync hook.
+    if (!process.env.SKILLS_SKIP_DASHBOARD) {
+        await fs.ensureDir(DASHBOARD_CONTENT_DIR)
+        if (!hasFilter) {
+            await fs.emptyDir(DASHBOARD_CONTENT_DIR)
             await fs.writeFile(
-                skillsIndex,
+                path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
                 `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
             )
+        } else {
+            const skillsIndex = path.join(DASHBOARD_CONTENT_DIR, "_index.md")
+            if (!(await fs.pathExists(skillsIndex))) {
+                await fs.writeFile(
+                    skillsIndex,
+                    `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
+                )
+            }
         }
-    }
-    let weight = 1
-    for (const [key, list] of grouped) {
-        const filteredList = list.filter(shouldSyncSkill)
-        if (filteredList.length === 0) {
-            weight++
-            continue
-        }
-        const catDir = path.join(DASHBOARD_CONTENT_DIR, key)
-        await fs.ensureDir(catDir)
-        await fs.writeFile(
-            path.join(catDir, "_index.md"),
-            `+++\ntitle = ${JSON.stringify(CATEGORIES[key]!.title)}\ndescription = ${JSON.stringify(CATEGORIES[key]!.description)}\nsort_by = "title"\ntemplate = "section.html"\nweight = ${weight++}\n+++\n`
-        )
-        for (const s of filteredList) {
-            const skillSrcDir = path.join(SKILLS_DIR, key, s.dirName)
-            const contentBase = `skills/${key}/${s.dirName}`
-            const outDir = path.join(catDir, s.dirName)
-            await fs.ensureDir(outDir)
-
-            const skillBody = rewriteSkillLinks(
-                s.content,
-                contentBase,
-                skillSrcDir
-            )
-            const skillMermaid = skillBody.includes("```mermaid")
+        let weight = 1
+        for (const [key, list] of grouped) {
+            const filteredList = list.filter(shouldSyncSkill)
+            if (filteredList.length === 0) {
+                weight++
+                continue
+            }
+            const catDir = path.join(DASHBOARD_CONTENT_DIR, key)
+            await fs.ensureDir(catDir)
             await fs.writeFile(
-                path.join(outDir, "_index.md"),
-                `+++
+                path.join(catDir, "_index.md"),
+                `+++\ntitle = ${JSON.stringify(CATEGORIES[key]!.title)}\ndescription = ${JSON.stringify(CATEGORIES[key]!.description)}\nsort_by = "title"\ntemplate = "section.html"\nweight = ${weight++}\n+++\n`
+            )
+            for (const s of filteredList) {
+                const skillSrcDir = path.join(SKILLS_DIR, key, s.dirName)
+                const contentBase = `skills/${key}/${s.dirName}`
+                const outDir = path.join(catDir, s.dirName)
+                await fs.ensureDir(outDir)
+
+                const skillBody = rewriteSkillLinks(
+                    s.content,
+                    contentBase,
+                    skillSrcDir
+                )
+                const skillMermaid = skillBody.includes("```mermaid")
+                await fs.writeFile(
+                    path.join(outDir, "_index.md"),
+                    `+++
 title = ${JSON.stringify(s.dirName)}
 description = ${JSON.stringify(s.metadata.description || "")}
 sort_by = "title"
@@ -288,20 +291,24 @@ mermaid = ${skillMermaid}
 
 ${skillBody}
 `
-            )
+                )
 
-            const siblings = (await fs.readdir(skillSrcDir)).filter(
-                (f) => f.endsWith(".md") && f !== "SKILL.md"
-            )
-            for (const file of siblings.sort()) {
-                const raw = (
-                    await fs.readFile(path.join(skillSrcDir, file), "utf-8")
-                ).replace(/\r\n/g, "\n")
-                const body = rewriteSkillLinks(raw, contentBase, skillSrcDir)
-                const sibMermaid = body.includes("```mermaid")
-                await fs.writeFile(
-                    path.join(outDir, file),
-                    `+++
+                const siblings = (await fs.readdir(skillSrcDir)).filter(
+                    (f) => f.endsWith(".md") && f !== "SKILL.md"
+                )
+                for (const file of siblings.sort()) {
+                    const raw = (
+                        await fs.readFile(path.join(skillSrcDir, file), "utf-8")
+                    ).replace(/\r\n/g, "\n")
+                    const body = rewriteSkillLinks(
+                        raw,
+                        contentBase,
+                        skillSrcDir
+                    )
+                    const sibMermaid = body.includes("```mermaid")
+                    await fs.writeFile(
+                        path.join(outDir, file),
+                        `+++
 title = ${JSON.stringify(file.replace(/\.md$/, ""))}
 [extra]
 skill = false
@@ -312,23 +319,27 @@ skill_name = ${JSON.stringify(s.dirName)}
 
 ${body}
 `
+                    )
+                }
+
+                const resourcesSrc = path.join(skillSrcDir, "resources")
+                const resourcesDest = path.join(outDir, "resources")
+                await syncResources(
+                    resourcesSrc,
+                    resourcesDest,
+                    path.posix.join(contentBase, "resources"),
+                    key,
+                    s.dirName
                 )
             }
-
-            const resourcesSrc = path.join(skillSrcDir, "resources")
-            const resourcesDest = path.join(outDir, "resources")
-            await syncResources(
-                resourcesSrc,
-                resourcesDest,
-                path.posix.join(contentBase, "resources"),
-                key,
-                s.dirName
-            )
         }
+        logTask("Generated dashboard content.")
     }
-    logTask("Generated dashboard content.")
 
-    // 5. Stage regenerated files.
+    // 5. Stage regenerated files (skipped for check-only runs like dashboard lint).
+    if (process.env.SKILLS_NO_STAGE) {
+        return
+    }
     try {
         const filesToStage: string[] = []
         if (hasFilter) {
@@ -347,12 +358,7 @@ ${body}
                 }
             }
         } else {
-            filesToStage.push(
-                AGENTS_FILE,
-                README_FILE,
-                SKILLS_SH_FILE,
-                DASHBOARD_CONTENT_DIR
-            )
+            filesToStage.push(AGENTS_FILE, README_FILE, SKILLS_SH_FILE)
         }
 
         if (filesToStage.length > 0) {

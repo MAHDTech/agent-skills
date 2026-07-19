@@ -1,8 +1,3 @@
-Title: Basic writing and formatting syntax - GitHub Docs
-
-URL Source: https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
-
-Markdown Content:
 Create sophisticated formatting for your prose and code on GitHub with simple syntax.
 
 ## Who can use this feature?

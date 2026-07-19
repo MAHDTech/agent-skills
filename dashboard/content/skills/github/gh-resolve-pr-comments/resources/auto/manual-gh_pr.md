@@ -7,13 +7,6 @@ mermaid = false
 skill_name = "gh-resolve-pr-comments"
 +++
 
-Title: GitHub CLI
-
-URL Source: https://cli.github.com/manual/gh_pr
-
-Published Time: Thu, 09 Jul 2026 15:15:41 GMT
-
-Markdown Content:
 [Skip to content](https://cli.github.com/manual/gh_pr#main)[CLI](https://cli.github.com/)
 
 [Copilot CLI](https://github.com/features/copilot/cli)[Manual](https://cli.github.com/manual)[Release notes](https://github.com/cli/cli/releases/latest)

@@ -1,8 +1,3 @@
-Title: Intro
-
-URL Source: https://opencode.ai/docs
-
-Markdown Content:
 [**OpenCode**](https://opencode.ai/) is an open source AI coding agent. It’s available as a terminal-based interface, desktop app, or IDE extension.
 
 ![Image 1: OpenCode TUI with the opencode theme](https://opencode.ai/docs/_astro/screenshot.CQjBbRyJ_1dLadc.webp)
