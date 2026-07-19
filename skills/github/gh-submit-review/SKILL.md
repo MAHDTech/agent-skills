@@ -7,7 +7,7 @@ resources:
 
 # Submit a PR Review
 
-Consult the [gh pr manual](resources/manual-gh_pr.md) for more details.
+Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 
 Close the loop after reviewing someone else's pull request: turn your findings into a formal GitHub review with the right event, a summary body, and inline comments anchored to the lines they concern.
 

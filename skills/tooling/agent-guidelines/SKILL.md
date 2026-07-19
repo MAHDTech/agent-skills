@@ -1,13 +1,13 @@
 ---
 name: agent-guidelines
-description: Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use when asked to follow the guidelines or verify work against them.
+description: Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use before and while implementing to avoid common LLM coding pitfalls — over-engineering, unrequested refactors, silent assumptions, and unverified changes.
 resources:
   - https://x.com/karpathy/status/2015883857489522876
 ---
 
 # Guidelines
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](resources/karpathy-status-2015883857489522876.md) on LLM coding pitfalls.
+Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](resources/auto/karpathy-status-2015883857489522876.md) on LLM coding pitfalls.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 

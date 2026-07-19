@@ -11,7 +11,7 @@ resources:
 
 # Quick PR Description
 
-Consult the [gh pr manual](resources/manual-gh_pr.md) for more details.
+Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 
 Generate a concise PR description by analyzing the diff against a base branch.
 
@@ -100,8 +100,11 @@ Once the user approves, execute the following steps in order:
 
 **Step 5a — Commit unstaged changes (if any):**
 
+Stage only the specific files this PR should include — never blanket-stage with `git add -A`, which sweeps in unrelated changes:
+
 ```bash
-git add -A && git commit -m "<generated title>"
+git add <specific intended files>
+git commit -m "<generated title>"
 ```
 
 If there are no unstaged/staged changes, skip this step.
@@ -173,7 +176,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 | 🟢/🔴/… | 1-3 words describing the component | 1 sentence describing how it worked before | 1 sentence describing how it works after |
 | …       | …                                  | …                                          | …                                        |
 
-> 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
+> _(legend blockquote — see the Feature Diff section rules for the exact line)_
 
 ## Details
 
@@ -195,7 +198,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 
 ## GitHub Admonitions
 
-Use [GitHub admonitions](resources/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default — only when one of the situations below applies.
+Use [GitHub admonitions](resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default — only when one of the situations below applies.
 
 **Syntax:**
 
@@ -264,8 +267,11 @@ Use [GitHub admonitions](resources/en-get-started-writing-on-github-getting-star
 - Group related rows; aim for 3-10 rows
 - Good component examples: API endpoint, DB table/column, config key, env var, dependency version, CLI flag, permission, error behavior
 - Use backticks for code references in Component, Before, and After cells (e.g., `sessions` table, `/auth/login`, `TOKEN_TTL`)
-- **Legend**: Always include a one-line legend below the Feature Diff table as a blockquote: `> 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking`
-- **Severity column (S)**: Every row must have a severity emoji as the first column:
+- **Legend**: Every Feature Diff table is followed by this exact one-line legend as a blockquote. This is the single definition of the severity symbols — the Output Format and Example Output templates above just reference it:
+
+  > 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
+
+- **Severity column (S)**: Every row must carry one of these severity emoji as its first column:
 
 | Emoji | Label         | When to use                           |
 | ----- | ------------- | ------------------------------------- |
@@ -312,7 +318,7 @@ _tl;dr Users can now log in with email/password and stay authenticated across br
 | 🟢  | `/auth/login`    | `N/A`                      | New endpoint                                    |
 | 🟢  | `/auth/logout`   | `N/A`                      | New endpoint                                    |
 
-> 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
+> _(legend blockquote — see the Feature Diff section rules for the exact line)_
 
 ## Details
 

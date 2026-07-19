@@ -34,12 +34,13 @@ git log "$PREV_TAG..HEAD" --no-merges --pretty='%s (%h) @%an'
 ```
 
 ```bash
+BASE=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name')   # default branch; do not assume main
 git log -1 --format=%as "$PREV_TAG"   # date of the previous tag
 gh pr list --state merged --base "$BASE" --search "merged:>=<that-date>" \
   --json number,title,labels,author,mergedAt
 ```
 
-Detect `$BASE` as the repo's default branch (`gh repo view --json defaultBranchRef -q '.defaultBranchRef.name'`); do not assume `main`.
+`$BASE` is the repo's default branch, derived above — never hard-code `main`.
 
 ## 3. Group by type
 
@@ -67,6 +68,12 @@ Rewrite each entry as a user-facing line, not a commit dump:
 Write the result to a file (e.g. `RELEASE_NOTES.md`) so you can publish it verbatim.
 
 ## 5. Publish the release
+
+Set `$VERSION` to the new tag you decided on in step 1:
+
+```bash
+VERSION=v1.2.3
+```
 
 To scaffold a first draft from GitHub's own diff, then edit it into the grouped form above:
 

@@ -59,13 +59,13 @@ Before the main flow — deciding _what_ to build and _how big_ it is:
 
 Orchestrating the lifecycle of codebase issues in a continuous loop:
 
-- `/backlog-loop` — reach for this when you want to run a complete loop of auditing the codebase, triaging tickets, and executing implementations.
-- [/backlog-prepare](../../planning/backlog-prepare/SKILL.md) — reach for this to reset the environment and prepare the workspace before starting a full backlog loop, cleaning up git worktrees and branches.
-- `/backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
-- `/backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
-- `/backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
-- [/backlog-review](../../review/backlog-review/SKILL.md) — reach for this during the implementation phase of the backlog loop to assess a subagent's code changes for compliance with the spec and repo standards.
-- `/backlog-create-issue` — reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
+- `/tars-backlog-loop` — reach for this when you want to run a complete loop of auditing the codebase, triaging tickets, and executing implementations.
+- [/tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) — reach for this to reset the environment and prepare the workspace before starting a full backlog loop, cleaning up git worktrees and branches.
+- `/tars-backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
+- `/tars-backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
+- `/tars-backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
+- [/tars-backlog-review](../../review/tars-backlog-review/SKILL.md) — reach for this during the implementation phase of the backlog loop to assess a subagent's code changes for compliance with the spec and repo standards.
+- `/tars-backlog-create-issue` — reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
 
 ## Changing existing code safely
 

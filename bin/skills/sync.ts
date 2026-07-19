@@ -3,6 +3,7 @@ import path from "path"
 import {glob} from "glob"
 import {execFileSync} from "child_process"
 import {intro, outro, log} from "@clack/prompts"
+import type {Skill} from "./lib.ts"
 import {
     getSkills,
     groupByCategory,
@@ -47,21 +48,43 @@ async function syncResources(
     for (const entry of entries) {
         const srcPath = path.join(src, entry.name)
         const destPath = path.join(dest, entry.name)
-        if (entry.isDirectory()) {
+        let isDirectory = entry.isDirectory()
+        let isFile = entry.isFile()
+        let realSrcPath = srcPath
+        let linkSrcDir = src
+
+        if (entry.isSymbolicLink()) {
+            try {
+                realSrcPath = await fs.realpath(srcPath)
+                const stat = await fs.stat(realSrcPath)
+                isDirectory = stat.isDirectory()
+                isFile = stat.isFile()
+                if (isFile) {
+                    linkSrcDir = path.dirname(realSrcPath)
+                }
+            } catch (err: any) {
+                log.warn(
+                    `Warning: Symbolic link at "${srcPath}" is broken or could not be resolved: ${err.message || err}`
+                )
+                continue
+            }
+        }
+
+        if (isDirectory) {
             await syncResources(
-                srcPath,
+                realSrcPath,
                 destPath,
                 path.posix.join(contentBase, entry.name),
                 key,
                 skillName
             )
-        } else if (entry.isFile()) {
+        } else if (isFile) {
             if (entry.name.endsWith(".md")) {
-                const raw = (await fs.readFile(srcPath, "utf-8")).replace(
+                const raw = (await fs.readFile(realSrcPath, "utf-8")).replace(
                     /\r\n/g,
                     "\n"
                 )
-                const body = rewriteSkillLinks(raw, contentBase, src)
+                const body = rewriteSkillLinks(raw, contentBase, linkSrcDir)
                 const sibMermaid = body.includes("```mermaid")
                 await fs.writeFile(
                     destPath,
@@ -78,13 +101,13 @@ ${body}
 `
                 )
             } else {
-                await fs.copy(srcPath, destPath)
+                await fs.copy(realSrcPath, destPath)
             }
         }
     }
 }
 
-export async function sync() {
+export async function sync(options?: {category?: string; skill?: string}) {
     const skills = await getSkills()
     if (skills.some((s) => s.yamlError)) {
         throw new Error(
@@ -98,8 +121,30 @@ export async function sync() {
     }
     const grouped = groupByCategory(skills)
 
+    const categoryFilter = options?.category
+    const skillFilter = options?.skill
+    const hasFilter = !!(categoryFilter || skillFilter)
+
+    function matchSkill(s: Skill, filter: string): boolean {
+        if (filter.includes("/")) {
+            const [cat, name] = filter.split("/")
+            return (
+                s.category === cat &&
+                (s.dirName === name || s.metadata.name === name)
+            )
+        }
+        return s.dirName === filter || s.metadata.name === filter
+    }
+
+    function shouldSyncSkill(s: Skill): boolean {
+        if (!categoryFilter && !skillFilter) return true
+        if (categoryFilter && s.category !== categoryFilter) return false
+        if (skillFilter && !matchSkill(s, skillFilter)) return false
+        return true
+    }
+
     // 1. agents/AGENTS.md — regenerate the skill index, preserve frontmatter.
-    if (await fs.pathExists(AGENTS_FILE)) {
+    if (!hasFilter && (await fs.pathExists(AGENTS_FILE))) {
         const agentsContent = (await fs.readFile(AGENTS_FILE, "utf-8")).replace(
             /\r\n/g,
             "\n"
@@ -119,28 +164,29 @@ export async function sync() {
     }
 
     // 2. README.md — badge, install, and a categorised catalog.
-    const docsList = (await fs.pathExists(DOCS_DIR))
-        ? (await glob("*.md", {cwd: DOCS_DIR})).sort()
-        : []
-    const docsContent = docsList.length
-        ? `## Documentation\n\n${docsList.map((doc) => `- [${doc.replace(".md", "")}](docs/${doc})`).join("\n")}\n\n`
-        : ""
+    if (!hasFilter) {
+        const docsList = (await fs.pathExists(DOCS_DIR))
+            ? (await glob("*.md", {cwd: DOCS_DIR})).sort()
+            : []
+        const docsContent = docsList.length
+            ? `## Documentation\n\n${docsList.map((doc) => `- [${doc.replace(".md", "")}](docs/${doc})`).join("\n")}\n\n`
+            : ""
 
-    const catalogContent = grouped
-        .map(([key, list]) => {
-            const title = CATEGORIES[key]!.title
-            const description = CATEGORIES[key]!.description
-            const skillsList = list
-                .map((s) => {
-                    const desc = (s.metadata.description || "").trim()
-                    return `- **[${s.dirName}](${s.path})** — ${desc}`
-                })
-                .join("\n")
-            return `### ${title}\n\n${description}\n\n${skillsList}`
-        })
-        .join("\n\n")
+        const catalogContent = grouped
+            .map(([key, list]) => {
+                const title = CATEGORIES[key]!.title
+                const description = CATEGORIES[key]!.description
+                const skillsList = list
+                    .map((s) => {
+                        const desc = (s.metadata.description || "").trim()
+                        return `- **[${s.dirName}](${s.path})** — ${desc}`
+                    })
+                    .join("\n")
+                return `### ${title}\n\n${description}\n\n${skillsList}`
+            })
+            .join("\n\n")
 
-    const readme = `# Agent Skills
+        const readme = `# Agent Skills
 
 ${readmeBadge()}
 
@@ -165,39 +211,57 @@ ${docsContent}## Available Skills
 ${catalogContent}
 `
 
-    await fs.writeFile(README_FILE, readme.trimEnd() + "\n")
-    logTask("Updated README.md catalog.")
+        await fs.writeFile(README_FILE, readme.trimEnd() + "\n")
+        logTask("Updated README.md catalog.")
+    }
 
     // 3. skills.sh.json — display groupings for the skills.sh repo page.
-    const skillsSh = {
-        $schema: "https://skills.sh/schemas/skills.sh.schema.json",
-        notGrouped: "bottom",
-        groupings: grouped.map(([key, list]) => ({
-            title: CATEGORIES[key]!.title,
-            description: CATEGORIES[key]!.description,
-            skills: list.map((s) => s.dirName),
-        })),
+    if (!hasFilter) {
+        const skillsSh = {
+            $schema: "https://skills.sh/schemas/skills.sh.schema.json",
+            notGrouped: "bottom",
+            groupings: grouped.map(([key, list]) => ({
+                title: CATEGORIES[key]!.title,
+                description: CATEGORIES[key]!.description,
+                skills: list.map((s) => s.dirName),
+            })),
+        }
+        await fs.writeJson(SKILLS_SH_FILE, skillsSh, {spaces: 2})
+        logTask("Updated skills.sh.json groupings.")
     }
-    await fs.writeJson(SKILLS_SH_FILE, skillsSh, {spaces: 2})
-    logTask("Updated skills.sh.json groupings.")
 
     // 4. Zola dashboard content — mirror the category tree so the theme groups
     //    skills into collapsible sections automatically.
     await fs.ensureDir(DASHBOARD_CONTENT_DIR)
-    await fs.emptyDir(DASHBOARD_CONTENT_DIR)
-    await fs.writeFile(
-        path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
-        `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
-    )
+    if (!hasFilter) {
+        await fs.emptyDir(DASHBOARD_CONTENT_DIR)
+        await fs.writeFile(
+            path.join(DASHBOARD_CONTENT_DIR, "_index.md"),
+            `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
+        )
+    } else {
+        const skillsIndex = path.join(DASHBOARD_CONTENT_DIR, "_index.md")
+        if (!(await fs.pathExists(skillsIndex))) {
+            await fs.writeFile(
+                skillsIndex,
+                `+++\ntitle = "Skills Catalog"\nsort_by = "title"\ntemplate = "section.html"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n`
+            )
+        }
+    }
     let weight = 1
     for (const [key, list] of grouped) {
+        const filteredList = list.filter(shouldSyncSkill)
+        if (filteredList.length === 0) {
+            weight++
+            continue
+        }
         const catDir = path.join(DASHBOARD_CONTENT_DIR, key)
         await fs.ensureDir(catDir)
         await fs.writeFile(
             path.join(catDir, "_index.md"),
             `+++\ntitle = ${JSON.stringify(CATEGORIES[key]!.title)}\ndescription = ${JSON.stringify(CATEGORIES[key]!.description)}\nsort_by = "title"\ntemplate = "section.html"\nweight = ${weight++}\n+++\n`
         )
-        for (const s of list) {
+        for (const s of filteredList) {
             const skillSrcDir = path.join(SKILLS_DIR, key, s.dirName)
             const contentBase = `skills/${key}/${s.dirName}`
             const outDir = path.join(catDir, s.dirName)
@@ -266,24 +330,44 @@ ${body}
 
     // 5. Stage regenerated files.
     try {
-        execFileSync(
-            "git",
-            [
-                "add",
+        const filesToStage: string[] = []
+        if (hasFilter) {
+            for (const [key, list] of grouped) {
+                const filteredList = list.filter(shouldSyncSkill)
+                if (filteredList.length === 0) continue
+
+                if (skillFilter) {
+                    for (const s of filteredList) {
+                        filesToStage.push(
+                            path.join(DASHBOARD_CONTENT_DIR, key, s.dirName)
+                        )
+                    }
+                } else {
+                    filesToStage.push(path.join(DASHBOARD_CONTENT_DIR, key))
+                }
+            }
+        } else {
+            filesToStage.push(
                 AGENTS_FILE,
                 README_FILE,
                 SKILLS_SH_FILE,
-                DASHBOARD_CONTENT_DIR,
-            ],
-            {stdio: "inherit"}
-        )
-        logTask("Staged generated files to git.")
+                DASHBOARD_CONTENT_DIR
+            )
+        }
+
+        if (filesToStage.length > 0) {
+            execFileSync("git", ["add", ...filesToStage], {stdio: "inherit"})
+            logTask("Staged generated files to git.")
+        }
     } catch {
         log.warn("Could not stage changes to git (no repo or no changes).")
     }
 }
 
-export async function syncAction() {
+export async function syncAction(options?: {
+    category?: string
+    skill?: string
+}) {
     intro("Agent Skills Sync")
     const repoOnly = !!(
         process.env.PRE_COMMIT ||
@@ -300,7 +384,7 @@ export async function syncAction() {
             {label: "Tools", value: toolList(m.tools)},
         ])
     }
-    await sync()
+    await sync(options)
     outro(
         repoOnly
             ? "Done! Generated files regenerated."

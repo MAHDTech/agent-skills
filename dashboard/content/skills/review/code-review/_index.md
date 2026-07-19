@@ -23,7 +23,7 @@ Both axes run as **parallel sub-agents** so they don't pollute each other's cont
 
 This review leans on your project's own conventions — where issues and tickets live (the issue tracker), and where specs and standards docs are kept. If none of that is obvious from the repo itself, ask the user before you start rather than guessing.
 
-Run any repo command through the project's environment (in this repo, `devenv shell -- <cmd>`). The diff is read with `git`; fetch issues and pull requests with the `gh` CLI.
+Run any repo command through your project's environment and its own test/lint command wrapper (whatever this project uses). The diff is read with `git`; fetch issues and pull requests with the `gh` CLI.
 
 ## Process
 
@@ -48,7 +48,7 @@ Look for the originating spec, in this order:
 
 Anything in the repo that documents how code should be written — a `CONTRIBUTING.md`, an `AGENTS.md` or `CLAUDE.md`, a coding-standards doc, or the conventions the repo's tooling already encodes.
 
-On top of whatever the repo documents, the Standards axis always carries a **smell baseline** — a fixed set of common code smells that applies even when a repo documents nothing. It lives in [code-smells.md](@/skills/review/code-review/resources/code-smells.md). Two rules bind it:
+On top of whatever the repo documents, the Standards axis always carries a **smell baseline** — a fixed set of common code smells that applies even when a repo documents nothing. It lives in [code-smells.md](@/skills/review/code-review/resources/manual/code-smells.md). Two rules bind it:
 
 - **The repo overrides.** A documented repo convention always wins; where it endorses something the baseline would flag, suppress the smell.
 - **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"), never a hard violation — and, like any standard here, skip anything the repo's tooling already enforces.
@@ -60,7 +60,7 @@ Send a single message with two sub-agent calls — one Standards, one Spec — s
 **Standards sub-agent prompt** — include:
 
 - The full diff command and commit list.
-- The list of standards-source files you found in step 3, **plus the full contents of [code-smells.md](@/skills/review/code-review/resources/code-smells.md) pasted in** — the sub-agent has no other access to that baseline.
+- The list of standards-source files you found in step 3, **plus the full contents of [code-smells.md](@/skills/review/code-review/resources/manual/code-smells.md) pasted in** — the sub-agent has no other access to that baseline.
 - The brief: "Report — per file or hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file plus the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls — documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo convention overrides the baseline. Skip anything tooling enforces. Under 400 words."
 
 **Spec sub-agent prompt** — include:
@@ -91,7 +91,7 @@ Reporting them separately stops one axis from masking the other.
 `code-review` stands on its own, but it sits next to narrower passes worth reaching for:
 
 - `/pr-build-context` — gather high-signal context on a pull request before the review.
-- `/pr-build-context`, `/pr-create-test-plan`, `/pr-edge-cases` — build reviewer context on a branch, draft a manual test plan, or probe edge cases and failure modes.
+- `/pr-create-test-plan`, `/pr-edge-cases` — draft a manual test plan, or probe edge cases and failure modes on a branch.
 - `/diagnosing-bugs` — when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

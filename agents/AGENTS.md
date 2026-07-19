@@ -7,7 +7,6 @@ description: Single source of truth for agent instructions
 
 ## Engineering
 
-- **backlog-implement**: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
 - **characterization-tests**: Pin down the existing behaviour of untested or legacy code with characterization (golden-master / approval) tests before you change it, so refactors and upgrades stay safe. Use when you must modify, refactor, or upgrade code that has no tests, want to capture current behaviour as an oracle even where it looks wrong, or need a safety net before a risky change. Distinct from /tdd, which specifies new behaviour test-first; this tests around existing behaviour. Pairs with /sculpt-code and /upgrade-dependencies.
 - **codebase-design**: Shared vocabulary and principles for designing deep modules. Use when designing or improving a module's interface, hunting for deepening opportunities, deciding where a seam goes, making code more testable or easier for an agent to navigate, or when another skill needs the deep-module vocabulary.
 - **diagnosing-bugs**: A disciplined loop for hard bugs and performance regressions. Use when the user says debug or diagnose this, or reports something broken, throwing, failing, flaky, or slow. Insists on building a tight, red-capable feedback loop before hypothesising, then reproduces, minimises, ranks hypotheses, instruments, fixes with a regression test, and runs a post-mortem.
@@ -18,6 +17,7 @@ description: Single source of truth for agent instructions
 - **research**: Investigate a question against high-trust primary sources — official docs, source code, specs, first-party APIs — and capture the findings as a cited Markdown file in the repo. Use when you want a topic researched, docs or API facts gathered and verified, or the reading legwork delegated to a background agent while you keep working.
 - **sculpt-code**: Reshape code for readability, naming, structure, TODOs, and reduced surface area — and take on larger cleanups like removing engineering debt, untangling oversized modules, and collapsing duplicated logic — all without changing behaviour. Use when you want to clean up or refactor code, from a quick readability pass to a staged debt-reduction effort.
 - **spacetimedb**: Expert guidance for developing, publishing, and debugging SpacetimeDB database modules (in Rust, C#, TypeScript, C++) and connecting real-time clients. Use when asked to write SpacetimeDB table schemas, reducers, views, schedule/event tables, or when using the spacetime CLI, generating client SDK bindings, or implementing WebSocket subscriptions.
+- **tars-backlog-implement**: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
 - **tdd**: Test-driven development done red-green-refactor. Use when building a feature or fixing a bug test-first, writing integration tests, deciding what to test and where the test seams go, or avoiding brittle implementation-coupled tests. Covers what a good test is, the anti-patterns to avoid, and the rules of the red-green loop.
 - **upgrade-dependencies**: Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime — read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on /characterization-tests for the net and /diagnosing-bugs when an upgrade breaks something.
 
@@ -27,28 +27,28 @@ description: Single source of truth for agent instructions
 
 ## Planning
 
-- **backlog-audit**: Audit the codebase for bugs, features, security issues, or technical debt, and generate structured issue files in `.tars/issues/todo/`. Reach for this when requested to perform a codebase audit, search for bugs and tasks, or populate the backlog.
-- **backlog-create-issue**: Use when creating a new backlog issue/ticket in the `.tars/issues/todo/` directory, defining its YAML frontmatter, headings, tasks, acceptance criteria, evidence collection, and triage review expectations.
-- **backlog-loop**: Coordinate the full backlog lifecycle by sequentially executing backlog-audit, backlog-triage, and backlog-implement to resolve all issues. Reach for this when asked to run a full backlog loop, converge on a complete project goal, or manage the overall ticket pipeline.
-- **backlog-prepare**: Prepare to run the backlog-loop by cleaning up orphaned git worktrees and branches, and ensuring the working tree is clean. Reach for this to reset the environment before starting a full backlog loop.
-- **backlog-triage**: Triage pending backlog issues in `.tars/issues/todo/` to verify their accuracy, check for hallucinations, and add review notes. Reach for this when requested to triage tickets, verify backlog accuracy, or prepare issues for implementation.
 - **estimate-work**: Size and estimate a body of work to set expectations and sequence delivery — turn a plan or ticket set into defensible estimates with ranges, named assumptions, and surfaced risk instead of false-precise point numbers. Use when the user wants to estimate or size work, forecast how long something will take, choose between relative sizing and time-based estimates, calibrate against past delivery, or decide whether to spike before committing.
 - **grilling**: Interview the user relentlessly, one question at a time, to stress-test a plan or design before any code is written. Use when the user wants to pressure-test an approach, resolve open design decisions, or asks you to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the decision tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
 - **handoff**: Compact the current conversation into a handoff document for another agent to pick up.
 - **prioritize-backlog**: Groom and prioritise a backlog — order, cut, cluster, and sequence a pile of work by value against cost and risk so the next thing to do is obvious. Use when the user wants to prioritise or rank a backlog, decide what to build next, trim or triage a pile of ideas, apply a lens like value-vs-effort, RICE, or cost-of-delay/WSJF, or sequence work around dependencies.
-- **store-plan**: Capture the current conversation's plan, decisions, and action items into a structured markdown file in the project's plans/ directory. Triggers on "store this plan", "save this plan for later", "document this for later", "write up what we discussed", "create a plan file", or "/store-plan".
+- **store-plan**: Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's plans/ directory.
+- **tars-backlog-audit**: Audit the codebase for bugs, features, security issues, or technical debt, and generate structured issue files in `.tars/issues/todo/`. Reach for this when requested to perform a codebase audit, search for bugs and tasks, or populate the backlog.
+- **tars-backlog-create-issue**: Use when creating a new backlog issue/ticket in the `.tars/issues/todo/` directory, defining its YAML frontmatter, headings, tasks, acceptance criteria, evidence collection, and triage review expectations.
+- **tars-backlog-loop**: Coordinate the full backlog lifecycle by sequentially executing tars-backlog-audit, tars-backlog-triage, and tars-backlog-implement to resolve all issues. Reach for this when asked to run a full backlog loop, converge on a complete project goal, or manage the overall ticket pipeline.
+- **tars-backlog-prepare**: Prepare to run the tars-backlog-loop by cleaning up orphaned git worktrees and branches, and ensuring the working tree is clean. Reach for this to reset the environment before starting a full backlog loop.
+- **tars-backlog-triage**: Triage pending backlog issues in `.tars/issues/todo/` to verify their accuracy, check for hallucinations, and add review notes. Reach for this when requested to triage tickets, verify backlog accuracy, or prepare issues for implementation.
 - **to-spec**: Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker — no interview, just synthesis of what you have already discussed.
 - **to-tickets**: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker — as one file per ticket locally, or as native blocking links on a real tracker.
 - **wayfinder**: Plan a huge chunk of work — more than one agent session can hold — as a shared map of investigation tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.
 
 ## Review
 
-- **backlog-review**: Review the code implementation of a backlog ticket on a subagent branch, assessing compliance with spec/acceptance criteria and repo standards before merge. Reach for this during the implementation phase of the backlog loop.
 - **code-review**: Review the changes since a fixed point (a commit, branch, tag, or merge-base) along two axes — Standards, meaning does the code follow this repo's documented conventions plus a baseline of common code smells, and Spec, meaning does the code do what the originating issue, ticket, or PRD asked for. Runs both reviews as parallel sub-agents and reports them side by side without merging or reranking them. Use when the user wants to review a branch, a pull request, work-in-progress changes, or asks to review the diff since some point.
 - **pr-build-context**: Build high-signal context for a pull request before review — diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
 - **pr-create-test-plan**: Generate a manual test plan for a branch's changes — hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
 - **pr-edge-cases**: Review branch changes for test gaps, logic edge cases, failure modes, and integration risks. Use when you want the changes on a branch probed for what breaks — untested paths, boundary conditions, race conditions, and integration hazards — before merging.
 - **rfc-review**: Review an RFC or design doc for problem clarity (SCQA), compliance, security, and performance, and return the few most important issues. Use when reviewing someone's RFC or design proposal before it's approved.
+- **tars-backlog-review**: Review the code implementation of a backlog ticket on a subagent branch, assessing compliance with spec/acceptance criteria and repo standards before merge. Reach for this during the implementation phase of the backlog loop.
 
 ## GitHub
 
@@ -64,13 +64,13 @@ description: Single source of truth for agent instructions
 ## Reflection
 
 - **critical-thinking**: Analyze your own immediately preceding response with rigorous, skeptical critical thinking — surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
-- **scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done
+- **scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done — to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed.
 - **self-review**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 
 ## Writing
 
 - **proofread**: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
-- **simplify-docs**: Simplify documentation for clarity and readability with approval-gated edits
+- **simplify-docs**: Simplify documentation for clarity and readability with approval-gated edits. Use when asked to simplify, rewrite, restructure, or de-clutter a doc — README, setup guide, reference or technical documentation — so it scans faster and leads with the shortest successful path.
 
 ## Authoring
 
@@ -81,15 +81,15 @@ description: Single source of truth for agent instructions
 
 ## Tooling
 
-- **agent-guidelines**: Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use when asked to follow the guidelines or verify work against them.
+- **agent-guidelines**: Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use before and while implementing to avoid common LLM coding pitfalls — over-engineering, unrequested refactors, silent assumptions, and unverified changes.
 - **antigravity**: Provides a comprehensive guide, quick reference, and sitemap for Google Antigravity (AGY), including the Antigravity CLI (agy), Antigravity 2.0, Antigravity IDE, Python SDK, slash commands, keybindings, and customizations (skills, rules, MCP, sidecars). Activate this skill when the user asks questions about how to use, configure, or customize Antigravity, AGY, the agy CLI, the Antigravity IDE, or Antigravity 2.0.
 - **devenv**: Strict guidelines for using devenv for shell and dependency management. Use when a repo contains a devenv.nix or devenv.yaml file, or when running commands in a devenv environment.
 - **install-skills**: Install, update, and manage agent skills from a GitHub-hosted collection with the skills.sh CLI (`npx skills add <owner>/<repo>`), across every runtime the collection targets — Claude Code, OpenCode, Goose, and Antigravity CLI. Use when adding skills to an agent, updating a stale copy, verifying an install, wiring the same collection into another runtime, or troubleshooting a skill that will not show up or that collides by name.
 - **opencode**: This skill provides comprehensive guidance for using OpenCode, the open-source AI coding agent. Use this skill when working with OpenCode CLI commands, keyboard shortcuts, agents (build/plan), slash commands, tools, skills, MCP servers, or configuration. Automatically triggered when OpenCode-specific questions or tasks are detected.
-- **opencode-acp**: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
+- **opencode-acp**: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates. Use when driving OpenCode headless or programmatically over ACP — starting a session, sending prompts, resuming a prior session, or checking and triggering OpenCode updates.
 - **pagefind**: Use when configuring, indexing, or troubleshooting Pagefind static search for websites. Covers config options, CLI flags, and client integrations.
 - **prek**: Run pre-commit hooks using the prek CLI tool. Differentiates between 'pre-commit' (the git hooks concept/lifecycle stage) and 'prek' (the actual binary command). Use when you need to run, configure, check, or troubleshoot git pre-commit hooks.
-- **scratchpad**: Enforces the use of a "scratch/" directory for all temporary or experimental AI agent scripts. Ensures the directory is .gitignored and instructs agents to clean up after completion.
+- **scratchpad**: Keep one-off, experimental, or temporary scripts and files out of the source tree by writing them to a single, consistent session scratch location, then cleaning them up. Use when creating throwaway, experimental, or temporary scripts/files during a task.
 - **tailwind**: Use when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
 - **tauri**: Expert reference and development guidelines for Tauri v2+ cross-platform desktop and mobile apps. Use when the user mentions Tauri, src-tauri, tauri v2, tauri.conf.json, or capabilities.json, or asks to build, modify, or debug Tauri application settings, IPC commands, or capabilities.
 - **zola**: Expert reference and development guidelines for the Zola static site generator. Use when the user asks to modify, build, serve, or customize Zola sites, themes, templates, shortcodes, or Zola configuration files (such as config.toml).

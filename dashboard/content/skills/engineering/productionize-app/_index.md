@@ -10,15 +10,13 @@ mermaid = false
 +++
 
 
-# Productionize App Agent Rules
+# Productionize App
 
 When asked to productionize an application for deployment:
 
 ## Overview
 
-Transform development code into production-ready applications through systematic, methodical analysis, improvement, and deployment preparation. Supports multiple frameworks and deployment targets.
-
-**Quality Over Speed Mandate**: Take time to be thorough and comprehensive. Focus on quality implementation over rapid completion. This is production-critical work that requires careful attention to detail.
+Transform development code into production-ready applications through systematic analysis, improvement, and deployment preparation. Supports multiple frameworks and deployment targets.
 
 ## Usage Patterns
 
@@ -70,9 +68,7 @@ Transform development code into production-ready applications through systematic
 
 ### 3. **Implementation Phase**
 
-Execute improvements systematically with methodical attention to detail, updating TodoWrite progress frequently:
-
-**Quality Focus**: Each implementation step should be thorough and well-tested. Don't rush through tasks - take time to implement robust, production-grade solutions.
+Execute improvements systematically, updating your task-tracking tool as you go:
 
 #### **Configuration & Environment**
 
@@ -105,37 +101,7 @@ Execute improvements systematically with methodical attention to detail, updatin
 
 ### 4. **Framework-Specific Optimizations**
 
-#### **Flutter**
-
-- Implement SharedPreferences for persistent caching
-- Add proper error handling for network requests
-- Optimize widget rebuilds and state management
-- Add platform-specific configurations (iOS/Android)
-- Implement proper navigation and state restoration
-
-#### **React/Next.js**
-
-- Implement proper state management (Redux, Zustand, Context)
-- Add error boundaries and suspense loading
-- Optimize bundle size and code splitting
-- Implement proper caching (SWR, React Query)
-- Add SEO and meta tag optimizations
-
-#### **Node.js**
-
-- Add proper middleware for error handling and logging
-- Implement rate limiting and security headers
-- Optimize database queries and connections
-- Add health checks and monitoring endpoints
-- Implement proper environment configuration
-
-#### **Python**
-
-- Add proper error handling and logging
-- Implement caching (Redis, in-memory)
-- Optimize database queries and ORM usage
-- Add input validation and sanitization
-- Implement proper testing and CI/CD
+Apply the checklist for the detected framework (Flutter, React/Next.js, Node.js, Python) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#framework-specific-optimizations).
 
 ### 5. **Documentation Phase**
 
@@ -188,37 +154,7 @@ _Brief compelling description with value proposition_
 
 ### 6. **Deployment Preparation Phase**
 
-#### **TestFlight (iOS)**
-
-- Verify App Store Connect configurations
-- Test provisioning profiles and certificates
-- Validate Info.plist settings
-- Create build and upload scripts
-- Prepare app description and screenshots
-
-#### **Google Play (Android)**
-
-- Configure Play Console settings
-- Test signing configurations
-- Validate manifest permissions
-- Create release notes and store listing
-- Test different device configurations
-
-#### **Web Deployment (Vercel/Netlify/AWS)**
-
-- Configure build scripts and environment variables
-- Set up domain and SSL certificates
-- Test deployment pipeline
-- Configure CDN and caching headers
-- Set up monitoring and analytics
-
-#### **Container Deployment (Docker/Kubernetes)**
-
-- Create optimized Dockerfiles
-- Configure health checks and resource limits
-- Set up environment variable management
-- Test scaling and load balancing
-- Configure logging and monitoring
+Apply the checklist for the chosen deployment target (TestFlight, Google Play, Web, or Container) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#deployment-preparation).
 
 ### 7. **Quality Assurance Checklist**
 
@@ -233,7 +169,7 @@ Before marking productionization complete:
 - [ ] Deployment process is tested and reliable
 - [ ] Monitoring and logging are configured
 - [ ] User experience is polished and accessible
-- [ ] All TodoWrite tasks are completed
+- [ ] All tracked checklist tasks are completed
 
 ### 8. **Proactive Question Analysis & Next Steps**
 
@@ -290,17 +226,13 @@ Auto-detect framework based on:
 
 ### 10. **Best Practices**
 
-- **Use TodoWrite religiously** - Track every phase and task with granular detail
-- **Quality over speed mentality** - Take time to implement robust solutions rather than rushing through tasks
-- **Be methodically systematic** - Don't skip phases even if they seem obvious; thoroughness is critical
+- **Track the checklist** - Record every phase and task in your task-tracking tool with granular detail
 - **Breadth AND depth analysis** - Always consider broader architectural implications beyond immediate scope
 - **Document decisions comprehensively** - Explain why certain production choices were made with context for future maintainers
 - **Proactive questioning** - Always identify what the user should have asked but didn't
 - **Test deployment rigorously** - Verify the deployment process works before completion
-- **Focus on real-world user experience** - Production means real users with real problems will interact with this
 - **Plan for scale and failure** - Consider what happens when usage grows AND when things break
-- **Security first mindset** - Never compromise on security for convenience
-- **Measure twice, deploy once** - Thorough testing and validation prevents production issues
+- **Security first** - Never compromise on security for convenience
 - **Always provide actionable next steps** - Give users concrete, prioritized actions to take post-productionization
 
 ### 11. **Success Criteria**
@@ -320,13 +252,11 @@ The application is production-ready when:
 
 ## Notes
 
-- **Methodical thoroughness is paramount** - Take time to be comprehensive rather than rushing through tasks
-- Always adapt to the specific framework and deployment target with deep domain expertise
+- Always adapt to the specific framework and deployment target
 - Prioritize based on the application's critical user flows and real-world usage patterns
 - Focus on production concerns, not development convenience
 - Document architectural decisions comprehensively for future maintainers
 - Test the complete user journey, not just individual features
 - **Always conclude with proactive question analysis and actionable next steps** - This is not optional
 - Consider broader architectural implications and related systems impact
-- Quality over speed - production readiness cannot be rushed
 

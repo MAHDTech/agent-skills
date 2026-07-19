@@ -14,6 +14,8 @@ mermaid = false
 
 A backlog is a pile until it's groomed. Grooming turns the pile into an ordered queue whose **top is unambiguously the next thing to do** — ordered by **value** against **cost** and **risk**, low-value items cut, and no blocker ever sitting above the work it gates.
 
+This is generic backlog **grooming** — ranking any pile of work (ideas, features, tickets) by value, whatever tracker it lives in. It does **not** touch the `.tars/issues/` backlog that the `/backlog-*` skills automate; that is a separate ticket pipeline, not the pile you groom here.
+
 ## Prepare the items
 
 Pull every candidate into one list. Each item is a discrete unit of **value** — an outcome someone wants, not a task ("users can reset their password", not "add a reset endpoint"). Split anything too big to compare against its neighbours; merge slivers that only deliver together.

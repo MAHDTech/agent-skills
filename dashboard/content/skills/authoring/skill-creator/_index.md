@@ -14,7 +14,7 @@ mermaid = false
 
 A skill exists to wrangle determinism out of a stochastic system. **Predictability** — the agent taking the same _process_ every run, not producing the same output — is the root virtue; every convention below serves it. Write the skill so the next run behaves like the last one.
 
-**Bold terms** are defined in [`GLOSSARY.md`](@/skills/authoring/skill-creator/resources/GLOSSARY.md); look them up there for the full meaning.
+**Bold terms** are defined in [`GLOSSARY.md`](@/skills/authoring/skill-creator/resources/manual/GLOSSARY.md); look them up there for the full meaning.
 
 ## Where a skill lives
 
@@ -24,17 +24,17 @@ Every skill is a directory holding a `SKILL.md`, placed by what it does:
 skills/<category>/<name>/SKILL.md
 ```
 
-- **`<category>`** is one of the eight topic buckets: `engineering`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Category comes from the directory — never from a frontmatter key.
+- **`<category>`** is one of the nine topic buckets: `engineering`, `game-development`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Category comes from the directory — never from a frontmatter key.
 - Two **lifecycle buckets** sit outside the topic tree: `in-progress/` holds drafts, and `deprecated/` holds retired skills.
 
-**Promotion** is the payoff of living in a topic bucket: only skills under the eight categories appear in the generated README and index. A skill in `in-progress/` or `deprecated/` is deliberately excluded — move it into a topic bucket to promote it, move it to `deprecated/` to retire it.
+**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README and index. A skill in `in-progress/` or `deprecated/` is deliberately excluded — move it into a topic bucket to promote it, move it to `deprecated/` to retire it.
 
 ## Naming
 
 The name is prefix-free kebab-case, and it must equal the directory basename (`skills/writing/proofread/` is named `proofread`).
 
 - **Verb-first for an action** the skill performs (`sculpt-code`, `git-resolve-conflicts`); **a noun for a body of knowledge** it holds (`tdd`, `agent-guidelines`).
-- **Keep only a genuine subject scope** as a prefix — `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on. Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
+- **Keep only a genuine subject scope** as a prefix — `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on; a project or subsystem name is a genuine scope too (`tars-` for the `.tars` backlog tooling, so `tars-backlog-*` is correct). Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
 - 1–64 characters, and it must not contain "anthropic" or "claude".
 
 ## Canonical frontmatter
@@ -52,10 +52,11 @@ description: What the skill does AND when to reach for it, in the user's own wor
 
 - **`disable-model-invocation: true`** — makes the skill **user-invoked** (see below).
 - **`argument-hint`** — a short usage hint for a skill that takes an argument.
-- **`context: fork`** with **`agent: general-purpose`** — runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
+- **`context: fork`** with **`agent: <type>`** (used together, e.g. `agent: general-purpose`) — runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
 - **`metadata:`** — a flat string→string map for provenance. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`).
+- **`resources:`** — a YAML **list** of source URLs. It is functional, not decorative: `skills --action download-resources` reads it (see `bin/skills/downloader.ts`) to (re)fetch the vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and many reference skills rely on it. Keep it intact; never strip it.
 
-Set the category by the directory and the frontmatter stays this small. Do **not** add a `custom:` block, nor `triggers:`, `category:`, or `type:` keys — earlier skills carry these mid-migration; a new or edited skill drops them and puts triggers into the `description` prose instead.
+That is the complete allowed set, so the frontmatter stays small. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` — forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.
 
 ## Invocation
 
@@ -82,13 +83,17 @@ A skill's content is ranked by how immediately the agent needs it — the **info
 2. **In-skill reference** — a definition, rule, or fact in `SKILL.md`, consulted on demand. Often a flat peer-set (every rule of a review on one rung), which is a fine arrangement, not a smell.
 3. **External reference** — reference pushed out of `SKILL.md` into a sibling file, reached by a **context pointer** and loaded only when the pointer fires (this skill discloses its definitions to `GLOSSARY.md`).
 
-**Progressive disclosure** is the move down the ladder — out of `SKILL.md` into a linked file — so the top stays legible. Siblings live beside `SKILL.md`:
+**Progressive disclosure** is the move down the ladder — out of `SKILL.md` into a linked file — so the top stays legible. Siblings live beside `SKILL.md` under `resources/`, which splits by ownership:
 
 ```text
 skills/<category>/<name>/
-  SKILL.md        # entry point — steps and top-tier reference
-  resources/      # optional: unified directory for scripts, docs, references, and static files
+  SKILL.md          # entry point — steps and top-tier reference
+  resources/        # optional; holds ONLY these two subdirectories:
+    auto/           # downloader-owned — (re)fetched from the `resources:` URLs; never hand-edit
+    manual/         # hand-authored scripts, docs, references, and static files
 ```
+
+Never place a file directly in `resources/`: every resource lives under `auto/` (managed by `download-resources`, safe to wipe and reproduce) or `manual/` (yours, tooling never touches it). `skills --action lint` enforces this, and `clean-resources` deletes only `auto/`.
 
 **Branching** is the disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A pointer's _wording_, not its target, decides when and how reliably the agent follows it — a must-have behind a weak pointer is a variance bug, so sharpen the wording before pulling material back inline.
 
@@ -112,6 +117,10 @@ Hunt for restatements a leading word retires: a triad spelled out three times, o
 ## Prompt the positive
 
 State the target behaviour, not the banned one. **Negation** backfires: _don't think of an elephant_ names the elephant and makes it more available. Describe what to do ("write one-line comments") so the forbidden pattern is never spoken. Keep a prohibition only as a hard guardrail you cannot phrase positively — and even then pair it with the positive target.
+
+## Stay host-agnostic
+
+A skill runs across multiple agent runtimes — Claude Code, OpenCode, Goose, Antigravity CLI — so it must bind to no single host's tooling. Name the **capability**, not the product: "your task-tracking tool", "your agent's subagent mechanism", never one runtime's command, tool name, or built-in. Never bake in a personal or absolute path; keep paths repo-relative. A skill that reads the same on every host stays predictable on every host.
 
 ## When to split
 

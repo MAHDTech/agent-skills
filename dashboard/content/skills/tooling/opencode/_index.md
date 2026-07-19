@@ -274,7 +274,7 @@ Use `--continue` or `-c` to resume previous sessions and maintain context.
 
 ## References
 
-For the complete CLI reference, tool and permission details, and agent configuration, see the official OpenCode documentation at [docs.md](@/skills/tooling/opencode/resources/docs.md).
+For the complete CLI reference, tool and permission details, and agent configuration, see the official OpenCode documentation at [docs.md](@/skills/tooling/opencode/resources/auto/docs.md).
 
 **See also:** `/opencode-acp` — drive OpenCode programmatically over the Agent Client Protocol (ACP) instead of through the interactive CLI.
 

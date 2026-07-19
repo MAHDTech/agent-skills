@@ -46,5 +46,6 @@ When the uncertainty is too large to estimate — you can't even bound the range
 ## Handoffs
 
 - Estimating a plan or ticket set? Size each slice as you cut it with `/to-tickets` — buildable slices are the natural estimation unit.
+- Sizing is not ranking: this skill sizes the work, `/prioritize-backlog` orders it by value against cost. Estimate, then prioritise.
 - When a body of work is too foggy to decompose or size at all, it isn't an estimate but an investigation; chart it with `/wayfinder`.
 

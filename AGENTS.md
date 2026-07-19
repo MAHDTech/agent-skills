@@ -10,7 +10,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 - Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
-- Sibling directories under a skill's path (`skills/<category>/<name>/`) must use a unified `resources/` directory for any additional scripts, documentation, static assets, or reference files.
+- Additional scripts, documentation, static assets, or reference files live under a skill's `resources/` directory, split by ownership into exactly two subdirectories: `resources/auto/` (downloader-owned — (re)fetched from the skill's `resources:` frontmatter URLs by `skills --action download-resources`, safe to wipe; `clean-resources` removes only this) and `resources/manual/` (hand-authored; tooling never touches it). No files may sit directly in `resources/`; lint enforces this.
 - **CRITICAL LINKING RULE:** Never use absolute `file:///` URLs referencing local paths (e.g., `file:///home/...`). Always use relative paths for links referencing files within the repository (e.g., `../../tooling/prek/SKILL.md`). This ensures paths do not leak local user directories and resolve correctly in CI and other environments.
 - Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details. Note that skills do not need to be published to the npm registry; the installer CLI fetches them directly from this GitHub repository.
 
@@ -31,71 +31,6 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Behaviour
 
-Behavioural guidelines to reduce common LLM coding mistakes.
+Follow the behavioural guidelines that reduce common LLM coding mistakes: think before coding (surface assumptions and tradeoffs instead of guessing), keep changes simple and surgical (minimum code, touch only what the request needs), and drive every task to a verified success criterion. They bias toward caution over speed — for trivial tasks, use judgment.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-### 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-### 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-
-### 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
-
-### 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-
-```text
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to over-complication, and clarifying questions come before implementation rather than after mistakes.
+The canonical, full version lives in the `agent-guidelines` skill: [skills/tooling/agent-guidelines/SKILL.md](skills/tooling/agent-guidelines/SKILL.md). Keep that file as the source of truth; this section is only a summary.

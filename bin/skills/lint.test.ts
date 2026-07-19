@@ -1,5 +1,8 @@
-import {describe, it, expect} from "bun:test"
-import {checkDuplicateSkills} from "./lint.ts"
+import {describe, it, expect, afterEach} from "bun:test"
+import fs from "fs-extra"
+import path from "path"
+import os from "os"
+import {checkDuplicateSkills, checkResourcesLayout} from "./lint.ts"
 import type {Skill} from "./lib.ts"
 
 describe("checkDuplicateSkills", () => {
@@ -88,5 +91,47 @@ describe("checkDuplicateSkills", () => {
         expect(result.warnings[0]).toContain(
             "Duplicate skill name 'duplicate-skill' detected in lifecycle/promoted categories"
         )
+    })
+})
+
+describe("checkResourcesLayout", () => {
+    const tmp = path.join(
+        os.tmpdir(),
+        `agent-skills-lint-resources-test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    )
+
+    afterEach(async () => {
+        await fs.remove(tmp)
+    })
+
+    it("returns no errors when resources/ does not exist", async () => {
+        const errors = await checkResourcesLayout(path.join(tmp, "resources"))
+        expect(errors).toEqual([])
+    })
+
+    it("returns no errors for a valid auto/ + manual/ layout", async () => {
+        const resDir = path.join(tmp, "resources")
+        await fs.ensureDir(path.join(resDir, "auto"))
+        await fs.ensureDir(path.join(resDir, "manual"))
+        expect(await checkResourcesLayout(resDir)).toEqual([])
+    })
+
+    it("flags a bare file placed directly in resources/", async () => {
+        const resDir = path.join(tmp, "resources")
+        await fs.ensureDir(path.join(resDir, "auto"))
+        await fs.writeFile(path.join(resDir, "stray.md"), "x")
+        const errors = await checkResourcesLayout(resDir)
+        expect(errors).toHaveLength(1)
+        expect(errors[0]).toContain("must not contain files directly")
+        expect(errors[0]).toContain("stray.md")
+    })
+
+    it("flags a disallowed subdirectory under resources/", async () => {
+        const resDir = path.join(tmp, "resources")
+        await fs.ensureDir(path.join(resDir, "docs"))
+        const errors = await checkResourcesLayout(resDir)
+        expect(errors).toHaveLength(1)
+        expect(errors[0]).toContain("only contain 'auto/' and 'manual/'")
+        expect(errors[0]).toContain("docs/")
     })
 })

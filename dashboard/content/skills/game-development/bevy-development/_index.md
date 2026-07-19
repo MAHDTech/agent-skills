@@ -32,7 +32,7 @@ these snippets. The migration cheat sheet below covers the churn since ~0.14.
 
 Load these for depth:
 
-- `resources/learn-migration-guides.md` — Bevy migration guides and release notes.
+- `resources/auto/learn-migration-guides.md` — Bevy migration guides and release notes.
 
 ## Migration Cheat Sheet (older Bevy -> 0.19)
 
@@ -169,7 +169,7 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>) {
 struct Scored(u32);
 ```
 
-## 6. Performance Patterns
+## 5. Performance Patterns
 
 - **Parallel iteration:** for large independent workloads, use `par_iter_mut()`.
 - **SparseSet storage:** for frequently added/removed components (buffs, statuses) —
@@ -187,7 +187,7 @@ fn parallel_update(mut query: Query<(&mut Transform, &Velocity)>) {
 }
 ```
 
-## 7. Developer Commands
+## 6. Developer Commands
 
 ```bash
 # Fast iterative dev builds via dynamic linking (much faster incremental compiles).
@@ -207,7 +207,7 @@ cargo run --release
 | Find deprecated bundle usage        | `grep -rn "Bundle" src/ --include="*.rs"`                                        |
 | Find deprecated Time calls          | `grep -rn "delta_seconds\|elapsed_seconds" src/ --include="*.rs"`                |
 
-## 8. Best Practices
+## 7. Best Practices
 
 - **Do:** access singletons with `Res<T>` rather than `ResMut<T>` unless you mutate —
   read-only access lets the scheduler run more systems concurrently.

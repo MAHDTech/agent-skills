@@ -98,7 +98,7 @@ describe("downloader unit tests", () => {
         // Verify the file was downloaded, converted to markdown (not saved as raw HTML)
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
         // The downloaded index and its linked resources should be saved
@@ -154,6 +154,55 @@ describe("downloader unit tests", () => {
         await expect(downloadAction(mockSkills, fakeRepo)).rejects.toThrow(
             "Download resources failed: 1 file(s) failed to download."
         )
+    })
+
+    it("should skip dead links discovered from an llms.txt index without failing the run", async () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/test-skill/SKILL.md",
+                dirName: "test-skill",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "test-skill",
+                    description: "Test skill description",
+                    resources: ["https://example.com/llms.txt"],
+                },
+                content: "",
+            },
+        ]
+
+        globalThis.fetch = mock(async (url: any) => {
+            const urlStr = String(url)
+            if (urlStr.endsWith("/llms.txt")) {
+                return new Response(
+                    `- [good](https://example.com/good)\n- [dead](https://example.com/dead)`,
+                    {status: 200, headers: {"content-type": "text/plain"}}
+                )
+            }
+            if (urlStr.endsWith("/dead")) {
+                // A link the upstream index still lists but that now 404s
+                return new Response("Not Found", {
+                    status: 404,
+                    headers: {"content-type": "text/plain"},
+                })
+            }
+            return new Response(
+                "# Good page\nThis is a good page with plenty of content to pass the fifty byte minimum size check.",
+                {status: 200, headers: {"content-type": "text/markdown"}}
+            )
+        }) as any
+
+        // Must NOT throw despite the dead discovered child link
+        await downloadAction(mockSkills, fakeRepo)
+
+        const autoDir = path.join(
+            fakeRepo,
+            "skills/engineering/test-skill/resources/auto"
+        )
+        const files = await fs.readdir(autoDir)
+        expect(files).toContain("good.md")
+        expect(files).not.toContain("dead.md")
     })
 
     describe("getDomainPrefix unit tests", () => {
@@ -254,7 +303,7 @@ describe("downloader unit tests", () => {
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
 
@@ -301,7 +350,7 @@ describe("downloader unit tests", () => {
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
 
@@ -347,7 +396,7 @@ Do not change [absolute](https://github.com/docs) or [anchor](#section).`,
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const fileContent = await fs.readFile(
             path.join(resourcesDir, "docs-page.md"),
@@ -412,7 +461,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const fileContent = await fs.readFile(
             path.join(resourcesDir, "rfds-v2-overview.md"),
@@ -493,6 +542,273 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
             expect(() => checkPathTraversal(resourcesDir, filename)).toThrow(
                 "Path traversal detected"
             )
+        })
+    })
+
+    describe("downloadAction and cleanAction configuration and filtering", () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/skill-a/SKILL.md",
+                dirName: "skill-a",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "skill-a",
+                    description: "Skill A description",
+                    resources: ["https://example.com/a.txt"],
+                },
+                content: "",
+            },
+            {
+                path: "skills/tooling/skill-b/SKILL.md",
+                dirName: "skill-b-dir",
+                category: "tooling",
+                promoted: false,
+                metadata: {
+                    name: "skill-b-name",
+                    description: "Skill B description",
+                    resources: ["https://example.com/b.txt"],
+                },
+                content: "",
+            },
+        ]
+
+        beforeEach(async () => {
+            globalThis.fetch = mock(async () => {
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+        })
+
+        it("should filter by skill name (dirName or metadata.name) in downloadAction", async () => {
+            // Filter by dirName
+            await downloadAction(mockSkills, fakeRepo, {skill: "skill-a"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/auto/a.txt"
+                    )
+                )
+            ).toBe(true)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/auto/b.txt"
+                    )
+                )
+            ).toBe(false)
+
+            // Cleanup
+            await fs.remove(path.join(fakeRepo, "skills"))
+
+            // Filter by metadata.name
+            await downloadAction(mockSkills, fakeRepo, {skill: "skill-b-name"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/auto/a.txt"
+                    )
+                )
+            ).toBe(false)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/auto/b.txt"
+                    )
+                )
+            ).toBe(true)
+        })
+
+        it("should filter by category in downloadAction", async () => {
+            await downloadAction(mockSkills, fakeRepo, {category: "tooling"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/auto/a.txt"
+                    )
+                )
+            ).toBe(false)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/auto/b.txt"
+                    )
+                )
+            ).toBe(true)
+        })
+
+        it("should filter by skill name and category in cleanAction", async () => {
+            // Create resources/auto dirs first (cleanAction removes only auto/)
+            const dirA = path.join(
+                fakeRepo,
+                "skills/engineering/skill-a/resources/auto"
+            )
+            const dirB = path.join(
+                fakeRepo,
+                "skills/tooling/skill-b/resources/auto"
+            )
+            await fs.ensureDir(dirA)
+            await fs.ensureDir(dirB)
+
+            // Clean only skill-a
+            const {cleanAction} = await import("./downloader.ts")
+            await cleanAction(mockSkills, fakeRepo, {skill: "skill-a"})
+            expect(await fs.pathExists(dirA)).toBe(false)
+            expect(await fs.pathExists(dirB)).toBe(true)
+
+            // Reset and Clean only category tooling
+            await fs.ensureDir(dirA)
+            await cleanAction(mockSkills, fakeRepo, {category: "tooling"})
+            expect(await fs.pathExists(dirA)).toBe(true)
+            expect(await fs.pathExists(dirB)).toBe(false)
+        })
+
+        it("should propagate custom timeout to fetch signal", async () => {
+            let capturedTimeoutSignal
+            globalThis.fetch = mock(async (_url, init) => {
+                capturedTimeoutSignal = init?.signal
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+
+            await downloadAction(mockSkills, fakeRepo, {
+                skill: "skill-a",
+                timeout: 45,
+            })
+            expect(capturedTimeoutSignal).toBeDefined()
+
+            const {download} = await import("./downloader.ts")
+            const originalAbortSignalTimeout = AbortSignal.timeout
+            let passedTimeoutMs = 0
+            AbortSignal.timeout = (ms) => {
+                passedTimeoutMs = ms
+                return originalAbortSignalTimeout(ms)
+            }
+            try {
+                await download("https://example.com/a.txt", 45)
+            } catch {
+                // ignore
+            } finally {
+                AbortSignal.timeout = originalAbortSignalTimeout
+            }
+            expect(passedTimeoutMs).toBe(45000)
+        })
+
+        it("should respect custom concurrency limit", async () => {
+            const manyResourcesSkill = [
+                {
+                    path: "skills/engineering/skill-many/SKILL.md",
+                    dirName: "skill-many",
+                    category: "engineering",
+                    promoted: false,
+                    metadata: {
+                        name: "skill-many",
+                        description: "Many resources",
+                        resources: [
+                            "https://example.com/1.txt",
+                            "https://example.com/2.txt",
+                            "https://example.com/3.txt",
+                            "https://example.com/4.txt",
+                            "https://example.com/5.txt",
+                        ],
+                    },
+                    content: "",
+                },
+            ]
+
+            let activeConnections = 0
+            let maxActiveConnections = 0
+
+            globalThis.fetch = mock(async () => {
+                activeConnections++
+                maxActiveConnections = Math.max(
+                    maxActiveConnections,
+                    activeConnections
+                )
+                await new Promise((r) => setTimeout(r, 10))
+                activeConnections--
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+
+            await downloadAction(manyResourcesSkill, fakeRepo, {concurrency: 2})
+            expect(maxActiveConnections).toBeLessThanOrEqual(2)
+
+            maxActiveConnections = 0
+            activeConnections = 0
+            await downloadAction(manyResourcesSkill, fakeRepo, {concurrency: 1})
+            expect(maxActiveConnections).toBe(1)
+        })
+
+        it("should remove resources/auto (self-healing) and keep resources/manual when a skill has no configured resources", async () => {
+            const base = "skills/engineering/skill-empty"
+            const autoDir = path.join(fakeRepo, base, "resources/auto")
+            const manualDir = path.join(fakeRepo, base, "resources/manual")
+            await fs.ensureDir(autoDir)
+            await fs.ensureDir(manualDir)
+            await fs.writeFile(path.join(autoDir, "stale.md"), "old downloaded")
+            await fs.writeFile(path.join(manualDir, "keep.md"), "hand-authored")
+
+            const emptySkill = [
+                {
+                    path: `${base}/SKILL.md`,
+                    dirName: "skill-empty",
+                    category: "engineering",
+                    promoted: false,
+                    metadata: {
+                        name: "skill-empty",
+                        description: "No configured resources",
+                        resources: [],
+                    },
+                    content: "",
+                },
+            ]
+
+            await downloadAction(emptySkill, fakeRepo)
+
+            expect(await fs.pathExists(autoDir)).toBe(false)
+            expect(await fs.pathExists(path.join(manualDir, "keep.md"))).toBe(
+                true
+            )
+        })
+
+        it("should remove only resources/auto and preserve resources/manual in cleanAction", async () => {
+            const base = "skills/engineering/skill-a"
+            const autoDir = path.join(fakeRepo, base, "resources/auto")
+            const manualDir = path.join(fakeRepo, base, "resources/manual")
+            await fs.ensureDir(autoDir)
+            await fs.ensureDir(manualDir)
+            await fs.writeFile(path.join(autoDir, "downloaded.md"), "x")
+            await fs.writeFile(path.join(manualDir, "authored.md"), "y")
+
+            const {cleanAction} = await import("./downloader.ts")
+            await cleanAction(mockSkills, fakeRepo, {skill: "skill-a"})
+
+            expect(await fs.pathExists(autoDir)).toBe(false)
+            expect(
+                await fs.pathExists(path.join(manualDir, "authored.md"))
+            ).toBe(true)
         })
     })
 })
