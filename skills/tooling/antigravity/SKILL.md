@@ -18,13 +18,13 @@ Use this skill when:
 
 ## Execution Rules
 
-1. **Locate the target topic**: Read the entry documentation file at [resources/docs-home.md](resources/docs-home.md) using `view_file` to find the exact filename and relative path of the documentation covering your query.
-2. **Read target document**: Open the corresponding markdown file in `resources/` to retrieve the primary source material.
+1. **Locate the target topic**: Read the entry documentation file at [resources/auto/docs-home.md](resources/auto/docs-home.md) using `view_file` to find the exact filename and relative path of the documentation covering your query.
+2. **Read target document**: Open the corresponding markdown file in `resources/auto/` to retrieve the primary source material.
 
 ## Completion Criteria
 
 The research task is complete when:
 
-1. The target documentation file identified from [resources/docs-home.md](resources/docs-home.md) has been read directly via `view_file` to answer the query.
+1. The target documentation file identified from [resources/auto/docs-home.md](resources/auto/docs-home.md) has been read directly via `view_file` to answer the query.
 2. Verified facts, CLI commands, parameters, or schemas match the official text exactly.
 3. Every cited fact is linked back to the user with a clickable link pointing to the specific documentation file.

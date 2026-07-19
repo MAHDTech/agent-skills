@@ -71,7 +71,7 @@ Examples:
 
 ## Plan Format and Example
 
-The full document structure (section by section), the formatting rules (status circles, no tables, headings, code references), and a complete worked example live in [resources/plan-format.md](@/skills/planning/store-plan/resources/plan-format.md).
+The full document structure (section by section), the formatting rules (status circles, no tables, headings, code references), and a complete worked example live in [resources/manual/plan-format.md](@/skills/planning/store-plan/resources/manual/plan-format.md).
 
 Read that file and follow its format when generating the plan. In short: lead with a ToC and an italic tl;dr, then include only the sections that have real content — Context, Decisions Made, Plan Overview, Action Items (grouped by P0/P1/P2), per-phase detail, Risks & Open Questions, and References. Use colored status circles as list indicators and structured lists instead of Markdown tables.
 

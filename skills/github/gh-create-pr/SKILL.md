@@ -11,7 +11,7 @@ resources:
 
 # Quick PR Description
 
-Consult the [gh pr manual](resources/manual-gh_pr.md) for more details.
+Consult the [gh pr manual](resources/auto/manual-gh_pr.md) for more details.
 
 Generate a concise PR description by analyzing the diff against a base branch.
 
@@ -198,7 +198,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 
 ## GitHub Admonitions
 
-Use [GitHub admonitions](resources/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default — only when one of the situations below applies.
+Use [GitHub admonitions](resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default — only when one of the situations below applies.
 
 **Syntax:**
 

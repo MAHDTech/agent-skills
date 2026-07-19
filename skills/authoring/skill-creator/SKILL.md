@@ -10,7 +10,7 @@ metadata:
 
 A skill exists to wrangle determinism out of a stochastic system. **Predictability** — the agent taking the same _process_ every run, not producing the same output — is the root virtue; every convention below serves it. Write the skill so the next run behaves like the last one.
 
-**Bold terms** are defined in [`GLOSSARY.md`](resources/GLOSSARY.md); look them up there for the full meaning.
+**Bold terms** are defined in [`GLOSSARY.md`](resources/manual/GLOSSARY.md); look them up there for the full meaning.
 
 ## Where a skill lives
 
@@ -50,7 +50,7 @@ description: What the skill does AND when to reach for it, in the user's own wor
 - **`argument-hint`** — a short usage hint for a skill that takes an argument.
 - **`context: fork`** with **`agent: <type>`** (used together, e.g. `agent: general-purpose`) — runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
 - **`metadata:`** — a flat string→string map for provenance. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`).
-- **`resources:`** — a YAML **list** of source URLs. It is functional, not decorative: `skills --action download-resources` reads it (see `bin/skills/downloader.ts`) to (re)fetch the vendored docs into the skill's `resources/` directory, and many reference skills rely on it. Keep it intact; never strip it.
+- **`resources:`** — a YAML **list** of source URLs. It is functional, not decorative: `skills --action download-resources` reads it (see `bin/skills/downloader.ts`) to (re)fetch the vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and many reference skills rely on it. Keep it intact; never strip it.
 
 That is the complete allowed set, so the frontmatter stays small. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` — forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.
 
@@ -79,13 +79,17 @@ A skill's content is ranked by how immediately the agent needs it — the **info
 2. **In-skill reference** — a definition, rule, or fact in `SKILL.md`, consulted on demand. Often a flat peer-set (every rule of a review on one rung), which is a fine arrangement, not a smell.
 3. **External reference** — reference pushed out of `SKILL.md` into a sibling file, reached by a **context pointer** and loaded only when the pointer fires (this skill discloses its definitions to `GLOSSARY.md`).
 
-**Progressive disclosure** is the move down the ladder — out of `SKILL.md` into a linked file — so the top stays legible. Siblings live beside `SKILL.md`:
+**Progressive disclosure** is the move down the ladder — out of `SKILL.md` into a linked file — so the top stays legible. Siblings live beside `SKILL.md` under `resources/`, which splits by ownership:
 
 ```text
 skills/<category>/<name>/
-  SKILL.md        # entry point — steps and top-tier reference
-  resources/      # optional: unified directory for scripts, docs, references, and static files
+  SKILL.md          # entry point — steps and top-tier reference
+  resources/        # optional; holds ONLY these two subdirectories:
+    auto/           # downloader-owned — (re)fetched from the `resources:` URLs; never hand-edit
+    manual/         # hand-authored scripts, docs, references, and static files
 ```
+
+Never place a file directly in `resources/`: every resource lives under `auto/` (managed by `download-resources`, safe to wipe and reproduce) or `manual/` (yours, tooling never touches it). `skills --action lint` enforces this, and `clean-resources` deletes only `auto/`.
 
 **Branching** is the disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A pointer's _wording_, not its target, decides when and how reliably the agent follows it — a must-have behind a weak pointer is a variance bug, so sharpen the wording before pulling material back inline.
 

@@ -18,7 +18,7 @@ For the deep-module vocabulary that governs where seams go, run `/codebase-desig
 
 Tests verify behaviour through public interfaces, not implementation details. Code can change entirely; tests should not. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists — and survives refactors because it does not care about internal structure.
 
-See [tests.md](resources/tests.md) for examples and [mocking.md](resources/mocking.md) for mocking guidelines.
+See [tests.md](resources/manual/tests.md) for examples and [mocking.md](resources/manual/mocking.md) for mocking guidelines.
 
 ## Seams — where tests go
 

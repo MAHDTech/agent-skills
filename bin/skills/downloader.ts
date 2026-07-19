@@ -28,6 +28,10 @@ interface DownloadJob {
     destFile: string
     skillName: string
     candidates?: string[]
+    // True for links auto-discovered from an llms.txt index (vs a directly
+    // configured resources: URL). A dead discovered link is upstream churn,
+    // not a config error, so it is skipped rather than failing the run.
+    discovered?: boolean
 }
 
 export function stripReaderProxy(urlStr: string): string {
@@ -435,6 +439,24 @@ export async function downloadAction(
             s.metadata.resources.length > 0
     )
 
+    // Self-healing: any skill with no configured resources must not keep a
+    // downloaded resources/auto directory. Removing the last URL (or the whole
+    // resources key) cleans up on the next run. resources/manual is never touched.
+    for (const skill of targetSkills) {
+        const urls = Array.isArray(skill.metadata.resources)
+            ? skill.metadata.resources
+            : []
+        if (urls.length > 0) continue
+        const skillDir = path.dirname(path.join(agentSkillsHome, skill.path))
+        const autoDir = path.join(skillDir, "resources", "auto")
+        if (await fs.pathExists(autoDir)) {
+            await fs.remove(autoDir)
+            log.info(
+                `  Removed stale resources/auto for ${skill.dirName} (no configured resources).`
+            )
+        }
+    }
+
     if (skillsWithDocs.length === 0) {
         log.info("No skills with configured resources found.")
         return
@@ -452,11 +474,20 @@ export async function downloadAction(
         url: string
         error: string
     }> = []
+    // Dead links discovered from upstream llms.txt indexes — reported as
+    // warnings, never fatal.
+    const staleLinks: Array<{
+        skillName: string
+        url: string
+        error: string
+    }> = []
 
     for (const skill of skillsWithDocs) {
         const skillName = skill.dirName
         const skillDir = path.dirname(path.join(agentSkillsHome, skill.path))
-        const resourcesDir = path.join(skillDir, "resources")
+        // Downloaded resources are owned by resources/auto; resources/manual
+        // holds hand-authored files and is never read or written here.
+        const resourcesDir = path.join(skillDir, "resources", "auto")
         await fs.ensureDir(resourcesDir)
 
         const urls = skill.metadata.resources || []
@@ -509,6 +540,7 @@ export async function downloadAction(
                                 destFile,
                                 skillName,
                                 candidates,
+                                discovered: true,
                             })
                         }
                     }
@@ -745,6 +777,21 @@ export async function downloadAction(
                 savedFiles.add(path.basename(job.destFile))
                 totalSuccess++
             } catch (err: any) {
+                if (job.discovered) {
+                    // A link listed in an upstream llms.txt index that no
+                    // longer resolves (upstream churn). Skip it without
+                    // failing the run or blocking this skill's prune.
+                    log.warn(
+                        `  [STALE] Skipping dead index link ${job.url}: ${err.message}`
+                    )
+                    staleLinks.push({
+                        skillName: job.skillName,
+                        url: job.url,
+                        error: err.message,
+                    })
+                    totalSkipped++
+                    return
+                }
                 log.error(
                     `  [FAIL] Failed to download ${job.url}: ${err.message}`
                 )
@@ -791,6 +838,27 @@ export async function downloadAction(
     log.info(
         `Download completed: ${totalSuccess} succeeded, ${totalSkipped} skipped, ${totalFailed} failed.`
     )
+
+    if (staleLinks.length > 0) {
+        log.warn(
+            `\n⚠️ Skipped ${staleLinks.length} dead link(s) from upstream llms.txt indexes (upstream churn, not a config error):`
+        )
+        const groupedStale: Record<string, typeof staleLinks> = {}
+        for (const item of staleLinks) {
+            let list = groupedStale[item.skillName]
+            if (!list) {
+                list = []
+                groupedStale[item.skillName] = list
+            }
+            list.push(item)
+        }
+        for (const [skill, items] of Object.entries(groupedStale)) {
+            log.warn(`  ● Skill: ${skill}`)
+            for (const item of items) {
+                log.warn(`    - ${item.url}`)
+            }
+        }
+    }
 
     if (failedDownloads.length > 0) {
         log.error("\n❌ Failed Downloads Summary:")
@@ -843,20 +911,18 @@ export async function cleanAction(
 
     let cleanedCount = 0
     for (const skill of targetSkills) {
-        if (
-            !skill.metadata.resources ||
-            !Array.isArray(skill.metadata.resources)
-        ) {
-            continue
-        }
         const skillDir = path.dirname(path.join(agentSkillsHome, skill.path))
-        const resourcesDir = path.join(skillDir, "resources")
-        if (await fs.pathExists(resourcesDir)) {
-            await fs.remove(resourcesDir)
+        // Only the downloader-owned resources/auto is removed, so a subsequent
+        // download-resources reproduces it cleanly; resources/manual is kept.
+        const autoDir = path.join(skillDir, "resources", "auto")
+        if (await fs.pathExists(autoDir)) {
+            await fs.remove(autoDir)
             cleanedCount++
         }
     }
-    log.info(`Cleaned resources for ${cleanedCount} skill(s).`)
+    log.info(
+        `Cleaned downloaded resources (resources/auto) for ${cleanedCount} skill(s).`
+    )
 }
 
 async function runWithConcurrencyLimit<T>(

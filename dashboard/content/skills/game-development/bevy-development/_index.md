@@ -32,7 +32,7 @@ these snippets. The migration cheat sheet below covers the churn since ~0.14.
 
 Load these for depth:
 
-- `resources/learn-migration-guides.md` — Bevy migration guides and release notes.
+- `resources/auto/learn-migration-guides.md` — Bevy migration guides and release notes.
 
 ## Migration Cheat Sheet (older Bevy -> 0.19)
 

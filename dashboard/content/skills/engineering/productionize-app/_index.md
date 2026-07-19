@@ -101,7 +101,7 @@ Execute improvements systematically, updating your task-tracking tool as you go:
 
 ### 4. **Framework-Specific Optimizations**
 
-Apply the checklist for the detected framework (Flutter, React/Next.js, Node.js, Python) from [resources/framework-checklists.md](@/skills/engineering/productionize-app/resources/framework-checklists.md#framework-specific-optimizations).
+Apply the checklist for the detected framework (Flutter, React/Next.js, Node.js, Python) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#framework-specific-optimizations).
 
 ### 5. **Documentation Phase**
 
@@ -154,7 +154,7 @@ _Brief compelling description with value proposition_
 
 ### 6. **Deployment Preparation Phase**
 
-Apply the checklist for the chosen deployment target (TestFlight, Google Play, Web, or Container) from [resources/framework-checklists.md](@/skills/engineering/productionize-app/resources/framework-checklists.md#deployment-preparation).
+Apply the checklist for the chosen deployment target (TestFlight, Google Play, Web, or Container) from [resources/manual/framework-checklists.md](@/skills/engineering/productionize-app/resources/manual/framework-checklists.md#deployment-preparation).
 
 ### 7. **Quality Assurance Checklist**
 

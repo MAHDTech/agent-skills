@@ -19,7 +19,7 @@ SpacetimeDB is a relational database system that runs your entire application se
 
 ## Reference Files
 
-- [llms.txt](resources/llms.txt) — Comprehensive sitemap and entry-point index for the SpacetimeDB developer documentation.
+- [llms.txt](resources/auto/llms.txt) — Comprehensive sitemap and entry-point index for the SpacetimeDB developer documentation.
 
 ---
 

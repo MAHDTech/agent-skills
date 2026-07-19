@@ -119,8 +119,8 @@ For the red to green loop that exercises these seams, run `/tdd`.
 
 ## Going deeper
 
-- **Deepening a cluster given its dependencies** — see [DEEPENING.md](@/skills/engineering/codebase-design/resources/DEEPENING.md): dependency categories, seam discipline, and replace-don't-layer testing.
-- **Exploring alternative interfaces** — see [DESIGN-IT-TWICE.md](@/skills/engineering/codebase-design/resources/DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
+- **Deepening a cluster given its dependencies** — see [DEEPENING.md](@/skills/engineering/codebase-design/resources/manual/DEEPENING.md): dependency categories, seam discipline, and replace-don't-layer testing.
+- **Exploring alternative interfaces** — see [DESIGN-IT-TWICE.md](@/skills/engineering/codebase-design/resources/manual/DESIGN-IT-TWICE.md): spin up parallel sub-agents to design the interface several radically different ways, then compare on depth, locality, and seam placement.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 

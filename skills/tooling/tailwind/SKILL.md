@@ -7,7 +7,7 @@ resources:
 
 # Tailwind CSS v4
 
-Guidelines for compiling stylesheet bundles and styling components using Tailwind CSS (utility-first styling framework). Consult the local [Tailwind CSS v4 Docs](resources/docs.md) for full reference.
+Guidelines for compiling stylesheet bundles and styling components using Tailwind CSS (utility-first styling framework). Consult the local [Tailwind CSS v4 Docs](resources/auto/docs.md) for full reference.
 
 ## Tailwind CSS v4 Key Rules
 

@@ -10,7 +10,7 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 - Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling), with `in-progress/` and `deprecated/` lifecycle buckets.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
-- Sibling directories under a skill's path (`skills/<category>/<name>/`) must use a unified `resources/` directory for any additional scripts, documentation, static assets, or reference files.
+- Additional scripts, documentation, static assets, or reference files live under a skill's `resources/` directory, split by ownership into exactly two subdirectories: `resources/auto/` (downloader-owned — (re)fetched from the skill's `resources:` frontmatter URLs by `skills --action download-resources`, safe to wipe; `clean-resources` removes only this) and `resources/manual/` (hand-authored; tooling never touches it). No files may sit directly in `resources/`; lint enforces this.
 - **CRITICAL LINKING RULE:** Never use absolute `file:///` URLs referencing local paths (e.g., `file:///home/...`). Always use relative paths for links referencing files within the repository (e.g., `../../tooling/prek/SKILL.md`). This ensures paths do not leak local user directories and resolve correctly in CI and other environments.
 - Consumers install with `npx skills add MAHDTech/agent-skills`. See [docs/install.md](./docs/install.md) for details. Note that skills do not need to be published to the npm registry; the installer CLI fetches them directly from this GitHub repository.
 

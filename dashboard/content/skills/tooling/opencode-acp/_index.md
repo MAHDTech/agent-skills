@@ -18,7 +18,7 @@ Control OpenCode directly via the Agent Client Protocol (ACP).
 
 ## Metadata
 
-- For ACP Protocol Docs (for Agents/LLMs): [Introduction](@/skills/tooling/opencode-acp/resources/get-started-introduction.md) and [Protocol Overview](@/skills/tooling/opencode-acp/resources/protocol-v1-overview.md)
+- For ACP Protocol Docs (for Agents/LLMs): [Introduction](@/skills/tooling/opencode-acp/resources/auto/get-started-introduction.md) and [Protocol Overview](@/skills/tooling/opencode-acp/resources/auto/protocol-v1-overview.md)
 - GitHub Repo: https://github.com/bjesuiter/opencode-acp-skill
 - If you have issues with this skill, please open an issue ticket here: https://github.com/bjesuiter/opencode-acp-skill/issues
 

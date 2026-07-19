@@ -1,5 +1,13 @@
 import {intro, outro, log} from "@clack/prompts"
-import {getSkills, CATEGORIES, NAME_RE, logTask} from "./lib.ts"
+import path from "node:path"
+import fs from "fs-extra"
+import {
+    getSkills,
+    CATEGORIES,
+    NAME_RE,
+    logTask,
+    AGENT_SKILLS_HOME,
+} from "./lib.ts"
 import type {Skill} from "./lib.ts"
 
 export function checkDuplicateSkills(skills: Skill[]): {
@@ -35,6 +43,30 @@ export function checkDuplicateSkills(skills: Skill[]): {
     }
 
     return {errors, warnings}
+}
+
+// resources/ may contain only auto/ (downloader-owned) and manual/
+// (hand-authored) subdirectories — no bare files, no other subdirectories.
+export async function checkResourcesLayout(
+    resourcesDirAbs: string
+): Promise<string[]> {
+    const errors: string[] = []
+    if (!(await fs.pathExists(resourcesDirAbs))) return errors
+    const entries = await fs.readdir(resourcesDirAbs, {withFileTypes: true})
+    for (const entry of entries) {
+        if (entry.isDirectory()) {
+            if (entry.name !== "auto" && entry.name !== "manual") {
+                errors.push(
+                    `resources/ may only contain 'auto/' and 'manual/' subdirectories; found '${entry.name}/'.`
+                )
+            }
+        } else {
+            errors.push(
+                `resources/ must not contain files directly; move '${entry.name}' into resources/auto/ (downloaded) or resources/manual/ (authored).`
+            )
+        }
+    }
+    return errors
 }
 
 export async function lint() {
@@ -120,6 +152,16 @@ export async function lint() {
             log.error(
                 `❌ ${file}: contains absolute file:/// URL. CRITICAL LINKING RULE violation: Never use absolute file:/// URLs referencing local paths.`
             )
+            errors++
+        }
+
+        const resourcesDirAbs = path.join(
+            AGENT_SKILLS_HOME,
+            path.dirname(skill.path),
+            "resources"
+        )
+        for (const msg of await checkResourcesLayout(resourcesDirAbs)) {
+            log.error(`❌ ${file}: ${msg}`)
             errors++
         }
     }

@@ -98,7 +98,7 @@ describe("downloader unit tests", () => {
         // Verify the file was downloaded, converted to markdown (not saved as raw HTML)
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
         // The downloaded index and its linked resources should be saved
@@ -154,6 +154,55 @@ describe("downloader unit tests", () => {
         await expect(downloadAction(mockSkills, fakeRepo)).rejects.toThrow(
             "Download resources failed: 1 file(s) failed to download."
         )
+    })
+
+    it("should skip dead links discovered from an llms.txt index without failing the run", async () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/test-skill/SKILL.md",
+                dirName: "test-skill",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "test-skill",
+                    description: "Test skill description",
+                    resources: ["https://example.com/llms.txt"],
+                },
+                content: "",
+            },
+        ]
+
+        globalThis.fetch = mock(async (url: any) => {
+            const urlStr = String(url)
+            if (urlStr.endsWith("/llms.txt")) {
+                return new Response(
+                    `- [good](https://example.com/good)\n- [dead](https://example.com/dead)`,
+                    {status: 200, headers: {"content-type": "text/plain"}}
+                )
+            }
+            if (urlStr.endsWith("/dead")) {
+                // A link the upstream index still lists but that now 404s
+                return new Response("Not Found", {
+                    status: 404,
+                    headers: {"content-type": "text/plain"},
+                })
+            }
+            return new Response(
+                "# Good page\nThis is a good page with plenty of content to pass the fifty byte minimum size check.",
+                {status: 200, headers: {"content-type": "text/markdown"}}
+            )
+        }) as any
+
+        // Must NOT throw despite the dead discovered child link
+        await downloadAction(mockSkills, fakeRepo)
+
+        const autoDir = path.join(
+            fakeRepo,
+            "skills/engineering/test-skill/resources/auto"
+        )
+        const files = await fs.readdir(autoDir)
+        expect(files).toContain("good.md")
+        expect(files).not.toContain("dead.md")
     })
 
     describe("getDomainPrefix unit tests", () => {
@@ -254,7 +303,7 @@ describe("downloader unit tests", () => {
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
 
@@ -301,7 +350,7 @@ describe("downloader unit tests", () => {
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const files = await fs.readdir(resourcesDir)
 
@@ -347,7 +396,7 @@ Do not change [absolute](https://github.com/docs) or [anchor](#section).`,
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const fileContent = await fs.readFile(
             path.join(resourcesDir, "docs-page.md"),
@@ -412,7 +461,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
 
         const resourcesDir = path.join(
             fakeRepo,
-            "skills/engineering/test-skill/resources"
+            "skills/engineering/test-skill/resources/auto"
         )
         const fileContent = await fs.readFile(
             path.join(resourcesDir, "rfds-v2-overview.md"),
@@ -543,7 +592,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/engineering/skill-a/resources/a.txt"
+                        "skills/engineering/skill-a/resources/auto/a.txt"
                     )
                 )
             ).toBe(true)
@@ -551,7 +600,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/tooling/skill-b/resources/b.txt"
+                        "skills/tooling/skill-b/resources/auto/b.txt"
                     )
                 )
             ).toBe(false)
@@ -565,7 +614,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/engineering/skill-a/resources/a.txt"
+                        "skills/engineering/skill-a/resources/auto/a.txt"
                     )
                 )
             ).toBe(false)
@@ -573,7 +622,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/tooling/skill-b/resources/b.txt"
+                        "skills/tooling/skill-b/resources/auto/b.txt"
                     )
                 )
             ).toBe(true)
@@ -585,7 +634,7 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/engineering/skill-a/resources/a.txt"
+                        "skills/engineering/skill-a/resources/auto/a.txt"
                     )
                 )
             ).toBe(false)
@@ -593,19 +642,22 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
                 await fs.pathExists(
                     path.join(
                         fakeRepo,
-                        "skills/tooling/skill-b/resources/b.txt"
+                        "skills/tooling/skill-b/resources/auto/b.txt"
                     )
                 )
             ).toBe(true)
         })
 
         it("should filter by skill name and category in cleanAction", async () => {
-            // Create resources dirs first
+            // Create resources/auto dirs first (cleanAction removes only auto/)
             const dirA = path.join(
                 fakeRepo,
-                "skills/engineering/skill-a/resources"
+                "skills/engineering/skill-a/resources/auto"
             )
-            const dirB = path.join(fakeRepo, "skills/tooling/skill-b/resources")
+            const dirB = path.join(
+                fakeRepo,
+                "skills/tooling/skill-b/resources/auto"
+            )
             await fs.ensureDir(dirA)
             await fs.ensureDir(dirB)
 
@@ -707,6 +759,56 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
             activeConnections = 0
             await downloadAction(manyResourcesSkill, fakeRepo, {concurrency: 1})
             expect(maxActiveConnections).toBe(1)
+        })
+
+        it("should remove resources/auto (self-healing) and keep resources/manual when a skill has no configured resources", async () => {
+            const base = "skills/engineering/skill-empty"
+            const autoDir = path.join(fakeRepo, base, "resources/auto")
+            const manualDir = path.join(fakeRepo, base, "resources/manual")
+            await fs.ensureDir(autoDir)
+            await fs.ensureDir(manualDir)
+            await fs.writeFile(path.join(autoDir, "stale.md"), "old downloaded")
+            await fs.writeFile(path.join(manualDir, "keep.md"), "hand-authored")
+
+            const emptySkill = [
+                {
+                    path: `${base}/SKILL.md`,
+                    dirName: "skill-empty",
+                    category: "engineering",
+                    promoted: false,
+                    metadata: {
+                        name: "skill-empty",
+                        description: "No configured resources",
+                        resources: [],
+                    },
+                    content: "",
+                },
+            ]
+
+            await downloadAction(emptySkill, fakeRepo)
+
+            expect(await fs.pathExists(autoDir)).toBe(false)
+            expect(await fs.pathExists(path.join(manualDir, "keep.md"))).toBe(
+                true
+            )
+        })
+
+        it("should remove only resources/auto and preserve resources/manual in cleanAction", async () => {
+            const base = "skills/engineering/skill-a"
+            const autoDir = path.join(fakeRepo, base, "resources/auto")
+            const manualDir = path.join(fakeRepo, base, "resources/manual")
+            await fs.ensureDir(autoDir)
+            await fs.ensureDir(manualDir)
+            await fs.writeFile(path.join(autoDir, "downloaded.md"), "x")
+            await fs.writeFile(path.join(manualDir, "authored.md"), "y")
+
+            const {cleanAction} = await import("./downloader.ts")
+            await cleanAction(mockSkills, fakeRepo, {skill: "skill-a"})
+
+            expect(await fs.pathExists(autoDir)).toBe(false)
+            expect(
+                await fs.pathExists(path.join(manualDir, "authored.md"))
+            ).toBe(true)
         })
     })
 })

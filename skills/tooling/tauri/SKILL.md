@@ -13,7 +13,7 @@ Guidelines and reference for developing Tauri v2+ cross-platform applications. A
 
 When deep context, precise API definitions, or config schemas are required, consult the bundled Tauri reference excerpts:
 
-- Start from [concept.md](resources/concept.md), a short index of core-concept topics that links into the granular reference pages vendored under `resources/` from the official v2 docs.
+- Start from [concept.md](resources/auto/concept.md), a short index of core-concept topics that links into the granular reference pages vendored under `resources/auto/` from the official v2 docs.
 
 ## Constraints
 
