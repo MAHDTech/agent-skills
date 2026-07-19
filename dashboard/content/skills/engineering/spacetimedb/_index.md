@@ -22,10 +22,6 @@ SpacetimeDB is a relational database system that runs your entire application se
 - Developing client-side integration using TypeScript, Rust, C#, Unreal Engine, Godot, or Unity.
 - Working with the `spacetime` command-line interface (CLI) to develop, run, and publish modules.
 
-## Reference Files
-
-- [llms.txt](resources/auto/llms.txt) — Comprehensive sitemap and entry-point index for the SpacetimeDB developer documentation.
-
 ---
 
 ## 1. Core Architecture
