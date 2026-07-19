@@ -88,10 +88,17 @@ acquire_lock() {
 
 	# Release lock on exit, Ctrl-C, or failure — clear identity and close fd.
 	release_lock() {
+		local sig="${1:-EXIT}"
+		trap - EXIT INT TERM
 		truncate -s 0 "${CODEQL_LOCK_FILE}" 2>/dev/null || true
-		exec 9>&-
+		exec 9>&- 2>/dev/null || true
+		if [[ ${sig} != "EXIT" ]]; then
+			kill -s "${sig}" $$
+		fi
 	}
-	trap release_lock EXIT INT TERM
+	trap 'release_lock EXIT' EXIT
+	trap 'release_lock INT' INT
+	trap 'release_lock TERM' TERM
 
 	log_info "Lock acquired (${CODEQL_LOCK_FILE})"
 }
