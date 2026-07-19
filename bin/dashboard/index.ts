@@ -39,7 +39,10 @@ if (action === "build") {
 } else if (action === "test") {
     import("./lib.ts")
         .then((lib) => {
-            lib.run("bun", ["test"])
+            lib.run("bun", ["test", "bin/dashboard/lib.test.ts"])
+            lib.run("bun", ["test", "bin/skills/lib.test.ts"])
+            lib.run("bun", ["test", "bin/skills/lint.test.ts"])
+            lib.run("bun", ["test", "bin/skills/downloader.test.ts"])
             return import("./build.ts")
         })
         .then((mod) => mod.buildAction())

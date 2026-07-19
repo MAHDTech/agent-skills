@@ -6,7 +6,7 @@
  *
  * CANISTER-SPECIFIC styles belong in their own entry points:
  *   - Station: static/styles/tailwind.css   (animations, .md-* classes)
- *   - Archive: themes/tars/css/main.css     (.prose, .toc, mermaid)
+ *   - Archive: css/input.css                (.prose, .toc, mermaid)
  */
 
 @import "./themes.css";
