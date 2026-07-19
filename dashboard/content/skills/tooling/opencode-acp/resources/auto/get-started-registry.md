@@ -149,7 +149,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.44**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.46**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -310,7 +310,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.4.18**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.4.19**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -626,7 +626,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Code and build agents with comprehensive multi-provider support
 
-    **0.9.14**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
+    **0.9.16**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -668,7 +668,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP agent powered by Zhipu AI's GLM Coding Plan models (glm-5.1, glm-5-turbo, glm-4.7, glm-4.5-air). Supports streaming, tool calls, mid-session model switching, image input via Z.AI Coding Plan Vision MCP, and session load/fork/resume with on-disk persistence.
 
-    **1.1.4**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
+    **1.2.0**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -696,7 +696,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **0.2.104**
+    **0.2.106**
   </Card>
 
   <Card
@@ -710,7 +710,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.22**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.26**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -897,7 +897,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.19.11**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.20.0**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card

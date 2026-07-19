@@ -162,6 +162,14 @@ in
         pass_filenames = false;
         require_serial = true;
       };
+      dashboard-lint = {
+        enable = true;
+        name = "Dashboard Lint";
+        entry = "dashboard --action lint";
+        files = "^(skills/.*\\.md$|dashboard/content/)";
+        pass_filenames = false;
+        require_serial = true;
+      };
       deadnix.enable = true;
       editorconfig-checker.enable = true;
       eslint = {
@@ -249,7 +257,7 @@ in
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "env SKILLS_REPO_ONLY=1 skills --action sync";
+        entry = "env SKILLS_REPO_ONLY=1 SKILLS_SKIP_DASHBOARD=1 skills --action sync";
         files = "SKILL\\.md$";
         pass_filenames = false;
         require_serial = true;
@@ -308,7 +316,7 @@ in
       exec = "bun run skills \"$@\"";
     };
     dashboard = {
-      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test>)";
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test|lint>)";
       exec = "bun run dashboard \"$@\"";
     };
     codeql-run = {

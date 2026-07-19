@@ -24,7 +24,7 @@ try {
     const message = e instanceof Error ? e.message : String(e)
     console.error(`Error: ${message}`)
     console.error(
-        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test> [--skill <skill>] [--category <category>]"
+        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test|lint> [--skill <skill>] [--category <category>]"
     )
     process.exit(1)
 }
@@ -65,13 +65,13 @@ if (action === "build") {
             lib.run("bun", ["test", "bin/skills/lib.test.ts"])
             lib.run("bun", ["test", "bin/skills/lint.test.ts"])
             lib.run("bun", ["test", "bin/skills/downloader.test.ts"])
-            return import("./build.ts")
         })
-        .then((mod) => mod.buildAction())
         .catch(fail)
+} else if (action === "lint") {
+    import("./lint.ts").then((mod) => mod.lintAction()).catch(fail)
 } else {
     console.error(
-        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test> [--skill <skill>] [--category <category>]"
+        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test|lint> [--skill <skill>] [--category <category>]"
     )
     process.exit(1)
 }
