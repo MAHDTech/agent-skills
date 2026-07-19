@@ -358,7 +358,7 @@ Do not change [absolute](https://github.com/docs) or [anchor](#section).`,
             "[task groups](https://antigravity.google/docs/task-groups)"
         )
         expect(fileContent).toContain(
-            "![Antigravity 2.0 UI](https://antigravity.google/assets/image/docs/AGY2.0-Home.png)"
+            "![Antigravity 2.0 UI](https://antigravity.google/docs/assets/image/docs/AGY2.0-Home.png)"
         )
         expect(fileContent).toContain(
             "![Model Selector Drop Down](https://antigravity.google/assets/image/docs/model-selector.png)"

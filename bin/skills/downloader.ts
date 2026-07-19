@@ -668,11 +668,10 @@ export async function downloadAction(
                                 return match
                             }
 
-                            // Check if it is a relative file link (does not start with / and does not start with assets/)
+                            // Check if it is a relative file link (does not start with /)
                             if (
                                 trimmedLink.startsWith(".") ||
-                                (!trimmedLink.startsWith("/") &&
-                                    !trimmedLink.startsWith("assets/"))
+                                !trimmedLink.startsWith("/")
                             ) {
                                 try {
                                     const resolvedUrlObj = new URL(
@@ -706,9 +705,6 @@ export async function downloadAction(
                                 !trimmedLink.startsWith("//")
                             ) {
                                 return `${prefix}(${origin}${trimmedLink})`
-                            }
-                            if (trimmedLink.startsWith("assets/")) {
-                                return `${prefix}(${origin}/${trimmedLink})`
                             }
                             return match
                         }
