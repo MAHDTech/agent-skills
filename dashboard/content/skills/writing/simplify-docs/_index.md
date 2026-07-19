@@ -1,6 +1,6 @@
 +++
 title = "simplify-docs"
-description = "Simplify documentation for clarity and readability with approval-gated edits"
+description = "Simplify documentation for clarity and readability with approval-gated edits. Use when asked to simplify, rewrite, restructure, or de-clutter a doc — README, setup guide, reference or technical documentation — so it scans faster and leads with the shortest successful path."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -65,17 +65,17 @@ Start the server:
 make start_server
 ```
 
-Run a command:
+Run database migrations:
 
 ```bash
-make run_command
+make migrate_db
 ```
 
 Incorrect pattern (separate steps combined in one unlabeled block):
 
 ```bash
 make start_server
-make run_command
+make migrate_db
 ```
 
 ## Section Defaults

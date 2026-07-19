@@ -13,16 +13,38 @@ const mockExecFileSync = mock(
     }
 )
 
+const mockSpawn = mock((_cmd: string, _args?: string[], _options?: any) => {
+    const listeners: Record<string, ((...args: any[]) => any)[]> = {}
+    const onCall = mock((event: string, callback: (...args: any[]) => any) => {
+        listeners[event] = listeners[event] || []
+        listeners[event].push(callback)
+    })
+    const killCall = mock((signal?: string) => {
+        if (listeners["exit"]) {
+            for (const cb of listeners["exit"]) {
+                cb(0, signal)
+            }
+        }
+    })
+    return {
+        pid: 12345,
+        on: onCall,
+        kill: killCall,
+    } as any
+})
+
 mock.module("child_process", () => ({
     execFileSync: mockExecFileSync,
+    spawn: mockSpawn,
 }))
 
 const mockLogStep = mock(() => {})
 const mockLogWarn = mock(() => {})
+const mockOutro = mock(() => {})
 
 mock.module("@clack/prompts", () => ({
     intro: () => {},
-    outro: () => {},
+    outro: mockOutro,
     log: {
         step: mockLogStep,
         warn: mockLogWarn,
@@ -397,6 +419,160 @@ describe("Dashboard Lib Tests", () => {
                     }
                     return ""
                 })
+            }
+        })
+    })
+
+    describe("serveAction", () => {
+        let serveMod: any
+
+        beforeAll(async () => {
+            serveMod = await import("./serve.ts")
+        })
+
+        it("should spawn background processes, start watcher, and clean up on SIGINT", async () => {
+            mockSpawn.mockClear()
+            mockOutro.mockClear()
+
+            const signalHandlers: Record<string, (...args: any[]) => any> = {}
+            const spyProcessOn = spyOn(process, "on").mockImplementation(
+                (event: string, handler: any) => {
+                    signalHandlers[event] = handler
+                    return process
+                }
+            )
+
+            const originalExit = process.exit
+            const exitMock = mock((code?: number) => {
+                throw new Error(`exit:${code}`)
+            })
+            process.exit = exitMock as any
+
+            try {
+                await serveMod.serveAction()
+
+                expect(mockSpawn).toHaveBeenCalled()
+                const tailwindCall = mockSpawn.mock.calls.find(
+                    (call) => call[0] === "tailwindcss"
+                )
+                expect(tailwindCall).toBeDefined()
+                expect(tailwindCall![1]).toContain("--watch")
+
+                const zolaCall = mockSpawn.mock.calls.find(
+                    (call) =>
+                        call[0] === "zola" &&
+                        call[1] &&
+                        call[1].includes("serve")
+                )
+                expect(zolaCall).toBeDefined()
+
+                const sigintHandler = signalHandlers["SIGINT"]
+                expect(sigintHandler).toBeDefined()
+                expect(() => sigintHandler!()).toThrow("exit:0")
+
+                expect(mockOutro).toHaveBeenCalledWith("Done!")
+            } finally {
+                process.exit = originalExit
+                spyProcessOn.mockRestore()
+            }
+        })
+
+        it("should spawn background processes, start watcher, and clean up on SIGTERM", async () => {
+            mockSpawn.mockClear()
+            mockOutro.mockClear()
+
+            const signalHandlers: Record<string, (...args: any[]) => any> = {}
+            const spyProcessOn = spyOn(process, "on").mockImplementation(
+                (event: string, handler: any) => {
+                    signalHandlers[event] = handler
+                    return process
+                }
+            )
+
+            const originalExit = process.exit
+            const exitMock = mock((code?: number) => {
+                throw new Error(`exit:${code}`)
+            })
+            process.exit = exitMock as any
+
+            try {
+                await serveMod.serveAction()
+
+                expect(mockSpawn).toHaveBeenCalled()
+                const tailwindCall = mockSpawn.mock.calls.find(
+                    (call) => call[0] === "tailwindcss"
+                )
+                expect(tailwindCall).toBeDefined()
+                expect(tailwindCall![1]).toContain("--watch")
+
+                const zolaCall = mockSpawn.mock.calls.find(
+                    (call) =>
+                        call[0] === "zola" &&
+                        call[1] &&
+                        call[1].includes("serve")
+                )
+                expect(zolaCall).toBeDefined()
+
+                const sigtermHandler = signalHandlers["SIGTERM"]
+                expect(sigtermHandler).toBeDefined()
+                expect(() => sigtermHandler!()).toThrow("exit:0")
+
+                expect(mockOutro).toHaveBeenCalledWith("Done!")
+            } finally {
+                process.exit = originalExit
+                spyProcessOn.mockRestore()
+            }
+        })
+    })
+
+    describe("Watcher and Rebuild functions", () => {
+        it("should debounce calls correctly", async () => {
+            let count = 0
+            const fn = lib.debounce(() => {
+                count++
+            }, 50)
+
+            fn()
+            fn()
+            fn()
+
+            await Bun.sleep(100)
+            expect(count).toBe(1)
+        })
+
+        it("should successfully trigger rebuildSearchIndexes and run zola build / pagefind", () => {
+            mockExecFileSync.mockClear()
+            lib.rebuildSearchIndexes()
+
+            expect(mockExecFileSync).toHaveBeenCalled()
+            const zolaBuildCall = mockExecFileSync.mock.calls.find(
+                (call) =>
+                    call[0] === "zola" && call[1] && call[1].includes("build")
+            )
+            expect(zolaBuildCall).toBeDefined()
+
+            const pagefindCall = mockExecFileSync.mock.calls.find(
+                (call) =>
+                    call[0] === "pagefind" &&
+                    call[1] &&
+                    call[1].includes("--output-path")
+            )
+            expect(pagefindCall).toBeDefined()
+        })
+
+        it("should start fs.watch on directories that exist", () => {
+            const spyWatch = spyOn(fs, "watch").mockImplementation(() => {
+                return {
+                    close: () => {},
+                } as any
+            })
+
+            try {
+                const watchers = lib.startWatcher(() => {})
+                expect(watchers.length).toBeGreaterThan(0)
+                expect(spyWatch).toHaveBeenCalled()
+            } finally {
+                spyWatch.mockRestore()
             }
         })
     })

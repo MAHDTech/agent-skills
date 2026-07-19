@@ -1,8 +1,11 @@
 import {intro, outro} from "@clack/prompts"
 import {build} from "./lib.ts"
 
-export async function buildAction() {
+export async function buildAction(options?: {
+    skill?: string
+    category?: string
+}) {
     intro("Dashboard Build")
-    build()
+    build(options)
     outro("Done! Site built to dashboard/public.")
 }

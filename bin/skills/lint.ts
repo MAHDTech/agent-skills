@@ -106,12 +106,17 @@ export async function lint() {
             )
             errors++
         } else if (!CATEGORIES[skill.category]) {
-            log.warn(
-                `⚠️ ${file}: unknown category '${skill.category}' (not declared in CATEGORIES).`
+            log.error(
+                `❌ ${file}: unknown category '${skill.category}' (not declared in CATEGORIES).`
             )
+            errors++
         }
 
-        if (/\]\(file:\/\/\/[^)]*\)/.test(skill.raw)) {
+        const cleanContent = skill.raw
+            .replace(/```[\s\S]*?```/g, "")
+            .replace(/`[^`]*?`/g, "")
+
+        if (/\bfile:(?:[/\\]+|[a-zA-Z]:)/i.test(cleanContent)) {
             log.error(
                 `❌ ${file}: contains absolute file:/// URL. CRITICAL LINKING RULE violation: Never use absolute file:/// URLs referencing local paths.`
             )

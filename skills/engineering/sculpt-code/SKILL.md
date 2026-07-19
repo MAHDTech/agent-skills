@@ -68,7 +68,9 @@ Reshape code quality across eight dimensions. Scope to branch changes by default
 
 ### 7. TODO Hygiene
 
-Apply the project's TODO prefix standards:
+Match the project's existing TODO convention. If it already uses a TODO-prefix taxonomy, follow that taxonomy; otherwise stick to a plain `TODO:` (plus the widely understood `FIXME:` / `HACK:`) rather than imposing a scheme the codebase hasn't adopted.
+
+For illustration, a project that uses a TODO-prefix convention might distinguish:
 
 - `TODO:` — general future work
 - `TODO_IMPROVE:` — code quality improvements

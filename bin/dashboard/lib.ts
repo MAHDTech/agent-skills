@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import {execFileSync} from "child_process"
+import {execFileSync, spawn, type ChildProcess} from "child_process"
 import {log} from "@clack/prompts"
 
 export const ROOT =
@@ -131,9 +131,18 @@ export function cleanOutputDir(
 }
 
 /** Regenerate skill content, build CSS, render the site, index it. */
-export function build(options: {serve?: boolean} = {}) {
+export function build(
+    options: {serve?: boolean; skill?: string; category?: string} = {}
+) {
     log.step("🔄 Syncing generated content…")
-    run("bun", ["run", "skills", "--action", "sync"], {SKILLS_REPO_ONLY: "1"})
+    const args = ["run", "skills", "--action", "sync"]
+    if (options.skill) {
+        args.push("--skill", options.skill)
+    }
+    if (options.category) {
+        args.push("--category", options.category)
+    }
+    run("bun", args, {SKILLS_REPO_ONLY: "1"})
     buildCss()
     writeSkillDates()
     cleanOutputDir()
@@ -155,4 +164,173 @@ export function build(options: {serve?: boolean} = {}) {
             "pagefind",
         ])
     }
+}
+
+export const activeProcesses: ChildProcess[] = []
+
+/** Run a process asynchronously. */
+export function runAsync(
+    cmd: string,
+    args: string[],
+    extraEnv: Record<string, string> = {}
+): ChildProcess {
+    try {
+        const child = spawn(cmd, args, {
+            cwd: ROOT,
+            stdio: "inherit",
+            env: {...process.env, ...extraEnv},
+        })
+
+        activeProcesses.push(child)
+
+        child.on("exit", () => {
+            const index = activeProcesses.indexOf(child)
+            if (index !== -1) {
+                activeProcesses.splice(index, 1)
+            }
+        })
+
+        child.on("error", (err: any) => {
+            if (err.code === "ENOENT") {
+                console.error(
+                    `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv shell -- dashboard --action <build|serve|css|test>\`)`
+                )
+                process.exit(1)
+            }
+            log.error(`Subprocess error (${cmd}): ${err.message || err}`)
+        })
+
+        return child
+    } catch (err: any) {
+        if (err.code === "ENOENT") {
+            console.error(
+                `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv shell -- dashboard --action <build|serve|css|test>\`)`
+            )
+            process.exit(1)
+        }
+        throw err
+    }
+}
+
+/** Run Tailwind CSS compilation with watch flag. */
+export function watchCss(): ChildProcess {
+    log.step("🎨 Watching CSS…")
+    return runAsync("tailwindcss", [
+        "-i",
+        "dashboard/css/input.css",
+        "-o",
+        "dashboard/static/build/css/generated.css",
+        "--watch",
+    ])
+}
+
+/** Run Zola serve asynchronously. */
+export function runZolaServe(): ChildProcess {
+    return runAsync("zola", ["--root", "dashboard", "serve"])
+}
+
+/** Cleanly terminate all active background subprocesses. */
+export function killActiveProcesses() {
+    for (const child of activeProcesses) {
+        try {
+            if (child.pid) {
+                child.kill("SIGTERM")
+            }
+        } catch {
+            // Ignore
+        }
+    }
+    activeProcesses.length = 0
+}
+
+export function debounce(fn: (...args: any[]) => void, delayMs: number) {
+    let timeout: any = null
+    return (...args: any[]) => {
+        if (timeout) clearTimeout(timeout)
+        timeout = setTimeout(() => {
+            fn(...args)
+        }, delayMs)
+    }
+}
+
+/** Rebuild Zola site and Pagefind indexes when content changes. */
+export function rebuildSearchIndexes(options?: {
+    skill?: string
+    category?: string
+}) {
+    log.step("🔄 Content changed. Rebuilding search indexes…")
+    try {
+        const args = ["run", "skills", "--action", "sync"]
+        if (options?.skill) {
+            args.push("--skill", options.skill)
+        }
+        if (options?.category) {
+            args.push("--category", options.category)
+        }
+        run("bun", args, {
+            SKILLS_REPO_ONLY: "1",
+        })
+        writeSkillDates()
+        run("zola", ["--root", "dashboard", "build"])
+        run("pagefind", [
+            "--site",
+            "dashboard/public",
+            "--output-path",
+            "dashboard/static/pagefind",
+        ])
+    } catch (err: any) {
+        log.warn(
+            `⚠️ Failed to rebuild dashboard search indexes: ${err.message || err}`
+        )
+    }
+}
+
+/** Start watcher on skills, content, and themes directories. */
+export function startWatcher(callback: () => void): fs.FSWatcher[] {
+    const watchDirs = [
+        path.join(ROOT, "skills"),
+        path.join(ROOT, "dashboard", "content"),
+        path.join(ROOT, "dashboard", "themes"),
+    ]
+
+    const debouncedCallback = debounce(callback, 300)
+
+    const watchers: fs.FSWatcher[] = []
+    for (const dir of watchDirs) {
+        if (!fs.existsSync(dir)) continue
+        try {
+            const watcher = fs.watch(
+                dir,
+                {recursive: true},
+                (_eventType, filename) => {
+                    if (filename) {
+                        const normalizedPath = filename.replace(/\\/g, "/")
+                        if (
+                            dir.includes("dashboard/content") &&
+                            (normalizedPath.startsWith("skills") ||
+                                normalizedPath.includes("/skills"))
+                        ) {
+                            return
+                        }
+                        if (
+                            normalizedPath.startsWith(".") ||
+                            normalizedPath.includes("node_modules") ||
+                            normalizedPath.includes("public") ||
+                            normalizedPath.includes("static/pagefind") ||
+                            normalizedPath.includes("skill_dates.toml")
+                        ) {
+                            return
+                        }
+                    }
+                    debouncedCallback()
+                }
+            )
+            watchers.push(watcher)
+        } catch (err: any) {
+            log.warn(
+                `⚠️ Failed to start watcher on ${dir}: ${err.message || err}`
+            )
+        }
+    }
+    return watchers
 }

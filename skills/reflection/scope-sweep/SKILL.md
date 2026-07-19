@@ -1,6 +1,6 @@
 ---
 name: scope-sweep
-description: Final pass to identify missed items, edge cases, and risks before considering a scope done
+description: Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done — to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed.
 ---
 
 # Scope Sweep

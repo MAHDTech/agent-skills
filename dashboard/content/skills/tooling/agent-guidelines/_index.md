@@ -1,6 +1,6 @@
 +++
 title = "agent-guidelines"
-description = "Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use when asked to follow the guidelines or verify work against them."
+description = "Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use before and while implementing to avoid common LLM coding pitfalls — over-engineering, unrequested refactors, silent assumptions, and unverified changes."
 sort_by = "title"
 template = "skill.html"
 [extra]

@@ -62,6 +62,8 @@ You are a proofreader for posts about to be published.
 
 ## Skimmability Pass (optional, user must opt in)
 
+> Boundary: proofread is error-correction for a publishable post — fixing spelling, grammar, repetition, and logic while preserving the author's voice. For a structural rewrite of reference or technical docs (reordering, quickstart-first, trimming to the shortest path), reach for `/simplify-docs` instead.
+
 If the user says yes to making the post more skimmable, **present the proposed changes first and apply after approval**. Follow these rules:
 
 ### Break up prose walls

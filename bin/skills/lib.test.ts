@@ -92,14 +92,15 @@ describe("Skills unit tests", () => {
             const staleTime = new Date(Date.now() - 15000)
             await fs.utimes(ANTIGRAVITY_LOCK_FILE, staleTime, staleTime)
 
-            let readCallCount = 0
             const spy = spyOn(fs, "readFile")
             spy.mockImplementation((async (path: any, options?: any) => {
-                if (path === ANTIGRAVITY_LOCK_FILE) {
-                    readCallCount++
-                    if (readCallCount === 1) {
+                if (
+                    typeof path === "string" &&
+                    path.includes(ANTIGRAVITY_LOCK_FILE)
+                ) {
+                    if (path === ANTIGRAVITY_LOCK_FILE) {
                         return "12345"
-                    } else {
+                    } else if (path.includes("stale-")) {
                         return "67890"
                     }
                 }
@@ -114,24 +115,23 @@ describe("Skills unit tests", () => {
                 // but 10 seconds is too long. Let's make it timeout quickly by changing Date.now or similar?
                 // Actually, wait! The loop checks: while (Date.now() - start < timeout)
                 // If we mock Date.now() to return a time that advances instantly, we can make it timeout in 1 tick!
-                const originalDateNow = Date.now
                 let tick = 0
-                Date.now = () => {
+                const mockNow = () => {
                     tick++
                     if (tick > 3) {
-                        return originalDateNow() + 15000 // Force timeout
+                        return Date.now() + 15000 // Force timeout
                     }
-                    return originalDateNow()
+                    return Date.now()
                 }
 
                 try {
-                    await expect(acquireLock()).rejects.toThrow()
+                    await expect(acquireLock({now: mockNow})).rejects.toThrow()
                     // The lock file should NOT have been removed because we returned a different verify content
                     expect(await fs.pathExists(ANTIGRAVITY_LOCK_FILE)).toBe(
                         true
                     )
                 } finally {
-                    Date.now = originalDateNow
+                    // Clean up/restoration of global Date.now no longer needed
                 }
             } finally {
                 spy.mockRestore()
@@ -555,6 +555,154 @@ let path = "file:///foo/bar";
             expect(loggedErrors.length).toBe(0)
         })
 
+        it("should fail linting when skill content contains reference-style absolute file URL", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---\nname: my-skill\ndescription: A standard test skill\n---\nSome reference link: [ref]: file:///home/user/path`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some(
+                    (err) =>
+                        err.includes("contains absolute file:/// URL") &&
+                        err.includes("CRITICAL LINKING RULE")
+                )
+            ).toBe(true)
+        })
+
+        it("should fail linting when skill content contains HTML elements with absolute file URLs", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---\nname: my-skill\ndescription: A standard test skill\n---\nHTML tag test: <a href="file:///home/user/path">link</a> or <img src="file:///home/user/path">`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some(
+                    (err) =>
+                        err.includes("contains absolute file:/// URL") &&
+                        err.includes("CRITICAL LINKING RULE")
+                )
+            ).toBe(true)
+        })
+
+        it("should fail linting when skill content contains variations of file URL slash count, casing, and layouts", async () => {
+            const variations = [
+                "file://home/user/path",
+                "file:/home/user/path",
+                "file:\\home\\user\\path",
+                "file:\\\\home\\\\user\\\\path",
+                "file:C:\\path",
+                "file:c:/path",
+                "FILE:///home/user/path",
+                "File://home/user/path",
+            ]
+
+            for (const variation of variations) {
+                loggedErrors = []
+                exitCode = undefined
+                await fs.remove(SKILLS_DIR)
+                await fs.ensureDir(SKILLS_DIR)
+
+                const skillPath = path.join(
+                    SKILLS_DIR,
+                    "engineering",
+                    "my-skill",
+                    "SKILL.md"
+                )
+                await fs.ensureDir(path.dirname(skillPath))
+                await fs.writeFile(
+                    skillPath,
+                    `---\nname: my-skill\ndescription: A standard test skill\n---\nTesting variation: ${variation}`
+                )
+
+                const {lint} = await import("./lint.ts")
+                try {
+                    await lint()
+                } catch (e) {
+                    if (e instanceof ExitError) {
+                        exitCode = e.code
+                    } else {
+                        throw e
+                    }
+                }
+
+                expect(exitCode).toBe(1)
+                expect(
+                    loggedErrors.some(
+                        (err) =>
+                            err.includes("contains absolute file:/// URL") &&
+                            err.includes("CRITICAL LINKING RULE")
+                    )
+                ).toBe(true)
+            }
+        })
+
+        it("should pass linting when file URL is in single-backtick inline code blocks", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---\nname: my-skill\ndescription: A standard test skill\n---\nTesting inline backticks \`file:///foo/bar\` should be fine.`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBeUndefined()
+            expect(loggedErrors.length).toBe(0)
+        })
+
         it("should fail linting and record error for missing frontmatter delimiters", async () => {
             const skillPath = path.join(
                 SKILLS_DIR,
@@ -600,6 +748,42 @@ Some content`
                     err.includes(
                         "YAML frontmatter syntax error: Missing or malformed YAML frontmatter delimiters"
                     )
+                )
+            ).toBe(true)
+        })
+
+        it("should fail linting when skill belongs to unknown category", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "unknown-category",
+                "my-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: my-skill
+description: A standard test skill in an unknown category
+---
+Some content`
+            )
+
+            const {lint} = await import("./lint.ts")
+            try {
+                await lint()
+            } catch (e) {
+                if (e instanceof ExitError) {
+                    exitCode = e.code
+                } else {
+                    throw e
+                }
+            }
+
+            expect(exitCode).toBe(1)
+            expect(
+                loggedErrors.some((err) =>
+                    err.includes("unknown category 'unknown-category'")
                 )
             ).toBe(true)
         })
@@ -811,6 +995,222 @@ Some content`
             const agentsContent = await fs.readFile(AGENTS_FILE, "utf-8")
             expect(agentsContent).toContain("A perfectly valid skill")
             expect(agentsContent).not.toContain("undefined")
+        })
+
+        it("should selectively sync by category", async () => {
+            const skillA = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "skill-a",
+                "SKILL.md"
+            )
+            const skillB = path.join(
+                SKILLS_DIR,
+                "writing",
+                "skill-b",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillA))
+            await fs.ensureDir(path.dirname(skillB))
+            await fs.writeFile(
+                skillA,
+                `---\nname: skill-a\ndescription: Skill A\n---\nContent A`
+            )
+            await fs.writeFile(
+                skillB,
+                `---\nname: skill-b\ndescription: Skill B\n---\nContent B`
+            )
+
+            const {sync} = await import("./sync.ts")
+            const {DASHBOARD_CONTENT_DIR} = await import("./lib.ts")
+
+            // Clean content dir first
+            await fs.remove(DASHBOARD_CONTENT_DIR)
+
+            // Sync only engineering
+            await sync({category: "engineering"})
+
+            // engineering/skill-a should exist, writing/skill-b should not
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "engineering", "skill-a")
+                )
+            ).toBe(true)
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "writing", "skill-b")
+                )
+            ).toBe(false)
+            // Zola section indexes should exist
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "_index.md")
+                )
+            ).toBe(true)
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "engineering", "_index.md")
+                )
+            ).toBe(true)
+        })
+
+        it("should selectively sync by skill (fully qualified and name-only)", async () => {
+            const skillA = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "skill-a",
+                "SKILL.md"
+            )
+            const skillB = path.join(
+                SKILLS_DIR,
+                "writing",
+                "skill-b",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillA))
+            await fs.ensureDir(path.dirname(skillB))
+            await fs.writeFile(
+                skillA,
+                `---\nname: skill-a\ndescription: Skill A\n---\nContent A`
+            )
+            await fs.writeFile(
+                skillB,
+                `---\nname: skill-b\ndescription: Skill B\n---\nContent B`
+            )
+
+            const {sync} = await import("./sync.ts")
+            const {DASHBOARD_CONTENT_DIR} = await import("./lib.ts")
+
+            // Clean content dir
+            await fs.remove(DASHBOARD_CONTENT_DIR)
+
+            // Sync skill-a with category/name format
+            await sync({skill: "engineering/skill-a"})
+
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "engineering", "skill-a")
+                )
+            ).toBe(true)
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "writing", "skill-b")
+                )
+            ).toBe(false)
+
+            // Clean content dir again
+            await fs.remove(DASHBOARD_CONTENT_DIR)
+
+            // Sync skill-b with name-only format
+            await sync({skill: "skill-b"})
+
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "engineering", "skill-a")
+                )
+            ).toBe(false)
+            expect(
+                await fs.pathExists(
+                    path.join(DASHBOARD_CONTENT_DIR, "writing", "skill-b")
+                )
+            ).toBe(true)
+        })
+
+        it("should handle directory and file symlinks during sync", async () => {
+            // Create a physical directory outside skills to point to
+            const extDir = path.join(tempHome, "external-resources")
+            await fs.ensureDir(extDir)
+
+            // Create a physical file in extDir
+            await fs.writeFile(
+                path.join(extDir, "some-doc.md"),
+                "This is a [link to self](./some-doc.md)"
+            )
+            await fs.writeFile(path.join(extDir, "other.txt"), "plain text")
+
+            // Create a valid skill
+            const skillDir = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "symlink-skill"
+            )
+            const skillPath = path.join(skillDir, "SKILL.md")
+            await fs.ensureDir(skillDir)
+            await fs.writeFile(
+                skillPath,
+                `---
+name: symlink-skill
+description: A skill testing symlinks
+---
+Content`
+            )
+
+            // Create the resources directory under the skill
+            const resourcesDir = path.join(skillDir, "resources")
+            await fs.ensureDir(resourcesDir)
+
+            // 1. Create a symlink to a file inside resources
+            const fileSymlink = path.join(resourcesDir, "doc-link.md")
+            await fs.symlink(path.join(extDir, "some-doc.md"), fileSymlink)
+
+            // 2. Create a symlink to a directory inside resources
+            const subExtDir = path.join(tempHome, "external-subdir")
+            await fs.ensureDir(subExtDir)
+            await fs.writeFile(
+                path.join(subExtDir, "nested-file.md"),
+                "Nested content"
+            )
+            const dirSymlink = path.join(resourcesDir, "nested-dir")
+            await fs.symlink(subExtDir, dirSymlink)
+
+            // 3. Create a broken symlink inside resources (should log warning but not throw)
+            const brokenSymlink = path.join(resourcesDir, "broken-link")
+            await fs.symlink(
+                path.join(tempHome, "does-not-exist"),
+                brokenSymlink
+            )
+
+            const {sync} = await import("./sync.ts")
+            const {DASHBOARD_CONTENT_DIR} = await import("./lib.ts")
+            await fs.remove(DASHBOARD_CONTENT_DIR)
+
+            // Run sync
+            await sync()
+
+            const destResources = path.join(
+                DASHBOARD_CONTENT_DIR,
+                "engineering",
+                "symlink-skill",
+                "resources"
+            )
+
+            // Check that the file symlink was resolved and syncResources copied/processed it
+            expect(
+                await fs.pathExists(path.join(destResources, "doc-link.md"))
+            ).toBe(true)
+            const syncedDocContent = await fs.readFile(
+                path.join(destResources, "doc-link.md"),
+                "utf-8"
+            )
+            expect(syncedDocContent).toContain('title = "doc-link"')
+            expect(syncedDocContent).toContain("This is a [link to self]")
+
+            // Check that the directory symlink was resolved and its contents synced
+            expect(
+                await fs.pathExists(
+                    path.join(destResources, "nested-dir", "nested-file.md")
+                )
+            ).toBe(true)
+            const syncedNestedContent = await fs.readFile(
+                path.join(destResources, "nested-dir", "nested-file.md"),
+                "utf-8"
+            )
+            expect(syncedNestedContent).toContain("Nested content")
+
+            // Broken link should not be copied
+            expect(
+                await fs.pathExists(path.join(destResources, "broken-link"))
+            ).toBe(false)
         })
     })
 

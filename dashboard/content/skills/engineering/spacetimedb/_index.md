@@ -55,11 +55,11 @@ Data in SpacetimeDB is stored in tables. You declare tables using macros/decorat
 
 ### Table Configurations & Attributes
 
-- **Public vs. Private**: Public tables (`#[spacetimedb(table(public))]` in Rust) are readable by any connected client. Private tables can only be queried by server-side code (reducers and views).
-- **Primary Keys**: Used to uniquely identify rows (`#[spacetimedb(primarykey)]`).
-- **Unique Constraints**: Prevent duplicate values in specified columns (`#[spacetimedb(unique)]`).
-- **Auto-Increment**: Automatically generates unique integer sequences for new rows (`#[spacetimedb(auto_increment)]`).
-- **Indexes**: Accelerate lookups on specific fields (`#[spacetimedb(index(btree))]`).
+- **Public vs. Private**: Tables are private by default — queryable only by server-side code (reducers and views). Add the `public` attribute (`#[table(accessor = <name>, public)]` in Rust) to make a table readable by any connected client.
+- **Primary Keys**: Used to uniquely identify rows (`#[primary_key]`).
+- **Unique Constraints**: Prevent duplicate values in specified columns (`#[unique]`).
+- **Auto-Increment**: Automatically generates unique integer sequences for new rows (`#[auto_inc]`).
+- **Indexes**: Accelerate lookups on specific fields (`#[index(btree)]`).
 
 ### Special-Purpose Tables
 
@@ -104,38 +104,38 @@ Special reducers invoked by the database host during system lifecycle events:
 Below is a complete, minimal Rust module defining tables and a reducer.
 
 ```rust
-use spacetimedb::{spacetimedb, Identity, ReducerContext};
+use spacetimedb::{reducer, table, Identity, ReducerContext, Table};
 
 // Define a public table for user profiles
-#[spacetimedb(table(public))]
+#[table(accessor = user_profile, public)]
 pub struct UserProfile {
-    #[spacetimedb(primarykey)]
+    #[primary_key]
     pub identity: Identity,
     pub username: String,
     pub online: bool,
 }
 
-// Define a schedule table for handling timeouts
-#[spacetimedb(table(private))]
+// Define a private table for handling timeouts (tables are private by default)
+#[table(accessor = heartbeat_timeout)]
 pub struct HeartbeatTimeout {
-    #[spacetimedb(primarykey)]
+    #[primary_key]
     pub identity: Identity,
     pub scheduled_time: u64,
 }
 
 // Reducer called by clients to register or update their username
-#[spacetimedb(reducer)]
+#[reducer]
 pub fn register_user(ctx: &ReducerContext, username: String) -> Result<(), String> {
     if username.trim().is_empty() {
         return Err("Username cannot be empty".to_string());
     }
 
-    if let Some(mut profile) = UserProfile::filter_by_identity(&ctx.sender) {
+    if let Some(mut profile) = ctx.db.user_profile().identity().find(ctx.sender()) {
         profile.username = username;
-        UserProfile::update_by_identity(&ctx.sender, profile);
+        ctx.db.user_profile().identity().update(profile);
     } else {
-        UserProfile::insert(UserProfile {
-            identity: ctx.sender,
+        ctx.db.user_profile().try_insert(UserProfile {
+            identity: ctx.sender(),
             username,
             online: true,
         })?;
@@ -145,11 +145,11 @@ pub fn register_user(ctx: &ReducerContext, username: String) -> Result<(), Strin
 }
 
 // Connection lifecycle hook
-#[spacetimedb(reducer(client_connected))]
+#[reducer(client_connected)]
 pub fn identity_connected(ctx: &ReducerContext) {
-    if let Some(mut profile) = UserProfile::filter_by_identity(&ctx.sender) {
+    if let Some(mut profile) = ctx.db.user_profile().identity().find(ctx.sender()) {
         profile.online = true;
-        UserProfile::update_by_identity(&ctx.sender, profile);
+        ctx.db.user_profile().identity().update(profile);
     }
 }
 ```

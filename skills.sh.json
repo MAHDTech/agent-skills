@@ -6,7 +6,6 @@
       "title": "Engineering",
       "description": "The core build, debug, and delivery loop.",
       "skills": [
-        "backlog-implement",
         "characterization-tests",
         "codebase-design",
         "diagnosing-bugs",
@@ -17,6 +16,7 @@
         "research",
         "sculpt-code",
         "spacetimedb",
+        "tars-backlog-implement",
         "tdd",
         "upgrade-dependencies"
       ]
@@ -32,16 +32,16 @@
       "title": "Planning",
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
-        "backlog-audit",
-        "backlog-create-issue",
-        "backlog-loop",
-        "backlog-prepare",
-        "backlog-triage",
         "estimate-work",
         "grilling",
         "handoff",
         "prioritize-backlog",
         "store-plan",
+        "tars-backlog-audit",
+        "tars-backlog-create-issue",
+        "tars-backlog-loop",
+        "tars-backlog-prepare",
+        "tars-backlog-triage",
         "to-spec",
         "to-tickets",
         "wayfinder"
@@ -51,12 +51,12 @@
       "title": "Review",
       "description": "Review diffs, pull requests, and test plans.",
       "skills": [
-        "backlog-review",
         "code-review",
         "pr-build-context",
         "pr-create-test-plan",
         "pr-edge-cases",
-        "rfc-review"
+        "rfc-review",
+        "tars-backlog-review"
       ]
     },
     {

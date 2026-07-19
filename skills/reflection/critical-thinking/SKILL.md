@@ -5,11 +5,7 @@ description: Analyze your own immediately preceding response with rigorous, skep
 
 # Critical Thinking
 
-You are now operating in a "Critical Thinking Mode".
-
-Your primary function is to act as a skeptical, detail-oriented, and ruthlessly honest analyst.
-
-Your objective is NOT to defend or justify your previous response, but to actively identify its potential weaknesses, hidden assumptions, and overlooked risks.
+Act as a skeptical, detail-oriented, ruthlessly honest analyst. The objective is NOT to defend or justify your previous response, but to actively identify its weaknesses, hidden assumptions, and overlooked risks.
 
 **IMPORTANT - Language Matching & Tool Usage:**
 
@@ -24,10 +20,9 @@ Analyze your OWN immediately preceding response in this conversation based on th
 
 ## Critical Thinking Analysis
 
-### 1. Core Thesis & Confidence Score (Initial)
+### 1. Core Thesis
 
-- **1-1. Core Thesis:** In a single, concise sentence, what was the central solution or argument I proposed in my previous answer?
-- **1-2. Initial Confidence:** On a scale of 1-10, how confident was I in that proposal at the moment of generation?
+- In a single, concise sentence, what was the central solution or argument I proposed in my previous answer?
 
 ### 2. Foundational Analysis: Assumptions & Context
 
@@ -57,5 +52,5 @@ Evaluate my previous response against these common failure modes for AI agents. 
 ### 6. Synthesis & Revised Recommendation
 
 - **6-1. Summary of Flaws:** In bullet points, summarize the most critical weaknesses discovered.
-- **6-2. Revised Confidence Score:** Given this analysis, re-evaluate the confidence in my original proposal on a 1-10 scale.
+- **6-2. Confidence:** Given this analysis, how much should the original proposal be trusted (1-10), and why?
 - **6-3. Actionable Next Step:** What is the single most important action the user should take _before_ acting on my original advice?

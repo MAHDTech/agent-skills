@@ -19,7 +19,7 @@ Both axes run as **parallel sub-agents** so they don't pollute each other's cont
 
 This review leans on your project's own conventions — where issues and tickets live (the issue tracker), and where specs and standards docs are kept. If none of that is obvious from the repo itself, ask the user before you start rather than guessing.
 
-Run any repo command through the project's environment (in this repo, `devenv shell -- <cmd>`). The diff is read with `git`; fetch issues and pull requests with the `gh` CLI.
+Run any repo command through your project's environment and its own test/lint command wrapper (whatever this project uses). The diff is read with `git`; fetch issues and pull requests with the `gh` CLI.
 
 ## Process
 
@@ -87,7 +87,7 @@ Reporting them separately stops one axis from masking the other.
 `code-review` stands on its own, but it sits next to narrower passes worth reaching for:
 
 - `/pr-build-context` — gather high-signal context on a pull request before the review.
-- `/pr-build-context`, `/pr-create-test-plan`, `/pr-edge-cases` — build reviewer context on a branch, draft a manual test plan, or probe edge cases and failure modes.
+- `/pr-create-test-plan`, `/pr-edge-cases` — draft a manual test plan, or probe edge cases and failure modes on a branch.
 - `/diagnosing-bugs` — when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

@@ -1,6 +1,6 @@
 ---
 name: opencode-acp
-description: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates.
+description: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates. Use when driving OpenCode headless or programmatically over ACP — starting a session, sending prompts, resuming a prior session, or checking and triggering OpenCode updates.
 metadata:
   version: 1.0.2
   author: Benjamin Jesuiter <bjesuiter@gmail.com>
@@ -162,13 +162,13 @@ Per OpenCode instance, track:
 ## Example: Complete Interaction
 
 ```
-1. bash(command: "opencode acp --cwd /home/user/myproject", background: true, workdir: "/home/user/myproject")
+1. bash(command: "opencode acp --cwd <project-dir>", background: true, workdir: "<project-dir>")
    -> processSessionId: "bg_42"
 
 2. process.write(sessionId: "bg_42", data: '{"jsonrpc":"2.0","id":0,"method":"initialize",...}\n')
    process.poll(sessionId: "bg_42") -> initialize response
 
-3. process.write(sessionId: "bg_42", data: '{"jsonrpc":"2.0","id":1,"method":"session/new","params":{"cwd":"/home/user/myproject","mcpServers":[]}}\n')
+3. process.write(sessionId: "bg_42", data: '{"jsonrpc":"2.0","id":1,"method":"session/new","params":{"cwd":"<project-dir>","mcpServers":[]}}\n')
    process.poll(sessionId: "bg_42") -> opencodeSessionId: "sess_xyz789"
 
 4. process.write(sessionId: "bg_42", data: '{"jsonrpc":"2.0","id":2,"method":"session/prompt","params":{"sessionId":"sess_xyz789","prompt":[{"type":"text","text":"List all TypeScript files"}]}}\n')

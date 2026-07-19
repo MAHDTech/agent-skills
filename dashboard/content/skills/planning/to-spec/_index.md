@@ -26,6 +26,8 @@ Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear
 
 3. Write the spec using the template below, then publish it to your project's issue tracker. Apply the project's ready-for-agent triage label (or its equivalent) — no need for additional triage.
 
+Once the spec is approved, slice it into tracer-bullet tickets with `/to-tickets`.
+
 ## Spec template
 
 ```markdown

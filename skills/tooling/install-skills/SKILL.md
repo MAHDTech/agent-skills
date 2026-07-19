@@ -1,8 +1,6 @@
 ---
 name: install-skills
 description: Install, update, and manage agent skills from a GitHub-hosted collection with the skills.sh CLI (`npx skills add <owner>/<repo>`), across every runtime the collection targets — Claude Code, OpenCode, Goose, and Antigravity CLI. Use when adding skills to an agent, updating a stale copy, verifying an install, wiring the same collection into another runtime, or troubleshooting a skill that will not show up or that collides by name.
-resources:
-  - https://bun.sh/docs/llms.txt
 ---
 
 # Install Skills

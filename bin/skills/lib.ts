@@ -324,10 +324,14 @@ export async function cleanStaleLinks(dir: string): Promise<number> {
 
 export const ANTIGRAVITY_LOCK_FILE = `${ANTIGRAVITY_SKILLS_JSON}.lock`
 
-export async function acquireLock() {
-    const timeout = 10000
-    const start = Date.now()
-    while (Date.now() - start < timeout) {
+export async function acquireLock(options?: {
+    now?: () => number
+    timeout?: number
+}) {
+    const timeout = options?.timeout ?? 10000
+    const now = options?.now ?? Date.now
+    const start = now()
+    while (now() - start < timeout) {
         try {
             await fs.writeFile(ANTIGRAVITY_LOCK_FILE, String(process.pid), {
                 flag: "wx",
@@ -341,18 +345,44 @@ export async function acquireLock() {
                         "utf-8"
                     )
                     const stat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
-                    if (Date.now() - stat.mtimeMs > 10000) {
-                        // Re-verify content and modification time still match the observed stale lock before removing
-                        const verifyContent = await fs.readFile(
-                            ANTIGRAVITY_LOCK_FILE,
-                            "utf-8"
-                        )
-                        const verifyStat = await fs.stat(ANTIGRAVITY_LOCK_FILE)
-                        if (
-                            verifyContent === content &&
-                            verifyStat.mtimeMs === stat.mtimeMs
-                        ) {
-                            await fs.remove(ANTIGRAVITY_LOCK_FILE)
+                    if (now() - stat.mtimeMs > 10000) {
+                        // Stale lock file. Rename it to a temp file in the same directory.
+                        // Since fs.rename is atomic, only one concurrent process can succeed in moving it.
+                        const tempPath = `${ANTIGRAVITY_LOCK_FILE}.stale-${now()}-${Math.random().toString(36).slice(2, 7)}`
+                        try {
+                            await fs.rename(ANTIGRAVITY_LOCK_FILE, tempPath)
+                            // Re-verify content and modification time still match the observed stale lock before removing
+                            const verifyContent = await fs.readFile(
+                                tempPath,
+                                "utf-8"
+                            )
+                            const verifyStat = await fs.stat(tempPath)
+                            if (
+                                verifyContent === content &&
+                                verifyStat.mtimeMs === stat.mtimeMs
+                            ) {
+                                await fs.remove(tempPath)
+                            } else {
+                                // Content or mtime did not match. It was replaced with a new lock before/during rename.
+                                // Restore it back atomically using the wx flag to avoid overwriting or TOCTOU race.
+                                try {
+                                    await fs.writeFile(
+                                        ANTIGRAVITY_LOCK_FILE,
+                                        verifyContent,
+                                        {
+                                            flag: "wx",
+                                        }
+                                    )
+                                } catch (writeErr: any) {
+                                    if (writeErr.code !== "EEXIST") {
+                                        throw writeErr
+                                    }
+                                } finally {
+                                    await fs.remove(tempPath)
+                                }
+                            }
+                        } catch {
+                            // Ignore concurrent rename/access failures
                         }
                     }
                 } catch {

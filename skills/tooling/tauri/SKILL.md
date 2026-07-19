@@ -11,9 +11,9 @@ Guidelines and reference for developing Tauri v2+ cross-platform applications. A
 
 ## Reference Documentation
 
-When deep context, precise API definitions, or config schemas are required, consult the full local Tauri documentation:
+When deep context, precise API definitions, or config schemas are required, consult the bundled Tauri reference excerpts:
 
-- Consult the local Tauri documentation: [concept.md](resources/concept.md) (granular pages fetched from the official v2 reference docs index).
+- Start from [concept.md](resources/concept.md), a short index of core-concept topics that links into the granular reference pages vendored under `resources/` from the official v2 docs.
 
 ## Constraints
 

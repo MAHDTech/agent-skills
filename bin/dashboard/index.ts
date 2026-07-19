@@ -1,12 +1,20 @@
 import {parseArgs} from "util"
 
-let options: {action?: string | boolean} = {}
+let options: {
+    action?: string | boolean
+    skill?: string
+    category?: string
+} = {}
 let positionals: string[] = []
 
 try {
     const parsed = parseArgs({
         args: process.argv.slice(2),
-        options: {action: {type: "string", short: "a"}},
+        options: {
+            action: {type: "string", short: "a"},
+            skill: {type: "string"},
+            category: {type: "string"},
+        },
         strict: true,
         allowPositionals: true,
     })
@@ -16,7 +24,7 @@ try {
     const message = e instanceof Error ? e.message : String(e)
     console.error(`Error: ${message}`)
     console.error(
-        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test>"
+        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test> [--skill <skill>] [--category <category>]"
     )
     process.exit(1)
 }
@@ -31,9 +39,23 @@ const fail = (e: unknown) => {
 }
 
 if (action === "build") {
-    import("./build.ts").then((mod) => mod.buildAction()).catch(fail)
+    import("./build.ts")
+        .then((mod) =>
+            mod.buildAction({
+                skill: options.skill,
+                category: options.category,
+            })
+        )
+        .catch(fail)
 } else if (action === "serve") {
-    import("./serve.ts").then((mod) => mod.serveAction()).catch(fail)
+    import("./serve.ts")
+        .then((mod) =>
+            mod.serveAction({
+                skill: options.skill,
+                category: options.category,
+            })
+        )
+        .catch(fail)
 } else if (action === "css") {
     import("./css.ts").then((mod) => mod.cssAction()).catch(fail)
 } else if (action === "test") {
@@ -49,7 +71,7 @@ if (action === "build") {
         .catch(fail)
 } else {
     console.error(
-        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test>"
+        "Usage: bun run bin/dashboard/index.ts --action <build|serve|css|test> [--skill <skill>] [--category <category>]"
     )
     process.exit(1)
 }

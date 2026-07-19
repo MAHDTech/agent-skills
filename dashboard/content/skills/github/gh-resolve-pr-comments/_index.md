@@ -196,21 +196,35 @@ After all items are addressed, show a summary:
 
 Skip resolution only for **Discuss** items the user explicitly deferred.
 
-For each addressed thread, get the thread ID from the comment's `node_id`:
+A review comment has no field back to its parent thread, so you cannot go directly from `node_id` to a thread ID. Instead, list the PR's review threads and match each thread to the comment you addressed by its `databaseId` (the REST `id` from step 3) or node `id`:
 
 ```bash
-gh api graphql -f query='
-query($nodeId: ID!) {
-  node(id: $nodeId) {
-    ... on PullRequestReviewComment {
-      pullRequestReviewThread: thread {
-        id
-        isResolved
+gh api graphql --paginate -f query='
+query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $pr) {
+      reviewThreads(first: 100, after: $endCursor) {
+        nodes {
+          id
+          isResolved
+          comments(first: 100) {
+            nodes {
+              id
+              databaseId
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       }
     }
   }
-}' -f nodeId="{comment_node_id}"
+}' -f owner="{owner}" -f repo="{repo}" -F pr={pr_number}
 ```
+
+The thread whose `comments` contains your addressed comment (`databaseId` == the REST `id`, or `id` == the `node_id`) is the one to resolve; take its `id`.
 
 Then resolve:
 
@@ -231,7 +245,7 @@ Ask the user:
 
 > All comments have been addressed and {M} threads resolved on GitHub. Ready to:
 >
-> 1. Commit with message "Tended to github comments"
+> 1. Commit with message "Address PR review comments" (edit to taste)
 > 2. Push to remote
 >
 > Proceed? Or would you like to review the changes first?
@@ -245,7 +259,7 @@ git add <specific changed files>
 ```
 
 ```bash
-git commit -m "Tended to github comments"
+git commit -m "Address PR review comments"
 ```
 
 ```bash

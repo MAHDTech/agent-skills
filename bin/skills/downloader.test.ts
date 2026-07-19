@@ -495,4 +495,218 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
             )
         })
     })
+
+    describe("downloadAction and cleanAction configuration and filtering", () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/skill-a/SKILL.md",
+                dirName: "skill-a",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "skill-a",
+                    description: "Skill A description",
+                    resources: ["https://example.com/a.txt"],
+                },
+                content: "",
+            },
+            {
+                path: "skills/tooling/skill-b/SKILL.md",
+                dirName: "skill-b-dir",
+                category: "tooling",
+                promoted: false,
+                metadata: {
+                    name: "skill-b-name",
+                    description: "Skill B description",
+                    resources: ["https://example.com/b.txt"],
+                },
+                content: "",
+            },
+        ]
+
+        beforeEach(async () => {
+            globalThis.fetch = mock(async () => {
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+        })
+
+        it("should filter by skill name (dirName or metadata.name) in downloadAction", async () => {
+            // Filter by dirName
+            await downloadAction(mockSkills, fakeRepo, {skill: "skill-a"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/a.txt"
+                    )
+                )
+            ).toBe(true)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/b.txt"
+                    )
+                )
+            ).toBe(false)
+
+            // Cleanup
+            await fs.remove(path.join(fakeRepo, "skills"))
+
+            // Filter by metadata.name
+            await downloadAction(mockSkills, fakeRepo, {skill: "skill-b-name"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/a.txt"
+                    )
+                )
+            ).toBe(false)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/b.txt"
+                    )
+                )
+            ).toBe(true)
+        })
+
+        it("should filter by category in downloadAction", async () => {
+            await downloadAction(mockSkills, fakeRepo, {category: "tooling"})
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/engineering/skill-a/resources/a.txt"
+                    )
+                )
+            ).toBe(false)
+            expect(
+                await fs.pathExists(
+                    path.join(
+                        fakeRepo,
+                        "skills/tooling/skill-b/resources/b.txt"
+                    )
+                )
+            ).toBe(true)
+        })
+
+        it("should filter by skill name and category in cleanAction", async () => {
+            // Create resources dirs first
+            const dirA = path.join(
+                fakeRepo,
+                "skills/engineering/skill-a/resources"
+            )
+            const dirB = path.join(fakeRepo, "skills/tooling/skill-b/resources")
+            await fs.ensureDir(dirA)
+            await fs.ensureDir(dirB)
+
+            // Clean only skill-a
+            const {cleanAction} = await import("./downloader.ts")
+            await cleanAction(mockSkills, fakeRepo, {skill: "skill-a"})
+            expect(await fs.pathExists(dirA)).toBe(false)
+            expect(await fs.pathExists(dirB)).toBe(true)
+
+            // Reset and Clean only category tooling
+            await fs.ensureDir(dirA)
+            await cleanAction(mockSkills, fakeRepo, {category: "tooling"})
+            expect(await fs.pathExists(dirA)).toBe(true)
+            expect(await fs.pathExists(dirB)).toBe(false)
+        })
+
+        it("should propagate custom timeout to fetch signal", async () => {
+            let capturedTimeoutSignal
+            globalThis.fetch = mock(async (_url, init) => {
+                capturedTimeoutSignal = init?.signal
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+
+            await downloadAction(mockSkills, fakeRepo, {
+                skill: "skill-a",
+                timeout: 45,
+            })
+            expect(capturedTimeoutSignal).toBeDefined()
+
+            const {download} = await import("./downloader.ts")
+            const originalAbortSignalTimeout = AbortSignal.timeout
+            let passedTimeoutMs = 0
+            AbortSignal.timeout = (ms) => {
+                passedTimeoutMs = ms
+                return originalAbortSignalTimeout(ms)
+            }
+            try {
+                await download("https://example.com/a.txt", 45)
+            } catch {
+                // ignore
+            } finally {
+                AbortSignal.timeout = originalAbortSignalTimeout
+            }
+            expect(passedTimeoutMs).toBe(45000)
+        })
+
+        it("should respect custom concurrency limit", async () => {
+            const manyResourcesSkill = [
+                {
+                    path: "skills/engineering/skill-many/SKILL.md",
+                    dirName: "skill-many",
+                    category: "engineering",
+                    promoted: false,
+                    metadata: {
+                        name: "skill-many",
+                        description: "Many resources",
+                        resources: [
+                            "https://example.com/1.txt",
+                            "https://example.com/2.txt",
+                            "https://example.com/3.txt",
+                            "https://example.com/4.txt",
+                            "https://example.com/5.txt",
+                        ],
+                    },
+                    content: "",
+                },
+            ]
+
+            let activeConnections = 0
+            let maxActiveConnections = 0
+
+            globalThis.fetch = mock(async () => {
+                activeConnections++
+                maxActiveConnections = Math.max(
+                    maxActiveConnections,
+                    activeConnections
+                )
+                await new Promise((r) => setTimeout(r, 10))
+                activeConnections--
+                return new Response(
+                    "Some mock resource content which is longer than fifty bytes to satisfy the size check.",
+                    {
+                        status: 200,
+                        headers: {"content-type": "text/plain"},
+                    }
+                )
+            }) as any
+
+            await downloadAction(manyResourcesSkill, fakeRepo, {concurrency: 2})
+            expect(maxActiveConnections).toBeLessThanOrEqual(2)
+
+            maxActiveConnections = 0
+            activeConnections = 0
+            await downloadAction(manyResourcesSkill, fakeRepo, {concurrency: 1})
+            expect(maxActiveConnections).toBe(1)
+        })
+    })
 })

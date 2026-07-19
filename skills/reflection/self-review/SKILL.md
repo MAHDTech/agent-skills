@@ -3,7 +3,7 @@ name: self-review
 description: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
 ---
 
-# Follow-Up
+# Self-Review
 
 Post-implementation reflection pass. Run after completing a task to catch loose ends and simplify before calling it done.
 
@@ -34,6 +34,8 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 - Are there language-specific antipatterns? (e.g., Python: bare `except`, mutable default args; Go: exported names that shouldn't be; JS/TS: `any` types that should be narrowed)
 
 ### 3. More modular?
+
+> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup — untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt — reach for `/sculpt-code` instead.
 
 - Are there functions doing more than one thing that should be split?
 - Is there duplicated logic across the diff that should be extracted?

@@ -26,13 +26,15 @@ Review branch changes for logic correctness. This skill finds what breaks, not w
 - Testable helpers or utilities that lack unit tests
 - Existing tests that may be invalidated by the changes
 
-### 2. Logic Simplification
+### 2. Logic Errors
 
-- Conditional branches that can be collapsed or are mutually exclusive
-- Defensive code that can't trigger (checking for nil after a constructor that never returns nil)
-- Redundant validation (checking the same condition at multiple layers)
-- Complex boolean expressions that could be a single predicate
-- Switch/match statements missing cases or with unreachable default branches
+Flag logic that produces _wrong behavior_, not merely code that could read more cleanly (that is `/sculpt-code`'s job).
+
+- Conditional branches that are unintentionally mutually exclusive or unreachable, so a case that should run never does
+- Inverted or off-by-one comparisons (`<` vs `<=`, `&&` vs `||`, negation errors) that select the wrong branch
+- Complex boolean expressions whose operator precedence or short-circuiting yields the wrong result
+- Switch/match statements missing a case, so valid inputs fall through to a wrong default
+- Validation applied in one path but skipped in another that reaches the same sink
 
 ### 3. Edge Cases & Failure Modes
 
