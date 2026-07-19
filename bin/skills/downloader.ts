@@ -44,6 +44,19 @@ export function stripReaderProxy(urlStr: string): string {
     return urlStr
 }
 
+// The r.jina.ai reader prepends a metadata preamble to fetched docs:
+//   Title: …\n\nURL Source: …\n\n[Published Time: …\n\n]Markdown Content:\n<doc>
+// The Published Time value jitters between fetches even when the page is
+// unchanged, which makes downloads non-idempotent. Strip the whole preamble so
+// re-downloading an unchanged page produces an identical file.
+export function stripReaderMetadata(content: string): string {
+    if (!content.startsWith("Title:")) return content
+    const marker = "\nMarkdown Content:\n"
+    const idx = content.indexOf(marker)
+    if (idx === -1) return content
+    return content.slice(idx + marker.length).replace(/^\n+/, "")
+}
+
 // Download content using Bun-native fetch
 export async function download(
     url: string,
@@ -672,7 +685,7 @@ export async function downloadAction(
                     isResponseHtml = result.isHtml
                 }
 
-                const trimmed = content.trim()
+                const trimmed = stripReaderMetadata(content.trim())
                 if (trimmed.length < MIN_CONTENT_BYTES) {
                     log.warn(`  [SKIP] Trivial content from ${job.url}`)
                     totalSkipped++

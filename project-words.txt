@@ -50,6 +50,7 @@ icat
 imgcat
 iseconds
 jetbrainsmono
+jina
 Karpathy
 khtml
 leitwort

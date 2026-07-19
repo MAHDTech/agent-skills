@@ -23,7 +23,31 @@ const {
     getCommonPrefix,
     parseLlmsTxtLinks,
     checkPathTraversal,
+    stripReaderMetadata,
 } = await import("./downloader.ts")
+
+describe("stripReaderMetadata", () => {
+    it("strips the jina reader preamble including the volatile Published Time", () => {
+        const input =
+            "Title: GitHub CLI\n\nURL Source: source-page\n\nPublished Time: Thu, 09 Jul 2026 15:15:41 GMT\n\nMarkdown Content:\n# gh issue\n\nManage issues.\n"
+        expect(stripReaderMetadata(input)).toBe(
+            "# gh issue\n\nManage issues.\n"
+        )
+    })
+    it("strips the preamble when Published Time is absent", () => {
+        const input =
+            "Title: T\n\nURL Source: source-page\n\nMarkdown Content:\nBody here.\n"
+        expect(stripReaderMetadata(input)).toBe("Body here.\n")
+    })
+    it("leaves non-jina content untouched", () => {
+        const input = "# A normal doc\n\nNo preamble here.\n"
+        expect(stripReaderMetadata(input)).toBe(input)
+    })
+    it("leaves content that starts with Title: but has no Markdown Content marker", () => {
+        const input = "Title: not jina\n\nsome body\n"
+        expect(stripReaderMetadata(input)).toBe(input)
+    })
+})
 
 describe("downloader unit tests", () => {
     let originalFetch: typeof globalThis.fetch
