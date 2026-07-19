@@ -138,6 +138,9 @@ export function rewriteSkillLinks(
             if (!fs.existsSync(targetFullPath)) return match
 
             const relToSkills = path.relative(SKILLS_DIR, targetFullPath)
+            if (relToSkills.startsWith("..") || path.isAbsolute(relToSkills)) {
+                return match
+            }
             const parts = relToSkills.split(/[\\/]/)
             const category = parts.length >= 2 ? parts[0]! : ""
             if (CATEGORIES[category]?.lifecycle) {
