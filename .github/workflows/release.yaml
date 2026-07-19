@@ -50,7 +50,7 @@ jobs:
 
       - id: compute_version
         name: Compute Version
-        shell: devenv shell --quiet bash -- -e {0}
+        shell: devenv shell --quiet -- bash -e {0}
         run: |
           CURRENT_VERSION=$(convco version 2>/dev/null || echo "0.0.0")
           NEXT_VERSION=$(convco version --bump 2>/dev/null || echo "0.0.0")
@@ -97,7 +97,7 @@ jobs:
       - id: generate_changelog
         name: Generate Changelog
         if: steps.compute_version.outputs.skip != 'true'
-        shell: devenv shell --quiet bash -- -e {0}
+        shell: devenv shell --quiet -- bash -e {0}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
