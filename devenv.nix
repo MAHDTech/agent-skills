@@ -321,7 +321,9 @@ in
   };
 
   enterTest = ''
-    bun test bin/skills
+    bun test bin/skills/lib.test.ts
+    bun test bin/skills/lint.test.ts
+    bun test bin/skills/downloader.test.ts
     bun test bin/dashboard
   '';
 }
