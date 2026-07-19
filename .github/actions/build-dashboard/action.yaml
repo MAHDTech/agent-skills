@@ -6,5 +6,5 @@ runs:
   steps:
     - id: build_dashboard
       name: Build Dashboard
-      shell: devenv shell --quiet bash -- -e {0}
+      shell: devenv shell --quiet -- bash -e {0}
       run: dashboard --action build
