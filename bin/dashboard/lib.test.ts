@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {describe, it, expect, beforeAll, afterAll, mock} from "bun:test"
+import {describe, it, expect, beforeAll, afterAll, mock, spyOn} from "bun:test"
 import fs from "fs"
 import path from "path"
 import os from "os"
@@ -94,6 +94,77 @@ describe("Dashboard Lib Tests", () => {
             lib.cleanOutputDir()
 
             expect(fs.existsSync(defaultPublicDir)).toBe(false)
+        })
+
+        it("should retry and succeed if fs.rmSync throws on the first few attempts but succeeds on a subsequent attempt", () => {
+            const testCleanDir = path.join(
+                tempRootDir,
+                "test-retry-success-dir"
+            )
+            fs.mkdirSync(testCleanDir, {recursive: true})
+            fs.writeFileSync(path.join(testCleanDir, "file.txt"), "hello")
+
+            let attempts = 0
+            const originalRmSync = fs.rmSync
+            const spy = spyOn(fs, "rmSync").mockImplementation(
+                (pathArg: any, options?: any) => {
+                    if (pathArg === testCleanDir) {
+                        attempts++
+                        if (attempts <= 2) {
+                            throw new Error(
+                                "Simulated locked file/permission error"
+                            )
+                        }
+                    }
+                    return originalRmSync(pathArg, options)
+                }
+            )
+
+            try {
+                lib.cleanOutputDir(testCleanDir)
+                expect(attempts).toBe(3)
+                expect(fs.existsSync(testCleanDir)).toBe(false)
+            } finally {
+                spy.mockRestore()
+            }
+        })
+
+        it("should retry 5 times and log a warning if deletion fails on all attempts", () => {
+            const testCleanDir = path.join(tempRootDir, "test-retry-fail-dir")
+            fs.mkdirSync(testCleanDir, {recursive: true})
+            fs.writeFileSync(path.join(testCleanDir, "file.txt"), "hello")
+
+            mockLogWarn.mockClear()
+            let attempts = 0
+            const originalRmSync = fs.rmSync
+            const spy = spyOn(fs, "rmSync").mockImplementation(
+                (pathArg: any, options?: any) => {
+                    if (pathArg === testCleanDir) {
+                        attempts++
+                        throw new Error("Simulated persistent error")
+                    }
+                    return originalRmSync(pathArg, options)
+                }
+            )
+
+            try {
+                lib.cleanOutputDir(testCleanDir)
+                expect(attempts).toBe(5)
+                expect(mockLogWarn).toHaveBeenCalled()
+                const warnCalls = mockLogWarn.mock.calls as any[]
+                expect(
+                    warnCalls.some(
+                        (call) =>
+                            call[0].includes("Failed to clean directory") &&
+                            call[0].includes("test-retry-fail-dir")
+                    )
+                ).toBe(true)
+            } finally {
+                spy.mockRestore()
+                if (fs.existsSync(testCleanDir)) {
+                    originalRmSync(testCleanDir, {recursive: true, force: true})
+                }
+            }
         })
     })
 
