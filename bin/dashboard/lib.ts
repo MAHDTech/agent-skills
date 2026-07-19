@@ -125,12 +125,7 @@ export function cleanOutputDir(
                 return
             }
             // Sleep/block before retrying using a non-busy-waiting synchronous wait
-            Atomics.wait(
-                new Int32Array(new SharedArrayBuffer(4)),
-                0,
-                0,
-                delayMs
-            )
+            Bun.sleepSync(delayMs)
         }
     }
 }
