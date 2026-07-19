@@ -32,6 +32,9 @@ jobs:
 
     timeout-minutes: 5
 
+    env:
+      GIPHY_TOKEN: "${{ secrets.GIPHY_TOKEN }}"
+
     steps:
       - id: giphy_search
         name: Search Giphy
