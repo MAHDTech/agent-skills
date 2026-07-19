@@ -1,0 +1,161 @@
+{% import "partials/sidebar_macros.html" as sidebar_macros %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    {% block title %}
+      {% if page %}{{ page.title }} · {{ config.title }}
+      {% elif section %}{% if section.title == config.title %}{{ config.title }}{% else %}{{ section.title }} · {{ config.title }}{% endif %}
+      {% else %}{{ config.title }}{% endif %}
+    {% endblock title %}
+  </title>
+
+  {% if page and page.description %}
+    <meta name="description" content="{{ page.description }}">
+  {% elif section and section.description %}
+    <meta name="description" content="{{ section.description }}">
+  {% elif config.description is defined %}
+    <meta name="description" content="{{ config.description }}">
+  {% endif %}
+
+  <link rel="preload" href="/fonts/jetbrainsmono-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/jetbrainsmono-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet">
+  <link rel="stylesheet" href="/build/css/generated.css">
+
+  {% if (page and page.extra.mermaid is defined and page.extra.mermaid) or (section and section.extra.mermaid is defined and section.extra.mermaid) %}
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        console.debug("[TARS] Mermaid DOM mutation script running...");
+        const blocks = document.querySelectorAll('code[data-lang="mermaid"]');
+        console.debug(`[TARS] Found ${blocks.length} raw mermaid blocks.`);
+
+        blocks.forEach(el => {
+          let pre = el.tagName === 'PRE' ? el : el.closest('pre');
+          if (pre && !pre.classList.contains('mermaid-processed')) {
+            console.debug("[TARS] Processing mermaid block:", pre);
+            pre.className = 'mermaid mermaid-processed';
+            pre.removeAttribute('data-lang');
+            pre.removeAttribute('style'); // Remove Zola's syntax highlighting background
+            let rawText = pre.textContent || pre.innerText;
+            console.debug(`[TARS] Extracted graph text:\n${rawText.substring(0, 50)}...`);
+            pre.textContent = rawText; // Set safe text node without HTML tags
+          }
+        });
+
+        console.debug("[TARS] Initializing mermaid library config...");
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: "dark",
+          themeVariables: {
+            primaryColor: "#151b23",
+            primaryBorderColor: "#00f0ff",
+            primaryTextColor: "#e2f1ff",
+            lineColor: "#2a3644",
+            secondaryColor: "#151b23",
+            tertiaryColor: "#0b0e14",
+            fontFamily: "JetBrains Mono, monospace",
+          },
+        });
+
+        try {
+          console.debug("[TARS] Explicitly running mermaid.run()...");
+          await mermaid.run({ querySelector: '.mermaid' });
+          console.debug("[TARS] Mermaid rendering complete.");
+        } catch (e) {
+          console.error("[TARS] Mermaid rendering failed:", e);
+        }
+      });
+    </script>
+  {% endif %}
+
+  <script>
+    (function() {
+      const allowedThemes = ['tars', 'tars-light', 'tars-dark', 'tars-synthwave'];
+
+      const applyTheme = (themeStr) => {
+          document.documentElement.setAttribute('data-theme', themeStr);
+          localStorage.setItem('tars-archive-theme', themeStr);
+      };
+
+      // Ensure zero-flicker on load
+      const params = new URLSearchParams(window.location.search);
+      const themeParam = params.get('theme');
+      const storedTheme = localStorage.getItem('tars-archive-theme');
+
+      const theme = themeParam
+        ? (allowedThemes.includes(themeParam) ? themeParam : 'tars')
+        : (storedTheme && allowedThemes.includes(storedTheme) ? storedTheme : 'tars');
+
+      applyTheme(theme);
+
+      // Listen for instant swaps from parent
+      window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'THEME_UPDATE' && allowedThemes.includes(event.data.theme)) {
+          applyTheme(event.data.theme);
+        }
+      });
+    })();
+  </script>
+
+  {% block head_extra %}{% endblock head_extra %}
+</head>
+<body>
+  {% include "partials/header.html" %}
+
+  <div class="w-full px-4 md:px-8 flex flex-col md:flex-row gap-8">
+    <aside class="w-full md:w-64 lg:w-72 shrink-0 py-8 border-r border-[var(--color-border)] pr-4 hidden md:block">
+      {% include "partials/sidebar.html" %}
+    </aside>
+
+    <main class="flex-1 py-8 overflow-x-hidden min-w-0">
+      {# Universal back/forward navigation — works from any page, incl. reference pages. #}
+      <div class="flex gap-2 mb-6 text-sm">
+        <button type="button" onclick="history.back()" aria-label="Go back"
+          class="px-2 py-1 rounded border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">‹ Back</button>
+        <button type="button" onclick="history.forward()" aria-label="Go forward"
+          class="px-2 py-1 rounded border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">Forward ›</button>
+      </div>
+      {% block content %}{% endblock content %}
+    </main>
+  </div>
+
+  {% include "partials/footer.html" %}
+
+  <pagefind-modal reset-on-close bundle-path="/pagefind/"></pagefind-modal>
+
+  <script data-cfasync="false" src="/pagefind/pagefind-component-ui.js" type="module"></script>
+  <script data-cfasync="false" type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+      const trigger = document.getElementById("search-trigger");
+      const modal = document.querySelector("pagefind-modal");
+      if (trigger && modal) {
+        // Update shortcut key depending on OS
+        const kbd = trigger.querySelector("kbd");
+        if (kbd) {
+          const isMac = /mac|ipod|iphone|ipad/i.test(navigator.userAgent || navigator.platform);
+          kbd.textContent = isMac ? "⌘K" : "Ctrl K";
+        }
+
+        trigger.addEventListener("click", () => {
+          if (typeof modal.open === "function") {
+            modal.open();
+          }
+        });
+        document.addEventListener("keydown", (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+            e.preventDefault();
+            if (typeof modal.open === "function") {
+              modal.open();
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

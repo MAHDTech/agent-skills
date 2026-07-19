@@ -1,0 +1,38 @@
+##################################################
+# Trivy Configuration
+# https://aquasecurity.github.io/trivy/latest/docs/references/configuration/config-file/
+##################################################
+
+scan:
+  # Scanners to enable
+  scanners:
+    - vuln
+    - misconfig
+    - secret
+    - license
+
+  # Severity levels to report
+  severity:
+    - CRITICAL
+    - HIGH
+    - MEDIUM
+
+  # Skip directories
+  skip-dirs:
+    - .devenv
+    - .git
+    - .vscode
+    - .codeql-db
+    - node_modules
+
+  # Skip files
+  skip-files:
+    - "*.nix"
+    - "Cargo.lock"
+    - "bun.lock"
+    - "devenv.lock"
+    - "flake.lock"
+
+vulnerability:
+  # Ignore unfixed vulnerabilities
+  ignore-unfixed: true

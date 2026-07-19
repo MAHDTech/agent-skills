@@ -1,0 +1,54 @@
+@layer base {
+    :root,
+    [data-theme="tars"] {
+        --theme-primary: #00f0ff;
+        --theme-bg-dark: #0b0e14;
+        --theme-surface: #151b23;
+        --theme-text-main: #e2f1ff;
+        --theme-muted: #647a8f;
+        --theme-accent: #ff00e6;
+        --theme-border-color: #2a3644;
+        --theme-status-green: #00ff66;
+        --theme-status-yellow: #ffd700;
+        --theme-status-red: #ff2a2a;
+    }
+
+    [data-theme="tars-light"] {
+        --theme-primary: #00808b;
+        --theme-bg-dark: #f5f8f8;
+        --theme-surface: #c4e0e2;
+        --theme-text-main: #0b0e14;
+        --theme-muted: #647a8f;
+        --theme-accent: #d000ba;
+        --theme-border-color: #00a040;
+        --theme-status-green: #00a040;
+        --theme-status-yellow: #b8860b;
+        --theme-status-red: #dc143c;
+    }
+
+    [data-theme="tars-dark"] {
+        --theme-primary: #00f0ff;
+        --theme-bg-dark: #0b0e14;
+        --theme-surface: #083b43;
+        --theme-text-main: #e2f1ff;
+        --theme-muted: #647a8f;
+        --theme-accent: #ff00e6;
+        --theme-border-color: #151b23;
+        --theme-status-green: #00ff66;
+        --theme-status-yellow: #ffd700;
+        --theme-status-red: #ff2a2a;
+    }
+
+    [data-theme="tars-synthwave"] {
+        --theme-primary: #2ee2fa;
+        --theme-bg-dark: #0b041c;
+        --theme-surface: #1a0b2e;
+        --theme-text-main: #f0f8ff;
+        --theme-muted: #d8d2fa;
+        --theme-accent: #f92aad;
+        --theme-border-color: #7b3db8;
+        --theme-status-green: #72f1b8;
+        --theme-status-yellow: #fdf129;
+        --theme-status-red: #fe4450;
+    }
+}

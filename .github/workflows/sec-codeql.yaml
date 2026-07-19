@@ -1,0 +1,113 @@
+---
+##################################################
+# Name: sec-codeql.yaml
+# Description: CodeQL static analysis for security vulnerabilities
+#
+# Triggers:
+#   - Pull request to trunk
+#   - Push to trunk (required for Security tab results)
+#   - Weekly schedule (Sunday 00:00 UTC)
+#
+# Scans:
+#   - JavaScript/TypeScript code
+#   - Rust code
+#   - GitHub Actions workflows
+#
+# Results uploaded to GitHub Security tab
+##################################################
+
+name: CodeQL
+
+on:
+  pull_request:
+    branches:
+      - main
+      - trunk
+
+  push:
+    branches:
+      - main
+      - trunk
+
+  schedule:
+    - cron: "0 0 * * 0"
+
+permissions:
+  contents: read
+  security-events: write
+  # actions: write is required by setup-devenv to delete/purge old nix caches
+  actions: write
+
+env:
+  NIXPKGS_ALLOW_UNFREE: 1
+  SECRETSPEC_PROVIDER: env
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ##################################################
+  # Run CodeQL analysis per language
+  ##################################################
+
+  analyze:
+    name: CodeQL Analyze (${{ matrix.language }})
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 120
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+            build-mode: none
+          - language: javascript-typescript
+            build-mode: none
+          #- language: rust
+          #  build-mode: none
+
+    steps:
+      - id: checkout_repository
+        name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          lfs: true
+
+      - id: setup_devenv
+        name: Setup Devenv
+        uses: ./.github/actions/setup-devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          skip-push: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+
+      - id: init_codeql
+        name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          config-file: .github/codeql-config.yml
+
+      - id: analyze_codeql
+        name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "CI Results"
+          jobs: |
+            Init CodeQL|${{ steps.init_codeql.outcome }}
+            Analyze CodeQL (${{ matrix.language }})|${{ steps.analyze_codeql.outcome }}

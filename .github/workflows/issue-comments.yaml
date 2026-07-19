@@ -1,0 +1,72 @@
+---
+##################################################
+# Name: comments.yaml
+# Description: React to issue comments (giphy, discord)
+##################################################
+
+name: Comments
+
+on:
+  issue_comment:
+    types:
+      - created
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  ENABLE_DISCORD: ${{ vars.ENABLE_DISCORD || 'false' }}
+
+jobs:
+  giphy:
+    name: Giphy
+
+    if: contains(github.event.comment.body, '/giphy')
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 5
+
+    steps:
+      - id: giphy_search
+        name: Search Giphy
+        if: ${{ env.GIPHY_TOKEN != '' }}
+        uses: IAmHughes/giphy-generator@90f0d797fb618be6d43c26fddb8008909dba77d6 # v1.0.0
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GIPHY_TOKEN: "${{ secrets.GIPHY_TOKEN }}"
+        with:
+          rating: "PG-13"
+          lang: "en"
+
+  discord:
+    name: Discord
+
+    if: ${{ vars.ENABLE_DISCORD == 'true' }}
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 5
+
+    steps:
+      - id: post_discord
+        name: Post Message to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_DISCORD }}
+          PING: "@CI"
+          MESSAGE: >
+            The ${{ github.event_name }} event was triggered in the ${{ github.repository }} repository.
+            The comment is available to view [here](${{ github.event.comment.html_url }})
+        run: |
+          JSON_CONTENT=$(jq -n --arg 'content' "${PING} ${MESSAGE}" '$ARGS.named')
+          curl \
+          --verbose \
+          --request POST \
+          --header "Content-Type: application/json" \
+          --data "${JSON_CONTENT}" \
+          "${WEBHOOK_URL}"

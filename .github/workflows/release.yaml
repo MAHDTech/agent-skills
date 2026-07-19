@@ -1,0 +1,168 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - trunk
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  statuses: write
+  # actions: write is required by setup-devenv to delete/purge old nix caches
+  actions: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.compute_version.outputs.version }}
+      tag: ${{ steps.compute_version.outputs.tag }}
+      skip: ${{ steps.compute_version.outputs.skip }}
+
+    steps:
+      - id: checkout_repository
+        name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - id: setup_devenv
+        name: Setup Devenv
+        uses: ./.github/actions/setup-devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          skip-push: "true"
+
+      - id: compute_version
+        name: Compute Version
+        shell: devenv shell --quiet bash -- -e {0}
+        run: |
+          CURRENT_VERSION=$(convco version 2>/dev/null || echo "0.0.0")
+          NEXT_VERSION=$(convco version --bump 2>/dev/null || echo "0.0.0")
+
+          if [[ "${CURRENT_VERSION}" == "${NEXT_VERSION}" || "${NEXT_VERSION}" == "0.0.0" ]]; then
+            echo "No bump-worthy commits found. Skipping release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "version=${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
+            echo "tag=v${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          TAG="v${NEXT_VERSION}"
+
+          # Guard: abort if this tag already exists on remote
+          if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+            echo "::error::Tag '${TAG}' already exists on remote. Aborting to prevent overwrite."
+            exit 1
+          fi
+
+          echo "version=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Version: ${NEXT_VERSION}, Tag: ${TAG}"
+
+      - id: create_release
+        name: Create Release
+        if: steps.compute_version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.compute_version.outputs.tag }}"
+
+          if gh release view "${TAG}" > /dev/null 2>&1; then
+            echo "Release ${TAG} already exists, reusing"
+          else
+            gh release create "${TAG}" \
+              --title "Release ${TAG}" \
+              --notes "Release ${TAG}" \
+              --target "${{ github.sha }}"
+          fi
+
+      - id: generate_changelog
+        name: Generate Changelog
+        if: steps.compute_version.outputs.skip != 'true'
+        shell: devenv shell --quiet bash -- -e {0}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.compute_version.outputs.tag }}"
+
+          # Fetch the tag created by gh release
+          git fetch --tags --force
+
+          # Generate changelog for the latest version
+          CHANGELOG=$(convco changelog --max-versions 1 --no-links 2>/dev/null || echo "Release ${TAG}")
+
+          {
+            echo "${CHANGELOG}"
+          } > /tmp/changelog.md
+
+          # Update the release with the real changelog
+          gh release edit "${TAG}" --notes-file /tmp/changelog.md
+          echo "Updated release ${TAG} with changelog"
+
+  status:
+    name: Write Summary
+    needs:
+      - release
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - id: checkout_repository
+        name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - id: report_status_step
+        name: Report Global Status
+        uses: ./.github/actions/report-status
+        with:
+          result: ${{ needs.release.result }}
+          success-message: "Release workflow completed successfully"
+          failure-message: "Release workflow failed"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          workflow-name: ${{ github.workflow }}
+          repository: ${{ github.repository }}
+          sha: ${{ github.sha }}
+          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - id: write_summary_push
+        name: Release Results Summary
+        if: needs.release.outputs.skip != 'true'
+        uses: ./.github/actions/step-summary
+        with:
+          title: "Release Results"
+          jobs: |
+            Release Setup|${{ needs.release.result }}
+          footer: |
+            ### 🏷️ Release Tag
+            **Tag**: \`${{ needs.release.outputs.tag }}\`
+            Go to [GitHub Releases](https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.tag }}) to review the changelog!
+
+      - id: write_summary_skip
+        name: Skipped Summary
+        if: needs.release.outputs.skip == 'true'
+        uses: ./.github/actions/step-summary
+        with:
+          title: "Release Skipped"
+          jobs: |
+            Release Setup|Skipped
+          footer: |
+            No feat/fix conventional commits were found. To trigger a release, push an impactful commit!

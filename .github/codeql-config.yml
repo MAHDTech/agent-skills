@@ -1,0 +1,14 @@
+---
+##################################################
+# Name: codeql-config.yml
+# Description: Custom CodeQL configuration
+#
+# Excludes generated/vendored paths from analysis
+# to reduce noise and false positives.
+##################################################
+
+name: "Agent Skills CodeQL Configuration"
+
+paths-ignore:
+  - "dashboard/public/**"
+  - "node_modules/**"

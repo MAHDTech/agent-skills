@@ -1,0 +1,21 @@
+<header class="border-b" style="border-color: var(--color-border); background: var(--color-surface)">
+  <div class="w-full px-4 md:px-8 h-14 flex items-center justify-between">
+    {# Logo / title #}
+    <a href="{{ get_url(path='/') }}" class="text-lg font-bold no-underline flex items-center gap-2" style="color: var(--color-primary)">
+      <span style="color: var(--color-muted)">▸</span> {{ config.title }}
+    </a>
+
+    {# Navigation #}
+    <nav class="flex items-center gap-6">
+      {% if config.extra.nav_links is defined %}
+        {% for link in config.extra.nav_links %}
+          <a href="{{ link.url }}" class="text-sm no-underline hover:underline" style="color: var(--color-muted)">{{ link.name }}</a>
+        {% endfor %}
+      {% endif %}
+
+      <button id="search-trigger" class="text-sm flex items-center gap-1.5 px-3 py-1 rounded cursor-pointer border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow-cyan)] transition-all bg-transparent font-mono" style="color: var(--color-muted);">
+        ⌛ Search <kbd class="text-xs px-1 rounded border border-[var(--color-border)] opacity-60 ml-0.5 font-mono">⌘K</kbd>
+      </button>
+    </nav>
+  </div>
+</header>

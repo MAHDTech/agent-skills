@@ -1,0 +1,122 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Engineering",
+      "description": "The core build, debug, and delivery loop.",
+      "skills": [
+        "backlog-implement",
+        "characterization-tests",
+        "codebase-design",
+        "diagnosing-bugs",
+        "domain-modeling",
+        "implement",
+        "optimize-performance",
+        "productionize-app",
+        "research",
+        "sculpt-code",
+        "spacetimedb",
+        "tdd",
+        "upgrade-dependencies"
+      ]
+    },
+    {
+      "title": "Game Development",
+      "description": "Game engines and game-development workflows.",
+      "skills": [
+        "bevy-development"
+      ]
+    },
+    {
+      "title": "Planning",
+      "description": "Turn ideas into specs, tickets, and multi-session plans.",
+      "skills": [
+        "backlog-audit",
+        "backlog-create-issue",
+        "backlog-loop",
+        "backlog-prepare",
+        "backlog-triage",
+        "estimate-work",
+        "grilling",
+        "handoff",
+        "prioritize-backlog",
+        "store-plan",
+        "to-spec",
+        "to-tickets",
+        "wayfinder"
+      ]
+    },
+    {
+      "title": "Review",
+      "description": "Review diffs, pull requests, and test plans.",
+      "skills": [
+        "backlog-review",
+        "code-review",
+        "pr-build-context",
+        "pr-create-test-plan",
+        "pr-edge-cases",
+        "rfc-review"
+      ]
+    },
+    {
+      "title": "GitHub",
+      "description": "GitHub and git workflows via the gh CLI.",
+      "skills": [
+        "gh-create-issue",
+        "gh-create-pr",
+        "gh-release-notes",
+        "gh-resolve-pr-comments",
+        "gh-submit-review",
+        "gh-triage",
+        "git-resolve-conflicts",
+        "git-update-branch"
+      ]
+    },
+    {
+      "title": "Reflection",
+      "description": "Self-critique and review of your own work.",
+      "skills": [
+        "critical-thinking",
+        "scope-sweep",
+        "self-review"
+      ]
+    },
+    {
+      "title": "Writing",
+      "description": "Proofreading and documentation polish.",
+      "skills": [
+        "proofread",
+        "simplify-docs"
+      ]
+    },
+    {
+      "title": "Authoring",
+      "description": "Create and maintain the skills themselves.",
+      "skills": [
+        "deprecate-skill",
+        "skill-audit",
+        "skill-creator",
+        "skill-router"
+      ]
+    },
+    {
+      "title": "Tooling",
+      "description": "Environments, CLIs, and agent conventions.",
+      "skills": [
+        "agent-guidelines",
+        "antigravity",
+        "devenv",
+        "install-skills",
+        "opencode",
+        "opencode-acp",
+        "pagefind",
+        "prek",
+        "scratchpad",
+        "tailwind",
+        "tauri",
+        "zola"
+      ]
+    }
+  ]
+}

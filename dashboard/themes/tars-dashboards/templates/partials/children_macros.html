@@ -1,0 +1,44 @@
+{#
+  Shared macro: renders the alphabetically-sorted child sections and pages
+  of the current section. Used by both index.html and section.html to stay DRY.
+
+  Usage:
+    {{ children_macros::render_children(section=section) }}
+#}
+
+{% macro render_children(section) %}
+  {% if section.subsections | length > 0 %}
+    <h2>Sections</h2>
+    <ul>
+      {% set_global _child_subs = [] %}
+      {% for path in section.subsections %}
+        {% set_global _child_subs = _child_subs | concat(with=get_section(path=path)) %}
+      {% endfor %}
+      {% for subsection in _child_subs | sort(attribute="title") %}
+        <li>
+          <a href="{{ subsection.permalink }}">{{ subsection.title }}</a>
+          {% if subsection.description %}
+            <span style="color: var(--color-muted)"> — {{ subsection.description }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if section.pages | length > 0 %}
+    <h2>Pages</h2>
+    <ul>
+      {% for page in section.pages | sort(attribute="title") %}
+        <li>
+          <a href="{{ page.permalink }}">{{ page.title }}</a>
+          {% if page.date %}
+            <span style="color: var(--color-muted)" class="text-sm ml-2">{{ page.date | date(format="%Y-%m-%d") }}</span>
+          {% endif %}
+          {% if page.description %}
+            <span style="color: var(--color-muted)"> — {{ page.description }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro render_children %}

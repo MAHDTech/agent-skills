@@ -1,0 +1,166 @@
++++
+title = "develop-_sections-frontend-listen"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "tauri"
++++
+
+# Calling the Frontend from Rust
+
+The `@tauri-apps/api` NPM package offers APIs to listen to both global
+and webview-specific events.
+
+- Listening to global events
+
+  ```
+  import { listen } from '@tauri-apps/api/event';
+  type DownloadStarted = {  url: string;  downloadId: number;  contentLength: number;};
+  listen<DownloadStarted>('download-started', (event) => {  console.log(    `downloading ${event.payload.contentLength} bytes from ${event.payload.url}`  );});
+  ```
+
+- Listening to webview-specific events
+
+  ```
+  import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+  const appWebview = getCurrentWebviewWindow();appWebview.listen<string>('logged-in', (event) => {  localStorage.setItem('session-token', event.payload);});
+  ```
+
+The `listen` function keeps the event listener registered for the entire
+lifetime of the application. To stop listening on an event you can use
+the `unlisten` function which is returned by the `listen` function:
+
+```
+import { listen } from '@tauri-apps/api/event';
+const unlisten = await listen('download-started', (event) => {});unlisten();
+```
+
+#### Common Pitfalls
+
+##### Don’t call `unlisten()` before the listener resolves
+
+The `listen` function returns a Promise that resolves to the `unlisten`
+handle. If you call `unlisten` synchronously before the Promise
+resolves, the handler will be removed immediately and you won’t receive
+any events:
+
+```
+// Wrong: unlisten is called before the listener is registeredconst unlisten = listen('sync-complete', (event) => {  console.log('sync finished');});unlisten(); // unlisten is a Promise here, not a function -- the listener is not cleaned up
+// Correct: await the Promise to get the unlisten handleconst unlisten = await listen('sync-complete', (event) => {  console.log('sync finished');});// Now you can store and call it later, e.g. in a cleanup functionunlisten();
+```
+
+##### Timing in setup hooks
+
+In frameworks like React, Vue, and Svelte, the setup or mount hook runs
+before the component is fully rendered. If you listen for events during
+setup, make sure the event handler does not depend on DOM elements that
+haven’t been rendered yet, or defer the listener registration to an
+effect/hook that runs after mount.
+
+```
+// Wrong: DOM ref may not be available yetfunction MyComponent() {  const ref = useRef(null);  listen('scroll-to', (event) => {    ref.current.scrollIntoView(); // ref.current may be null during setup  });  return <div ref={ref} />;}
+// Correct: use useEffect which runs after the component mountsfunction MyComponent() {  const ref = useRef(null);  useEffect(() => {    const unlisten = listen('scroll-to', (event) => {      ref.current?.scrollIntoView();    });    return () => {      unlisten.then((fn) => fn());    };  }, []);  return <div ref={ref} />;}
+```
+
+##### Event ordering and async listeners
+
+Event listeners are called in the order they are registered, but if a
+listener is async and the event emitter sends multiple events in rapid
+succession, the listeners may process events out of order. For ordered,
+high-throughput data delivery, consider using
+[Channels](https://v2.tauri.app/develop/calling-frontend/#channels) instead of the event
+system.
+
+#### Framework-specific Cleanup Examples
+
+When using a frontend framework, you should clean up event listeners
+when a component is unmounted to avoid memory leaks and duplicate
+handlers.
+
+- [React](#tab-panel-1123)
+- [Vue](#tab-panel-1124)
+- [Svelte](#tab-panel-1125)
+
+```
+import { useEffect, useState } from 'react';import { listen } from '@tauri-apps/api/event';
+function DownloadTracker() {  const [progress, setProgress] = useState(0);
+  useEffect(() => {    const unlisten = listen<number>('download-progress', (event) => {      setProgress(event.payload);    });
+    return () => {      unlisten.then((fn) => fn());    };  }, []);
+  return <div>Download progress: {progress}%</div>;}
+```
+
+```
+<script setup lang="ts">import { ref, onMounted, onUnmounted } from 'vue';import { listen } from '@tauri-apps/api/event';
+const progress = ref(0);let unlistenPromise;
+onMounted(() => {  unlistenPromise = listen<number>('download-progress', (event) => {    progress.value = event.payload;  });});
+onUnmounted(() => {  unlistenPromise?.then((fn) => fn());});</script>
+<template>  <div>Download progress: {{ progress }}%</div></template>
+```
+
+```
+<script lang="ts">import { listen } from '@tauri-apps/api/event';
+let progress = $state(0);
+$effect(() => {  const unlistenPromise = listen<number>(    'download-progress',    (event) => {      progress = event.payload;    }  );
+  return () => {    unlistenPromise.then((unlisten) => unlisten());  };});</script>
+<div>Download progress: {progress}%</div>
+```
+
+Additionally Tauri provides a utility function for listening to an event
+exactly once:
+
+```
+import { once } from '@tauri-apps/api/event';import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+once('ready', (event) => {});
+const appWebview = getCurrentWebviewWindow();appWebview.once('ready', () => {});
+```
+
+#### Listening to Events on Rust
+
+Global and webview-specific events are also delivered to listeners
+registered in Rust.
+
+- Listening to global events
+
+  ```
+  use tauri::Listener;
+  #[cfg_attr(mobile, tauri::mobile_entry_point)]pub fn run() {  tauri::Builder::default()    .setup(|app| {      app.listen("download-started", |event| {        if let Ok(payload) = serde_json::from_str::<DownloadStarted>(&event.payload()) {          println!("downloading {}", payload.url);        }      });      Ok(())    })    .run(tauri::generate_context!())    .expect("error while running tauri application");}
+  ```
+
+  src-tauri/src/lib.rs
+
+- Listening to webview-specific events
+
+  ```
+  use tauri::{Listener, Manager};
+  #[cfg_attr(mobile, tauri::mobile_entry_point)]pub fn run() {  tauri::Builder::default()    .setup(|app| {      let webview = app.get_webview_window("main").unwrap();      webview.listen("logged-in", |event| {        let session_token = event.data;        // save token..      });      Ok(())    })    .run(tauri::generate_context!())    .expect("error while running tauri application");}
+  ```
+
+  src-tauri/src/lib.rs
+
+The `listen` function keeps the event listener registered for the entire
+lifetime of the application. To stop listening on an event you can use
+the `unlisten` function:
+
+```
+// unlisten outside of the event handler scope:let event_id = app.listen("download-started", |event| {});app.unlisten(event_id);
+// unlisten when some event criteria is matchedlet handle = app.handle().clone();app.listen("status-changed", |event| {  if event.data == "ready" {    handle.unlisten(event.id);  }});
+```
+
+Additionally Tauri provides a utility function for listening to an event
+exactly once:
+
+```
+app.once("ready", |event| {  println!("app is ready");});
+```
+
+In this case the event listener is immediately unregistered after its
+first trigger.
+
+------------------------------------------------------------------------
+
+[Support on Open Collective](https://opencollective.com/tauri)[Sponsor
+on GitHub](https://github.com/sponsors/tauri-apps)
+
+© 2026 Tauri Contributors. CC-BY / MIT
+

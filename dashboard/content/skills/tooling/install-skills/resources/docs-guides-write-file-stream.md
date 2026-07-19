@@ -1,0 +1,28 @@
++++
+title = "docs-guides-write-file-stream"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "install-skills"
++++
+
+> ## Documentation Index
+> Fetch the complete documentation index at: https://bun.com/docs/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Write a ReadableStream to a file
+
+To write a `ReadableStream` to disk, create a `Response` from the stream and pass it to [`Bun.write()`](https://bun.com/runtime/file-io#writing-files-bun-write).
+
+```ts theme={"theme":{"light":"github-light","dark":"dracula"}}
+const stream: ReadableStream = ...;
+const path = "./file.txt";
+const response = new Response(stream);
+
+await Bun.write(path, response);
+```
+
+***
+
+See [`Bun.write()`](https://bun.com/runtime/file-io#writing-files-bun-write).

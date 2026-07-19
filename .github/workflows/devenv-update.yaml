@@ -1,0 +1,114 @@
+---
+##################################################
+# Name: update.yaml
+# Description: Workflow for Updating Developer Environment
+#
+# Note: To allow pull_request workflows (like Devenv) to run on the created PR,
+# a repository secret named WORKFLOW_PAT must be provisioned with scopes:
+#   - contents: write
+#   - pull-requests: write
+# If not provisioned, GITHUB_TOKEN is used as a fallback, but the PR will trigger no checks.
+# If sign-commits is set to true, commits will attribute to the PAT owner.
+##################################################
+
+name: Devenv Update
+
+# prettier-ignore
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  # actions: write is required by setup-devenv to delete/purge old nix caches
+  actions: write
+
+env:
+  # GitHub
+  PROJECT: ${{ github.repository }}
+  BRANCH_NAME_DEFAULT: ${{ github.event.repository.default_branch }}
+
+  # Nix
+  NIXPKGS_ALLOW_UNFREE: 1
+
+  # Secretspec
+  SECRETSPEC_PROVIDER: env
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ##################################################
+  # Update
+  ##################################################
+
+  update:
+    name: Update
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - id: checkout_repository
+        name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          lfs: false
+          submodules: recursive
+
+      - id: setup_devenv
+        name: Setup Devenv
+        uses: ./.github/actions/setup-devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          skip-push: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+
+      - id: devenv_gc
+        name: Devenv gc
+        run: |
+          devenv gc
+
+      - id: devenv_update
+        name: Devenv update
+        run: |
+          devenv update
+
+      - id: devenv_test
+        name: Devenv test
+        run: |
+          devenv test
+
+      - id: create_pull_request
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "chore: Update devenv.lock"
+          title: "chore: Update devenv.lock"
+          body: "This PR updates the devenv input dependencies"
+          branch: "update-devenv-lock"
+          base: ${{ env.BRANCH_NAME_DEFAULT }}
+          labels: "dependencies"
+          assignees: "MAHDTech"
+          reviewers: "MAHDTech"
+          draft: false
+          signoff: true
+          delete-branch: true
+          sign-commits: true

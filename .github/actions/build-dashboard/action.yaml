@@ -1,0 +1,10 @@
+name: Build Dashboard
+description: Build the Zola dashboard inside devenv.
+
+runs:
+  using: composite
+  steps:
+    - id: build_dashboard
+      name: Build Dashboard
+      shell: devenv shell --quiet bash -- -e {0}
+      run: dashboard --action build

@@ -1,0 +1,15 @@
+name: Free Disk Space
+description: Remove pre-installed Ubuntu runner packages to free disk space.
+
+runs:
+  using: composite
+  steps:
+    - id: free_disk_space
+      name: Free Disk Space
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"

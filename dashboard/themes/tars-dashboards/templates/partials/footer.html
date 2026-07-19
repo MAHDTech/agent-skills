@@ -1,0 +1,20 @@
+<footer class="border-t mt-16 py-8" style="border-color: var(--color-border)">
+  <div class="max-w-[90rem] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm" style="color: var(--color-muted)">
+    <span>
+      {% if config.extra.footer_text is defined %}
+        {{ config.extra.footer_text }}
+      {% else %}
+        © {{ now(utc=true) | date(format="%Y") }} {{ config.title }}
+      {% endif %}
+      <span class="opacity-50 ml-2">| Last built: {{ now(utc=true) | date(format="%Y-%m-%d %H:%M UTC") }}</span>
+    </span>
+
+    {% if config.extra.footer_links is defined %}
+      <nav class="flex gap-4">
+        {% for link in config.extra.footer_links %}
+          <a href="{{ link.url }}" class="hover:underline" style="color: var(--color-muted)">{{ link.name }}</a>
+        {% endfor %}
+      </nav>
+    {% endif %}
+  </div>
+</footer>

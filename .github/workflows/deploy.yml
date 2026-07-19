@@ -1,0 +1,65 @@
+name: Deploy Dashboard
+
+on:
+  push:
+    branches:
+      - trunk
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  # actions: write is required by setup-devenv to delete/purge old nix caches
+  actions: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout_repository
+        name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - id: setup_devenv
+        name: Setup Devenv
+        uses: ./.github/actions/setup-devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          skip-push: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+
+      - id: build_dashboard
+        name: Build Dashboard
+        uses: ./.github/actions/build-dashboard
+
+      - id: upload_pages_artifact
+        name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dashboard/public
+
+      - id: deploy_to_gh_pages
+        name: Deploy to GH Pages
+        uses: actions/deploy-pages@v5
+
+      - id: write_summary
+        name: Write Results Summary
+        if: always()
+        uses: ./.github/actions/step-summary
+        with:
+          title: "Deployment Results"
+          jobs: |
+            Build Dashboard|${{ steps.build_dashboard.outcome }}
+            Deploy to GH Pages|${{ steps.deploy_to_gh_pages.outcome }}
+          footer: |
+            ### 📦 Live Site
+            Successfully deployed to [GitHub Pages](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)

@@ -1,0 +1,80 @@
+name: Setup Devenv
+description: Install Nix + devenv.
+
+inputs:
+  github-token:
+    description: "GitHub token"
+    required: true
+  cachix-cache-name:
+    description: "Cachix cache name"
+    required: false
+  cachix-auth-token:
+    description: "Cachix auth token"
+    required: false
+  skip-push:
+    description: "Whether to skip pushing to cachix"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - id: free_disk_space
+      name: Free Disk Space
+      uses: ./.github/actions/free-disk-space
+
+    - id: install_nix
+      name: Install Nix
+      uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ inputs.github-token }}
+        extra_nix_config: |
+          extra-substituters = https://devenv.cachix.org
+          extra-trusted-public-keys = devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=
+
+    - id: enable_cachix
+      name: Enable Cachix
+      if: inputs.cachix-cache-name != '' && inputs.cachix-auth-token != ''
+      uses: cachix/cachix-action@v17
+      with:
+        name: ${{ inputs.cachix-cache-name }}
+        authToken: ${{ inputs.cachix-auth-token }}
+        skipPush: ${{ inputs.skip-push }}
+        pushFilter: '(-source$|nixpkgs\.tar\.gz$|\.tar\.gz$|\.zip$)'
+
+    - id: cachix_warning
+      name: Cachix Warning
+      if: inputs.cachix-cache-name == '' || inputs.cachix-auth-token == ''
+      shell: bash
+      run: |
+        echo "::warning::Cachix was not enabled for this workflow run as both the cache name and auth token are required."
+        echo "> [!NOTE]" >> $GITHUB_STEP_SUMMARY
+        echo "> Cachix was not enabled for this Workflow run as both the cache name and auth token are required." >> $GITHUB_STEP_SUMMARY
+
+    - id: nix_cache
+      name: Cache Nix Store
+      uses: nix-community/cache-nix-action@v7
+      with:
+        primary-key: ${{ runner.os }}-nix-${{ hashFiles('devenv.lock', 'devenv.nix', 'devenv.yaml') }}
+        restore-prefixes-first-match: ${{ runner.os }}-nix-
+        gc-max-store-size-linux: 5G
+        purge: true
+        purge-created: P7D
+        token: ${{ inputs.github-token }}
+
+    - id: install_devenv
+      name: Install Devenv
+      shell: bash
+      run: |
+        nix profile install --accept-flake-config nixpkgs#devenv
+
+    - id: version_check
+      name: Version Check
+      shell: bash
+      run: |
+        devenv version
+
+    - id: warmup_devenv
+      name: Warm up Devenv shell
+      shell: bash
+      run: |
+        devenv shell -- hello --greeting "devenv cache warm-up complete!"

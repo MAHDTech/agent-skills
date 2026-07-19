@@ -1,0 +1,21 @@
+# Use the CNAME for the Base URL.
+base_url = "https://skills.mahdtech.com/"
+title = "Agent Skills"
+description = "A collection of AI agent skills"
+theme = "tars-dashboards"
+output_dir = "public"
+
+[link_checker]
+internal_level = "warn"
+
+[markdown]
+insert_anchor_links = "heading"
+render_emoji = true
+smart_punctuation = true
+
+[markdown.highlighting]
+theme = "dracula"
+
+[extra]
+author = "MAHDTech"
+github = "https://github.com/MAHDTech/agent-skills"

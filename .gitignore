@@ -1,0 +1,43 @@
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Security analysis results
+.codeql-db/
+.codeql-results/
+trivy-results.sarif
+
+# Node and build output
+node_modules/
+dist/
+
+# Env & Config
+.env
+.devenv/
+
+# OS specific
+.DS_Store
+
+# Editor
+.vscode/
+.cursor/
+.windsurf/
+.antigravitycli/
+
+# Dashboard Build
+dashboard/public/
+dashboard/static/build/
+dashboard/static/pagefind/
+dashboard/skill_dates.toml
+
+# Backlog Tickets (TARS)
+.tars/
+
+# Scratch directory for AI scripts
+scratch/
+

@@ -1,0 +1,90 @@
+{% macro render_section(section_path, current_path="") %}
+  {% set s = get_section(path=section_path) %}
+
+  {# A skill is a section (so its reference files can be sub-pages), but the
+     sidebar navigates skills only — render skills as leaf links and never list
+     their sibling reference pages here. #}
+  {% set is_skill = s.extra.skill | default(value=false) %}
+
+  {# Check if this section or any descendant is the current page #}
+  {% set_global is_ancestor = false %}
+  {% if s.path == current_path %}
+    {% set_global is_ancestor = true %}
+  {% endif %}
+  {% for p in s.pages %}
+    {% if p.path == current_path %}
+      {% set_global is_ancestor = true %}
+    {% endif %}
+  {% endfor %}
+  {% for subpath in s.subsections %}
+    {% set sub = get_section(path=subpath) %}
+    {% if sub.path == current_path %}
+      {% set_global is_ancestor = true %}
+    {% endif %}
+    {% for p in sub.pages %}
+      {% if p.path == current_path %}
+        {% set_global is_ancestor = true %}
+      {% endif %}
+    {% endfor %}
+    {# Check one more level deep for nested sub-components #}
+    {% for subsubpath in sub.subsections %}
+      {% set subsub = get_section(path=subsubpath) %}
+      {% if subsub.path == current_path %}
+        {% set_global is_ancestor = true %}
+      {% endif %}
+      {% for p in subsub.pages %}
+        {% if p.path == current_path %}
+          {% set_global is_ancestor = true %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+
+  {% set has_children = (s.pages | length > 0 or s.subsections | length > 0) and not is_skill %}
+  {% set is_section_active = s.path == current_path %}
+
+  {% if has_children %}
+    <details class="sidebar-section mb-2" {% if is_ancestor %}open{% endif %}>
+      <summary class="sidebar-summary transition-colors cursor-pointer list-none flex items-center gap-1.5 mb-1 px-2 py-1 -ml-2 rounded select-none {% if is_section_active %}text-[var(--color-primary)] font-bold bg-[#00f0ff1a] border-l-2 border-[var(--color-primary)]{% else %}text-[var(--color-text-main)] font-bold hover:text-[var(--color-primary)]{% endif %}"
+        {% if is_section_active %}id="sidebar-active-item"{% endif %}>
+        <span class="sidebar-chevron text-[var(--color-muted)] text-xs transition-transform">▶</span>
+        {{ s.title }}
+      </summary>
+
+      <div class="sidebar-children ml-2 border-l border-[var(--color-border)] pl-4">
+        {% if s.pages | length > 0 %}
+          <ul class="space-y-1.5 mb-2">
+            {% for p in s.pages | sort(attribute="title") %}
+              {% set is_active = p.path == current_path %}
+              <li>
+                <a href="{{ p.permalink }}"
+                   class="transition-colors block py-0.5 border-l-2 -ml-[17px] pl-[15px] {% if is_active %}border-[var(--color-primary)] text-[var(--color-primary)] font-bold{% else %}border-transparent text-[var(--color-muted)] hover:text-[var(--color-primary)]{% endif %}"
+                   {% if is_active %}id="sidebar-active-item"{% endif %}>
+                  {{ p.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if s.subsections | length > 0 %}
+          {% set_global _macro_subs = [] %}
+          {% for subpath in s.subsections %}
+            {% set_global _macro_subs = _macro_subs | concat(with=get_section(path=subpath)) %}
+          {% endfor %}
+          {% set sorted_subs = _macro_subs | sort(attribute="title") %}
+          <div class="space-y-1 mt-1">
+            {% for sub in sorted_subs %}
+              {{ self::render_section(section_path=sub.relative_path, current_path=current_path) }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </details>
+  {% else %}
+    {# Leaf section with no children — render as a simple link #}
+    <div class="mb-2">
+      <a href="{{ s.permalink }}" class="transition-colors block mb-1 px-2 py-1 -ml-2 rounded {% if is_section_active %}text-[var(--color-primary)] font-bold bg-[#00f0ff1a] border-l-2 border-[var(--color-primary)]{% else %}text-[var(--color-text-main)] font-bold hover:text-[var(--color-primary)]{% endif %}" {% if is_section_active %}id="sidebar-active-item"{% endif %}>{{ s.title }}</a>
+    </div>
+  {% endif %}
+{% endmacro render_section %}
