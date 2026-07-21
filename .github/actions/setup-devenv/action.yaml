@@ -61,11 +61,11 @@ runs:
         purge-created: P7D
         token: ${{ inputs.github-token }}
 
-    - id: install_devenv
-      name: Install Devenv
+    - id: cachix_tools_install
+      name: Install Cachix Tools
       shell: bash
       run: |
-        nix profile install --accept-flake-config nixpkgs#devenv
+        nix profile install --accept-flake-config nixpkgs#devenv nixpkgs#secretspec nixpkgs#cachix
 
     - id: version_check
       name: Version Check

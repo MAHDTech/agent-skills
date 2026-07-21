@@ -20,6 +20,7 @@ description: Single source of truth for agent instructions
 - **tars-backlog-implement**: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
 - **tdd**: Test-driven development done red-green-refactor. Use when building a feature or fixing a bug test-first, writing integration tests, deciding what to test and where the test seams go, or avoiding brittle implementation-coupled tests. Covers what a good test is, the anti-patterns to avoid, and the rules of the red-green loop.
 - **upgrade-dependencies**: Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime — read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on /characterization-tests for the net and /diagnosing-bugs when an upgrade breaks something.
+- **xai**: Build applications with xAI and Grok APIs, SDKs, model selection, function calling, vision, live web search, and OpenAI-compatible client configurations. Use when integrating Grok models or xAI API endpoints, querying xAI capabilities, or configuring xAI API SDKs.
 
 ## Game Development
 
