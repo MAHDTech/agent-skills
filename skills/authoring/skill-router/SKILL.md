@@ -138,5 +138,6 @@ Beyond `/code-review` on the main flow:
 - [/tailwind](../../tooling/tailwind/SKILL.md) — reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
 - `/tauri` — reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - [/zola](../../tooling/zola/SKILL.md) — reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
+- [/zed](../../tooling/zed/SKILL.md) — reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
