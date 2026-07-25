@@ -65,7 +65,8 @@ runs:
       name: Install Cachix Tools
       shell: bash
       run: |
-        nix profile install --accept-flake-config nixpkgs#devenv nixpkgs#secretspec nixpkgs#cachix
+        # NOTE: cachix is already pre-install in the install nix step.
+        nix profile install --accept-flake-config nixpkgs#devenv nixpkgs#secretspec
 
     - id: version_check
       name: Version Check
