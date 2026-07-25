@@ -1,8 +1,5 @@
-Title: Overview \| Zola URL Source:
-https://www.getzola.org/documentation/ Published Time: Sun, 19 Jul 2026
-07:29:22 GMT Markdown Content: \##
-\[🔗\](https://www.getzola.org/documentation/#zola-at-a-glance)Zola at a
-Glance Zola is a static site generator (SSG), similar to
+\## \[🔗\](https://www.getzola.org/documentation/#zola-at-a-glance)Zola
+at a Glance Zola is a static site generator (SSG), similar to
 \[Hugo\](https://gohugo.io/), \[Pelican\](https://blog.getpelican.com/),
 and \[Jekyll\](https://jekyllrb.com/) (for a comprehensive list of SSGs,
 please see \[Jamstack\](https://jamstack.org/generators)). It is written

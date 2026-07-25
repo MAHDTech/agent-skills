@@ -158,3 +158,5 @@ worktree
 worktrees
 WSJF
 xclip
+keymap
+keymaps

@@ -57,11 +57,9 @@ Devenv integrates with SecretSpec, a tool that manages secret resolution and aud
 - Prioritize the use of the Devenv MCP server when it is available:
   - It can be accessed via `devenv mcp` to run locally.
   - Or via the remote URL: `https://mcp.devenv.sh` (Note: requires active internet connection).
-- When no MCP server is available, use the local [Devenv LLMs Backup Text](resources/auto/secretspec-llms-full.txt) as a backup.
 
 ## References
 
 - [Devenv Documentation](@/skills/tooling/devenv/resources/auto/devenv-getting-started-index.md)
 - [Devenv MCP Server](https://mcp.devenv.sh) (Online-Only)
-- [Devenv LLMs Backup Text](resources/auto/secretspec-llms-full.txt)
 

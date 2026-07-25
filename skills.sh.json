@@ -18,7 +18,8 @@
         "spacetimedb",
         "tars-backlog-implement",
         "tdd",
-        "upgrade-dependencies"
+        "upgrade-dependencies",
+        "xai"
       ]
     },
     {
@@ -115,6 +116,7 @@
         "scratchpad",
         "tailwind",
         "tauri",
+        "zed",
         "zola"
       ]
     }
