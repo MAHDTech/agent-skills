@@ -1298,6 +1298,6 @@ task.cancel(with: .normalClosure, reason: nil)
 * [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) - Try voices and speech tags in your browser
 * [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts) - Get started with the API
 * [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) - Overview of all xAI voice capabilities
-* [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) - Real-time voice conversations via WebSocket
+* [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) - Real-time voice conversations via WebSocket
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) - Full TTS endpoint specification
 * [List Voices](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---list-voices) - Programmatically discover available voices

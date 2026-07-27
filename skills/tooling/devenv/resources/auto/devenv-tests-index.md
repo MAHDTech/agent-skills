@@ -85,9 +85,7 @@ ncdu 2.2
 
 ## Changing environment if testing
 
-New in version 1.0.6
-
-[Read more about the Rust rewrite in the v1.0 release post](https://devenv.sh/blog/2024/03/20/devenv-10-rewrite-in-rust/index.md)
+Added in `1.0.6`
 
 devenv.nix
 

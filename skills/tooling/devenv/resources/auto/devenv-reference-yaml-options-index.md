@@ -8,19 +8,19 @@ Select the Nix backend used to evaluate `devenv.nix`.
 
 ## clean.enabled
 
+Added in `1.0`
+
 Clean the environment when entering the shell.
 
 *Type:* `boolean` · *Default:* `false`
 
-New in version 1.0
-
 ## clean.keep
+
+Added in `1.0`
 
 A list of environment variables to keep when cleaning the environment.
 
 *Type:* `list of string` · *Default:* `[]`
-
-New in version 1.0
 
 ## imports
 
@@ -30,11 +30,11 @@ A list of relative paths, absolute paths, or references to inputs to import `dev
 
 ## impure
 
+Added in `1.0`
+
 Relax the hermeticity of the environment.
 
 *Type:* `boolean` · *Default:* `false`
-
-New in version 1.0
 
 ## inputs
 
@@ -74,11 +74,11 @@ URI specification of the input. See [Supported URI formats](https://devenv.sh/in
 
 ## nixpkgs.allow_broken
 
+Added in `1.7`
+
 Allow packages marked as broken.
 
 *Type:* `boolean` · *Default:* `false`
-
-New in version 1.7
 
 ## nixpkgs.allow_non_source
 
@@ -88,19 +88,19 @@ Allow packages not built from source.
 
 ## nixpkgs.allow_unfree
 
+Added in `1.7`
+
 Allow unfree packages.
 
 *Type:* `boolean` · *Default:* `false`
 
-New in version 1.7
-
 ## nixpkgs.allow_unsupported_system
+
+Added in `2.0.5`
 
 Allow packages that are not supported on the current system.
 
 *Type:* `boolean` · *Default:* `false`
-
-New in version 2.0.5
 
 ## nixpkgs.allowlisted_licenses
 
@@ -122,119 +122,119 @@ A list of license names to block. Uses nixpkgs license attribute names (e.g. `un
 
 ## nixpkgs.cuda_capabilities
 
+Added in `1.7`
+
 Select CUDA capabilities for nixpkgs.
 
 *Type:* `list of string` · *Default:* `[]`
 
-New in version 1.7
-
 ## nixpkgs.cuda_support
+
+Added in `1.7`
 
 Enable CUDA support for nixpkgs.
 
 *Type:* `boolean` · *Default:* `false`
 
-New in version 1.7
-
 ## nixpkgs.per_platform
+
+Added in `1.7`
 
 Per-platform nixpkgs configuration. Accepts the same options as `nixpkgs`.
 
 *Type:* `attribute set of nixpkgs config`
 
-New in version 1.7
-
 ## nixpkgs.permitted_insecure_packages
+
+Added in `1.7`
 
 A list of insecure permitted packages.
 
 *Type:* `list of string` · *Default:* `[]`
 
-New in version 1.7
-
 ## nixpkgs.permitted_unfree_packages
+
+Added in `1.9`
 
 A list of unfree packages to allow by name.
 
 *Type:* `list of string` · *Default:* `[]`
 
-New in version 1.9
-
 ## nixpkgs.rocm_support
+
+Added in `2.0.7`
 
 Enable ROCm support for nixpkgs.
 
 *Type:* `boolean` · *Default:* `false`
 
-New in version 2.0.7
-
 ## profile
+
+Added in `1.11`
 
 Default profile to activate. Can be overridden by `--profile` CLI flag. See [Profiles](https://devenv.sh/profiles/index.md).
 
 *Type:* `string`
 
-New in version 1.11
-
 ## reload
+
+Added in `2.0`
 
 Enable auto-reload of the shell when files change. Can be overridden by `--reload` or `--no-reload` CLI flags.
 
 *Type:* `boolean` · *Default:* `true`
 
-New in version 2.0
-
 ## require_version
+
+Added in `2.1`
 
 Version requirement for the devenv CLI. Set to `true` to enforce that the CLI version matches the modules version (from the `devenv` input), or use a constraint string with operators (`>=`, `<=`, `>`, `<`, `=`, or a bare version for an exact match).
 
 *Type:* `boolean | string`
 
-New in version 2.1
-
 ## secretspec.cachix_auth_token
 
-Name of the secretspec secret to read the Cachix auth token from when `CACHIX_AUTH_TOKEN` is not set in the environment.
+Added in `2.2`
 
-This is the secret name declared in `secretspec.toml`, not the token value. Use this when your secretspec backend (e.g. an OpenBao/Vault policy) only grants access to a secret under a name other than the default `CACHIX_AUTH_TOKEN`.
+Require the Cachix auth token through SecretSpec when `CACHIX_AUTH_TOKEN` is not set in the environment.
 
-*Type:* `string` · *Default:* `CACHIX_AUTH_TOKEN`
+Set to `true` to use the built-in `CACHIX_AUTH_TOKEN` secret name, `false` to disable SecretSpec lookup, or a string to use a custom secret name. No declaration in `secretspec.toml` is required.
 
-New in version 2.1.3
+*Type:* `boolean | string` · *Default:* unset
 
 ## secretspec.enable
+
+Added in `1.8`
 
 Enable [secretspec integration](https://devenv.sh/integrations/secretspec/index.md).
 
 *Type:* `boolean` · *Default:* `false`
 
-New in version 1.8
-
 ## secretspec.profile
+
+Added in `1.8`
 
 Secretspec profile name to use.
 
 *Type:* `string`
 
-New in version 1.8
-
 ## secretspec.provider
+
+Added in `1.8`
 
 Secretspec provider to use.
 
 *Type:* `string`
 
-New in version 1.8
-
 ## shell
+
+Added in `2.1`
 
 Default interactive shell to use when entering the devenv environment. Can be overridden by the `--shell` CLI flag. Falls back to the `$SHELL` environment variable, then `bash`.
 
 Supported values: `bash`, `zsh`, `fish`, `nu`. Any other value falls back to `bash`.
 
 *Type:* `string` · *Default:* `$SHELL` or `bash`
-
-New in version 2.1
 
 ## strict_ports
 

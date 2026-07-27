@@ -2,7 +2,7 @@
 
 # Ephemeral Tokens
 
-Ephemeral tokens provide secure, short-lived authentication for client-side applications. Use them when connecting to the [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) from browsers or mobile apps to avoid exposing your API key.
+Ephemeral tokens provide secure, short-lived authentication for client-side applications. Use them when connecting to the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) from browsers or mobile apps to avoid exposing your API key.
 
 ## How It Works
 

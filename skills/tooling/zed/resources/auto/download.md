@@ -1,11 +1,11 @@
 ![Zed's
 logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
 
-# 1.11.3
+# 1.12.1
 
-July 15, 2026
+July 27, 2026
 
-[](https://zed.dev/releases/stable/1.11.3)
+[](https://zed.dev/releases/stable/1.12.1)
 
 View changelog →
 

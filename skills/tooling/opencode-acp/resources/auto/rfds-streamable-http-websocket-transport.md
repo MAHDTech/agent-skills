@@ -406,7 +406,10 @@ Yes. A client may call `session/new` multiple times within a single `Acp-Connect
 
 ### How does this interact with authentication?
 
-Authentication (see auth-methods RFD) is orthogonal and layered on top via HTTP headers, query parameters, or WebSocket subprotocols. `Acp-Connection-Id` and `Acp-Session-Id` are transport-level identifiers, not auth tokens.
+[ACP authentication](https://agentclientprotocol.com/protocol/v2/authentication) is orthogonal and layered on
+top via HTTP headers, query parameters, or WebSocket subprotocols.
+`Acp-Connection-Id` and `Acp-Session-Id` are transport-level identifiers, not
+auth tokens.
 
 ### What about the `Acp-Protocol-Version` header?
 

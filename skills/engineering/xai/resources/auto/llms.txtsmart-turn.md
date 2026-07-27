@@ -311,8 +311,8 @@ Flags for headless runs (`-p`, `--output-format`, and related) are covered in [H
 | `-m, --model <MODEL>` | Model ID to use |
 | `--effort <LEVEL>` | Reasoning effort |
 | `--always-approve` | Auto-approve all tool executions (alias `--yolo`) |
-| `--allow <RULE>`, `--deny <RULE>` | Permission rules — see [Enterprise Deployments](https://docs.x.ai/build/enterprise#permissions) |
-| `--sandbox <PROFILE>` | Sandbox profile — see [Enterprise Deployments](https://docs.x.ai/build/enterprise#sandbox) |
+| `--allow <RULE>`, `--deny <RULE>` | Permission rules — see [Permissions](https://docs.x.ai/build/features/permissions) |
+| `--sandbox <PROFILE>` | Sandbox profile — see [Sandbox](https://docs.x.ai/build/features/sandbox) |
 | `--rules <TEXT>` | Extra rules appended to the system prompt |
 | `--system-prompt-override <TEXT>` | Replace the system prompt entirely |
 | `--tools <LIST>`, `--disallowed-tools <LIST>` | Allow or remove built-in tools |
@@ -424,7 +424,7 @@ Grok loads configuration from five layers, lowest to highest priority:
 
 Settings in `requirements.toml` cannot be overridden by lower layers, remote settings, or user config — use it for compliance-critical policies. All layers support `[[version_overrides]]` for version-conditional patches and `$VAR` expansion.
 
-### System-level policy for MDM and fleet deployments
+### System-level policy for MDM and managed deployments
 
 The highest-priority configuration layer is `/etc/grok/requirements.toml`. This is the recommended mechanism for organizations managing Grok at scale via Mobile Device Management (MDM), golden images, configuration management tools, or onboarding scripts.
 
@@ -534,53 +534,27 @@ If you are migrating from Claude Code, `forceLoginMethod` maps to `disable_api_k
 
 ## Security controls
 
+Day-to-day [permissions](https://docs.x.ai/build/features/permissions) (modes, allow/deny rules) and [sandbox](https://docs.x.ai/build/features/sandbox) profiles apply to individual machines as well as managed deployments. This section covers enterprise-only policy: pinning, headless modes, and locking always-approve off.
+
 ### Sandbox
 
-The sandbox is applied once at process startup and is irreversible. It uses Landlock on Linux (kernel 5.13+) and Seatbelt on macOS.
-
-| Profile | Filesystem read | Filesystem write | Child network | Use case |
-| --- | --- | --- | --- | --- |
-| `off` | Unrestricted | Unrestricted | Allowed | No sandbox (default) |
-| `workspace` | Everywhere | CWD, `/tmp`, `~/.grok/` | Allowed | Normal development |
-| `devbox` | Everywhere | Everything except `/data` | Allowed | Cloud devbox environments |
-| `read-only` | Everywhere | `~/.grok/` and tmp only | Blocked | Code review, auditing |
-| `strict` | CWD and system paths only | CWD, `/tmp`, `~/.grok/` | Blocked | Untrusted repositories |
-
-Set the profile with `--sandbox workspace` or pin it in `requirements.toml` under `[sandbox] profile`.
-
-Certain directories are always write-protected regardless of profile: `~/.ssh`, `~/.gnupg`, `~/.grok/auth`, `~/.aws`, `~/.config/gcloud`, `~/.azure`.
-
-In `read-only` and `strict` profiles, child processes are blocked from making network connections via a seccomp BPF filter. This enforcement is Linux-only; on macOS, child network blocking is not currently enforced.
-
-Custom profiles can be defined in `~/.grok/sandbox.toml` or `.grok/sandbox.toml`:
+Profiles, custom `sandbox.toml`, and how the sandbox relates to permissions are under [Sandbox](https://docs.x.ai/build/features/sandbox). Pin a profile in `requirements.toml`:
 
 ```text
-[profiles.my-profile]
-extends = "workspace"
-restrict_network = true
-deny = ["/secrets"]
+[sandbox]
+profile = "workspace"
 ```
 
 ### Permissions
 
-The permission system controls which tool calls the model can execute, independent of the sandbox. When the model requests a tool, checks run in order: PreToolUse hooks, policy rules (deny > ask > allow), built-in fast paths, then the prompt policy. See [Modes and Commands](https://docs.x.ai/build/modes-and-commands) for the basic `ask` and `always-approve` modes.
-
-For enterprise and CI environments, two additional modes are relevant:
+Ask, auto, and always-approve, plus CLI `--allow` / `--deny` and config rules, are under [Permissions](https://docs.x.ai/build/features/permissions). For CI and headless runs, two additional modes matter:
 
 | Mode | Behavior | Typical use |
 | --- | --- | --- |
-| `dontAsk` | Silently deny anything without an explicit allow rule | Headless, CI, high-security |
+| `dontAsk` | Silently deny anything without an explicit allow rule | Headless, CI |
 | `acceptEdits` | Auto-approve file edits; prompt for shell commands | Semi-automated workflows |
 
-Set via `--permission-mode` in headless mode (e.g., `grok -p "..." --permission-mode dontAsk`; accepts `default`, `dontAsk`, `acceptEdits`, `bypassPermissions`, `plan`) or `[ui] permission_mode` in config for persistent use (accepts `ask`, `always-approve`).
-
-**Always-safe operations**
-
-Certain read-only operations are auto-approved without prompting in all modes, including `dontAsk`: `read_file`, `list_dir`, `grep`, `web_search`, `todo_write`, and a curated set of safe shell commands including `ls`, `cat`, `pwd`, `date`, `whoami`, `hostname`, `uptime`, `ps`, `head`, `tail`, `wc`, `sort`, `uniq`, `tr`, `cut`, `grep`, `git status`, `git branch`, `git log`, `git diff`, `git ls-files`, `git show`, `git rev-parse`, `cargo check`, and `kubectl get/logs/describe`. Shell commands are parsed per-segment — `ls && rm -rf /` will auto-approve `ls` but block `rm`.
-
-**Policy rules**
-
-Fine-grained allow/deny rules target specific tool types with glob patterns. Deny rules always take precedence over allow rules.
+Example headless run:
 
 ```bash customLanguage="bash"
 grok -p "Review the API changes" \
@@ -589,29 +563,9 @@ grok -p "Review the API changes" \
   --allow 'Bash(gh *)' \
   --allow 'Read' \
   --allow 'Grep' \
-  --deny 'Bash(rm -rf *)'
+  --deny 'Bash(rm -rf *)' \
+  --sandbox strict
 ```
-
-Supported tool filters: `Bash`, `Edit`, `Read`, `Grep`, `MCPTool`, `WebFetch`. Rule syntax: `Bash(git *)` matches any command starting with `git`; `Edit(**/*.rs)` matches Rust files; `MCPTool(my-server__*)` matches MCP tools from a specific server.
-
-Rules can also be set in `~/.grok/config.toml`:
-
-```text
-[permission]
-rules = [
-  { action = "allow", tool = "bash", pattern = "git *" },
-  { action = "allow", tool = "read" },
-  { action = "deny",  tool = "bash", pattern = "*" },
-]
-```
-
-**Dangerous commands**
-
-`rm`, `chmod`, `chown`, `chgrp`, `chattr`, `kill`, `pkill`, `killall`, and `git push` always prompt in `ask` mode, even if the user has whitelisted them. In always-approve mode, they are auto-approved like all other commands. To block them in always-approve mode, add explicit deny rules.
-
-**Combining permissions with sandbox**
-
-Permissions control what the model is allowed to request. The sandbox controls what the process can do even if a command is approved. For untrusted code, combine `dontAsk` + narrow allow rules + `--sandbox strict`.
 
 **Locking bypass-permissions mode**
 
@@ -647,7 +601,7 @@ ZDR is enforced at the team level. When enabled for a team or enterprise, zero d
 
 # Background Tasks
 
-Grok can run commands, subagents, and monitors in the background while the conversation continues. Press `Ctrl+B` to open the tasks pane listing everything currently running, or run `/tasks` for a snapshot in the scrollback; press `Ctrl+G` to demote a running foreground command to the background instead of waiting for it.
+Grok can run commands, subagents, and monitors in the background while the conversation continues. Press `Ctrl+G` to open the tasks pane listing everything currently running, or run `/tasks` for a snapshot in the scrollback; press `Ctrl+B` to demote a running foreground command to the background instead of waiting for it. This is separate from the agent’s [todos](https://docs.x.ai/build/features/sessions#todos) (`Ctrl+T` on the agent screen), which track planned multi-step work rather than running processes.
 
 ## Background commands
 
@@ -816,6 +770,94 @@ Grok also loads MCP configurations from `~/.claude.json`, `.cursor/mcp.json`, an
 `grok mcp doctor` is the first stop. For stdio servers that start but fail to connect, Grok captures stderr to `~/.grok/logs/mcp/<server>.stderr.log`. Cold-start `npx` servers that download packages on first launch may need a higher `startup_timeout_sec`.
 
 
+===/build/features/permissions===
+#### Features
+
+# Permissions
+
+Permissions decide which tool calls may run. The [sandbox](https://docs.x.ai/build/features/sandbox) is separate: it limits what an approved call can do on the filesystem and network.
+
+## Modes
+
+| Mode | Behavior | Enter via |
+| ---- | -------- | --------- |
+| Ask (default) | Prompt for anything not already allowed | — |
+| Auto | Classifier auto-approves safe tools; dangerous ones may still prompt (`deny` rules and hooks still apply) | `/auto`, `Shift+Tab` when the feature is on |
+| Always-approve | Auto-approve tool calls (`deny` rules and PreToolUse hooks still apply) | `/always-approve`, `Ctrl+O`, `Shift+Tab`, `grok --always-approve` |
+
+`Shift+Tab` cycles Normal → Plan → Auto (when available) → Always-approve. `/auto` only appears when the auto permission-mode feature is enabled. Running `/auto` while always-approve is on (or the reverse) switches modes rather than stacking them. Status shows `auto` when auto is active and plan mode is not.
+
+Default in user config only (`~/.grok/config.toml` or managed/requirements — not project `.grok/config.toml`):
+
+```text
+[ui]
+permission_mode = "auto" # or "ask" | "always-approve"
+```
+
+Legacy keys `approval_mode` and `yolo = true` still work; `permission_mode` wins when more than one is set.
+
+[Plan mode](https://docs.x.ai/build/features/plan-mode) is independent: edit tools stay limited while planning, and the plan review UI is not skipped under auto or always-approve.
+
+Headless modes such as `dontAsk` and locking always-approve off: [Enterprise Deployments](https://docs.x.ai/build/enterprise#permissions).
+
+## Allow and deny rules
+
+```text
+[permission]
+rules = [
+  { action = "allow", tool = "bash", pattern = "git *" },
+  { action = "allow", tool = "read" },
+  { action = "deny",  tool = "bash", pattern = "rm -rf *" },
+]
+```
+
+`--allow` / `--deny` take the same patterns per invocation. Supported filters include `Bash`, `Edit`, `Read`, `Grep`, `MCPTool`, `WebFetch`, and `WebSearch`. `deny` always wins over `allow`.
+
+A remembered “always allow” grant still prompts for dangerous patterns such as `rm` and `git push`. An explicit config or CLI allow rule auto-approves them. Under always-approve they run unless you add a deny.
+
+
+===/build/features/plan-mode===
+#### Features
+
+# Plan Mode
+
+In plan mode the agent explores the codebase and drafts a plan for your approval before it edits anything.
+
+## When to use
+
+| | |
+| --- | --- |
+| **Use for** | Ambiguous architecture, unclear requirements, or high-impact restructures |
+| **Skip for** | Clear one-path changes, obvious bug fixes, renames, formatting, pure research ([explore](https://docs.x.ai/build/features/subagents) instead) |
+
+## Enter plan mode
+
+* **`/plan`** — Enter plan mode (active on your next prompt). `/plan <description>` enters and starts a turn.
+* **`Shift+Tab`** — Cycle modes. From Normal, one press lands on Plan (then Auto when available, then Always-approve).
+
+The agent can enter plan mode on its own when a task looks ambiguous. That is not a permission prompt. Leave with `Shift+Tab` when idle, or with `q` on the approval screen.
+
+## Review and approve
+
+When planning finishes, the TUI opens a plan preview. Auto and always-approve do not skip this review. Use **`/view-plan`** (aliases `/show-plan`, `/plan-view`) to reopen a saved preview.
+
+| Shortcut | Action |
+| -------- | ------ |
+| `a` | Approve and start building (or approve with pending comments) |
+| `s` | Request changes (type notes, then Enter) |
+| `c` | Comment on the selected line or range |
+| `q` | Quit plan and turn plan mode off |
+| `Tab` | Focus between plan preview and prompt |
+
+An empty plan still opens this surface. Plan mode stays on until you approve or quit.
+
+## Caveats
+
+* Only the session plan file may be edited until you approve. Other edit tools are rejected, including under auto or always-approve. Reads, bash, and MCP still follow [permission mode](https://docs.x.ai/build/features/permissions). Plan mode gates edit tools, not the shell — bash can still write via redirection.
+* [Subagents](https://docs.x.ai/build/features/subagents) are not edit-gated by the parent’s plan mode; they do inherit permission mode (including auto and always-approve).
+* Status shows `plan` while planning and `plan approval` on the review screen. The `auto` or always-approve flag returns when plan mode ends.
+
+
 ===/build/features/project-rules===
 #### Features
 
@@ -861,6 +903,55 @@ grok inspect
 This lists each rules file Grok found, with its path and approximate token count.
 
 
+===/build/features/sandbox===
+#### Features
+
+# Sandbox
+
+The sandbox limits what the agent process and its children can read, write, and reach on the network (Landlock on Linux, Seatbelt on macOS). Off by default. Permissions gate whether a tool call runs; the sandbox limits what an approved call can do — see [Permissions](https://docs.x.ai/build/features/permissions).
+
+## Profiles
+
+| Profile | Filesystem read | Filesystem write | Child network | Use case |
+| --- | --- | --- | --- | --- |
+| `off` | Unrestricted | Unrestricted | Allowed | No sandbox (default) |
+| `workspace` | Everywhere | CWD, `~/.grok/`, temp | Allowed | Normal development |
+| `devbox` | Everywhere | Top-level dirs except `/data` | Allowed | Cloud devbox environments |
+| `read-only` | Everywhere | `~/.grok/` and temp only | Blocked | Code review, auditing |
+| `strict` | CWD and system paths | CWD, `~/.grok/`, temp | Blocked | Untrusted repositories |
+
+| Limitation | Detail |
+| --- | --- |
+| Child network | Enforced on Linux only; no-op on macOS for `read-only` / `strict` |
+| Credentials | Built-ins do not permanently protect paths such as `~/.ssh`; use a custom `deny` list |
+| `~/.grok/` | Stays writable under sandboxed profiles so sessions can persist |
+| In-process network | Model API and web tools are not blocked by child-network settings |
+
+## Enable a profile
+
+| Mechanism | Example |
+| --- | --- |
+| CLI | `grok --sandbox workspace` |
+| Config | `[sandbox] profile = "workspace"` in `~/.grok/config.toml` |
+| Env | `GROK_SANDBOX=workspace` |
+| Managed pin | `requirements.toml` (can override CLI) — [Enterprise](https://docs.x.ai/build/enterprise#sandbox) |
+
+## Custom profiles
+
+Define named profiles in `~/.grok/sandbox.toml` or project `.grok/sandbox.toml`:
+
+```text
+[profiles.my-profile]
+extends = "workspace"
+restrict_network = true
+deny = ["/secrets", "**/.env", "**/*.pem"]
+```
+
+Select with `--sandbox my-profile` or `[sandbox] profile`. Built-in names cannot be redefined for selection. Field details: [Settings Reference](https://docs.x.ai/build/settings/reference).
+
+For untrusted trees, pair a strict profile with narrow [permission](https://docs.x.ai/build/features/permissions) allows (or headless `dontAsk`).
+
+
 ===/build/features/sessions===
 #### Features
 
@@ -897,6 +988,14 @@ grok -p "Start the refactor" --output-format json | jq -r '.sessionId'
 ## Compacting
 
 `/compact [context]` compresses the conversation history to reclaim context window, with optional instructions about what to preserve. Grok also auto-compacts as the context window fills; check usage with `/context` or `/session-info`.
+
+## Todos
+
+For multi-step work, the agent keeps a structured todo list so you can see what is planned, what is in progress, and what is done. Items use statuses pending, in progress, completed, and cancelled (when a step is dropped).
+
+On the agent screen, press `Ctrl+T` to view the todo pane. The list is part of the session: resume the same session and the todos return with their last statuses.
+
+Todos are separate from [background tasks](https://docs.x.ai/build/features/background-tasks), which track long-running commands and monitors.
 
 ## Housekeeping
 
@@ -962,7 +1061,7 @@ Marketplace sources come from `[[marketplace.sources]]` in `~/.grok/config.toml`
 
 ## Subagents
 
-Subagents spawn independent child sessions that handle tasks in parallel.
+Subagents spawn independent child sessions that handle tasks in parallel. Types and personas are under [Subagents](https://docs.x.ai/build/features/subagents).
 
 ## Claude Code compatibility
 
@@ -976,6 +1075,24 @@ Grok also reads the `AGENTS.md` instruction-file family (`AGENTS.md`, `Agents.md
 
 * `~/.agents/skills/`
 * `~/.agents/commands/`
+
+
+===/build/features/subagents===
+#### Features
+
+# Subagents
+
+Subagents are independent child sessions with their own context. They return a summary to the parent when finished. Enabled by default when the setting is unset.
+
+## Built-in types
+
+| Type | Role |
+| ---- | ---- |
+| `general-purpose` | Default full-capability child |
+| `explore` | Read, list, and search only (no shell, no edits) |
+| `plan` | Drafts an implementation plan (no shell, no edits) |
+
+Add or override types under `.grok/agents/` or `~/.grok/agents/`. Manage agents and personas with `/config-agents` (alias `/agents`) or `/personas`. Personas are behavioral overlays only (tone, focus, contracts); define them under `[subagents.personas]` or `.grok/personas/*.toml` / `~/.grok/personas/*.toml`.
 
 
 ===/build/features/theming===
@@ -1021,7 +1138,7 @@ For a denser layout, `/compact-mode` reduces padding and persists the choice. Fi
 
 # Worktrees
 
-A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes.
+A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes. [Subagents](https://docs.x.ai/build/features/subagents) can also request worktree isolation when the parent delegates parallel work.
 
 ## Starting one
 
@@ -1064,7 +1181,7 @@ Some chords differ by terminal; see [Terminal differences](#terminal-differences
 | `Esc` | Cancel the running turn |
 | `Esc Esc` | Clear the prompt, or open rewind when it is empty |
 | `Ctrl+C` | Cancel turn |
-| `Shift+Tab` | Cycle mode (Normal / Plan / Always-approve) |
+| `Shift+Tab` | Cycle mode (Normal / Plan / Auto when available / Always-approve) |
 | `Ctrl+P` or `?` | Command palette |
 | `Ctrl+.` / `Ctrl+X` | Keyboard shortcuts |
 | `F2` or `Ctrl+,` | Settings |
@@ -1105,12 +1222,12 @@ Focus the scrollback with `Tab`, then navigate. Bare-letter keys require vim mod
 
 | Keys | Action |
 | ---- | ------ |
-| `Ctrl+T` | Toggle todo pane |
-| `Ctrl+B` | Toggle tasks pane |
+| `Ctrl+T` | Toggle the [todo pane](https://docs.x.ai/build/features/sessions#todos) (agent screen) |
+| `Ctrl+B` | Send the running command to the background |
 | `Ctrl+;` or `Ctrl+'` | Toggle prompt queue |
 | `Ctrl+S` | Open sessions |
 | `Ctrl+L` | Open extensions |
-| `Ctrl+G` | Send the running command to the background |
+| `Ctrl+G` | Toggle the [tasks pane](https://docs.x.ai/build/features/background-tasks) |
 | `Ctrl+O` | Toggle always-approve |
 | `Ctrl+N` | New session (press twice) |
 | `Ctrl+M` | Pick model, when the prompt is not focused |
@@ -1136,40 +1253,15 @@ In the TUI, `Shift+Tab` cycles session modes. For the full key reference, see [K
 
 ### Plan
 
-Plan mode is for planning first. When it is active, edits to the session plan file are auto-approved while writes to other files still require your approval.
+Plan mode is planning first: only the session plan file can be edited until you approve. That file-edit gate is independent of the permission mode (ask, auto, or always-approve). Enter with `/plan [description]` or `Shift+Tab`, and reopen a plan with `/view-plan`. See [Plan Mode](https://docs.x.ai/build/features/plan-mode).
 
-Use it when you want Grok to sketch the approach before it starts making changes. Enter it with `/plan [description]` and view the current plan with `/view-plan`.
+### Auto
 
-Plan mode keeps the working plan visible in the TUI.
-
-It can also stop to ask a clarifying question before edits.
+Auto uses a classifier to auto-approve safe tools; dangerous ones may still prompt. Toggle with `/auto` or `Shift+Tab` when the feature is enabled. Full mode table: [Permissions](https://docs.x.ai/build/features/permissions).
 
 ### Always-approve
 
-Always-approve skips permission prompts for tool calls.
-
-You can start in this mode with:
-
-```bash customLanguage="bash"
-grok --always-approve
-```
-
-You can also toggle it from the TUI with `/always-approve`.
-
-### Permission mode in config.toml
-
-Set the default permission behavior in `~/.grok/config.toml`:
-
-```text
-[ui]
-permission_mode = "always-approve"
-```
-
-Use `permission_mode = "ask"` for prompts on each tool call, or `permission_mode = "always-approve"` to skip them. The default is `ask`. The legacy keys `approval_mode` and `yolo = true` are still accepted but `permission_mode` takes precedence.
-
-Put this in `~/.grok/config.toml`, not project-scoped `.grok/config.toml`.
-
-For the full set of `config.toml` options, see [Settings](https://docs.x.ai/build/settings).
+Always-approve skips permission prompts for tool calls (`deny` rules and hooks still apply). Toggle with `/always-approve` or `Shift+Tab`, or start with `grok --always-approve`. Modes, allow/deny rules, and how they relate to the sandbox are under [Permissions](https://docs.x.ai/build/features/permissions).
 
 ## Core TUI commands
 
@@ -1199,6 +1291,7 @@ Use `/context` to check current context usage.
 | `/model <name>` (alias `/m`) | Switch the active model |
 | `/effort` | Set reasoning effort for the current model |
 | `/always-approve` | Toggle always-approve mode |
+| `/auto` | Toggle auto mode (classifier; when feature enabled) |
 | `/plan [description]` | Enter plan mode |
 | `/view-plan` | View the current plan |
 | `/btw <question>` | Ask a side question without interrupting |
@@ -1404,7 +1497,7 @@ For MCP servers, see [MCP Servers](https://docs.x.ai/build/features/mcp-servers)
 | Managed | `~/.grok/managed_config.toml`, `/etc/grok/managed_config.toml` | Enterprise-served defaults |
 | Requirements | `~/.grok/requirements.toml`, `/etc/grok/requirements.toml` | Policy pins |
 
-Project configs are limited to MCP servers, plugins, and permission rules, not full user configs. For scope merge order and managed deployments, see [Enterprise Deployments](https://docs.x.ai/build/enterprise#configuration). [Permission rules](https://docs.x.ai/build/enterprise#permissions) and [sandboxing](https://docs.x.ai/build/enterprise#sandbox) are documented there too — they apply to individual use as much as to fleets.
+Project configs are limited to MCP servers, plugins, and permission rules, not full user configs. For scope merge order and managed deployments, see [Enterprise Deployments](https://docs.x.ai/build/enterprise#configuration). Day-to-day [permissions](https://docs.x.ai/build/features/permissions) and [sandbox](https://docs.x.ai/build/features/sandbox) apply to individual use; managed locks and headless modes are under Enterprise.
 
 ## Verification
 
@@ -1642,7 +1735,7 @@ deny = ["/data/shared-secrets", "**/.env", "**/*.pem"]
 | `read_write` | path list | Additional read-write paths. |
 | `deny` | path or **glob** list | Kernel-enforced deny for read and write/rename. An entry is a glob if it contains `*`, `?`, or `[` (for example `**/.env`, `**/*.pem`). |
 
-A non-empty `deny` list is enforced at the kernel level when the sandbox can be applied. On Linux, read-deny requires `bubblewrap`. For managed deployments and policy, see [Enterprise Deployment](https://docs.x.ai/build/enterprise).
+A non-empty `deny` list is enforced at the kernel level when the sandbox can be applied. On Linux, read-deny requires `bubblewrap`. Operator guide: [Sandbox](https://docs.x.ai/build/features/sandbox). Managed pins: [Enterprise Deployments](https://docs.x.ai/build/enterprise#sandbox).
 
 ### `[session]`, `[cli]`, and `[hints]`
 
@@ -7960,8 +8053,6 @@ curl -s "https://api.x.ai/v1/files?filter=public_url%20!%3D%20null" \\
 
 Grok 4.5 is SpaceXAI's frontier model built for coding, agentic tasks, and knowledge work. It was trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.
 
-> Grok 4.5 isn't available in the API console for EU users yet. Availability is expected later this month.
-
 ## Using the API
 
 If you already have an [API key](https://console.x.ai/team/default/api-keys), set the model name to `grok-4.5`:
@@ -8360,7 +8451,7 @@ We are here to support you through this migration. If you have any questions or 
 
 # Custom Voices
 
-Clone a voice from a short reference clip and use it anywhere a built-in voice works. Upload an audio sample and immediately start using it in our TTS and Voice Agent APIs.
+Clone a voice from a short reference clip and use it anywhere a built-in voice works. Upload an audio sample and immediately start using it in our TTS and Speech to Speech APIs.
 
 > [!WARNING]
 >
@@ -8794,7 +8885,7 @@ await fetch("https://api.x.ai/v1/custom-voices/nlbqfwie", {
 });
 ```
 
-The response is `{"deleted": true}`. After deletion, subsequent requests for the same `voice_id` return `404` and any TTS / Voice Agent calls referencing it will fail with an unknown-voice error.
+The response is `{"deleted": true}`. After deletion, subsequent requests for the same `voice_id` return `404` and any TTS / Speech to Speech calls referencing it will fail with an unknown-voice error.
 
 ## Using a Custom Voice
 
@@ -8848,9 +8939,9 @@ async def stream_with_custom_voice(voice_id: str):
 asyncio.run(stream_with_custom_voice("nlbqfwie"))
 ```
 
-### Voice Agent API
+### Speech to Speech API
 
-Set `voice` in the `session.update` message. See the [Voice Agent API docs](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) for the full session lifecycle.
+Set `voice` in the `session.update` message. See the [Speech to Speech API docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) for the full session lifecycle.
 
 ```python customLanguage="pythonWithoutSDK"
 import asyncio
@@ -8908,7 +8999,7 @@ The default limit is 30 custom voices per team. If you need more, contact us to 
 
 # Ephemeral Tokens
 
-Ephemeral tokens provide secure, short-lived authentication for client-side applications. Use them when connecting to the [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) from browsers or mobile apps to avoid exposing your API key.
+Ephemeral tokens provide secure, short-lived authentication for client-side applications. Use them when connecting to the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) from browsers or mobile apps to avoid exposing your API key.
 
 ## How It Works
 
@@ -9044,6 +9135,1866 @@ new WebSocket("wss://api.x.ai/v1/realtime", [\`xai-client-secret.\${OBTAINED_EPH
 ```
 
 
+===/developers/model-capabilities/audio/speech-to-speech===
+#### Model Capabilities
+
+# Speech to Speech API
+
+Build real-time voice applications powered by Grok. Stream audio and text bidirectionally via WebSocket for voice assistants, phone agents, and interactive voice systems.
+
+## Quick Start
+
+Connect to the Speech to Speech API and start a conversation:
+
+```python customLanguage="pythonWithoutSDK"
+import asyncio
+import json
+import os
+import websockets
+
+async def voice_agent():
+    async with websockets.connect(
+        "wss://api.x.ai/v1/realtime?model=grok-voice-latest",
+        additional_headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"}
+    ) as ws:
+        # Configure session
+        await ws.send(json.dumps({
+            "type": "session.update",
+            "session": {
+                "voice": "eve",
+                "instructions": "You are a helpful assistant.",
+                "turn_detection": {"type": "server_vad"}
+            }
+        }))
+        
+        # Send a text message
+        await ws.send(json.dumps({
+            "type": "conversation.item.create",
+            "item": {"type": "message", "role": "user", 
+                     "content": [{"type": "input_text", "text": "Hello!"}]}
+        }))
+        await ws.send(json.dumps({"type": "response.create"}))
+        
+        # Receive audio/text responses
+        async for msg in ws:
+            event = json.loads(msg)
+            print(f"Event: {event['type']}")
+
+asyncio.run(voice_agent())
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+import WebSocket from "ws";
+
+const ws = new WebSocket("wss://api.x.ai/v1/realtime?model=grok-voice-latest", {
+  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
+});
+
+/* 
+Web browsers do not support WebSocket headers. Instead, pass an
+Ephemeral Token (prefixed with xai-client-secret.) in the WebSocket protocol.
+ 
+const ws = new WebSocket("wss://api.x.ai/v1/realtime",
+  [`xai-client-secret.${XAI_EPHEMERAL_TOKEN}`]);
+*/
+
+ws.on("open", () => {
+  // Configure session
+  ws.send(JSON.stringify({
+    type: "session.update",
+    session: {
+      voice: "eve",
+      instructions: "You are a helpful assistant.",
+      turn_detection: { type: "server_vad" }
+    }
+  }));
+
+  // Send a text message
+  ws.send(JSON.stringify({
+    type: "conversation.item.create",
+    item: { type: "message", role: "user",
+            content: [{ type: "input_text", text: "Hello!" }] }
+  }));
+  ws.send(JSON.stringify({ type: "response.create" }));
+});
+
+ws.on("message", (data) => {
+  const event = JSON.parse(data);
+  console.log("Event:", event.type);
+});
+
+```
+
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent)
+
+[API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
+
+[Live Voice Demos](https://x.ai/api/voice)
+
+[Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing)
+
+### Get Started with Our Tester Apps
+
+* **[iOS Tester App](https://github.com/xai-org/xai-cookbook/tree/main/iOS/VoiceTesterApp)** — A Swift-based iOS app to act as a guide for setting up voice agents in your apps.
+* **[Web Agent (WebSocket)](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/web)** — A web app voice agent using WebSocket.
+* **[WebRTC Agent](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/webrtc)** — A web app voice agent using WebRTC.
+* **[Telephony Agent](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/telephony)** — A callable phone agent using Twilio.
+
+## Authentication
+
+Authenticate your WebSocket connection with either method:
+
+* **[Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens)** (recommended) — Short-lived tokens for client-side apps (browsers, mobile). Keeps your API key off the client.
+* **API Key** — Pass your xAI API key directly in the `Authorization` header. Server-side only.
+
+Read more in our [API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime).
+
+## Events
+
+Once the WebSocket is open, two-way events can begin. Client events are used to provide conversation information and send user audio to the Voice API, while server events include audio and text responses.
+
+[API documentation →](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
+
+## Model Selection
+
+Pass `model` as a query parameter; use a versioned name to pin to a specific release.
+
+```python customLanguage="pythonWithoutSDK"
+MODEL = "grok-voice-latest"
+url = f"wss://api.x.ai/v1/realtime?model={MODEL}"
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+const MODEL = "grok-voice-latest";
+const url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
+```
+
+| Model | Description |
+|-------|-------------|
+| `grok-voice-latest` | Alias that tracks the newest voice model |
+| `grok-voice-think-fast-1.0` | Flagship voice model |
+
+## Session Parameters
+
+After the session has been created, clients may send the [session.update](https://docs.x.ai/developers/rest-api-reference/inference/voice#session.update) event to configure the session.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `instructions` | string | System prompt |
+| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. |
+| `voice` | string | Voice selection: any built-in voice (e.g. `eve`, the default) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
+| `tools` | array | Tools available to the voice agent. Supports `file_search`, `web_search`, `x_search`, `mcp`, and `function` types. See [Using Tools](#using-tools-with-grok-speech-to-speech-api). |
+| `turn_detection.type` | string | null | `"server_vad"` for automatic detection, `null` for manual text turns |
+| `turn_detection.threshold` | number | optional | VAD activation threshold (0.1–0.9). Higher values require louder audio to trigger. Default: `0.85`. |
+| `turn_detection.silence_duration_ms` | number | optional | How long the user must be silent (in ms) before the server ends the turn (0–10000). Higher values let users pause longer without being cut off. |
+| `turn_detection.prefix_padding_ms` | number | optional | Amount of audio (in ms) to include before the detected start of speech (0–10000). Helps capture the beginning of words that might otherwise be clipped by the VAD. Default: `333`. |
+| `turn_detection.idle_timeout_ms` | number | optional | When set, the server proactively re-engages the user if no speech is detected for this many milliseconds after the assistant finishes responding. The timer re-arms after every response, so it fires repeatedly each `idle_timeout_ms` until the user speaks. Default: `null`.  |
+| `resumption.enabled` | boolean | optional | Opt in to [Session Resumption](#session-resumption): the server caches conversation turns keyed by `conversation_id` and replays them on reconnect so the model stays conditioned on prior context. Defaults to `false`. See [Session Resumption](#session-resumption). |
+| `audio.input.format.type` | string | Input codec: `"audio/pcm"`, `"audio/pcmu"`, `"audio/pcma"`, or `"audio/opus"` |
+| `audio.input.format.rate` | number | Input sample rate (PCM only): 8000, 16000, 22050, 24000, 32000, 44100, 48000 |
+| `audio.input.transport` | `"json"` | `"binary"` | optional | Wire path for input audio. Default: `"json"` (base64 in `input_audio_buffer.append`). `"binary"`: raw codec bytes as WebSocket binary frames. See [Audio Transport](#audio-transport). |
+| `audio.output.format.type` | string | Output codec: `"audio/pcm"`, `"audio/pcmu"`, `"audio/pcma"`, or `"audio/opus"` |
+| `audio.output.format.rate` | number | Output sample rate (PCM only): 8000, 16000, 22050, 24000, 32000, 44100, 48000 |
+| `audio.output.transport` | `"json"` | `"binary"` | optional | Wire path for assistant audio. Default: `"json"` (base64 in `response.output_audio.delta` / `response.audio.delta`). `"binary"`: raw codec bytes as WebSocket binary frames. Mid-session changes apply at the next response boundary. See [Audio Transport](#audio-transport). |
+| `audio.input.transcription.language_hint` | string | BCP-47 language code (e.g. `"ja"`, `"ar"`, `"es-MX"`, `"pt-BR"`) to bias ASR transcription toward a specific language. Can be updated mid-session. See [Language Hint](#language-hint). |
+| `audio.input.transcription.keyterms` | array | List of key terms (e.g. product names, proper nouns) to bias transcription toward. Max 100 terms, each up to 50 characters. Can be updated mid-session. See [Keyterms](#keyterms). |
+| `audio.output.speed` | number | Playback speed multiplier for assistant audio output. Range: 0.7–1.5. Default: `1.0`. Values below 1.0 slow down speech; values above 1.0 speed it up. |
+| `replace` | object | optional | Map of phrases to spoken substitutions applied to the model's output before TTS, e.g. `{"Acme Mobile": "Acme Mobull"}`. Fixes pronunciation by changing the spoken audio without altering the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
+
+## Available Voices
+
+The same roster of voices works across the Speech to Speech API and Text to Speech API. Browse the full list with tone descriptions and samples in the [voice table](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech#voices), or fetch it programmatically via [`GET /v1/tts/voices`](https://docs.x.ai/developers/rest-api-reference/inference/voice). Pass the lowercase voice ID as the `voice` parameter on `session.update`.
+
+### Custom Voices
+
+Need a voice that isn't in this list? Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices). The resulting `voice_id` works as the `voice` parameter on `session.update` exactly like a built-in voice.
+
+### Selecting a Voice
+
+Specify the voice in your session configuration using the `voice` parameter:
+
+```pythonWithoutSDK
+# Configure session with a specific voice
+session_config = {
+    "type": "session.update",
+    "session": {
+        "voice": "eve",  # eve, ara, rex, sal, leo, or custom voice ID
+        "instructions": "You are a helpful assistant.",
+        # Audio format settings (these are the defaults if not specified)
+        "audio": {
+            "input": {"format": {"type": "audio/pcm", "rate": 24000}},
+            "output": {"format": {"type": "audio/pcm", "rate": 24000}}
+        }
+    }
+}
+
+await ws.send(json.dumps(session_config))
+```
+
+```javascriptWithoutSDK
+// Configure session with a specific voice
+const sessionConfig = {
+  type: "session.update",
+  session: {
+    voice: "eve", // eve, ara, rex, sal, leo, or custom voice ID
+    instructions: "You are a helpful assistant.",
+    // Audio format settings (these are the defaults if not specified)
+    audio: {
+      input: { format: { type: "audio/pcm", rate: 24000 } },
+      output: { format: { type: "audio/pcm", rate: 24000 } }
+    }
+  }
+};
+
+ws.send(JSON.stringify(sessionConfig));
+```
+
+## Audio
+
+When `turn_detection.type` is set to `server_vad`, we'll perform Voice Activity Detection (VAD) and automatically detect when the user is finished speaking. If you are using server VAD, you'll only need the [input\_audio\_buffer.append](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.append) event.
+
+Otherwise, you'll need to send the [commit](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.commit) event once the user is finished speaking, and use [clear](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.clear) to discard all audio that has been appended but not committed yet.
+
+### Configuring Audio Format
+
+Specify the audio codec and sample rate in the `audio` [session parameters](#session-parameters). Input and output are specified separately and do not need to match. Codec (`format`) is independent of wire path (`transport`); see [Audio Transport](#audio-transport).
+
+| Format | Encoding | Container Types | Sample Rate |
+|--------|----------|-----------------|-------------|
+| **`audio/pcm`** (Default) | Linear16, Little-endian | Raw, WAV, AIFF | Configurable (see below) |
+| **`audio/pcmu`** | G.711 μ-law (Mulaw) | Raw | 8000 Hz |
+| **`audio/pcma`** | G.711 A-law | Raw | 8000 Hz |
+| **`audio/opus`** | Opus | Raw packets (one packet per payload) | 24000 Hz |
+
+When using the `audio/pcm` format, you can configure the sample rate to one of the following supported values:
+
+| Sample Rate | Quality | Description |
+|------------:|---------|-------------|
+| **8000 Hz** | Telephone | Narrowband, suitable for voice calls |
+| **16000 Hz** | Wideband | Good for speech recognition |
+| **22050 Hz** | Standard | Balanced quality and bandwidth |
+| **24000 Hz** (Default) | High | Recommended for most use cases |
+| **32000 Hz** | Very High | Enhanced audio clarity |
+| **44100 Hz** | CD Quality | Standard for music / media |
+| **48000 Hz** | Professional | Studio-grade audio |
+
+You can configure the audio format and sample rate for both input and output in the session configuration:
+
+```pythonWithoutSDK
+# Configure audio format with custom sample rate for input and output
+session_config = {
+    "type": "session.update",
+    "session": {
+        "audio": {
+            "input": {
+                "format": {
+                    "type": "audio/pcm",  # or "audio/pcmu" or "audio/pcma"
+                    "rate": 16000  # Only applicable for audio/pcm
+                }
+            },
+            "output": {
+                "format": {
+                    "type": "audio/pcm",  # or "audio/pcmu" or "audio/pcma"
+                    "rate": 16000  # Only applicable for audio/pcm
+                }
+            }
+        },
+        "instructions": "You are a helpful assistant.",
+    }
+}
+
+await ws.send(json.dumps(session_config))
+```
+
+```javascriptWithoutSDK
+// Configure audio format with custom sample rate for input and output
+const sessionConfig = {
+  type: "session.update",
+  session: {
+    audio: {
+      input: {
+        format: {
+          type: "audio/pcm", // or "audio/pcmu" or "audio/pcma"
+          rate: 16000 // Only applicable for audio/pcm
+        }
+      },
+      output: {
+        format: {
+          type: "audio/pcm", // or "audio/pcmu" or "audio/pcma"
+          rate: 16000 // Only applicable for audio/pcm
+        }
+      }
+    },
+    instructions: "You are a helpful assistant.",
+  }
+};
+
+ws.send(JSON.stringify(sessionConfig));
+```
+
+### Audio Transport
+
+`format` selects the **codec**. `transport` selects how those bytes travel on the WebSocket:
+
+| | **Input** | **Output** |
+|---|-----------|------------|
+| **`json`** (default) | Base64 in [`input_audio_buffer.append`](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.append) | Base64 in [`response.output_audio.delta`](https://docs.x.ai/developers/rest-api-reference/inference/voice#response.output_audio.delta) / `response.audio.delta` |
+| **`binary`** | Raw codec bytes as WebSocket **binary** frames (no protocol header) | Same binary frames; lifecycle events (`response.created`, `response.done`, transcripts, etc.) stay JSON |
+
+Omit `transport` (or set `"json"`) to keep existing clients unchanged.
+
+**Input dual-accept:** when input format is configured, the server accepts **both** JSON append and binary frames for that codec. Use `input.transport` as the preferred send path for your client; you do not need to drain one channel before the other mid-session.
+
+**Output is strict:** assistant audio is emitted only on `output.transport`. Changing `output.transport` mid-session applies at the **next response boundary** so a single utterance never mixes JSON deltas and binary frames.
+
+**Opus:** each JSON `delta` / `audio` field or each binary frame is one raw Opus packet (24 kHz mono). There is no extra framing header on binary frames.
+
+Example: PCM over binary on both directions:
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        "audio": {
+            "input": {
+                "format": {"type": "audio/pcm", "rate": 24000},
+                "transport": "binary",
+            },
+            "output": {
+                "format": {"type": "audio/pcm", "rate": 24000},
+                "transport": "binary",
+            },
+        },
+    },
+}
+await ws.send(json.dumps(session_config))
+
+# Send mic audio as raw PCM16 little-endian frames (not base64 JSON)
+await ws.send(pcm16_bytes)  # WebSocket binary message
+
+# Receive: binary messages are audio; text messages are JSON events
+async for message in ws:
+    if isinstance(message, bytes):
+        # raw PCM16 (or Opus packets if format is audio/opus)
+        play(message)
+    else:
+        event = json.loads(message)
+        # response.done, transcripts, etc.
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+  type: "session.update",
+  session: {
+    audio: {
+      input: {
+        format: { type: "audio/pcm", rate: 24000 },
+        transport: "binary",
+      },
+      output: {
+        format: { type: "audio/pcm", rate: 24000 },
+        transport: "binary",
+      },
+    },
+  },
+};
+ws.send(JSON.stringify(sessionConfig));
+
+// Send mic audio as raw PCM16 little-endian frames
+ws.send(pcm16ArrayBuffer); // binary WebSocket frame
+
+ws.binaryType = "arraybuffer";
+ws.on("message", (data) => {
+  if (data instanceof ArrayBuffer || Buffer.isBuffer(data)) {
+    // raw PCM16 (or Opus packets if format is audio/opus)
+    play(data);
+    return;
+  }
+  const event = JSON.parse(data.toString());
+  // response.done, transcripts, etc.
+});
+```
+
+### Receiving and Playing Audio
+
+Decode and play base64 PCM16 audio received from the API when `output.transport` is `"json"` (default). Use the same sample rate as configured. For `transport: "binary"`, play the binary frame payload directly (same codec bytes, no base64).
+
+```pythonWithoutSDK
+import base64
+import numpy as np
+
+# Configure session with 16kHz sample rate for lower bandwidth (input and output)
+session_config = {
+    "type": "session.update",
+    "session": {
+        "instructions": "You are a helpful assistant.",
+        "voice": "eve",
+        "turn_detection": {
+            "type": "server_vad",
+        },
+        "audio": {
+            "input": {
+                "format": {
+                    "type": "audio/pcm",
+                    "rate": 16000  # 16kHz for lower bandwidth usage
+                }
+            },
+            "output": {
+                "format": {
+                    "type": "audio/pcm",
+                    "rate": 16000  # 16kHz for lower bandwidth usage
+                }
+            }
+        }
+    }
+}
+await ws.send(json.dumps(session_config))
+
+# When processing audio, use the same sample rate
+SAMPLE_RATE = 16000
+
+# Convert audio data to PCM16 and base64
+def audio_to_base64(audio_data: np.ndarray) -> str:
+    """Convert float32 audio array to base64 PCM16 string."""
+    # Normalize to [-1, 1] and convert to int16
+    audio_int16 = (audio_data * 32767).astype(np.int16)
+    # Encode to base64
+    audio_bytes = audio_int16.tobytes()
+    return base64.b64encode(audio_bytes).decode('utf-8')
+
+# Convert base64 PCM16 to audio data
+def base64_to_audio(base64_audio: str) -> np.ndarray:
+    """Convert base64 PCM16 string to float32 audio array."""
+    # Decode base64
+    audio_bytes = base64.b64decode(base64_audio)
+    # Convert to int16 array
+    audio_int16 = np.frombuffer(audio_bytes, dtype=np.int16)
+    # Normalize to [-1, 1]
+    return audio_int16.astype(np.float32) / 32768.0
+```
+
+```javascriptWithoutSDK
+// Configure session with 16kHz sample rate for lower bandwidth (input and output)
+const sessionConfig = {
+  type: "session.update",
+  session: {
+    instructions: "You are a helpful assistant.",
+    voice: "eve",
+    turn_detection: { type: "server_vad" },
+    audio: {
+      input: {
+        format: {
+          type: "audio/pcm",
+          rate: 16000 // 16kHz for lower bandwidth usage
+        }
+      },
+      output: {
+        format: {
+          type: "audio/pcm",
+          rate: 16000 // 16kHz for lower bandwidth usage
+        }
+      }
+    }
+  }
+};
+ws.send(JSON.stringify(sessionConfig));
+
+// When processing audio, use the same sample rate
+const SAMPLE_RATE = 16000;
+
+// Create AudioContext with matching sample rate
+const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
+
+// Helper function to convert Float32Array to base64 PCM16
+function float32ToBase64PCM16(float32Array) {
+  const pcm16 = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Array[i]));
+    pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  const bytes = new Uint8Array(pcm16.buffer);
+  return btoa(String.fromCharCode(...bytes));
+}
+
+// Helper function to convert base64 PCM16 to Float32Array
+function base64PCM16ToFloat32(base64String) {
+  const binaryString = atob(base64String);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  const pcm16 = new Int16Array(bytes.buffer);
+  const float32 = new Float32Array(pcm16.length);
+  for (let i = 0; i < pcm16.length; i++) {
+    float32[i] = pcm16[i] / 32768.0;
+  }
+  return float32;
+}
+```
+
+## Pronunciation Replacements
+
+Use the `replace` parameter to fix how the model pronounces specific words or phrases. Each key is matched (case-insensitively) in the model's output and swapped for its replacement value **before** text-to-speech — so only the spoken audio changes; the transcript the user sees keeps the original text.
+
+This is useful for brand names, acronyms, or domain terms the model mispronounces. For example, mapping `"Acme Mobile"` to `"Acme Mobull"` makes the audio say it correctly while the transcript still reads "Acme Mobile".
+
+```python customLanguage="pythonWithoutSDK"
+await ws.send(json.dumps({
+    "type": "session.update",
+    "session": {
+        "voice": "eve",
+        "instructions": "You are a helpful assistant.",
+        "replace": {"Acme Mobile": "Acme Mobull"}
+    }
+}))
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+ws.send(JSON.stringify({
+  type: "session.update",
+  session: {
+    voice: "eve",
+    instructions: "You are a helpful assistant.",
+    replace: { "Acme Mobile": "Acme Mobull" }
+  }
+}));
+```
+
+Matching behavior:
+
+* Matching is case-insensitive; the replacement is spoken using the casing you provide.
+* Whole-word boundaries are required, so `Acme, Mobile`, `Acme-Mobile`, and `Acme Mobiles` do **not** match.
+* When multiple keys share a prefix, the longest match wins.
+* The map can be updated mid-session with another `session.update`; the applied map is echoed back on `session.updated`.
+
+## Supported Languages
+
+The Speech to Speech API supports 20+ languages with native-quality accents. The model automatically detects the input language and responds naturally in the same language — no configuration required.
+
+| Language | Code |
+|----------|------|
+| English | `en` |
+| Arabic (Egypt) | `ar-EG` |
+| Arabic (Saudi Arabia) | `ar-SA` |
+| Arabic (United Arab Emirates) | `ar-AE` |
+| Bengali | `bn` |
+| Chinese (Simplified) | `zh` |
+| French | `fr` |
+| German | `de` |
+| Hindi | `hi` |
+| Indonesian | `id` |
+| Italian | `it` |
+| Japanese | `ja` |
+| Korean | `ko` |
+| Portuguese (Brazil) | `pt-BR` |
+| Portuguese (Portugal) | `pt-PT` |
+| Russian | `ru` |
+| Spanish (Mexico) | `es-MX` |
+| Spanish (Spain) | `es-ES` |
+| Turkish | `tr` |
+| Vietnamese | `vi` |
+
+The model is also capable of conversing in additional languages beyond those listed above, with varying degrees of accuracy. You can specify a preferred language or accent in your system instructions for consistent multilingual experiences.
+
+### Language Hint
+
+Bias transcription toward a specific language by setting `audio.input.transcription.language_hint` in `session.update`. Use a BCP-47 code from the [Supported Languages](#supported-languages) table. Can be changed mid-session.
+
+For Spanish and Portuguese, you must specify a regional variant (e.g. `"es-MX"`, `"es-ES"`, `"pt-BR"`, `"pt-PT"`) — bare `"es"` and `"pt"` are not accepted. Unrecognized codes are silently ignored and fall back to automatic language detection.
+
+```pythonWithoutSDK
+await ws.send(json.dumps({
+    "type": "session.update",
+    "session": {
+        "audio": {
+            "input": {
+                "transcription": {
+                    "language_hint": "ja"
+                }
+            }
+        }
+    }
+}))
+```
+
+```javascriptWithoutSDK
+ws.send(JSON.stringify({
+  type: "session.update",
+  session: {
+    audio: {
+      input: {
+        transcription: {
+          language_hint: "ja"
+        }
+      }
+    }
+  }
+}));
+```
+
+### Keyterms
+
+Bias transcription toward domain-specific vocabulary — product names, proper nouns, brand names, or technical terms that the model might otherwise mis-transcribe — by setting `audio.input.transcription.keyterms` in `session.update`. Provide an array of strings, up to 100 terms with each term up to 50 characters. Keyterms can be updated mid-session.
+
+```pythonWithoutSDK
+await ws.send(json.dumps({
+    "type": "session.update",
+    "session": {
+        "audio": {
+            "input": {
+                "transcription": {
+                    "keyterms": ["xAI", "Grok", "Understand The Universe"]
+                }
+            }
+        }
+    }
+}))
+```
+
+```javascriptWithoutSDK
+ws.send(JSON.stringify({
+  type: "session.update",
+  session: {
+    audio: {
+      input: {
+        transcription: {
+          keyterms: ["xAI", "Grok", "Understand The Universe"]
+        }
+      }
+    }
+  }
+}));
+```
+
+## Using Tools with Grok Speech to Speech API
+
+The Grok Speech to Speech API supports various tools that can be configured in your session to enhance the capabilities of your voice agent. Tools can be configured in the `session.update` message.
+
+### Available Tool Types
+
+* **Collections Search (`file_search`)** - Search through your uploaded document collections
+* **Web Search (`web_search`)** - Search the web for current information
+* **X Search (`x_search`)** - Search X (Twitter) for posts and information
+* **Remote MCP Tools (`mcp`)** - Connect to external [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers for custom tools
+* **Custom Functions** - Define your own function tools with JSON schemas
+
+### Collections Search with `file_search`
+
+Use the `file_search` tool to enable your voice agent to search through document collections. You'll need to create a collection first using the [Collections API](https://docs.x.ai/developers/rest-api-reference/collections).
+
+```pythonWithoutSDK
+COLLECTION_ID = "your-collection-id"  # Replace with your collection ID
+
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "file_search",
+                "vector_store_ids": [COLLECTION_ID],
+                "max_num_results": 10,
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const COLLECTION_ID = "your-collection-id"; // Replace with your collection ID
+
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "file_search",
+                vector_store_ids: [COLLECTION_ID],
+                max_num_results: 10,
+            },
+        ],
+    },
+};
+```
+
+### Web Search and X Search
+
+Configure web search and X search tools to give your voice agent access to current information from the web and X (Twitter). Both tools run server-side — enable them by listing them in `session.tools`, optionally with the same filtering parameters as the text-API [Web Search](https://docs.x.ai/developers/tools/web-search) and [X Search](https://docs.x.ai/developers/tools/x-search) tools.
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "web_search",
+                "allowed_domains": ["x.ai", "docs.x.ai"],
+                "location": {"country": "US", "city": "San Francisco"},
+            },
+            {
+                "type": "x_search",
+                "allowed_x_handles": ["xai"],
+                "from_date": "2025-01-01",
+                "to_date": "2025-06-01",
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "web_search",
+                allowed_domains: ["x.ai", "docs.x.ai"],
+                location: { country: "US", city: "San Francisco" },
+            },
+            {
+                type: "x_search",
+                allowed_x_handles: ["xai"],
+                from_date: "2025-01-01",
+                to_date: "2025-06-01",
+            },
+        ],
+    },
+};
+```
+
+#### Web Search Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `allowed_domains` | No | Only include results from these domains (no protocol or path, e.g. `example.com`). Max 5. Mutually exclusive with `excluded_domains` — do not set both on the same tool. |
+| `excluded_domains` | No | Exclude results from these domains. Max 5. Mutually exclusive with `allowed_domains` — do not set both on the same tool. |
+| `enable_image_understanding` | No | Let the agent view images found during web search. |
+| `location` | No | Bias results by location: `country` (ISO 3166-1 alpha-2 or full name), `city`, `region`, `timezone` (IANA, e.g. `America/Los_Angeles`). Also accepted under the text-API name `user_location`. |
+
+#### X Search Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `allowed_x_handles` | No | Only include posts from these X handles (without `@`). Max 20. Mutually exclusive with `excluded_x_handles` — do not set both on the same tool. |
+| `excluded_x_handles` | No | Exclude posts from these X handles. Max 20. Mutually exclusive with `allowed_x_handles` — do not set both on the same tool. |
+| `from_date` | No | Only consider posts from this date, ISO-8601 `YYYY-MM-DD`. Must not be later than `to_date`. |
+| `to_date` | No | Only consider posts up to this date, ISO-8601 `YYYY-MM-DD`. |
+| `enable_image_understanding` | No | Let the agent view images in posts. |
+| `enable_video_understanding` | No | Let the agent view videos in posts. |
+
+An invalid configuration — too many entries, `allowed_*` and `excluded_*` set together, or a malformed/inverted date window — is rejected with an `error` event that describes the problem. The session stays connected and its previous configuration remains in effect.
+
+### Remote MCP Tools
+
+Use the `mcp` tool type to connect your voice agent to external [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers. This lets you extend your voice agent with third-party or custom tools without implementing them as client-side functions — xAI manages the MCP server connection and tool execution on your behalf.
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "mcp",
+                "server_url": "https://mcp.example.com/mcp",
+                "server_label": "my-tools",
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "mcp",
+                server_url: "https://mcp.example.com/mcp",
+                server_label: "my-tools",
+            },
+        ],
+    },
+};
+```
+
+#### MCP Tool Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `server_url` | Yes | The URL of the MCP server. Only Streaming HTTP and SSE transports are supported. |
+| `server_label` | Yes | A label to identify the server (used for tool call prefixing). |
+| `server_description` | No | A description of what the server provides. |
+| `allowed_tools` | No | List of specific tool names to allow. If omitted, all tools from the server are available. |
+| `authorization` | No | A token set in the `Authorization` header on requests to the MCP server. |
+| `headers` | No | Additional headers to include in requests to the MCP server. |
+
+#### Advanced MCP Configuration
+
+You can restrict which tools are available, provide authentication, and add custom headers:
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "mcp",
+                "server_url": "https://mcp.example.com/mcp",
+                "server_label": "my-tools",
+                "server_description": "Custom business tools for order management",
+                "allowed_tools": ["lookup_order", "check_inventory"],
+                "authorization": "Bearer your-token-here",
+                "headers": {
+                    "X-Custom-Header": "value"
+                },
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "mcp",
+                server_url: "https://mcp.example.com/mcp",
+                server_label: "my-tools",
+                server_description: "Custom business tools for order management",
+                allowed_tools: ["lookup_order", "check_inventory"],
+                authorization: "Bearer your-token-here",
+                headers: {
+                    "X-Custom-Header": "value",
+                },
+            },
+        ],
+    },
+};
+```
+
+#### Multiple MCP Servers
+
+You can connect to multiple MCP servers simultaneously, each providing different capabilities:
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "mcp",
+                "server_url": "https://mcp.deepwiki.com/mcp",
+                "server_label": "deepwiki",
+            },
+            {
+                "type": "mcp",
+                "server_url": "https://your-tools.example.com/mcp",
+                "server_label": "custom-tools",
+                "allowed_tools": ["search_database", "format_data"],
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "mcp",
+                server_url: "https://mcp.deepwiki.com/mcp",
+                server_label: "deepwiki",
+            },
+            {
+                type: "mcp",
+                server_url: "https://your-tools.example.com/mcp",
+                server_label: "custom-tools",
+                allowed_tools: ["search_database", "format_data"],
+            },
+        ],
+    },
+};
+```
+
+> [!NOTE]
+>
+> MCP tools are server-side tools — xAI handles the connection and execution automatically. Unlike custom function tools, you don't need to handle tool call responses in your client code. For more details on MCP tool configuration, see the [Remote MCP Tools](https://docs.x.ai/developers/tools/remote-mcp) guide.
+
+### Custom Function Tools
+
+You can define custom function tools with JSON schemas to extend your voice agent's capabilities.
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "function",
+                "name": "generate_random_number",
+                "description": "Generate a random number between min and max values",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "min": {
+                            "type": "number",
+                            "description": "Minimum value (inclusive)",
+                        },
+                        "max": {
+                            "type": "number",
+                            "description": "Maximum value (inclusive)",
+                        },
+                    },
+                    "required": ["min", "max"],
+                },
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "function",
+                name: "generate_random_number",
+                description: "Generate a random number between min and max values",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        min: {
+                            type: "number",
+                            description: "Minimum value (inclusive)",
+                        },
+                        max: {
+                            type: "number",
+                            description: "Maximum value (inclusive)",
+                        },
+                    },
+                    required: ["min", "max"],
+                },
+            },
+        ],
+    },
+};
+```
+
+### Combining Multiple Tools
+
+You can combine multiple tool types in a single session configuration, including server-side tools (web search, X search, collections, MCP) and client-side function tools:
+
+```pythonWithoutSDK
+session_config = {
+    "type": "session.update",
+    "session": {
+        ...
+        "tools": [
+            {
+                "type": "file_search",
+                "vector_store_ids": ["your-collection-id"],
+                "max_num_results": 10,
+            },
+            {
+                "type": "web_search",
+            },
+            {
+                "type": "x_search",
+            },
+            {
+                "type": "mcp",
+                "server_url": "https://mcp.example.com/mcp",
+                "server_label": "my-tools",
+            },
+            {
+                "type": "function",
+                "name": "generate_random_number",
+                "description": "Generate a random number",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "min": {"type": "number"},
+                        "max": {"type": "number"},
+                    },
+                    "required": ["min", "max"],
+                },
+            },
+        ],
+    },
+}
+```
+
+```javascriptWithoutSDK
+const sessionConfig = {
+    type: "session.update",
+    session: {
+        ...
+        tools: [
+            {
+                type: "file_search",
+                vector_store_ids: ["your-collection-id"],
+                max_num_results: 10,
+            },
+            {
+                type: "web_search",
+            },
+            {
+                type: "x_search",
+            },
+            {
+                type: "mcp",
+                server_url: "https://mcp.example.com/mcp",
+                server_label: "my-tools",
+            },
+            {
+                type: "function",
+                name: "generate_random_number",
+                description: "Generate a random number",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        min: { type: "number" },
+                        max: { type: "number" },
+                    },
+                    required: ["min", "max"],
+                },
+            },
+        ],
+    },
+};
+```
+
+> [!NOTE]
+>
+> Server-side tools (web search, X search, collections, and MCP) are executed automatically by xAI — you don't need to handle their responses. Only custom function tools require client-side handling. For more details, see [Collections](https://docs.x.ai/developers/rest-api-reference/collections), [Web Search](https://docs.x.ai/developers/tools/web-search), [X Search](https://docs.x.ai/developers/tools/x-search), and [Remote MCP Tools](https://docs.x.ai/developers/tools/remote-mcp).
+
+### Handling Function Call Responses
+
+When you define custom function tools, the voice agent will call these functions during conversation. You need to handle these function calls, execute them, and return the results to continue the conversation.
+
+### Function Call Flow
+
+1. **Agent decides to call a function** → sends `response.function_call_arguments.done` event
+2. **Your code executes the function** → processes the arguments and generates a result
+3. **Send result back to agent** → sends `conversation.item.create` with the function output
+4. **Request continuation** → sends `response.create` to let the agent continue
+
+### Complete Example
+
+```pythonWithoutSDK
+import json
+import websockets
+
+# Define your function implementations
+def get_weather(location: str, units: str = "celsius"):
+    """Get current weather for a location"""
+    # In production, call a real weather API
+    return {
+        "location": location,
+        "temperature": 22,
+        "units": units,
+        "condition": "Sunny",
+        "humidity": 45
+    }
+
+def book_appointment(date: str, time: str, service: str):
+    """Book an appointment"""
+    # In production, interact with your booking system
+    import random
+    confirmation = f"CONF{random.randint(1000, 9999)}"
+    return {
+        "status": "confirmed",
+        "confirmation_code": confirmation,
+        "date": date,
+        "time": time,
+        "service": service
+    }
+
+# Map function names to implementations
+FUNCTION_HANDLERS = {
+    "get_weather": get_weather,
+    "book_appointment": book_appointment
+}
+
+async def handle_function_call(ws, event):
+    """Handle function call from the voice agent"""
+    function_name = event["name"]
+    call_id = event["call_id"]
+    arguments = json.loads(event["arguments"])
+
+    print(f"Function called: {function_name} with args: {arguments}")
+
+    # Execute the function
+    if function_name in FUNCTION_HANDLERS:
+        result = FUNCTION_HANDLERS[function_name](arguments.md)
+
+        # Send result back to agent
+        await ws.send(json.dumps({
+            "type": "conversation.item.create",
+            "item": {
+                "type": "function_call_output",
+                "call_id": call_id,
+                "output": json.dumps(result)
+            }
+        }))
+
+        # Request agent to continue with the result
+        await ws.send(json.dumps({
+            "type": "response.create"
+        }))
+    else:
+        print(f"Unknown function: {function_name}")
+
+# In your WebSocket message handler
+async def on_message(ws, message):
+    event = json.loads(message)
+
+    # Listen for function calls
+    if event["type"] == "response.function_call_arguments.done":
+        await handle_function_call(ws, event)
+    elif event["type"] == "response.output_audio.delta":
+        # Handle audio response
+        pass
+```
+
+```javascriptWithoutSDK
+// Define your function implementations
+const functionHandlers = {
+  get_weather: async (args) => {
+    // In production, call a real weather API
+    return {
+      location: args.location,
+      temperature: 22,
+      units: args.units || "celsius",
+      condition: "Sunny",
+      humidity: 45
+    };
+  },
+
+  book_appointment: async (args) => {
+    // In production, interact with your booking system
+    const confirmation = \`CONF\${Math.floor(Math.random() * 9000) + 1000}\`;
+    return {
+      status: "confirmed",
+      confirmation_code: confirmation,
+      date: args.date,
+      time: args.time,
+      service: args.service
+    };
+  }
+};
+
+// Handle function calls from the voice agent
+async function handleFunctionCall(ws, event) {
+  const functionName = event.name;
+  const callId = event.call_id;
+  const args = JSON.parse(event.arguments);
+
+  console.log(\`Function called: \${functionName\} with args:\`, args);
+
+  // Execute the function
+  const handler = functionHandlers[functionName];
+  if (handler) {
+    const result = await handler(args);
+
+    // Send result back to agent
+    ws.send(JSON.stringify({
+      type: "conversation.item.create",
+      item: {
+        type: "function_call_output",
+        call_id: callId,
+        output: JSON.stringify(result)
+      }
+    }));
+
+    // Request agent to continue with the result
+    ws.send(JSON.stringify({
+      type: "response.create"
+    }));
+  } else {
+    console.error(\`Unknown function: \${functionName\}\`);
+  }
+}
+
+// In your WebSocket message handler
+ws.on("message", (message) => {
+  const event = JSON.parse(message);
+
+  // Listen for function calls
+  if (event.type === "response.function_call_arguments.done") {
+    handleFunctionCall(ws, event);
+  } else if (event.type === "response.output_audio.delta") {
+    // Handle audio response
+  }
+});
+```
+
+### Function Call Events
+
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `response.function_call_arguments.done` | Server → Client | Function call triggered with complete arguments |
+| `conversation.item.create` (function\_call\_output) | Client → Server | Send function execution result back |
+| `response.create` | Client → Server | Request agent to continue processing |
+
+### Parallel Tool Calling
+
+When the model determines that multiple function calls are needed to fulfill a request, it will emit multiple `response.function_call_arguments.done` events before any audio response. In this case, you must resolve **all** function calls and send their results back before emitting `response.create`.
+
+**Expected behavior:**
+
+1. Receive multiple `response.function_call_arguments.done` events (one per function call)
+2. Execute all functions (can be done in parallel for performance)
+3. Send a `conversation.item.create` with `function_call_output` for **each** function call
+4. Only after all function outputs have been sent, emit a single `response.create` to continue
+
+> [!WARNING]
+>
+> **Important:** Do not send `response.create` until all function call outputs have been submitted. Sending `response.create` prematurely will cause the model to respond without the complete context from all tool results.
+
+## Force Message
+
+Use `force_message` to make the agent speak a **hard-coded, TTS-synthesized line** without involving the model. This is useful for scripted greetings, compliance disclosures (e.g. "This call is being recorded"), IVR prompts, or any utterance that must be delivered verbatim.
+
+Send a `conversation.item.create` event with `item.type` set to `"force_message"`:
+
+```python customLanguage="pythonWithoutSDK"
+await ws.send(json.dumps({
+    "type": "conversation.item.create",
+    "item": {
+        "type": "force_message",
+        "role": "assistant",
+        "interruptible": False,
+        "content": [{"type": "output_text", "text": "This call is being recorded."}]
+    }
+}))
+# Do NOT send response.create — the force_message IS the turn.
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+ws.send(JSON.stringify({
+  type: "conversation.item.create",
+  item: {
+    type: "force_message",
+    role: "assistant",
+    interruptible: false,
+    content: [{ type: "output_text", text: "This call is being recorded." }],
+  },
+}));
+// Do NOT send response.create — the force_message IS the turn.
+```
+
+| Field | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `item.type` | Yes | — | Must be `"force_message"` |
+| `item.content[].text` | Yes | — | Verbatim text to synthesize via TTS |
+| `item.interruptible` | No | `true` | When `false`, caller audio is dropped until playback completes |
+
+The server injects a full response lifecycle (`response.created` → `response.output_audio.delta` → `response.done`) so the force message appears to clients like a normal model turn.
+
+> [!NOTE]
+>
+> `force_message` is an xAI extension. It is not part of the OpenAI Realtime API.
+
+## Per-Response Instructions
+
+Override the session-level system prompt for a single response by setting `instructions` on `response.create`:
+
+```python customLanguage="pythonWithoutSDK"
+await ws.send(json.dumps({
+    "type": "response.create",
+    "response": {
+        "instructions": "Respond in Spanish for this turn only."
+    }
+}))
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+ws.send(JSON.stringify({
+  type: "response.create",
+  response: {
+    instructions: "Respond in Spanish for this turn only.",
+  },
+}));
+```
+
+The override applies only to this response — subsequent responses revert to the session `instructions`. This is useful for injecting dynamic context (e.g. CRM data, caller info) or temporarily changing behavior without updating the session.
+
+## Session Resumption
+
+By default a `/v1/realtime` connection loses its conversation history when the WebSocket closes. **Session resumption** caches each turn and replays the prior context on reconnect, so the model stays conditioned on what was said earlier.
+
+To continue a session across connections, capture the server's `conversation.created.conversation.id` and pass it back as `?conversation_id=<id>` on reconnect (with the same opt-in).
+
+1. **Connect and opt in** by sending `resumption.enabled: true` on `session.update`. Read the assigned id from `conversation.created` and store it.
+2. **Reconnect with that id.** Reopen the WebSocket with `?conversation_id=<id>` and opt in again. The cached turns replay before your first new turn, echoed back as `conversation.item.created` events.
+
+```python customLanguage="pythonWithoutSDK"
+import json, websockets
+
+# resume_id is None on a fresh conversation; pass the saved id to resume.
+async def connect(resume_id=None):
+    url = f"wss://api.x.ai/v1/realtime?model={MODEL}"
+    if resume_id:
+        url += f"&conversation_id={resume_id}"
+
+    async with websockets.connect(url, additional_headers=headers) as ws:
+        # Opt in to resumption (required to cache and to replay).
+        await ws.send(json.dumps({
+            "type": "session.update",
+            "session": {"resumption": {"enabled": True}},
+        }))
+
+        async for raw in ws:
+            event = json.loads(raw)
+            if event["type"] == "conversation.created":
+                # Server-assigned id. Save it and pass it as
+                # ?conversation_id= on your next connect to resume.
+                saved_id = event["conversation"]["id"]
+            # ... handle the rest of the session
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+// resumeId is null on a fresh conversation; pass the saved id to resume.
+function connect(resumeId = null) {
+  let url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
+  if (resumeId) url += `&conversation_id=${resumeId}`;
+  const ws = new WebSocket(url);
+
+  ws.addEventListener("open", () => {
+    // Opt in to resumption (required to cache and to replay).
+    ws.send(JSON.stringify({
+      type: "session.update",
+      session: { resumption: { enabled: true } },
+    }));
+  });
+
+  ws.addEventListener("message", (msg) => {
+    const event = JSON.parse(msg.data);
+    if (event.type === "conversation.created") {
+      // Server-assigned id. Save it and pass it as
+      // ?conversation_id= on your next connect to resume.
+      savedId = event.conversation.id;
+    }
+    // ... handle the rest of the session
+  });
+}
+```
+
+Persisted and replayed: user and assistant transcripts, assistant tool calls, and your `function_call_output` results.
+
+* **Opt-in both ways.** No history replays unless the resuming session also sends `resumption.enabled: true`.
+* **Expiry.** History is dropped after 30 minutes of inactivity.
+
+## Best Practices
+
+This section outlines key recommendations for building low-latency, reliable, and natural-feeling voice experiences using the xAI Speech to Speech API.
+
+### Minimize perceived latency with parallel initialization
+
+Start the WebSocket connection and microphone input streaming in parallel.
+
+* Initiate the WebSocket connection (including authentication via ephemeral token or API key) **as early as possible** — ideally when the voice interface loads or the user opens the mic-enabled screen.
+* Simultaneously begin capturing microphone audio (using `getUserMedia` in browsers or equivalent APIs on mobile/native platforms).
+* Do **not** wait for the WebSocket `open` event before starting to collect microphone samples.
+
+**Audio Buffering Example**
+
+```javascript customLanguage="javascriptWithoutSDK"
+// 1. Immediately request mic access and start capturing
+const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+const audioContext = new AudioContext({ sampleRate: 24000 });
+
+const source = audioContext.createMediaStreamSource(stream);
+const processor = audioContext.createScriptProcessor(4096, 1, 1); // or AudioWorklet for better perf
+
+source.connect(processor);
+processor.connect(audioContext.destination); // optional
+
+// Buffer incoming PCM data immediately
+let earlyAudioBuffer = []; // Float32Array[] or Int16Array[]
+
+processor.onaudioprocess = (e) => {
+  const input = e.inputBuffer.getChannelData(0);
+  earlyAudioBuffer.push(new Float32Array(input)); // or convert to PCM16
+};
+
+// 2. In parallel – connect WebSocket (may take time)
+const ws = new WebSocket("wss://api.x.ai/v1/realtime?model=grok-voice-latest", [
+  `xai-client-secret.${token}`,
+]);
+
+ws.onopen = () => {
+  // Send session.update configuration
+  ws.send(JSON.stringify({ type: "session.update", session: { ... } }));
+
+  // Flush any buffered audio now that we're connected
+  if (earlyAudioBuffer.length > 0) {
+    flushBufferedAudioToWS(earlyAudioBuffer);
+    earlyAudioBuffer = [];
+  }
+};
+```
+
+#### Tips for Production
+
+* Convert to 24 kHz PCM16 little-endian before buffering or flushing.
+* Flush in reasonably sized messages (100ms samples each) for smooth transmission.
+* On reconnection, resume buffering immediately.
+
+### Avoid Audio Overlap During Tool Calls
+
+When the model invokes a tool during a voice response, the server delivers all audio deltas first, then the function call events alongside `response.done`. If your client immediately sends `conversation.item.create` (with the function result) followed by `response.create`, the server starts generating the next response right away — even if the client is still playing audio from the previous turn. This causes overlapping audio.
+
+**Recommended sequence:**
+
+1. Receive `response.function_call_arguments.done` → execute your tool
+2. Send `conversation.item.create` with the `function_call_output`
+3. **Wait until audio playback of the current turn is complete** (or nearly complete)
+4. Then send `response.create`
+
+While waiting for playback to finish, show a visual "thinking" indicator (e.g., animated dots) so the user knows the agent is processing. This creates a natural pause between the model's spoken response and the follow-up after the tool result.
+
+```javascript customLanguage="javascriptWithoutSDK"
+ws.on("message", async (message) => {
+  const event = JSON.parse(message);
+
+  if (event.type === "response.function_call_arguments.done") {
+    // 1. Execute the tool
+    const result = await executeFunction(event.name, JSON.parse(event.arguments));
+
+    // 2. Send the function result immediately
+    ws.send(JSON.stringify({
+      type: "conversation.item.create",
+      item: {
+        type: "function_call_output",
+        call_id: event.call_id,
+        output: JSON.stringify(result),
+      },
+    }));
+
+    // 3. Show a "thinking" indicator in the UI
+    showThinkingIndicator();
+
+    // 4. Wait for current audio playback to finish
+    await waitForPlaybackComplete();
+
+    // 5. Now request the next response
+    ws.send(JSON.stringify({ type: "response.create" }));
+    hideThinkingIndicator();
+  }
+});
+
+```
+
+### Additional High-Impact Recommendations
+
+* **Prefer [ephemeral tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens)** for client-side security.
+* **Enable `server_vad`** for automatic, natural barge-in.
+* **Match input/output format** (24 kHz PCM) to avoid resampling.
+* **Stream output audio deltas** (`response.output_audio.delta`) to the speaker instantly — do not wait for the full response.
+* **Implement graceful reconnection** while continuing to buffer new audio.
+* **Monitor WebSocket health** and use exponential backoff if needed.
+
+## Built for Enterprise Voice
+
+* **Telephony Integration** — Connect via SIP, WebSocket, or LiveKit. Native G.711 μ-law/A-law codec support — no transcoding overhead.
+
+* **Tool Calling** — CRMs, calendars, databases, and any REST or GraphQL endpoint via function calling during live conversations.
+
+* **20+ Languages** — Natural pronunciation, accent handling, and seamless code-switching between languages in the same conversation.
+
+* **Domain Expertise** — Precise transcription of medical, legal, financial, and technical terminology — names, codes, and addresses.
+
+## SIP phone calls
+
+Route PSTN, contact-center, or PBX calls into a Speech to Speech API session. See [SIP Phone Calls](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/sip) for API integration with `CreatePhoneNumberV2`, call control, DTMF, and telephony provider examples.
+
+## Migrating from OpenAI Realtime
+
+If you have an existing application built on the [OpenAI Realtime API](https://developers.openai.com/api/docs/guides/realtime-conversations), switching to the Grok Speech to Speech API requires only a few changes: update the base URL, swap your API key, and choose a Grok voice model.
+
+### Step 1 — Update the Base URL and API Key
+
+#### Using the OpenAI SDK
+
+If you are using the official OpenAI SDK, point the client at the xAI endpoint and supply your xAI API key:
+
+```python customLanguage="pythonWithoutSDK"
+import asyncio
+from openai import AsyncOpenAI
+
+# Before (OpenAI)
+# client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+# After (xAI)
+client = AsyncOpenAI(
+    api_key=os.environ["XAI_API_KEY"],
+    base_url="https://api.x.ai/v1",
+)
+
+async def main():
+    async with client.realtime.connect(
+        model="grok-voice-latest"
+    ) as conn:
+        await conn.session.update(session={
+            "voice": "eve",
+            "instructions": "You are a helpful assistant.",
+            "turn_detection": {"type": "server_vad"},
+        })
+        # ... rest of your application code
+
+asyncio.run(main())
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+import OpenAI from "openai";
+import { OpenAIRealtimeWS } from "openai/realtime/ws";
+
+// Before (OpenAI)
+// const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// After (xAI)
+const client = new OpenAI({
+  apiKey: process.env.XAI_API_KEY,
+  baseURL: "https://api.x.ai/v1",
+});
+
+// Pass the configured client so the connection uses the xAI base URL and key
+const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
+
+rt.on("session.created", () => {
+  rt.send({
+    type: "session.update",
+    session: {
+      voice: "eve",
+      instructions: "You are a helpful assistant.",
+      turn_detection: { type: "server_vad" },
+    },
+  });
+});
+
+rt.on("error", (err) => {
+  console.error("Realtime error:", err);
+});
+
+// ... rest of your application code
+```
+
+#### Using a Raw WebSocket
+
+If you connect directly via WebSocket, change the URL and `Authorization` header:
+
+```python customLanguage="pythonWithoutSDK"
+import os
+import websockets
+
+# Before (OpenAI)
+# url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview"
+# headers = {"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"}
+
+# After (xAI)
+url = "wss://api.x.ai/v1/realtime?model=grok-voice-latest"
+headers = {"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"}
+
+async with websockets.connect(url, additional_headers=headers) as ws:
+    # Your existing event handling code works as-is
+    pass
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+import WebSocket from "ws";
+
+// Before (OpenAI)
+// const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview";
+// const headers = { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` };
+
+// After (xAI)
+const url = "wss://api.x.ai/v1/realtime?model=grok-voice-latest";
+const headers = { Authorization: `Bearer ${process.env.XAI_API_KEY}` };
+
+const ws = new WebSocket(url, { headers });
+
+ws.on("open", () => {
+  // Your existing event handling code works as-is
+});
+```
+
+### Step 2 — Choose a Model
+
+Pass the model name when you establish the connection:
+
+```python customLanguage="pythonWithoutSDK"
+# Pass the model in connect()
+async with client.realtime.connect(model="grok-voice-latest") as conn:
+    ...
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+// Pass the model in the OpenAIRealtimeWS constructor
+const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
+```
+
+### Step 3 — Model-Specific Best Practices
+
+#### `grok-voice-think-fast-1.0` (Recommended)
+
+This is the flagship voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
+
+* **Simplify your system prompt.** The model is significantly more capable, so your prompt should be much shorter. Ask Grok to generalize your existing system prompt rather than porting it verbatim.
+* **Remove workaround prompting.** Prompt hacks and edge-case fixes needed for GPT models are unnecessary. Strip out instructions added solely to patch bugs or limitations of the previous model.
+* **Reasoning is enabled by default.** The default `reasoning.effort` is `"high"` for complex multi-step instructions, nuanced tone, and ambiguous queries. Set it to `"none"` to disable reasoning.
+
+> [!NOTE]
+>
+> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-1.0`). Pin to a versioned model name in production for stability.
+
+## OpenAI Realtime API Compatibility
+
+The Grok Speech to Speech API is compatible with the [OpenAI Realtime API](https://developers.openai.com/api/docs/guides/realtime-conversations). Most OpenAI client libraries and SDKs work with the xAI endpoint by changing the base URL to `wss://api.x.ai/v1/realtime`. This section documents event naming differences and unsupported events.
+
+### Event Naming Differences
+
+The xAI API uses different event names for a few events with different payloads:
+
+* OpenAI's `conversation.item.input_audio_transcription.delta` is named `conversation.item.input_audio_transcription.updated` in the xAI API. The `updated` event contains the cumulative transcript (which may include corrections to previous updates), rather than an incremental delta. Only emitted when `audio.input.transcription.model` is set to `"grok-transcribe"`.
+
+### Unsupported Client Events
+
+| OpenAI Event | Notes |
+|---|---|
+| `conversation.item.retrieve` | Not supported. |
+| `output_audio_buffer.clear` | WebRTC/SIP only. |
+
+### Unsupported Server Events
+
+| OpenAI Event | Notes |
+|---|---|
+| `conversation.item.done` | Not emitted. |
+| `conversation.item.input_audio_transcription.failed` | Not emitted. |
+| `conversation.item.input_audio_transcription.segment` | Not supported. |
+| `conversation.item.retrieved` | Not supported. |
+| `output_audio_buffer.started` | WebRTC/SIP only. |
+| `output_audio_buffer.stopped` | WebRTC/SIP only. |
+| `output_audio_buffer.cleared` | WebRTC/SIP only. |
+| `rate_limits.updated` | Not emitted. |
+
+### xAI Extensions
+
+These events and features are xAI-specific and not part of the OpenAI Realtime API:
+
+| Event / Feature | Description |
+|---|---|
+| `force_message` | New `conversation.item.create` item type for TTS-synthesized scripted utterances. See [Force Message](#force-message). |
+| `resumption` | Field on `session.update` that caches conversation turns and replays them on reconnect. See [Session Resumption](#session-resumption). |
+| `replace` | Field on `session.update` that maps phrases to spoken substitutions applied before TTS to fix pronunciation without changing the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
+
+
+===/developers/model-capabilities/audio/speech-to-speech/sip===
+#### Speech to Speech API
+
+# SIP Phone Calls
+
+SIP lets you route PSTN, contact-center, or PBX calls into a Speech to Speech API session.
+
+### 1. Register the phone number
+
+Create a Direct SIP phone number and include the webhook details that should receive incoming-call events. Use `origin: "byo_trunk"` for a customer-owned number. Provisioning xAI phone numbers via API is not supported. xAI returns the webhook signing secret in the response.
+
+Choose one SIP authentication method.
+
+The response includes a signing secret after you register the phone number. Store it securely; xAI returns it only once.
+
+Configure your carrier or PBX to route calls to:
+
+
+
+If you provide `allowed_addresses`, make sure the list contains your provider's SIP signaling CIDR ranges. If you provide SIP digest credentials, configure your carrier with the same username and password; xAI never returns the password after creation.
+
+### 2. Handle the incoming-call webhook
+
+When a caller dials the number, xAI sends a signed `realtime.call.incoming` webhook to the webhook URL. Verify the `webhook-id`, `webhook-timestamp`, and `webhook-signature` headers using the signing secret returned after you register the phone number, then read `data.call_id` from the payload.
+
+The webhook has this shape:
+
+```json
+{
+  "object": "event",
+  "id": "evt_123",
+  "type": "realtime.call.incoming",
+  "created_at": 1750000000,
+  "data": {
+    "call_id": "00000000-0000-0000-0000-000000000000",
+    "sip_headers": [
+      { "name": "From", "value": "+14155550100" },
+      { "name": "To", "value": "+18005550199" }
+    ],
+    "metadata": {}
+  }
+}
+```
+
+### 3. Join the call over WebSocket
+
+Open `wss://api.x.ai/v1/realtime?call_id={call_id}` with your xAI API key. Then send `session.update` to configure the voice agent for this call, followed by `response.create` when the agent should begin speaking.
+
+After connecting, the WebSocket behaves like any other Speech to Speech API session. The SIP caller's audio is bridged into the session, and assistant audio is played back to the caller.
+
+```python customLanguage="pythonWithoutSDK"
+import asyncio
+import json
+import os
+import websockets
+
+async def handle_sip_call(call_id: str):
+    async with websockets.connect(
+        f"wss://api.x.ai/v1/realtime?call_id={call_id}",
+        additional_headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
+    ) as ws:
+        await ws.send(json.dumps({
+            "type": "session.update",
+            "session": {
+                "voice": "eve",
+                "instructions": "You are a helpful phone support agent.",
+                "turn_detection": {"type": "server_vad"},
+            },
+        }))
+        await ws.send(json.dumps({"type": "response.create"}))
+
+        async for msg in ws:
+            event = json.loads(msg)
+            print(event["type"])
+
+asyncio.run(handle_sip_call("00000000-0000-0000-0000-000000000000"))
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+import WebSocket from "ws";
+
+const callId = "00000000-0000-0000-0000-000000000000";
+const ws = new WebSocket(`wss://api.x.ai/v1/realtime?call_id=${callId}`, {
+  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
+});
+
+ws.on("open", () => {
+  ws.send(JSON.stringify({
+    type: "session.update",
+    session: {
+      voice: "eve",
+      instructions: "You are a helpful phone support agent.",
+      turn_detection: { type: "server_vad" },
+    },
+  }));
+  ws.send(JSON.stringify({ type: "response.create" }));
+});
+
+ws.on("message", data => {
+  const event = JSON.parse(data.toString());
+  console.log(event.type);
+});
+```
+
+## Call control
+
+Use `refer` to transfer the caller to another PSTN or SIP destination:
+
+```bash customLanguage="bash"
+curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/refer" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"target_uri": "sip:agent@example.com"}'
+```
+
+Use `hangup` when your application should end the call:
+
+```bash customLanguage="bash"
+curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/hangup" \
+  -H "Authorization: Bearer $XAI_API_KEY"
+```
+
+## DTMF phone keypresses
+
+When using the Speech to Speech API over SIP, phone keypresses (DTMF tones) are automatically buffered and flushed to the model as text input. The client receives `input_audio_buffer.dtmf_event_received` events as an audit trail of each keypress.
+
+### Flush triggers
+
+Buffered digits are submitted to the model when any of the following occurs:
+
+* The user presses `#` (submit key)
+* 2.5 seconds of idle time after the last keypress
+* The user begins speaking (preempts the digit buffer)
+
+### Audit event
+
+Each keypress is reported to the client WebSocket:
+
+```json customLanguage="json"
+{
+  "type": "input_audio_buffer.dtmf_event_received",
+  "event": "5",
+  "received_at": 1730000000
+}
+```
+
+> [!NOTE]
+>
+> DTMF is only available on SIP sessions — it is not emitted on direct WebSocket connections.
+
+## Telephony providers
+
+In every provider, the destination is the xAI SIP URI for your registered number:
+
+
+
+Replace `{number}` with your Direct SIP phone number. If you configured `allowed_addresses` when registering the number, include your provider's SIP signaling CIDR ranges.
+
+### Twilio
+
+1. In the Twilio Console, go to **Voice** → **Elastic SIP Trunking** and create a trunk.
+2. Open the trunk's **Origination** settings and add this origination URI: `sip:{number}@sip.voice.x.ai;transport=tls`.
+3. Assign a Twilio phone number to the trunk, or purchase a new number and attach it.
+4. If your application transfers calls mid-session, enable call transfer on the trunk.
+
+### Telnyx
+
+1. In the Telnyx Portal, go to **Voice Suite** → **SIP Trunking** and create an FQDN SIP Connection.
+2. In **Authentication and Routing**, add `sip.voice.x.ai` as the primary FQDN on port `5060` with record type `A`.
+3. In **Inbound settings**, set the destination number format to **E.164**.
+4. Enable at least one supported codec: G.711 μ-law, G.711 A-law, or G.722.
+5. Assign a phone number to the SIP Connection.
+
+### Plivo
+
+1. In the Plivo Console, go to **SIP Trunking** and create a SIP trunk.
+2. Choose **Inbound**, then create a new URI with FQDN `sip.voice.x.ai`.
+3. Link an existing phone number to the trunk, or buy a new number and attach it.
+
+### Bring Your Own SIP Provider
+
+1. In your carrier, contact center, or PBX, create an outbound route or SIP trunk.
+2. Set the destination to `sip:{number}@sip.voice.x.ai;transport=tls`.
+
+
 ===/developers/model-capabilities/audio/speech-to-text===
 #### Model Capabilities
 
@@ -9157,8 +11108,11 @@ The request uses `multipart/form-data`. Either `file` or `url` must be provided.
 | `diarize` | boolean | `false` | | When `true`, enables speaker diarization. Each word in the response includes a `speaker` field (integer) identifying the detected speaker. |
 | `keyterm` | string | | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the field for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `filler_words` | boolean | `false` | | When `true`, filler words (e.g. "uh", "um", "er") are included in the transcript. When `false` (default), filler words are automatically removed from the transcript text and the `words` array. |
+| `vad_threshold` | number | `0.5` | | Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio segments scoring below the threshold are treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise. `0` disables the gate. |
 
 † Either `file` or `url` must be provided.
+
+Option fields should precede `file` in the multipart body — for streamable uploads, fields sent after `file` may be ignored.
 
 ### Example with text formatting
 
@@ -9257,6 +11211,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 | `keyterm` | string | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the parameter for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `smart_turn` | number | | End-of-turn detection threshold (0.0–1.0). When set, enables Smart Turn — an ML model predicts whether the speaker has finished their thought at each silence boundary. See [Smart Turn](#smart-turn). |
 | `smart_turn_timeout` | integer | | Maximum silence duration (ms) before forcing `speech_final`, even when the Smart Turn model predicts the speaker hasn't finished. Range: 1–5000. Only applies when `smart_turn` is enabled. See [Smart Turn](#smart-turn). |
+| `vad_threshold` | number | `0.08` | Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise. `0` disables the gate. Does not affect endpointing or `speech_final` timing. |
 
 ### Server Events
 
@@ -10787,1881 +12742,9 @@ task.cancel(with: .normalClosure, reason: nil)
 * [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) - Try voices and speech tags in your browser
 * [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts) - Get started with the API
 * [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) - Overview of all xAI voice capabilities
-* [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) - Real-time voice conversations via WebSocket
+* [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) - Real-time voice conversations via WebSocket
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) - Full TTS endpoint specification
 * [List Voices](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---list-voices) - Programmatically discover available voices
-
-
-===/developers/model-capabilities/audio/voice-agent===
-#### Model Capabilities
-
-# Voice Agent API
-
-Build real-time voice applications powered by Grok. Stream audio and text bidirectionally via WebSocket for voice assistants, phone agents, and interactive voice systems.
-
-## Quick Start
-
-Connect to the Voice Agent API and start a conversation:
-
-```python customLanguage="pythonWithoutSDK"
-import asyncio
-import json
-import os
-import websockets
-
-async def voice_agent():
-    async with websockets.connect(
-        "wss://api.x.ai/v1/realtime?model=grok-voice-latest",
-        additional_headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"}
-    ) as ws:
-        # Configure session
-        await ws.send(json.dumps({
-            "type": "session.update",
-            "session": {
-                "voice": "eve",
-                "instructions": "You are a helpful assistant.",
-                "turn_detection": {"type": "server_vad"}
-            }
-        }))
-        
-        # Send a text message
-        await ws.send(json.dumps({
-            "type": "conversation.item.create",
-            "item": {"type": "message", "role": "user", 
-                     "content": [{"type": "input_text", "text": "Hello!"}]}
-        }))
-        await ws.send(json.dumps({"type": "response.create"}))
-        
-        # Receive audio/text responses
-        async for msg in ws:
-            event = json.loads(msg)
-            print(f"Event: {event['type']}")
-
-asyncio.run(voice_agent())
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-import WebSocket from "ws";
-
-const ws = new WebSocket("wss://api.x.ai/v1/realtime?model=grok-voice-latest", {
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-/* 
-Web browsers do not support WebSocket headers. Instead, pass an
-Ephemeral Token (prefixed with xai-client-secret.) in the WebSocket protocol.
- 
-const ws = new WebSocket("wss://api.x.ai/v1/realtime",
-  [`xai-client-secret.${XAI_EPHEMERAL_TOKEN}`]);
-*/
-
-ws.on("open", () => {
-  // Configure session
-  ws.send(JSON.stringify({
-    type: "session.update",
-    session: {
-      voice: "eve",
-      instructions: "You are a helpful assistant.",
-      turn_detection: { type: "server_vad" }
-    }
-  }));
-
-  // Send a text message
-  ws.send(JSON.stringify({
-    type: "conversation.item.create",
-    item: { type: "message", role: "user",
-            content: [{ type: "input_text", text: "Hello!" }] }
-  }));
-  ws.send(JSON.stringify({ type: "response.create" }));
-});
-
-ws.on("message", (data) => {
-  const event = JSON.parse(data);
-  console.log("Event:", event.type);
-});
-
-```
-
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent)
-
-[API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
-
-[Live Voice Demos](https://x.ai/api/voice)
-
-[Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing)
-
-### Get Started with Our Tester Apps
-
-* **[iOS Tester App](https://github.com/xai-org/xai-cookbook/tree/main/iOS/VoiceTesterApp)** — A Swift-based iOS app to act as a guide for setting up voice agents in your apps.
-* **[Web Agent (WebSocket)](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/web)** — A web app voice agent using WebSocket.
-* **[WebRTC Agent](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/webrtc)** — A web app voice agent using WebRTC.
-* **[Telephony Agent](https://github.com/xai-org/xai-cookbook/tree/main/voice-examples/agent/telephony)** — A callable phone agent using Twilio.
-
-## Authentication
-
-Authenticate your WebSocket connection with either method:
-
-* **[Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens)** (recommended) — Short-lived tokens for client-side apps (browsers, mobile). Keeps your API key off the client.
-* **API Key** — Pass your xAI API key directly in the `Authorization` header. Server-side only.
-
-Read more in our [API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime).
-
-## Events
-
-Once the WebSocket is open, two-way events can begin. Client events are used to provide conversation information and send user audio to the Voice API, while server events include audio and text responses.
-
-[API documentation →](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
-
-## Model Selection
-
-Pass `model` as a query parameter; use a versioned name to pin to a specific release.
-
-```python customLanguage="pythonWithoutSDK"
-MODEL = "grok-voice-latest"
-url = f"wss://api.x.ai/v1/realtime?model={MODEL}"
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-const MODEL = "grok-voice-latest";
-const url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
-```
-
-| Model | Description | |
-|-------|-------------|---|
-| `grok-voice-think-fast-1.0` | Flagship voice model | |
-| `grok-voice-fast-1.0` | Legacy voice model | deprecated |
-
-> [!NOTE]
->
-> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-1.0`).
-
-## Session Parameters
-
-After the session has been created, clients may send the [session.update](https://docs.x.ai/developers/rest-api-reference/inference/voice#session.update) event to configure the session.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `instructions` | string | System prompt |
-| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. |
-| `voice` | string | Voice selection: any built-in voice (e.g. `eve`, the default) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
-| `tools` | array | Tools available to the voice agent. Supports `file_search`, `web_search`, `x_search`, `mcp`, and `function` types. See [Using Tools](#using-tools-with-grok-voice-agent-api). |
-| `turn_detection.type` | string | null | `"server_vad"` for automatic detection, `null` for manual text turns |
-| `turn_detection.threshold` | number | optional | VAD activation threshold (0.1–0.9). Higher values require louder audio to trigger. Default: `0.85`. |
-| `turn_detection.silence_duration_ms` | number | optional | How long the user must be silent (in ms) before the server ends the turn (0–10000). Higher values let users pause longer without being cut off. |
-| `turn_detection.prefix_padding_ms` | number | optional | Amount of audio (in ms) to include before the detected start of speech (0–10000). Helps capture the beginning of words that might otherwise be clipped by the VAD. Default: `333`. |
-| `turn_detection.idle_timeout_ms` | number | optional | When set, the server proactively re-engages the user if no speech is detected for this many milliseconds after the assistant finishes responding. The timer re-arms after every response, so it fires repeatedly each `idle_timeout_ms` until the user speaks. Default: `null`.  |
-| `resumption.enabled` | boolean | optional | Opt in to [Session Resumption](#session-resumption): the server caches conversation turns keyed by `conversation_id` and replays them on reconnect so the model stays conditioned on prior context. Defaults to `false`. See [Session Resumption](#session-resumption). |
-| `audio.input.format.type` | string | Input codec: `"audio/pcm"`, `"audio/pcmu"`, `"audio/pcma"`, or `"audio/opus"` |
-| `audio.input.format.rate` | number | Input sample rate (PCM only): 8000, 16000, 22050, 24000, 32000, 44100, 48000 |
-| `audio.input.transport` | `"json"` | `"binary"` | optional | Wire path for input audio. Default: `"json"` (base64 in `input_audio_buffer.append`). `"binary"`: raw codec bytes as WebSocket binary frames. See [Audio Transport](#audio-transport). |
-| `audio.output.format.type` | string | Output codec: `"audio/pcm"`, `"audio/pcmu"`, `"audio/pcma"`, or `"audio/opus"` |
-| `audio.output.format.rate` | number | Output sample rate (PCM only): 8000, 16000, 22050, 24000, 32000, 44100, 48000 |
-| `audio.output.transport` | `"json"` | `"binary"` | optional | Wire path for assistant audio. Default: `"json"` (base64 in `response.output_audio.delta` / `response.audio.delta`). `"binary"`: raw codec bytes as WebSocket binary frames. Mid-session changes apply at the next response boundary. See [Audio Transport](#audio-transport). |
-| `audio.input.transcription.language_hint` | string | BCP-47 language code (e.g. `"ja"`, `"ar"`, `"es-MX"`, `"pt-BR"`) to bias ASR transcription toward a specific language. Can be updated mid-session. See [Language Hint](#language-hint). |
-| `audio.input.transcription.keyterms` | array | List of key terms (e.g. product names, proper nouns) to bias transcription toward. Max 100 terms, each up to 50 characters. Can be updated mid-session. See [Keyterms](#keyterms). |
-| `audio.output.speed` | number | Playback speed multiplier for assistant audio output. Range: 0.7–1.5. Default: `1.0`. Values below 1.0 slow down speech; values above 1.0 speed it up. |
-| `replace` | object | optional | Map of phrases to spoken substitutions applied to the model's output before TTS, e.g. `{"Acme Mobile": "Acme Mobull"}`. Fixes pronunciation by changing the spoken audio without altering the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
-
-## Available Voices
-
-The same roster of voices works across the Voice Agent API and Text to Speech API. Browse the full list with tone descriptions and samples in the [voice table](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech#voices), or fetch it programmatically via [`GET /v1/tts/voices`](https://docs.x.ai/developers/rest-api-reference/inference/voice). Pass the lowercase voice ID as the `voice` parameter on `session.update`.
-
-### Custom Voices
-
-Need a voice that isn't in this list? Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices). The resulting `voice_id` works as the `voice` parameter on `session.update` exactly like a built-in voice.
-
-### Selecting a Voice
-
-Specify the voice in your session configuration using the `voice` parameter:
-
-```pythonWithoutSDK
-# Configure session with a specific voice
-session_config = {
-    "type": "session.update",
-    "session": {
-        "voice": "eve",  # eve, ara, rex, sal, leo, or custom voice ID
-        "instructions": "You are a helpful assistant.",
-        # Audio format settings (these are the defaults if not specified)
-        "audio": {
-            "input": {"format": {"type": "audio/pcm", "rate": 24000}},
-            "output": {"format": {"type": "audio/pcm", "rate": 24000}}
-        }
-    }
-}
-
-await ws.send(json.dumps(session_config))
-```
-
-```javascriptWithoutSDK
-// Configure session with a specific voice
-const sessionConfig = {
-  type: "session.update",
-  session: {
-    voice: "eve", // eve, ara, rex, sal, leo, or custom voice ID
-    instructions: "You are a helpful assistant.",
-    // Audio format settings (these are the defaults if not specified)
-    audio: {
-      input: { format: { type: "audio/pcm", rate: 24000 } },
-      output: { format: { type: "audio/pcm", rate: 24000 } }
-    }
-  }
-};
-
-ws.send(JSON.stringify(sessionConfig));
-```
-
-## Audio
-
-When `turn_detection.type` is set to `server_vad`, we'll perform Voice Activity Detection (VAD) and automatically detect when the user is finished speaking. If you are using server VAD, you'll only need the [input\_audio\_buffer.append](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.append) event.
-
-Otherwise, you'll need to send the [commit](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.commit) event once the user is finished speaking, and use [clear](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.clear) to discard all audio that has been appended but not committed yet.
-
-### Configuring Audio Format
-
-Specify the audio codec and sample rate in the `audio` [session parameters](#session-parameters). Input and output are specified separately and do not need to match. Codec (`format`) is independent of wire path (`transport`); see [Audio Transport](#audio-transport).
-
-| Format | Encoding | Container Types | Sample Rate |
-|--------|----------|-----------------|-------------|
-| **`audio/pcm`** (Default) | Linear16, Little-endian | Raw, WAV, AIFF | Configurable (see below) |
-| **`audio/pcmu`** | G.711 μ-law (Mulaw) | Raw | 8000 Hz |
-| **`audio/pcma`** | G.711 A-law | Raw | 8000 Hz |
-| **`audio/opus`** | Opus | Raw packets (one packet per payload) | 24000 Hz |
-
-When using the `audio/pcm` format, you can configure the sample rate to one of the following supported values:
-
-| Sample Rate | Quality | Description |
-|------------:|---------|-------------|
-| **8000 Hz** | Telephone | Narrowband, suitable for voice calls |
-| **16000 Hz** | Wideband | Good for speech recognition |
-| **22050 Hz** | Standard | Balanced quality and bandwidth |
-| **24000 Hz** (Default) | High | Recommended for most use cases |
-| **32000 Hz** | Very High | Enhanced audio clarity |
-| **44100 Hz** | CD Quality | Standard for music / media |
-| **48000 Hz** | Professional | Studio-grade audio |
-
-You can configure the audio format and sample rate for both input and output in the session configuration:
-
-```pythonWithoutSDK
-# Configure audio format with custom sample rate for input and output
-session_config = {
-    "type": "session.update",
-    "session": {
-        "audio": {
-            "input": {
-                "format": {
-                    "type": "audio/pcm",  # or "audio/pcmu" or "audio/pcma"
-                    "rate": 16000  # Only applicable for audio/pcm
-                }
-            },
-            "output": {
-                "format": {
-                    "type": "audio/pcm",  # or "audio/pcmu" or "audio/pcma"
-                    "rate": 16000  # Only applicable for audio/pcm
-                }
-            }
-        },
-        "instructions": "You are a helpful assistant.",
-    }
-}
-
-await ws.send(json.dumps(session_config))
-```
-
-```javascriptWithoutSDK
-// Configure audio format with custom sample rate for input and output
-const sessionConfig = {
-  type: "session.update",
-  session: {
-    audio: {
-      input: {
-        format: {
-          type: "audio/pcm", // or "audio/pcmu" or "audio/pcma"
-          rate: 16000 // Only applicable for audio/pcm
-        }
-      },
-      output: {
-        format: {
-          type: "audio/pcm", // or "audio/pcmu" or "audio/pcma"
-          rate: 16000 // Only applicable for audio/pcm
-        }
-      }
-    },
-    instructions: "You are a helpful assistant.",
-  }
-};
-
-ws.send(JSON.stringify(sessionConfig));
-```
-
-### Audio Transport
-
-`format` selects the **codec**. `transport` selects how those bytes travel on the WebSocket:
-
-| | **Input** | **Output** |
-|---|-----------|------------|
-| **`json`** (default) | Base64 in [`input_audio_buffer.append`](https://docs.x.ai/developers/rest-api-reference/inference/voice#input_audio_buffer.append) | Base64 in [`response.output_audio.delta`](https://docs.x.ai/developers/rest-api-reference/inference/voice#response.output_audio.delta) / `response.audio.delta` |
-| **`binary`** | Raw codec bytes as WebSocket **binary** frames (no protocol header) | Same binary frames; lifecycle events (`response.created`, `response.done`, transcripts, etc.) stay JSON |
-
-Omit `transport` (or set `"json"`) to keep existing clients unchanged.
-
-**Input dual-accept:** when input format is configured, the server accepts **both** JSON append and binary frames for that codec. Use `input.transport` as the preferred send path for your client; you do not need to drain one channel before the other mid-session.
-
-**Output is strict:** assistant audio is emitted only on `output.transport`. Changing `output.transport` mid-session applies at the **next response boundary** so a single utterance never mixes JSON deltas and binary frames.
-
-**Opus:** each JSON `delta` / `audio` field or each binary frame is one raw Opus packet (24 kHz mono). There is no extra framing header on binary frames.
-
-Example: PCM over binary on both directions:
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        "audio": {
-            "input": {
-                "format": {"type": "audio/pcm", "rate": 24000},
-                "transport": "binary",
-            },
-            "output": {
-                "format": {"type": "audio/pcm", "rate": 24000},
-                "transport": "binary",
-            },
-        },
-    },
-}
-await ws.send(json.dumps(session_config))
-
-# Send mic audio as raw PCM16 little-endian frames (not base64 JSON)
-await ws.send(pcm16_bytes)  # WebSocket binary message
-
-# Receive: binary messages are audio; text messages are JSON events
-async for message in ws:
-    if isinstance(message, bytes):
-        # raw PCM16 (or Opus packets if format is audio/opus)
-        play(message)
-    else:
-        event = json.loads(message)
-        # response.done, transcripts, etc.
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-  type: "session.update",
-  session: {
-    audio: {
-      input: {
-        format: { type: "audio/pcm", rate: 24000 },
-        transport: "binary",
-      },
-      output: {
-        format: { type: "audio/pcm", rate: 24000 },
-        transport: "binary",
-      },
-    },
-  },
-};
-ws.send(JSON.stringify(sessionConfig));
-
-// Send mic audio as raw PCM16 little-endian frames
-ws.send(pcm16ArrayBuffer); // binary WebSocket frame
-
-ws.binaryType = "arraybuffer";
-ws.on("message", (data) => {
-  if (data instanceof ArrayBuffer || Buffer.isBuffer(data)) {
-    // raw PCM16 (or Opus packets if format is audio/opus)
-    play(data);
-    return;
-  }
-  const event = JSON.parse(data.toString());
-  // response.done, transcripts, etc.
-});
-```
-
-### Receiving and Playing Audio
-
-Decode and play base64 PCM16 audio received from the API when `output.transport` is `"json"` (default). Use the same sample rate as configured. For `transport: "binary"`, play the binary frame payload directly (same codec bytes, no base64).
-
-```pythonWithoutSDK
-import base64
-import numpy as np
-
-# Configure session with 16kHz sample rate for lower bandwidth (input and output)
-session_config = {
-    "type": "session.update",
-    "session": {
-        "instructions": "You are a helpful assistant.",
-        "voice": "eve",
-        "turn_detection": {
-            "type": "server_vad",
-        },
-        "audio": {
-            "input": {
-                "format": {
-                    "type": "audio/pcm",
-                    "rate": 16000  # 16kHz for lower bandwidth usage
-                }
-            },
-            "output": {
-                "format": {
-                    "type": "audio/pcm",
-                    "rate": 16000  # 16kHz for lower bandwidth usage
-                }
-            }
-        }
-    }
-}
-await ws.send(json.dumps(session_config))
-
-# When processing audio, use the same sample rate
-SAMPLE_RATE = 16000
-
-# Convert audio data to PCM16 and base64
-def audio_to_base64(audio_data: np.ndarray) -> str:
-    """Convert float32 audio array to base64 PCM16 string."""
-    # Normalize to [-1, 1] and convert to int16
-    audio_int16 = (audio_data * 32767).astype(np.int16)
-    # Encode to base64
-    audio_bytes = audio_int16.tobytes()
-    return base64.b64encode(audio_bytes).decode('utf-8')
-
-# Convert base64 PCM16 to audio data
-def base64_to_audio(base64_audio: str) -> np.ndarray:
-    """Convert base64 PCM16 string to float32 audio array."""
-    # Decode base64
-    audio_bytes = base64.b64decode(base64_audio)
-    # Convert to int16 array
-    audio_int16 = np.frombuffer(audio_bytes, dtype=np.int16)
-    # Normalize to [-1, 1]
-    return audio_int16.astype(np.float32) / 32768.0
-```
-
-```javascriptWithoutSDK
-// Configure session with 16kHz sample rate for lower bandwidth (input and output)
-const sessionConfig = {
-  type: "session.update",
-  session: {
-    instructions: "You are a helpful assistant.",
-    voice: "eve",
-    turn_detection: { type: "server_vad" },
-    audio: {
-      input: {
-        format: {
-          type: "audio/pcm",
-          rate: 16000 // 16kHz for lower bandwidth usage
-        }
-      },
-      output: {
-        format: {
-          type: "audio/pcm",
-          rate: 16000 // 16kHz for lower bandwidth usage
-        }
-      }
-    }
-  }
-};
-ws.send(JSON.stringify(sessionConfig));
-
-// When processing audio, use the same sample rate
-const SAMPLE_RATE = 16000;
-
-// Create AudioContext with matching sample rate
-const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
-
-// Helper function to convert Float32Array to base64 PCM16
-function float32ToBase64PCM16(float32Array) {
-  const pcm16 = new Int16Array(float32Array.length);
-  for (let i = 0; i < float32Array.length; i++) {
-    const s = Math.max(-1, Math.min(1, float32Array[i]));
-    pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-  }
-  const bytes = new Uint8Array(pcm16.buffer);
-  return btoa(String.fromCharCode(...bytes));
-}
-
-// Helper function to convert base64 PCM16 to Float32Array
-function base64PCM16ToFloat32(base64String) {
-  const binaryString = atob(base64String);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  const pcm16 = new Int16Array(bytes.buffer);
-  const float32 = new Float32Array(pcm16.length);
-  for (let i = 0; i < pcm16.length; i++) {
-    float32[i] = pcm16[i] / 32768.0;
-  }
-  return float32;
-}
-```
-
-## Pronunciation Replacements
-
-Use the `replace` parameter to fix how the model pronounces specific words or phrases. Each key is matched (case-insensitively) in the model's output and swapped for its replacement value **before** text-to-speech — so only the spoken audio changes; the transcript the user sees keeps the original text.
-
-This is useful for brand names, acronyms, or domain terms the model mispronounces. For example, mapping `"Acme Mobile"` to `"Acme Mobull"` makes the audio say it correctly while the transcript still reads "Acme Mobile".
-
-```python customLanguage="pythonWithoutSDK"
-await ws.send(json.dumps({
-    "type": "session.update",
-    "session": {
-        "voice": "eve",
-        "instructions": "You are a helpful assistant.",
-        "replace": {"Acme Mobile": "Acme Mobull"}
-    }
-}))
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-ws.send(JSON.stringify({
-  type: "session.update",
-  session: {
-    voice: "eve",
-    instructions: "You are a helpful assistant.",
-    replace: { "Acme Mobile": "Acme Mobull" }
-  }
-}));
-```
-
-Matching behavior:
-
-* Matching is case-insensitive; the replacement is spoken using the casing you provide.
-* Whole-word boundaries are required, so `Acme, Mobile`, `Acme-Mobile`, and `Acme Mobiles` do **not** match.
-* When multiple keys share a prefix, the longest match wins.
-* The map can be updated mid-session with another `session.update`; the applied map is echoed back on `session.updated`.
-
-## Supported Languages
-
-The Voice Agent API supports 20+ languages with native-quality accents. The model automatically detects the input language and responds naturally in the same language — no configuration required.
-
-| Language | Code |
-|----------|------|
-| English | `en` |
-| Arabic (Egypt) | `ar-EG` |
-| Arabic (Saudi Arabia) | `ar-SA` |
-| Arabic (United Arab Emirates) | `ar-AE` |
-| Bengali | `bn` |
-| Chinese (Simplified) | `zh` |
-| French | `fr` |
-| German | `de` |
-| Hindi | `hi` |
-| Indonesian | `id` |
-| Italian | `it` |
-| Japanese | `ja` |
-| Korean | `ko` |
-| Portuguese (Brazil) | `pt-BR` |
-| Portuguese (Portugal) | `pt-PT` |
-| Russian | `ru` |
-| Spanish (Mexico) | `es-MX` |
-| Spanish (Spain) | `es-ES` |
-| Turkish | `tr` |
-| Vietnamese | `vi` |
-
-The model is also capable of conversing in additional languages beyond those listed above, with varying degrees of accuracy. You can specify a preferred language or accent in your system instructions for consistent multilingual experiences.
-
-### Language Hint
-
-Bias transcription toward a specific language by setting `audio.input.transcription.language_hint` in `session.update`. Use a BCP-47 code from the [Supported Languages](#supported-languages) table. Can be changed mid-session.
-
-For Spanish and Portuguese, you must specify a regional variant (e.g. `"es-MX"`, `"es-ES"`, `"pt-BR"`, `"pt-PT"`) — bare `"es"` and `"pt"` are not accepted. Unrecognized codes are silently ignored and fall back to automatic language detection.
-
-```pythonWithoutSDK
-await ws.send(json.dumps({
-    "type": "session.update",
-    "session": {
-        "audio": {
-            "input": {
-                "transcription": {
-                    "language_hint": "ja"
-                }
-            }
-        }
-    }
-}))
-```
-
-```javascriptWithoutSDK
-ws.send(JSON.stringify({
-  type: "session.update",
-  session: {
-    audio: {
-      input: {
-        transcription: {
-          language_hint: "ja"
-        }
-      }
-    }
-  }
-}));
-```
-
-### Keyterms
-
-Bias transcription toward domain-specific vocabulary — product names, proper nouns, brand names, or technical terms that the model might otherwise mis-transcribe — by setting `audio.input.transcription.keyterms` in `session.update`. Provide an array of strings, up to 100 terms with each term up to 50 characters. Keyterms can be updated mid-session.
-
-```pythonWithoutSDK
-await ws.send(json.dumps({
-    "type": "session.update",
-    "session": {
-        "audio": {
-            "input": {
-                "transcription": {
-                    "keyterms": ["xAI", "Grok", "Understand The Universe"]
-                }
-            }
-        }
-    }
-}))
-```
-
-```javascriptWithoutSDK
-ws.send(JSON.stringify({
-  type: "session.update",
-  session: {
-    audio: {
-      input: {
-        transcription: {
-          keyterms: ["xAI", "Grok", "Understand The Universe"]
-        }
-      }
-    }
-  }
-}));
-```
-
-## Using Tools with Grok Voice Agent API
-
-The Grok Voice Agent API supports various tools that can be configured in your session to enhance the capabilities of your voice agent. Tools can be configured in the `session.update` message.
-
-### Available Tool Types
-
-* **Collections Search (`file_search`)** - Search through your uploaded document collections
-* **Web Search (`web_search`)** - Search the web for current information
-* **X Search (`x_search`)** - Search X (Twitter) for posts and information
-* **Remote MCP Tools (`mcp`)** - Connect to external [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers for custom tools
-* **Custom Functions** - Define your own function tools with JSON schemas
-
-### Collections Search with `file_search`
-
-Use the `file_search` tool to enable your voice agent to search through document collections. You'll need to create a collection first using the [Collections API](https://docs.x.ai/developers/rest-api-reference/collections).
-
-```pythonWithoutSDK
-COLLECTION_ID = "your-collection-id"  # Replace with your collection ID
-
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "file_search",
-                "vector_store_ids": [COLLECTION_ID],
-                "max_num_results": 10,
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const COLLECTION_ID = "your-collection-id"; // Replace with your collection ID
-
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "file_search",
-                vector_store_ids: [COLLECTION_ID],
-                max_num_results: 10,
-            },
-        ],
-    },
-};
-```
-
-### Web Search and X Search
-
-Configure web search and X search tools to give your voice agent access to current information from the web and X (Twitter). Both tools run server-side — enable them by listing them in `session.tools`, optionally with the same filtering parameters as the text-API [Web Search](https://docs.x.ai/developers/tools/web-search) and [X Search](https://docs.x.ai/developers/tools/x-search) tools.
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "web_search",
-                "allowed_domains": ["x.ai", "docs.x.ai"],
-                "location": {"country": "US", "city": "San Francisco"},
-            },
-            {
-                "type": "x_search",
-                "allowed_x_handles": ["xai"],
-                "from_date": "2025-01-01",
-                "to_date": "2025-06-01",
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "web_search",
-                allowed_domains: ["x.ai", "docs.x.ai"],
-                location: { country: "US", city: "San Francisco" },
-            },
-            {
-                type: "x_search",
-                allowed_x_handles: ["xai"],
-                from_date: "2025-01-01",
-                to_date: "2025-06-01",
-            },
-        ],
-    },
-};
-```
-
-#### Web Search Parameters
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `allowed_domains` | No | Only include results from these domains (no protocol or path, e.g. `example.com`). Max 5. Mutually exclusive with `excluded_domains` — do not set both on the same tool. |
-| `excluded_domains` | No | Exclude results from these domains. Max 5. Mutually exclusive with `allowed_domains` — do not set both on the same tool. |
-| `enable_image_understanding` | No | Let the agent view images found during web search. |
-| `location` | No | Bias results by location: `country` (ISO 3166-1 alpha-2 or full name), `city`, `region`, `timezone` (IANA, e.g. `America/Los_Angeles`). Also accepted under the text-API name `user_location`. |
-
-#### X Search Parameters
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `allowed_x_handles` | No | Only include posts from these X handles (without `@`). Max 20. Mutually exclusive with `excluded_x_handles` — do not set both on the same tool. |
-| `excluded_x_handles` | No | Exclude posts from these X handles. Max 20. Mutually exclusive with `allowed_x_handles` — do not set both on the same tool. |
-| `from_date` | No | Only consider posts from this date, ISO-8601 `YYYY-MM-DD`. Must not be later than `to_date`. |
-| `to_date` | No | Only consider posts up to this date, ISO-8601 `YYYY-MM-DD`. |
-| `enable_image_understanding` | No | Let the agent view images in posts. |
-| `enable_video_understanding` | No | Let the agent view videos in posts. |
-
-An invalid configuration — too many entries, `allowed_*` and `excluded_*` set together, or a malformed/inverted date window — is rejected with an `error` event that describes the problem. The session stays connected and its previous configuration remains in effect.
-
-### Remote MCP Tools
-
-Use the `mcp` tool type to connect your voice agent to external [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers. This lets you extend your voice agent with third-party or custom tools without implementing them as client-side functions — xAI manages the MCP server connection and tool execution on your behalf.
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "mcp",
-                "server_url": "https://mcp.example.com/mcp",
-                "server_label": "my-tools",
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "mcp",
-                server_url: "https://mcp.example.com/mcp",
-                server_label: "my-tools",
-            },
-        ],
-    },
-};
-```
-
-#### MCP Tool Parameters
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `server_url` | Yes | The URL of the MCP server. Only Streaming HTTP and SSE transports are supported. |
-| `server_label` | Yes | A label to identify the server (used for tool call prefixing). |
-| `server_description` | No | A description of what the server provides. |
-| `allowed_tools` | No | List of specific tool names to allow. If omitted, all tools from the server are available. |
-| `authorization` | No | A token set in the `Authorization` header on requests to the MCP server. |
-| `headers` | No | Additional headers to include in requests to the MCP server. |
-
-#### Advanced MCP Configuration
-
-You can restrict which tools are available, provide authentication, and add custom headers:
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "mcp",
-                "server_url": "https://mcp.example.com/mcp",
-                "server_label": "my-tools",
-                "server_description": "Custom business tools for order management",
-                "allowed_tools": ["lookup_order", "check_inventory"],
-                "authorization": "Bearer your-token-here",
-                "headers": {
-                    "X-Custom-Header": "value"
-                },
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "mcp",
-                server_url: "https://mcp.example.com/mcp",
-                server_label: "my-tools",
-                server_description: "Custom business tools for order management",
-                allowed_tools: ["lookup_order", "check_inventory"],
-                authorization: "Bearer your-token-here",
-                headers: {
-                    "X-Custom-Header": "value",
-                },
-            },
-        ],
-    },
-};
-```
-
-#### Multiple MCP Servers
-
-You can connect to multiple MCP servers simultaneously, each providing different capabilities:
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "mcp",
-                "server_url": "https://mcp.deepwiki.com/mcp",
-                "server_label": "deepwiki",
-            },
-            {
-                "type": "mcp",
-                "server_url": "https://your-tools.example.com/mcp",
-                "server_label": "custom-tools",
-                "allowed_tools": ["search_database", "format_data"],
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "mcp",
-                server_url: "https://mcp.deepwiki.com/mcp",
-                server_label: "deepwiki",
-            },
-            {
-                type: "mcp",
-                server_url: "https://your-tools.example.com/mcp",
-                server_label: "custom-tools",
-                allowed_tools: ["search_database", "format_data"],
-            },
-        ],
-    },
-};
-```
-
-> [!NOTE]
->
-> MCP tools are server-side tools — xAI handles the connection and execution automatically. Unlike custom function tools, you don't need to handle tool call responses in your client code. For more details on MCP tool configuration, see the [Remote MCP Tools](https://docs.x.ai/developers/tools/remote-mcp) guide.
-
-### Custom Function Tools
-
-You can define custom function tools with JSON schemas to extend your voice agent's capabilities.
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "function",
-                "name": "generate_random_number",
-                "description": "Generate a random number between min and max values",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "min": {
-                            "type": "number",
-                            "description": "Minimum value (inclusive)",
-                        },
-                        "max": {
-                            "type": "number",
-                            "description": "Maximum value (inclusive)",
-                        },
-                    },
-                    "required": ["min", "max"],
-                },
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "function",
-                name: "generate_random_number",
-                description: "Generate a random number between min and max values",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        min: {
-                            type: "number",
-                            description: "Minimum value (inclusive)",
-                        },
-                        max: {
-                            type: "number",
-                            description: "Maximum value (inclusive)",
-                        },
-                    },
-                    required: ["min", "max"],
-                },
-            },
-        ],
-    },
-};
-```
-
-### Combining Multiple Tools
-
-You can combine multiple tool types in a single session configuration, including server-side tools (web search, X search, collections, MCP) and client-side function tools:
-
-```pythonWithoutSDK
-session_config = {
-    "type": "session.update",
-    "session": {
-        ...
-        "tools": [
-            {
-                "type": "file_search",
-                "vector_store_ids": ["your-collection-id"],
-                "max_num_results": 10,
-            },
-            {
-                "type": "web_search",
-            },
-            {
-                "type": "x_search",
-            },
-            {
-                "type": "mcp",
-                "server_url": "https://mcp.example.com/mcp",
-                "server_label": "my-tools",
-            },
-            {
-                "type": "function",
-                "name": "generate_random_number",
-                "description": "Generate a random number",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "min": {"type": "number"},
-                        "max": {"type": "number"},
-                    },
-                    "required": ["min", "max"],
-                },
-            },
-        ],
-    },
-}
-```
-
-```javascriptWithoutSDK
-const sessionConfig = {
-    type: "session.update",
-    session: {
-        ...
-        tools: [
-            {
-                type: "file_search",
-                vector_store_ids: ["your-collection-id"],
-                max_num_results: 10,
-            },
-            {
-                type: "web_search",
-            },
-            {
-                type: "x_search",
-            },
-            {
-                type: "mcp",
-                server_url: "https://mcp.example.com/mcp",
-                server_label: "my-tools",
-            },
-            {
-                type: "function",
-                name: "generate_random_number",
-                description: "Generate a random number",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        min: { type: "number" },
-                        max: { type: "number" },
-                    },
-                    required: ["min", "max"],
-                },
-            },
-        ],
-    },
-};
-```
-
-> [!NOTE]
->
-> Server-side tools (web search, X search, collections, and MCP) are executed automatically by xAI — you don't need to handle their responses. Only custom function tools require client-side handling. For more details, see [Collections](https://docs.x.ai/developers/rest-api-reference/collections), [Web Search](https://docs.x.ai/developers/tools/web-search), [X Search](https://docs.x.ai/developers/tools/x-search), and [Remote MCP Tools](https://docs.x.ai/developers/tools/remote-mcp).
-
-### Handling Function Call Responses
-
-When you define custom function tools, the voice agent will call these functions during conversation. You need to handle these function calls, execute them, and return the results to continue the conversation.
-
-### Function Call Flow
-
-1. **Agent decides to call a function** → sends `response.function_call_arguments.done` event
-2. **Your code executes the function** → processes the arguments and generates a result
-3. **Send result back to agent** → sends `conversation.item.create` with the function output
-4. **Request continuation** → sends `response.create` to let the agent continue
-
-### Complete Example
-
-```pythonWithoutSDK
-import json
-import websockets
-
-# Define your function implementations
-def get_weather(location: str, units: str = "celsius"):
-    """Get current weather for a location"""
-    # In production, call a real weather API
-    return {
-        "location": location,
-        "temperature": 22,
-        "units": units,
-        "condition": "Sunny",
-        "humidity": 45
-    }
-
-def book_appointment(date: str, time: str, service: str):
-    """Book an appointment"""
-    # In production, interact with your booking system
-    import random
-    confirmation = f"CONF{random.randint(1000, 9999)}"
-    return {
-        "status": "confirmed",
-        "confirmation_code": confirmation,
-        "date": date,
-        "time": time,
-        "service": service
-    }
-
-# Map function names to implementations
-FUNCTION_HANDLERS = {
-    "get_weather": get_weather,
-    "book_appointment": book_appointment
-}
-
-async def handle_function_call(ws, event):
-    """Handle function call from the voice agent"""
-    function_name = event["name"]
-    call_id = event["call_id"]
-    arguments = json.loads(event["arguments"])
-
-    print(f"Function called: {function_name} with args: {arguments}")
-
-    # Execute the function
-    if function_name in FUNCTION_HANDLERS:
-        result = FUNCTION_HANDLERS[function_name](arguments.md)
-
-        # Send result back to agent
-        await ws.send(json.dumps({
-            "type": "conversation.item.create",
-            "item": {
-                "type": "function_call_output",
-                "call_id": call_id,
-                "output": json.dumps(result)
-            }
-        }))
-
-        # Request agent to continue with the result
-        await ws.send(json.dumps({
-            "type": "response.create"
-        }))
-    else:
-        print(f"Unknown function: {function_name}")
-
-# In your WebSocket message handler
-async def on_message(ws, message):
-    event = json.loads(message)
-
-    # Listen for function calls
-    if event["type"] == "response.function_call_arguments.done":
-        await handle_function_call(ws, event)
-    elif event["type"] == "response.output_audio.delta":
-        # Handle audio response
-        pass
-```
-
-```javascriptWithoutSDK
-// Define your function implementations
-const functionHandlers = {
-  get_weather: async (args) => {
-    // In production, call a real weather API
-    return {
-      location: args.location,
-      temperature: 22,
-      units: args.units || "celsius",
-      condition: "Sunny",
-      humidity: 45
-    };
-  },
-
-  book_appointment: async (args) => {
-    // In production, interact with your booking system
-    const confirmation = \`CONF\${Math.floor(Math.random() * 9000) + 1000}\`;
-    return {
-      status: "confirmed",
-      confirmation_code: confirmation,
-      date: args.date,
-      time: args.time,
-      service: args.service
-    };
-  }
-};
-
-// Handle function calls from the voice agent
-async function handleFunctionCall(ws, event) {
-  const functionName = event.name;
-  const callId = event.call_id;
-  const args = JSON.parse(event.arguments);
-
-  console.log(\`Function called: \${functionName\} with args:\`, args);
-
-  // Execute the function
-  const handler = functionHandlers[functionName];
-  if (handler) {
-    const result = await handler(args);
-
-    // Send result back to agent
-    ws.send(JSON.stringify({
-      type: "conversation.item.create",
-      item: {
-        type: "function_call_output",
-        call_id: callId,
-        output: JSON.stringify(result)
-      }
-    }));
-
-    // Request agent to continue with the result
-    ws.send(JSON.stringify({
-      type: "response.create"
-    }));
-  } else {
-    console.error(\`Unknown function: \${functionName\}\`);
-  }
-}
-
-// In your WebSocket message handler
-ws.on("message", (message) => {
-  const event = JSON.parse(message);
-
-  // Listen for function calls
-  if (event.type === "response.function_call_arguments.done") {
-    handleFunctionCall(ws, event);
-  } else if (event.type === "response.output_audio.delta") {
-    // Handle audio response
-  }
-});
-```
-
-### Function Call Events
-
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `response.function_call_arguments.done` | Server → Client | Function call triggered with complete arguments |
-| `conversation.item.create` (function\_call\_output) | Client → Server | Send function execution result back |
-| `response.create` | Client → Server | Request agent to continue processing |
-
-### Parallel Tool Calling
-
-When the model determines that multiple function calls are needed to fulfill a request, it will emit multiple `response.function_call_arguments.done` events before any audio response. In this case, you must resolve **all** function calls and send their results back before emitting `response.create`.
-
-**Expected behavior:**
-
-1. Receive multiple `response.function_call_arguments.done` events (one per function call)
-2. Execute all functions (can be done in parallel for performance)
-3. Send a `conversation.item.create` with `function_call_output` for **each** function call
-4. Only after all function outputs have been sent, emit a single `response.create` to continue
-
-> [!WARNING]
->
-> **Important:** Do not send `response.create` until all function call outputs have been submitted. Sending `response.create` prematurely will cause the model to respond without the complete context from all tool results.
-
-## Force Message
-
-Use `force_message` to make the agent speak a **hard-coded, TTS-synthesized line** without involving the model. This is useful for scripted greetings, compliance disclosures (e.g. "This call is being recorded"), IVR prompts, or any utterance that must be delivered verbatim.
-
-Send a `conversation.item.create` event with `item.type` set to `"force_message"`:
-
-```python customLanguage="pythonWithoutSDK"
-await ws.send(json.dumps({
-    "type": "conversation.item.create",
-    "item": {
-        "type": "force_message",
-        "role": "assistant",
-        "interruptible": False,
-        "content": [{"type": "output_text", "text": "This call is being recorded."}]
-    }
-}))
-# Do NOT send response.create — the force_message IS the turn.
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-ws.send(JSON.stringify({
-  type: "conversation.item.create",
-  item: {
-    type: "force_message",
-    role: "assistant",
-    interruptible: false,
-    content: [{ type: "output_text", text: "This call is being recorded." }],
-  },
-}));
-// Do NOT send response.create — the force_message IS the turn.
-```
-
-| Field | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `item.type` | Yes | — | Must be `"force_message"` |
-| `item.content[].text` | Yes | — | Verbatim text to synthesize via TTS |
-| `item.interruptible` | No | `true` | When `false`, caller audio is dropped until playback completes |
-
-The server injects a full response lifecycle (`response.created` → `response.output_audio.delta` → `response.done`) so the force message appears to clients like a normal model turn.
-
-> [!NOTE]
->
-> `force_message` is an xAI extension. It is not part of the OpenAI Realtime API.
-
-## Per-Response Instructions
-
-Override the session-level system prompt for a single response by setting `instructions` on `response.create`:
-
-```python customLanguage="pythonWithoutSDK"
-await ws.send(json.dumps({
-    "type": "response.create",
-    "response": {
-        "instructions": "Respond in Spanish for this turn only."
-    }
-}))
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-ws.send(JSON.stringify({
-  type: "response.create",
-  response: {
-    instructions: "Respond in Spanish for this turn only.",
-  },
-}));
-```
-
-The override applies only to this response — subsequent responses revert to the session `instructions`. This is useful for injecting dynamic context (e.g. CRM data, caller info) or temporarily changing behavior without updating the session.
-
-## Session Resumption
-
-By default a `/v1/realtime` connection loses its conversation history when the WebSocket closes. **Session resumption** caches each turn and replays the prior context on reconnect, so the model stays conditioned on what was said earlier.
-
-To continue a session across connections, capture the server's `conversation.created.conversation.id` and pass it back as `?conversation_id=<id>` on reconnect (with the same opt-in).
-
-1. **Connect and opt in** by sending `resumption.enabled: true` on `session.update`. Read the assigned id from `conversation.created` and store it.
-2. **Reconnect with that id.** Reopen the WebSocket with `?conversation_id=<id>` and opt in again. The cached turns replay before your first new turn, echoed back as `conversation.item.created` events.
-
-```python customLanguage="pythonWithoutSDK"
-import json, websockets
-
-# resume_id is None on a fresh conversation; pass the saved id to resume.
-async def connect(resume_id=None):
-    url = f"wss://api.x.ai/v1/realtime?model={MODEL}"
-    if resume_id:
-        url += f"&conversation_id={resume_id}"
-
-    async with websockets.connect(url, additional_headers=headers) as ws:
-        # Opt in to resumption (required to cache and to replay).
-        await ws.send(json.dumps({
-            "type": "session.update",
-            "session": {"resumption": {"enabled": True}},
-        }))
-
-        async for raw in ws:
-            event = json.loads(raw)
-            if event["type"] == "conversation.created":
-                # Server-assigned id. Save it and pass it as
-                # ?conversation_id= on your next connect to resume.
-                saved_id = event["conversation"]["id"]
-            # ... handle the rest of the session
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-// resumeId is null on a fresh conversation; pass the saved id to resume.
-function connect(resumeId = null) {
-  let url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
-  if (resumeId) url += `&conversation_id=${resumeId}`;
-  const ws = new WebSocket(url);
-
-  ws.addEventListener("open", () => {
-    // Opt in to resumption (required to cache and to replay).
-    ws.send(JSON.stringify({
-      type: "session.update",
-      session: { resumption: { enabled: true } },
-    }));
-  });
-
-  ws.addEventListener("message", (msg) => {
-    const event = JSON.parse(msg.data);
-    if (event.type === "conversation.created") {
-      // Server-assigned id. Save it and pass it as
-      // ?conversation_id= on your next connect to resume.
-      savedId = event.conversation.id;
-    }
-    // ... handle the rest of the session
-  });
-}
-```
-
-Persisted and replayed: user and assistant transcripts, assistant tool calls, and your `function_call_output` results.
-
-* **Opt-in both ways.** No history replays unless the resuming session also sends `resumption.enabled: true`.
-* **Expiry.** History is dropped after 30 minutes of inactivity.
-
-## Best Practices
-
-This section outlines key recommendations for building low-latency, reliable, and natural-feeling voice experiences using the xAI Voice Agent API.
-
-### Minimize perceived latency with parallel initialization
-
-Start the WebSocket connection and microphone input streaming in parallel.
-
-* Initiate the WebSocket connection (including authentication via ephemeral token or API key) **as early as possible** — ideally when the voice interface loads or the user opens the mic-enabled screen.
-* Simultaneously begin capturing microphone audio (using `getUserMedia` in browsers or equivalent APIs on mobile/native platforms).
-* Do **not** wait for the WebSocket `open` event before starting to collect microphone samples.
-
-**Audio Buffering Example**
-
-```javascript customLanguage="javascriptWithoutSDK"
-// 1. Immediately request mic access and start capturing
-const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-const audioContext = new AudioContext({ sampleRate: 24000 });
-
-const source = audioContext.createMediaStreamSource(stream);
-const processor = audioContext.createScriptProcessor(4096, 1, 1); // or AudioWorklet for better perf
-
-source.connect(processor);
-processor.connect(audioContext.destination); // optional
-
-// Buffer incoming PCM data immediately
-let earlyAudioBuffer = []; // Float32Array[] or Int16Array[]
-
-processor.onaudioprocess = (e) => {
-  const input = e.inputBuffer.getChannelData(0);
-  earlyAudioBuffer.push(new Float32Array(input)); // or convert to PCM16
-};
-
-// 2. In parallel – connect WebSocket (may take time)
-const ws = new WebSocket("wss://api.x.ai/v1/realtime?model=grok-voice-latest", [
-  `xai-client-secret.${token}`,
-]);
-
-ws.onopen = () => {
-  // Send session.update configuration
-  ws.send(JSON.stringify({ type: "session.update", session: { ... } }));
-
-  // Flush any buffered audio now that we're connected
-  if (earlyAudioBuffer.length > 0) {
-    flushBufferedAudioToWS(earlyAudioBuffer);
-    earlyAudioBuffer = [];
-  }
-};
-```
-
-#### Tips for Production
-
-* Convert to 24 kHz PCM16 little-endian before buffering or flushing.
-* Flush in reasonably sized messages (100ms samples each) for smooth transmission.
-* On reconnection, resume buffering immediately.
-
-### Avoid Audio Overlap During Tool Calls
-
-When the model invokes a tool during a voice response, the server delivers all audio deltas first, then the function call events alongside `response.done`. If your client immediately sends `conversation.item.create` (with the function result) followed by `response.create`, the server starts generating the next response right away — even if the client is still playing audio from the previous turn. This causes overlapping audio.
-
-**Recommended sequence:**
-
-1. Receive `response.function_call_arguments.done` → execute your tool
-2. Send `conversation.item.create` with the `function_call_output`
-3. **Wait until audio playback of the current turn is complete** (or nearly complete)
-4. Then send `response.create`
-
-While waiting for playback to finish, show a visual "thinking" indicator (e.g., animated dots) so the user knows the agent is processing. This creates a natural pause between the model's spoken response and the follow-up after the tool result.
-
-```javascript customLanguage="javascriptWithoutSDK"
-ws.on("message", async (message) => {
-  const event = JSON.parse(message);
-
-  if (event.type === "response.function_call_arguments.done") {
-    // 1. Execute the tool
-    const result = await executeFunction(event.name, JSON.parse(event.arguments));
-
-    // 2. Send the function result immediately
-    ws.send(JSON.stringify({
-      type: "conversation.item.create",
-      item: {
-        type: "function_call_output",
-        call_id: event.call_id,
-        output: JSON.stringify(result),
-      },
-    }));
-
-    // 3. Show a "thinking" indicator in the UI
-    showThinkingIndicator();
-
-    // 4. Wait for current audio playback to finish
-    await waitForPlaybackComplete();
-
-    // 5. Now request the next response
-    ws.send(JSON.stringify({ type: "response.create" }));
-    hideThinkingIndicator();
-  }
-});
-
-```
-
-### Additional High-Impact Recommendations
-
-* **Prefer [ephemeral tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens)** for client-side security.
-* **Enable `server_vad`** for automatic, natural barge-in.
-* **Match input/output format** (24 kHz PCM) to avoid resampling.
-* **Stream output audio deltas** (`response.output_audio.delta`) to the speaker instantly — do not wait for the full response.
-* **Implement graceful reconnection** while continuing to buffer new audio.
-* **Monitor WebSocket health** and use exponential backoff if needed.
-
-## Built for Enterprise Voice
-
-* **Telephony Integration** — Connect via SIP, WebSocket, or LiveKit. Native G.711 μ-law/A-law codec support — no transcoding overhead.
-
-* **Tool Calling** — CRMs, calendars, databases, and any REST or GraphQL endpoint via function calling during live conversations.
-
-* **20+ Languages** — Natural pronunciation, accent handling, and seamless code-switching between languages in the same conversation.
-
-* **Domain Expertise** — Precise transcription of medical, legal, financial, and technical terminology — names, codes, and addresses.
-
-## SIP phone calls
-
-Route PSTN, contact-center, or PBX calls into a Voice Agent API session. See [SIP Phone Calls](https://docs.x.ai/developers/model-capabilities/audio/voice-agent/sip) for API integration with `CreatePhoneNumberV2`, call control, DTMF, and telephony provider examples.
-
-## Migrating from OpenAI Realtime
-
-If you have an existing application built on the [OpenAI Realtime API](https://developers.openai.com/api/docs/guides/realtime-conversations), switching to the Grok Voice Agent API requires only a few changes: update the base URL, swap your API key, and choose a Grok voice model.
-
-### Step 1 — Update the Base URL and API Key
-
-#### Using the OpenAI SDK
-
-If you are using the official OpenAI SDK, point the client at the xAI endpoint and supply your xAI API key:
-
-```python customLanguage="pythonWithoutSDK"
-import asyncio
-from openai import AsyncOpenAI
-
-# Before (OpenAI)
-# client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
-# After (xAI)
-client = AsyncOpenAI(
-    api_key=os.environ["XAI_API_KEY"],
-    base_url="https://api.x.ai/v1",
-)
-
-async def main():
-    async with client.realtime.connect(
-        model="grok-voice-latest"
-    ) as conn:
-        await conn.session.update(session={
-            "voice": "eve",
-            "instructions": "You are a helpful assistant.",
-            "turn_detection": {"type": "server_vad"},
-        })
-        # ... rest of your application code
-
-asyncio.run(main())
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-import OpenAI from "openai";
-import { OpenAIRealtimeWS } from "openai/realtime/ws";
-
-// Before (OpenAI)
-// const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// After (xAI)
-const client = new OpenAI({
-  apiKey: process.env.XAI_API_KEY,
-  baseURL: "https://api.x.ai/v1",
-});
-
-// Pass the configured client so the connection uses the xAI base URL and key
-const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
-
-rt.on("session.created", () => {
-  rt.send({
-    type: "session.update",
-    session: {
-      voice: "eve",
-      instructions: "You are a helpful assistant.",
-      turn_detection: { type: "server_vad" },
-    },
-  });
-});
-
-rt.on("error", (err) => {
-  console.error("Realtime error:", err);
-});
-
-// ... rest of your application code
-```
-
-#### Using a Raw WebSocket
-
-If you connect directly via WebSocket, change the URL and `Authorization` header:
-
-```python customLanguage="pythonWithoutSDK"
-import os
-import websockets
-
-# Before (OpenAI)
-# url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview"
-# headers = {"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"}
-
-# After (xAI)
-url = "wss://api.x.ai/v1/realtime?model=grok-voice-latest"
-headers = {"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"}
-
-async with websockets.connect(url, additional_headers=headers) as ws:
-    # Your existing event handling code works as-is
-    pass
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-import WebSocket from "ws";
-
-// Before (OpenAI)
-// const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview";
-// const headers = { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` };
-
-// After (xAI)
-const url = "wss://api.x.ai/v1/realtime?model=grok-voice-latest";
-const headers = { Authorization: `Bearer ${process.env.XAI_API_KEY}` };
-
-const ws = new WebSocket(url, { headers });
-
-ws.on("open", () => {
-  // Your existing event handling code works as-is
-});
-```
-
-### Step 2 — Choose a Model
-
-Pass the model name when you establish the connection:
-
-```python customLanguage="pythonWithoutSDK"
-# Pass the model in connect()
-async with client.realtime.connect(model="grok-voice-latest") as conn:
-    ...
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-// Pass the model in the OpenAIRealtimeWS constructor
-const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
-```
-
-### Step 3 — Model-Specific Best Practices
-
-#### `grok-voice-think-fast-1.0` (Recommended)
-
-This is the flagship voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
-
-* **Simplify your system prompt.** The model is significantly more capable, so your prompt should be much shorter. Ask Grok to generalize your existing system prompt rather than porting it verbatim.
-* **Remove workaround prompting.** Prompt hacks and edge-case fixes needed for GPT models are unnecessary. Strip out instructions added solely to patch bugs or limitations of the previous model.
-* **Reasoning is enabled by default.** The default `reasoning.effort` is `"high"` for complex multi-step instructions, nuanced tone, and ambiguous queries. Set it to `"none"` to disable reasoning.
-
-#### Deprecated model
-
-This model remains available for existing integrations, but new applications should use `grok-voice-latest`.
-
-* `grok-voice-fast-1.0`: Legacy voice model with similar prompting characteristics to GPT realtime models.
-
-The deprecated model follows the same client and server event flow as `grok-voice-latest`, so existing integrations can pin to it while migrating.
-
-> [!NOTE]
->
-> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-1.0`). Pin to a versioned model name in production for stability.
-
-## OpenAI Realtime API Compatibility
-
-The Grok Voice Agent API is compatible with the [OpenAI Realtime API](https://developers.openai.com/api/docs/guides/realtime-conversations). Most OpenAI client libraries and SDKs work with the xAI endpoint by changing the base URL to `wss://api.x.ai/v1/realtime`. This section documents event naming differences and unsupported events.
-
-### Event Naming Differences
-
-The xAI API uses different event names for a few events with different payloads:
-
-* OpenAI's `conversation.item.input_audio_transcription.delta` is named `conversation.item.input_audio_transcription.updated` in the xAI API. The `updated` event contains the cumulative transcript (which may include corrections to previous updates), rather than an incremental delta. Only emitted when `audio.input.transcription.model` is set to `"grok-transcribe"`.
-
-### Unsupported Client Events
-
-| OpenAI Event | Notes |
-|---|---|
-| `conversation.item.retrieve` | Not supported. |
-| `output_audio_buffer.clear` | WebRTC/SIP only. |
-
-### Unsupported Server Events
-
-| OpenAI Event | Notes |
-|---|---|
-| `conversation.item.done` | Not emitted. |
-| `conversation.item.input_audio_transcription.failed` | Not emitted. |
-| `conversation.item.input_audio_transcription.segment` | Not supported. |
-| `conversation.item.retrieved` | Not supported. |
-| `output_audio_buffer.started` | WebRTC/SIP only. |
-| `output_audio_buffer.stopped` | WebRTC/SIP only. |
-| `output_audio_buffer.cleared` | WebRTC/SIP only. |
-| `rate_limits.updated` | Not emitted. |
-
-### xAI Extensions
-
-These events and features are xAI-specific and not part of the OpenAI Realtime API:
-
-| Event / Feature | Description |
-|---|---|
-| `force_message` | New `conversation.item.create` item type for TTS-synthesized scripted utterances. See [Force Message](#force-message). |
-| `resumption` | Field on `session.update` that caches conversation turns and replays them on reconnect. See [Session Resumption](#session-resumption). |
-| `replace` | Field on `session.update` that maps phrases to spoken substitutions applied before TTS to fix pronunciation without changing the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
-
-
-===/developers/model-capabilities/audio/voice-agent/sip===
-#### Voice Agent API
-
-# SIP Phone Calls
-
-SIP lets you route PSTN, contact-center, or PBX calls into a Voice Agent API session.
-
-### 1. Register the phone number
-
-Create a Direct SIP phone number and include the webhook details that should receive incoming-call events. Use `origin: "byo_trunk"` for a customer-owned number. Provisioning xAI phone numbers via API is not supported. xAI returns the webhook signing secret in the response.
-
-Choose one SIP authentication method.
-
-The response includes a signing secret after you register the phone number. Store it securely; xAI returns it only once.
-
-Configure your carrier or PBX to route calls to:
-
-
-
-If you provide `allowed_addresses`, make sure the list contains your provider's SIP signaling CIDR ranges. If you provide SIP digest credentials, configure your carrier with the same username and password; xAI never returns the password after creation.
-
-### 2. Handle the incoming-call webhook
-
-When a caller dials the number, xAI sends a signed `realtime.call.incoming` webhook to the webhook URL. Verify the `webhook-id`, `webhook-timestamp`, and `webhook-signature` headers using the signing secret returned after you register the phone number, then read `data.call_id` from the payload.
-
-The webhook has this shape:
-
-```json
-{
-  "object": "event",
-  "id": "evt_123",
-  "type": "realtime.call.incoming",
-  "created_at": 1750000000,
-  "data": {
-    "call_id": "00000000-0000-0000-0000-000000000000",
-    "sip_headers": [
-      { "name": "From", "value": "+14155550100" },
-      { "name": "To", "value": "+18005550199" }
-    ],
-    "metadata": {}
-  }
-}
-```
-
-### 3. Join the call over WebSocket
-
-Open `wss://api.x.ai/v1/realtime?call_id={call_id}` with your xAI API key. Then send `session.update` to configure the voice agent for this call, followed by `response.create` when the agent should begin speaking.
-
-After connecting, the WebSocket behaves like any other Voice Agent API session. The SIP caller's audio is bridged into the session, and assistant audio is played back to the caller.
-
-```python customLanguage="pythonWithoutSDK"
-import asyncio
-import json
-import os
-import websockets
-
-async def handle_sip_call(call_id: str):
-    async with websockets.connect(
-        f"wss://api.x.ai/v1/realtime?call_id={call_id}",
-        additional_headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-    ) as ws:
-        await ws.send(json.dumps({
-            "type": "session.update",
-            "session": {
-                "voice": "eve",
-                "instructions": "You are a helpful phone support agent.",
-                "turn_detection": {"type": "server_vad"},
-            },
-        }))
-        await ws.send(json.dumps({"type": "response.create"}))
-
-        async for msg in ws:
-            event = json.loads(msg)
-            print(event["type"])
-
-asyncio.run(handle_sip_call("00000000-0000-0000-0000-000000000000"))
-```
-
-```javascript customLanguage="javascriptWithoutSDK"
-import WebSocket from "ws";
-
-const callId = "00000000-0000-0000-0000-000000000000";
-const ws = new WebSocket(`wss://api.x.ai/v1/realtime?call_id=${callId}`, {
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-ws.on("open", () => {
-  ws.send(JSON.stringify({
-    type: "session.update",
-    session: {
-      voice: "eve",
-      instructions: "You are a helpful phone support agent.",
-      turn_detection: { type: "server_vad" },
-    },
-  }));
-  ws.send(JSON.stringify({ type: "response.create" }));
-});
-
-ws.on("message", data => {
-  const event = JSON.parse(data.toString());
-  console.log(event.type);
-});
-```
-
-## Call control
-
-Use `refer` to transfer the caller to another PSTN or SIP destination:
-
-```bash customLanguage="bash"
-curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/refer" \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"target_uri": "sip:agent@example.com"}'
-```
-
-Use `hangup` when your application should end the call:
-
-```bash customLanguage="bash"
-curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/hangup" \
-  -H "Authorization: Bearer $XAI_API_KEY"
-```
-
-## DTMF phone keypresses
-
-When using the Voice Agent API over SIP, phone keypresses (DTMF tones) are automatically buffered and flushed to the model as text input. The client receives `input_audio_buffer.dtmf_event_received` events as an audit trail of each keypress.
-
-### Flush triggers
-
-Buffered digits are submitted to the model when any of the following occurs:
-
-* The user presses `#` (submit key)
-* 2.5 seconds of idle time after the last keypress
-* The user begins speaking (preempts the digit buffer)
-
-### Audit event
-
-Each keypress is reported to the client WebSocket:
-
-```json customLanguage="json"
-{
-  "type": "input_audio_buffer.dtmf_event_received",
-  "event": "5",
-  "received_at": 1730000000
-}
-```
-
-> [!NOTE]
->
-> DTMF is only available on SIP sessions — it is not emitted on direct WebSocket connections.
-
-## Telephony providers
-
-In every provider, the destination is the xAI SIP URI for your registered number:
-
-
-
-Replace `{number}` with your Direct SIP phone number. If you configured `allowed_addresses` when registering the number, include your provider's SIP signaling CIDR ranges.
-
-### Twilio
-
-1. In the Twilio Console, go to **Voice** → **Elastic SIP Trunking** and create a trunk.
-2. Open the trunk's **Origination** settings and add this origination URI: `sip:{number}@sip.voice.x.ai;transport=tls`.
-3. Assign a Twilio phone number to the trunk, or purchase a new number and attach it.
-4. If your application transfers calls mid-session, enable call transfer on the trunk.
-
-### Telnyx
-
-1. In the Telnyx Portal, go to **Voice Suite** → **SIP Trunking** and create an FQDN SIP Connection.
-2. In **Authentication and Routing**, add `sip.voice.x.ai` as the primary FQDN on port `5060` with record type `A`.
-3. In **Inbound settings**, set the destination number format to **E.164**.
-4. Enable at least one supported codec: G.711 μ-law, G.711 A-law, or G.722.
-5. Assign a phone number to the SIP Connection.
-
-### Plivo
-
-1. In the Plivo Console, go to **SIP Trunking** and create a SIP trunk.
-2. Choose **Inbound**, then create a new URI with FQDN `sip.voice.x.ai`.
-3. Link an existing phone number to the trunk, or buy a new number and attach it.
-
-### Bring Your Own SIP Provider
-
-1. In your carrier, contact center, or PBX, create an outbound route or SIP trunk.
-2. Set the destination to `sip:{number}@sip.voice.x.ai;transport=tls`.
 
 
 ===/developers/model-capabilities/audio/voice===
@@ -12671,7 +12754,7 @@ Replace `{number}` with your Direct SIP phone number. If you configured `allowed
 
 The xAI Voice APIs offer a range of powerful voice capabilities, all powered by Grok, with enterprise-grade reliability and sub-second latency.
 
-## Voice Agent API
+## Speech to Speech API
 
 Build real-time, speech-to-speech voice agents over WebSockets, with low-latency turn-taking and tool use. For client-side apps, use [Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens) to connect securely without exposing your API key.
 
@@ -12927,11 +13010,11 @@ const speech = await fetch("https://api.x.ai/v1/tts", {
 fs.writeFileSync("custom.mp3", Buffer.from(await speech.arrayBuffer()));
 ```
 
-The custom `voice_id` also works with the streaming TTS WebSocket and the Voice Agent realtime API. See the [Custom Voices guide](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) for the full API.
+The custom `voice_id` also works with the streaming TTS WebSocket and the Speech to Speech realtime API. See the [Custom Voices guide](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) for the full API.
 
 ## Voices
 
-When using the Voice Agent API or Text to Speech, you can choose from the full set of built-in voices. Each has its own personality and tone, so pick the one that best fits your application (`eve` is the default):
+When using the Speech to Speech API or Text to Speech, you can choose from the full set of built-in voices. Each has its own personality and tone, so pick the one that best fits your application (`eve` is the default):
 
 ### Enterprise Compliance & Security
 
@@ -19728,106 +19811,6 @@ done
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
 
 
-===/developers/models/speech-to-text===
-#### Models
-
-# Speech to Text
-
-The Speech to Text API transcribes audio into text. Use the REST endpoint for file-based batch transcription, or the streaming endpoint for real-time low-latency transcription.
-
-## At a glance
-
-| | Details |
-|---|---|
-| **Modalities** | Audio → Text |
-| **REST pricing** | $0.10 / hr |
-| **Streaming pricing** | $0.20 / hr |
-| **Region** | us-east-1 |
-
-## Pricing
-
-| | Details |
-|---|---:|
-| **REST (per hour)** | $0.10 / hr |
-| **Streaming (per hour)** | $0.20 / hr |
-
-## Rate Limits
-
-| | REST | Streaming |
-|---|---:|---:|
-| **RPS** (Requests per second) | 10 | 10 |
-| **Concurrent sessions** | — | 100 per team |
-
-## Capabilities
-
-* REST and streaming transcription
-* Multiple audio formats (WAV, MP3, WebM, OGG, M4A)
-* Multiple languages
-* Real-time interim results (streaming)
-* Keyterm prompting for domain-specific vocabulary
-* Smart Turn end-of-turn detection (streaming) — ML-based prediction of whether the speaker has finished their thought
-
-## Availability
-
-| | Details |
-|---|---|
-| **Cluster** | us-east-1 |
-
-## Documentation
-
-* [Speech to Text Guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text) — Getting started with speech to text
-* [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) — Overview of all voice capabilities
-* [Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing) — Full pricing overview
-
-
-===/developers/models/text-to-speech===
-#### Models
-
-# Text to Speech
-
-The Text to Speech API converts text into natural speech, billed per input character. Supports a full lineup of expressive voices, streaming, and batch output, in MP3, WAV, PCM, μ-law, and A-law formats.
-
-## At a glance
-
-| | Details |
-|---|---|
-| **Modalities** | Text → Audio |
-| **Pricing** | $15.00 / 1M chars |
-| **Region** | us-east-1 |
-
-## Pricing
-
-| | Details |
-|---|---|
-| **Per 1M chars** | $15.00 / 1M chars |
-
-## Rate Limits
-
-| | Details |
-|---|---:|
-| **Requests per second** | 50 RPS |
-| **Concurrent sessions** | 100 per team |
-
-## Capabilities
-
-* Expressive built-in voices
-* Streaming output
-* Batch output
-* MP3 / WAV / PCM / μ-law / A-law formats
-
-## Availability
-
-| | Details |
-|---|---|
-| **Cluster** | us-east-1 |
-
-## Documentation
-
-* [Text to Speech Guide](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech) — Getting started with text to speech
-* [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) — Text to Speech endpoint reference
-* [Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing) — Full pricing overview
-
-
 ===/developers/models===
 #### Key Information
 
@@ -19913,34 +19896,34 @@ Some models have aliases to help users automatically migrate to the next version
 For most users, the aliased `<modelname>` or `<modelname>-latest` are recommended, as you would receive the latest features automatically.
 
 
-===/developers/models/voice-agent-api===
+===/developers/models/speech-to-speech===
 #### Models
 
-# Voice Agent API
+# Speech to Speech API
 
-The Voice Agent API enables real-time voice conversations over WebSocket, billed by minute of audio plus a flat fee per text input message. Supports function calling with web search, X search, collections, MCP, and custom functions.
+The Speech to Speech API enables real-time voice conversations over WebSocket, billed by minute of audio plus a flat fee per text input message. Supports function calling with web search, X search, collections, MCP, and custom functions.
 
 ## At a glance
 
 | | Details |
 |---|---|
 | **Modalities** | Text, Audio → Text, Audio |
-| **Audio pricing** | $0.05 / min ($3.00 / hr) |
-| **Text Input pricing** | $0.004 / message |
+| **Audio pricing** |  / min ( / hr) |
+| **Text Input pricing** |  / message |
 | **Region** | us-east-1 |
 
 ## Pricing
 
-The Voice Agent API charges based on audio duration and text events sent without audio.
+The Speech to Speech API charges based on audio duration and text events sent without audio.
 
 | | Details |
 |---|---|
-| **Audio** | $0.05 / min of audio sent or received ($3.00 / hr) |
-| **Text Input** | $0.004 per `conversation.item.create` event |
+| **Audio** |  / min of audio sent or received ( / hr) |
+| **Text Input** |  per `conversation.item.create` event |
 
 ### What counts as a text input message
 
-Every `conversation.item.create` event you send from the client is billed at $0.004, with two exceptions:
+Every `conversation.item.create` event you send from the client is billed at , with two exceptions:
 
 * `function_call_output` items (server-requested tool results) are not billed.
 * Items whose content is `input_audio` or `audio` are billed by the audio meter instead.
@@ -19951,7 +19934,7 @@ Every `conversation.item.create` event you send from the client is billed at $0.
 
 | | Details |
 |---|---:|
-| **Concurrent sessions** | 100 per team |
+| **Concurrent sessions** |  per team |
 | **Max session duration** | 120 minutes |
 
 ## Capabilities
@@ -19970,8 +19953,108 @@ Every `conversation.item.create` event you send from the client is billed at $0.
 
 ## Documentation
 
-* [Voice Agent Guide](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) — Getting started with real-time voice conversations
+* [Speech to Speech Guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) — Getting started with real-time voice conversations
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice) — WebSocket endpoint reference
+* [Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing) — Full pricing overview
+
+
+===/developers/models/speech-to-text===
+#### Models
+
+# Speech to Text
+
+The Speech to Text API transcribes audio into text. Use the REST endpoint for file-based batch transcription, or the streaming endpoint for real-time low-latency transcription.
+
+## At a glance
+
+| | Details |
+|---|---|
+| **Modalities** | Audio → Text |
+| **REST pricing** |  / hr |
+| **Streaming pricing** |  / hr |
+| **Region** | us-east-1 |
+
+## Pricing
+
+| | Details |
+|---|---:|
+| **REST (per hour)** |  / hr |
+| **Streaming (per hour)** |  / hr |
+
+## Rate Limits
+
+| | REST | Streaming |
+|---|---:|---:|
+| **RPS** (Requests per second) |  |  |
+| **Concurrent sessions** | — |  per team |
+
+## Capabilities
+
+* REST and streaming transcription
+* Multiple audio formats (WAV, MP3, WebM, OGG, M4A)
+* Multiple languages
+* Real-time interim results (streaming)
+* Keyterm prompting for domain-specific vocabulary
+* Smart Turn end-of-turn detection (streaming) — ML-based prediction of whether the speaker has finished their thought
+
+## Availability
+
+| | Details |
+|---|---|
+| **Cluster** | us-east-1 |
+
+## Documentation
+
+* [Speech to Text Guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text) — Getting started with speech to text
+* [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) — Overview of all voice capabilities
+* [Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing) — Full pricing overview
+
+
+===/developers/models/text-to-speech===
+#### Models
+
+# Text to Speech
+
+The Text to Speech API converts text into natural speech, billed per input character. Supports a full lineup of expressive voices, streaming, and batch output, in MP3, WAV, PCM, μ-law, and A-law formats.
+
+## At a glance
+
+| | Details |
+|---|---|
+| **Modalities** | Text → Audio |
+| **Pricing** |  / 1M chars |
+| **Region** | us-east-1 |
+
+## Pricing
+
+| | Details |
+|---|---|
+| **Per 1M chars** |  / 1M chars |
+
+## Rate Limits
+
+| | Details |
+|---|---:|
+| **Requests per second** |  RPS |
+| **Concurrent sessions** |  per team |
+
+## Capabilities
+
+* Expressive built-in voices
+* Streaming output
+* Batch output
+* MP3 / WAV / PCM / μ-law / A-law formats
+
+## Availability
+
+| | Details |
+|---|---|
+| **Cluster** | us-east-1 |
+
+## Documentation
+
+* [Text to Speech Guide](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech) — Getting started with text to speech
+* [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) — Text to Speech endpoint reference
 * [Pricing](https://docs.x.ai/developers/pricing#voice-api-pricing) — Full pricing overview
 
 
@@ -20005,8 +20088,8 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
+| grok-imagine-image | $0.02 / image |
 | grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
 
@@ -20383,10 +20466,10 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image-quality | 5 | — |
 | grok-imagine-image | 5 | — |
-| grok-imagine-video-1.5 | 10 | — |
+| grok-imagine-image-quality | 5 | — |
 | grok-imagine-video | 10 | — |
+| grok-imagine-video-1.5 | 10 | — |
 
 ### What counts toward TPM
 
@@ -20458,6 +20541,14 @@ def request_with_backoff(prompt, max_retries=5):
 
 ## July
 
+### Adjustable VAD threshold for Speech to Text
+
+Speech to Text now accepts a `vad_threshold` parameter (streaming query param and batch multipart field) to tune the voice-activity gate that skips non-speech audio. Lower values transcribe quieter or noisier speech — useful for narrowband telephony — and `0` disables the gate. See the [Speech to Text docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text).
+
+### Grok 4.5 available in the EU
+
+Grok 4.5 is now available in the API console for EU users. See the [Grok 4.5 overview](https://docs.x.ai/developers/grok-4-5).
+
 ### Grok 4.5
 
 Grok 4.5, SpaceXAI's model for coding, agentic tasks, and knowledge work, is now available on the xAI API. Priced at $2 / 1M input tokens and $6 / 1M output tokens, with configurable reasoning effort (low, medium, or high; default high). See the [Grok 4.5 overview](https://docs.x.ai/developers/grok-4-5) and the [announcement](https://x.ai/news/grok-4-5).
@@ -20512,7 +20603,7 @@ For more details, see the [Grok Build docs](https://docs.x.ai/build/overview).
 
 ### Custom Voices
 
-You can now clone a voice from a short audio clip and use it across the Text-to-Speech and Voice Agent APIs. Create and manage your voice catalog from the xAI console. For more details, check out the [Custom Voices docs](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) and our [blog post](https://x.ai/news/grok-custom-voices).
+You can now clone a voice from a short audio clip and use it across the Text-to-Speech and Speech to Speech APIs. Create and manage your voice catalog from the xAI console. For more details, check out the [Custom Voices docs](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) and our [blog post](https://x.ai/news/grok-custom-voices).
 
 ## April
 
@@ -20526,7 +20617,7 @@ You can now set an expiration policy on uploaded files using `expires_after` or 
 
 ### Grok Voice Think Fast 1.0 is available
 
-You can now use `grok-voice-think-fast-1.0` with the Voice Agent API. To get started, check out the [Voice Agent docs](https://docs.x.ai/developers/model-capabilities/audio/voice-agent). For more details, see our [blog post](https://x.ai/news/grok-voice-think-fast-1).
+You can now use `grok-voice-think-fast-1.0` with the Speech to Speech API. To get started, check out the [Speech to Speech docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech). For more details, see our [blog post](https://x.ai/news/grok-voice-think-fast-1).
 
 ### Speech to Text is available
 
@@ -20562,9 +20653,9 @@ You can now create batches by uploading a [JSONL file](https://docs.x.ai/develop
 
 ## December 2025
 
-### Grok Voice Agent API is released
+### Grok Speech to Speech API is released
 
-Grok Voice Agent API is generally available. Visit [Grok Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice) for guidance on using the API.
+Grok Speech to Speech API is generally available. Visit [Grok Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/voice) for guidance on using the API.
 
 ## November 2025
 
@@ -22974,7 +23065,7 @@ Create a chat response from text/image chat prompts. This is the endpoint for ma
 
 * `logprobs` (boolean | null) — Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message. Not supported by models \`grok-4.20\` and newer; the field will be silently ignored if set.
 
-* `max_completion_tokens` (integer | null) — An upper bound for the number of tokens that can be generated for a completion, only applies to visible output tokens (i.e. does not apply to tokens used for reasoning or function calls). Defaults to None, meaning the model will generate as many tokens as needed up until the model's maximum context length.
+* `max_completion_tokens` (integer | null) — An upper bound for the number of tokens that can be generated for a completion, only applies to visible output tokens (i.e. does not apply to tokens used for reasoning or function calls). Defaults to 128,000 when unset; set a larger value to allow longer generations.
 
 * `max_tokens` (integer | null) — \\\[DEPRECATED\\] The maximum number of tokens that can be generated in the chat completion. Deprecated in favor of \`max\_completion\_tokens\`.
 
@@ -23203,7 +23294,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
 * `logprobs` (boolean | null) — Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message. Not supported by models \`grok-4.20\` and newer; the field will be silently ignored if set.
 
-* `max_output_tokens` (integer | null) — Max number of tokens that can be generated in a response. This includes both output and reasoning tokens.
+* `max_output_tokens` (integer | null) — Max number of tokens that can be generated in a response. This includes both output and reasoning tokens. Defaults to 128,000 when unset; set a larger value to allow longer generations.
 
 * `max_turns` (integer | null) — Maximum number of agentic tool calling turns allowed for this request.
   If not set, defaults to the server's global cap.
@@ -25375,6 +25466,8 @@ Transcribe an audio file to text.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
 
+* `vad_threshold` (number) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio segments scoring below the threshold are treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Default: \`0.5\`.
+
 ### Response Body
 
 * `text` (string, required) — Full transcript text. For multichannel requests, this is a merged transcript across all channels (words interleaved by timestamp).
@@ -25510,6 +25603,8 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 * `smart_turn` (number, optional) — Enable Smart Turn end-of-turn detection. Set to a confidence threshold between \`0.0\` and \`1.0\`. When the model's end-of-turn probability exceeds this threshold at a VAD silence boundary, \`speech\_final\` fires immediately. When confidence is below the threshold, \`speech\_final\` is suppressed and the event is demoted to \`chunk\_final\`. Every \`transcript.partial\` event includes an \`end\_of\_turn\_confidence\` field (0.0–1.0) when Smart Turn is enabled. Example: \`smart\_turn=0.7\`.
 
 * `smart_turn_timeout` (integer, optional) — Maximum silence duration in milliseconds before forcing \`speech\_final\`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when \`smart\_turn\` is enabled. Range: 1–5000. Example: \`smart\_turn\_timeout=3000\`.
+
+* `vad_threshold` (number, optional, default: 0.08) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Does not affect endpointing or \`speech\_final\` timing. Default: \`0.08\`.
 
 ### Client Messages
 
@@ -25990,7 +26085,7 @@ Create an ephemeral client secret for authenticating browser-side Realtime API c
 
 * `session` (object | null) — Optional initial session configuration to bind to the client secret. This JSON value is stored alongside the secret and applied when the WebSocket connection opens.
 
-  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0" | "grok-voice-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
+  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
 
   * `reasoning` (object) — Reasoning settings for models that support them.
 
@@ -26819,6 +26914,8 @@ Transcribe an audio file to text.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
 
+* `vad_threshold` (number) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio segments scoring below the threshold are treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Default: \`0.5\`.
+
 ### Response Body
 
 * `text` (string, required) — Full transcript text. For multichannel requests, this is a merged transcript across all channels (words interleaved by timestamp).
@@ -26955,6 +27052,8 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 * `smart_turn_timeout` (integer, optional) — Maximum silence duration in milliseconds before forcing \`speech\_final\`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when \`smart\_turn\` is enabled. Range: 1–5000. Example: \`smart\_turn\_timeout=3000\`.
 
+* `vad_threshold` (number, optional, default: 0.08) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Does not affect endpointing or \`speech\_final\` timing. Default: \`0.08\`.
+
 ### Client Messages
 
 * `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.
@@ -27023,7 +27122,7 @@ Create a custom voice from a reference audio clip.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 
@@ -27132,7 +27231,7 @@ List custom voices owned by your team.
 
 * `voices` (array\<object>, required) — List of custom voices owned by the calling team.
 
-  * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+  * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
   * `name` (string | null) — Display name.
 
@@ -27229,7 +27328,7 @@ Get a single custom voice.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 
@@ -27325,7 +27424,7 @@ Update custom voice metadata.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 
@@ -32685,7 +32784,7 @@ Remote MCP Tools allow Grok to connect to external MCP (Model Context Protocol) 
 
 ## SDK Support
 
-Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent#remote-mcp-tools).
+Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#remote-mcp-tools).
 
 > [!NOTE]
 >

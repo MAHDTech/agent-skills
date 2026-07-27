@@ -4,191 +4,22 @@
 
 ## POST /v1/realtime/client\_secrets
 
-Create an ephemeral client secret for authenticating browser-side Realtime API connections.
+API endpoint for POST requests to /v1/realtime/client\_secrets.
 
-### Request Body
-
-* `expires_after` (object)
-
-  * `seconds` (integer) — Number of seconds until the client secret expires. Maximum: 3600 (1 hour). Defaults to 600 (10 minutes) when omitted.
-
-* `session` (object | null) — Optional initial session configuration to bind to the client secret. This JSON value is stored alongside the secret and applied when the WebSocket connection opens.
-
-  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0" | "grok-voice-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
-
-  * `reasoning` (object) — Reasoning settings for models that support them.
-
-    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with \`grok-voice-latest\` and \`grok-voice-think-fast-1.0\`.
-
-### Response Body
-
-* `value` (string, required) — The ephemeral token value. Use as a Bearer token in the WebSocket \`Authorization\` header, or in the \`sec-websocket-protocol\` header with prefix \`xai-client-secret.\`.
-
-* `expires_at` (integer, required) — Unix timestamp (seconds) when this client secret expires.
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/realtime/client_secrets \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -d '{
-    "expires_after": {
-      "seconds": 300
-    }
-  }'
 ```
-
-```javascriptWithoutSDK
-const response = await fetch("https://api.x.ai/v1/realtime/client_secrets", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${process.env.XAI_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    expires_after: {
-      seconds: 300,
-    },
-  }),
-});
-
-const data = await response.json();
-console.log(JSON.stringify(data, null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.post(
-    "https://api.x.ai/v1/realtime/client_secrets",
-    headers={
-        "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
-        "Content-Type": "application/json",
-    },
-    json={
-        "expires_after": {
-            "seconds": 300,
-        },
-    },
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "value": "xai-realtime-client-secret-abc123...",
-  "expires_at": 1750000000
-}
+Method: POST
+Path: /v1/realtime/client_secrets
 ```
 
 ***
 
 ## POST /v2/phone-numbers
 
-Create a phone number for API-controlled SIP calls.
+API endpoint for POST requests to /v2/phone-numbers.
 
-### Request Body
-
-* `origin` ("xai\_provisioned" | "byo\_trunk", required) — Use \`byo\_trunk\` for customer-owned Direct SIP numbers.
-
-* `name` (string, required)
-
-* `agent_id` (string) — Route calls to this agent. Mutually exclusive with \`webhook\`.
-
-* `area_code` (string) — xAI-provisioned only: optional 3-digit US area code filter.
-
-* `phone_number` (string) — BYO trunk only: customer-owned phone number in E.164 format.
-
-* `sip_auth` (object)
-
-  * `auth_username` (string) — SIP digest username. Must be provided together with \`auth\_password\`.
-
-  * `auth_password` (string) — SIP digest password. Stored encrypted and never returned by read endpoints.
-
-  * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
-
-* `webhook` (object)
-
-  * `name` (string) — Optional display name. Defaults to the phone number's name when omitted.
-
-  * `url` (string, required) — URL xAI POSTs signed \`realtime.call.incoming\` events to.
-
-  * `auth_url` (string) — Optional OAuth token-exchange URL paired with \`auth\_token\`.
-
-  * `auth_token` (string) — Optional bearer credential, or OAuth client credential when paired with \`auth\_url\`.
-
-### Response Body
-
-* `phone_number` (object)
-
-  * `phone_number_id` (string)
-
-  * `team_id` (string)
-
-  * `phone_number` (string) — Phone number in E.164 format.
-
-  * `name` (string)
-
-  * `agent_id` (string) — Agent this number routes to.
-
-  * `webhook_id` (string) — Webhook endpoint this number dispatches \`realtime.call.incoming\` events to.
-
-  * `origin` ("xai\_provisioned" | "byo\_trunk")
-
-  * `sip_host` (string) — SIP host your carrier or PBX should route calls to.
-
-  * `inbound_trunk_id` (string) — Read-only SIP trunk identifier.
-
-  * `sip_auth` (object)
-
-    * `auth_username` (string) — SIP digest username. Present only when digest auth is configured.
-
-    * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
-
-  * `created_at` (string)
-
-  * `updated_at` (string)
-
-  * `agent_name` (string)
-
-* `webhook` (object)
-
-  * `webhook_id` (string)
-
-  * `dispatch_signing_secret` (string) — Standard Webhooks v1 HMAC-SHA256 signing secret. Returned only once and cannot be recovered.
-
-\*\*Response example:\*\*
-
-```json
-{
-  "phone_number": {
-    "phone_number_id": "phone_abc123",
-    "team_id": "00000000-0000-0000-0000-000000000000",
-    "phone_number": "+18005550199",
-    "name": "Support SIP trunk",
-    "webhook_id": "webhook_abc123",
-    "origin": "byo_trunk",
-    "sip_host": "sip.voice.x.ai",
-    "sip_auth": {
-      "allowed_addresses": [
-        "203.0.113.0/24"
-      ]
-    },
-    "created_at": "2026-06-19T00:00:00Z",
-    "updated_at": "2026-06-19T00:00:00Z"
-  },
-  "webhook": {
-    "webhook_id": "webhook_abc123",
-    "dispatch_signing_secret": "whsec_..."
-  }
-}
+```
+Method: POST
+Path: /v2/phone-numbers
 ```
 
 ***
@@ -345,262 +176,33 @@ Full schemas and examples: [`/voice-realtime.ws.json`](https://docs.x.ai/voice-r
 
 ## POST /v1/realtime/calls/\{call\_id}/refer
 
-Transfer an active SIP call to a PSTN or SIP destination.
+API endpoint for POST requests to /v1/realtime/calls/\{call\_id}/refer.
 
-### Path Parameters
-
-* `call_id` (string, required) — SIP call identifier from the \`realtime.call.incoming\` webhook.
-
-### Request Body
-
-* `target_uri` (string, required) — Destination for the SIP REFER. Use \`tel:+E.164\` for PSTN destinations or \`sip:user@host\` for direct SIP routing.
-
-\*\*Request example:\*\*
-
-```json
-{
-  "target_uri": "sip:agent@example.com"
-}
 ```
-
-\*\*Response example:\*\*
-
-```json
-{}
+Method: POST
+Path: /v1/realtime/calls/{call_id}/refer
 ```
 
 ***
 
 ## POST /v1/realtime/calls/\{call\_id}/hangup
 
-End an active SIP call.
+API endpoint for POST requests to /v1/realtime/calls/\{call\_id}/hangup.
 
-### Path Parameters
-
-* `call_id` (string, required) — SIP call identifier from the \`realtime.call.incoming\` webhook.
-
-\*\*Response example:\*\*
-
-```json
-{}
+```
+Method: POST
+Path: /v1/realtime/calls/{call_id}/hangup
 ```
 
 ***
 
 ## POST /v1/tts
 
-Convert text into speech audio.
+API endpoint for POST requests to /v1/tts.
 
-### Request Body
-
-* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\<soft>\`, \`\<whisper>\`, \`\<loud>\`, \`\<build-intensity>\`, \`\<decrease-intensity>\`, \`\<higher-pitch>\`, \`\<lower-pitch>\`, \`\<slow>\`, \`\<fast>\`, \`\<sing-song>\`, \`\<singing>\`, \`\<laugh-speak>\`, \`\<emphasis>\`.
-
-* `voice_id` (string) — Voice identifier. Use a built-in voice from \`GET /v1/tts/voices\` (e.g. \`eve\`, \`ara\`) or a custom voice ID. Defaults to \`eve\` when omitted.
-
-* `output_format` (object)
-
-  * `codec` ("mp3" | "wav" | "pcm" | "mulaw" | "alaw", required) — Audio codec.
-
-  * `sample_rate` (integer | null) — Sample rate in Hz. Supported values: 8000, 16000, 22050, 24000, 44100, 48000. Defaults to 24000.
-
-  * `bit_rate` (integer | null) — Bit rate in bps. Applies to MP3 codec only. Supported values: 32000, 64000, 96000, 128000, 192000. Defaults to 128000.
-
-* `language` (string, required) — BCP-47 language code (e.g. \`en\`, \`zh\`, \`pt-BR\`) or \`auto\` for automatic language detection. Case-insensitive. Supported values: \`auto\`, \`en\`, \`ar-EG\`, \`ar-SA\`, \`ar-AE\`, \`bn\`, \`zh\`, \`fr\`, \`de\`, \`hi\`, \`id\`, \`it\`, \`ja\`, \`ko\`, \`pt-BR\`, \`pt-PT\`, \`ru\`, \`es-MX\`, \`es-ES\`, \`tr\`, \`vi\`. Additional languages may work with varying accuracy.
-
-* `optimize_streaming_latency` ("0" | "1") — Latency optimization level for streaming synthesis. \`0\` (default): No optimization — best audio quality. \`1\`: Reduced first-chunk size for lower time-to-first-audio, with minor quality tradeoff at chunk boundaries.
-
-* `text_normalization` (boolean) — Enable text normalization before synthesis. When enabled, the model normalizes written-form text (e.g. numbers, abbreviations, symbols) into spoken-form before generating audio.
-
-* `with_timestamps` (boolean) — Return per-character timing metadata alongside the audio. When \`true\`, the response is \`application/json\` containing base64-encoded audio plus \`audio\_timestamps\`.
-
-* `speed` (number) — Speech speed multiplier. \`1.0\` is normal speed. Values below \`1.0\` slow down speech, values above \`1.0\` speed it up. Defaults to \`1.0\` when omitted.
-
-### Response Body
-
-* `audio` (string, required) — Base64-encoded audio bytes in the requested codec.
-
-* `content_type` (string, required) — MIME type of the decoded audio (e.g. \`audio/mpeg\`, \`audio/wav\`).
-
-* `duration` (number, required) — Total audio duration in seconds.
-
-* `audio_timestamps` (object) — Per-character timings produced when \`with\_timestamps\` is \`true\`.
-
-  * `graph_chars` (array\<string>, required) — Each character of the original input text, in order.
-
-  * `graph_times` (array\<object>, required) — Start/end seconds for each entry in \`graph\_chars\`.
-
-    * `start` (number, required) — Start time in seconds, measured from the beginning of the synthesized audio.
-
-    * `end` (number, required) — End time in seconds, measured from the beginning of the synthesized audio.
-
-### Code Examples
-
-```bash
-tmpfile=$(mktemp /tmp/tts-output-XXXXXX.mp3)
-trap 'rm -f "$tmpfile"' EXIT
-
-http_code=$(curl -s -o "$tmpfile" -w "%{http_code}" \
-  https://api.x.ai/v1/tts \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -d '{
-    "text": "Hello, this is a text-to-speech test from xAI.",
-    "voice_id": "eve",
-    "language": "en"
-  }')
-
-if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
-  file_size=$(wc -c < "$tmpfile" | tr -d ' ')
-  echo "{\"status\": $http_code, \"audio_bytes\": $file_size}"
-else
-  cat "$tmpfile"
-  exit 1
-fi
 ```
-
-```javascriptWithoutSDK
-const response = await fetch("https://api.x.ai/v1/tts", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${process.env.XAI_API_KEY}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    text: "Hello, this is a text-to-speech test from xAI.",
-    voice_id: "eve",
-    language: "en",
-  }),
-});
-
-if (response.ok) {
-  const audioBuffer = await response.arrayBuffer();
-  console.log(
-    JSON.stringify(
-      {
-        status: response.status,
-        audio_bytes: audioBuffer.byteLength,
-        content_type: response.headers.get("content-type") || "",
-      },
-      null,
-      2,
-    ),
-  );
-} else {
-  const errorText = await response.text();
-  console.error(errorText);
-  process.exit(1);
-}
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.post(
-    "https://api.x.ai/v1/tts",
-    headers={
-        "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
-        "Content-Type": "application/json",
-    },
-    json={
-        "text": "Hello, this is a text-to-speech test from xAI.",
-        "voice_id": "eve",
-        "language": "en",
-    },
-)
-
-if response.ok:
-    print(
-        json.dumps(
-            {
-                "status": response.status_code,
-                "audio_bytes": len(response.content),
-                "content_type": response.headers.get("Content-Type", ""),
-            },
-            indent=2,
-        )
-    )
-else:
-    print(response.text)
-    raise SystemExit(1)
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "audio": "<base64-encoded MP3>",
-  "content_type": "audio/mpeg",
-  "duration": 0.92,
-  "audio_timestamps": {
-    "graph_chars": [
-      "H",
-      "e",
-      "l",
-      "l",
-      "o",
-      " ",
-      "w",
-      "o",
-      "r",
-      "l",
-      "d",
-      "."
-    ],
-    "graph_times": [
-      {
-        "start": 0,
-        "end": 0.06
-      },
-      {
-        "start": 0.06,
-        "end": 0.12
-      },
-      {
-        "start": 0.12,
-        "end": 0.18
-      },
-      {
-        "start": 0.18,
-        "end": 0.24
-      },
-      {
-        "start": 0.24,
-        "end": 0.34
-      },
-      {
-        "start": 0.34,
-        "end": 0.4
-      },
-      {
-        "start": 0.4,
-        "end": 0.48
-      },
-      {
-        "start": 0.48,
-        "end": 0.54
-      },
-      {
-        "start": 0.54,
-        "end": 0.62
-      },
-      {
-        "start": 0.62,
-        "end": 0.68
-      },
-      {
-        "start": 0.68,
-        "end": 0.78
-      },
-      {
-        "start": 0.78,
-        "end": 0.92
-      }
-    ]
-  }
-}
+Method: POST
+Path: /v1/tts
 ```
 
 ***
@@ -667,280 +269,33 @@ Full schemas and examples: [`/tts-streaming.ws.json`](https://docs.x.ai/tts-stre
 
 ## GET /v1/tts/voices
 
-List all available TTS voices.
+API endpoint for GET requests to /v1/tts/voices.
 
-### Response Body
-
-* `voices` (array\<object>, required) — List of available voices.
-
-  * `voice_id` (string, required) — Unique identifier for the voice (lowercase). Pass this value as \`voice\_id\` in TTS requests or as the \`voice\` parameter in Realtime API session configuration.
-
-  * `name` (string, required) — Human-readable display name for the voice.
-
-  * `language` (string | null) — Language code for the voice (e.g. \`en\`).
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/tts/voices \
-  -H "Authorization: Bearer $XAI_API_KEY"
 ```
-
-```javascriptWithoutSDK
-const response = await fetch("https://api.x.ai/v1/tts/voices", {
-  headers: {
-    Authorization: `Bearer ${process.env.XAI_API_KEY}`,
-  },
-});
-
-const data = await response.json();
-console.log(JSON.stringify(data, null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.get(
-    "https://api.x.ai/v1/tts/voices",
-    headers={
-        "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
-    },
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voices": [
-    {
-      "voice_id": "ara",
-      "name": "Ara",
-      "language": "en"
-    },
-    {
-      "voice_id": "eve",
-      "name": "Eve",
-      "language": "en"
-    },
-    {
-      "voice_id": "leo",
-      "name": "Leo",
-      "language": "en"
-    },
-    {
-      "voice_id": "rex",
-      "name": "Rex",
-      "language": "en"
-    },
-    {
-      "voice_id": "sal",
-      "name": "Sal",
-      "language": "en"
-    }
-  ]
-}
+Method: GET
+Path: /v1/tts/voices
 ```
 
 ***
 
 ## GET /v1/tts/voices/\{voice\_id}
 
-Get details for a specific voice.
+API endpoint for GET requests to /v1/tts/voices/\{voice\_id}.
 
-### Path Parameters
-
-* `voice_id` (string, required) — The unique identifier of the voice (e.g. \`eve\`, \`ara\`).
-
-### Response Body
-
-* `voice_id` (string, required) — Unique identifier for the voice (lowercase). Pass this value as \`voice\_id\` in TTS requests or as the \`voice\` parameter in Realtime API session configuration.
-
-* `name` (string, required) — Human-readable display name for the voice.
-
-* `language` (string | null) — Language code for the voice (e.g. \`en\`).
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/tts/voices/eve \
-  -H "Authorization: Bearer $XAI_API_KEY"
 ```
-
-```javascriptWithoutSDK
-const voiceId = "eve";
-
-const response = await fetch(`https://api.x.ai/v1/tts/voices/${voiceId}`, {
-  headers: {
-    Authorization: `Bearer ${process.env.XAI_API_KEY}`,
-  },
-});
-
-const data = await response.json();
-console.log(JSON.stringify(data, null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-voice_id = "eve"
-
-response = requests.get(
-    f"https://api.x.ai/v1/tts/voices/{voice_id}",
-    headers={
-        "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
-    },
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voice_id": "eve",
-  "name": "Eve",
-  "language": "en"
-}
+Method: GET
+Path: /v1/tts/voices/{voice_id}
 ```
 
 ***
 
 ## POST /v1/stt
 
-Transcribe an audio file to text.
+API endpoint for POST requests to /v1/stt.
 
-### Request Body
-
-* `file` (string) — Audio file to transcribe. Maximum size: 500 MB. Supported container formats (auto-detected): \`wav\`, \`mp3\`, \`ogg\`, \`opus\`, \`flac\`, \`aac\`, \`mp4\`, \`m4a\`, \`mkv\` (MP3/AAC/FLAC codecs only). Supported raw formats (requires \`audio\_format\` and \`sample\_rate\`): \`pcm\`, \`mulaw\`, \`alaw\`. Must be the last field in the multipart form.
-
-* `url` (string) — URL of an audio file to download and transcribe (server-side). Either \`file\` or \`url\` must be provided.
-
-* `audio_format` ("pcm" | "mulaw" | "alaw" | "wav" | "mp3" | "ogg" | "opus" | "flac" | "aac" | "mp4" | "m4a" | "mkv") — Audio format hint. \*\*Only required for raw/headerless formats\*\* (\`pcm\`, \`mulaw\`, \`alaw\`). For container formats (MP3, WAV, OGG, etc.) the server auto-detects the format from the file header — do not set this field.
-
-* `sample_rate` ("8000" | "16000" | "22050" | "24000" | "44100" | "48000") — Audio sample rate in Hz. \*\*Required when \`audio\_format\` is a raw format\*\* (\`pcm\`, \`mulaw\`, \`alaw\`). Ignored for container formats. Either \`sample\_rate\` or \`sample\_rate\_hertz\` may be used.
-
-* `language` (string) — Language code for the audio (e.g. \`en\`, \`fr\`, \`de\`, \`ja\`). When set together with \`format=true\`, enables Inverse Text Normalization — spoken-form numbers, currencies, and units are converted to their written form.
-
-* `format` ("true" | "false") — When \`true\`, enables text formatting. Requires \`language\` to be set.
-
-* `multichannel` ("true" | "false") — When \`true\`, enables per-channel transcription. Each audio channel is transcribed independently and results are returned in the \`channels\` array.
-
-* `channels` (integer) — Number of audio channels. Required for multichannel raw audio (min 2, max 8). For container formats, the channel count is auto-detected from the file header.
-
-* `diarize` ("true" | "false") — When \`true\`, enables speaker diarization. Each word in the response includes a \`speaker\` field (integer) identifying the detected speaker.
-
-* `keyterm` (array\<string>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
-
-* `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
-
-### Response Body
-
-* `text` (string, required) — Full transcript text. For multichannel requests, this is a merged transcript across all channels (words interleaved by timestamp).
-
-* `language` (string, required) — Detected language code (ISO 639-1, e.g. \`en\`). Currently empty — language detection is not yet enabled.
-
-* `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
-
-* `words` (array\<object>) — Word-level segments with timestamps. Omitted when empty.
-
-  * `text` (string, required) — The word text.
-
-  * `start` (number, required) — Word start time in seconds (2 d.p.).
-
-  * `end` (number, required) — Word end time in seconds (2 d.p.).
-
-  * `confidence` (number) — Confidence score (0.0–1.0, entropy-based). Omitted when 0.
-
-  * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
-
-* `channels` (array\<object>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
-
-  * `index` (integer, required) — Zero-based channel index in the source audio.
-
-  * `language` (string) — Detected language code for this channel. Currently empty.
-
-  * `text` (string, required) — Full transcript text for this channel.
-
-  * `words` (array\<object>) — Word-level segments with timestamps for this channel.
-
-    * `text` (string, required) — The word text.
-
-    * `start` (number, required) — Word start time in seconds (2 d.p.).
-
-    * `end` (number, required) — Word end time in seconds (2 d.p.).
-
-    * `confidence` (number) — Confidence score (0.0–1.0, entropy-based). Omitted when 0.
-
-    * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
-
-\*\*Response example:\*\*
-
-```json
-{
-  "text": "The balance is $167,983.15. That is $23.4 kilograms.",
-  "language": "",
-  "duration": 8.4,
-  "words": [
-    {
-      "text": "The",
-      "start": 0,
-      "end": 0.24,
-      "confidence": 0.33
-    },
-    {
-      "text": "balance",
-      "start": 0.24,
-      "end": 0.64,
-      "confidence": 0.67
-    },
-    {
-      "text": "is",
-      "start": 0.64,
-      "end": 0.88,
-      "confidence": 0.41
-    },
-    {
-      "text": "$167,983.15.",
-      "start": 0.88,
-      "end": 4.8,
-      "confidence": 0.07
-    },
-    {
-      "text": "That",
-      "start": 6.16,
-      "end": 6.48,
-      "confidence": 0.29
-    },
-    {
-      "text": "is",
-      "start": 6.48,
-      "end": 6.64,
-      "confidence": 0.4
-    },
-    {
-      "text": "$23.4",
-      "start": 6.64,
-      "end": 7.52,
-      "confidence": 0.07
-    },
-    {
-      "text": "kilograms.",
-      "start": 7.76,
-      "end": 8.4,
-      "confidence": 0.09
-    }
-  ]
-}
+```
+Method: POST
+Path: /v1/stt
 ```
 
 ***
@@ -978,6 +333,8 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 * `smart_turn` (number, optional) — Enable Smart Turn end-of-turn detection. Set to a confidence threshold between \`0.0\` and \`1.0\`. When the model's end-of-turn probability exceeds this threshold at a VAD silence boundary, \`speech\_final\` fires immediately. When confidence is below the threshold, \`speech\_final\` is suppressed and the event is demoted to \`chunk\_final\`. Every \`transcript.partial\` event includes an \`end\_of\_turn\_confidence\` field (0.0–1.0) when Smart Turn is enabled. Example: \`smart\_turn=0.7\`.
 
 * `smart_turn_timeout` (integer, optional) — Maximum silence duration in milliseconds before forcing \`speech\_final\`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when \`smart\_turn\` is enabled. Range: 1–5000. Example: \`smart\_turn\_timeout=3000\`.
+
+* `vad_threshold` (number, optional, default: 0.08) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Does not affect endpointing or \`speech\_final\` timing. Default: \`0.08\`.
 
 ### Client Messages
 
@@ -1023,526 +380,64 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ## POST /v1/custom-voices
 
-Create a custom voice from a reference audio clip.
+API endpoint for POST requests to /v1/custom-voices.
 
-### Request Body
-
-* `file` (string, required) — Reference audio file. Maximum duration: 120 seconds. Supported formats: WAV, MP3, FLAC, OGG, Opus, M4A, AAC, MKV, MP4 (anything \`ffmpeg\` can decode).
-
-* `name` (string) — Display name for the voice. Shown in the console and returned by \`GET /v1/custom-voices\`.
-
-* `description` (string) — Free-text description of the voice.
-
-* `gender` ("male" | "female" | "neutral") — Voice gender label.
-
-* `accent` (string) — Free-text accent label (e.g. \`British\`, \`American\`).
-
-* `age` ("young" | "middle-aged" | "old") — Voice age label.
-
-* `language` (string) — ISO 639 language code (e.g. \`en\`) or BCP-47-style code (e.g. \`en-US\`, \`zh-CN\`). Region must be uppercase.
-
-* `use_case` ("conversational" | "narration" | "characters" | "educational" | "advertisement" | "social\_media" | "entertainment") — Intended use case label.
-
-* `tone` ("warm" | "casual" | "professional" | "friendly" | "authoritative" | "expressive" | "calm") — Tonal label.
-
-### Response Body
-
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
-
-* `name` (string | null) — Display name.
-
-* `description` (string | null) — Free-text description.
-
-* `gender` ("male" | "female" | "neutral" | "null") — Voice gender label.
-
-* `accent` (string | null) — Free-text accent label.
-
-* `age` ("young" | "middle-aged" | "old" | "null") — Voice age label.
-
-* `language` (string | null) — ISO 639 / BCP-47 language code.
-
-* `use_case` (string | null) — Intended use case label.
-
-* `tone` (string | null) — Tonal label.
-
-* `created_at` (string, required) — RFC 3339 timestamp.
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/custom-voices \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -F "name=Friendly Narrator" \
-  -F "language=en" \
-  -F "gender=female" \
-  -F "tone=warm" \
-  -F "use_case=narration" \
-  -F "file=@reference.wav;type=audio/wav"
 ```
-
-```javascriptWithoutSDK
-import fs from 'fs';
-
-const form = new FormData();
-form.append('file', new Blob([fs.readFileSync('reference.wav')]), 'reference.wav');
-form.append('name', 'Friendly Narrator');
-form.append('language', 'en');
-form.append('gender', 'female');
-form.append('tone', 'warm');
-form.append('use_case', 'narration');
-
-const response = await fetch('https://api.x.ai/v1/custom-voices', {
-  method: 'POST',
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-  body: form,
-});
-
-console.log(JSON.stringify(await response.json(), null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-with open("reference.wav", "rb") as f:
-    response = requests.post(
-        "https://api.x.ai/v1/custom-voices",
-        headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-        files={"file": ("reference.wav", f, "audio/wav")},
-        data={
-            "name": "Friendly Narrator",
-            "language": "en",
-            "gender": "female",
-            "tone": "warm",
-            "use_case": "narration",
-        },
-    )
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voice_id": "nlbqfwie",
-  "name": "Friendly Narrator",
-  "description": "Warm, conversational tone for narration.",
-  "gender": "female",
-  "accent": "American",
-  "age": "young",
-  "language": "en",
-  "use_case": "narration",
-  "tone": "warm",
-  "created_at": "2026-04-26T18:56:34.872993+00:00"
-}
+Method: POST
+Path: /v1/custom-voices
 ```
 
 ***
 
 ## GET /v1/custom-voices
 
-List custom voices owned by your team.
+API endpoint for GET requests to /v1/custom-voices.
 
-### Query Parameters
-
-* `limit` (integer) — Maximum number of voices to return per page. Range: 1-1000. Default: 100.
-
-* `pagination_token` (string) — Token from a previous response's \`pagination\_token\` field. Pass to fetch the next page.
-
-### Response Body
-
-* `voices` (array\<object>, required) — List of custom voices owned by the calling team.
-
-  * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
-
-  * `name` (string | null) — Display name.
-
-  * `description` (string | null) — Free-text description.
-
-  * `gender` ("male" | "female" | "neutral" | "null") — Voice gender label.
-
-  * `accent` (string | null) — Free-text accent label.
-
-  * `age` ("young" | "middle-aged" | "old" | "null") — Voice age label.
-
-  * `language` (string | null) — ISO 639 / BCP-47 language code.
-
-  * `use_case` (string | null) — Intended use case label.
-
-  * `tone` (string | null) — Tonal label.
-
-  * `created_at` (string, required) — RFC 3339 timestamp.
-
-* `pagination_token` (string | null) — Opaque token to fetch the next page. Absent when there are no more results.
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/custom-voices \
-  -H "Authorization: Bearer $XAI_API_KEY"
 ```
-
-```javascriptWithoutSDK
-const response = await fetch('https://api.x.ai/v1/custom-voices', {
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-console.log(JSON.stringify(await response.json(), null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.get(
-    "https://api.x.ai/v1/custom-voices",
-    headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voices": [
-    {
-      "voice_id": "nlbqfwie",
-      "name": "Friendly Narrator",
-      "description": "Warm, conversational tone for narration.",
-      "gender": "female",
-      "accent": "American",
-      "age": "young",
-      "language": "en",
-      "use_case": "narration",
-      "tone": "warm",
-      "created_at": "2026-04-26T18:56:34.872993+00:00"
-    },
-    {
-      "voice_id": "k17hrosg",
-      "name": "Phone Agent",
-      "description": null,
-      "gender": "male",
-      "accent": null,
-      "age": null,
-      "language": "en",
-      "use_case": "conversational",
-      "tone": "professional",
-      "created_at": "2026-04-23T06:20:31.784256+00:00"
-    }
-  ],
-  "pagination_token": null
-}
+Method: GET
+Path: /v1/custom-voices
 ```
 
 ***
 
 ## GET /v1/custom-voices/\{voice\_id}
 
-Get a single custom voice.
+API endpoint for GET requests to /v1/custom-voices/\{voice\_id}.
 
-### Path Parameters
-
-* `voice_id` (string, required) — The 8-character lowercase alphanumeric custom voice ID returned by \`POST /v1/custom-voices\`.
-
-### Response Body
-
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
-
-* `name` (string | null) — Display name.
-
-* `description` (string | null) — Free-text description.
-
-* `gender` ("male" | "female" | "neutral" | "null") — Voice gender label.
-
-* `accent` (string | null) — Free-text accent label.
-
-* `age` ("young" | "middle-aged" | "old" | "null") — Voice age label.
-
-* `language` (string | null) — ISO 639 / BCP-47 language code.
-
-* `use_case` (string | null) — Intended use case label.
-
-* `tone` (string | null) — Tonal label.
-
-* `created_at` (string, required) — RFC 3339 timestamp.
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/custom-voices/nlbqfwie \
-  -H "Authorization: Bearer $XAI_API_KEY"
 ```
-
-```javascriptWithoutSDK
-const response = await fetch('https://api.x.ai/v1/custom-voices/nlbqfwie', {
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-console.log(JSON.stringify(await response.json(), null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.get(
-    "https://api.x.ai/v1/custom-voices/nlbqfwie",
-    headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voice_id": "nlbqfwie",
-  "name": "Friendly Narrator",
-  "description": "Warm, conversational tone for narration.",
-  "gender": "female",
-  "accent": "American",
-  "age": "young",
-  "language": "en",
-  "use_case": "narration",
-  "tone": "warm",
-  "created_at": "2026-04-26T18:56:34.872993+00:00"
-}
+Method: GET
+Path: /v1/custom-voices/{voice_id}
 ```
 
 ***
 
 ## PATCH /v1/custom-voices/\{voice\_id}
 
-Update custom voice metadata.
+API endpoint for PATCH requests to /v1/custom-voices/\{voice\_id}.
 
-### Path Parameters
-
-* `voice_id` (string, required)
-
-### Request Body
-
-* `name` (string | null)
-
-* `description` (string | null)
-
-* `gender` ("male" | "female" | "neutral" | "null")
-
-* `accent` (string | null)
-
-* `age` ("young" | "middle-aged" | "old" | "null")
-
-* `language` (string | null)
-
-* `use_case` ("conversational" | "narration" | "characters" | "educational" | "advertisement" | "social\_media" | "entertainment" | "null")
-
-* `tone` ("warm" | "casual" | "professional" | "friendly" | "authoritative" | "expressive" | "calm" | "null")
-
-### Response Body
-
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
-
-* `name` (string | null) — Display name.
-
-* `description` (string | null) — Free-text description.
-
-* `gender` ("male" | "female" | "neutral" | "null") — Voice gender label.
-
-* `accent` (string | null) — Free-text accent label.
-
-* `age` ("young" | "middle-aged" | "old" | "null") — Voice age label.
-
-* `language` (string | null) — ISO 639 / BCP-47 language code.
-
-* `use_case` (string | null) — Intended use case label.
-
-* `tone` (string | null) — Tonal label.
-
-* `created_at` (string, required) — RFC 3339 timestamp.
-
-### Code Examples
-
-```bash
-curl -s -X PATCH https://api.x.ai/v1/custom-voices/nlbqfwie \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "description": "Updated after a tuning pass.",
-    "tone": "calm"
-  }'
 ```
-
-```javascriptWithoutSDK
-const response = await fetch('https://api.x.ai/v1/custom-voices/nlbqfwie', {
-  method: 'PATCH',
-  headers: {
-    Authorization: `Bearer ${process.env.XAI_API_KEY}`,
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    description: 'Updated after a tuning pass.',
-    tone: 'calm',
-  }),
-});
-
-console.log(JSON.stringify(await response.json(), null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.patch(
-    "https://api.x.ai/v1/custom-voices/nlbqfwie",
-    headers={
-        "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
-        "Content-Type": "application/json",
-    },
-    json={
-        "description": "Updated after a tuning pass.",
-        "tone": "calm",
-    },
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "voice_id": "nlbqfwie",
-  "name": "Friendly Narrator",
-  "description": "Updated after a tuning pass.",
-  "gender": "female",
-  "accent": "American",
-  "age": "young",
-  "language": "en",
-  "use_case": "narration",
-  "tone": "calm",
-  "created_at": "2026-04-26T18:56:34.872993+00:00"
-}
+Method: PATCH
+Path: /v1/custom-voices/{voice_id}
 ```
 
 ***
 
 ## DELETE /v1/custom-voices/\{voice\_id}
 
-Delete a custom voice.
+API endpoint for DELETE requests to /v1/custom-voices/\{voice\_id}.
 
-### Path Parameters
-
-* `voice_id` (string, required)
-
-### Response Body
-
-* `deleted` (boolean, required) — Always \`true\` on success.
-
-### Code Examples
-
-```bash
-curl -s -X DELETE https://api.x.ai/v1/custom-voices/nlbqfwie \
-  -H "Authorization: Bearer $XAI_API_KEY"
 ```
-
-```javascriptWithoutSDK
-const response = await fetch('https://api.x.ai/v1/custom-voices/nlbqfwie', {
-  method: 'DELETE',
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-console.log(JSON.stringify(await response.json(), null, 2));
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.delete(
-    "https://api.x.ai/v1/custom-voices/nlbqfwie",
-    headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-)
-
-print(json.dumps(response.json(), indent=2))
-```
-
-\*\*Response example:\*\*
-
-```json
-{
-  "deleted": true
-}
+Method: DELETE
+Path: /v1/custom-voices/{voice_id}
 ```
 
 ***
 
 ## GET /v1/custom-voices/\{voice\_id}/audio
 
-Download the reference audio for a custom voice.
+API endpoint for GET requests to /v1/custom-voices/\{voice\_id}/audio.
 
-### Path Parameters
-
-* `voice_id` (string, required)
-
-### Code Examples
-
-```bash
-curl -s https://api.x.ai/v1/custom-voices/nlbqfwie/audio \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  --output reference.wav
 ```
-
-```javascriptWithoutSDK
-const response = await fetch('https://api.x.ai/v1/custom-voices/nlbqfwie/audio', {
-  headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
-});
-
-const audioBuffer = await response.arrayBuffer();
-console.log(
-  JSON.stringify(
-    {
-      status: response.status,
-      audio_bytes: audioBuffer.byteLength,
-      content_type: response.headers.get('content-type') || '',
-    },
-    null,
-    2,
-  ),
-);
-```
-
-```pythonWithoutSDK
-import json
-import os
-
-import requests
-
-response = requests.get(
-    "https://api.x.ai/v1/custom-voices/nlbqfwie/audio",
-    headers={"Authorization": f"Bearer {os.environ['XAI_API_KEY']}"},
-)
-
-print(
-    json.dumps(
-        {
-            "status": response.status_code,
-            "audio_bytes": len(response.content),
-            "content_type": response.headers.get("Content-Type", ""),
-        },
-        indent=2,
-    )
-)
+Method: GET
+Path: /v1/custom-voices/{voice_id}/audio
 ```

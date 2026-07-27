@@ -17,4 +17,4 @@
 
 ## Regions
 
-Available in: us-east-1, us-west-2
+Available in: us-east-1, us-west-2, us-saltlake-2

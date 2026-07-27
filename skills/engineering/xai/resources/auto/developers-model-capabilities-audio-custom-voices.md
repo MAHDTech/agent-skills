@@ -2,7 +2,7 @@
 
 # Custom Voices
 
-Clone a voice from a short reference clip and use it anywhere a built-in voice works. Upload an audio sample and immediately start using it in our TTS and Voice Agent APIs.
+Clone a voice from a short reference clip and use it anywhere a built-in voice works. Upload an audio sample and immediately start using it in our TTS and Speech to Speech APIs.
 
 > [!WARNING]
 >
@@ -436,7 +436,7 @@ await fetch("https://api.x.ai/v1/custom-voices/nlbqfwie", {
 });
 ```
 
-The response is `{"deleted": true}`. After deletion, subsequent requests for the same `voice_id` return `404` and any TTS / Voice Agent calls referencing it will fail with an unknown-voice error.
+The response is `{"deleted": true}`. After deletion, subsequent requests for the same `voice_id` return `404` and any TTS / Speech to Speech calls referencing it will fail with an unknown-voice error.
 
 ## Using a Custom Voice
 
@@ -490,9 +490,9 @@ async def stream_with_custom_voice(voice_id: str):
 asyncio.run(stream_with_custom_voice("nlbqfwie"))
 ```
 
-### Voice Agent API
+### Speech to Speech API
 
-Set `voice` in the `session.update` message. See the [Voice Agent API docs](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) for the full session lifecycle.
+Set `voice` in the `session.update` message. See the [Speech to Speech API docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) for the full session lifecycle.
 
 ```python customLanguage="pythonWithoutSDK"
 import asyncio

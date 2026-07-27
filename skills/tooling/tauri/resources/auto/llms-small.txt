@@ -1,0 +1,15 @@
+# Welcome to Tauri!
+
+[![Vite Logo](https://v2.tauri.app/vite.svg)](https://vitejs.dev) [![Tauri
+Logo](https://v2.tauri.app/tauri.svg)](https://tauri.app) [![Svelte
+Logo](https://v2.tauri.app/svelte.svg)](https://svelte.dev)
+
+Click on the Tauri, Vite, and Svelte logos to learn more.
+
+Ping
+
+{@html response}
+
+Write
+
+{@html response}

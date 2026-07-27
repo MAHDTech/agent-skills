@@ -278,55 +278,54 @@ Shipped in 2026
 
 Shipped in 2025
 
-[](https://github.com/zed-industries/zed/pull/60552)
+[](https://github.com/zed-industries/zed/pull/61662)
 
-Csettings_ui: Fix MCP server toggle not updating in UI
+Magent: Improve error messaging for \`edit_file\` tool
 
-@counterfactual5•\#60552•16h ago•View →
+@mfeyg•\#61662•10h ago•View →
 
-[](https://github.com/zed-industries/zed/pull/59586)
+[](https://github.com/zed-industries/zed/pull/61621)
 
-Ragent_ui: Fix duplicate terminal when starting a new agent thread
+Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
+files
 
-@rbstp•\#59586•1w ago•View →
+@amtoaer•\#61621•2d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/60893)
+
+NTTreat blank spawn_agent session IDs as absent
+
+@nevo-ts•\#60893•3d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/58217)
+
+Hagent_ui: Fix agent terminal close behavior with keyboard shortcuts
+
+@hugh2slowmo•\#58217•3d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/57207)
 
 ZLAllow configuring adaptive thinking for Anthropic available_models
 
-@zerx-lab•\#57207•6d ago•View →
+@zerx-lab•\#57207•1w ago•View →
+
+[](https://github.com/zed-industries/zed/pull/60552)
+
+Csettings_ui: Fix MCP server toggle not updating in UI
+
+@counterfactual5•\#60552•1w ago•View →
+
+[](https://github.com/zed-industries/zed/pull/59586)
+
+Ragent_ui: Fix duplicate terminal when starting a new agent thread
+
+@rbstp•\#59586•2w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/60507)
 
 WHGuard OpenCode bell plugin in ACP mode
 
-@white-hat•\#60507•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/38278)
-
-Zprompts: Improve inline assist prompt to reduce garbage from smaller
-models
-
-@zanmato•\#38278•9mo ago•View →
-
-[](https://github.com/zed-industries/zed/pull/57861)
-
-Glmstudio: Fix context wheel by including token usage in streaming
-responses
-
-@GabrieleAncillai•\#57861•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/58225)
-
-Manthropic: Allow configured models to opt into fast mode
-
-@Moeblack•\#58225•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/52849)
-
-OFix MCP servers in multi root workspaces
-
-@OmChillure•\#52849•1w ago•View →
+@white-hat•\#60507•2w ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)
