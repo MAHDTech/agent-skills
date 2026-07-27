@@ -11,6 +11,7 @@ basenames
 blockquotes
 bluf
 bunx
+byos
 cachix
 cfasync
 cheatsheet
@@ -33,9 +34,11 @@ direnv
 dockerfiles
 edgecase
 endmacro
+endraw
 esac
 evals
 evans
+fips
 Fira
 Fire
 flexbox
@@ -52,7 +55,12 @@ iseconds
 jetbrainsmono
 jina
 Karpathy
+keymap
+keymaps
 khtml
+kommander
+konvoy
+kubeconfig
 leitwort
 lifecycle
 llms
@@ -62,6 +70,7 @@ makefiles
 mattpocock
 mcpc
 mdns
+mgmt
 microbenchmark
 minto
 misconfig
@@ -77,6 +86,7 @@ nixpkgs
 nonblock
 noninfringement
 npx
+nutanix
 nygard
 olshansk
 olshansk's
@@ -102,6 +112,7 @@ pubspec
 pyproject
 pytest
 qcow
+quickstarts
 readlink
 reinstall
 rfds
@@ -148,6 +159,7 @@ todowrite
 toolsdirectory
 unitless
 unmirrored
+velero
 vercel
 verdana
 wayfinder
@@ -158,6 +170,3 @@ worktree
 worktrees
 WSJF
 xclip
-keymap
-keymaps
-endraw
