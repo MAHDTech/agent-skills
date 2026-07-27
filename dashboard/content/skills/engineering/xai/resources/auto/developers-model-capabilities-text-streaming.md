@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Streaming
@@ -167,3 +168,4 @@ Example streaming responses in Python/Javascript:
 ```
 Neural networks learn by adjusting connection weights to minimize prediction error. Through backpropagation, they propagate gradients backward through layers so each weight updates in the direction that improves accuracy on training data.
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Generate Text
@@ -850,3 +851,4 @@ curl -X DELETE https://api.x.ai/v1/responses/{response_id} \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600
 ```
+{% endraw %}

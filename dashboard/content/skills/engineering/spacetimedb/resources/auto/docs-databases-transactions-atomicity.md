@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -300,3 +301,4 @@ The `#[auto_inc]` sequence generator is not transactional:
     Transactional](#auto-increment-is-not-transactional)
 - [Related Topics](#related-topics)
 
+{% endraw %}

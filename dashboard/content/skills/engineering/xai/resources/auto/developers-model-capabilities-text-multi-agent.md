@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Multi Agent
@@ -555,3 +556,4 @@ If your research builds on prior knowledge or specific constraints, include that
 * **No client-side or custom tools:** Client-side tools (function calling) and custom tools are not currently supported by the multi-agent model variant. We do support a set of built-in tools (e.g., `web_search`, `x_search`) and remote MCP tools. See our [built-in tool docs](https://docs.x.ai/developers/tools/overview) for more details.
 * **Chat Completions API not supported:** The multi-agent model does **not** work with the OpenAI Chat Completions API. Use the [xAI SDK](https://github.com/xai-org/xai-sdk-python) or the [Responses API](https://docs.x.ai/developers/model-capabilities/text/generate-text) instead.
 * **`max_tokens` is not supported:** The `max_tokens` parameter is not currently supported by the multi-agent model variant.
+{% endraw %}

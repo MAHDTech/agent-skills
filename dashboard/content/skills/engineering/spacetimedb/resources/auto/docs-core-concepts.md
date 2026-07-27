@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -86,3 +87,4 @@ Connect your frontend to SpacetimeDB.
 - [Authentication](#authentication)
 - [Clients](#clients)
 
+{% endraw %}

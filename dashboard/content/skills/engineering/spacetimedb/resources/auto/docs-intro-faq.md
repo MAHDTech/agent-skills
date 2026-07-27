@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -566,3 +567,4 @@ your bindings, and update your client SDK to the matching version.
   - [I got a weird error when compiling my
     client!](#i-got-a-weird-error-when-compiling-my-client)
 
+{% endraw %}

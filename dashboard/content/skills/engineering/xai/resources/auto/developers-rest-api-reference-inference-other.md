@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Other
@@ -134,3 +135,4 @@ Tokenize text with the specified model
   ]
 }
 ```
+{% endraw %}

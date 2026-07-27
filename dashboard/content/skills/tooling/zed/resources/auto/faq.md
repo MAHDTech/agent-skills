@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # Frequently Asked Questions
 
 ## [Zed](#zed)
@@ -350,3 +351,4 @@ We generate revenue through optional [Zed Pro](https://zed.dev/pricing) subscrip
 Yes. We sold equity in our company to investors to enable ourselves to
 give Zed the focus it deserves.
 
+{% endraw %}

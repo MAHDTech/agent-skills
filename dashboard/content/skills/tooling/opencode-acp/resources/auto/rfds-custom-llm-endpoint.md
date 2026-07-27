@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -409,3 +410,4 @@ Today, `session-config` values are effectively string-oriented and do not define
 * 2026-03-07: Rename "provider" to "protocol" to reflect API compatibility level; make `LlmProtocol` an open string type with well-known values; resolve open questions on identifier standardization and model availability
 * 2026-03-04: Revised to use dedicated `setLlmEndpoints` method with capability advertisement
 * 2026-02-02: Initial draft - preliminary proposal to start discussion
+{% endraw %}

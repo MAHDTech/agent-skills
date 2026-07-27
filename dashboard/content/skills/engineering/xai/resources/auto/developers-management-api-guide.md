@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Using Management API
@@ -194,3 +195,4 @@ Example with time filter:
 curl "https://management-api.x.ai/audit/teams/{teamId}/events?pageSize=50&eventTimeFrom=2025-01-01T00:00:00Z" \\
     -H "Authorization: Bearer <Your Management API Key>"
 ```
+{% endraw %}

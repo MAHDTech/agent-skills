@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -646,3 +647,4 @@ benefit from fewer indexes.
 - [Index Design Guidelines](#index-design-guidelines)
 - [Next Steps](#next-steps)
 
+{% endraw %}

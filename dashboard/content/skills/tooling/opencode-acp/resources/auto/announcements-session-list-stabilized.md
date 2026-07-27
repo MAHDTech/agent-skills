@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -22,3 +23,4 @@ The Session List RFD has moved to Completed and the session/list method is stabi
 This gives clients a standard way to discover sessions known to an agent, making features like session history, session switching, and cleanup much easier to implement consistently across ACP clients.
 
 For the shipped protocol, see [Session List](https://agentclientprotocol.com/protocol/v1/session-list). For the design history, see the [Session List RFD](https://agentclientprotocol.com/rfds/session-list).
+{% endraw %}

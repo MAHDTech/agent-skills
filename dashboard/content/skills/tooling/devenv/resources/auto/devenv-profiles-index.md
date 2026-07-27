@@ -7,11 +7,10 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Profiles
 
-New in 1.9
-
-[Read more about profiles in the v1.9 release post](https://devenv.sh/blog/2025/09/17/devenv-19-scaling-nix-projects-using-modules-and-profiles/index.md)
+Added in `1.9`
 
 Profiles allow you to organize different variations of your development environment. You can activate profiles manually using CLI flags or have them activate automatically based on your system environment.
 
@@ -255,3 +254,4 @@ When you run `devenv --profile backend shell` on a machine named "ci-server" wit
 - `profiles.backend` (via `--profile`)
 - `profiles.hostname."ci-server"` (automatic hostname match)
 - `profiles.user."developer"` (automatic user match)
+{% endraw %}

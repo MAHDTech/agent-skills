@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "gh-create-pr"
 +++
 
+{% raw %}
 Create sophisticated formatting for your prose and code on GitHub with simple syntax.
 
 ## Who can use this feature?
@@ -509,3 +510,4 @@ Disabling Markdown rendering enables you to use source view features, such as li
 *   [About writing and formatting on GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/about-writing-and-formatting-on-github)
 *   [Working with advanced formatting](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting)
 *   [Quickstart for writing on GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github)
+{% endraw %}

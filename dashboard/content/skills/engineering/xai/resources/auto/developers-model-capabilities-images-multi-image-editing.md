@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Multi-Image Editing
@@ -21,3 +22,4 @@ Each source image can be a public URL, a base64-encoded data URI, or a `file_id`
 * [Image Editing](https://docs.x.ai/developers/model-capabilities/images/editing) — Edit a source image with natural language
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
+{% endraw %}

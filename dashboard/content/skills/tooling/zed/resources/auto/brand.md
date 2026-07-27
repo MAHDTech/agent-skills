@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # The Zed Brand
 
 The text editor is called "Zed". The company that develops Zed is called
@@ -104,3 +105,4 @@ Therefore:
 > Additionally, you may not use our trademarks for t-shirts, stickers,
 > or other merchandise without explicit written consent.
 
+{% endraw %}

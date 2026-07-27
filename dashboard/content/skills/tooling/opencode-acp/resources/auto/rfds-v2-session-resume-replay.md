@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -102,3 +103,4 @@ An object leaves room for future cursor forms that need fields. The initial
 ## Revision history
 
 * 2026-07-02: Initial draft.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB Rust app running in under 5 minutes.
@@ -118,3 +119,4 @@ spacetime logs
 - Read the [Rust SDK Reference](https://spacetimedb.com/docs/clients/rust) for detailed API
   docs
 
+{% endraw %}

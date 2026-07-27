@@ -7,130 +7,164 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
----
-slug: enterprise
-section: Enterprise
-title: Enterprise
-path:
-  - Enterprise
----
+{% raw %}
+- side_navigation
+- Enterprise
 
-# Getting Started with Antigravity and Gemini Enterprise Agent Platform
+# Getting Started with Antigravity and Gemini Enterprise Agent Platform[link](#getting-started-with-antigravity-and-gemini-enterprise-agent-platform)
 
-Supported products: <span class="chip">Antigravity 2.0</span><span class="chip">Antigravity CLI</span>
+Supported products: Antigravity 2.0Antigravity CLI
 
-This guide is for administrators setting up the Google Cloud environment to
-enable Antigravity integration with Gemini Enterprise Agent Platform. This
-integration allows enterprise developers to use Antigravity with models hosted
-in your own Google Cloud project, under Google Cloud Terms of Service,
-satisfying private networking and data residency requirements, and utilizing
-consumption-based billing.
+This guide is for administrators setting up the Google Cloud environment
+to enable Antigravity integration with Gemini Enterprise Agent Platform.
+This integration allows enterprise developers to use Antigravity with
+models hosted in your own Google Cloud project, under Google Cloud Terms
+of Service, satisfying private networking and data residency
+requirements, and utilizing consumption-based billing.
 
-<Announcement>
-icon: info
-iconColor: var(--theme-primary)
-color: var(--theme-surface-surface-container)
-text: <strong>Note</strong>: Integration is only supported for Antigravity 2.0 and Antigravity CLI. Antigravity IDE is not supported for enterprise customers.
-link: /docs/models
-linktext: Supported Models
-</Announcement>
+info
 
-## Basic Setup
+**Note**: Integration is only supported for Antigravity 2.0 and
+Antigravity CLI. Antigravity IDE is not supported for enterprise
+customers.
 
-### Prerequisites
+[Supported Models](https://antigravity.google/docs/models)
+
+## Basic Setup[link](#basic-setup)
+
+### Prerequisites[link](#prerequisites)
 
 Before you begin, ensure you have:
 
-* A Google Cloud account.  
-* Access to the Google Cloud console.
+- A Google Cloud account.
+- Access to the Google Cloud console.
 
-### Step 1: Select or Create a Google Cloud Project
+### Step 1: Select or Create a Google Cloud Project[link](#step-1-select-or-create-a-google-cloud-project)
 
-In the Google Cloud console, on the project selector page, select or create a Google Cloud project.
+In the Google Cloud console, on the project selector page, select or
+create a Google Cloud project.
 
-### Roles Required to Select or Create a Project
+### Roles Required to Select or Create a Project[link](#roles-required-to-select-or-create-a-project)
 
-* **Select a project**: Selecting a project doesn't require a specific IAM role—you can select any project that you've been granted a role on.  
-  
-  <Announcement>
-  icon: info
-  iconColor: var(--theme-primary)
-  color: var(--theme-surface-surface-container)
-  text: **Note**: To switch to a different Google Cloud project or location, you must first log out of the Antigravity CLI or Hub, then log back in and select your new project/location. Directly changing the project or location while logged in is currently not supported.
-  </Announcement>
-  
-* **Create a project**: To create a project, you need the **Project Creator** role (`roles/resourcemanager.projectCreator`), which contains the `resourcemanager.projects.create` permission. [Learn how to grant roles](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
+- **Select a project**: Selecting a project doesn't require a specific
+  IAM role—you can select any project that you've been granted a role
+  on.
 
-<Announcement>
-icon: info
-iconColor: var(--theme-primary)
-color: var(--theme-surface-surface-container)
-text: **Note**: If you don't plan to keep the resources that you create in this procedure, create a new project instead of selecting an existing project. After you finish these steps, you can delete the project to remove all associated resources.
-</Announcement>
+info
 
-[Go to project selector](https://console.cloud.google.com/projectselector2)
+**Note**: To switch to a different Google Cloud project or location, you
+must first log out of the Antigravity CLI or Hub, then log back in and
+select your new project/location. Directly changing the project or
+location while logged in is currently not supported.
 
-### Step 2: Verify Billing
+- **Create a project**: To create a project, you need the **Project
+  Creator** role (`roles/resourcemanager.projectCreator`), which
+  contains the `resourcemanager.projects.create` permission. [Learn how
+  to grant
+  roles](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
 
-Verify that billing is enabled for your Google Cloud project. You can check the billing status in the [Google Cloud Billing Console](https://console.cloud.google.com/billing). For detailed instructions, see [Verify the billing status of your projects](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled).
+info
 
-### Step 3: Enable the Agent Platform API
+**Note**: If you don't plan to keep the resources that you create in
+this procedure, create a new project instead of selecting an existing
+project. After you finish these steps, you can delete the project to
+remove all associated resources.
 
-To use Antigravity with Gemini Enterprise Agent Platform, you must enable the Agent Platform API (`aiplatform.googleapis.com`).
+[Go to project
+selector](https://console.cloud.google.com/projectselector2)
 
-### Roles Required to Enable APIs
+### Step 2: Verify Billing[link](#step-2-verify-billing)
 
-To enable APIs, you need the **Service Usage Admin** IAM role (`roles/serviceusage.serviceUsageAdmin`), which contains the `serviceusage.services.enable` permission. [Learn how to grant roles](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
+Verify that billing is enabled for your Google Cloud project. You can
+check the billing status in the [Google Cloud Billing
+Console](https://console.cloud.google.com/billing). For detailed
+instructions, see [Verify the billing status of your
+projects](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled).
 
-### Enable the API
+### Step 3: Enable the Agent Platform API[link](#step-3-enable-the-agent-platform-api)
 
-[Enable the Agent Platform API in the API Library](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com)
+To use Antigravity with Gemini Enterprise Agent Platform, you must
+enable the Agent Platform API (`aiplatform.googleapis.com`).
 
-### User Permissions
+### Roles Required to Enable APIs[link](#roles-required-to-enable-apis)
 
-To get the permissions that you need to use Gemini Enterprise Agent Platform, ask your administrator to grant you the **Agent Platform User** (`roles/aiplatform.user`) IAM role on your project. For more information about granting roles, see [Manage access to projects, folders, and organizations](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
+To enable APIs, you need the **Service Usage Admin** IAM role
+(`roles/serviceusage.serviceUsageAdmin`), which contains the
+`serviceusage.services.enable` permission. [Learn how to grant
+roles](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
 
-You might also be able to get the required permissions through [custom roles](https://cloud.google.com/iam/docs/creating-custom-roles) or other [predefined roles](https://cloud.google.com/iam/docs/roles-overview#predefined).
+### Enable the API[link](#enable-the-api)
 
-## Advanced Configuration
+[Enable the Agent Platform API in the API
+Library](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com)
 
-### Request and Response Logging
+### User Permissions[link](#user-permissions)
 
-For detailed instructions on how to enable and configure request and response logging for the Gemini Enterprise Agent Platform, please refer to the official documentation:
+To get the permissions that you need to use Gemini Enterprise Agent
+Platform, ask your administrator to grant you the **Agent Platform
+User** (`roles/aiplatform.user`) IAM role on your project. For more
+information about granting roles, see [Manage access to projects,
+folders, and
+organizations](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
 
-[Request and Response Logging Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/request-response-logging)
+You might also be able to get the required permissions through [custom
+roles](https://cloud.google.com/iam/docs/creating-custom-roles) or other
+[predefined
+roles](https://cloud.google.com/iam/docs/roles-overview#predefined).
 
-### VPC Service Controls (VPC-SC)
+## Advanced Configuration[link](#advanced-configuration)
 
-If your organization has a service perimeter, then you must add the following resources to your perimeter:
+### Request and Response Logging[link](#request-and-response-logging)
 
-* Agent Platform API
+For detailed instructions on how to enable and configure request and
+response logging for the Gemini Enterprise Agent Platform, please refer
+to the official documentation:
 
-For detailed instructions on how to configure VPC Service Controls, please refer to the official documentation:
+[Request and Response Logging
+Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/request-response-logging)
 
-[VPC Service Controls Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/general/vpc-service-controls)
+### VPC Service Controls (VPC-SC)[link](#vpc-service-controls-vpc-sc)
 
-## Complementary Resources
+If your organization has a service perimeter, then you must add the
+following resources to your perimeter:
 
-### Consumption Options
+- Agent Platform API
 
-Gemini Enterprise Agent Platform offers different consumption options to suit your needs.
+For detailed instructions on how to configure VPC Service Controls,
+please refer to the official documentation:
 
-For detailed information on consumption options, please refer to the official documentation:
+[VPC Service Controls
+Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/general/vpc-service-controls)
 
-[Consumption Options Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options)
+## Complementary Resources[link](#complementary-resources)
 
-### Deployments and Endpoints Locations
+### Consumption Options[link](#consumption-options)
 
-For now, Antigravity CLI and 2.0 offer 3 endpoints: global, multi-region eu, and multi-region us.
+Gemini Enterprise Agent Platform offers different consumption options to
+suit your needs.
 
-<Announcement>
-icon: info
-iconColor: var(--theme-primary)
-color: var(--theme-surface-surface-container)
-text: **Note**: Image generation is currently not available in `eu` and `us` locations.
-</Announcement>
+For detailed information on consumption options, please refer to the
+official documentation:
 
-For a full list of available locations and deployment endpoints, please refer to the official documentation:
+[Consumption Options
+Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options)
 
-[Deployment Endpoints Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations#global)
+### Deployments and Endpoints Locations[link](#deployments-and-endpoints-locations)
+
+For now, Antigravity CLI and 2.0 offer 3 endpoints: global, multi-region
+eu, and multi-region us.
+
+info
+
+**Note**: Image generation is currently not available in `eu` and `us`
+locations.
+
+For a full list of available locations and deployment endpoints, please
+refer to the official documentation:
+
+[Deployment Endpoints
+Documentation](https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations#global)
+
+On this Page
+
+{% endraw %}

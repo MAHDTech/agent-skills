@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Collections Search Tool
@@ -487,3 +488,4 @@ This pattern is valuable for:
 * **Compliance Verification**: Cross-reference internal policies with current regulatory requirements and industry standards
 * **Strategic Planning**: Ground business decisions in both proprietary data and real-time market conditions
 * **Customer Research**: Combine internal customer data with external reviews, social sentiment, and market trends
+{% endraw %}

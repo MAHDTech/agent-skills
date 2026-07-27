@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 # Enterprise Deployments
 
 This page covers everything needed to deploy Grok Build in enterprise environments, including network requirements, configuration management, authentication options, security controls, and the data lifecycle.
@@ -62,7 +63,7 @@ Grok loads configuration from five layers, lowest to highest priority:
 
 Settings in `requirements.toml` cannot be overridden by lower layers, remote settings, or user config — use it for compliance-critical policies. All layers support `[[version_overrides]]` for version-conditional patches and `$VAR` expansion.
 
-### System-level policy for MDM and fleet deployments
+### System-level policy for MDM and managed deployments
 
 The highest-priority configuration layer is `/etc/grok/requirements.toml`. This is the recommended mechanism for organizations managing Grok at scale via Mobile Device Management (MDM), golden images, configuration management tools, or onboarding scripts.
 
@@ -172,53 +173,27 @@ If you are migrating from Claude Code, `forceLoginMethod` maps to `disable_api_k
 
 ## Security controls
 
+Day-to-day [permissions](https://docs.x.ai/build/features/permissions) (modes, allow/deny rules) and [sandbox](https://docs.x.ai/build/features/sandbox) profiles apply to individual machines as well as managed deployments. This section covers enterprise-only policy: pinning, headless modes, and locking always-approve off.
+
 ### Sandbox
 
-The sandbox is applied once at process startup and is irreversible. It uses Landlock on Linux (kernel 5.13+) and Seatbelt on macOS.
-
-| Profile | Filesystem read | Filesystem write | Child network | Use case |
-| --- | --- | --- | --- | --- |
-| `off` | Unrestricted | Unrestricted | Allowed | No sandbox (default) |
-| `workspace` | Everywhere | CWD, `/tmp`, `~/.grok/` | Allowed | Normal development |
-| `devbox` | Everywhere | Everything except `/data` | Allowed | Cloud devbox environments |
-| `read-only` | Everywhere | `~/.grok/` and tmp only | Blocked | Code review, auditing |
-| `strict` | CWD and system paths only | CWD, `/tmp`, `~/.grok/` | Blocked | Untrusted repositories |
-
-Set the profile with `--sandbox workspace` or pin it in `requirements.toml` under `[sandbox] profile`.
-
-Certain directories are always write-protected regardless of profile: `~/.ssh`, `~/.gnupg`, `~/.grok/auth`, `~/.aws`, `~/.config/gcloud`, `~/.azure`.
-
-In `read-only` and `strict` profiles, child processes are blocked from making network connections via a seccomp BPF filter. This enforcement is Linux-only; on macOS, child network blocking is not currently enforced.
-
-Custom profiles can be defined in `~/.grok/sandbox.toml` or `.grok/sandbox.toml`:
+Profiles, custom `sandbox.toml`, and how the sandbox relates to permissions are under [Sandbox](https://docs.x.ai/build/features/sandbox). Pin a profile in `requirements.toml`:
 
 ```text
-[profiles.my-profile]
-extends = "workspace"
-restrict_network = true
-deny = ["/secrets"]
+[sandbox]
+profile = "workspace"
 ```
 
 ### Permissions
 
-The permission system controls which tool calls the model can execute, independent of the sandbox. When the model requests a tool, checks run in order: PreToolUse hooks, policy rules (deny > ask > allow), built-in fast paths, then the prompt policy. See [Modes and Commands](https://docs.x.ai/build/modes-and-commands) for the basic `ask` and `always-approve` modes.
-
-For enterprise and CI environments, two additional modes are relevant:
+Ask, auto, and always-approve, plus CLI `--allow` / `--deny` and config rules, are under [Permissions](https://docs.x.ai/build/features/permissions). For CI and headless runs, two additional modes matter:
 
 | Mode | Behavior | Typical use |
 | --- | --- | --- |
-| `dontAsk` | Silently deny anything without an explicit allow rule | Headless, CI, high-security |
+| `dontAsk` | Silently deny anything without an explicit allow rule | Headless, CI |
 | `acceptEdits` | Auto-approve file edits; prompt for shell commands | Semi-automated workflows |
 
-Set via `--permission-mode` in headless mode (e.g., `grok -p "..." --permission-mode dontAsk`; accepts `default`, `dontAsk`, `acceptEdits`, `bypassPermissions`, `plan`) or `[ui] permission_mode` in config for persistent use (accepts `ask`, `always-approve`).
-
-**Always-safe operations**
-
-Certain read-only operations are auto-approved without prompting in all modes, including `dontAsk`: `read_file`, `list_dir`, `grep`, `web_search`, `todo_write`, and a curated set of safe shell commands including `ls`, `cat`, `pwd`, `date`, `whoami`, `hostname`, `uptime`, `ps`, `head`, `tail`, `wc`, `sort`, `uniq`, `tr`, `cut`, `grep`, `git status`, `git branch`, `git log`, `git diff`, `git ls-files`, `git show`, `git rev-parse`, `cargo check`, and `kubectl get/logs/describe`. Shell commands are parsed per-segment — `ls && rm -rf /` will auto-approve `ls` but block `rm`.
-
-**Policy rules**
-
-Fine-grained allow/deny rules target specific tool types with glob patterns. Deny rules always take precedence over allow rules.
+Example headless run:
 
 ```bash customLanguage="bash"
 grok -p "Review the API changes" \
@@ -227,29 +202,9 @@ grok -p "Review the API changes" \
   --allow 'Bash(gh *)' \
   --allow 'Read' \
   --allow 'Grep' \
-  --deny 'Bash(rm -rf *)'
+  --deny 'Bash(rm -rf *)' \
+  --sandbox strict
 ```
-
-Supported tool filters: `Bash`, `Edit`, `Read`, `Grep`, `MCPTool`, `WebFetch`. Rule syntax: `Bash(git *)` matches any command starting with `git`; `Edit(**/*.rs)` matches Rust files; `MCPTool(my-server__*)` matches MCP tools from a specific server.
-
-Rules can also be set in `~/.grok/config.toml`:
-
-```text
-[permission]
-rules = [
-  { action = "allow", tool = "bash", pattern = "git *" },
-  { action = "allow", tool = "read" },
-  { action = "deny",  tool = "bash", pattern = "*" },
-]
-```
-
-**Dangerous commands**
-
-`rm`, `chmod`, `chown`, `chgrp`, `chattr`, `kill`, `pkill`, `killall`, and `git push` always prompt in `ask` mode, even if the user has whitelisted them. In always-approve mode, they are auto-approved like all other commands. To block them in always-approve mode, add explicit deny rules.
-
-**Combining permissions with sandbox**
-
-Permissions control what the model is allowed to request. The sandbox controls what the process can do even if a command is approved. For untrusted code, combine `dontAsk` + narrow allow rules + `--sandbox strict`.
 
 **Locking bypass-permissions mode**
 
@@ -278,3 +233,4 @@ A session moves data through six phases:
 ### Zero Data Retention
 
 ZDR is enforced at the team level. When enabled for a team or enterprise, zero data retention occurs when using Grok Build.
+{% endraw %}

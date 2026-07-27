@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -198,3 +199,4 @@ Conn->Db->User->OnDelete.AddDynamic(this, &AMyActor::OnUserDelete);
 - [Reacting to Cache Changes](#reacting-to-cache-changes)
 - [Canonical API References](#canonical-api-references)
 
+{% endraw %}

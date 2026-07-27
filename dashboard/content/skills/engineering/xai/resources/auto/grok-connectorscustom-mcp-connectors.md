@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Grok
 
 # Connectors
@@ -66,3 +67,4 @@ To add a custom MCP connector:
 Grok will discover the tools your MCP server exposes and make them available in conversations, just like the built-in and catalog connectors.
 
 Your MCP server must be reachable over the public internet. If it is running on your local machine, you will need a tunneling service to make it accessible. See [Custom MCP Server Tunneling](https://docs.x.ai/grok/connectors/custom-mcp-tunneling) for setup instructions.
+{% endraw %}

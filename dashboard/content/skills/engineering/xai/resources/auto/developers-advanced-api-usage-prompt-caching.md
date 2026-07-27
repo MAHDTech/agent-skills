@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # Prompt Caching
@@ -27,3 +28,4 @@ When consecutive requests share the same starting messages, the xAI API automati
 * [What Breaks Caching](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/multi-turn) — Common mistakes that cause cache misses
 * [Usage & Pricing](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing) — Read cached token counts and understand billing
 * [Best Practices & FAQ](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/best-practices) — Tips, supported models, and common questions
+{% endraw %}

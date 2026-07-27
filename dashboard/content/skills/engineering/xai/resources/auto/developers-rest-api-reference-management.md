@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Management API
 
 # Management REST API Overview
@@ -30,3 +31,4 @@ any of these options, please ask your team administrator to enable the appropria
 * [Accounts and Authorization](https://docs.x.ai/developers/rest-api-reference/management/auth)
 * [Billing Management](https://docs.x.ai/developers/rest-api-reference/management/billing)
 * [Audit Logs](https://docs.x.ai/developers/rest-api-reference/management/audit)
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -304,3 +305,4 @@ async fn main() -> Result<(), anyhow::Error> {
   - [Using Rust (`tokio-postgres` +
     `rustls`)](#using-rust-tokio-postgres--rustls)
 
+{% endraw %}

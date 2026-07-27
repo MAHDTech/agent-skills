@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -74,7 +75,7 @@ Then the client would be able to request a fork of the given session:
 
 The request expects the same options as `session/load`, such as `cwd` and `mcpServers`.
 
-Similarly, the agent would respond with optional data such as config options, the same as `session/load`.
+Similarly, the agent would respond with the `sessionId` of the new session, plus optional data such as config options, the same as `session/new`.
 
 Agents may reply with an error if forking of that specific session or with the given options is not supported,
 for example if the agent does not support forking with a different working directory than the initial session.
@@ -109,3 +110,4 @@ None. This proposal is inspired by the abilities exposed in Claude Agent SDK. It
 * 2025-11-17: Mentioned capabilities format, updated FAQ.
 * 2025-11-20: Added request format and updated capabilities format.
 * 2025-12-10: Adjust fork options to align with `session/load`.
+{% endraw %}

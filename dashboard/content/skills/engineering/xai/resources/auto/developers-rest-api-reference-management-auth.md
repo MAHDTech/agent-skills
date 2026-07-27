@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Management API
 
 # Accounts and Authorization
@@ -1212,3 +1213,4 @@ API endpoint for GET requests to /auth/management-keys/validation.
   "ipRanges": null
 }
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -398,3 +399,4 @@ different times depending on the kind of function being called:
 - [Use Cases](#use-cases)
 - [Next Steps](#next-steps)
 
+{% endraw %}

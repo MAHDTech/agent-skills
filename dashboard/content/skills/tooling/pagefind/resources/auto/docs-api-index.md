@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -255,3 +256,4 @@ await pagefind.search( /* ... */ );
 Calling `pagefind.destroy()` will unload the active Pagefind, and also forget anything that was passed through `pagefind.options()`, resetting to the blank state after the script was first imported.
 
 After being destroyed, initializing Pagefind will look again at the active language, and use any new options you might pass in.
+{% endraw %}

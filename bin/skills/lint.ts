@@ -45,6 +45,23 @@ export function checkDuplicateSkills(skills: Skill[]): {
     return {errors, warnings}
 }
 
+async function checkNoIndexFiles(dirAbs: string): Promise<string[]> {
+    const errors: string[] = []
+    if (!(await fs.pathExists(dirAbs))) return errors
+    const entries = await fs.readdir(dirAbs, {withFileTypes: true})
+    for (const entry of entries) {
+        const fullPath = path.join(dirAbs, entry.name)
+        if (entry.isDirectory()) {
+            errors.push(...(await checkNoIndexFiles(fullPath)))
+        } else if (entry.isFile() && entry.name.toLowerCase() === "index.md") {
+            errors.push(
+                `file '${entry.name}' at ${fullPath} is disallowed inside resources/; rename it to prevent Zola section index (_index.md) collisions.`
+            )
+        }
+    }
+    return errors
+}
+
 // resources/ may contain only auto/ (downloader-owned) and manual/
 // (hand-authored) subdirectories — no bare files, no other subdirectories.
 export async function checkResourcesLayout(
@@ -58,6 +75,12 @@ export async function checkResourcesLayout(
             if (entry.name !== "auto" && entry.name !== "manual") {
                 errors.push(
                     `resources/ may only contain 'auto/' and 'manual/' subdirectories; found '${entry.name}/'.`
+                )
+            } else {
+                errors.push(
+                    ...(await checkNoIndexFiles(
+                        path.join(resourcesDirAbs, entry.name)
+                    ))
                 )
             }
         } else {

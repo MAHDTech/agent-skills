@@ -1,0 +1,26 @@
++++
+title = "announcements-request-cancellation-stabilized"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "opencode-acp"
++++
+
+{% raw %}
+> ## Documentation Index
+> Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Request Cancellation is stabilized
+
+> Announcement that protocol-level request cancellation is now part of the stable ACP protocol.
+
+**Published:** June 29, 2026
+
+The [Request Cancellation RFD](https://agentclientprotocol.com/rfds/request-cancellation) has moved to Completed and the `$/cancel_request` notification is stabilized.
+
+Either side can use the optional notification to request cancellation of an outstanding JSON-RPC request by ID. Implementations can return a valid partial result or the standard `-32800` Request Cancelled error, while feature-specific mechanisms such as `session/cancel` remain available for richer semantics.
+
+For the protocol documentation, see [Cancellation](https://agentclientprotocol.com/protocol/v1/cancellation).
+{% endraw %}

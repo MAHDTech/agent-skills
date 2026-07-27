@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "gh-triage"
 +++
 
+{% raw %}
 [Skip to content](https://cli.github.com/manual/gh_issue#main)[CLI](https://cli.github.com/)
 
 [Copilot CLI](https://github.com/features/copilot/cli)[Manual](https://cli.github.com/manual)[Release notes](https://github.com/cli/cli/releases/latest)
@@ -644,3 +645,4 @@ $ gh issue view 123 --web
 *   [](https://www.youtube.com/github "GitHub on YouTube")
 *   [](https://www.linkedin.com/company/github "GitHub on Linkedin")
 *   [](https://github.com/github "GitHub's organization")
+{% endraw %}

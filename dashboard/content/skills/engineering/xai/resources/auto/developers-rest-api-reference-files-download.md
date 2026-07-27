@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files API
 
 # Download
@@ -26,3 +27,4 @@ payload; use \`GET /v1/files/\{file\_id}\` for metadata only.
 ### Query Parameters
 
 * `format` ("original" | "text") — Format of the downloaded content.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Image Editing
@@ -93,3 +94,4 @@ The `grok-imagine-image-quality` model supports a wide range of visual styles, f
 * [Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing) — Edit with multiple source images
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
+{% endraw %}

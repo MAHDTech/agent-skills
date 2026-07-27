@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -119,3 +120,4 @@ You can decode the ID token using any JWT decoder (e.g.
 - [Step 3: Run the Flow](#step-3-run-the-flow)
 - [Step 4: Inspect your tokens](#step-4-inspect-your-tokens)
 
+{% endraw %}

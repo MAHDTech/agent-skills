@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -80,3 +81,4 @@ This will produce the sort tags for the page:
 > Pages that omit a `data-pagefind-sort` tag for a given sorting key will be omitted from search results if that sort is applied. i.e. if a site has four pages, and three are tagged `data-pagefind-sort="date"`, sorting your search results by `date` will return three total results.
 
 > Sort orders are precomputed while indexing the site. Due to this, if you are using the [Multisite feature](https://pagefind.app/docs/multisite/) sorting will not be fully correct. Searching across multiple indexes with a sort applied will first sort each index, and then zip them together, providing interlaced results from each index.
+{% endraw %}

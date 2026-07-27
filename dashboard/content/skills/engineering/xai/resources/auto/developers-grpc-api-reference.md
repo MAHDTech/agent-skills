@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 # gRPC API Reference
 
 The xAI gRPC API is a robust, high-performance gRPC interface designed for seamless integration into existing systems.
@@ -29,3 +30,4 @@ cd xai-proto
 All `buf curl` examples below assume you run from inside the cloned `xai-proto` directory.
 
 ***
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1474,3 +1475,4 @@ during development.
   API](#example-calling-an-external-ai-api)
   - [Calling from a client](#calling-from-a-client)
 
+{% endraw %}

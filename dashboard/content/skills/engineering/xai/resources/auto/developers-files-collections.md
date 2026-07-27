@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files & Collections
 
 # Collections
@@ -179,3 +180,4 @@ The following would be a non-exhaustive list for the MIME types that we support:
 * text/xml
 * text/xml-dtd
 * text/yaml
+{% endraw %}

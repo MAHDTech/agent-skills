@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -927,3 +928,4 @@ Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt
 - [Common CLI Commands](#common-cli-commands)
 - [Common Types](#common-types)
 
+{% endraw %}

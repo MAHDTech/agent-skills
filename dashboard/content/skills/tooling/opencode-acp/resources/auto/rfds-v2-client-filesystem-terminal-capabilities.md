@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -68,7 +69,7 @@ Remove the v1 Client-owned terminal tool-call content semantics as well. Without
 
 As this was always opt-in anyway, it should require minimal changes on the agent side, as they just no longer have to check these capabilities.
 
-This does not remove `clientCapabilities.auth.terminal`. That field belongs to the authentication methods proposal and only indicates whether a Client can run an Agent's terminal authentication flow for the user.
+This does not remove `capabilities.auth.terminal`. That field belongs to the authentication methods proposal and only indicates whether a Client can run an Agent's terminal authentication flow for the user.
 
 ## Shiny future
 
@@ -98,7 +99,7 @@ We will look at exploring configuration for Agent sandboxing and filesystem acce
 
 ### Does this remove terminal authentication?
 
-No. Terminal authentication is represented by `clientCapabilities.auth.terminal`, not by the top-level `clientCapabilities.terminal` execution capability. This RFD only removes the top-level terminal execution capability.
+No. Terminal authentication is represented by v2 `capabilities.auth.terminal`, not by the v1 top-level `clientCapabilities.terminal` execution capability. This RFD only removes the top-level terminal execution capability.
 
 ### Does this remove terminal display?
 
@@ -108,3 +109,4 @@ No. It removes Client execution and control. The [Terminal Output](@/skills/tool
 
 * 2026-07-14: Linked the Agent-owned Terminal Output replacement and clarified the incompatible ownership models.
 * 2026-06-02: Initial draft
+{% endraw %}

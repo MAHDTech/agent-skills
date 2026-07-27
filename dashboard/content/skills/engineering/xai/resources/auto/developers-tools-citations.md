@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Citations
@@ -476,3 +477,4 @@ for citation in response.inline_citations:
         url = citation.x_citation.url
     print(f"  [{citation.id}] {url}")
 ```
+{% endraw %}

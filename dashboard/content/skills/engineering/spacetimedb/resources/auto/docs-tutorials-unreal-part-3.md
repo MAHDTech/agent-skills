@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -2731,3 +2732,4 @@ objects.
 - [Trying It Out](#trying-it-out)
 - [Next Steps](#next-steps)
 
+{% endraw %}

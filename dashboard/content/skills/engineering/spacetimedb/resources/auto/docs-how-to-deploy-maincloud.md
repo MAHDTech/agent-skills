@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -215,3 +216,4 @@ This action cannot be undone.
 - [Deleting a Database](#deleting-a-database)
 - [Next Steps](#next-steps)
 
+{% endraw %}

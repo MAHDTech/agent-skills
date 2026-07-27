@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 # grok-imagine-video
 
 ## At a glance
@@ -26,4 +27,5 @@ skill_name = "xai"
 
 ## Regions
 
-Available in: us-east-1, us-west-2
+Available in: us-east-1, us-west-2, us-saltlake-2
+{% endraw %}

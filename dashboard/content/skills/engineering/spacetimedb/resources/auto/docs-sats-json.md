@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -242,3 +243,4 @@ endpoint](https://spacetimedb.com/docs/http/database#get-v1databasename_or_ident
   - [`BuiltinType`](#builtintype)
   - [`AlgebraicTypeRef`](#algebraictyperef)
 
+{% endraw %}

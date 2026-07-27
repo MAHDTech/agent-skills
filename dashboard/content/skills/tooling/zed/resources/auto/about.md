@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # Our Vision
 
 We’re Zed Industries, a small and passionate team with a vision for
@@ -98,3 +99,4 @@ View Site
 
 View Site
 
+{% endraw %}

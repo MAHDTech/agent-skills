@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files API
 
 # Upload
@@ -94,3 +95,4 @@ API endpoint for POST requests to /v1/files:uploadChunks.
 Method: POST
 Path: /v1/files:uploadChunks
 ```
+{% endraw %}

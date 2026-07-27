@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files & Collections
 
 # Files
@@ -182,3 +183,4 @@ Combine files with the [code execution tool](https://docs.x.ai/developers/model-
   * And many other text-based formats
 
 ## Next Steps
+{% endraw %}

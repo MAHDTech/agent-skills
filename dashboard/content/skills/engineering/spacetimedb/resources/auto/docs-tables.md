@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -640,3 +641,4 @@ See [Schedule Tables](https://spacetimedb.com/docs/tables/schedule-tables) for d
 - [Schedule Tables](#schedule-tables)
 - [Next Steps](#next-steps)
 
+{% endraw %}

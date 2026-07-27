@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### FAQ
 
 # FAQ - Grok Website / Apps
@@ -350,3 +351,4 @@ Use the **Report an issue** feature in the product (or reply to your receipt ema
 ### I have issues using X, can I reach out to xAI for help?
 
 While xAI provides the Grok in X service on X.com and X apps, it does not have operational oversight of X's service. You can contact X via their [Help Center](https://help.x.com/) or message [@premium on X](https://x.com/premium).
+{% endraw %}

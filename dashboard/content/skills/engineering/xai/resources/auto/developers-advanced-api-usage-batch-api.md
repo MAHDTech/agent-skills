@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # Batch API
@@ -995,3 +996,4 @@ Both [server-side tools](https://docs.x.ai/developers/tools/overview) and client
 * [gRPC Reference: Batch management](https://docs.x.ai/developers/grpc-api-reference#batch-management)
 * [Pricing — Batch API Pricing](https://docs.x.ai/developers/pricing#batch-api-pricing)
 * [xAI Python SDK](https://github.com/xai-org/xai-sdk-python)
+{% endraw %}

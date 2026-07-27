@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files & Collections
 
 # Managing Files
@@ -769,3 +770,4 @@ Supported file types include:
 * And many other text-based formats
 
 ## Next Steps
+{% endraw %}

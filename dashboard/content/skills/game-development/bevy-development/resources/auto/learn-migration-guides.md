@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "bevy-development"
 +++
 
+{% raw %}
 - [x] 
 
 ![Image 1: Three horizontal lines stacked on top of eachother](https://bevy.org/assets/icon-hamburger.svg) 
@@ -78,3 +79,4 @@ Bevy is still in the "experimentation phase", which means each release has its f
 [Improve this page](https://github.com/bevyengine/bevy-website/edit/main/content/learn/migration-guides/introduction.md)[Report issue](https://github.com/bevyengine/bevy-website/issues/new?template=docs.md&title=Issue%20on%20page%20Introduction)
 
 [![Image 7: GitHub logo](https://bevy.org/assets/github-mark-white.svg)](https://github.com/bevyengine/bevy "GitHub")[![Image 8: Discord logo](https://bevy.org/assets/discord.svg)](https://discord.gg/bevy "Discord")[![Image 9: Bluesky logo](https://bevy.org/assets/bluesky.svg)](https://bsky.app/profile/bevy.org "Bluesky")[![Image 10: Mastodon logo](https://bevy.org/assets/mastodon-logo-purple.svg)](https://mastodon.social/@bevy "Mastodon")[![Image 11: Reddit logo](https://bevy.org/assets/reddit.svg)](https://www.reddit.com/r/bevy/ "Reddit")[![Image 12: itch.io logo](https://bevy.org/assets/itchio-textless.svg)](https://itch.io/games/tag-bevy "itch.io")[![Image 13: Bevy news feed](https://bevy.org/assets/feed.svg)](https://bevy.org/atom.xml "Bevy news feed")
+{% endraw %}

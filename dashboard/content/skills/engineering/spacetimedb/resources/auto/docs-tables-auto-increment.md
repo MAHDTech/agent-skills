@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -401,3 +402,4 @@ attempt to populate the column automatically.
   - [Concurrency and Gaps](#concurrency-and-gaps)
 - [Combining with Other Attributes](#combining-with-other-attributes)
 
+{% endraw %}

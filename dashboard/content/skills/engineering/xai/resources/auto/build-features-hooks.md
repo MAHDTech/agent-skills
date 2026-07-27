@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Features
 
 # Hooks
@@ -59,3 +60,4 @@ A `PreToolUse` hook decides by writing JSON to stdout:
 ```
 
 Exit code 0 allows, exit code 2 denies. Everything else — timeouts, crashes, malformed output — is fail-open: the failure is recorded in the session but the tool call proceeds. Only an explicit `deny` blocks. For passive events, stdout is ignored; exit 0 on success.
+{% endraw %}

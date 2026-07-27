@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -22,3 +23,4 @@ The Session Info Update RFD has moved to Completed and the session\_info\_update
 This lets agents push session metadata updates to clients in real time, including generated titles and related metadata, so session lists can stay current without polling.
 
 The stable protocol behavior is documented in [Session List](https://agentclientprotocol.com/protocol/v1/session-list#updating-session-metadata), and the design history remains in the [Session Info Update RFD](https://agentclientprotocol.com/rfds/session-info-update).
+{% endraw %}

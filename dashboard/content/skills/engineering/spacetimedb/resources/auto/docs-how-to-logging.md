@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -305,3 +306,4 @@ SPACETIMEDB_REDUCER(transfer_credits, ReducerContext ctx, uint64_t to_user, uint
   - [Structured Logging](#structured-logging)
 - [Next Steps](#next-steps)
 
+{% endraw %}

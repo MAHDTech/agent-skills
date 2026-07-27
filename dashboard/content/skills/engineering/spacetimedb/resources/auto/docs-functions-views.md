@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1523,3 +1524,4 @@ triggered the refresh.
   - [Primary Keys for Views](#primary-keys-for-views)
 - [Next Steps](#next-steps)
 
+{% endraw %}

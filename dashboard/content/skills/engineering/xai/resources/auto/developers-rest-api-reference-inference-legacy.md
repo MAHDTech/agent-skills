@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Legacy & Deprecated
@@ -329,3 +330,4 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
   "model": "grok-3"
 }
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Models
@@ -553,3 +554,4 @@ Get full information about a video generation model with its model\_id.
   "aliases": []
 }
 ```
+{% endraw %}

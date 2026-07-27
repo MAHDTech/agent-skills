@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # devenv.nix
 
 ## packages
@@ -10889,7 +10890,7 @@ Which Erlang package to use.
 *Default:*
 
 ```
-pkgs.erlang
+pkgs.beamPackages.erlang
 ```
 
 *Declared by:*
@@ -33866,3 +33867,4 @@ A list of removed environment variables to make the shell/direnv more lean.
 *Declared by:*
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/top-level.nix>
+{% endraw %}

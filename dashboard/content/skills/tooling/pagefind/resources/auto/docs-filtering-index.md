@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 \> \*\*Important: Pagefind 1.5.0 introduces the Component UI, which
 replaces the \> Default UI (pagefind-ui.js / PagefindUI). It includes a
 search modal, better \> accessibility and customization.\*\* Full
@@ -61,3 +62,4 @@ attribute will still apply if set on or within a
 \`data-pagefind-ignore\` element. \> The keys \`any\`, \`all\`,
 \`none\`, and \`not\` are reserved and can't be used as filter keys.
 
+{% endraw %}

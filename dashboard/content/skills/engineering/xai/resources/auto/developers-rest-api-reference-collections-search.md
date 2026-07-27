@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Collections API
 
 # Search in Collections
@@ -103,3 +104,4 @@ Search for content related to the query within the given collections.
   ]
 }
 ```
+{% endraw %}

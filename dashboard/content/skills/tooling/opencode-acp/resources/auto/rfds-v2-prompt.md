@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -235,3 +236,4 @@ Given that the agent is ultimately the owner of the session history, it makes se
 
 2026-04-13: Initial draft
 2026-04-22: Move from bidirectional notification approach to a change in the prompt request lifecycle
+{% endraw %}

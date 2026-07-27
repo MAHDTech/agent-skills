@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -373,3 +374,4 @@ different purposes:
 - [Unique Columns](#unique-columns)
 - [Primary Keys vs Unique Columns](#primary-keys-vs-unique-columns)
 
+{% endraw %}

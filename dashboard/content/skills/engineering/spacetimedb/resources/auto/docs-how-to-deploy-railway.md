@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -103,3 +104,4 @@ current client connection patterns across supported SDKs.
 - [Step 4: Connect clients](#step-4-connect-clients)
 - [Notes](#notes)
 
+{% endraw %}

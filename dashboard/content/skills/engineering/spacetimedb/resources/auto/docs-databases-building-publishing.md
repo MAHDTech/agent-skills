@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -137,3 +138,4 @@ After publishing:
   - [Publishing Options](#publishing-options)
 - [Next Steps](#next-steps)
 
+{% endraw %}

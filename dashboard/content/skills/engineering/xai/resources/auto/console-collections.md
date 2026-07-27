@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Guides
 
 # Using Collections in Console
@@ -38,3 +39,4 @@ Once the upload has completed, each document is given a File ID. You can view th
 ## Deleting documents and collections
 
 You can delete `documents` and `collections` by clicking on the more button on the right side of the collections or documents table.
+{% endraw %}

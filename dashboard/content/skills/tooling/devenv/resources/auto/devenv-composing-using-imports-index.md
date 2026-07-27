@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Composing using imports
 
 You can compose environments either locally or by referencing [inputs](https://devenv.sh/inputs/index.md).
@@ -37,4 +38,26 @@ Added in 1.10
 
 Composing `devenv.yaml` files is now supported for local files (relative and absolute paths). Remote inputs are not yet supported for `devenv.yaml` imports.
 
+## Sharing configuration from another repository
+
+To keep your devenv configuration in a separate repository, for example when working on a team that doesn't use devenv, declare it as a `path:` input and import it:
+
+devenv.yaml
+
+```
+inputs:
+  shared-config:
+    url: path:../shared-config/
+    flake: false
+imports:
+- shared-config
+```
+
+The sibling `shared-config` repository only needs a `devenv.nix` file. Combine this with [profiles](https://devenv.sh/profiles/index.md) to define one shared configuration that adapts to each project.
+
+New in version 2.2
+
+Changes to files in local `path:` inputs are picked up automatically. Previously the evaluation cache held on to the old configuration until `.devenv` was deleted.
+
 See [devenv.yaml reference](https://devenv.sh/reference/yaml-options/#imports) for all supported import options.
+{% endraw %}

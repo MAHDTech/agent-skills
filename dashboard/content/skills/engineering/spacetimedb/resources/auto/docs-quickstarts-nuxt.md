@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB Nuxt app running in under 5 minutes.
@@ -245,3 +246,4 @@ const displayPeople = computed(() => {
 - Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
   detailed API docs
 
+{% endraw %}

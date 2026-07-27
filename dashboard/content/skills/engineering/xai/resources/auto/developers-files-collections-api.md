@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files & Collections
 
 # Using Collections via API
@@ -374,3 +375,4 @@ curl https://management-api.x.ai/v1/collections/collection_dbc087b1-6c99-493d-86
 ```
 
 ## Next Steps
+{% endraw %}

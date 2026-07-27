@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files & Collections
 
 # Metadata Fields
@@ -164,3 +165,4 @@ category="finance" AND (year=2023 OR year=2024) AND status!="archived"
 | Either condition | `status="pending" OR status="draft"` |
 | Grouped logic | `(status="active" OR status="pending") AND year>=2020` |
 | Complex filter | `category="finance" AND year>=2020 AND status!="archived"` |
+{% endraw %}

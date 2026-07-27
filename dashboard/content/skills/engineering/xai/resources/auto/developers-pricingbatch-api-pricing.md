@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Pricing
@@ -164,3 +165,4 @@ Your model access might vary depending on various factors such as geographical l
 For how the **bills are charged**, visit [Manage Billing](https://docs.x.ai/console/billing) for more information.
 
 For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models) on xAI Console.
+{% endraw %}

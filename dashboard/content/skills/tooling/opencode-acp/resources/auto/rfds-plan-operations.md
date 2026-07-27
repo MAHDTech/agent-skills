@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -166,3 +167,4 @@ A generic "agent shares markdown document" API would be simpler and more reusabl
 ## Revision history
 
 2026-04-02: Initial draft
+{% endraw %}

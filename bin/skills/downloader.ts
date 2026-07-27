@@ -325,7 +325,7 @@ export function smartSlugify(urlStr: string, commonPrefix?: string): string {
     pathStr = pathStr.replace(/^\/+|\/+$/g, "")
 
     if (!pathStr) {
-        return "index.md"
+        return "overview-index.md"
     }
 
     // Determine extension
@@ -348,8 +348,8 @@ export function smartSlugify(urlStr: string, commonPrefix?: string): string {
     let slug = pathStr.replace(/\//g, "-")
     slug = slug.replace(/[^a-zA-Z0-9.\-_]/g, "")
 
-    if (!slug) {
-        slug = "index"
+    if (!slug || slug.toLowerCase() === "index") {
+        slug = "overview-index"
     }
 
     return `${slug}${ext}`

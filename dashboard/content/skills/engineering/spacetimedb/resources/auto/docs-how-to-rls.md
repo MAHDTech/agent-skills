@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -350,3 +351,4 @@ that rule is defined.
 - [Usage in Subscriptions](#usage-in-subscriptions)
 - [Best Practices](#best-practices)
 
+{% endraw %}

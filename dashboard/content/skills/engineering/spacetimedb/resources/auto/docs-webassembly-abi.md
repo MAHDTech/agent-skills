@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -540,3 +541,4 @@ uint16_t _iter_start_filtered(
 - [Querying tables](#querying-tables)
 - [Appendix, `bindings.h`](#appendix-bindingsh)
 
+{% endraw %}

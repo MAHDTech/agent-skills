@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Management API
 
 # Billing Management
@@ -1057,3 +1058,4 @@ Get historical usage of the API over a time period, aggregated by fields.
   "limitReached": false
 }
 ```
+{% endraw %}

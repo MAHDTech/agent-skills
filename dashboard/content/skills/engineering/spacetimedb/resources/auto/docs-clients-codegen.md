@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -395,3 +396,4 @@ not automatically updated when the module changes.
   - [Missing module directory](#missing-module-directory)
   - [Outdated bindings](#outdated-bindings)
 
+{% endraw %}
