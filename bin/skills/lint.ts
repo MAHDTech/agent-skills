@@ -178,6 +178,24 @@ export async function lint() {
             errors++
         }
 
+        const relativeLinkRegex =
+            /\]\((?!https?:\/\/|@\/|#|mailto:|\/)([^)#\s]+)\)/g
+        let matchLink: RegExpExecArray | null
+        while ((matchLink = relativeLinkRegex.exec(cleanContent)) !== null) {
+            const relTarget = matchLink[1]!
+            const skillDirAbs = path.join(
+                AGENT_SKILLS_HOME,
+                path.dirname(skill.path)
+            )
+            const targetAbs = path.resolve(skillDirAbs, relTarget)
+            if (!fs.existsSync(targetAbs)) {
+                log.error(
+                    `❌ ${file}: relative link '${relTarget}' points to non-existent file on disk.`
+                )
+                errors++
+            }
+        }
+
         const resourcesDirAbs = path.join(
             AGENT_SKILLS_HOME,
             path.dirname(skill.path),
