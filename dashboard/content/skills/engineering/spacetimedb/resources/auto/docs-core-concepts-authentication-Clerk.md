@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -297,3 +298,4 @@ corresponding issuer and signing keys.
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
 
+{% endraw %}

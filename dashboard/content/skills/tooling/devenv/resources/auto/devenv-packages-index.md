@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Packages
 
 Packages allow you to add executables and libraries/headers to your environment.
@@ -84,3 +85,4 @@ $ nix run github:nix-community/nix-index-database libquadmath.so
 (zecwallet-lite.out)                                  0 s /nix/store/rllm8zagppnjf4kh14drwwg93gsxwaja-zecwallet-lite-1.8.8-fhs/usr/lib/libquadmath.so.0.0.0
 ...
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -142,3 +143,4 @@ client.
     Manager](#add-the-spacetimedb-network-manager)
   - [Create the Server Module](#create-the-server-module)
 
+{% endraw %}

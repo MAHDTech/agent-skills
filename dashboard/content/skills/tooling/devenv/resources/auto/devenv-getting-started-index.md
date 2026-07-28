@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 ## Installation
 
 ### 1. Install [Nix](https://nixos.org)
@@ -171,3 +172,4 @@ Add a badge to your project's README to show it's built with devenv:
 ```
 [![Built with devenv](https://devenv.sh/assets/devenv-badge.svg)](https://devenv.sh)
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -141,3 +142,4 @@ client.
   - [Create a new Scene](#create-a-new-scene)
   - [Create the Server Module](#create-the-server-module)
 
+{% endraw %}

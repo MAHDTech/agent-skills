@@ -7,13 +7,12 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Get Started
 
 # Grok 4.5
 
 Grok 4.5 is SpaceXAI's frontier model built for coding, agentic tasks, and knowledge work. It was trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.
-
-> Grok 4.5 isn't available in the API console for EU users yet. Availability is expected later this month.
 
 ## Using the API
 
@@ -115,3 +114,4 @@ For benchmark results and cost-versus-score comparisons, see the [announcement](
 * [Announcement](https://x.ai/news/grok-4-5) - launch post with demos and full benchmark figures
 * [Models](https://docs.x.ai/developers/models) - compare available models and their capabilities
 * [Pricing](https://docs.x.ai/developers/pricing) - token pricing for all models
+{% endraw %}

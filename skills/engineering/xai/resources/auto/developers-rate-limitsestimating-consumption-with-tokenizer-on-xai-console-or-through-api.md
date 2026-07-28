@@ -39,10 +39,10 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image | 5 | — |
 | grok-imagine-image-quality | 5 | — |
-| grok-imagine-video | 10 | — |
+| grok-imagine-image | 5 | — |
 | grok-imagine-video-1.5 | 10 | — |
+| grok-imagine-video | 10 | — |
 
 ### What counts toward TPM
 

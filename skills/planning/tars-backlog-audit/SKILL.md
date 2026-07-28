@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-audit
 description: Audit the codebase for bugs, features, security issues, or technical debt, and generate structured issue files in `.tars/issues/todo/`. Reach for this when requested to perform a codebase audit, search for bugs and tasks, or populate the backlog.
+disable-model-invocation: true
 ---
 
 # Backlog Audit

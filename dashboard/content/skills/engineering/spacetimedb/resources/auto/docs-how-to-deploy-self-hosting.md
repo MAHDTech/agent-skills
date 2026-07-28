@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -340,3 +341,4 @@ sudo journalctl -u nginx --no-pager | tail -20
     Issues](#lets-encrypt-certificate-renewal-issues)
   - [Nginx Fails to Start](#nginx-fails-to-start)
 
+{% endraw %}

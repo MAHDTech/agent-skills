@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -182,3 +183,4 @@ the latest migration features and capabilities.
 - [Client Compatibility](#client-compatibility)
 - [Future Improvements](#future-improvements)
 
+{% endraw %}

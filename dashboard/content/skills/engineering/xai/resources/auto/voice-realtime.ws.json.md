@@ -7,8 +7,9 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 {
-  "title": "Realtime Voice Agent",
+  "title": "Realtime Speech to Speech",
   "endpoint": "wss://api.x.ai/v1/realtime",
   "description": "Real-time voice conversations with Grok models via WebSocket. The connection begins with an HTTP GET that is upgraded to WebSocket (status 101). Once connected, the client and server exchange JSON messages to configure the session, stream audio, and receive responses. For SIP calls, connect with the `call_id` from a `realtime.call.incoming` webhook.",
   "authentication": {
@@ -41,7 +42,7 @@ skill_name = "xai"
       "type": "string",
       "required": false,
       "default": "grok-voice-latest",
-      "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0", "grok-voice-fast-1.0"],
+      "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0"],
       "description": "Model to use for the session. Ignored when `call_id` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions."
     },
     {
@@ -71,7 +72,7 @@ skill_name = "xai"
             "properties": {
               "model": {
                 "type": "string",
-                "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0", "grok-voice-fast-1.0"],
+                "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0"],
                 "description": "Model to use for the session. Defaults to `grok-voice-latest`. Can also be set at connection time via the `model` query parameter."
               },
               "instructions": {
@@ -2720,3 +2721,4 @@ skill_name = "xai"
     }
   ]
 }
+{% endraw %}

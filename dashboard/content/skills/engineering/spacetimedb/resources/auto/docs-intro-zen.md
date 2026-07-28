@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -176,3 +177,4 @@ This is the Zen of SpacetimeDB: a simpler way to build and live.
 - [Everything is Programmable](#everything-is-programmable)
 - [The Result](#the-result)
 
+{% endraw %}

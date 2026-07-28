@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Processes
 
 Devenv provides built-in process management with supervision, socket activation, file watching, and dependency management.
@@ -415,3 +416,4 @@ devenv.nix
   process.manager.implementation = "process-compose";
 }
 ```
+{% endraw %}

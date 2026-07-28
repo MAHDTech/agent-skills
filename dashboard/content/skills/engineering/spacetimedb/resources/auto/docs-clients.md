@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -169,3 +170,4 @@ New to SpacetimeDB client development? Follow this progression:
 - [Learning Path](#learning-path)
 - [Next Steps](#next-steps)
 
+{% endraw %}

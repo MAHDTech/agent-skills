@@ -6,7 +6,7 @@ Remote MCP Tools allow Grok to connect to external MCP (Model Context Protocol) 
 
 ## SDK Support
 
-Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent#remote-mcp-tools).
+Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#remote-mcp-tools).
 
 > [!NOTE]
 >

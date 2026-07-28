@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Settings
 
 # Reference
@@ -190,7 +191,7 @@ deny = ["/data/shared-secrets", "**/.env", "**/*.pem"]
 | `read_write` | path list | Additional read-write paths. |
 | `deny` | path or **glob** list | Kernel-enforced deny for read and write/rename. An entry is a glob if it contains `*`, `?`, or `[` (for example `**/.env`, `**/*.pem`). |
 
-A non-empty `deny` list is enforced at the kernel level when the sandbox can be applied. On Linux, read-deny requires `bubblewrap`. For managed deployments and policy, see [Enterprise Deployment](https://docs.x.ai/build/enterprise).
+A non-empty `deny` list is enforced at the kernel level when the sandbox can be applied. On Linux, read-deny requires `bubblewrap`. Operator guide: [Sandbox](https://docs.x.ai/build/features/sandbox). Managed pins: [Enterprise Deployments](https://docs.x.ai/build/enterprise#sandbox).
 
 ### `[session]`, `[cli]`, and `[hints]`
 
@@ -234,3 +235,4 @@ Project-scoped and user-scoped. Evaluation order: **deny > ask > allow**.
 | `disabled` | `[skills]` / `[plugins]` | name lists | Discover but do not activate. |
 | `enabled` | `[plugins]` | name lists | Explicitly enable plugins (project plugins may default off). |
 | `skills` / `rules` / `agents` / `mcps` / `hooks` | `[compat.cursor]` / `[compat.claude]` | `true` / `false` (default `true`) | Scan Cursor or Claude harness directories. |
+{% endraw %}

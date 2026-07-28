@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1076,3 +1077,4 @@ chat with us!
 - [Connecting to Maincloud](#connecting-to-maincloud)
 - [Conclusion](#conclusion)
 
+{% endraw %}

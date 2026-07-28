@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "domain-modeling"
 +++
 
+{% raw %}
 # CONTEXT.md Format
 
 ## Structure
@@ -68,3 +69,4 @@ The skill infers which structure applies:
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
 
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -151,3 +152,4 @@ an inconsistent intermediate state.
   - [Pending Callbacks and Cache
     Consistency](#pending-callbacks-and-cache-consistency)
 
+{% endraw %}

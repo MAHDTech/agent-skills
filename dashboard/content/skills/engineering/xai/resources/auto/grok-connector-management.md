@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Grok Business / Enterprise
 
 # Connector Management
@@ -62,3 +63,4 @@ If you lack permissions, contact your team admin to provision the connectors you
 >
 > &#x20;For white-glove support, Enterprise upgrades, or connector setup
 > assistance, contact xAI sales at .
+{% endraw %}

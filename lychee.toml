@@ -7,11 +7,13 @@ accept = ["200..=299", "403", "406", "429"]
 exclude_loopback = true
 
 # Paths lychee should not check at all:
-#   - opencode-acp/**  : vendored third-party docs (agentclientprotocol.com)
-#   - dashboard/**     : Zola site; links resolve at build time, not as local files
-#   - .out-of-scope/** : example/placeholder content
+#   - opencode-acp/**      : vendored third-party docs (agentclientprotocol.com)
+#   - dashboard/**         : Zola site; links resolve at build time, not as local files
+#   - .out-of-scope/**     : example/placeholder content
+#   - skills/**/resources/auto : vendored downloaded 3rd party documentation
 exclude_path = [
   "skills/tooling/opencode-acp",
+  "skills/.*/resources/auto",
   "dashboard",
   ".out-of-scope",
   "bin/skills/lib.test.ts",

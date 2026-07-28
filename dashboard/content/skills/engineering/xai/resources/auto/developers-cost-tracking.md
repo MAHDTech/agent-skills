@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Cost Tracking
@@ -357,3 +358,4 @@ print(f"Image cost: ${cost_ticks / 1e10:.4f}")
 ## Batch API
 
 Batch results include per-request costs. You can sum them to get the total batch cost, or read the `cost_breakdown` on the batch object itself. See [Batch API](https://docs.x.ai/developers/advanced-api-usage/batch-api) for details.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Image-to-Video
@@ -30,3 +31,4 @@ In the Vercel AI SDK, the `prompt` parameter accepts an object with `image` and 
 * [Video Editing](https://docs.x.ai/developers/model-capabilities/video/editing) — Edit existing videos
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
+{% endraw %}

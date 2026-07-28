@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-review
 description: Review the code implementation of a backlog ticket on a subagent branch, assessing compliance with spec/acceptance criteria and repo standards before merge. Reach for this during the implementation phase of the backlog loop.
+disable-model-invocation: true
 ---
 
 # Backlog Review

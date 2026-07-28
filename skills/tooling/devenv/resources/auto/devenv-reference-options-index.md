@@ -10880,7 +10880,7 @@ Which Erlang package to use.
 *Default:*
 
 ```
-pkgs.erlang
+pkgs.beamPackages.erlang
 ```
 
 *Declared by:*

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -198,3 +199,4 @@ login page for authentication.
   - [4. Implement Authentication Logic in Your
     App](#4-implement-authentication-logic-in-your-app)
 
+{% endraw %}

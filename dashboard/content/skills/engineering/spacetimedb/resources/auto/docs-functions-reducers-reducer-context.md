@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -443,3 +444,4 @@ all nodes.
 - [Module Identity](#module-identity)
 - [Context Properties Reference](#context-properties-reference)
 
+{% endraw %}

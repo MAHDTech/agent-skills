@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -280,3 +281,4 @@ After creating your database module:
     `spacetime init`](#create-a-new-project-with-spacetime-init)
 - [Next Steps](#next-steps)
 
+{% endraw %}

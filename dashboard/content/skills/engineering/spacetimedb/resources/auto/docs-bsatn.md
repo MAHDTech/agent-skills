@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -160,3 +161,4 @@ BSATN and *not JSON*.
   - [Primitives](#primitives)
 - [Types](#types)
 
+{% endraw %}

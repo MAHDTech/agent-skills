@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -205,3 +206,4 @@ While no one would set a value of type boolean that doesn't support it, there is
 * 2026-06-22: Added the v1 `session.configOptions.boolean` client capability gate so boolean config options are only sent to Clients that explicitly opt in, and made v2-to-v1 compatibility conversion advertise the capability by default
 * 2026-03-05: Updated to reflect final implementation — `flag` renamed to `boolean`, value type changed from untagged `String | Bool` enum to internally-tagged enum with `type` discriminator and untagged `ValueId` fallback, feature-gated behind `unstable_boolean_config`
 * 2026-02-24: Initial proposal
+{% endraw %}

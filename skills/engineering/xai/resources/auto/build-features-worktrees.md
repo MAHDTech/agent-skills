@@ -2,7 +2,7 @@
 
 # Worktrees
 
-A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes.
+A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes. [Subagents](https://docs.x.ai/build/features/subagents) can also request worktree isolation when the parent delegates parallel work.
 
 ## Starting one
 

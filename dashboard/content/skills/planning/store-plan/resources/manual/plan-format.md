@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "store-plan"
 +++
 
+{% raw %}
 # Plan Document Format & Example
 
 Reference material for the store-plan skill: the section-by-section document structure, the formatting rules, and a full worked example. Follow this format when generating the plan.
@@ -243,3 +244,4 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 > 🔴 High risk · 🟡 Medium / open question · ⚪ Low / informational
 ```
 
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Grok Business / Enterprise
 
 # Grok.com User Guide
@@ -74,3 +75,4 @@ Once activated, your team workspace will become available on grok.com.
 > [!NOTE]
 >
 > &#x20;For white-glove support and Enterprise features, contact xAI sales at .
+{% endraw %}

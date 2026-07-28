@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -152,3 +153,4 @@ The [`session/list` RFD](https://agentclientprotocol.com/rfds/session-list#what-
 * **2026-06-02**: Moved to Preview
 * **2025-02-03**: Fixed capability example to use agent capability (initialize response)
 * **2025-01-24**: Initial draft
+{% endraw %}

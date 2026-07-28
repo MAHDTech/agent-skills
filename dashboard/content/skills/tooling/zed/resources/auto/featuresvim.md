@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # Features
 
 Created by the team that developed Atom, Electron, and Tree-sitter, Zed
@@ -513,3 +514,4 @@ itself.
 - [Zed's `vim.json` file](https://zed.dev/ref/vim.json)
 - [Devhints.io Vim cheatsheet](https://devhints.io/vim)
 
+{% endraw %}

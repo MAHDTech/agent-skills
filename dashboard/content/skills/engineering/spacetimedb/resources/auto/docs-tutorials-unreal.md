@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -86,3 +87,4 @@ server, check out our completed tutorial project!
   Multiplayer](#blackholio-tutorial---basic-multiplayer)
 - [Blackhol.io Tutorial - Advanced](#blackholio-tutorial---advanced)
 
+{% endraw %}

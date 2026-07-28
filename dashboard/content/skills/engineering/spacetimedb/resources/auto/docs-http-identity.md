@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -131,3 +132,4 @@ request, returns `401 Unauthorized`.
 - [`GET /v1/identity/:identity/databases`](#get-v1identityidentitydatabases)
 - [`GET /v1/identity/:identity/verify`](#get-v1identityidentityverify)
 
+{% endraw %}

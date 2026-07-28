@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # Deferred Chat Completions
@@ -213,3 +214,4 @@ The response body will be the same as what you would expect with non-deferred ch
 ```
 
 For more details, refer to [Chat completions](https://docs.x.ai/developers/rest-api-reference/inference/chat#chat-completions) and [Get deferred chat completions](https://docs.x.ai/developers/rest-api-reference/inference/chat#get-deferred-chat-completions) in our REST API Reference.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -78,3 +79,4 @@ sequenceDiagram
     Note over Client,Agent: 6. Agent completes prompt cancellation
     Agent->>Client: response to id=1 (stopReason: "cancelled")
 ```
+{% endraw %}

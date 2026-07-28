@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB Bun app running in under 5 minutes.
@@ -249,3 +250,4 @@ bun run start
 - Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
   detailed API docs
 
+{% endraw %}

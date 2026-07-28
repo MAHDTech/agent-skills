@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -46,3 +47,4 @@ You can read the full documentation for the `agent-client-protocol` crate on
 
 The `agent-client-protocol` crate powers the integration with external agents in
 the [Zed](https://zed.dev) editor.
+{% endraw %}

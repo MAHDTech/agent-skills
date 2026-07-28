@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Remote MCP Tools
@@ -15,7 +16,7 @@ Remote MCP Tools allow Grok to connect to external MCP (Model Context Protocol) 
 
 ## SDK Support
 
-Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent#remote-mcp-tools).
+Remote MCP tools are supported in the xAI native SDK, the OpenAI compatible Responses API, and the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#remote-mcp-tools).
 
 > [!NOTE]
 >
@@ -199,3 +200,4 @@ Each server can provide different capabilities - documentation tools, API integr
 * **Filter tools appropriately**: Use `allowed_tools` to restrict access to only necessary tools, especially when servers have many tools since the model must keep all available tool definitions in context
 * **Use secure connections**: Always use HTTPS URLs and implement proper authentication mechanisms on your MCP server
 * **Provide Examples**: While the model can generally figure out what tools to use based on the tool descriptions and the user request it may help to provide examples in the prompt
+{% endraw %}

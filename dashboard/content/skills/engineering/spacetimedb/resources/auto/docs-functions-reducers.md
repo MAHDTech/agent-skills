@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -682,3 +683,4 @@ options.
 - [Scheduling Procedures](#scheduling-procedures)
 - [Next Steps](#next-steps)
 
+{% endraw %}

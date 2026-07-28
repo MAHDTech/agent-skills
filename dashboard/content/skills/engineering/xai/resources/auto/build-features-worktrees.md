@@ -7,11 +7,12 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Features
 
 # Worktrees
 
-A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes.
+A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes. [Subagents](https://docs.x.ai/build/features/subagents) can also request worktree isolation when the parent delegates parallel work.
 
 ## Starting one
 
@@ -36,3 +37,4 @@ Worktrees persist until you remove them: ending or deleting a session leaves its
 | `grok worktree show <id>` | Show details for one worktree |
 | `grok worktree rm <ids...>` | Remove worktrees (`--dry-run` to preview) |
 | `grok worktree gc` | Remove entries whose directory is gone; `--max-age 7d` also expires idle worktrees not in use by a running process |
+{% endraw %}

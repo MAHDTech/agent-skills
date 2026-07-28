@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -28,3 +29,4 @@ This follows the existing pattern laid out in the [Model Context Protocol](https
 This is being introduced as an optional field for now for backwards compatibility. It is possible it will be made required in a future version of the protocol, like MCP, so that both sides can count on this information being available.
 
 For the user-facing protocol guide, see [Implementation Information](https://agentclientprotocol.com/protocol/v1/initialization#implementation-information).
+{% endraw %}

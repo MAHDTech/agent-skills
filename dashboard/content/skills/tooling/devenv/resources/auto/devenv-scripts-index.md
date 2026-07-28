@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 Most projects out there have a bunch of shell scripts lying around.
 
 Questions arise as to where to define scripts and how to provide the tooling to make sure they work for all developers.
@@ -168,3 +169,4 @@ Entering shell ...
 
 (devenv) $
 ```
+{% endraw %}

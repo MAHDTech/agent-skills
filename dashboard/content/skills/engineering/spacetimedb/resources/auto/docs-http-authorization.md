@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -59,3 +60,4 @@ endpoint to determine whether they are able to connect to SpacetimeDB.
 - [`Authorization` headers](#authorization-headers)
 - [`GET /v1/ping`](#get-v1ping)
 
+{% endraw %}

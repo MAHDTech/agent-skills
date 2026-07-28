@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Speech to Text
@@ -119,8 +120,11 @@ The request uses `multipart/form-data`. Either `file` or `url` must be provided.
 | `diarize` | boolean | `false` | | When `true`, enables speaker diarization. Each word in the response includes a `speaker` field (integer) identifying the detected speaker. |
 | `keyterm` | string | | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the field for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `filler_words` | boolean | `false` | | When `true`, filler words (e.g. "uh", "um", "er") are included in the transcript. When `false` (default), filler words are automatically removed from the transcript text and the `words` array. |
+| `vad_threshold` | number | `0.5` | | Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio segments scoring below the threshold are treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise. `0` disables the gate. |
 
 † Either `file` or `url` must be provided.
+
+Option fields should precede `file` in the multipart body — for streamable uploads, fields sent after `file` may be ignored.
 
 ### Example with text formatting
 
@@ -219,6 +223,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 | `keyterm` | string | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the parameter for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `smart_turn` | number | | End-of-turn detection threshold (0.0–1.0). When set, enables Smart Turn — an ML model predicts whether the speaker has finished their thought at each silence boundary. See [Smart Turn](#smart-turn). |
 | `smart_turn_timeout` | integer | | Maximum silence duration (ms) before forcing `speech_final`, even when the Smart Turn model predicts the speaker hasn't finished. Range: 1–5000. Only applies when `smart_turn` is enabled. See [Smart Turn](#smart-turn). |
+| `vad_threshold` | number | `0.08` | Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise. `0` disables the gate. Does not affect endpointing or `speech_final` timing. |
 
 ### Server Events
 
@@ -446,3 +451,4 @@ ws.on("message", (data) => {
 * [Text to Speech](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech) — Convert text to speech
 * [API Reference — Speech to text](https://docs.x.ai/developers/rest-api-reference/inference/voice#speech-to-text---rest) — Full REST endpoint specification
 * [API Reference — Streaming](https://docs.x.ai/developers/rest-api-reference/inference/voice#speech-to-text---streaming) — WebSocket streaming specification
+{% endraw %}

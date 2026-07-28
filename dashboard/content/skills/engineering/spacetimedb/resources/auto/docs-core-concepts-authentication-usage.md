@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -382,3 +383,4 @@ SpacetimeDB community for help.
 - [Accessing custom claims](#accessing-custom-claims)
 - [Summary and Best Practices](#summary-and-best-practices)
 
+{% endraw %}

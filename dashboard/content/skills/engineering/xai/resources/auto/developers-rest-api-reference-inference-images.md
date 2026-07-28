@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Images
@@ -300,3 +301,4 @@ print(json.dumps(response.json(), indent=2))
   ]
 }
 ```
+{% endraw %}

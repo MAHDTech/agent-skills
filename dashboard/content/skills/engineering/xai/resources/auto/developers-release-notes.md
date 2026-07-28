@@ -7,11 +7,20 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Release Notes
 
 # Release Notes
 
 ## July
+
+### Adjustable VAD threshold for Speech to Text
+
+Speech to Text now accepts a `vad_threshold` parameter (streaming query param and batch multipart field) to tune the voice-activity gate that skips non-speech audio. Lower values transcribe quieter or noisier speech — useful for narrowband telephony — and `0` disables the gate. See the [Speech to Text docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text).
+
+### Grok 4.5 available in the EU
+
+Grok 4.5 is now available in the API console for EU users. See the [Grok 4.5 overview](https://docs.x.ai/developers/grok-4-5).
 
 ### Grok 4.5
 
@@ -67,7 +76,7 @@ For more details, see the [Grok Build docs](https://docs.x.ai/build/overview).
 
 ### Custom Voices
 
-You can now clone a voice from a short audio clip and use it across the Text-to-Speech and Voice Agent APIs. Create and manage your voice catalog from the xAI console. For more details, check out the [Custom Voices docs](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) and our [blog post](https://x.ai/news/grok-custom-voices).
+You can now clone a voice from a short audio clip and use it across the Text-to-Speech and Speech to Speech APIs. Create and manage your voice catalog from the xAI console. For more details, check out the [Custom Voices docs](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) and our [blog post](https://x.ai/news/grok-custom-voices).
 
 ## April
 
@@ -81,7 +90,7 @@ You can now set an expiration policy on uploaded files using `expires_after` or 
 
 ### Grok Voice Think Fast 1.0 is available
 
-You can now use `grok-voice-think-fast-1.0` with the Voice Agent API. To get started, check out the [Voice Agent docs](https://docs.x.ai/developers/model-capabilities/audio/voice-agent). For more details, see our [blog post](https://x.ai/news/grok-voice-think-fast-1).
+You can now use `grok-voice-think-fast-1.0` with the Speech to Speech API. To get started, check out the [Speech to Speech docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech). For more details, see our [blog post](https://x.ai/news/grok-voice-think-fast-1).
 
 ### Speech to Text is available
 
@@ -117,9 +126,9 @@ You can now create batches by uploading a [JSONL file](https://docs.x.ai/develop
 
 ## December 2025
 
-### Grok Voice Agent API is released
+### Grok Speech to Speech API is released
 
-Grok Voice Agent API is generally available. Visit [Grok Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice) for guidance on using the API.
+Grok Speech to Speech API is generally available. Visit [Grok Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/voice) for guidance on using the API.
 
 ## November 2025
 
@@ -285,3 +294,4 @@ We are happy to announce the immediate availability of our API, which
 gives developers programmatic access to our Grok series of foundation models. To get started, head
 to [console.x.ai](https://console.x.ai/) and sign up to create an account. We are excited to see
 what developers build using Grok.
+{% endraw %}

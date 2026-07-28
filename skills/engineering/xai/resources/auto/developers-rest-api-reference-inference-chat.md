@@ -16,7 +16,7 @@ Create a chat response from text/image chat prompts. This is the endpoint for ma
 
 * `logprobs` (boolean | null) — Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message. Not supported by models \`grok-4.20\` and newer; the field will be silently ignored if set.
 
-* `max_completion_tokens` (integer | null) — An upper bound for the number of tokens that can be generated for a completion, only applies to visible output tokens (i.e. does not apply to tokens used for reasoning or function calls). Defaults to None, meaning the model will generate as many tokens as needed up until the model's maximum context length.
+* `max_completion_tokens` (integer | null) — An upper bound for the number of tokens that can be generated for a completion, only applies to visible output tokens (i.e. does not apply to tokens used for reasoning or function calls). Defaults to 128,000 when unset; set a larger value to allow longer generations.
 
 * `max_tokens` (integer | null) — \\\[DEPRECATED\\] The maximum number of tokens that can be generated in the chat completion. Deprecated in favor of \`max\_completion\_tokens\`.
 
@@ -245,7 +245,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
 * `logprobs` (boolean | null) — Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message. Not supported by models \`grok-4.20\` and newer; the field will be silently ignored if set.
 
-* `max_output_tokens` (integer | null) — Max number of tokens that can be generated in a response. This includes both output and reasoning tokens.
+* `max_output_tokens` (integer | null) — Max number of tokens that can be generated in a response. This includes both output and reasoning tokens. Defaults to 128,000 when unset; set a larger value to allow longer generations.
 
 * `max_turns` (integer | null) — Maximum number of agentic tool calling turns allowed for this request.
   If not set, defaults to the server's global cap.

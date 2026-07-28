@@ -4,7 +4,7 @@
 
 The xAI Voice APIs offer a range of powerful voice capabilities, all powered by Grok, with enterprise-grade reliability and sub-second latency.
 
-## Voice Agent API
+## Speech to Speech API
 
 Build real-time, speech-to-speech voice agents over WebSockets, with low-latency turn-taking and tool use. For client-side apps, use [Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens) to connect securely without exposing your API key.
 
@@ -260,11 +260,11 @@ const speech = await fetch("https://api.x.ai/v1/tts", {
 fs.writeFileSync("custom.mp3", Buffer.from(await speech.arrayBuffer()));
 ```
 
-The custom `voice_id` also works with the streaming TTS WebSocket and the Voice Agent realtime API. See the [Custom Voices guide](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) for the full API.
+The custom `voice_id` also works with the streaming TTS WebSocket and the Speech to Speech realtime API. See the [Custom Voices guide](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) for the full API.
 
 ## Voices
 
-When using the Voice Agent API or Text to Speech, you can choose from the full set of built-in voices. Each has its own personality and tone, so pick the one that best fits your application (`eve` is the default):
+When using the Speech to Speech API or Text to Speech, you can choose from the full set of built-in voices. Each has its own personality and tone, so pick the one that best fits your application (`eve` is the default):
 
 ### Enterprise Compliance & Security
 

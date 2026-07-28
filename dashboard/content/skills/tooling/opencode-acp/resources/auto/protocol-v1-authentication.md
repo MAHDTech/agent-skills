@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -152,3 +153,4 @@ After a successful `logout`, new sessions that require authentication will requi
 The protocol does not guarantee what happens to already-running sessions after `logout`. Agents may terminate them, keep them running, or return `auth_required` errors for future session activity.
 
 Clients **SHOULD** be prepared for active session operations to fail with authentication-related errors after logout and should prompt the user to authenticate again when appropriate.
+{% endraw %}

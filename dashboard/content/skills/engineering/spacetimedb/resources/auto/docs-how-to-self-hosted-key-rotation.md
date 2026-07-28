@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1465,3 +1466,4 @@ Checks:
   - [`403` path: ownership mismatch](#403-path-ownership-mismatch)
   - [General runtime checks](#general-runtime-checks)
 
+{% endraw %}

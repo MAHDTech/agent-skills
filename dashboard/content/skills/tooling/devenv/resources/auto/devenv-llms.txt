@@ -46,3 +46,4 @@ It allows developers to define project-specific development environments with su
 
 - [devenv.nix](https://devenv.sh/reference/options/index.md)
 - [devenv.yaml](https://devenv.sh/reference/yaml-options/index.md)
+- [Environment variables](https://devenv.sh/reference/environment-variables/index.md)

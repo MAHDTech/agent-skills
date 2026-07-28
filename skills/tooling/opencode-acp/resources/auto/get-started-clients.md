@@ -10,6 +10,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 
 ## Editors and IDEs
 
+* [Anycode](https://github.com/anycode-ade/anycode) — web-based IDE with Rust backend and React frontend
 * [Chrome ACP](https://github.com/Areo-Joe/chrome-acp) (Chrome extension / PWA)
 * Emacs via [agent-shell.el](https://github.com/xenodium/agent-shell)
 * [JetBrains](https://www.jetbrains.com/help/ai-assistant/acp.html)
@@ -27,6 +28,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Unity Agent Client](https://github.com/nuskey8/UnityAgentClient) (Unity editor)
 * Visual Studio Code
   * [ACP Client](https://github.com/formulahendry/vscode-acp) extension
+  * [ACP Patchbay](https://github.com/solutionsunity/acp-patchbay) extension
   * [ACP Pro Extension](https://marketplace.visualstudio.com/items?itemName=duclvz.acp-pro)
     * VS Code–compatible IDEs (Cursor, Windsurf, Trae,..): [ACP Pro Extension](https://open-vsx.org/extension/duclvz/acp-pro)
 * [Zed](https://zed.dev/docs/ai/external-agents)
@@ -48,6 +50,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [AionUi](https://github.com/iOfficeAI/AionUi)
 * [aizen](https://aizen.win)
 * [Braide](https://braide.dev) - Parallel sessions, worktrees, personas and interactive agent responses (supports macOS, Windows, Linux)
+* [Casper](https://github.com/joeyshi12/casper) - A web client for kiro-cli that talks to it over the Agent Client Protocol (ACP), giving you a browser-based chat UI with live streaming, session history, and rich per-tool-call rendering.
 * [Codeg](https://github.com/xintaofei/codeg) — collaborative multi-agent coding workbench that unifies ACP agents (Claude Code, Codex, Gemini CLI, OpenCode, and more) with session aggregation; desktop app, self-hosted server, or Docker (macOS, Windows, Linux, Web)
 * [DeepChat](https://github.com/ThinkInAIXYZ/deepchat)
 * [Devin Desktop](https://devin.ai/desktop)
@@ -123,3 +126,4 @@ These connectors bridge ACP into other environments and transport layers:
 * [ACP Remote](https://github.com/vcoderun/acpkit/tree/main/packages/transports/acpremote) - remote WebSocket transport for ACP agents and clients.
 * [OpenClaw](https://docs.openclaw.ai/cli/acp) — through the [`openclaw acp`](https://docs.openclaw.ai/cli/acp) bridge to an OpenClaw Gateway
 * [stdio Bus](https://stdiobus.com) – deterministic stdio-based kernel providing transport-level routing for ACP/MCP-style agent protocols.
+* [acpdbg](https://github.com/phimage/acpdbg) — bridges LLDB crashes (C/C++/Rust/Swift) to any ACP coding agent for root-cause analysis and live debugging

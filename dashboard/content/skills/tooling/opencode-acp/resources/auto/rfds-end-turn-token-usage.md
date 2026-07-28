@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -43,7 +44,7 @@ The session-level context and cost proposal no longer depends on resolving these
 
 > What are you proposing to improve the situation?
 
-The current strawman is to add an optional `usage` field to the turn-completion signal. In v1, that signal is `PromptResponse`. In v2, where `session/prompt` returns when the prompt is accepted, the same `usage` object is carried on the idle `state_update` session update that ends the turn.
+The current strawman is to add an optional `usage` field to the turn-completion signal. In v1, that signal is `PromptResponse`. In v2, where `session/prompt` returns when the prompt is accepted, the same `usage` object is carried on the idle `state_update` that ends foreground work.
 
 ```json theme={null}
 {
@@ -174,3 +175,4 @@ Context size and cost have a clear session-level contract. Token usage still nee
 ## Revision history
 
 * 2026-06-02: Split from the original combined session usage and context RFD for separate draft discussion.
+{% endraw %}

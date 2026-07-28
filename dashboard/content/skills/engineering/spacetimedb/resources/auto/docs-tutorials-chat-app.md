@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -3116,3 +3117,4 @@ Congratulations! You've built a chat app with SpacetimeDB.
 - [Creating the Client](#creating-the-client)
 - [What's next?](#whats-next)
 
+{% endraw %}

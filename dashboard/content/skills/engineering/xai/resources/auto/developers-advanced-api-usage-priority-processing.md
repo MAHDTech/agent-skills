@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # Priority Processing
@@ -120,3 +121,4 @@ The response includes `"service_tier": "priority"` when the request was served a
 * **Latency-sensitive paths first** — Priority Processing is most valuable for user-facing requests where response time directly affects experience. Background jobs, evaluations, and bulk processing are better served by the [Batch API](https://docs.x.ai/developers/advanced-api-usage/batch-api).
 * **Monitor the `service_tier` field** — Log the returned tier to track how often your requests are served at priority versus default and to correlate with your latency metrics.
 * **Combine with prompt caching** — Cached input tokens are discounted before the priority multiplier is applied, so [prompt caching](https://docs.x.ai/developers/advanced-api-usage/prompt-caching) and priority processing complement each other well.
+{% endraw %}

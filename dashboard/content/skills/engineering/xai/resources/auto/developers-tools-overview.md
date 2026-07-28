@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Overview
@@ -179,3 +180,4 @@ The API automatically returns source URLs for information gathered via tools. Se
 * **[Code Execution](https://docs.x.ai/developers/tools/code-execution)** - Execute Python code in a sandbox
 * **[Collections Search](https://docs.x.ai/developers/tools/collections-search)** - Query your uploaded documents
 * **[Citations](https://docs.x.ai/developers/tools/citations)** - Access source URLs and inline citations
+{% endraw %}

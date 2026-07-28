@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -368,3 +369,4 @@ client. Therefore:
 - [Client Disconnected](#client-disconnected)
 - [Scheduled Reducers](#scheduled-reducers)
 
+{% endraw %}

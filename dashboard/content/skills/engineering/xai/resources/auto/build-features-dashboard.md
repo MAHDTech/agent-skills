@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Features
 
 # Agent Dashboard
@@ -35,3 +36,4 @@ The input bar at the bottom dispatches prompts to new sessions. `Ctrl+L` changes
 | `Esc` | Close peek, then filter, then the dashboard |
 
 Grouping and pins persist under `[dashboard]` in `~/.grok/config.toml`. Set `enabled = false` there, or `GROK_AGENT_DASHBOARD=0`, to disable the feature.
+{% endraw %}

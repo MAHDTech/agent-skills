@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -845,3 +846,4 @@ whether the data needs to participate in real-time subscriptions.
   Originals](#hybrid-approach-thumbnails-and-originals)
 - [Choosing a Strategy](#choosing-a-strategy)
 
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -36,3 +37,4 @@ We don't enforce the use of one version over the other, meaning you can choose t
 <Frame>
   <img src="https://mintcdn.com/zed-685ed6d6/0gwpXYa47bQsPCSW/assets/acp-docs-logo-mark.webp?fit=max&auto=format&n=0gwpXYa47bQsPCSW&q=85&s=3ab81fb3792f3c613bcecafec5da05cf" alt="Agentic Client Protocol Logomark" width="3840" height="2160" data-path="assets/acp-docs-logo-mark.webp" />
 </Frame>
+{% endraw %}

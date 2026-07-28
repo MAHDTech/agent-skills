@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Code Execution Tool
@@ -360,3 +361,4 @@ Data: [['2024-01', 50000, 35000], ['2024-02', 55000, 38000], ...]
 * No access to external networks or file systems
 * Temporary execution context that doesn't persist between requests
 * All computations are stateless and secure
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -123,3 +124,4 @@ your module:
 - [Authenticate your services](#authenticate-your-services)
 - [Authorization in your module](#authorization-in-your-module)
 
+{% endraw %}

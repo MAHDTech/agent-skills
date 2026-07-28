@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 # Grok 4.5
 
 SpaceXAI's intelligent coding model for agentic software, engineering, and workflow tasks. Trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.
@@ -44,3 +45,4 @@ Requests whose prompt reaches 200k tokens are billed at the higher rate for all 
 ## Regions
 
 Available in: us-east-1, us-west-2
+{% endraw %}

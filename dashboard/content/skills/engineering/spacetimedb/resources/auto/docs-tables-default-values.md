@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -166,3 +167,4 @@ const badTable = table(
 - [Restrictions](#restrictions)
 - [Use Cases](#use-cases)
 
+{% endraw %}

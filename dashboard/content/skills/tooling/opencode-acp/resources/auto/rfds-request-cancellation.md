@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -218,3 +219,4 @@ This ensures complete cleanup and prevents resource leaks.
 * 2025-12-09: Mirror LSP behavior.
 * 2025-12-05: Updated with current implementation.
 * 2025-11-13: Initial version converted from PR #183
+{% endraw %}

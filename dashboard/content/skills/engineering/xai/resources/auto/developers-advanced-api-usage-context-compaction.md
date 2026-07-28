@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # Context Compaction
@@ -277,3 +278,4 @@ The same method is available on `AsyncClient` as `await chat.compact()`.
 * [Generate Text — Responses API](https://docs.x.ai/developers/model-capabilities/text/generate-text) — the primary endpoint that compaction feeds into.
 * [Prompt Caching](https://docs.x.ai/developers/advanced-api-usage/prompt-caching) — a complementary cost-reduction lever for unchanged prompt prefixes.
 * [Chat API Reference](https://docs.x.ai/developers/rest-api-reference/inference/chat) — full request/response schema for the Compaction API.
+{% endraw %}

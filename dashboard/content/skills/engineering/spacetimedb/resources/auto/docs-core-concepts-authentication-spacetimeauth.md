@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -133,3 +134,4 @@ to learn how to create and configure a SpacetimeAuth project.
   - [Roles](#roles)
 - [Getting Started](#getting-started)
 
+{% endraw %}

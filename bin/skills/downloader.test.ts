@@ -286,9 +286,15 @@ describe("downloader unit tests", () => {
             )
         })
 
-        it("should fall back to index.md for empty slug from non-ASCII paths", () => {
+        it("should fall back to overview-index.md for empty or index slug to avoid Zola collisions", () => {
             expect(smartSlugify("https:/" + "/example.com/日本語/")).toBe(
-                "index.md"
+                "overview-index.md"
+            )
+            expect(smartSlugify("https:/" + "/example.com/index.html")).toBe(
+                "overview-index.md"
+            )
+            expect(smartSlugify("https:/" + "/example.com/")).toBe(
+                "overview-index.md"
             )
         })
     })
@@ -378,12 +384,12 @@ describe("downloader unit tests", () => {
         )
         const files = await fs.readdir(resourcesDir)
 
-        // They should have resolved to distinct files since both originally mapped to index.md
+        // They should have resolved to distinct files since both originally mapped to overview-index.md
         expect(files.length).toBe(2)
 
-        // Each file name should be index-[hash].md
+        // Each file name should be overview-index-[hash].md
         for (const file of files) {
-            expect(file).toMatch(/^index-[a-f0-9]{8}\.md$/)
+            expect(file).toMatch(/^overview-index-[a-f0-9]{8}\.md$/)
         }
     })
 

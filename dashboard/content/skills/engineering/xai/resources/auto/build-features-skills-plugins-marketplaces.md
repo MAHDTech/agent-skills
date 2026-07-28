@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Features
 
 # Skills, Plugins & Marketplaces
@@ -58,7 +59,7 @@ Marketplace sources come from `[[marketplace.sources]]` in `~/.grok/config.toml`
 
 ## Subagents
 
-Subagents spawn independent child sessions that handle tasks in parallel.
+Subagents spawn independent child sessions that handle tasks in parallel. Types and personas are under [Subagents](https://docs.x.ai/build/features/subagents).
 
 ## Claude Code compatibility
 
@@ -72,3 +73,4 @@ Grok also reads the `AGENTS.md` instruction-file family (`AGENTS.md`, `Agents.md
 
 * `~/.agents/skills/`
 * `~/.agents/commands/`
+{% endraw %}

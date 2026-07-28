@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 # Modes and Commands
 
 The TUI has pager-local slash commands, plus a smaller set provided by `xai-grok-shell`. User-invocable skills also appear as slash commands.
@@ -17,40 +18,15 @@ In the TUI, `Shift+Tab` cycles session modes. For the full key reference, see [K
 
 ### Plan
 
-Plan mode is for planning first. When it is active, edits to the session plan file are auto-approved while writes to other files still require your approval.
+Plan mode is planning first: only the session plan file can be edited until you approve. That file-edit gate is independent of the permission mode (ask, auto, or always-approve). Enter with `/plan [description]` or `Shift+Tab`, and reopen a plan with `/view-plan`. See [Plan Mode](https://docs.x.ai/build/features/plan-mode).
 
-Use it when you want Grok to sketch the approach before it starts making changes. Enter it with `/plan [description]` and view the current plan with `/view-plan`.
+### Auto
 
-Plan mode keeps the working plan visible in the TUI.
-
-It can also stop to ask a clarifying question before edits.
+Auto uses a classifier to auto-approve safe tools; dangerous ones may still prompt. Toggle with `/auto` or `Shift+Tab` when the feature is enabled. Full mode table: [Permissions](https://docs.x.ai/build/features/permissions).
 
 ### Always-approve
 
-Always-approve skips permission prompts for tool calls.
-
-You can start in this mode with:
-
-```bash customLanguage="bash"
-grok --always-approve
-```
-
-You can also toggle it from the TUI with `/always-approve`.
-
-### Permission mode in config.toml
-
-Set the default permission behavior in `~/.grok/config.toml`:
-
-```text
-[ui]
-permission_mode = "always-approve"
-```
-
-Use `permission_mode = "ask"` for prompts on each tool call, or `permission_mode = "always-approve"` to skip them. The default is `ask`. The legacy keys `approval_mode` and `yolo = true` are still accepted but `permission_mode` takes precedence.
-
-Put this in `~/.grok/config.toml`, not project-scoped `.grok/config.toml`.
-
-For the full set of `config.toml` options, see [Settings](https://docs.x.ai/build/settings).
+Always-approve skips permission prompts for tool calls (`deny` rules and hooks still apply). Toggle with `/always-approve` or `Shift+Tab`, or start with `grok --always-approve`. Modes, allow/deny rules, and how they relate to the sandbox are under [Permissions](https://docs.x.ai/build/features/permissions).
 
 ## Core TUI commands
 
@@ -80,6 +56,7 @@ Use `/context` to check current context usage.
 | `/model <name>` (alias `/m`) | Switch the active model |
 | `/effort` | Set reasoning effort for the current model |
 | `/always-approve` | Toggle always-approve mode |
+| `/auto` | Toggle auto mode (classifier; when feature enabled) |
 | `/plan [description]` | Enter plan mode |
 | `/view-plan` | View the current plan |
 | `/btw <question>` | Ask a side question without interrupting |
@@ -128,3 +105,4 @@ These appear when cross-session memory is enabled.
 Any user-invocable skill can also appear as a slash command, for example `/<skill-name>`.
 
 If names collide, use the qualified form, such as `/local:commit`.
+{% endraw %}

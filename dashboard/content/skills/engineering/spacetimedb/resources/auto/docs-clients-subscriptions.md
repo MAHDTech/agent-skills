@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -460,3 +461,4 @@ responsive.
     Unsubscribing](#3-subscribe-before-unsubscribing)
   - [4. Avoid Overlapping Queries](#4-avoid-overlapping-queries)
 
+{% endraw %}

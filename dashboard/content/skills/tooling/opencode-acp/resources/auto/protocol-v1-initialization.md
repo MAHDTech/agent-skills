@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -152,6 +153,20 @@ The Client **SHOULD** specify whether it supports the following capabilities:
   Learn more about Terminals
 </Card>
 
+#### Elicitation
+
+<ParamField path="elicitation" type="ElicitationCapabilities Object">
+  The Client advertises its supported `elicitation/create` modes. Omitted or
+  `null` means no modes are advertised. A present object advertises each mode
+  only through its corresponding non-null `form` or `url` field. Empty and
+  all-null objects are valid but advertise no supported modes. Unlike MCP, ACP
+  does not treat `{}` as form support.
+</ParamField>
+
+<Card icon="message-question" horizontal href="/protocol/v1/elicitation">
+  Learn more about Elicitation
+</Card>
+
 #### Boolean Config Options
 
 <ParamField path="session.configOptions.boolean" type="BooleanConfigOptionCapabilities Object">
@@ -271,3 +286,4 @@ Both Clients and Agents **SHOULD** provide information about their implementatio
 ***
 
 Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v1/session-setup) and begin the conversation with the Agent.
+{% endraw %}

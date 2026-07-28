@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -51,3 +52,4 @@ Tutorial](https://spacetimedb.com/docs/tutorials/unity/part-1).
 - [Client SDKs](#client-sdks)
   - [Unity](#unity)
 
+{% endraw %}

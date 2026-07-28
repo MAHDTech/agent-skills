@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -546,3 +547,4 @@ handlers](https://spacetimedb.com/docs/functions/http-handlers).
 - [`POST /v1/database/:name_or_identity/sql`](#post-v1databasename_or_identitysql)
 - [`ANY /v1/database/:name_or_identity/route/{*path}`](#any-v1databasename_or_identityroutepath)
 
+{% endraw %}

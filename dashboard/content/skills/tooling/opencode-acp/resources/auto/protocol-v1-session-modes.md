@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -184,3 +185,4 @@ When an option is chosen, the tool runs, setting the mode and sending the `curre
 <Card icon="shield-check" horizontal href="/protocol/v1/tool-calls#requesting-permission">
   Learn more about permission requests
 </Card>
+{% endraw %}

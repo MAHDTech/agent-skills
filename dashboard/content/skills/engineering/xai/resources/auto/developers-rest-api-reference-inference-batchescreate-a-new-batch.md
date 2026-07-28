@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Batches
@@ -633,3 +634,4 @@ Cancel processing of all requests in a batch.
   }
 }
 ```
+{% endraw %}

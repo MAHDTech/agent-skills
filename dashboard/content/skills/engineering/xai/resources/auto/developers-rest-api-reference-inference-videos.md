@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Videos
@@ -425,3 +426,4 @@ print(json.dumps(response.json(), indent=2))
   "model": "grok-imagine-video"
 }
 ```
+{% endraw %}

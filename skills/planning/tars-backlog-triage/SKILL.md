@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-triage
 description: Triage pending backlog issues in `.tars/issues/todo/` to verify their accuracy, check for hallucinations, and add review notes. Reach for this when requested to triage tickets, verify backlog accuracy, or prepare issues for implementation.
+disable-model-invocation: true
 ---
 
 # Backlog Triage

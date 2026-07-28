@@ -1,27 +1,35 @@
----
-slug: faq
-section: FAQ
-title: FAQ
-path:
-  - FAQ
----
+- side_navigation
+- FAQ
 
-# FAQ
+# FAQ[link](#faq)
 
-## Why can I not authenticate into Google Antigravity?
+## Why can I not authenticate into Google Antigravity?[link](#why-can-i-not-authenticate-into-google-antigravity)
 
-Google Antigravity is currently available for personal Google accounts in approved geographies. Please try using an @gmail.com email address if having challenges with Workspace Google accounts.
+Google Antigravity is currently available for personal Google accounts
+in approved geographies. Please try using an @gmail.com email address if
+having challenges with Workspace Google accounts.
 
-## Why is my age unverified?
+## Why is my age unverified?[link](#why-is-my-age-unverified)
 
-At the moment, Antigravity is unavailable to under-18 users. If you do meet the minimum age requirement, you may [verify your age](https://myaccount.google.com/age-verification) to continue using Antigravity.
+At the moment, Antigravity is unavailable to under-18 users. If you do
+meet the minimum age requirement, you may [verify your
+age](https://myaccount.google.com/age-verification) to continue using
+Antigravity.
 
-## What is Google Antigravity’s geographical availability?
-Google Antigravity is available in the following countries and territories. If you're not in one of these countries or territories, you will be unable to use Google Antigravity at this time:
+## What is Google Antigravity’s geographical availability?[link](#what-is-google-antigravitys-geographical-availability)
 
-**Important**: Please check the country listed on the [Google Terms of Service](https://policies.google.com/terms) page. If this is the wrong country, you may [submit a request](https://policies.google.com/country-association-form) to change your associated region.
+Google Antigravity is available in the following countries and
+territories. If you're not in one of these countries or territories, you
+will be unable to use Google Antigravity at this time:
+
+**Important**: Please check the country listed on the [Google Terms of
+Service](https://policies.google.com/terms) page. If this is the wrong
+country, you may [submit a
+request](https://policies.google.com/country-association-form) to change
+your associated region.
 
 Americas
+
 - American Samoa
 - Anguilla
 - Antigua and Barbuda
@@ -75,6 +83,7 @@ Americas
 - Venezuela
 
 Europe
+
 - Albania
 - Armenia
 - Austria
@@ -120,10 +129,13 @@ Europe
 - Spain
 - Sweden
 - Switzerland
-- Ukrainian territories other than Crimea, the so-called Donetsk People's Republic ("DNR"), and the so-called Luhansk People's Republic ("LNR")
+- Ukrainian territories other than Crimea, the so-called Donetsk
+  People's Republic ("DNR"), and the so-called Luhansk People's Republic
+  ("LNR")
 - United Kingdom
 
 Africa
+
 - Algeria
 - Angola
 - Benin
@@ -182,6 +194,7 @@ Africa
 - Zimbabwe
 
 Asia
+
 - Bahrain
 - Bangladesh
 - Bhutan
@@ -226,6 +239,7 @@ Asia
 - Yemen
 
 Oceania
+
 - Australia
 - Cook Islands
 - Fiji
@@ -253,11 +267,13 @@ Oceania
 - Wallis and Futuna
 
 Antarctica
+
 - Antarctica
 
-## Why am I ineligible for a Google One AI plan?
+## Why am I ineligible for a Google One AI plan?[link](#why-am-i-ineligible-for-a-google-one-ai-plan)
 
-The following regions do not currently have access to Google One AI plans:
+The following regions do not currently have access to Google One AI
+plans:
 
 - Antarctica
 - Brunei
@@ -291,26 +307,40 @@ The following regions do not currently have access to Google One AI plans:
 - U.S. Virgin Islands
 - Wallis and Futuna
 
+## What is Google Antigravity’s stance on data collection?[link](#what-is-google-antigravitys-stance-on-data-collection)
 
-## What is Google Antigravity’s stance on data collection?
-Please refer to the [Terms of Service](https://antigravity.google/terms). You may opt out of data collection at any point from the Settings panel.
+Please refer to the [Terms of Service](https://antigravity.google/terms). You may opt out of data
+collection at any point from the Settings panel.
 
-## How do I sign in with a GCP project?
+## How do I sign in with a GCP project?[link](#how-do-i-sign-in-with-a-gcp-project)
 
-Follow the steps in the [Enterprise Page](https://antigravity.google/docs/enterprise) to learn how to sign in with GCP.
+Follow the steps in the [Enterprise Page](https://antigravity.google/docs/enterprise) to learn how
+to sign in with GCP.
 
-## How do I get support?
+## How do I get support?[link](#how-do-i-get-support)
+
 Check out the communities on our [Support page](https://antigravity.google/support).
 
-## What are the model rate limits?
+## What are the model rate limits?[link](#what-are-the-model-rate-limits)
+
 Please see more details in the docs on [Plans](https://antigravity.google/docs/plans).
 
-## Why can’t I use third party software (e.g. Claude Code, OpenClaw, OpenCode) with my Antigravity login?
+## Why can’t I use third party software (e.g. Claude Code, OpenClaw, OpenCode) with my Antigravity login?[link](#why-cant-i-use-third-party-software-eg-claude-code-openclaw-opencode-with-my-antigravity-login)
 
-Using third party software, tools, or services to access Antigravity is a violation of our [Terms of Service](https://antigravity.google/terms), and severely degrades the experience for legitimate product users. Such actions may be grounds for suspension or termination of your account. If you would like to use a third party coding agent with Gemini, we recommend using a Vertex or AI Studio API key.
+Using third party software, tools, or services to access Antigravity is
+a violation of our [Terms of Service](https://antigravity.google/terms), and severely degrades the
+experience for legitimate product users. Such actions may be grounds for
+suspension or termination of your account. If you would like to use a
+third party coding agent with Gemini, we recommend using a Vertex or AI
+Studio API key.
 
-## Does Google Antigravity currently support worktrees?
+## Does Google Antigravity currently support worktrees?[link](#does-google-antigravity-currently-support-worktrees)
+
 Yes, you can use worktrees in Antigravity 2.0.
 
-## What happens when my computer goes to sleep?
-If an agent is running, Antigravity will prevent your computer from sleeping.
+## What happens when my computer goes to sleep?[link](#what-happens-when-my-computer-goes-to-sleep)
+
+If an agent is running, Antigravity will prevent your computer from
+sleeping.
+
+On this Page

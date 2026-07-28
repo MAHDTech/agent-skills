@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Chat with Files
@@ -553,3 +554,4 @@ The model will:
 ## Next Steps
 
 Learn more about managing your files:
+{% endraw %}

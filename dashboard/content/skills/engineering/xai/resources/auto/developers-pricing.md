@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Pricing
@@ -36,8 +37,8 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-image | $0.02 / image |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-video-1.5 | $0.080 / sec |
 | grok-imagine-video | $0.050 / sec |
 
@@ -164,3 +165,4 @@ Your model access might vary depending on various factors such as geographical l
 For how the **bills are charged**, visit [Manage Billing](https://docs.x.ai/console/billing) for more information.
 
 For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models) on xAI Console.
+{% endraw %}

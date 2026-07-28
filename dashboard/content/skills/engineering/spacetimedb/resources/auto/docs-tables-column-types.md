@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -393,3 +394,4 @@ FIELD_PrimaryKeyAutoInc(player, id)
 - [Type Reference](#type-reference)
 - [Complete Example](#complete-example)
 
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Manage Billing
@@ -86,3 +87,4 @@ You can view your invoices for prepaid credits and monthly invoices on [Billing 
 > regenerate the invoices at the moment.
 
 Your billing address and tax information will be displayed on the invoice. On [Billing -> Payment](https://console.x.ai/team/default/billing), you can also add/change your billing address. When you add/change billing address, you can optionally add your organization's tax information.
+{% endraw %}

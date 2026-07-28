@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -16,6 +17,39 @@ skill_name = "opencode-acp"
 > Lifecycle updates for ACP Requests for Dialog
 
 This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](https://agentclientprotocol.com/updates).
+
+<Update label="July 27, 2026" tags={["Preview"]}>
+  ## Terminal Authentication RFD moves to Preview
+
+  The Terminal Authentication RFD has moved to Preview. Clients can run an
+  Agent's interactive login flow in a terminal and reconnect after it succeeds.
+  The proposal now focuses on terminal authentication. The experimental `env_var`
+  method has been removed as an explicit SDK and schema variant. Please review
+  the [RFD](https://agentclientprotocol.com/rfds/auth-methods) for the version-specific wire shapes and lifecycle
+  semantics.
+</Update>
+
+<Update label="July 24, 2026" tags={["Completed"]}>
+  ## Elicitation RFD moves to Completed
+
+  The RFD for structured user input through `elicitation/create` has been
+  stabilized and is now part of the protocol. Agents can request form-based
+  structured input or URL-based out-of-band interactions, and Clients advertise
+  each mode they support explicitly. Please review the
+  [documentation](https://agentclientprotocol.com/protocol/v1/elicitation) for more information.
+</Update>
+
+<Update label="July 21, 2026" tags={["Draft"]}>
+  ## auth/status RFD moves to Draft stage
+
+  The RFD for allowing clients to query an agent's current authentication state has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/get-auth-state) for more information and provide feedback as work on the implementation begins.
+</Update>
+
+<Update label="July 21, 2026" tags={["Draft"]}>
+  ## Tool Call Name RFD moves to Draft stage
+
+  The RFD for adding an optional programmatic `name` to tool calls in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/tool-call-name) for more information and provide feedback while the draft implementation is exercised.
+</Update>
 
 <Update label="July 9, 2026" tags={["Preview"]}>
   ## Elicitation RFD moves to Preview stage
@@ -386,3 +420,4 @@ This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP 
 
   The RFD for adding a session/list method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-list) for more information on the current proposal and provide feedback as work on the implementation begins.
 </Update>
+{% endraw %}

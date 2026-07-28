@@ -130,7 +130,17 @@ Clients provide the interface between users and agents. They are typically code 
   Kill terminal command without releasing (requires `terminal` capability).
 </ResponseField>
 
+<ResponseField name="elicitation/create" post={[<a href="/protocol/v1/schema#elicitation%2Fcreate">Schema</a>]}>
+  [Request structured information from the user](https://agentclientprotocol.com/protocol/v1/elicitation)
+  (requires the matching `elicitation` mode capability).
+</ResponseField>
+
 ### Notifications
+
+<ResponseField name="elicitation/complete" post={[<a href="/protocol/v1/schema#elicitation%2Fcomplete">Schema</a>]}>
+  [Report completion of an out-of-band URL
+  interaction](https://agentclientprotocol.com/protocol/v1/elicitation#url-completion) (no response expected).
+</ResponseField>
 
 <ResponseField name="session/update" post={[<a href="/protocol/v1/schema#session%2Fupdate">Schema</a>]}>
   [Send session updates](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) to
