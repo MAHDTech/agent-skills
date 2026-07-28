@@ -189,3 +189,4 @@ worktree
 worktrees
 WSJF
 xclip
+ntnx
