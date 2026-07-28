@@ -1,23 +1,66 @@
 ---
 name: tars-backlog-implement
-description: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
+description: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated clones. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
 disable-model-invocation: true
 ---
 
 # Backlog Implement
 
-Implement pending issue tickets from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces, and verify and merge them back into the active topic branch sequentially.
+Implement pending issue tickets from `.tars/issues/todo/` in parallel, conflict-free batches using isolated clones, verifying each one before it is merged back into the active topic branch.
 
-This skill operates in a Hub-and-Spoke topology, spawning implementation subagents in parallel, while the Hub manages sequencing, merges, and testing.
+This skill operates in a Hub-and-Spoke topology, spawning implementation subagents ("spokes") in parallel, while the Hub manages sequencing, verification, and merges.
 
 ## Targets and Paths
 
 - Target Folders: `.tars/issues/{todo,done,failed}/` relative to project root.
 - Ticket status updates are written to disk only. Ticket files are never staged, committed, or force-added in git.
+- This skill requires `tars-backlog-prepare` to have run first. Read `.tars/run.env` for the resolved `TARS_SPOKE_ROOT`, `TARS_CLONE_MODE`, `TARS_LOCK`, `TARS_HEAVY_LOCK`, and `TARS_TOPIC_BRANCH`. Re-read that file rather than remembering its values, so a compacted Hub context cannot drift onto a different spoke root mid-run.
 
 ## Topic Branch Workflow (Hub Only)
 
-All backlog operations run from a topic branch (never the default branch). Every implementation subagent branches off this active topic branch, and all approved changes are merged back into it. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) for the full policy and commands.
+All backlog operations run from a topic branch (never the default branch). Every spoke branches off this active topic branch, and all approved changes are merged back into it. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) for the full policy and commands.
+
+## The Two Contention Rules
+
+Everything below follows from two facts about running several agents against one repository. Both are load-bearing; violating either produces failures that look like flaky code rather than orchestration bugs.
+
+1. **A spoke must never be able to write to the parent's git state.** `.git/hooks/` and `.git/config` are shared by every linked worktree of a repository, so a spoke running `prek install` in a worktree rewrites the hook for the parent and all its siblings — `prek` bakes an **absolute** config path into every shim it writes, so there is no benign version of this. Giving each spoke its own **clone** makes the whole class of shared-state collisions structurally impossible rather than merely forbidden.
+
+2. **Concurrent heavy commands produce false test failures, not just slow ones.** Test suites that spawn processes, bootstrap temporary directories, or carry timeouts fail under CPU starvation and pass in isolation. A false failure is worse than a slow one: it sends correct work into the rework loop. So heavy commands are serialised by a mutex, while cheap deterministic checks stay fully parallel.
+
+The split that matters is **load-sensitivity, not which agent is running the command**:
+
+| Class                    | Examples                                                        | How it runs                    |
+| ------------------------ | --------------------------------------------------------------- | ------------------------------ |
+| Deterministic under load | `tsc --noEmit`, `prek run <changed files>`, formatters, linters | Freely, in parallel, unlocked  |
+| Starvation-sensitive     | Test suites, `devenv test`, nix builds, `prek run -a`           | Under the mutex, one at a time |
+
+These get slower under load; those get **wrong** under load.
+
+## The Heavy-Command Mutex
+
+Any starvation-sensitive command — run by a spoke or by the Hub — is wrapped:
+
+```bash
+sh "$TARS_LOCK" "$TARS_HEAVY_LOCK" <command>
+```
+
+The helper ships at `resources/manual/tars-lock` beside this skill. It prefers `flock(1)` and falls back to an atomic-mkdir lock with stale reclaim where `flock` is absent, which is the normal case on macOS. Always invoke it as `sh <path>`, never by executing it directly, so it works regardless of whether the install method preserved the executable bit.
+
+The Hub takes the same lock as the spokes. That is deliberate: the Hub's verification gate is itself a heavy command, and left unlocked it would become an extra concurrent test run on top of a full batch.
+
+The heavy-command set is per-repository. Read it from `.tars/config.yaml` if configured, otherwise use these defaults:
+
+```yaml
+concurrency:
+  heavy_commands:
+    - "devenv test"
+    - "prek run -a"
+    - "bun test"
+    - "npm test"
+    - "cargo test"
+    - "pytest"
+```
 
 ## Implementation Workflow
 
@@ -29,39 +72,71 @@ All backlog operations run from a topic branch (never the default branch). Every
 4. Update the ticket frontmatter with `batch: X` (starting with `batch: 1`) and write to disk so batches are remembered.
 5. Prior to executing a batch, the Hub must verify that all tickets in the current batch are indeed conflict-free.
 
-### 2. Spawn Implementation Spokes & Initialize Worktrees
+> Conflict-free here means **non-overlapping files**, which is not the same as behaviourally independent. Two tickets can each pass alone and still break each other once both are merged. Step 5 closes that gap.
 
-For each ticket in the selected batch, spawn an implementation subagent in an isolated workspace (worktree).
+### 2. Spawn Spokes in Isolated Clones
 
-Since gitignored files/directories (like `.tars/` or `.pre-commit-config.yaml`) do not exist in the subagent's new worktree workspace, the Hub must initialize the worktree workspace and transfer the necessary files/directories before the subagent starts execution.
+For each ticket in the selected batch, create an isolated clone and spawn an implementation subagent in it.
 
-#### Hub-to-Spoke Gitignore Transfer Logic
+#### 2a. Create the clone
 
-1. **Locate Worktree Path**: Run `git worktree list` to retrieve the absolute path of the new subagent's worktree directory.
-2. **Read Configured Transfer Files**: Check if `.tars/config.yaml` exists and contains a `worktree.transfer_files` key configured.
-   - If configured, read the list of transfer patterns.
-   - If not configured, use these default patterns:
+```bash
+SPOKE_DIR="$TARS_SPOKE_ROOT/<TICKET_ID>"
+```
 
-     ```yaml
-     worktree:
-       transfer_files:
-         - ".pre-commit-config.yaml"
-         - ".env*"
-         - ".tars/"
-         - "devenv.local.nix"
-         - "devenv.local.yaml"
-     ```
+Clone from the parent repository using the mode `tars-backlog-prepare` resolved:
 
-3. **Synchronize/Symlink Files**: For each matching file or directory in the parent workspace root:
-   - **Symlink Attempt (Preferred)**: Try to create a symlink in the subagent's worktree pointing to the corresponding item in the parent workspace root. (e.g., symlink `<subagent-worktree>/.tars/` to `<parent-workspace>/.tars/`).
-     > [!IMPORTANT]
-     > Symlinking `.tars/` allows the subagent to read and write directly to the shared issue queue, meaning you do not need to manually copy ticket updates back when the subagent finishes.
-   - **Copy Fallback**: If symlinking fails (e.g., on Windows without Developer Mode or due to a permissions error), fallback to copying the file or directory physically into the subagent's worktree root.
-     - Note: If `.tars/` is copied as a fallback, the Hub **MUST** copy the modified ticket file (`.tars/issues/todo/XXX.md`) back from the subagent's worktree to the parent workspace before cleaning up the worktree.
-4. **Isolate Pre-commit Cache**: To prevent pre-commit cache folder permission blocks or hangs inside the subagent's sandboxed environment, the Hub **MUST** set the `PRE_COMMIT_HOME` environment variable to point to a local directory inside the worktree (e.g. `<worktree-path>/.cache/pre-commit`) before spawning or symlinking.
-5. **Pass Context**: Pass the ticket content directly in the subagent's prompt as context.
+```bash
+# TARS_CLONE_MODE=hardlink  (spoke root shares a filesystem with the repo)
+git clone --branch "$TARS_TOPIC_BRANCH" "$REPO_ROOT" "$SPOKE_DIR"
 
-Spawn each subagent for its ticket on its own isolated workspace/branch, and equip it with:
+# TARS_CLONE_MODE=shared    (different filesystem; borrow objects, copy nothing)
+git clone --shared --branch "$TARS_TOPIC_BRANCH" "$REPO_ROOT" "$SPOKE_DIR"
+```
+
+In `shared` mode the Hub must **not** run `git gc` or `git prune` in the parent while any spoke is alive, because spokes borrow the parent's objects through alternates.
+
+Then position the spoke's branch inside the clone:
+
+- **New ticket**: `git checkout -b subagent-<TICKET_ID>`
+- **Rework ticket** (frontmatter carries `branch:`): the clone already fetched it, so `git checkout subagent-<TICKET_ID>` then `git merge origin/<topic-branch>` to pick up everything merged since the last attempt.
+
+A fresh clone has no hooks installed — `.git/hooks/` contains only samples. Spoke commits therefore fire nothing, which is why a spoke never needs `--no-verify` and never has a reason to run `prek install`. Verification in a spoke is always an explicit command, never a side effect of committing.
+
+#### 2b. Transfer gitignored files
+
+Gitignored files do not exist in a fresh clone, and several are required to work — `.pre-commit-config.yaml` in particular is generated by tooling and gitignored in many repositories. Read `worktree.transfer_files` from `.tars/config.yaml` if configured, otherwise use these defaults:
+
+```yaml
+worktree:
+  transfer_files:
+    - ".pre-commit-config.yaml"
+    - ".env*"
+    - ".tars/"
+    - "devenv.local.nix"
+    - "devenv.local.yaml"
+```
+
+For each matching file or directory in the parent workspace root:
+
+- **Symlink (preferred)**: create a symlink in the clone pointing at the parent's copy.
+  > [!IMPORTANT]
+  > Symlinking `.tars/` gives the spoke direct read/write access to the shared issue queue and to `.tars/run.env`, so ticket updates need no copying back when the spoke finishes.
+- **Copy (fallback)**: if symlinking fails, copy the file or directory in. If `.tars/` was copied rather than symlinked, the Hub **MUST** copy the ticket file back from `<spoke-dir>/.tars/issues/todo/XXX.md` to the parent before deleting the clone.
+
+#### 2c. Share one hook cache
+
+Set `PRE_COMMIT_HOME` to a **single shared** cache under the spoke root, used by every spoke and by the Hub:
+
+```bash
+PRE_COMMIT_HOME="$TARS_SPOKE_ROOT/prek-cache"
+```
+
+One cache rather than one per spoke: hook environments are expensive to build, and installing them N times per batch is pure waste. The original per-workspace isolation existed to dodge permission blocks in sandboxed environments — placing the shared cache under the spoke root, which `tars-backlog-prepare` already write-probed, satisfies that requirement too.
+
+#### 2d. Spawn the subagent
+
+Spawn each spoke on its clone, and equip it with:
 
 - **Role**: `Implement-<TICKET_ID>` (substitute the 3-digit ticket ID, e.g. `Implement-044`)
 - **Prompt**:
@@ -72,49 +147,87 @@ Spawn each subagent for its ticket on its own isolated workspace/branch, and equ
   Ticket Details:
   <TICKET_CONTENT>
 
+  Your workspace is an isolated clone at <SPOKE_DIR>, already checked out on
+  your branch. Its `origin` is the parent repository.
+
   Instructions:
   1. Read the ticket details completely, including the Tasks, Acceptance Criteria (conforming to the guidelines in [tars-backlog-create-issue](../../planning/tars-backlog-create-issue/SKILL.md)), the '## Review' section, and the '## Implementation Review' section (if it exists).
-  2. Branch Resumption: Check the ticket frontmatter. If a `branch` is specified (e.g., `branch: subagent-XXX`), ensure you checkout and resume work on that branch, then run `git merge <topic-branch>` (substituting the active topic branch name) to sync with the latest changes. Otherwise, create a new branch from the active topic branch.
-  3. Implement the changes described, addressing any feedback listed in the '## Implementation Review' section.
-  4. Verify your implementation by running tests:
-     - Detect if 'devenv.nix' or 'devenv/default.nix' is present in the workspace root. If so, run 'devenv test'.
-     - Otherwise, check for standard project test configs (e.g., package.json -> 'npm test', cargo.toml -> 'cargo test', pytest, etc.) and execute them.
-     - Ensure the test suite passes prior to returning.
-  5. Ensure all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). To avoid permission errors or hangs, prefix the execution command with the isolated cache environment: `PRE_COMMIT_HOME="<worktree-path>/.cache/pre-commit" prek run -a`. Fix any failing checks before committing.
-  6. Commit your changes using Conventional Commits. STRICT GITIGNORE CONSTRAINT: You must NEVER stage, commit, or force-add any files under the `.tars/` directory (such as the ticket file `.tars/issues/todo/XXX.md`). These files must remain completely unstaged and uncommitted in git.
-  7. STRICT ISOLATION CONSTRAINT: You must NEVER check out the default branch or the active topic branch, commit directly to them, or attempt to merge branches. You must only commit changes on your local isolated workspace branch and report completion. The orchestrator Hub is solely responsible for merging branches and cleaning up workspaces.
-  8. Update the ticket file `.tars/issues/todo/XXX.md` (which has been copied to your worktree) to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [tars-backlog-create-issue](../../planning/tars-backlog-create-issue/SKILL.md).
-  9. **STRICT TOOL SYNTAX CONSTRAINT**: When calling filesystem or command-execution tools, you must never wrap string argument values in nested, escaped, or literal double quotes (e.g. pass a path argument as `/path/to/file`, not the same value re-wrapped in escaped quotes, which is incorrect and will fail due to invalid characters).
+  2. Implement the changes described, addressing any feedback listed in the '## Implementation Review' section.
+  3. Verify as you work. Cheap deterministic checks — typecheck, formatters, linters, and `prek run <your changed files>` — you may run freely and as often as you like; they get slower under load but never wrong.
+  4. Run test suites ONLY through the mutex, because several suites at once cause false failures. Wrap every test command exactly like this, substituting the paths given above:
+     PRE_COMMIT_HOME="<PRE_COMMIT_HOME>" sh "<TARS_LOCK>" "<TARS_HEAVY_LOCK>" <test command>
+     Run the tests covering your change, not the whole suite — the Hub runs the full suite at the gate. Detect the runner as usual: `devenv test` if `devenv.nix` or `devenv/default.nix` is present, otherwise the project's standard test config. If a test fails, re-run it alone before treating it as real.
+  5. NEVER run `prek install`, and NEVER run `prek run -a`. Installing hooks bakes an absolute config path into a shim; running the whole repository's hooks is a heavy command reserved for the Hub's gate. `prek run <changed files>` is the form you want. See the [prek](../../tooling/prek/SKILL.md) skill.
+  6. Commit your changes using Conventional Commits. Your clone has no git hooks installed, so commits are unhooked by design and you must never pass `--no-verify`. STRICT GITIGNORE CONSTRAINT: You must NEVER stage, commit, or force-add any files under the `.tars/` directory (such as the ticket file `.tars/issues/todo/XXX.md`). These files must remain completely unstaged and uncommitted in git.
+  7. STRICT ISOLATION CONSTRAINT: Work only on your own branch in your own clone. Never check out the default branch or the topic branch, never commit to them, and never merge your branch into anything. The one merge you may perform is pulling the topic branch INTO your branch (`git merge origin/<topic-branch>`) to sync. The Hub is solely responsible for merging your work back and for cleaning up your workspace.
+  8. Update the ticket file `.tars/issues/todo/XXX.md` to complete the checkboxes in the '## Tasks' and '## Acceptance Criteria' sections, and document command runs and outputs proving execution in the '## Evidence' section as outlined in [tars-backlog-create-issue](../../planning/tars-backlog-create-issue/SKILL.md).
+  9. Report completion, then STAY AVAILABLE. The Hub will run a full verification gate on your work and may send you failures to fix. Do not consider yourself finished until the Hub tells you the ticket is resolved.
+  10. **STRICT TOOL SYNTAX CONSTRAINT**: When calling filesystem or command-execution tools, you must never wrap string argument values in nested, escaped, or literal double quotes (e.g. pass a path argument as `/path/to/file`, not the same value re-wrapped in escaped quotes, which is incorrect and will fail due to invalid characters).
   ```
 
-### 3. Incremental Merge-Back, Liveness Checking & Verification (Hub Only)
+### 3. Monitor Spokes
 
-Rather than waiting passively for the entire batch to complete (which blocks progress if a single spoke gets stuck or dies), the Hub must monitor spokes dynamically and process them incrementally:
+Do **NOT** wait passively for the whole batch — a single stuck spoke would block all progress.
 
-1. **Monitor Spoke Liveness, Approvals & Revive**:
-   - Do **NOT** wait passively. Periodically (e.g. every couple of minutes) check on the running subagents while they work: if your runtime provides a scheduling or wakeup mechanism, use it to trigger the check, otherwise poll. On each check, use your agent's subagent-management capability to list the running subagents and verify their liveness/status.
-   - **Detect blocked/approval-waiting subagents**: Subagents running commands inside sandboxed worktrees may issue a command that gets suspended waiting for user approval, and such approval prompts do not always bubble up automatically. If your runtime surfaces subagent logs or state, inspect the latest entries to detect a subagent blocked awaiting approval; otherwise rely on its status/liveness signal. When a subagent appears blocked on an approval, output an explicit warning to the user:
-     `"⚠️ Subagent <role> is waiting for your approval to run a command. Please switch to its session or approve the command."`
-   - If a subagent has stopped (e.g., due to a server restart or crash) before completing its task, check its branch status. Revive it by sending it a follow-up query to resume its task, or restart the subagent on that branch if needed.
-2. **Process Completed Spokes Incrementally**: As soon as any individual subagent in the batch reports completion, immediately run the merge-back and verification workflow for that spoke:
-   - **Reset Staged Side-Effects**: Running tests or git hooks in the parent repository can generate untracked or staged test files (e.g., `target-skill`) that block git merges. Before executing git merge, verify `git status --porcelain`. If any unstaged or staged changes exist in the parent repository, run `git reset --hard` and `git clean -fd` to completely clear the git index and working tree.
-   - **Sync Ticket Updates**: If the `.tars/` directory in the subagent's worktree was copied as a fallback instead of symlinked, copy the updated ticket markdown file from `<subagent-worktree>/.tars/issues/todo/XXX.md` back to the parent workspace's `.tars/issues/todo/XXX.md` to preserve the completed checklists and evidence. (If symlinking was successful, they share the same physical file, and copying is a harmless no-op).
-   - **Run Implementation Review**: Call the `tars-backlog-review` skill (see [tars-backlog-review](../../review/tars-backlog-review/SKILL.md)) on the subagent's branch and the synced ticket file to verify the implementation.
-   - **Handle Verdicts**:
-     - **If Approved**:
-       - **Merge Sequentially**: Sequentially merge the branch back into the active topic branch one at a time. Never perform parallel merges.
-       - **Pre-commit Integrity**: For each merge, ensure that all pre-commit hooks run and pass using `prek` (see the [prek](../../tooling/prek/SKILL.md) skill). **NEVER** use `--no-verify` or bypass hooks.
-       - **Parent Test Verification**: After each individual merge, run the test suite in the parent workspace to verify stability.
-       - **Move Ticket**: Move the ticket file to `.tars/issues/done/`.
-       - **CRITICAL CLEANUP CONSTRAINT**: Immediately clean up the worktree and branch.
-         - Run `git worktree remove --force <path>`
-         - Run `git branch -D <branch-name>`
-     - **If Request Rework**:
-       - Do **NOT** merge the branch.
-       - Increment the ticket's `attempts` count in the frontmatter.
-       - If `attempts >= 5`, move the ticket file to `.tars/issues/failed/` and clean up the worktree and branch.
-         - Run `git worktree remove --force <path>`
-         - Run `git branch -D <branch-name>`
-       - Otherwise, set `status: rework`, set `batch: null`, update `branch: <branch-name>` in the frontmatter, and append the review feedback under `## Implementation Review` following the format in [tars-backlog-review](../../review/tars-backlog-review/SKILL.md). The ticket remains in `.tars/issues/todo/` and the branch is **NOT** cleaned up.
+- Periodically (e.g. every couple of minutes) check on the running spokes while they work: if your runtime provides a scheduling or wakeup mechanism, use it to trigger the check, otherwise poll. On each check, use your agent's subagent-management capability to list the running spokes and verify their liveness/status.
+- **Detect blocked/approval-waiting spokes**: a spoke may issue a command that gets suspended waiting for user approval, and such prompts do not always bubble up. If your runtime surfaces spoke logs or state, inspect the latest entries; otherwise rely on its status signal. When a spoke appears blocked on an approval, warn the user explicitly:
+  `"⚠️ Subagent <role> is waiting for your approval to run a command. Please switch to its session or approve the command."`
+- **A spoke waiting on the mutex is not stuck.** `tars-lock` prints a notice to stderr after 30 seconds of waiting. Queued is the system working as designed.
+- If a spoke has stopped (e.g. due to a crash or restart) before its ticket resolved, revive it with a follow-up query, or restart it on its branch. Prefer `SIGTERM` over `SIGKILL` when stopping a spoke: the mutex's fallback path keys on the wrapper's PID, and `SIGKILL` can briefly let two heavy commands overlap.
 
-Repeat monitoring and incremental merges until all spokes in the batch have been successfully merged or moved to rework/failed, then proceed to the next batch.
+### 4. Verify, Then Merge (Hub Only)
+
+Process each spoke the moment it reports, rather than waiting for the batch. **Verification happens before the merge, inside the spoke's own clone.** That ordering is what keeps the parent working tree pristine — there is no `git reset --hard` anywhere in this path — and it means a failure is found while the agent that wrote the code is still alive to fix it.
+
+For each spoke that reports completion:
+
+1. **Sync the spoke onto the latest topic branch.** Instruct the spoke to run `git fetch origin && git merge origin/<topic-branch>`. Let the spoke resolve any conflicts; it has the context for its own code.
+
+2. **Capture the work durably.** Fetch the spoke's branch into the parent repository:
+
+   ```bash
+   git fetch "$SPOKE_DIR" "+subagent-<TICKET_ID>:subagent-<TICKET_ID>"
+   ```
+
+   Do this whether the gate later passes or fails. The parent repository is the durable store of all spoke work; clone directories are disposable scratch. Skipping this step means deleting a clone destroys its commits.
+
+3. **Run the verification gate, in the clone, under the mutex:**
+
+   ```bash
+   PRE_COMMIT_HOME="$TARS_SPOKE_ROOT/prek-cache" \
+     sh "$TARS_LOCK" "$TARS_HEAVY_LOCK" \
+     sh -c 'cd "$SPOKE_DIR" && prek run -a && <full test command>'
+   ```
+
+   **NEVER** use `--no-verify` or bypass hooks.
+
+4. **Handle a red gate**: send the failure output back to the live spoke and let it fix its own work. No rework ticket, no respawn — the agent still holds the context. Allow up to **3** fix rounds. If it is still red after that, treat it as `Request Rework` below; a spoke that has failed three times usually has a context anchored on a wrong approach, and a fresh agent reading the feedback beats a tired one re-reading its own reasoning.
+
+5. **Run the implementation review**: on a green gate, call the `tars-backlog-review` skill (see [tars-backlog-review](../../review/tars-backlog-review/SKILL.md)) against the spoke's clone and ticket file.
+
+   > Gate first, review second. A gate failure is self-service — the spoke fixes it with no Hub tokens spent — whereas a review rejection costs synthesis and interpretation. Reviewing first would also mean reviewing code that is about to change under it, and spending reviewer attention on lint that `prek` already catches.
+
+6. **Handle the verdict**:
+   - **If Approved**:
+     - **Merge sequentially** into the active topic branch, one spoke at a time. Never perform parallel merges.
+     - **Move Ticket**: move the ticket file to `.tars/issues/done/`.
+     - **Clean up**: delete the clone directory `$SPOKE_DIR` and the branch (`git branch -D subagent-<TICKET_ID>`), and release the spoke.
+   - **If Request Rework**:
+     - Do **NOT** merge the branch.
+     - Increment the ticket's `attempts` count in the frontmatter.
+     - If `attempts >= 5`, move the ticket file to `.tars/issues/failed/`, delete the clone directory, and `git branch -D subagent-<TICKET_ID>`.
+     - Otherwise, set `status: rework`, set `batch: null`, update `branch: subagent-<TICKET_ID>` in the frontmatter, and append the review feedback under `## Implementation Review` following the format in [tars-backlog-review](../../review/tars-backlog-review/SKILL.md). The ticket remains in `.tars/issues/todo/`. Delete the clone directory but **keep the branch** — it was fetched into the parent in step 2, and the next attempt clones from there.
+
+Repeat until every spoke in the batch has been merged, sent to rework, or failed.
+
+### 5. Batch-Final Gate (Hub Only)
+
+Once the whole batch is merged, run the full gate once more — on the **topic branch**, in the parent workspace, under the mutex:
+
+```bash
+sh "$TARS_LOCK" "$TARS_HEAVY_LOCK" sh -c 'prek run -a && <full test command>'
+```
+
+Each spoke was verified against the topic branch as it stood at its own gate, but the topic branch moves as its siblings merge. This pass catches the semantic interaction that file-level conflict-free batching cannot see: two tickets that touch no common file, each green alone, that break each other once both are in.
+
+If this gate is red, the offending merge is one of the batch just landed. Identify it, revert that merge, and return its ticket to rework with the failure recorded under `## Implementation Review`. Then proceed to the next batch.

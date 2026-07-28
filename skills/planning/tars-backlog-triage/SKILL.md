@@ -17,7 +17,7 @@ This skill runs in a Hub-and-Spoke topology using sub-agents to verify tickets i
 
 ## Topic Branch Workflow (Hub Only)
 
-All backlog operations must run from a topic branch, never the default branch, and every spawned subagent branches off that active topic branch. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../tars-backlog-prepare/SKILL.md) for the full policy and commands.
+All backlog operations must run from a topic branch, never the default branch. Triage subagents are read-only and take no branch of their own — they read the topic branch's working tree as the Hub has it checked out. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../tars-backlog-prepare/SKILL.md) for the full policy and commands.
 
 ## Triage Workflow
 
@@ -28,13 +28,17 @@ Determine the triage mode based on the user's instructions/invocation:
 - **Normal Triage**: Triggered by default. To reduce token spend, identify only the unreviewed tickets (those missing a `## Review` section and having `status: todo` or missing a status). Tickets already having a `## Review` section or with `status: rework` must be skipped.
 - **Adversarial Triage (Double-Check)**: Triggered if the user request contains keywords like `adversarial`, `double-check`, `re-triage`, or `force` (e.g., `/tars-backlog-triage perform an adversarial triage of the backlog`). In this mode, identify **all** tickets in `.tars/issues/todo/` (including those with existing `## Review` sections or `status: rework`) to be triaged/double-checked.
 
-Group the identified tickets into parallel batches of at most 5 concurrent subagents. Ensure that tickets within the same batch do not audit overlapping files to avoid git or environment conflicts.
+Group the identified tickets into parallel batches of at most 5 concurrent subagents. Overlapping files are fine here — triage agents only read, so they cannot conflict with each other. The batch limit bounds concurrent token and CPU spend, nothing more.
 
 ### 2. Spawn Triage Spokes
 
-For each ticket to verify in the batch, spawn a read-only research subagent on its own dedicated, isolated workspace/branch.
+For each ticket to verify in the batch, spawn a read-only research subagent that reads the **parent working tree directly** — no clone, no worktree, no workspace setup or teardown.
 
-Since `.tars/` is gitignored, the subagent's workspace will not have access to the ticket files. Because triage agents are read-only and return their findings directly to the Hub via message, the Hub only needs to pass the ticket content directly in the subagent's prompt (copying the file to the subagent workspace is not required).
+Triage agents verify claims against the codebase and report back by message; they never commit. An isolated workspace would cost real setup on every batch and buy nothing, since nobody is modifying the tree they are reading.
+
+The Hub passes the ticket content directly in the subagent's prompt, so no ticket file needs copying anywhere.
+
+The safety this gives up is enforced by checking rather than by construction — see the cleanliness assertion in step 3.
 
 Equip each subagent with:
 
@@ -56,7 +60,7 @@ Equip each subagent with:
      - Are there any gaps? (e.g., missing package configurations, unmentioned side effects, compile-time type errors, build script modifications).
      - Are there any hallucinations? (e.g., non-existent files, deprecated APIs, incorrect function signatures, wrong line references).
   3. Assess Constraints: Check for platform compatibility concerns (Node vs Bun APIs, Windows path resolution/CRLF issues) and repository-specific guidelines.
-  4. STRICT ISOLATION CONSTRAINT: You must NEVER check out the default branch, active topic branch, commit directly to them, or attempt to merge branches. You must operate strictly within your local isolated workspace.
+  4. STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, `prek run`, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
   5. [Adversarial Mode Only] Double-Check/Adversarial Audit: The ticket content includes a `## Review` section from a previous review. Critically assess if those findings are correct and relevant. If any previous findings are incorrect or no longer apply, note that explicitly in your review. If new findings or gaps are discovered, list them.
 
   Formulate a detailed review of this ticket. If it is accurate and ready, state that. Otherwise, list the critical findings or gaps as bullet points.
@@ -77,8 +81,18 @@ When a subagent completes:
    ```
 
 3. Save the file to disk (do **NOT** stage or commit).
-4. **CRITICAL CLEANUP CONSTRAINT**: As the Hub, you MUST clean up each subagent's worktree and branch immediately, regardless of whether the subagent succeeded, failed, or timed out. Failure to do so will break future iterations.
-   - Run `git worktree remove --force <path>`
-   - Run `git branch -D <branch-name>`
+4. **CRITICAL CLEANLINESS ASSERTION**: Triage agents read the parent working tree in place, so the Hub must confirm they left it untouched — run this after every batch, whether the agents succeeded, failed, or timed out:
+
+   ```bash
+   git status --porcelain
+   ```
+
+   If anything changed, an agent violated its read-only constraint. Restore the tree and warn the user:
+
+   ```bash
+   git reset --hard && git clean -fd
+   ```
+
+   This is safe here because spoke workspaces live outside the repository tree entirely (see `TARS_SPOKE_ROOT` in [tars-backlog-prepare](../tars-backlog-prepare/SKILL.md)), so no in-flight work can be caught by it. There are no worktrees or branches to tear down.
 
 Repeat for subsequent batches until all tickets in `.tars/issues/todo/` have been triaged/double-checked and contain an up-to-date `## Review` section.

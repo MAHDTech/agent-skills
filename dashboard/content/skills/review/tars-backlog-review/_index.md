@@ -26,6 +26,16 @@ This skill is invoked by the Hub for each branch implemented by a subagent. It c
 - **Ticket File Path**: Path to the ticket markdown file (e.g., `.tars/issues/todo/001.md`).
 - **Implementation Branch**: The git branch containing the changes (e.g., `subagent-001`).
 - **Target Branch**: The active topic branch to compare against (e.g., `fix/description-of-fix`).
+- **Spoke Clone Path**: The spoke's isolated clone, which already has the implementation branch checked out.
+
+## Where This Runs
+
+The Hub runs this review **after** the verification gate has passed, and before the merge — see [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md).
+
+Two consequences:
+
+- **Do not re-run the test suite or `prek run -a`.** They are already green for this branch. They are also starvation-sensitive commands that must be taken under the mutex, and re-running them here would occupy it for no new information.
+- **No workspace needs creating.** The spoke's clone is still alive with the branch checked out, so use it when a working tree is wanted. The branch also exists in the parent repository, because the Hub fetched it there for durability before gating — so diff extraction can run in the parent too, which needs no checkout and touches nothing.
 
 ## Workflow
 
@@ -48,7 +58,7 @@ git diff <merge-base>..<implementation-branch>
 
 ### 2. Run the Dual-Axis Review
 
-The general Spec-and-Standards review is not backlog-specific, so **delegate it to the [code-review](@/skills/review/code-review/_index.md) skill** rather than restating it here. Run that review — either inline, or in a subagent spawned on the implementation branch's isolated workspace/branch — and pass it:
+The general Spec-and-Standards review is not backlog-specific, so **delegate it to the [code-review](@/skills/review/code-review/_index.md) skill** rather than restating it here. Run that review — either inline, or in a subagent working in the spoke's existing clone — and pass it:
 
 - the **ticket as the originating spec/issue** (its `## Description`, `## Tasks`, and `## Acceptance Criteria`), and
 - the **diff** (or the implementation branch and its merge-base) as the range to review.

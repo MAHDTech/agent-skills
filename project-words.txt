@@ -48,6 +48,8 @@ gamedev
 ghostty
 giphy
 grabbable
+hardlink
+hardlinked
 hitl
 icat
 imgcat
@@ -114,7 +116,9 @@ pytest
 qcow
 quickstarts
 readlink
+realpath
 reinstall
+respawn
 rfds
 rgba
 roundrect
@@ -132,6 +136,8 @@ skimmability
 skimmable
 spacetimedb
 sqfs
+stfolder
+stignore
 strokecolor
 sublicense
 subsubpath
@@ -153,10 +159,12 @@ thumbsup
 tidewave
 timebox
 timeboxed
+tmpfs
 TOCTOU
 todoread
 todowrite
 toolsdirectory
+toplevel
 unitless
 unmirrored
 velero
