@@ -28,7 +28,7 @@ The Hub runs this review **after** the verification gate has passed, and before 
 
 Two consequences:
 
-- **Do not re-run the test suite or `prek run -a`.** They are already green for this branch. They are also starvation-sensitive commands that must be taken under the mutex, and re-running them here would occupy it for no new information.
+- **Do not re-run the test suite or the whole-repo hook run.** They are already green for this branch. They are also starvation-sensitive commands that must be taken under the mutex, and re-running them here would occupy it for no new information.
 - **No workspace needs creating.** The spoke's clone is still alive with the branch checked out, so use it when a working tree is wanted. The branch also exists in the parent repository, because the Hub fetched it there for durability before gating — so diff extraction can run in the parent too, which needs no checkout and touches nothing.
 
 ## Workflow
@@ -58,6 +58,37 @@ The general Spec-and-Standards review is not backlog-specific, so **delegate it 
 - the **diff** (or the implementation branch and its merge-base) as the range to review.
 
 `/code-review` reports the two axes: **Spec** (does the change do what the ticket asked?) and **Standards** (does it follow the repo's documented conventions and avoid common code smells?).
+
+#### Reviewer prompt template
+
+When running the review in a subagent, the constraints above are **not** inherited — the subagent never sees this document. Carry them explicitly:
+
+```text
+You are reviewing one backlog ticket's implementation. Work in the spoke's clone at <SPOKE_DIR>,
+on branch <IMPLEMENTATION_BRANCH>, against merge-base <MERGE_BASE>.
+
+Ticket (the originating spec):
+<TICKET_CONTENT>
+
+DO NOT RUN THE TEST SUITE, AND DO NOT RUN THE REPOSITORY'S HOOKS ACROSS ALL FILES.
+Both have already passed for this exact branch — the Hub gated it before calling you.
+They are also serialised behind a shared mutex, so re-running them blocks every other
+spoke in the batch to re-prove a result that is already known. Read the diff and the
+code; do not re-execute the gate.
+
+You may run cheap, read-only commands (git log/diff/show, typecheck, reading files).
+
+Report:
+1. Spec — does the change do what the ticket asked?
+2. Standards — does it follow the repo's documented conventions and avoid common code smells?
+3. Task & Criteria Coverage — is every '## Tasks' and '## Acceptance Criteria' checkbox genuinely
+   satisfied by the diff, not merely ticked?
+4. Evidence Authenticity — do the '## Evidence' command logs correspond to the implemented code,
+   rather than being fabricated, stale, or copied from an unrelated run?
+
+End with exactly one verdict line: APPROVED or REQUEST REWORK, followed by bulleted,
+actionable findings.
+```
 
 On top of that, apply the backlog-specific checks the general review does not cover:
 

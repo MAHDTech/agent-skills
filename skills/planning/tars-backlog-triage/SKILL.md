@@ -60,7 +60,7 @@ Equip each subagent with:
      - Are there any gaps? (e.g., missing package configurations, unmentioned side effects, compile-time type errors, build script modifications).
      - Are there any hallucinations? (e.g., non-existent files, deprecated APIs, incorrect function signatures, wrong line references).
   3. Assess Constraints: Check for platform compatibility concerns (Node vs Bun APIs, Windows path resolution/CRLF issues) and repository-specific guidelines.
-  4. STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, `prek run`, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
+  4. STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, a hook runner, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
   5. [Adversarial Mode Only] Double-Check/Adversarial Audit: The ticket content includes a `## Review` section from a previous review. Critically assess if those findings are correct and relevant. If any previous findings are incorrect or no longer apply, note that explicitly in your review. If new findings or gaps are discovered, list them.
 
   Formulate a detailed review of this ticket. If it is accurate and ready, state that. Otherwise, list the critical findings or gaps as bullet points.

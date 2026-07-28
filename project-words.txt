@@ -16,6 +16,7 @@ cachix
 cfasync
 cheatsheet
 checkboxed
+Codeberg
 colour
 commitlog
 contextlib
@@ -32,6 +33,8 @@ despawns
 devenv
 direnv
 dockerfiles
+drivedownload
+driveupload
 edgecase
 endmacro
 endraw
@@ -47,10 +50,12 @@ functools
 gamedev
 ghostty
 giphy
+Gitea
 grabbable
 hardlink
 hardlinked
 hitl
+husky
 icat
 imgcat
 iseconds
@@ -63,6 +68,7 @@ khtml
 kommander
 konvoy
 kubeconfig
+lefthook
 leitwort
 lifecycle
 llms
@@ -82,6 +88,7 @@ mocharc
 mockability
 mtimes
 navbars
+Nextcloud
 nixfmt
 nixos
 nixpkgs

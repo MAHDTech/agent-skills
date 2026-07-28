@@ -48,7 +48,7 @@ Equip each subagent with:
   3. Automated Testing: Test coverage gaps, missing integration suites, and fragile mock patterns.
   4. Features & Enhancements: Programmatic tools or utility endpoints that would improve user/agent experience.
 
-  STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, `prek run`, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
+  STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, a hook runner, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
 
   Verification & Output Format:
   - If the module is clean, stable, and conforms fully to the above criteria, reply with exactly:
