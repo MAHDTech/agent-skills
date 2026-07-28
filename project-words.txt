@@ -72,6 +72,7 @@ lefthook
 leitwort
 lifecycle
 llms
+lockfiles
 mahd
 MAHDTech
 makefiles
@@ -125,6 +126,8 @@ quickstarts
 readlink
 realpath
 reinstall
+reparented
+reparenting
 respawn
 rfds
 rgba

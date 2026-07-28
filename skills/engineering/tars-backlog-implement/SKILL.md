@@ -78,6 +78,18 @@ concurrency:
 
 The corollary is that a _wrapper_ must not be listed. An entry of `devenv` or `bun` on its own would match `devenv shell -- prek run <file>`, serialising precisely the cheap deterministic checks that are supposed to stay parallel. Match on the action (`test`, `coverage`, `build`), never on the shell that runs it.
 
+### Leaked workers defeat the mutex
+
+Test runners spawn worker processes, and a worker that outlives its parent is **reparented to init**. It then holds no lock, so the mutex cannot see it — while it saturates cores exactly like a second concurrent suite. This is worse than an unlocked command: it starves every spoke and both gates while the system looks idle, so nothing in the pipeline attributes the resulting slowness or false failures to it. One observed leak ran for over three hours across 15 threads and ignored `SIGTERM`.
+
+Three defences, in order of reliability:
+
+1. **`tars-lock` contains and reaps.** It runs each command in its own process group and signals the whole group on exit — `SIGTERM`, escalating to `SIGKILL` after five seconds. This works even after descendants are reparented, because process-group membership survives reparenting. It degrades to no reaping (never to failure) where `ps` is unavailable, and can be disabled with `TARS_LOCK_NO_REAP=1`.
+2. **Spokes must not background heavy commands.** Run them in the foreground and let them exit. A spoke that reports completion while its test runner is still alive has leaked by construction.
+3. **The Hub sweeps between batches.** Before starting a new batch, look for processes matching the repository's heavy commands that belong to no live spoke, and kill them. Something that ignores `SIGTERM` needs `SIGKILL`.
+
+> Do this sweep even when the batch looked clean. The cost of a leak scales with batch size — five spokes leaking a few hundred megabytes each, every batch, is how a machine reaches an OOM kill — and the symptom, tests failing under load, is the one the mutex exists to prevent, so it will be misread as a flaky suite.
+
 ## The Verification Gate
 
 The Hub runs this twice — once per spoke inside its clone, once on the topic branch after the batch. Both use the same shape, and the quoting is the part that goes wrong.
@@ -134,14 +146,35 @@ Putting the install inside the gate chain covers all three, because every one of
 1. Scan the `.tars/issues/todo/` directory for ticket markdown files.
 2. Analyze the `files` or `component` lists of all pending tickets, and their `dependencies` frontmatter.
 3. Dynamically group the tickets into batches of at most 5 concurrent tickets. A batch is admissible only if **both** rules hold:
-   - **File rule**: no two tickets in the batch modify overlapping files.
+   - **File rule**: no two tickets in the batch modify overlapping files, compared using each ticket's `files:` frontmatter.
    - **Dependency rule**: no ticket in the batch names, in its `dependencies`, another ticket that is in the same batch or is still unmerged (anywhere in `.tars/issues/todo/` or `.tars/issues/failed/`).
-4. Update the ticket frontmatter with `batch: X` (starting with `batch: 1`) and write to disk so batches are remembered.
-5. Prior to executing a batch, the Hub must verify that all tickets in the current batch satisfy **both** rules.
-6. **Resolve tickets the dependency rule can never admit.** Before declaring a pass complete, check every ticket still unbatched:
-   - **Dependency in `.tars/issues/failed/`**: the dependent can never become eligible. Move it to `.tars/issues/failed/` too, recording under `## Implementation Review` which failed dependency blocked it.
-   - **Dependency cycle** (A depends on B, B depends on A, directly or transitively): no member can ever be batched. Move every ticket in the cycle to `.tars/issues/failed/`, naming the cycle, and report it — a cycle is a ticket-authoring bug, not a scheduling one.
-   - **Dependency on an ID that does not exist** in any of the three folders: treat the edge as satisfied and warn, rather than blocking forever on a ticket that was never written.
+
+   **A ticket with no `files:` list fails the File rule — it does not pass it.** An absent list means "unknown footprint", and comparing two unknowns finds no overlap, so a naive reading batches everything together precisely when it has the least idea what will collide. When `files:` is missing or empty, either derive it first (read the ticket body and the code it names, then write the list back to the frontmatter) or schedule that ticket **alone**. Never treat an empty list as a wide berth.
+
+   > `component:` is not a substitute. It is coarse by design — a backlog where most tickets share one component would batch them all, and several tickets editing different files under one directory is exactly the case the File rule exists to catch. Use it to _suspect_ a collision, never to clear one.
+
+#### Shared append-only files
+
+Some files every ticket may need to touch without knowing it in advance: a spellcheck dictionary, a changelog, a barrel/index re-export, an i18n catalogue, a lockfile. A spoke adding a new identifier discovers mid-implementation that a blocking hook requires a dictionary entry, and appends one line to the tail of a file every other spoke is also appending to.
+
+The File rule cannot prevent this — the need is unforeseeable at ticket-writing time — and it would be wrong to try: serialising every ticket that _might_ need a dictionary entry would serialise the whole backlog.
+
+Declare them instead, and resolve them mechanically. Read `worktree.shared_append_files` from `.tars/config.yaml`:
+
+```yaml
+worktree:
+  shared_append_files:
+    - "project-words.txt"
+    - "CHANGELOG.md"
+```
+
+For a file on this list, a merge conflict is **expected and not a rework trigger**. The Hub resolves it by taking the union of both sides, applying the file's own ordering convention (sorted for a dictionary, newest-first for a changelog), and continuing the merge. Sending a spoke back to rework over two independent additions to a word list would burn an attempt on a conflict that carries no disagreement about the code.
+
+> Everything else stays a real conflict. This exception is for files whose semantics are "an unordered set of lines", where both sides are simply right. Do not extend it to source files. 4. Update the ticket frontmatter with `batch: X` (starting with `batch: 1`) and write to disk so batches are remembered. 5. Prior to executing a batch, the Hub must verify that all tickets in the current batch satisfy **both** rules. 6. **Resolve tickets the dependency rule can never admit.** Before declaring a pass complete, check every ticket still unbatched:
+
+- **Dependency in `.tars/issues/failed/`**: the dependent can never become eligible. Move it to `.tars/issues/failed/` too, recording under `## Implementation Review` which failed dependency blocked it.
+- **Dependency cycle** (A depends on B, B depends on A, directly or transitively): no member can ever be batched. Move every ticket in the cycle to `.tars/issues/failed/`, naming the cycle, and report it — a cycle is a ticket-authoring bug, not a scheduling one.
+- **Dependency on an ID that does not exist** in any of the three folders: treat the edge as satisfied and warn, rather than blocking forever on a ticket that was never written.
 
 > Step 6 is what stops the dependency rule from stalling the loop. "Cannot be batched yet" and "can never be batched" look identical to a scheduler, and without an explicit sweep a ticket blocked behind a failed or cyclic dependency stays in `todo/` forever — which never terminates, because the convergence condition is an empty `todo/`.
 >
@@ -273,6 +306,7 @@ Do **NOT** wait passively for the whole batch — a single stuck spoke would blo
 - **Detect blocked/approval-waiting spokes**: a spoke may issue a command that gets suspended waiting for user approval, and such prompts do not always bubble up. If your runtime surfaces spoke logs or state, inspect the latest entries; otherwise rely on its status signal. When a spoke appears blocked on an approval, warn the user explicitly:
   `"⚠️ Subagent <role> is waiting for your approval to run a command. Please switch to its session or approve the command."`
 - **A spoke waiting on the mutex is not stuck.** `tars-lock` prints a notice to stderr after 30 seconds of waiting. Queued is the system working as designed.
+- **Never infer completion from log content.** Use the runtime's own status signal for the subagent, or an explicit completion report from the spoke. Pattern-matching its output for words like `error`, `fail`, or `done` gives false readings, because a passing suite prints those words while exercising its error paths — so a still-running gate reads as finished. A Hub that trusts such a signal merges on an unfinished gate, which is the one failure this whole ordering exists to prevent.
 - If a spoke has stopped (e.g. due to a crash or restart) before its ticket resolved, revive it with a follow-up query, or restart it on its branch. Prefer `SIGTERM` over `SIGKILL` when stopping a spoke: the mutex's fallback path keys on the wrapper's PID, and `SIGKILL` can briefly let two heavy commands overlap.
 
 ### 4. Verify, Then Merge (Hub Only)

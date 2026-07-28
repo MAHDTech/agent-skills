@@ -21,10 +21,19 @@
 # descriptor, so it survives until the wrapped command itself exits. The mkdir
 # fallback keys on the wrapper's PID, so killing the wrapper makes the lock
 # reclaimable while its child may still be running. Prefer SIGTERM when
-# stopping a spoke; SIGKILL can briefly let two heavy commands overlap.
+# stopping a spoke; SIGKILL can briefly let two heavy commands overlap, and it
+# skips the traps that would otherwise reap the command's process group.
+#
+# It also contains what it runs. The command gets its own process group, and
+# that whole group is signalled when the command finishes or the wrapper is
+# interrupted. Without this, a test runner that leaks worker processes leaves
+# them reparented to init, holding no lock and therefore invisible to the
+# mutex, while they saturate the machine -- causing exactly the false test
+# failures the mutex exists to prevent.
 #
 # Environment:
-#   TARS_LOCK_TIMEOUT  seconds to wait before giving up (default 3600)
+#   TARS_LOCK_TIMEOUT   seconds to wait before giving up (default 3600)
+#   TARS_LOCK_NO_REAP   set to any value to leave stray processes alone
 #
 # Exit codes:
 #   75  could not acquire the lock before the timeout
@@ -56,13 +65,62 @@ mkdir -p "$LOCK_PARENT" || {
 	exit 73
 }
 
+CHILD_PGID=""
+
+reap_group() {
+	# A leaked worker is worse than a slow one. Test runners routinely spawn
+	# workers that outlive their parent; once orphaned they are reparented to
+	# init, so they hold no lock and the mutex sees an idle system while they
+	# saturate every core. That inverts the whole point of serialising heavy
+	# commands, so the wrapper cleans up after itself.
+	[ -n "${TARS_LOCK_NO_REAP:-}" ] && return 0
+	[ -n "$CHILD_PGID" ] || return 0
+
+	# Never signal our own process group -- that would take the caller,
+	# and the whole agent session, down with it.
+	# `|| true` matters: a minimal container may ship neither ps nor tr, and
+	# under `set -e` a failing command substitution would abort the wrapper
+	# rather than the command it exists to run. No PGID means no reaping.
+	self_pgid="$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ' 2>/dev/null || true)"
+	[ -n "$self_pgid" ] || return 0
+	[ "$CHILD_PGID" = "$self_pgid" ] && return 0
+
+	kill -0 "-$CHILD_PGID" 2>/dev/null || return 0
+	echo "tars-lock: reaping stray processes in group $CHILD_PGID" >&2
+	kill -TERM "-$CHILD_PGID" 2>/dev/null || true
+
+	waited_for_exit=0
+	while [ "$waited_for_exit" -lt 5 ]; do
+		kill -0 "-$CHILD_PGID" 2>/dev/null || return 0
+		sleep 1
+		waited_for_exit=$((waited_for_exit + 1))
+	done
+
+	echo "tars-lock: group $CHILD_PGID ignored SIGTERM, sending SIGKILL" >&2
+	kill -KILL "-$CHILD_PGID" 2>/dev/null || true
+}
+
 run_command() {
-	# Run the wrapped command without `set -e` killing us, so the lock is
-	# released cleanly and the command's real status is propagated.
+	# Job-control mode puts the command in a process group of its own, which
+	# is what makes the whole group signallable as a unit later -- including
+	# descendants that have since been reparented away from us.
+	set -m 2>/dev/null || true
+	"$@" &
+	cmd_pid=$!
+	set +m 2>/dev/null || true
+
+	# Never fatal: if ps or tr is unavailable this stays empty and reaping is
+	# simply skipped, which degrades containment without breaking the gate.
+	CHILD_PGID="$(ps -o pgid= -p "$cmd_pid" 2>/dev/null | tr -d ' ' 2>/dev/null || true)"
+
+	# Run without `set -e` killing us, so the lock is released cleanly and the
+	# command's real status is propagated.
 	set +e
-	"$@"
+	wait "$cmd_pid"
 	command_status=$?
 	set -e
+
+	reap_group
 	return "$command_status"
 }
 
@@ -83,6 +141,13 @@ if command -v flock >/dev/null 2>&1; then
 		echo "tars-lock: timed out after ${TIMEOUT}s waiting for $LOCK" >&2
 		exit 75
 	fi
+
+	# Reap on the way out however we leave, so an interrupted wrapper does not
+	# strand the very workers it was meant to contain.
+	trap 'reap_group' EXIT
+	trap 'reap_group; exit 130' INT
+	trap 'reap_group; exit 143' TERM
+	trap 'reap_group; exit 129' HUP
 
 	run_command "$@"
 	exit $?
@@ -106,10 +171,10 @@ release_lock() {
 		rm -rf "$LOCKDIR"
 	fi
 }
-trap release_lock EXIT
-trap 'release_lock; exit 130' INT
-trap 'release_lock; exit 143' TERM
-trap 'release_lock; exit 129' HUP
+trap 'reap_group; release_lock' EXIT
+trap 'reap_group; release_lock; exit 130' INT
+trap 'reap_group; release_lock; exit 143' TERM
+trap 'reap_group; release_lock; exit 129' HUP
 
 waited=0
 orphan_seen=0

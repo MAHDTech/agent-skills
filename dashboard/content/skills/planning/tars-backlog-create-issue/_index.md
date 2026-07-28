@@ -43,6 +43,11 @@ files:
   - path/to/file1.ts
 ---
 
+> [!IMPORTANT]
+> **`files:` is mandatory and must not be empty.** It is the only input to the File rule that decides which tickets may be implemented in parallel — see [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md). A ticket without it cannot be batched with anything and must run alone, so an omitted list silently serialises the backlog at best, and at worst gets treated as "no conflicts" and batched into a collision.
+>
+> List every file the work will touch, including ones changed only incidentally: test files, fixtures, barrel/index re-exports, lockfiles, and shared append-only files such as a spellcheck dictionary. Under-declaring is the failure that matters; over-declaring only costs a little parallelism.
+
 # XXX — Issue Name
 
 ## Description
