@@ -61,7 +61,8 @@ Two rules hold across every phase below. Both are established in full by [tars-b
 4. On a green gate, the Hub executes [tars-backlog-review](../../review/tars-backlog-review/SKILL.md) inline for the double-axis verdict. Approved branches merge sequentially into the topic branch and their tickets move to `.tars/issues/done/`; either way the spoke is told its ticket is resolved so it can stop.
 5. For rejected tickets, the Hub will update their status to `rework`, append the review comments, and return them to the todo queue while preserving the implementation branch for the next attempt.
 6. After the whole batch has merged, the Hub runs the full gate once more on the topic branch, catching interactions between tickets that were conflict-free by file but not by behaviour.
-7. Wait for the implementation and review phase to run to completion.
+7. If the topic branch is pushed and the repository runs CI, the Hub confirms CI agrees before starting the next batch — a green local gate is not a green CI, and an undiagnosed CI failure is worth recording against its ticket rather than carrying forward silently.
+8. Wait for the implementation and review phase to run to completion.
 
 ## Convergence
 

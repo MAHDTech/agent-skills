@@ -175,6 +175,7 @@ toplevel
 unitless
 unmirrored
 velero
+venv
 vercel
 verdana
 wayfinder

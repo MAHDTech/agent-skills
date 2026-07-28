@@ -96,22 +96,42 @@ So: the `sh -c` argument is **double-quoted**, letting the outer shell interpola
 # Plain repository. <angle brackets> are substituted by the Hub before running.
 PRE_COMMIT_HOME="<spoke-root>/hook-cache" \
   sh "<tars-lock>" "<heavy-lock>" \
-  sh -c "cd '<spoke-dir>' && <hook-command> && <test-command>"
+  sh -c "cd '<spoke-dir>' && <install-command> && <hook-command> && <test-command>"
 ```
 
-**When `TARS_HOOK_COMMAND` is empty** — a legitimate result for a repository with no hook runner — substitute `:`, the POSIX no-op. Splicing an empty string leaves `&& &&`, which is a syntax error, not an empty step.
+**The gate always installs first.** It is idempotent and costs milliseconds when the lockfile has not moved, and it removes an entire class of false red gates — see _Installed dependencies go stale_ below.
+
+**When a substituted command is empty** — `TARS_HOOK_COMMAND` for a repository with no hook runner, or `TARS_INSTALL_COMMAND` for one with no install step — substitute `:`, the POSIX no-op. Splicing an empty string leaves `&& &&`, which is a syntax error, not an empty step.
 
 **In a `devenv` repository** every command must run inside `devenv shell --`, which nests a third shell. Interpolate at the outer level and keep the innermost layer in single quotes:
 
 ```bash
 PRE_COMMIT_HOME="<spoke-root>/hook-cache" \
   sh "<tars-lock>" "<heavy-lock>" \
-  sh -c "cd '<spoke-dir>' && devenv shell -- sh -c '<hook-command> && <test-command>'"
+  sh -c "cd '<spoke-dir>' && devenv shell -- sh -c '<install-command> && <hook-command> && <test-command>'"
 ```
 
 The hook and test commands sit inside single quotes here, so neither may itself contain a single quote. If one does, write the pair into a small script in the clone and run that instead of fighting the quoting.
 
 > Verify the gate command before trusting a red result. The first time it runs in a repository, confirm it actually executed in the clone — a gate that fails instantly, or that reports problems in files the ticket never touched, is a quoting bug rather than a finding.
+
+### Installed dependencies go stale
+
+Installed dependencies are derived from the lockfile, and **git moves the lockfile without touching `node_modules/`** (or `vendor/`, `target/`, `.venv/`). Any operation that changes the manifest therefore invalidates what is installed, and the next command fails with a missing-module error that looks like broken code.
+
+This bites in three distinct places, and fixing only one leaves the other two:
+
+| Moment                                           | Why it goes stale                                                                   |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Spoke starts in a fresh clone                    | Nothing is installed at all                                                         |
+| Spoke merges the topic branch to sync            | A **sibling** ticket may have added a dependency since this clone was made          |
+| Parent, after merging a dependency-adding ticket | The parent's installed tree predates the merge, so the batch-final gate fails on it |
+
+The third is the one that surprises people: the ticket's own gate was green — it installed its new dependency in its own clone — and the parent then fails with `Cannot find module` for that same dependency, immediately after a successful merge. Every dependency-adding ticket reproduces it.
+
+Putting the install inside the gate chain covers all three, because every one of those moments is followed by a gate. Re-run it after step 4.1's sync merge too, since the spoke's own cheap checks run outside the gate.
+
+> Use the **lockfile-respecting** install form — `bun install --frozen-lockfile`, `npm ci`, `cargo fetch --locked`, `uv sync --frozen`. At gate time the committed lockfile is the authority; an install that is free to resolve new versions could turn a green gate into a different dependency tree than the one being reviewed.
 
 ## Implementation Workflow
 
@@ -267,7 +287,7 @@ Process each spoke the moment it reports, rather than waiting for the batch. **V
 
 For each spoke that reports completion:
 
-1. **Sync the spoke onto the latest topic branch.** Instruct the spoke to run `git fetch origin && git merge origin/<topic-branch>`. Let the spoke resolve any conflicts; it has the context for its own code.
+1. **Sync the spoke onto the latest topic branch.** Instruct the spoke to run `git fetch origin && git merge origin/<topic-branch>`, then re-run the install command. Let the spoke resolve any conflicts; it has the context for its own code. The re-install matters because a sibling ticket may have added a dependency since this clone was made — see _Installed dependencies go stale_ above.
 
 2. **Capture the work durably.** Fetch the spoke's branch into the parent repository:
 
@@ -310,7 +330,17 @@ Repeat until every spoke in the batch has been merged, sent to rework, or failed
 
 Once the whole batch is merged, run the full gate once more — on the **topic branch**, in the parent workspace, under the mutex. Same shape and quoting rules as **The Verification Gate** above, with `<spoke-dir>` set to the parent repository root.
 
+Use the **same resolved commands** as the per-spoke gate — the values `tars-backlog-prepare` recorded, unchanged. Do not re-derive or substitute a shortened command here. A batch-final gate that runs less than the per-spoke gate cannot catch the cross-ticket interaction it exists for, and the divergence is invisible: both report green.
+
 Each spoke was verified against the topic branch as it stood at its own gate, but the topic branch moves as its siblings merge. This pass catches the semantic interaction that file-level conflict-free batching cannot see: two tickets that touch no common file, each green alone, that break each other once both are in.
 
 If this gate is red, the offending merge is one of the batch just landed. Identify it, revert that merge, and return its ticket to rework with the failure recorded under `## Implementation Review`. Then proceed to the next batch.
+
+### 6. Confirm CI Agrees (Hub Only)
+
+A green local gate is **not** a green CI. If the topic branch is pushed and the repository runs CI, check the result for the batch's head commit before starting the next batch.
+
+This is not belt-and-braces. The loop's value is that merged work is verified, and a CI-only failure discovered five batches later has to be bisected across everything merged since — whereas checking per batch names the culprit immediately. Where CI disagrees with a green local gate, record which workflow failed against the responsible ticket, even if the cause is not yet understood. "Merged, local gate green, CI workflow X red, undiagnosed" is a useful state; silently continuing is not.
+
+> **The mutex does not reach CI.** It bounds concurrent heavy commands during a backlog run _on this host_. A CI runner is a different machine under its own load, so a test that is timing-sensitive can still fail there while passing every local run — the same starvation class the mutex exists for, outside its reach. Two things make this materially worse and are worth checking in the CI config: a suite that runs more than once per workflow (hooks that invoke tests, plus a separate test step, plus a test task — the same duplication the gate avoids), and jobs running in parallel on one runner. Deduplicating those removes real pressure from exactly the tests that fail this way.
 
