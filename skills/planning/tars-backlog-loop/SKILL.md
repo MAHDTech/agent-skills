@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-loop
 description: Coordinate the full backlog lifecycle by sequentially executing tars-backlog-audit, tars-backlog-triage, and tars-backlog-implement to resolve all issues. Reach for this when asked to run a full backlog loop, converge on a complete project goal, or manage the overall ticket pipeline.
+disable-model-invocation: true
 ---
 
 # Backlog Loop

@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-prepare
 description: Prepare to run the tars-backlog-loop by cleaning up orphaned git worktrees and branches, and ensuring the working tree is clean. Reach for this to reset the environment before starting a full backlog loop.
+disable-model-invocation: true
 ---
 
 # Backlog Prepare

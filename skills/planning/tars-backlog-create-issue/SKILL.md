@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-create-issue
 description: Use when creating a new backlog issue/ticket in the `.tars/issues/todo/` directory, defining its YAML frontmatter, headings, tasks, acceptance criteria, evidence collection, and triage review expectations.
+disable-model-invocation: true
 ---
 
 # Backlog Create Issue

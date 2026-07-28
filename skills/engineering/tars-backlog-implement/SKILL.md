@@ -1,6 +1,7 @@
 ---
 name: tars-backlog-implement
 description: Implement pending backlog issues from `.tars/issues/todo/` in parallel, conflict-free batches using isolated workspaces. Reach for this when asked to implement backlog issues, execute tasks from tickets in parallel, or resolve the issue queue.
+disable-model-invocation: true
 ---
 
 # Backlog Implement
