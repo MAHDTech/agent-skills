@@ -997,6 +997,110 @@ Some content`
             expect(agentsContent).not.toContain("undefined")
         })
 
+        it("should stage DASHBOARD_CONTENT_DIR during unfiltered sync when SKILLS_SKIP_DASHBOARD is not set", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "valid-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: valid-skill
+description: A perfectly valid skill
+---
+Some content`
+            )
+
+            const childProcess = await import("child_process")
+            const execSpy = spyOn(
+                childProcess,
+                "execFileSync"
+            ).mockImplementation(() => "" as any)
+
+            const {sync} = await import("./sync.ts")
+            const {
+                AGENTS_FILE,
+                README_FILE,
+                SKILLS_SH_FILE,
+                DASHBOARD_CONTENT_DIR,
+            } = await import("./lib.ts")
+
+            const oldSkip = process.env.SKILLS_SKIP_DASHBOARD
+            delete process.env.SKILLS_SKIP_DASHBOARD
+
+            try {
+                await sync()
+                expect(execSpy).toHaveBeenCalledWith(
+                    "git",
+                    [
+                        "add",
+                        AGENTS_FILE,
+                        README_FILE,
+                        SKILLS_SH_FILE,
+                        DASHBOARD_CONTENT_DIR,
+                    ],
+                    {stdio: "inherit"}
+                )
+            } finally {
+                if (oldSkip !== undefined) {
+                    process.env.SKILLS_SKIP_DASHBOARD = oldSkip
+                } else {
+                    delete process.env.SKILLS_SKIP_DASHBOARD
+                }
+                execSpy.mockRestore()
+            }
+        })
+
+        it("should omit DASHBOARD_CONTENT_DIR from staging during unfiltered sync when SKILLS_SKIP_DASHBOARD is set", async () => {
+            const skillPath = path.join(
+                SKILLS_DIR,
+                "engineering",
+                "valid-skill",
+                "SKILL.md"
+            )
+            await fs.ensureDir(path.dirname(skillPath))
+            await fs.writeFile(
+                skillPath,
+                `---
+name: valid-skill
+description: A perfectly valid skill
+---
+Some content`
+            )
+
+            const childProcess = await import("child_process")
+            const execSpy = spyOn(
+                childProcess,
+                "execFileSync"
+            ).mockImplementation(() => "" as any)
+
+            const {sync} = await import("./sync.ts")
+            const {AGENTS_FILE, README_FILE, SKILLS_SH_FILE} =
+                await import("./lib.ts")
+
+            const oldSkip = process.env.SKILLS_SKIP_DASHBOARD
+            process.env.SKILLS_SKIP_DASHBOARD = "1"
+
+            try {
+                await sync()
+                expect(execSpy).toHaveBeenCalledWith(
+                    "git",
+                    ["add", AGENTS_FILE, README_FILE, SKILLS_SH_FILE],
+                    {stdio: "inherit"}
+                )
+            } finally {
+                if (oldSkip !== undefined) {
+                    process.env.SKILLS_SKIP_DASHBOARD = oldSkip
+                } else {
+                    delete process.env.SKILLS_SKIP_DASHBOARD
+                }
+                execSpy.mockRestore()
+            }
+        })
+
         it("should selectively sync by category", async () => {
             const skillA = path.join(
                 SKILLS_DIR,
