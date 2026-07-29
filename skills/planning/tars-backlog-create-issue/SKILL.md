@@ -59,7 +59,7 @@ Detailed list of concrete developer tasks to complete:
 
 Explicit, checkable conditions that must be satisfied for the ticket to be considered complete:
 
-- [ ] Criterion 1 (e.g. `devenv test` passes without error)
+- [ ] Criterion 1 (e.g. `devenv --no-tui test` passes without error)
 - [ ] Criterion 2 (e.g. Invalid input is caught and returns exit code 1)
 
 ## Evidence
@@ -92,7 +92,7 @@ The triage agent will review the ticket and append a `## Review` section contain
 The implementation agent must:
 
 1. Complete all checkboxes in the `## Tasks` and `## Acceptance Criteria` sections.
-2. Run `devenv test` (or the project's test command) and verify the tests pass.
+2. Run `devenv --no-tui test` (or the project's test command) and verify the tests pass.
 3. Document terminal outputs or test run success under the `## Evidence` section.
 4. Conventional commits must be used when committing the changes.
 

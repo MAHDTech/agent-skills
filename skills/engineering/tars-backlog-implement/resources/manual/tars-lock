@@ -3,7 +3,7 @@
 # tars-lock -- run a command under a portable, single-holder mutex.
 #
 # Usage:  tars-lock <lock-path> <command> [args...]
-# Example: tars-lock "$HOME/.cache/tars/locks/myrepo.heavy" devenv test
+# Example: tars-lock "$HOME/.cache/tars/locks/myrepo.heavy" devenv --no-tui test
 #
 # Backlog spokes run in parallel, but starvation-sensitive commands (test
 # suites, nix/devenv builds, whole-repo hook runs) produce false failures when

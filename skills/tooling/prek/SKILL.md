@@ -20,7 +20,7 @@ description: Run pre-commit hooks using the prek CLI tool. Differentiates betwee
 When working inside a `devenv` shell, run:
 
 ```bash
-SECRETSPEC_REASON="running pre-commit hooks" devenv shell -- prek run -a
+SECRETSPEC_REASON="running pre-commit hooks" devenv --no-tui shell -- prek run -a
 ```
 
 If not using `devenv`, run:

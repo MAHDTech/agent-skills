@@ -305,48 +305,48 @@ export function getDomainPrefix(urlStr: string): string {
 
 // Clean and format slug names for downloaded files
 export function smartSlugify(urlStr: string, commonPrefix?: string): string {
-    let pathStr = stripReaderProxy(urlStr)
-    if (commonPrefix && pathStr.startsWith(commonPrefix)) {
-        pathStr = pathStr.slice(commonPrefix.length)
-    } else {
-        try {
-            const url = new URL(pathStr)
-            pathStr = url.pathname
-        } catch {
-            // Fallback
+    const cleanUrl = stripReaderProxy(urlStr)
+
+    let pathname = ""
+    try {
+        const url = new URL(cleanUrl)
+        if (commonPrefix && cleanUrl.startsWith(commonPrefix)) {
+            pathname = cleanUrl.slice(commonPrefix.length)
+            const hashIdx = pathname.indexOf("#")
+            if (hashIdx !== -1) pathname = pathname.slice(0, hashIdx)
+            const queryIdx = pathname.indexOf("?")
+            if (queryIdx !== -1) pathname = pathname.slice(0, queryIdx)
+        } else {
+            pathname = url.pathname
         }
+    } catch {
+        pathname = cleanUrl
     }
 
     try {
-        pathStr = decodeURIComponent(pathStr)
+        pathname = decodeURIComponent(pathname)
     } catch {}
 
-    // Remove leading/trailing slashes
-    pathStr = pathStr.replace(/^\/+|\/+$/g, "")
+    // Remove leading and trailing slashes
+    pathname = pathname.replace(/^\/+|\/+$/g, "")
 
-    if (!pathStr) {
+    if (!pathname) {
         return "overview-index.md"
     }
 
-    // Determine extension
+    // Determine extension and base pathname
     let ext = ".md"
-    if (pathStr.endsWith(".txt")) {
-        ext = ".txt"
-        pathStr = pathStr.slice(0, -4)
-    } else if (pathStr.endsWith(".md")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -3)
-    } else if (pathStr.endsWith(".mdx")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -4)
-    } else if (pathStr.endsWith(".html")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -5)
+    const knownExts = [".txt", ".md", ".mdx", ".html"]
+    for (const kExt of knownExts) {
+        if (pathname.endsWith(kExt)) {
+            ext = kExt === ".txt" ? ".txt" : ".md"
+            pathname = pathname.slice(0, -kExt.length)
+            break
+        }
     }
 
     // Replace slashes with dashes and clean up characters
-    let slug = pathStr.replace(/\//g, "-")
-    slug = slug.replace(/[^a-zA-Z0-9.\-_]/g, "")
+    let slug = pathname.replace(/\//g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "")
 
     if (!slug || slug.toLowerCase() === "index") {
         slug = "overview-index"
@@ -377,6 +377,7 @@ export function parseLlmsTxtLinks(content: string, baseUrl: string): string[] {
     for (const u of urls) {
         try {
             const resolvedUrl = new URL(u, base)
+            resolvedUrl.hash = ""
             // Only keep URLs sharing the same origin or base second-level domain name (e.g. bun.sh and bun.com)
             const resolvedDomain = getDomainPrefix(resolvedUrl.toString())
             const baseDomain = getDomainPrefix(base.toString())

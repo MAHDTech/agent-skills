@@ -72,11 +72,11 @@ concurrency:
     - "nix build"
 ```
 
-**Matching rule**: an entry matches if it appears **anywhere in the full command line**, compared case-insensitively. Not prefix, not exact — substring. This is what makes `bun run test:coverage`, `devenv test`, `plugin --action test`, and `cargo test --workspace` all match the single entry `test`, without anyone having to enumerate every invocation a repository happens to use.
+**Matching rule**: an entry matches if it appears **anywhere in the full command line**, compared case-insensitively. Not prefix, not exact — substring. This is what makes `bun run test:coverage`, `devenv --no-tui test`, `plugin --action test`, and `cargo test --workspace` all match the single entry `test`, without anyone having to enumerate every invocation a repository happens to use.
 
 **When in doubt, take the lock.** The two errors are not symmetrical: over-matching costs a spoke some waiting, while under-matching costs a false test failure that sends correct work into the rework loop. An entry broad enough to catch an occasional cheap command is the right trade.
 
-The corollary is that a _wrapper_ must not be listed. An entry of `devenv` or `bun` on its own would match `devenv shell -- prek run <file>`, serialising precisely the cheap deterministic checks that are supposed to stay parallel. Match on the action (`test`, `coverage`, `build`), never on the shell that runs it.
+The corollary is that a _wrapper_ must not be listed. An entry of `devenv` or `bun` on its own would match `devenv --no-tui shell -- prek run <file>`, serialising precisely the cheap deterministic checks that are supposed to stay parallel. Match on the action (`test`, `coverage`, `build`), never on the shell that runs it.
 
 ### Leaked workers defeat the mutex
 
@@ -109,12 +109,12 @@ PRE_COMMIT_HOME="<spoke-root>/hook-cache" \
 
 **When a substituted command is empty** — `TARS_HOOK_COMMAND` for a repository with no hook runner, or `TARS_INSTALL_COMMAND` for one with no install step — substitute `:`, the POSIX no-op. Splicing an empty string leaves `&& &&`, which is a syntax error, not an empty step.
 
-**In a `devenv` repository** every command must run inside `devenv shell --`, which nests a third shell. Interpolate at the outer level and keep the innermost layer in single quotes:
+**In a `devenv` repository** every command must run inside `devenv --no-tui shell --`, which nests a third shell. Interpolate at the outer level and keep the innermost layer in single quotes:
 
 ```bash
 PRE_COMMIT_HOME="<spoke-root>/hook-cache" \
   sh "<tars-lock>" "<heavy-lock>" \
-  sh -c "cd '<spoke-dir>' && devenv shell -- sh -c '<install-command> && <hook-command> && <test-command>'"
+  sh -c "cd '<spoke-dir>' && devenv --no-tui shell -- sh -c '<install-command> && <hook-command> && <test-command>'"
 ```
 
 The hook and test commands sit inside single quotes here, so neither may itself contain a single quote. If one does, write the pair into a small script in the clone and run that instead of fighting the quoting.

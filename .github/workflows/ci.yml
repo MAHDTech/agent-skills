@@ -34,12 +34,12 @@ jobs:
       - id: prek_run
         name: Run pre-commit hooks
         run: |
-          devenv shell --verbose -- prek run -a
+          devenv --no-tui shell --verbose -- prek run -a
 
       - id: devenv_test
         name: Devenv test
         run: |
-          devenv test
+          devenv --no-tui test
 
       - id: report_status
         name: Report Status

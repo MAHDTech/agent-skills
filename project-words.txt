@@ -190,3 +190,4 @@ worktrees
 WSJF
 xclip
 ntnx
+slugifying

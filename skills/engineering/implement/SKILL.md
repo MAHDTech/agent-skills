@@ -16,7 +16,7 @@ This is **serial** implementation from a spec or a set of tickets. To clear a qu
 ## Flow
 
 1. **Implement.** Work through the spec or tickets. Use `/tdd` wherever it fits, at pre-agreed seams: write the failing test, make it pass, refactor.
-2. **Verify.** Run typechecking and single test files regularly as you go, then run the full test suite once at the end. Run these through your project's tooling (for example `devenv shell -- <cmd>`). Don't move on while checks are red.
+2. **Verify.** Run typechecking and single test files regularly as you go, then run the full test suite once at the end. Run these through your project's tooling (for example `devenv --no-tui shell -- <cmd>`). Don't move on while checks are red.
 3. **Review.** Use `/code-review` to review the work before committing.
 4. **Commit.** Commit to the current branch using a conventional commit message.
 

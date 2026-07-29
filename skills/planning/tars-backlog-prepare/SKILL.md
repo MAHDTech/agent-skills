@@ -177,7 +177,7 @@ sh "$TARS_LOCK" /tmp/tars-preflight-probe true
 
 Determine, once, the three commands every spoke and gate will need, and verify each actually runs in this repository before recording it. Detect them from what the repository contains — never assume a specific toolchain:
 
-- **Test command** — what the Hub's verification gate runs. `devenv test` if `devenv.nix` or `devenv/default.nix` is present; otherwise the project's standard entry point (`bun test`, `npm test`, `cargo test`, `pytest`, `go test ./...`, `mix test`, …). Prefer the script the repository itself treats as its full suite, which is often not the bare runner: a `test:coverage` or `check` script may be the real gate.
+- **Test command** — what the Hub's verification gate runs. `devenv --no-tui test` if `devenv.nix` or `devenv/default.nix` is present; otherwise the project's standard entry point (`bun test`, `npm test`, `cargo test`, `pytest`, `go test ./...`, `mix test`, …). Prefer the script the repository itself treats as its full suite, which is often not the bare runner: a `test:coverage` or `check` script may be the real gate.
 - **Install command** — what a fresh clone needs before it can build or typecheck. Use the **lockfile-respecting** form, because this command also runs inside the verification gate where the committed lockfile is the authority: `bun install --frozen-lockfile`, `npm ci`, `cargo fetch --locked`, `uv sync --frozen`, `go mod download`. Record an empty value for repositories that need no install step.
 - **Hook command** — how this repository runs its whole-repo hooks, which the gate invokes before the tests:
 

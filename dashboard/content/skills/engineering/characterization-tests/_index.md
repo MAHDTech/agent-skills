@@ -16,7 +16,7 @@ Legacy or untested code you are about to change is a cliff with no guardrail. A 
 
 This is test-_around_ existing behaviour. For test-_first_ design of _new_ behaviour, run /tdd. Once the net is green, /sculpt-code and /upgrade-dependencies are safe to run against it.
 
-Run the suite through the project's toolchain — for example `devenv shell -- <cmd>` — so red and green mean the same thing every run.
+Run the suite through the project's toolchain — for example `devenv --no-tui shell -- <cmd>` — so red and green mean the same thing every run.
 
 ## Phase 1 — Find the seam
 

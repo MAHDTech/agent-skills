@@ -29,7 +29,7 @@ skills/                       # Skill directories grouped by category
 - **Runtime**: Bun (use `bun` not `npm`)
 - **Dashboard**: Zola (Rust-based static site generator)
 - **Styling**: Tailwind CSS v4
-- **Dev environment**: `devenv` (Nix). Always run commands inside the shell or via `devenv shell -- <cmd>`
+- **Dev environment**: `devenv` (Nix). Always run commands inside the shell or via `devenv --no-tui shell -- <cmd>`
 - **CI/CD**: GitHub Actions using composite actions and `devenv` for reproducibility
 
 ## Quick Commands

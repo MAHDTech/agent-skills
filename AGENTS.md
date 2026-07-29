@@ -16,9 +16,10 @@ See the [README.md](./README.md) for an overview of the project and available sk
 
 ## Development
 
-- Environment: This project requires `devenv`. Always check if `devenv` is active. Run ad-hoc commands inside the devenv shell with `devenv shell -- <command>`.
-  - **CRITICAL LINTING RULE:** NEVER run individual linters directly (e.g., `devenv shell -- markdownlint .`). All linters and pre-commit hooks (managed via `prek`, see the [prek](skills/tooling/prek/SKILL.md) skill) MUST be configured and run inside `devenv.nix`.
-  - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv test` or the `run-tests` wrappers. This is the single guaranteed path.
+- Environment: This project requires `devenv`. Always check if `devenv` is active. Run ad-hoc commands inside the devenv shell with `devenv --no-tui shell -- <command>`.
+  - ⚠️ **CRITICAL WARNING**: Always pass the `--no-tui` flag when running `devenv` commands (e.g., `devenv --no-tui shell`, `devenv --no-tui test`) in automated or AI agent environments to disable the interactive terminal interface and prevent commands from getting stuck.
+  - **CRITICAL LINTING RULE:** NEVER run individual linters directly (e.g., `devenv --no-tui shell -- markdownlint .`). All linters and pre-commit hooks (managed via `prek`, see the [prek](skills/tooling/prek/SKILL.md) skill) MUST be configured and run inside `devenv.nix`.
+  - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv --no-tui test` or the `run-tests` wrappers. This is the single guaranteed path.
   - If a specific linter or `prek` hook check doesn't exist, check the devenv MCP server or devenv agent docs. If you STILL don't find it, ask the user for confirmation.
 - Runtime: `bun`. Use `bun` for all scripts.
 - CLI Skills Tool: `bun run bin/skills/index.ts` (also `bun run skills`). Use this to lint and sync skills, and to symlink them for local development.

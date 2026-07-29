@@ -297,6 +297,27 @@ describe("downloader unit tests", () => {
                 "overview-index.md"
             )
         })
+
+        it("should strip hash fragments (#...) and query strings (?...) before slugifying", () => {
+            expect(
+                smartSlugify(
+                    "https:/" + "/docs.x.ai/llms.txt#audio-transport",
+                    "https:/" + "/docs.x.ai/"
+                )
+            ).toBe("llms.txt")
+            expect(
+                smartSlugify(
+                    "https:/" +
+                        "/docs.x.ai/developers/model-capabilities/text/generate-text#adding-encrypted-thinking-content",
+                    "https:/" + "/docs.x.ai/"
+                )
+            ).toBe("developers-model-capabilities-text-generate-text.md")
+            expect(
+                smartSlugify(
+                    "https:/" + "/example.com/docs/page?version=2#section"
+                )
+            ).toBe("docs-page.md")
+        })
     })
 
     it("should resolve same-domain filename collisions by appending a short hash of the URL", async () => {

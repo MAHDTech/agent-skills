@@ -12,7 +12,7 @@ mermaid = false
 
 # Create GitHub Issue from Conversation
 
-Consult the [gh issue manual](@/skills/github/gh-create-issue/resources/auto/manual-gh_issue.md) for more details.
+Consult the [gh issue manual](resources/auto/manual-gh_issue.md) for more details.
 
 Create a well-structured GitHub issue using `gh` CLI, populated with context from the current conversation.
 

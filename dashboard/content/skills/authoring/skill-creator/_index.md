@@ -146,8 +146,8 @@ Prune sentence by sentence: run the no-op test on each sentence in isolation, an
 
 Regenerate the derived artifacts and the router:
 
-1. `devenv shell -- skills --action lint` — validate frontmatter, naming, and placement.
-2. `devenv shell -- skills --action sync` — regenerate the README, `agents/AGENTS.md`, the Zola dashboard, and `skills.sh.json`.
+1. `devenv --no-tui shell -- skills --action lint` — validate frontmatter, naming, and placement.
+2. `devenv --no-tui shell -- skills --action sync` — regenerate the README, `agents/AGENTS.md`, the Zola dashboard, and `skills.sh.json`.
 3. Update the `/skill-router` index so the new or renamed skill is reachable.
 
 Done when lint passes, sync leaves no further diff, and the router names the skill.

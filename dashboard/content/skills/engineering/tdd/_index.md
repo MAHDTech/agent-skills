@@ -42,7 +42,7 @@ Ask: "What's the public interface, and which seams should we test?"
 
 - **Red before green.** Write the failing test first, then only enough code to pass it. Do not anticipate future tests or add speculative features.
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
-- **Run tests through the project's toolchain.** In this repo that means the pinned environment — for example `devenv shell -- bun test`. Confirm the runner before you start looping so red and green are reliable signals.
+- **Run tests through the project's toolchain.** In this repo that means the pinned environment — for example `devenv --no-tui shell -- bun test`. Confirm the runner before you start looping so red and green are reliable signals.
 - **Refactoring is not part of the loop.** It belongs to the review stage (run `/code-review`), not the red to green implementation cycle.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
