@@ -47,11 +47,7 @@ pixel-perfect reality.
 
 State-of-the-art image and video generation, editing, and restyling — one API for every visual modality.
 
-[Explore playground](https://console.x.ai/team/default/image?flow=explore&mode=generate&campaign=imagine-landing&utm_source=website&utm_medium=referral&utm_campaign=imagine-landing&utm_content=composer-explore)[Docs](https://docs.x.ai/developers/model-capabilities/imagine?campaign=imagine-landing)
-
-Image Video
-
-Generate Generate in Playground
+[Try Playground](https://console.x.ai/team/default/image?flow=explore&campaign=imagine-landing&utm_source=website&utm_medium=referral&utm_campaign=imagine-landing&utm_content=control)[Documentation](https://docs.x.ai/developers/model-capabilities/imagine?campaign=imagine-landing)
 
 Up to 2K resolution 10 images per request Video up to 15s From $0.02 / image
 

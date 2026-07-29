@@ -182,7 +182,7 @@ Zed Industries
 
 Make
 
-394k
+395k
 
 Makefile syntax highlighting
 
@@ -243,7 +243,7 @@ Caius Durling, Daniel Banck
 
 One Dark Pro
 
-282k
+283k
 
 A port of VSCode One Dark Pro with some tweaks
 

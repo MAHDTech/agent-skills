@@ -46,7 +46,7 @@ Non-inference
 
 eu-west-1 us-east-1
 
-99.92%
+100%
 
 Inference
 
@@ -56,7 +56,7 @@ Non-inference
 
 eu-west-1 us-west-2
 
-99.90%
+100%
 
 Inference
 
@@ -76,7 +76,7 @@ Non-inference
 
 us-east-1 us-east-1
 
-99.92%
+100%
 
 Inference
 
@@ -106,7 +106,7 @@ Non-inference
 
 us-west-2 us-east-1
 
-99.92%
+100%
 
 Inference
 
@@ -116,7 +116,7 @@ Non-inference
 
 us-west-2 us-west-2
 
-99.75%
+99.83%
 
 Inference
 
@@ -124,7 +124,7 @@ Inference
 
 Non-inference
 
-Last updated 27 seconds ago
+Last updated 30 seconds ago
 
 ## Services
 

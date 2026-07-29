@@ -49,21 +49,7 @@ SOC 2 Type II HIPAA GDPR & CCPA SSO & SCIM
 
 Summarize our recent order forms and put them into a pitch deck
 
-I've compiled 3 documents from your recent orders:
-
-Order_Summary.xlsx
-
-Aggregated order data — 142 line items
-
-Supplier_Terms.docx
-
-Vendor terms extracted from 6 contracts
-
-Pitch_Deck.pptx
-
-Executive summary — 12 slides
-
-Ask Grok anything...
+Summarize our recent order for
 
 Fast
 
@@ -155,19 +141,7 @@ Use Connectors to integrate your tools, automate workflows, and make your workpl
 *   Read and update records end-to-end
 *   Bring your own MCP server
 
-Build an account plan for Enterprise prospects in Q4 pipeline
-
-Here's a Q4 plan covering 12 enterprise targets, ranked by deal size and buying signals. 
-
-Research competitor pricing and create sales battlecards
-
-Analyzed 5 competitors. Key differentiators: real-time data, multi-model access, and 40% lower TCO. 
-
-Draft personalized outreach sequences for decision-makers
-
-Created 3 outreach sequences tailored to VP, Director, and C-suite personas with personalized hooks. 
-
-What do you want to know?
+Build an account plan for Enterprise prospects
 
 Fast
 
@@ -216,19 +190,7 @@ Draft campaign copy, subject lines, and landing page content that matches your b
 *   Leverages real-time knowledge from X
 *   Localization across markets, not just translation
 
-Create customer marketing campaigns using agent builder
-
-Built a 3-channel campaign targeting mid-market accounts with personalized messaging sequences. 
-
-Pull real-time user sentiment analysis to create copy
-
-Sentiment is 72% positive. Key themes: speed and reliability. Here's copy that leans into both. 
-
-Generate A/B test variants for email subject lines
-
-8 variants across urgency, curiosity, and social proof angles. Predicted top performer: 34% open rate. 
-
-What do you want to know?
+Create customer marketing campaigns using agen
 
 Fast
 
@@ -382,23 +344,11 @@ Raw Data
 
 Charts
 
-Revise Q4 projections with 15% higher bookings and recalculate YTD totals
+Revise Q4 projections with 15
 
 Fast
 
-Build an account plan for Enterprise prospects in Q4 pipeline
-
-Here's a Q4 plan covering 12 enterprise targets, ranked by deal size and buying signals. 
-
-Research competitor pricing and create sales battlecards
-
-Analyzed 5 competitors. Key differentiators: real-time data, multi-model access, and 40% lower TCO. 
-
-Draft personalized outreach sequences for decision-makers
-
-Created 3 outreach sequences tailored to VP, Director, and C-suite personas with personalized hooks. 
-
-What do you want to know?
+Build an account plan for Enterprise prospects
 
 Fast
 
