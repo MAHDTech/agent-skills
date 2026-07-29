@@ -91,7 +91,7 @@ List all batches for the current team.
 
 ### Response Body
 
-* `batches` (array\<object>, required) — The information about the batches.
+* `batches` (array\\<object\>, required) — The information about the batches.
 
   * `batch_id` (string, required) — The ID of the batch.
 
@@ -239,7 +239,7 @@ List metadata for all requests in a batch.
 
 ### Response Body
 
-* `batch_request_metadata` (array\<object>, required) — The batch request metadata for the given batch.
+* `batch_request_metadata` (array\\<object\>, required) — The batch request metadata for the given batch.
 
   * `batch_request_id` (string, required) — ID of the request. Unique within this batch.
 
@@ -285,7 +285,7 @@ Add multiple requests to an existing batch.
 
 ### Request Body
 
-* `batch_requests` (array\<object>, required) — List of batch requests to add to the batch
+* `batch_requests` (array\\<object\>, required) — List of batch requests to add to the batch
 
   * `batch_request` (object, required)
 
@@ -303,7 +303,7 @@ Add multiple requests to an existing batch.
 
       * `max_tokens` (integer | null) — \\\[DEPRECATED\\] The maximum number of tokens that can be generated in the chat completion. Deprecated in favor of \`max\_completion\_tokens\`.
 
-      * `messages` (array\<object | object | object | object | object>) — A list of messages that make up the the chat conversation. Different models support different message types, such as image and text.
+      * `messages` (array\\<object | object | object | object | object\>) — A list of messages that make up the the chat conversation. Different models support different message types, such as image and text.
 
       * `model` (string) — Model name for the model to use. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
@@ -417,7 +417,7 @@ List the processing results for a batch.
 
 * `pagination_token` (string | null) — The page token to retrieve results from the next page. Will be empty if this is the last page.
 
-* `results` (array\<object>, required) — The results that has been processed.
+* `results` (array\\<object\>, required) — The results that has been processed.
 
   * `batch_request_id` (string, required) — User-provided or generated identifier for the input request. If a user has provided \`batch\_request\_id\` in the
     \`BatchRequest\`, the value will match the user-provided value.
@@ -431,7 +431,7 @@ List the processing results for a batch.
 
       * `chat_get_completion` (object, required) — The chat response body for \`/v1/chat/completions\` endpoint.
 
-        * `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+        * `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
           * `finish_reason` (string | null) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -469,7 +469,7 @@ List the processing results for a batch.
 
           * `cache_write_input_bytes` (integer, required) — Size of cache write
 
-          * `chunks` (array\<string>, required) — The individual chunks returned from the pipeline of samplers.
+          * `chunks` (array\\<string\>, required) — The individual chunks returned from the pipeline of samplers.
 
           * `engine_request` (string, required) — JSON-serialized request sent to the inference engine.
 
@@ -479,7 +479,7 @@ List the processing results for a batch.
 
           * `request` (string, required) — The request received from the user.
 
-          * `responses` (array\<string>, required) — The response(s) received from the model.
+          * `responses` (array\\<string\>, required) — The response(s) received from the model.
 
           * `sampler_checkpoint_mount` (string, required) — The underlying checkpoint mount path for the sampler that served this request.
 

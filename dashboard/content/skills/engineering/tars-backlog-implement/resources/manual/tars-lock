@@ -1,0 +1,233 @@
+#!/bin/sh
+#
+# tars-lock -- run a command under a portable, single-holder mutex.
+#
+# Usage:  tars-lock <lock-path> <command> [args...]
+# Example: tars-lock "$HOME/.cache/tars/locks/myrepo.heavy" devenv --no-tui test
+#
+# Backlog spokes run in parallel, but starvation-sensitive commands (test
+# suites, nix/devenv builds, whole-repo hook runs) produce false failures when
+# several run at once. Wrapping them in this helper bounds them to one at a
+# time without any coordination from the Hub.
+#
+# Uses flock(1) where available. macOS ships the flock(2) syscall but no
+# flock(1) binary, so this falls back to an atomic-mkdir lock with PID-based
+# stale reclaim. POSIX sh only -- no bashisms, no GNU-only flags.
+#
+# The two mechanisms do NOT interlock with each other; they use different
+# paths on disk. That is fine because a backlog run is confined to one host.
+#
+# They also differ under SIGKILL. flock's lock lives on an inherited file
+# descriptor, so it survives until the wrapped command itself exits. The mkdir
+# fallback keys on the wrapper's PID, so killing the wrapper makes the lock
+# reclaimable while its child may still be running. Prefer SIGTERM when
+# stopping a spoke; SIGKILL can briefly let two heavy commands overlap, and it
+# skips the traps that would otherwise reap the command's process group.
+#
+# It also contains what it runs. The command gets its own process group, and
+# that whole group is signalled when the command finishes or the wrapper is
+# interrupted. Without this, a test runner that leaks worker processes leaves
+# them reparented to init, holding no lock and therefore invisible to the
+# mutex, while they saturate the machine -- causing exactly the false test
+# failures the mutex exists to prevent.
+#
+# Environment:
+#   TARS_LOCK_TIMEOUT   seconds to wait before giving up (default 3600)
+#   TARS_LOCK_NO_REAP   set to any value to leave stray processes alone
+#
+# Exit codes:
+#   75  could not acquire the lock before the timeout
+#   64  usage error
+#   *   otherwise, the wrapped command's own exit status
+#
+
+set -eu
+
+TIMEOUT="${TARS_LOCK_TIMEOUT:-3600}"
+NOTICE_AFTER=30
+
+LOCK="${1:-}"
+if [ -z "$LOCK" ]; then
+	echo "tars-lock: usage: tars-lock <lock-path> <command> [args...]" >&2
+	exit 64
+fi
+shift
+
+if [ "$#" -eq 0 ]; then
+	echo "tars-lock: no command given" >&2
+	exit 64
+fi
+
+# `dirname` is POSIX; mkdir -p is idempotent.
+LOCK_PARENT="$(dirname "$LOCK")"
+mkdir -p "$LOCK_PARENT" || {
+	echo "tars-lock: cannot create lock directory $LOCK_PARENT" >&2
+	exit 73
+}
+
+CHILD_PGID=""
+
+reap_group() {
+	# A leaked worker is worse than a slow one. Test runners routinely spawn
+	# workers that outlive their parent; once orphaned they are reparented to
+	# init, so they hold no lock and the mutex sees an idle system while they
+	# saturate every core. That inverts the whole point of serialising heavy
+	# commands, so the wrapper cleans up after itself.
+	[ -n "${TARS_LOCK_NO_REAP:-}" ] && return 0
+	[ -n "$CHILD_PGID" ] || return 0
+
+	# Never signal our own process group -- that would take the caller,
+	# and the whole agent session, down with it.
+	# `|| true` matters: a minimal container may ship neither ps nor tr, and
+	# under `set -e` a failing command substitution would abort the wrapper
+	# rather than the command it exists to run. No PGID means no reaping.
+	self_pgid="$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ' 2>/dev/null || true)"
+	[ -n "$self_pgid" ] || return 0
+	[ "$CHILD_PGID" = "$self_pgid" ] && return 0
+
+	kill -0 "-$CHILD_PGID" 2>/dev/null || return 0
+	echo "tars-lock: reaping stray processes in group $CHILD_PGID" >&2
+	kill -TERM "-$CHILD_PGID" 2>/dev/null || true
+
+	waited_for_exit=0
+	while [ "$waited_for_exit" -lt 5 ]; do
+		kill -0 "-$CHILD_PGID" 2>/dev/null || return 0
+		sleep 1
+		waited_for_exit=$((waited_for_exit + 1))
+	done
+
+	echo "tars-lock: group $CHILD_PGID ignored SIGTERM, sending SIGKILL" >&2
+	kill -KILL "-$CHILD_PGID" 2>/dev/null || true
+}
+
+run_command() {
+	# Job-control mode puts the command in a process group of its own, which
+	# is what makes the whole group signallable as a unit later -- including
+	# descendants that have since been reparented away from us.
+	set -m 2>/dev/null || true
+	"$@" &
+	cmd_pid=$!
+	set +m 2>/dev/null || true
+
+	# Never fatal: if ps or tr is unavailable this stays empty and reaping is
+	# simply skipped, which degrades containment without breaking the gate.
+	CHILD_PGID="$(ps -o pgid= -p "$cmd_pid" 2>/dev/null | tr -d ' ' 2>/dev/null || true)"
+
+	# Run without `set -e` killing us, so the lock is released cleanly and the
+	# command's real status is propagated.
+	set +e
+	wait "$cmd_pid"
+	command_status=$?
+	set -e
+
+	reap_group
+	return "$command_status"
+}
+
+# --- Preferred path: flock(1) -------------------------------------------
+#
+# Locking a file descriptor rather than using flock's command form keeps the
+# lock's exit status separate from the wrapped command's, so a timeout is
+# always distinguishable from a command that happened to exit 1. The kernel
+# drops the lock when fd 9 closes at process exit, including on kill -9.
+
+if command -v flock >/dev/null 2>&1; then
+	exec 9>"$LOCK" || {
+		echo "tars-lock: cannot open lock file $LOCK" >&2
+		exit 73
+	}
+
+	if ! flock -w "$TIMEOUT" 9; then
+		echo "tars-lock: timed out after ${TIMEOUT}s waiting for $LOCK" >&2
+		exit 75
+	fi
+
+	# Reap on the way out however we leave, so an interrupted wrapper does not
+	# strand the very workers it was meant to contain.
+	trap 'reap_group' EXIT
+	trap 'reap_group; exit 130' INT
+	trap 'reap_group; exit 143' TERM
+	trap 'reap_group; exit 129' HUP
+
+	run_command "$@"
+	exit $?
+fi
+
+# --- Fallback path: atomic mkdir ----------------------------------------
+#
+# mkdir is atomic on every POSIX filesystem, so exactly one racer creates the
+# directory. The holder's PID is recorded inside so waiters can tell a live
+# holder from one that was killed.
+
+LOCKDIR="$LOCK.d"
+held_lock=""
+
+# shellcheck disable=SC2329  # invoked indirectly by the traps below
+release_lock() {
+	# Only remove the lock if this process still owns it. Without the
+	# ownership check, a process whose lock was reclaimed as stale would
+	# delete the new holder's lock on its way out.
+	if [ -n "$held_lock" ] && [ "$(cat "$LOCKDIR/pid" 2>/dev/null || true)" = "$$" ]; then
+		rm -rf "$LOCKDIR"
+	fi
+}
+trap 'reap_group; release_lock' EXIT
+trap 'reap_group; release_lock; exit 130' INT
+trap 'reap_group; release_lock; exit 143' TERM
+trap 'reap_group; release_lock; exit 129' HUP
+
+waited=0
+orphan_seen=0
+notified=0
+
+while :; do
+	if mkdir "$LOCKDIR" 2>/dev/null; then
+		echo "$$" >"$LOCKDIR/pid"
+		held_lock="yes"
+		break
+	fi
+
+	holder="$(cat "$LOCKDIR/pid" 2>/dev/null || true)"
+
+	if [ -z "$holder" ]; then
+		# The directory exists but carries no PID yet. Normally this is a
+		# holder mid-acquisition, so give it a grace period; past that,
+		# assume it died between mkdir and the write.
+		orphan_seen=$((orphan_seen + 1))
+		if [ "$orphan_seen" -lt 10 ]; then
+			sleep 1
+			waited=$((waited + 1))
+			continue
+		fi
+	elif kill -0 "$holder" 2>/dev/null; then
+		orphan_seen=0
+
+		if [ "$notified" -eq 0 ] && [ "$waited" -ge "$NOTICE_AFTER" ]; then
+			echo "tars-lock: waiting on pid $holder holding $LOCKDIR" >&2
+			notified=1
+		fi
+
+		if [ "$waited" -ge "$TIMEOUT" ]; then
+			echo "tars-lock: timed out after ${TIMEOUT}s waiting for $LOCKDIR (held by pid $holder)" >&2
+			exit 75
+		fi
+
+		sleep 1
+		waited=$((waited + 1))
+		continue
+	fi
+
+	# The holder is gone. Claim the stale lock by renaming it: rename is
+	# atomic, so if several waiters race here only one succeeds, and the
+	# losers simply loop round and contend for a fresh mkdir. Deleting the
+	# directory in place instead would let a loser erase the winner's lock.
+	stale="$LOCKDIR.stale.$$"
+	if mv "$LOCKDIR" "$stale" 2>/dev/null; then
+		rm -rf "$stale"
+		echo "tars-lock: reclaimed stale lock from pid ${holder:-unknown}" >&2
+	fi
+	orphan_seen=0
+done
+
+run_command "$@"
+exit $?

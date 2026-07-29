@@ -10,8 +10,10 @@
 Define custom scripting configurations and format dynamic JSON state
 payloads to customize your TUI status line.
 
-> **NOTE:** To toggle the status line on/off or configure it from the
-> TUI, see the **[Status Line Command](https://antigravity.google/docs/cli/commands/statusline)**.
+info
+
+To toggle the status line on/off or configure it from the TUI, see the
+Status Line Command.
 
 ## Overview[link](#overview)
 
@@ -44,9 +46,9 @@ content_copy
 ```
 
 Whenever the agent state changes, the TUI executes your command script,
-pipes a detailed state JSON payload directly to the script's `stdin`,
+pipes a detailed state JSON payload directly to the script’s `stdin`,
 reads your formatted string from `stdout`, and renders the result in the
-prompt's status line. Full ANSI color codes are supported.
+prompt’s status line. Full ANSI color codes are supported.
 
 ### Available JSON fields[link](#available-json-fields)
 
@@ -54,7 +56,7 @@ The JSON payload piped to your script contains the following top-level
 fields:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `cwd` | string | Current working directory when the CLI was launched. |
 | `session_id` | string | Backward-compatibility alias for `conversation_id`. |
 | `conversation_id` | string | Current unique conversation ID. |

@@ -1454,13 +1454,3 @@ warning
 **Security note:** Never hardcode API keys in your client code. Consider
 storing them securely on the server side or using environment variables
 during development.
-
-- [Defining Procedures](#defining-procedures)
-  - [Accessing the database](#accessing-the-database)
-- [HTTP Requests](#http-requests)
-- [Calling Reducers from Procedures](#calling-reducers-from-procedures)
-- [Calling procedures](#calling-procedures)
-  - [Observing return values](#observing-return-values)
-- [Example: Calling an External AI
-  API](#example-calling-an-external-ai-api)
-  - [Calling from a client](#calling-from-a-client)

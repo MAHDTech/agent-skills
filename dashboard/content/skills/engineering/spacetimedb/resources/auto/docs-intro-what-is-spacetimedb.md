@@ -90,7 +90,4 @@ whenever the database state changes. Note that this is a **read-only**
 mirror -- the only way to change the database is to submit requests,
 which are validated on the server.
 
-- [Application Workflow Preview](#application-workflow-preview)
-- [State Mirroring](#state-mirroring)
-
 {% endraw %}

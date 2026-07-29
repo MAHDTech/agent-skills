@@ -16,7 +16,7 @@ skill_name = "opencode-acp"
 
 > The easiest way to find and install ACP-compatible agents.
 
-<style>
+\<style\>
   {`
     .agent-icon {
     width: 20px;
@@ -150,7 +150,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.46**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.47**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -294,7 +294,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.2.36**
+    **0.2.38**
   </Card>
 
   <Card
@@ -323,7 +323,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.180.0**
+    **0.182.0**
   </Card>
 
   <Card
@@ -627,7 +627,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Code and build agents with comprehensive multi-provider support
 
-    **0.9.25**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
+    **0.9.26**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -641,7 +641,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google's official CLI for Gemini
 
-    **0.52.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
+    **0.53.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -664,7 +664,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
     title="GLM Agent"
     href="https://github.com/stefandevo/glm-acp-agent"
     icon={
-  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" fillRule="evenodd"><title>Z.ai</title><path d="M8.07 1.333L6.618 3.302H.435L1.887 1.333h6.184zM15.503 12.699L14.052 14.667h-6.161l1.449-1.968h6.163zM16 1.333L6.176 14.667H0L9.824 1.333H16z"/></svg>
+  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" fillRule="evenodd">\<title\>Z.ai</title><path d="M8.07 1.333L6.618 3.302H.435L1.887 1.333h6.184zM15.503 12.699L14.052 14.667h-6.161l1.449-1.968h6.163zM16 1.333L6.176 14.667H0L9.824 1.333H16z"/></svg>
 }
   >
     ACP agent powered by Zhipu AI's GLM Coding Plan models (glm-5.1, glm-5-turbo, glm-4.7, glm-4.5-air). Supports streaming, tool calls, mid-session model switching, image input via Z.AI Coding Plan Vision MCP, and session load/fork/resume with on-disk persistence.
@@ -697,7 +697,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **0.2.112**
+    **0.2.113**
   </Card>
 
   <Card
@@ -711,7 +711,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.41**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.42**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -808,7 +808,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Mistral's open-source coding assistant
 
-    **2.22.0**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
+    **2.23.1**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -843,7 +843,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.18.7**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.9**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -898,7 +898,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.21.0**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.21.1**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -1006,7 +1006,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Local-first coding agent. Runs entirely on your machine with optional on-device LLM inference via Onde.
 
-    **1.5.0**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
+    **1.5.1**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
   </Card>
 
   <Card

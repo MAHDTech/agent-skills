@@ -12,8 +12,8 @@ All commands must be run within the `devenv` shell environment:
 
 ```bash
 # Build the static site and Zola content
-devenv shell -- dashboard --action build
+devenv --no-tui shell -- dashboard --action build
 
 # Build and serve the site with live reloading (defaults to http://localhost:1111)
-devenv shell -- dashboard --action serve
+devenv --no-tui shell -- dashboard --action serve
 ```

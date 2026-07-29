@@ -57,7 +57,7 @@ content_copy
 
 ------------------------------------------------------------------------
 
-## Custom Agent Selection & Discovery[link](#custom-agent-selection-discovery)
+## Custom Agent Selection & Discovery[link](#custom-agent-selection--discovery)
 
 Antigravity CLI supports loading custom agent definitions with
 specialized system instructions and tool permissions. The **Available
@@ -117,14 +117,14 @@ EOF
 When you reopen `/agents`, the CLI automatically discovers
 `code-reviewer` and lists it under **Available Agents**. If you need an
 agent scoped strictly to a single project repository, place it inside
-that workspace's `.agents/agents/` directory (for example,
+that workspace’s `.agents/agents/` directory (for example,
 `/home/user/projects/my-app/.agents/agents/code-reviewer/agent.md`). You
 can also package and distribute custom agents inside
 [Plugins](https://antigravity.google/docs/cli/plugins).
 
 ------------------------------------------------------------------------
 
-## Subagent Monitoring & Control[link](#subagent-monitoring-control)
+## Subagent Monitoring & Control[link](#subagent-monitoring--control)
 
 When your primary agent delegates tasks (such as running tests or
 querying large codebases), the spawned threads appear in the `/agents`
@@ -137,13 +137,13 @@ panel under **Subagents**, grouped by their triggering prompt.
   group.
 - **Status Indicators**: Each subagent row displays a live lifecycle
   state:
-- `running`: Actively executing tools or generating reasoning steps.
-- `done`: Successfully completed its assigned background task.
-- `error`: Encountered a terminal failure during execution.
-- `killed`: Terminated manually by the user or parent process.
+  - `running`: Actively executing tools or generating reasoning steps.
+  - `done`: Successfully completed its assigned background task.
+  - `error`: Encountered a terminal failure during execution.
+  - `killed`: Terminated manually by the user or parent process.
 - **Detail View**: Highlight a specific subagent row and press `Enter`
   to open the full-screen **Subagent Detail View**. This view displays
-  the subagent's complete internal thoughts, tool calls, and execution
+  the subagent’s complete internal thoughts, tool calls, and execution
   stdout. Press `Esc` to return to the list.
 
 ### 2. Terminating active subagents[link](#2-terminating-active-subagents)
@@ -169,7 +169,7 @@ When focused inside the `/agents` panel, the following keyboard
 shortcuts apply:
 
 | Key | Action | Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`↑` / `↓`** | Navigate | Move the cursor between headers, subagents, and available agents. |
 | **`Enter`** | Select / Toggle | Expand/collapse groups, open Subagent Detail View, or select a custom agent. |
 | **`k`** | Kill Active Subagent | Instantly cancel (`CancelSubagent`) the highlighted running subagent. |
@@ -180,9 +180,9 @@ shortcuts apply:
 ## Common mistakes[link](#common-mistakes)
 
 | Mistake | Why it fails | Fix |
-|----|----|----|
-| Expecting custom agent switches to modify the existing turn history | Switching agents inside an active thread forks the conversation to preserve historical integrity | Continue your workflow in the newly forked session with the new agent's capabilities |
-| Putting custom agent markdown files directly inside `~/.gemini/config/` or `.agents/` | The CLI scanner looks specifically inside `agents/` subdirectories (`.agents/agents/` or `~/.gemini/config/agents/`) | Move your agent definition to `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` |
+|:---|:---|:---|
+| Expecting custom agent switches to modify the existing turn history | Switching agents inside an active thread forks the conversation to preserve historical integrity | Continue your workflow in the newly forked session with the new agent’s capabilities |
+| Putting custom agent markdown files directly inside `~/.gemini/config/` or `.agents/` | The CLI scanner looks specifically inside `agents/` subdirectories (`.agents/agents/` or `~/.gemini/config/agents/`) | Move your agent definition to `.agents/agents/\<name\>.md` or `.agents/agents/\<name\>/agent.md` |
 | Using `k` on completed subagents | `KeyKillSubagent` only targets active (`running`) subagent processes | Use `Enter` to inspect completed or failed subagent logs instead |
 
 ------------------------------------------------------------------------

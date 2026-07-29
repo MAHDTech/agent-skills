@@ -1,0 +1,217 @@
+# OpenBao Provider
+
+The OpenBao provider integrates with OpenBao’s KV (Key-Value) secrets
+engine using OpenBao’s own provider identity and configuration
+conventions.
+
+## At a glance
+
+|  |  |
+|----|----|
+| Provider | `openbao` (0.17+) |
+| URI | `openbao://[namespace@]host[:port][/mount][?options]` |
+| Access | Read, write, and delete; secret references are read-only |
+| Best for | Open-source, policy-controlled secret infrastructure |
+| Authentication | Token, AppRole, or JWT/OIDC |
+| Build feature | `openbao` (0.17+) |
+| Default storage | KV path `secretspec/{project}/{profile}/{key}`, field `value` |
+
+## Quick start
+
+```
+$ export BAO_TOKEN=hvs.your-token-here$ secretspec set DATABASE_URL --provider openbao://bao.example.com:8200Enter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to openbao (profile: default)
+```
+
+Terminal window
+
+## Setup
+
+### Prerequisites
+
+- A running OpenBao server
+- Authentication credentials
+- KV secrets engine enabled (v1 or v2)
+- Build with `--features openbao`
+
+### Environment compatibility
+
+For the variables defined by the OpenBao CLI, the provider follows its
+documented convention: `BAO_ADDR`, `BAO_NAMESPACE`, `BAO_TOKEN`, and
+`BAO_TOKEN_PATH` take precedence over their `VAULT_*` counterparts.
+
+SecretSpec additionally defines OpenBao-prefixed provider inputs for
+AppRole and JWT authentication. These are consumed by SecretSpec, not by
+the `bao` CLI, and retain the corresponding `VAULT_*` names as
+compatibility fallbacks.
+
+### Token authentication
+
+Token authentication is the default. SecretSpec checks these sources in
+order:
+
+1.  The alias’s `token` provider credential
+2.  `BAO_TOKEN`, then `VAULT_TOKEN`
+3.  The file selected by `BAO_TOKEN_PATH`, then `VAULT_TOKEN_PATH`
+4.  The OpenBao CLI’s default `~/.vault-token`
+
+```
+$ export BAO_TOKEN=hvs.your-token-here
+```
+
+Terminal window
+
+### AppRole authentication
+
+Select AppRole with `?auth=approle`:
+
+```
+$ export BAO_ROLE_ID=your-role-id$ export BAO_SECRET_ID=your-secret-id
+```
+
+Terminal window
+
+These are SecretSpec provider inputs, not OpenBao CLI variables.
+`VAULT_ROLE_ID` and `VAULT_SECRET_ID` remain accepted as fallbacks.
+Prefer semantic provider credentials when configuring an alias:
+
+```
+[providers.bao_approle]uri = "openbao://bao.example.com:8200/secret?auth=approle"
+[providers.bao_approle.credentials]role_id = { provider = "onepassword", ref = { vault = "Infra", item = "bao-approle", field = "role_id" } }secret_id = { provider = "onepassword", ref = { vault = "Infra", item = "bao-approle", field = "secret_id" } }
+```
+
+secretspec.toml
+
+### JWT / OIDC authentication
+
+Select JWT with `?auth=jwt` and a `role`. The provider performs the
+`auth/jwt/login` exchange itself. The JWT comes from SecretSpec’s
+`BAO_JWT` input, then the `VAULT_JWT` compatibility fallback. Otherwise,
+in a GitHub Actions or Forgejo job with `id-token: write`, the provider
+mints one from the runner’s OIDC identity.
+
+- `?role=`, `BAO_JWT_ROLE`, or `VAULT_JWT_ROLE` (required)
+- `?audience=`, `BAO_JWT_AUDIENCE`, or `VAULT_JWT_AUDIENCE`
+
+## Configuration
+
+### URI format
+
+```
+openbao://[namespace@]host[:port][/mount][?key=value&...]
+```
+
+- `host[:port]`: OpenBao address (falls back through `BAO_ADDR`,
+  `VAULT_ADDR`)
+- `mount`: KV engine mount path (default: `secret`)
+- `namespace@`: Optional namespace (falls back through `BAO_NAMESPACE`,
+  `VAULT_NAMESPACE`)
+- `?auth=approle`: Use AppRole authentication (default: `token`)
+- `?auth=jwt`: Use JWT/OIDC authentication (requires a role)
+- `?role=`: OpenBao role for JWT auth
+- `?audience=`: Audience requested from the CI OIDC issuer
+- `?kv=1`: Use KV v1 (default: v2)
+- `?tls=false`: Disable TLS for development servers
+
+### Concurrent resolution
+
+- One HTTP client is reused per provider instance (connection pool / h2
+  reuse).
+- Concurrent unique-address fetches are capped at 8 by default.
+- Override the cap with `SECRETSPEC_PROVIDER_CONCURRENCY` (integer ≥ 1)
+  when your OpenBao proxy tolerates more or less parallel load.
+
+### URI examples
+
+```
+openbao://bao.example.com:8200/secretopenbao://team-a@bao.example.com:8200/secretopenbao://bao.example.com:8200/secret?auth=approleopenbao://bao.example.com:8200/secret?auth=jwt&role=ci
+```
+
+### Project configuration
+
+```
+[providers]bao_prod = "openbao://bao.example.com:8200/secret"
+[profiles.production]DATABASE_URL = { description = "Database URL", providers = ["bao_prod"] }
+```
+
+secretspec.toml
+
+## Storage model
+
+Each secret is stored at `secretspec/{project}/{profile}/{key}` under
+the configured mount, with its value in a field named `value`.
+
+For KV v2, `DATABASE_URL` for project `myapp` and profile `production`
+is read from
+`GET /v1/secret/data/secretspec/myapp/production/DATABASE_URL`.
+
+## Provider caching
+
+A KV v2 mount can hold a [cached provider
+route’s](https://secretspec.dev/concepts/providers/caching/) entries. OpenBao expires them
+itself: the cache’s `max_age` is written to the path’s
+`delete_version_after` metadata, so a cached copy of another store’s
+secret stops existing at that age even if SecretSpec never runs again.
+This needs write access to the path’s metadata as well as its data, and
+KV v1 is refused as a cache because it has no expiry.
+
+Deleting — [`cache clear`](https://secretspec.dev/reference/cli/#cache-clear-017) and
+automatic invalidation — removes the KV path’s metadata and every
+version, and is confined to entries SecretSpec owns: a secret reference
+is never deleted, since the path it names is managed outside SecretSpec.
+
+## Use existing secrets
+
+A secret’s [`ref`](https://secretspec.dev/reference/configuration/#secret-references) field
+names an existing KV entry: `item` is the path relative to the mount,
+and `field` selects the field to read. References are **read-only** so a
+single-field write cannot overwrite the entry’s other fields.
+
+```
+[profiles.production]DATABASE_URL = { description = "DB", ref = { item = "myapp/config", field = "db_url" }, providers = ["openbao://bao.example.com:8200/secret"] }
+```
+
+## CI/CD
+
+AppRole avoids placing a user token in the CI environment:
+
+```
+$ export BAO_ROLE_ID="$CI_ROLE_ID"$ export BAO_SECRET_ID="$CI_SECRET_ID"$ secretspec export --format gha --provider "openbao://bao.example.com:8200/secret?auth=approle"
+```
+
+Terminal window
+
+With GitHub Actions or Forgejo Actions `id-token: write`, JWT/OIDC
+avoids a static authentication credential:
+
+```
+$ secretspec export --format gha --provider "openbao://bao.example.com:8200/secret?auth=jwt&role=ci"
+```
+
+Terminal window
+
+## Advanced configuration
+
+### KV version 1
+
+```
+$ secretspec set DATABASE_URL --provider "openbao://bao.example.com:8200/secret?kv=1"
+```
+
+Terminal window
+
+### OpenBao namespaces
+
+```
+$ secretspec check --provider openbao://team-a@bao.example.com:8200/secret
+$ export BAO_NAMESPACE=team-a$ secretspec check --provider openbao://bao.example.com:8200/secret
+```
+
+Terminal window
+
+### Development mode
+
+```
+$ bao server -dev -dev-root-token-id="dev-only-token"$ export BAO_TOKEN="dev-only-token"$ secretspec check --provider "openbao://127.0.0.1:8200/secret?tls=false"
+```
+
+Terminal window

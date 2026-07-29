@@ -95,13 +95,4 @@ current client connection patterns across supported SDKs.
 - If you want full control over the host, reverse proxy, and operating
   system setup, see [Self-hosting](https://spacetimedb.com/docs/how-to/deploy/self-hosting).
 
-- [Prerequisites](#prerequisites)
-- [Step 1: Deploy the Railway
-  template](#step-1-deploy-the-railway-template)
-- [Step 2: Add the Railway deployment to your
-  CLI](#step-2-add-the-railway-deployment-to-your-cli)
-- [Step 3: Publish your database](#step-3-publish-your-database)
-- [Step 4: Connect clients](#step-4-connect-clients)
-- [Notes](#notes)
-
 {% endraw %}

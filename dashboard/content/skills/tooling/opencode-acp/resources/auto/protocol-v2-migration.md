@@ -94,7 +94,7 @@ Nothing about v2 changes the underlying JSON-RPC framing, so a single connection
 
 v1 used role-specific field names: the Client sent `clientCapabilities` and optional `clientInfo`, and the Agent returned `agentCapabilities` and optional `agentInfo`. v2 uses the same two field names in both directions (`capabilities` and `info`), and `info` is now **required** on both sides.
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 request theme={null}
   {
     "jsonrpc": "2.0",
@@ -129,7 +129,7 @@ v1 used role-specific field names: the Client sent `clientCapabilities` and opti
   ```
 </CodeGroup>
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 response theme={null}
   {
     "jsonrpc": "2.0",
@@ -525,7 +525,7 @@ While a permission request is pending, the Agent **SHOULD** report `state_update
 
 The v1 `plan` update was a flat entries list with no identity and no room to grow. v2 replaces it with `plan_update`, whose payload is a tagged union keyed by a required `planId`:
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 theme={null}
   {
     "sessionUpdate": "plan",
@@ -663,7 +663,7 @@ If you maintain a validator or generated models, v2 also tightens schema-level d
 
 The advertisement model (`available_commands_update` carrying commands with `name` and `description`) is unchanged, but a command's optional `input` specification is now a tagged union. The v1 untagged unstructured input gains an explicit `type: "text"` discriminator so richer input types can be added later:
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 theme={null}
   {
     "name": "search",

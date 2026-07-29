@@ -36,7 +36,7 @@ system kernel utilities to create secure process rings with zero
 execution overhead:
 
 | Operating System | Sandboxing Utility | Security Characteristics |
-|----|----|----|
+|:---|:---|:---|
 | **Linux** | `nsjail` | Open-source process isolator utilizing kernel namespaces and cgroups to confine CPU, memory, and path visibility. |
 | **macOS** | `sandbox-exec` | Native system tool enforcing policy profiles that restrict absolute filesystem access and raw TCP queries. |
 | **Windows** | `AppContainer` | Desktop security containment ring isolating filesystem permissions and registry visibility. |
@@ -77,30 +77,29 @@ prompt block adapts dynamically based on your sandboxing state:
 
 - **When Sandbox is Enabled**: The prompt panel offers a temporary
   escape option:
+  text
 
-content_copy
+  content_copy
+  ```
+  Do you want to proceed?
+  1. Yes
+  2. Yes, and run without sandbox restrictions
+  3. No
+  ```
 
-```
-    Do you want to proceed?
-    1. Yes
-    2. Yes, and run without sandbox restrictions
-    3. No
-```
-
-Choosing Option 2 bypasses the containment barrier exclusively for that
-single execution run.
-
+  Choosing Option 2 bypasses the containment barrier exclusively for
+  that single execution run.
 - **When Sandbox is Disabled**: The prompt lets you force containment
   for a risky command:
+  text
 
-content_copy
-
-```
-    Do you want to proceed?
-    1. Yes
-    2. Yes, and run in sandbox
-    3. No
-```
+  content_copy
+  ```
+  Do you want to proceed?
+  1. Yes
+  2. Yes, and run in sandbox
+  3. No
+  ```
 
 ## See also[link](#see-also)
 

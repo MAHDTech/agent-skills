@@ -33,24 +33,25 @@ security settings independently.
 ### Key Differences: Workspace vs. Projects[link](#key-differences-workspace-vs-projects)
 
 | Feature | Original Model (Workspace) | New Model (Project) |
-|----|----|----|
+|:---|:---|:---|
 | **Organization Scope** | Tightly coupled to a single local repository. | Projects are a configuration of all of the context and folders that your agents should work with. |
 | **Directory Boundaries** | Agent is strictly confined to one folder structure. | A single Project can span **multiple folders** at once. |
-| **Settings Isolation** | Settings inherited globally from the machine. | Projects have their own settings. Agents in a project use the project's settings. |
+| **Settings Isolation** | Settings inherited globally from the machine. | Projects have their own settings. Agents in a project use the project’s settings. |
 | **Permissions** | Broad, global permissions. | Global permissions are inherited. Projects can have their own permissions in addition to global permissions. |
 | **Customizations** | Skills/MCPs managed globally or per-workspace. | Reusable skills, MCPs, and hooks are managed globally. |
 
 ### Core Project Concepts[link](#core-project-concepts)
 
-**1. Folders** A Project is composed of **folders**, which define the
-directories and repositories the agent is allowed to access:
+**1. Folders**  
+A Project is composed of **folders**, which define the directories and
+repositories the agent is allowed to access:
 
 - **Local Folders**: A folder that doesn’t have git configured.
 - **Local Git Checkout**: A folder that is a Git repository checkout.
 
-**2. Worktree Selection (Local vs. New Worktree)** When starting a new
-conversation in a Project, you choose how the agent should interact with
-your folders via the worktree selector:
+**2. Worktree Selection (Local vs. New Worktree)**  
+When starting a new conversation in a Project, you choose how the agent
+should interact with your folders via the worktree selector:
 
 - **Local Mode**: The agent works directly in your active local folders
   or Git checkouts. (Best for quick, interactive edits in your current
@@ -59,8 +60,8 @@ your folders via the worktree selector:
   conversation. (Best for complex tasks, keeping your active working
   folder untouched and preventing parallel subagents from conflicting).
 
-**3. Scoped Settings and Permissions** Settings and permissions are both
-scoped at the project level:
+**3. Scoped Settings and Permissions**  
+Settings and permissions are both scoped at the project level:
 
 - **Settings**: When a Project is created, it always starts with the
   default security preset where it has read and write access to all of
@@ -69,9 +70,9 @@ scoped at the project level:
   within this project.
 - **Permissions**: Projects inherit global permissions but allow you to
   augment them at the Project level, ensuring agents only have the exact
-  access required for that specific project's tasks.
+  access required for that specific project’s tasks.
 
-### Workflows using Projects[link](#workflows-using-projects)
+### Workflows Using Projects[link](#workflows-using-projects)
 
 - **Working in a Single Folder**: Create a project with a folder and
   then configure its settings.
@@ -84,7 +85,7 @@ scoped at the project level:
   starting an agent so that separate, isolated Git worktrees are
   provisioned for each agent session, avoiding conflicts between agents.
 - **Mixed Checkouts & Local Folders**: Working locally operates directly
-  in the existing folders. Using "New Worktree Mode" will spawn a new
+  in the existing folders. Using “New Worktree Mode” will spawn a new
   Git worktree for all active Git checkouts, allowing the agent to
   operate inside the new worktrees and the existing non-git local
   folders simultaneously.

@@ -14,7 +14,7 @@ knowledge and coding tasks.
 
 ### What is Antigravity 2.0?[link](#what-is-antigravity-20)
 
-Antigravity 2.0 serves as your AI agents' central command center,
+Antigravity 2.0 serves as your AI agents’ central command center,
 providing a unified platform to launch, monitor, and orchestrate their
 activities. Unlike its predecessor, the Agent Manager, Antigravity 2.0
 is a standalone application that functions independently of an IDE.

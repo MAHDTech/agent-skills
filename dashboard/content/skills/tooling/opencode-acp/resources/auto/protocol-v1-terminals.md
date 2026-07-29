@@ -115,7 +115,7 @@ This allows the command to run in the background while the Agent performs other 
 
 After creating the terminal, the Agent can use the `terminal/wait_for_exit` method to wait for the command to complete.
 
-<Note>
+\<Note\>
   The Agent **MUST** release the terminal using `terminal/release` when it's no
   longer needed.
 </Note>

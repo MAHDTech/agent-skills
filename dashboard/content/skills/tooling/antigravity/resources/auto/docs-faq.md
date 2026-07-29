@@ -29,7 +29,7 @@ Antigravity.
 ## What is Google Antigravity’s geographical availability?[link](#what-is-google-antigravitys-geographical-availability)
 
 Google Antigravity is available in the following countries and
-territories. If you're not in one of these countries or territories, you
+territories. If you’re not in one of these countries or territories, you
 will be unable to use Google Antigravity at this time:
 
 **Important**: Please check the country listed on the [Google Terms of
@@ -140,8 +140,8 @@ Europe
 - Sweden
 - Switzerland
 - Ukrainian territories other than Crimea, the so-called Donetsk
-  People's Republic ("DNR"), and the so-called Luhansk People's Republic
-  ("LNR")
+  People’s Republic (“DNR”), and the so-called Luhansk People’s Republic
+  (“LNR”)
 - United Kingdom
 
 Africa
@@ -157,7 +157,7 @@ Africa
 - Central African Republic
 - Chad
 - Comoros
-- Côte d'Ivoire
+- Côte d’Ivoire
 - Democratic Republic of the Congo
 - Djibouti
 - Egypt

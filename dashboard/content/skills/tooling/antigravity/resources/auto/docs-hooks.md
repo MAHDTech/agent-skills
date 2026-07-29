@@ -18,7 +18,7 @@ skill_name = "antigravity"
 # Hooks[link](#hooks)
 
 Hooks allow you to run custom scripts or shell commands at specific
-points during Antigravity's execution loop. This is powerful for
+points during Antigravity’s execution loop. This is powerful for
 enforcing custom rules, running linters, or capturing diagnostics
 automatically.
 
@@ -79,7 +79,7 @@ content_copy
 ### Hook Definition Fields[link](#hook-definition-fields)
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `enabled` | boolean | Optional. Set to `false` to disable the hook without removing it. Defaults to `true`. |
 | `PreToolUse` | array | Handlers that run before a tool is executed. |
 | `PostToolUse` | array | Handlers that run after a tool completes. |
@@ -90,7 +90,7 @@ content_copy
 ## Supported Events[link](#supported-events)
 
 | Event | Description | Matcher Target |
-|----|----|----|
+|:---|:---|:---|
 | `PreToolUse` | Fires before a tool is executed. | Tool name (e.g., `run_command`) |
 | `PostToolUse` | Fires after a tool completes. | Tool name |
 | `PreInvocation` | Fires before the model is called. | N/A (matcher ignored) |
@@ -109,9 +109,9 @@ the `matcher` field to specify which tools trigger the hook:
 
 info
 
-**Note**: For `PreInvocation`, `PostInvocation`, and `Stop`, the
-structure is simpler (a list of handlers directly under the event key)
-and the matcher is ignored.
+Note: For PreInvocation, PostInvocation, and Stop, the structure is
+simpler (a list of handlers directly under the event key) and the
+matcher is ignored.
 
 ## Supported Tools[link](#supported-tools)
 
@@ -121,85 +121,85 @@ following tool names, grouped by category:
 ### File and Directory Operations[link](#file-and-directory-operations)
 
 - **`view_file`**: View the contents of a file.
-- Arguments: `AbsolutePath`, `StartLine` (optional), `EndLine`
-  (optional), `IsSkillFile` (optional)
+  - Arguments: `AbsolutePath`, `StartLine` (optional), `EndLine`
+    (optional), `IsSkillFile` (optional)
 - **`write_to_file`**: Create new files.
-- Arguments: `TargetFile`, `Overwrite`, `CodeContent`, `Description`,
-  `IsArtifact` (optional), `ArtifactMetadata` (optional)
+  - Arguments: `TargetFile`, `Overwrite`, `CodeContent`, `Description`,
+    `IsArtifact` (optional), `ArtifactMetadata` (optional)
 - **`replace_file_content`**: Edit a single contiguous block of text in
   a file.
-- Arguments: `TargetFile`, `Instruction`, `Description`,
-  `AllowMultiple`, `TargetContent`, `ReplacementContent`, `StartLine`,
-  `EndLine`, `TargetLintErrorIds` (optional)
+  - Arguments: `TargetFile`, `Instruction`, `Description`,
+    `AllowMultiple`, `TargetContent`, `ReplacementContent`, `StartLine`,
+    `EndLine`, `TargetLintErrorIds` (optional)
 - **`multi_replace_file_content`**: Make multiple, non-contiguous edits
   to the same file.
-- Arguments: `TargetFile`, `Instruction`, `Description`,
-  `ReplacementChunks` (array of chunks), `TargetLintErrorIds`
-  (optional), `ArtifactMetadata` (optional)
+  - Arguments: `TargetFile`, `Instruction`, `Description`,
+    `ReplacementChunks` (array of chunks), `TargetLintErrorIds`
+    (optional), `ArtifactMetadata` (optional)
 - **`list_dir`**: List the contents of a directory.
-- Arguments: `DirectoryPath`
+  - Arguments: `DirectoryPath`
 - **`find_by_name`**: Search for files and directories using glob
   patterns.
-- Arguments: `SearchDirectory`, `Pattern`, `Type` (optional), `Excludes`
-  (optional), `Extensions` (optional), `FullPath` (optional), `MaxDepth`
-  (optional)
+  - Arguments: `SearchDirectory`, `Pattern`, `Type` (optional),
+    `Excludes` (optional), `Extensions` (optional), `FullPath`
+    (optional), `MaxDepth` (optional)
 
 ### Search and Research[link](#search-and-research)
 
 - **`grep_search`**: Fast text searches within specific paths.
-- Arguments: `SearchPath`, `Query`, `IsRegex` (optional),
-  `CaseInsensitive` (optional), `Includes` (optional), `MatchPerLine`
-  (optional)
+  - Arguments: `SearchPath`, `Query`, `IsRegex` (optional),
+    `CaseInsensitive` (optional), `Includes` (optional), `MatchPerLine`
+    (optional)
 - **`search_web`**: Perform a general web search.
-- Arguments: `query`, `domain` (optional)
+  - Arguments: `query`, `domain` (optional)
 - **`read_url_content`**: Fetch text content of a public URL.
-- Arguments: `Url`
+  - Arguments: `Url`
 
 ### System and Execution[link](#system-and-execution)
 
 - **`run_command`**: Propose a bash command to run.
-- Arguments: `CommandLine`, `Cwd`, `WaitMsBeforeAsync`, `RunPersistent`
-  (optional), `RequestedTerminalID` (optional)
+  - Arguments: `CommandLine`, `Cwd`, `WaitMsBeforeAsync`,
+    `RunPersistent` (optional), `RequestedTerminalID` (optional)
 - **`manage_task`**: Interact with background tasks.
-- Arguments: `Action` (`'list'`, `'kill'`, `'status'`, `'send_input'`),
-  `TaskId` (optional), `Input` (optional)
+  - Arguments: `Action` (`'list'`, `'kill'`, `'status'`,
+    `'send_input'`), `TaskId` (optional), `Input` (optional)
 - **`schedule`**: Set timers or recurring cron jobs.
-- Arguments: `DurationSeconds` (optional), `CronExpression` (optional),
-  `MaxIterations` (optional), `Prompt`
+  - Arguments: `DurationSeconds` (optional), `CronExpression`
+    (optional), `MaxIterations` (optional), `Prompt`
 - **`list_permissions`**: View current resource access grants.
-- Arguments: None
+  - Arguments: None
 - **`ask_permission`**: Request additional scoped permissions.
-- Arguments: `Action`, `Target`, `Reason`
+  - Arguments: `Action`, `Target`, `Reason`
 
 ### Agent Collaboration[link](#agent-collaboration)
 
 - **`invoke_subagent`**: Spawn specialized sub-agents.
-- Arguments: `Subagents` (array of specs with `Prompt`, `Role`,
-  `TypeName`, `Workspace` (optional))
+  - Arguments: `Subagents` (array of specs with `Prompt`, `Role`,
+    `TypeName`, `Workspace` (optional))
 - **`define_subagent`**: Create a custom sub-agent.
-- Arguments: `name`, `description`, `system_prompt`, `enable_mcp_tools`
-  (optional), `enable_write_tools` (optional), `enable_subagent_tools`
-  (optional)
+  - Arguments: `name`, `description`, `system_prompt`,
+    `enable_mcp_tools` (optional), `enable_write_tools` (optional),
+    `enable_subagent_tools` (optional)
 - **`send_message`**: Communicate with other agents.
-- Arguments: `Recipient`, `Message`
+  - Arguments: `Recipient`, `Message`
 - **`manage_subagents`**: List or terminate active sub-agents.
-- Arguments: `Action` (`'list'`, `'kill'`, `'kill_all'`),
-  `ConversationIds` (optional)
+  - Arguments: `Action` (`'list'`, `'kill'`, `'kill_all'`),
+    `ConversationIds` (optional)
 
 ### Interaction and Media[link](#interaction-and-media)
 
 - **`ask_question`**: Ask multiple-choice questions.
-- Arguments: `questions` (array of questions with `question`, `options`,
-  `is_multi_select`)
+  - Arguments: `questions` (array of questions with `question`,
+    `options`, `is_multi_select`)
 - **`generate_image`**: Create or edit images.
-- Arguments: `Prompt`, `ImageName`, `ImagePaths` (optional)
+  - Arguments: `Prompt`, `ImageName`, `ImagePaths` (optional)
 
 ## Hook Handler Configuration[link](#hook-handler-configuration)
 
 Each item in the `hooks` array supports:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `type` | string | Optional. Currently only `"command"` is supported. Defaults to `"command"`. |
 | `command` | string | Required. The shell command to execute. |
 | `timeout` | integer | Optional. Timeout in seconds. Defaults to `30`. |
@@ -227,12 +227,12 @@ Fires before a tool is executed.
 **Input Fields (stdin)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `toolCall` | object | Details of the proposed tool call. |
 | `toolCall.name` | string | The name of the tool being executed (e.g., `run_command`). |
 | `toolCall.args` | object | The arguments passed to the tool. |
 | `stepIdx` | integer | The 0-based index of the current step in the trajectory. |
-| *(Common Fields)* | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |  |
+| *(Common Fields)* |  | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |
 
 **Output Fields (stdout)**:
 
@@ -293,10 +293,10 @@ Fires after a tool completes.
 **Input Fields (stdin)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `stepIdx` | integer | The 0-based index of the completed step. |
 | `error` | string | Optional. The detailed runtime error message if the tool call failed. Empty if successful. |
-| *(Common Fields)* | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |  |
+| *(Common Fields)* |  | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |
 
 **Output Fields (stdout)**: Returns an empty JSON object `{}`.
 
@@ -334,15 +334,15 @@ Fires before the model is called.
 **Input Fields (stdin)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `invocationNum` | integer | The 0-indexed sequence number of the current model invocation (the first invocation is 0). |
 | `initialNumSteps` | integer | The number of steps currently in the trajectory. |
-| *(Common Fields)* | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |  |
+| *(Common Fields)* |  | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |
 
 **Output Fields (stdout)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `injectSteps` | array of objects | **Optional.** List of steps to inject into the conversation trajectory before the model is called. |
 
 *Injected Step Schema*: Each object in the `injectSteps` array can have
@@ -430,17 +430,17 @@ Fires when the execution loop terminates.
 **Input Fields (stdin)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `executionNum` | integer | The sequence number of the execution attempt. |
 | `terminationReason` | string | The reason why the execution is stopping (e.g., `"model_stop"`, `"max_steps_exceeded"`, `"error"`). |
 | `error` | string | Optional. The error message if termination was caused by a system error. |
 | `fullyIdle` | boolean | **Required.** `true` if the agent is completely finished and all background commands or asynchronous tasks have completed. `false` if active background tasks are still running. |
-| *(Common Fields)* | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |  |
+| *(Common Fields)* |  | Includes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath`. |
 
 **Output Fields (stdout)**:
 
 | Field | Type | Description |
-|----|----|----|
+|:---|:---|:---|
 | `decision` | string | **Required.** Set to `"continue"` to prevent the agent from stopping and re-enter the execution loop. Any other value allows the stop. |
 | `reason` | string | **Optional.** If `decision` is `"continue"`, this message is injected as a system message into the conversation. |
 

@@ -164,11 +164,4 @@ recommend verifying your setup with a quick test.
 - [React integration
   guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/react-integration)
 
-- [Managing Clients](#managing-clients)
-  - [Scopes and Claims](#scopes-and-claims)
-  - [Redirect URIs](#redirect-uris)
-- [Setting Up Third-Party Identity
-  Providers](#setting-up-third-party-identity-providers)
-- [Next Steps](#next-steps)
-
 {% endraw %}

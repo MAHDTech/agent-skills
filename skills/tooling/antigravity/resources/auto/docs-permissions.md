@@ -21,15 +21,15 @@ Permissions are evaluated across three distinct access lists:
 
 warning
 
-**Precedence Rule:** Conflicting rules are strictly evaluated in
-priority order: **Deny \> Ask \> Allow**. For example, if you configure
-`command(*)` in Ask and `command(git)` in Allow, the Ask rule takes
-precedence and prompts before every command.
+Precedence Rule: Conflicting rules are strictly evaluated in priority
+order: Deny \> Ask \> Allow. For example, if you configure command(\*)
+in Ask and command(git) in Allow, the Ask rule takes precedence and
+prompts before every command.
 
-## Supported Actions & Matching Rules[link](#supported-actions-matching-rules)
+## Supported Actions & Matching Rules[link](#supported-actions--matching-rules)
 
 | Action | Target Format | Matching Behavior | Default Fallback |
-|----|----|----|----|
+|:---|:---|:---|:---|
 | `read_file` | `read_file(/path)`, `read_file(dir)`, or `read_file(*)` | Matches absolute paths or paths relative to project workspace roots. Grants recursive read access to all contained files/folders. Using `read_file(*)` matches all files on the system. | **Ask** (Auto-allowed in workspace) |
 | `write_file` | `write_file(/path)` or `write_file(*)` | Same as `read_file`. Implicitly grants `read_file` for the exact same target path. | **Ask** (Auto-allowed in workspace) |
 | `read_url` | `read_url(domain)` or `read_url(*)` | Matches hostnames and subdomains (e.g., `google.com` covers `mail.google.com`). Ignores URL path segments. Using `read_url(*)` matches any domain. | **Ask** |
@@ -40,16 +40,11 @@ precedence and prompts before every command.
 
 info
 
-Global Wildcard Syntax (
+Global Wildcard Syntax (*): Across all supported action types (e.g.,
+read_file(*), command(*), mcp(*)), passing the global wildcard \*
+matches all targets within that entire action namespace.
 
-): Across all supported action types (e.g., `read_file()`,
-
-command(
-
-), `mcp()`), passing the global wildcard `*` matches all targets within
-that entire action namespace.
-
-### Understanding read_url vs execute_url Across the Platform[link](#understanding-read-url-vs-execute-url-across-the-platform)
+### Understanding read_url vs execute_url Across the Platform[link](#understanding-read_url-vs-execute_url-across-the-platform)
 
 The `read_url` permission governs outbound web connectivity across three
 distinct areas of Antigravity:
@@ -62,11 +57,11 @@ distinct areas of Antigravity:
     However, interactive UI actuation (clicking buttons, typing text) is
     governed independently by `execute_url`.
 3.  **Terminal Sandboxing:** In sandbox mode, any domain granted under
-    `read_url` is compiled directly into the container's outbound
+    `read_url` is compiled directly into the container’s outbound
     network allowlist (`AllowedDomains`), permitting commands like
     `curl` or `npm` to connect to authorized hosts.
 
-### Cross-Platform Command & Path Matching[link](#cross-platform-command-path-matching)
+### Cross-Platform Command & Path Matching[link](#cross-platform-command--path-matching)
 
 Antigravity ensures your permission rules work flawlessly whether you
 are developing on macOS, Linux, or Windows. On macOS and Linux, paths
@@ -99,19 +94,19 @@ commands).*
 
 Permission grants also apply to commands when sandbox is enabled:
 
-- Paths granted under `read_file` dynamically populate the sandbox's
+- Paths granted under `read_file` dynamically populate the sandbox’s
   read-only filesystem allowlist.
-- Paths granted under `write_file` dynamically populate the sandbox's
+- Paths granted under `write_file` dynamically populate the sandbox’s
   read-write filesystem allowlist.
 - Domains granted under `read_url` define outbound network access
   policies.
 
 info
 
-**Sandbox Availability:** Terminal sandboxing is currently in preview on
+Sandbox Availability: Terminal sandboxing is currently in preview on
 macOS / Linux, and coming soon to Windows.
 
-## Default System Behaviors & Guardrails[link](#default-system-behaviors-guardrails)
+## Default System Behaviors & Guardrails[link](#default-system-behaviors--guardrails)
 
 When an action is not explicitly listed in your Allow, Deny, or Ask
 lists, Antigravity falls back to secure system defaults:

@@ -259,15 +259,4 @@ We've now got the very basics set up. In [part
 create a SpacetimeDB server module and how to connect to it from your
 client.
 
-- [Setting up the Tutorial Unreal
-  Project](#setting-up-the-tutorial-unreal-project)
-  - [Step 1: Create a Blank Unreal
-    Project](#step-1-create-a-blank-unreal-project)
-  - [Import the SpacetimeDB Unreal
-    SDK](#import-the-spacetimedb-unreal-sdk)
-  - [Create the GameManager Actor](#create-the-gamemanager-actor)
-  - [Set Up the Level](#set-up-the-level)
-  - [Add a Simple GameMode](#add-a-simple-gamemode)
-  - [Create the Server Module](#create-the-server-module)
-
 {% endraw %}

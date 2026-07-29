@@ -192,11 +192,4 @@ Conn->Db->User->OnDelete.AddDynamic(this, &AMyActor::OnUserDelete);
 - [Unreal Reference](https://spacetimedb.com/docs/clients/unreal#subscriptions) - Unreal
   subscription APIs
 
-- [Prerequisites](#prerequisites)
-- [Subscriptions](#subscriptions)
-  - [Example](#example)
-- [Querying the Local Cache](#querying-the-local-cache)
-- [Reacting to Cache Changes](#reacting-to-cache-changes)
-- [Canonical API References](#canonical-api-references)
-
 {% endraw %}

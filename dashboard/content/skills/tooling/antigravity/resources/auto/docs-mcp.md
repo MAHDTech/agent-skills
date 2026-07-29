@@ -24,7 +24,7 @@ file parsers, and external remote APIs. This integration provides the AI
 model with real-time context and execution capabilities beyond your
 immediate workspace.
 
-In this guide, you'll learn how to connect and configure MCP servers
+In this guide, you’ll learn how to connect and configure MCP servers
 across Antigravity products. You can also skip to information for MCP
 servers in [Antigravity 2.0](https://antigravity.google/docs/mcp#antigravity-20), [Antigravity
 IDE](https://antigravity.google/docs/mcp#antigravity-ide), [Antigravity
@@ -73,7 +73,7 @@ To install an MCP server from the **Installed MCP Servers** section:
 
 1.  Click **Add MCP**. This will connect you to the MCP Store, a
     searchable list of available MCP servers.
-2.  Search or scroll down to an MCP server you'd like to install.
+2.  Search or scroll down to an MCP server you’d like to install.
 3.  Click **Add**.
 
 To manage your MCP servers from this screen:
@@ -93,7 +93,7 @@ updating your `mcp_config.json`.
 
 To use the MCP Store:
 
-1.  Click **...** at the top of the editor's agent side panel and select
+1.  Click **…** at the top of the editor’s agent side panel and select
     **MCP Servers**.
 2.  Hover over any supported server and click **Install**. (Or, click a
     server to view details and then click **Install**.)
@@ -104,7 +104,7 @@ available to the editor.
 
 To connect to a custom MCP server not listed in the store:
 
-1.  Click **...** at the top of the editor's agent side panel and select
+1.  Click **…** at the top of the editor’s agent side panel and select
     **MCP Servers**.
 2.  Click **Manage MCP Servers**.
 3.  Click **View raw config**.
@@ -147,10 +147,9 @@ configuration](https://antigravity.google/docs/mcp#mcp-configuration-structure).
 
 warning
 
-**Remote Connection Schema**: When declaring remote SSE, Streamable
-HTTP, or websocket-based MCP connections, you must define the
-`serverUrl` field. Legacy fields like `url` or `httpUrl` are not
-supported.
+Remote Connection Schema: When declaring remote SSE, Streamable HTTP, or
+websocket-based MCP connections, you must define the serverUrl field.
+Legacy fields like url or httpUrl are not supported.
 
 ## Antigravity SDK[link](#antigravity-sdk)
 
@@ -159,7 +158,7 @@ SDK](https://antigravity.google/docs/sdk/overview), MCP servers (`stdio`, `SSE`,
 connected programmatically under a unified execution pipeline alongside
 built-in tools and custom Python functions.
 
-The SDK automatically discovers servers configured in your workspace's
+The SDK automatically discovers servers configured in your workspace’s
 `.agents/mcp_config.json` file. You can also instantiate agents with
 local configurations directly:
 
@@ -329,13 +328,13 @@ When connecting to an OAuth-enabled server:
 ![Click
 Authenticate](https://antigravity.google/assets/image/docs/tools/mcp-oauth-authenticate.png)
 
-1.  Complete authentication in your browser and copy the authorization
+3.  Complete authentication in your browser and copy the authorization
     code.
 
 ![Copy authorization
 code](https://antigravity.google/assets/image/docs/tools/mcp-oauth-copy-code.png)
 
-1.  Paste the code back into the settings panel and click **Submit**.
+4.  Paste the code back into the settings panel and click **Submit**.
 
 ![Paste auth code](https://antigravity.google/assets/image/docs/tools/mcp-oauth-paste-code.png)
 
@@ -373,7 +372,7 @@ content_copy
 ## MCP Permissions and Access Control[link](#mcp-permissions-and-access-control)
 
 Access to Model Context Protocol tools and resources is governed by
-Antigravity's [permissions system](https://antigravity.google/docs/permissions). By default,
+Antigravity’s [permissions system](https://antigravity.google/docs/permissions). By default,
 unconfigured MCP tools run in **Ask** mode, requiring your approval
 before execution. You can allow specific tools or entire servers in your
 policy configuration:

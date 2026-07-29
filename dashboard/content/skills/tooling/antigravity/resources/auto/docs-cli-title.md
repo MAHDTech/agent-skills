@@ -20,14 +20,16 @@ skill_name = "antigravity"
 Configure dynamic window titles, map custom scripting configurations,
 and format JSON state outputs to customize terminal headers.
 
-> **NOTE:** To toggle or set the terminal title interactively, see the
-> **[Window Title Command](https://antigravity.google/docs/cli/commands/title)**.
+info
+
+To toggle or set the terminal title interactively, see the Window Title
+Command.
 
 ## Overview[link](#overview)
 
 The terminal window title feature displays agent details, active
 workspace basenames, and active conversation parameters inside your
-terminal emulator's title bar. This lets you monitor agent progress even
+terminal emulator’s title bar. This lets you monitor agent progress even
 when the terminal window is minimized or unfocused.
 
 ## Custom title scripting[link](#custom-title-scripting)
@@ -54,7 +56,7 @@ content_copy
 ```
 
 Whenever the agent state changes, the TUI executes your command script,
-pipes a detailed state JSON payload directly to the script's `stdin`,
+pipes a detailed state JSON payload directly to the script’s `stdin`,
 reads your formatted string from `stdout`, and updates your terminal
 window title. Non-printable characters and ANSI escape sequences are
 automatically stripped before rendering.

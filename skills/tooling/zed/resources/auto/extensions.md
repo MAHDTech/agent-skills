@@ -72,7 +72,7 @@ Java Extension Contributors
 
 Catppuccin
 
-959k
+960k
 
 🦀 Soothing pastel theme for Zed
 
@@ -82,7 +82,7 @@ Catppuccin
 
 Dockerfile
 
-918k
+920k
 
 Dockerfile support.
 
@@ -92,7 +92,7 @@ d1y, joshmeads
 
 SQL
 
-727k
+734k
 
 SQL language support.
 
@@ -102,7 +102,7 @@ nervenes, notpeter, phileix, tammyxiong
 
 PHP
 
-651k
+667k
 
 PHP support.
 
@@ -112,7 +112,7 @@ Piotr Osiewicz
 
 Vue
 
-634k
+636k
 
 Vue support.
 
@@ -122,7 +122,7 @@ Zed Industries
 
 Ruby
 
-508k
+509k
 
 Ruby support.
 
@@ -132,7 +132,7 @@ Vitaly Slobodin
 
 Catppuccin Icons
 
-468k
+469k
 
 🦊 Soothing pastel icons for Zed
 
@@ -142,7 +142,7 @@ Catppuccin
 
 macOS Classic Theme
 
-461k
+462k
 
 A macOS native style theme, let it same like native app in macOS.
 
@@ -152,7 +152,7 @@ Jason Lee
 
 SCSS & SASS
 
-432k
+434k
 
 SCSS and SASS support
 
@@ -162,7 +162,7 @@ Raunak Raj
 
 Material Icon Theme
 
-396k
+397k
 
 Material Design icons.
 
@@ -172,7 +172,7 @@ Zed Industries
 
 Make
 
-394k
+395k
 
 Makefile syntax highlighting
 
@@ -183,7 +183,7 @@ Alexander, Donnie Adams
 
 Tokyo Night Themes
 
-392k
+393k
 
 Tokyo Night Themes
 
@@ -193,7 +193,7 @@ ssaunderss
 
 C#
 
-384k
+385k
 
 C# support.
 
@@ -203,7 +203,7 @@ fminkowski, Fabian Freimueller
 
 XML
 
-317k
+318k
 
 XML syntax support.
 
@@ -213,7 +213,7 @@ sweetppro
 
 Lua
 
-317k
+318k
 
 Lua support.
 
@@ -233,7 +233,7 @@ Caius Durling, Daniel Banck
 
 One Dark Pro
 
-282k
+283k
 
 A port of VSCode One Dark Pro with some tweaks
 
@@ -263,7 +263,7 @@ nervenes, notpeter, d1y
 
 Dart
 
-263k
+264k
 
 Dart and Flutter development support.
 
@@ -273,7 +273,7 @@ Abdullah Alsigar, Flo, ybbond, nielsenko
 
 Swift
 
-260k
+262k
 
 Swift support.
 
@@ -303,7 +303,7 @@ Alvaro Gaona, 0xk1f0
 
 Github Theme
 
-239k
+240k
 
 GitHub themes for Zed
 
@@ -323,7 +323,7 @@ Ben Hamment
 
 Kotlin
 
-235k
+236k
 
 Kotlin language support.
 
@@ -354,7 +354,7 @@ Ruben Zukic, Oli Callaghan, Luke Naylor, Jan Solanti
 
 VSCode Dark Modern
 
-212k
+213k
 
 VSCode Dark Modern Theme for Zed
 
@@ -364,7 +364,7 @@ kcamcam
 
 Nightfox - opaque / blurred
 
-209k
+210k
 
 🦊 A port of the Neovim Nightfox themes. Includes all variants as opaque
 and blurred version.
@@ -375,7 +375,7 @@ cange
 
 Zig
 
-208k
+209k
 
 Zig support.
 
@@ -395,7 +395,7 @@ eivs
 
 Nix
 
-176k
+177k
 
 Nix support.
 
@@ -415,7 +415,7 @@ Thanabodee Charoenpiriyakij
 
 Catppuccin Blur
 
-172k
+173k
 
 Catppuccin themes with blur
 
@@ -425,7 +425,7 @@ Jens Lystad
 
 Biome
 
-172k
+173k
 
 Biome support for Zed
 

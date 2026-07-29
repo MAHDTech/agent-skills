@@ -515,7 +515,7 @@ When the Agent receives this notification, it **SHOULD** stop all language model
 
 After all ongoing operations have been successfully aborted and pending updates have been sent, the Agent **MUST** send an idle `state_update` session update with the `cancelled` [stop reason](#stop-reasons).
 
-<Warning>
+\<Warning\>
   API client libraries and tools often throw an exception when their operation is aborted, which may otherwise be surfaced as a generic failure.
 
   Clients often display unrecognized errors from the Agent to the user, which would be undesirable for cancellations as they aren't considered errors.

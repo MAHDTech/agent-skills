@@ -5,7 +5,7 @@
   \>
 - Plugins & Skills
 
-# Plugins & skills[link](#plugins-skills)
+# Plugins & skills[link](#plugins--skills)
 
 Extend agent capabilities, install third-party extension bundles,
 package custom workflow skills, and interface with Model Context
@@ -59,7 +59,7 @@ content_copy
 ### The plugin manifest (plugin.json)[link](#the-plugin-manifest-pluginjson)
 
 The `plugin.json` file is a mandatory manifest located at the root of
-your plugin directory. It defines the plugin's identity and metadata.
+your plugin directory. It defines the plugin’s identity and metadata.
 
 **Manifest example**
 
@@ -78,9 +78,9 @@ content_copy
 **Field reference**
 
 | Field | Type | Required | Description |
-|----|----|----|----|
+|:---|:---|:---|:---|
 | `name` | String | **Yes** | The unique, machine-readable name of the plugin. It must contain only alphanumeric characters, hyphens, and underscores (matches `^[a-zA-Z0-9-_]+$`). This name is used to reference the plugin in CLI commands. |
-| `description` | String | No | A brief human-readable description of the plugin's purpose, displayed in plugin listings. |
+| `description` | String | No | A brief human-readable description of the plugin’s purpose, displayed in plugin listings. |
 
 **Automatic validation**
 
@@ -133,40 +133,37 @@ manage your extensions:
 
 - **List installed plugins**: Show active packages and their loaded
   components.
+  bash
 
-content_copy
-
-```
-    agy plugin list
-```
-
+  content_copy
+  ```
+  agy plugin list
+  ```
 - **Install a local or remote plugin**: Stage a package directory into
   your local profile.
+  bash
 
-content_copy
-
-```
-    agy plugin install /path/to/local/plugin
-```
-
-- **Disable/Enable a plugin**: Suspend a plugin's tools without deleting
+  content_copy
+  ```
+  agy plugin install /path/to/local/plugin
+  ```
+- **Disable/Enable a plugin**: Suspend a plugin’s tools without deleting
   its assets.
+  bash
 
-content_copy
-
-```
-    agy plugin disable <plugin_name>
-    agy plugin enable <plugin_name>
-```
-
+  content_copy
+  ```
+  agy plugin disable <plugin_name>
+  agy plugin enable <plugin_name>
+  ```
 - **Uninstall a plugin**: Purge the package directory and clean up
   registries.
+  bash
 
-content_copy
-
-```
-    agy plugin uninstall <plugin_name>
-```
+  content_copy
+  ```
+  agy plugin uninstall <plugin_name>
+  ```
 
 ## Agent skills[link](#agent-skills)
 
@@ -185,7 +182,7 @@ To deploy workspace-specific skills that stay with your git repository:
 1.  Create a directory named `.agents/skills/` at your project root.
 2.  Inside, draft a markdown file with a `.md` extension (such as
     `format-tests.md`).
-3.  Define the skill's Frontmatter metadata (see the example below).
+3.  Define the skill’s Frontmatter metadata (see the example below).
 4.  Below the metadata, write explicit instructions for the agent. When
     you run `agy` in this directory, the skill is compiled, and
     `/format-tests` becomes available in the prompt box.
@@ -226,7 +223,7 @@ execution. They are useful for running automated pre-flight checks or
 post-generation formats (such as running `prettier` after writing
 files).
 
-Hooks are defined inside a plugin's `hooks.json` or configured inside
+Hooks are defined inside a plugin’s `hooks.json` or configured inside
 your primary `settings.json` file. You can inspect all loaded and active
 hooks inside the TUI by typing:
 

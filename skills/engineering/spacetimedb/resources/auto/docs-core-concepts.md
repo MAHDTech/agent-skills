@@ -70,9 +70,3 @@ Connect your frontend to SpacetimeDB.
 - [TypeScript](https://spacetimedb.com/docs/clients/typescript), [Rust](https://spacetimedb.com/docs/clients/rust),
   [C#](https://spacetimedb.com/docs/clients/c-sharp), [Unreal](https://spacetimedb.com/docs/clients/unreal) -
   Language-specific references
-
-- [Databases](#databases)
-- [Tables](#tables)
-- [Functions](#functions)
-- [Authentication](#authentication)
-- [Clients](#clients)

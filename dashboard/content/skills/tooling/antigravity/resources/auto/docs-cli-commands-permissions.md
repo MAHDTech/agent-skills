@@ -53,29 +53,30 @@ The Permissions Manager operates in three panels:
 
 1.  **Scope Picker**: Select the configuration scope you want to edit:
 
-- **Project**: Rules applying only to the active project (disabled if no
-  project is open).
-- **Shared**: Rules shared across all Antigravity products.
-- **Global**: Global rules applying to all your sessions.
+    - **Project**: Rules applying only to the active project (disabled
+      if no project is open).
+    - **Shared**: Rules shared across all Antigravity products.
+    - **Global**: Global rules applying to all your sessions.
 
-Use `↑`/`↓` (or `j`/`k`) to navigate, `Enter` to select, and `Esc` to
-exit.
+    Use `↑`/`↓` (or `j`/`k`) to navigate, `Enter` to select, and `Esc`
+    to exit.
 
-1.  **Rule Viewer**: View the rules configured for the selected scope.
+2.  **Rule Viewer**: View the rules configured for the selected scope.
 
-- Switch between **allowlist**, **denylist**, and **asklist** tabs using
-  `←`/`→` (or `Tab`).
-- Scroll through the rules using `↑`/`↓` (or `j`/`k`).
-- Press `a` to add a new rule.
-- Press `e` (or `Ctrl+G`) to edit the highlighted rule.
-- Press `d` (or `Backspace`) to delete the highlighted rule.
-- Press `Esc` to return to the Scope Picker.
+    - Switch between **allowlist**, **denylist**, and **asklist** tabs
+      using `←`/`→` (or `Tab`).
+    - Scroll through the rules using `↑`/`↓` (or `j`/`k`).
+    - Press `a` to add a new rule.
+    - Press `e` (or `Ctrl+G`) to edit the highlighted rule.
+    - Press `d` (or `Backspace`) to delete the highlighted rule.
+    - Press `Esc` to return to the Scope Picker.
 
-1.  **Add/Edit Rule**: Type or edit a rule in the input field.
+3.  **Add/Edit Rule**: Type or edit a rule in the input field.
 
-- Rules must follow the `action(target)` format (e.g., `command(git)`).
-- Press `Enter` to validate and save the rule.
-- Press `Esc` to cancel.
+    - Rules must follow the `action(target)` format (e.g.,
+      `command(git)`).
+    - Press `Enter` to validate and save the rule.
+    - Press `Esc` to cancel.
 
 ------------------------------------------------------------------------
 
@@ -104,17 +105,17 @@ prompting:
 1.  In the Rule Viewer, press `a`. The **Add Rule** panel opens at the
     bottom:
 
-![Add Rule Panel](https://antigravity.google/assets/image/docs/cli/permissions-add.png)
+    ![Add Rule Panel](https://antigravity.google/assets/image/docs/cli/permissions-add.png)
 
-1.  Type `command(git)` in the input field:
+2.  Type `command(git)` in the input field:
 
-![Typing the Rule](https://antigravity.google/assets/image/docs/cli/permissions-add-typed.png)
+    ![Typing the Rule](https://antigravity.google/assets/image/docs/cli/permissions-add-typed.png)
 
-1.  Press `Enter`. The rule is validated and saved. You are returned to
+3.  Press `Enter`. The rule is validated and saved. You are returned to
     the Rule Viewer, and `command(git)` now appears in your allowlist:
 
-![Rule Saved
-Successfully](https://antigravity.google/assets/image/docs/cli/permissions-viewer-with-rule.png)
+    ![Rule Saved
+    Successfully](https://antigravity.google/assets/image/docs/cli/permissions-viewer-with-rule.png)
 
 ### 3. Editing a permission rule[link](#3-editing-a-permission-rule)
 

@@ -9,9 +9,9 @@
 
 Sidecars are background processes that run alongside Antigravity.
 Antigravity manages the lifecycle of sidecars, automatically launching
-them and restarting them if they crash or error. They are useful for
-persistent background scripts, scheduled recurring tasks, and reacting
-to events.
+them and restarting them if they crash or error.  
+They are useful for persistent background scripts, scheduled recurring
+tasks, and reacting to events.
 
 ## Configuration[link](#configuration)
 
@@ -20,7 +20,7 @@ files. They can be defined in two locations:
 
 - Global sidecars: Under `~/.gemini/config/sidecars/`
 - Plugin sidecars: Under
-  `~/.gemini/config/plugins/<pluginName>/sidecars/`
+  `~/.gemini/config/plugins/\<pluginName\>/sidecars/`
 
 Each sidecar has its own directory and the directory name is used as the
 sidecar’s ID. Sidecars loaded from plugins have the ID
@@ -133,7 +133,7 @@ content_copy
 ### Runtime Data[link](#runtime-data)
 
 Runtime data produced by sidecars are stored in
-`~/.gemini/antigravity/sidecar_data/<sidecarId>/`.
+`~/.gemini/antigravity/sidecar_data/\<sidecarId\>/`.
 
 This includes:
 
@@ -143,7 +143,7 @@ This includes:
 - **`logs/`**: Auto-generated timestamped logs from stdout and stderr.
 - **`events/`**: JSON files recorded for `agentapi` calls.
 
-### \`schedule\` builtin[link](#schedule-builtin)
+### `schedule` builtin[link](#schedule-builtin)
 
 `schedule` is a simple builtin scheduler for running recurring commands.
 
@@ -167,16 +167,14 @@ The first argument is a standard 5-field cron expression. The remaining
 arguments are the command and arguments to run on the specified
 schedule.
 
-### \`agentapi\`[link](#agentapi)
+### `agentapi`[link](#agentapi)
 
 Sidecars can use the `agentapi` CLI to programmatically interact with
 Antigravity. The executable is automatically added to the sidecar’s path
 and available as `agentapi`.
 
-- `agentapi new-conversation <prompt>`
-
-Sidecars creating conversations must have a `projectId` set.
-
-- `agentapi send-message <conversation_id> <prompt>`
+- `agentapi new-conversation <prompt>`  
+  Sidecars creating conversations must have a `projectId` set.
+- `agentapi send-message \<conversation_id\> <prompt>`
 
 On this Page

@@ -126,21 +126,21 @@ content_copy
 Use active session navigation tools to recover from engineering
 dead-ends or course-correct intermediate agent loops.
 
-### Course-correct early (\`esc\`)[link](#course-correct-early-esc)
+### Course-correct early (`esc`)[link](#course-correct-early-esc)
 
 If you watch an agent execute an incorrect search pattern or write code
 that deviates from your intentions, press the global escape hatch key
 `esc` immediately to interrupt the turn and regain focus of a clean
 prompt.
 
-### Rewind history with \`/rewind\`[link](#rewind-history-with-rewind)
+### Rewind history with `/rewind`[link](#rewind-history-with-rewind)
 
 If an agent has made several successive changes that introduce build
 errors, you do not need to discard the session. Type `/rewind` (or
 `/undo`) to roll back your conversation thread to a previous stable
 checkout.
 
-### Branch experiments with \`/fork\`[link](#branch-experiments-with-fork)
+### Branch experiments with `/fork`[link](#branch-experiments-with-fork)
 
 If you are unsure of the best implementation path:
 
@@ -155,7 +155,7 @@ If you are unsure of the best implementation path:
 Antigravity CLI is designed to operate seamlessly within standard shell
 pipeline tools.
 
-### Run non-interactive commands (\`-p\`)[link](#run-non-interactive-commands-p)
+### Run non-interactive commands (`-p`)[link](#run-non-interactive-commands--p)
 
 To automate quick queries or integrate agents into git hooks, use the
 one-shot prompt flag `-p`:

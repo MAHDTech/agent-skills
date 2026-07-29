@@ -267,7 +267,7 @@ The model is also capable of generating speech in additional languages beyond th
 
 ## Speech Tags
 
-*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \<whisper>It was a secret the whole time.\</whisper> Pretty cool, right?
+*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \\<whisper\>It was a secret the whole time.\</whisper> Pretty cool, right?
 
 Add inline speech tags to your text for expressive delivery. There are two types of tags:
 
@@ -429,7 +429,7 @@ try whisperData.write(to: URL(fileURLWithPath: "whisper.mp3"))
 * Combine tags with punctuation — `"Really? [laugh] That's incredible!"` produces more natural results than stacking tags
 * Use `[pause]` or `[long-pause]` to add dramatic timing or let a thought land
 * Wrapping tags work best around complete phrases — `<whisper>It is a secret.</whisper>` reads more naturally than wrapping individual words
-* Combine styles for effect — `<slow><soft>Goodnight, sleep well.</soft></slow>`
+* Combine styles for effect — `<slow>\<soft\>Goodnight, sleep well.</soft></slow>`
 
 ## Output Formats
 

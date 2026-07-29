@@ -14,7 +14,7 @@ Type `/` inside the prompt box to open the typeahead command selection
 menu.
 
 | Command | Category | Alias | Execution Purpose |
-|----|----|----|----|
+|:---|:---|:---|:---|
 | **`/add-dir <path>`** | Utilities | — | Add a directory path to the active workspace. |
 | **[`/agents`](https://antigravity.google/docs/cli/commands/agents)** | Tools & Tasks | — | Open the [Agent Manager Panel](https://antigravity.google/docs/cli/commands/agents) to switch custom agents and monitor background subagents. |
 | **`/artifact`** | Tools & Tasks | — | Open the Artifact Review Panel. |
@@ -58,7 +58,7 @@ These hotkeys are always active regardless of which panel, overlay, or
 prompt is currently focused.
 
 | Key | TUI Command | Action Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`Esc`** | `cli.escape` | Closes active panels, halts active streams, or clears empty prompts. |
 | **`Ctrl+C`** | `cli.exit` | Terminates the CLI session (prompts for confirmation if agent is working). |
 | **`Ctrl+D`** | `cli.exit` | Exits the CLI session (only when the prompt box is empty). |
@@ -69,7 +69,7 @@ prompt is currently focused.
 These keys are active when writing instructions inside the prompt box.
 
 | Key | TUI Command | Action Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`Enter`** | `prompt.submit` | Submits your prompt or active menu selection to the agent. |
 | **`Shift+Enter`** / **`Ctrl+J`** | `prompt.newline` | Inserts a clean newline without submitting. |
 | **`Ctrl+V`** | `prompt.paste` | Pastes graphic media files or clipboard blocks into the prompt. |
@@ -84,12 +84,12 @@ These keys are active when writing instructions inside the prompt box.
 | **`Ctrl+Shift+Z`** | `prompt.redo_text` | Redoes the last undone text operation. |
 | **`Ctrl+D`** | `—` | Forward delete (only when the prompt box is non-empty). |
 
-### Navigation & scrolling[link](#navigation-scrolling)
+### Navigation & scrolling[link](#navigation--scrolling)
 
 Used inside select panels, menus, and scrollable text boxes.
 
 | Key | TUI Command | Action Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`↑`** / **`↓`** | `navigation.up` / `navigation.down` | Scrolls highlighted selections up or down by one item. |
 | **`PgUp`** / **`Shift+↑`** | `navigation.page_up` | Scrolls the active text viewport up by one page block. |
 | **`PgDn`** / **`Shift+↓`** | `navigation.page_down` | Scrolls the active text viewport down by one page block. |
@@ -101,17 +101,17 @@ Used inside select panels, menus, and scrollable text boxes.
 Active during confirmation prompts.
 
 | Key | TUI Command | Action Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`y`** | `confirm.yes` | Authorizes the proposed tool, command, or active artifact. |
 | **`n`** | `confirm.no` | Rejects the proposed tool, command, or active artifact. |
 | **`A`** | `—` | (Inside Review Panel) Approves all generated artifacts in one action (built-in shortcut). |
 
-## Configuration keys (\`settings.json\`)[link](#configuration-keys-settingsjson)
+## Configuration keys (`settings.json`)[link](#configuration-keys-settingsjson)
 
 Primary settings key names, data types, system defaults, and expected
 parameters.
 
-### Example \`settings.json\`[link](#example-settingsjson)
+### Example `settings.json`[link](#example-settingsjson)
 
 json
 
@@ -128,7 +128,7 @@ content_copy
 ```
 
 | Option Key Name | Value Type | System Default | Parameter Characteristics & Options |
-|----|----|----|----|
+|:---|:---|:---|:---|
 | **`colorScheme`** | string | `"terminal"` | Color theme: `"light"`, `"solarized light"`, `"colorblind-friendly light"`, `"dark"`, `"solarized dark"`, `"colorblind-friendly dark"`, `"tokyo night"`, or `"terminal"` (inherits native shell colors). |
 | **`altScreenMode`** | string | `"default"` | Screen buffer usage: `"default"` (adaptive inline/altscreen), `"always"` (force alternate screen buffer), or `"never"` (force inline sequential output). |
 | **`toolPermission`** | string | `"request-review"` | Global safety presets: `"request-review"` (prompts for write/bash/web tools), `"proceed-in-sandbox"` (auto-proceed inside sandbox), `"always-proceed"` (never prompts), or `"strict"` (prompts for all non-read tools). |
@@ -137,7 +137,7 @@ content_copy
 | **`showTips`** | boolean | `true` | Displays helpful agentic tips above the prompt panel during generation turns. |
 | **`showFeedbackSurvey`** | boolean | `true` | Displays periodic quality feedback surveys upon active task completions. |
 | **`editor`** | string | `"auto"` | Target text editor utility: `"auto"` (consults system `$EDITOR`), `"vim"`, `"emacs"`, or custom text labels. |
-| **`allowNonWorkspaceAccess`** | boolean | `false` | Permits the agent's file read and write tools to navigate outside recognized Git/workspace roots. |
+| **`allowNonWorkspaceAccess`** | boolean | `false` | Permits the agent’s file read and write tools to navigate outside recognized Git/workspace roots. |
 | **`enableTerminalSandbox`** | boolean | `false` | Restricts all local execution commands launched by agents to OS containment rings. |
 | **`useG1Credits`** | boolean | `false` | *External builds only.* Uses personal AI credits for model calls once plan quotas are exhausted. |
 | **`enableTelemetry`** | boolean | `true` | Permits metric collection and crash log streaming to improve tool reliability. |

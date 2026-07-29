@@ -114,10 +114,3 @@ If the token is valid but does not match the identity, returns
 
 If the token is invalid, or no `Authorization` header is included in the
 request, returns `401 Unauthorized`.
-
-- [At a glance](#at-a-glance)
-- [`POST /v1/identity`](#post-v1identity)
-- [`POST /v1/identity/websocket-token`](#post-v1identitywebsocket-token)
-- [`GET /v1/identity/public-key`](#get-v1identitypublic-key)
-- [`GET /v1/identity/:identity/databases`](#get-v1identityidentitydatabases)
-- [`GET /v1/identity/:identity/verify`](#get-v1identityidentityverify)

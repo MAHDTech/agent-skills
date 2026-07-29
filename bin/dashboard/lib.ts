@@ -20,7 +20,7 @@ export function run(
     } catch (err: any) {
         if (err.code === "ENOENT") {
             console.error(
-                `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv shell -- dashboard --action <build|serve|css|test>\`)`
+                `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv --no-tui shell -- dashboard --action <build|serve|css|test>\`)`
             )
             process.exit(1)
         }
@@ -193,7 +193,7 @@ export function runAsync(
         child.on("error", (err: any) => {
             if (err.code === "ENOENT") {
                 console.error(
-                    `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv shell -- dashboard --action <build|serve|css|test>\`)`
+                    `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv --no-tui shell -- dashboard --action <build|serve|css|test>\`)`
                 )
                 process.exit(1)
             }
@@ -204,7 +204,7 @@ export function runAsync(
     } catch (err: any) {
         if (err.code === "ENOENT") {
             console.error(
-                `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv shell -- dashboard --action <build|serve|css|test>\`)`
+                `Error: \`${cmd}\` not found — run inside the devenv shell (\`devenv --no-tui shell -- dashboard --action <build|serve|css|test>\`)`
             )
             process.exit(1)
         }

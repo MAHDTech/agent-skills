@@ -53,15 +53,15 @@ Which will return an object with the following structure:
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
-  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the <body> of the page.",
 ~  "sub_results": [
 ~    {
 ~        /* ... other result keys ... */
 ~        "title": "The title from the first h1 element on the page",
 ~        "url": "/url-of-the-page/",
-~        "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page",
-~        "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page"
+~        "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page",
+~        "plain_excerpt": "A small snippet of the static content, from the <body> of the page"
 ~    },
 ~    {
 ~        /* ... other result keys ... */
@@ -94,7 +94,7 @@ Within the data for a page result, the `anchors`, `locations`, and `content` key
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, with the search term(s) highlighted in &lt;mark&gt; elements.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, with the search term(s) highlighted in <mark> elements.",
 ~  "content": "The processed text content of this page ...",
 ~  "locations": [ 4, 18, 70 ],
   "weighted_locations": [

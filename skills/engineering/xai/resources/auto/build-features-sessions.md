@@ -51,4 +51,4 @@ Todos are separate from [background tasks](https://docs.x.ai/build/features/back
 | `grok sessions list` | List recent sessions for this directory |
 | `grok sessions search <query>` | Search session titles and prompts |
 | `grok sessions delete <id>` | Permanently delete a session |
-| `grok export <id> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |
+| `grok export \<id\> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |

@@ -12,7 +12,7 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read any project context docs (a `CONTEXT.md`, architecture notes, or ADRs in the area you are touching) if they exist, to build a clear mental model of the relevant modules and conventions.
 
-Run repo commands through the project's toolchain — for example `devenv shell -- <cmd>` — so the loop behaves the same way every run.
+Run repo commands through the project's toolchain — for example `devenv --no-tui shell -- <cmd>` — so the loop behaves the same way every run.
 
 ## Phase 1 — Build a feedback loop
 

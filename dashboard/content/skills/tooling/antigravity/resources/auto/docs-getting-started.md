@@ -40,13 +40,13 @@ not install it now and would like to re-download it later, you can do so
 Agents work within Projects, which define the boundaries of the folders
 and repositories they can access.
 
-1.  Click the **folder with a "+" icon** in the **left sidebar**.
-2.  Click on **"New Project"**.
+1.  Click the **folder with a “+” icon** in the **left sidebar**.
+2.  Click on **“New Project”**.
 3.  Click **Add Folder** to associate one or more local folders or Git
     repositories. Adding multiple folders provides your agent with full
     cross-repository context.
 4.  Click **Create**.
-5.  *(Optional)* Configure your Project's settings. Each Project
+5.  *(Optional)* Configure your Project’s settings. Each Project
     maintains its own isolated settings and security policies that the
     agent respects.
 
@@ -55,17 +55,18 @@ and repositories they can access.
 Once your Project is created, you can spawn an agent to start working on
 tasks.
 
-1.  Type your goal or instruction in the chat input (e.g., "Help me add
-    a new feature") and press **Enter**.
+1.  Type your goal or instruction in the chat input (e.g., “Help me add
+    a new feature”) and press **Enter**.
 2.  Choose a **Mode** in the setup modal to boot up your agent:
-
-- **Local Mode**: The agent operates directly in your active folders.
-- **New Worktree Mode**: The agent operates in an isolated Git worktree.
+    - **Local Mode**: The agent operates directly in your active
+      folders.
+    - **New Worktree Mode**: The agent operates in an isolated Git
+      worktree.
 
 ### Basic Navigation[link](#basic-navigation)
 
 | Action                         | macOS         | Windows / Linux   |
-|--------------------------------|---------------|-------------------|
+|:-------------------------------|:--------------|:------------------|
 | **Open Conversation Picker**   | `⌘K`          | `Ctrl + K`        |
 | **Open File Search**           | `⌘P`          | `Ctrl + P`        |
 | **Focus Input**                | `⌘L`          | `Ctrl + L`        |

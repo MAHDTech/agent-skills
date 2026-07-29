@@ -1,0 +1,71 @@
++++
+title = "secretspec-sdk-go-ffe1707c"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+{% raw %}
+# Go SDK
+
+The Go SDK (`secretspec-go`) is a thin client over the `secretspec-ffi`
+C ABI, loaded via [purego](https://github.com/ebitengine/purego)
+(dlopen, no cgo). Resolution happens in the Rust core, so the SDK
+inherits every provider with no Go-side logic.
+
+## Quick start
+
+```
+import secretspec "github.com/cachix/secretspec/secretspec-go"
+resolved, err := secretspec.New().    WithProvider("keyring://").    WithProfile("production").    WithReason("boot web app").    Load()if err != nil {    log.Fatal(err)}
+fmt.Println(resolved.Provider, resolved.Profile)db := resolved.Secrets["DATABASE_URL"]fmt.Println(db.Get()) // the value, or the file path for as_path secretsresolved.SetAsEnv()   // export everything into the process environment
+```
+
+A missing required secret returns `*MissingRequiredError`; any other
+failure returns `*Error` (with a stable `.Kind`).
+
+## Scopes (0.17+)
+
+Use `WithScope("api")` to resolve only a named `[scopes.api]` subset.
+The selected name is available as `Resolved.Scope` and `Report.Scope`:
+
+```
+resolved, err := secretspec.New().WithScope("api").Load()
+```
+
+## Typed access (codegen)
+
+Generate typed structs with `secretspec schema` plus
+[quicktype](https://quicktype.io), then unmarshal
+`resolved.FieldsJSON()`:
+
+```
+secretspec schema | quicktype -s schema --top-level SecretSpec --lang go -o secrets_gen.go
+```
+
+Terminal window
+
+```
+data, _ := resolved.FieldsJSON()typed, _ := UnmarshalSecretSpec(data) // typed, generatedfmt.Println(typed.DatabaseURL)
+```
+
+## Library discovery
+
+The native `secretspec-ffi` cdylib is resolved at runtime, in order:
+
+1.  The `SECRETSPEC_FFI_LIB` environment variable (an explicit path).
+2.  A library embedded at build time with `-tags embed_lib`.
+3.  A Cargo `target` directory found by searching up from the working
+    directory (the development path).
+
+The SDK uses [purego](https://github.com/ebitengine/purego), so the
+cdylib is loaded at runtime, not linked. Either install/build
+`libsecretspec_ffi` and set `SECRETSPEC_FFI_LIB`, or stage the
+per-platform library into `lib/` and build with `-tags embed_lib` for a
+self-contained binary. The embedded library is extracted to a per-user,
+owner-only cache directory at first use, and is not distributed through
+the Go module proxy.
+
+{% endraw %}

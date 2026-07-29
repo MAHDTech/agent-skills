@@ -13,7 +13,7 @@ serially, an agent can delegate tasks—such as running tests or
 performing extensive codebase searches—to dedicated subagents. This
 architecture frees the parent agent to continue working on other tasks
 in parallel and prevents its context window from being polluted by the
-details of a subagent's work.
+details of a subagent’s work.
 
 > **Antigravity CLI Reference:** Working in the terminal? See [CLI
 > Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents) and the [`/agents`
@@ -29,7 +29,7 @@ concurrent session with a dedicated role and initial prompt.
   workspace as its parent (`inherit`), create an isolated Git worktree
   (`branch`), or share directory storage (`share`).
 - **Context Isolation**: The subagent runs using the specified model
-  tier but does not inherit the parent's existing conversation history
+  tier but does not inherit the parent’s existing conversation history
   (context window), starting with a clean slate.
 - **Execution**: Once invoked, the subagent immediately begins executing
   its task. A parent agent can invoke multiple subagents concurrently.
@@ -62,10 +62,10 @@ Antigravity automatically discovers custom subagent `.md` files in the
 following locations:
 
 | Location | Path | Scope |
-|----|----|----|
-| **Workspace Customizations** | `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` | Workspace / Repository Root |
-| **Global Customizations** | `~/.gemini/config/agents/<name>.md` or `.../agents/<name>/agent.md` | Machine-wide / All Projects |
-| **Plugins** | `plugins/<plugin_name>/agents/` | Bundled Plugin Package |
+|:---|:---|:---|
+| **Workspace Customizations** | `.agents/agents/\<name\>.md` or `.agents/agents/\<name\>/agent.md` | Workspace / Repository Root |
+| **Global Customizations** | `~/.gemini/config/agents/\<name\>.md` or `.../agents/\<name\>/agent.md` | Machine-wide / All Projects |
+| **Plugins** | `plugins/\<plugin_name\>/agents/` | Bundled Plugin Package |
 
 ### Frontmatter Configuration (YAML)[link](#frontmatter-configuration-yaml)
 
@@ -73,7 +73,7 @@ Define agent metadata, capability limits, and execution policies using
 YAML frontmatter at the top of your `.md` file:
 
 | Property | Type | Default | Description |
-|----|----|----|----|
+|:---|:---|:---|:---|
 | `name` | `string` | *(Required)* | The unique identifier for the custom agent. |
 | `description` | `string` | *(Required)* | Detailed description used by the planner to determine when to delegate tasks to this agent. |
 | `tools` | `string[]` | `[]` | Explicit list of tools permitted for this subagent (e.g. `view_file`, `replace_file_content`, `grep_search`, `run_command`). |
@@ -91,13 +91,13 @@ YAML frontmatter at the top of your `.md` file:
 > subagents. Enhanced schema validation and a fix for this behavior will
 > be released in an upcoming update.
 
-### System Prompt & Markdown Body[link](#system-prompt-markdown-body)
+### System Prompt & Markdown Body[link](#system-prompt--markdown-body)
 
-The content following the YAML `---` delimiter defines the subagent's
+The content following the YAML `---` delimiter defines the subagent’s
 system prompt. You can organize instructions using standard Markdown H1
 headings (`# System Prompt`, `# Review Guidelines`).
 
-### Example Markdown Custom Agent (\`code-auditor.md\`)[link](#example-markdown-custom-agent-code-auditormd)
+### Example Markdown Custom Agent (`code-auditor.md`)[link](#example-markdown-custom-agent-code-auditormd)
 
 markdown
 
@@ -162,7 +162,7 @@ The subagent is permanently terminated and cannot be re-awoken.
 - **Visibility**: Historical conversation transcripts remain readable in
   JSONL logs.
 
-## Inter-Agent Communication & Nesting Limits[link](#inter-agent-communication-nesting-limits)
+## Inter-Agent Communication & Nesting Limits[link](#inter-agent-communication--nesting-limits)
 
 Agents communicate by sending messages to each other using unique agent
 conversation IDs.
@@ -171,25 +171,25 @@ conversation IDs.
   subagents, or peer agents whose ID is known.
 - **Auto-Wake**: Sending a message to an idle subagent automatically
   re-awakens it to process incoming instructions.
-- **Shared Transcripts**: Agents can read each other's conversation
+- **Shared Transcripts**: Agents can read each other’s conversation
   transcripts to audit multi-step workflows.
 
 warning
 
-**Nesting Depth Limit**: A maximum nesting depth of **10 levels**
-(layers of subagents beneath the primary agent) is strictly enforced to
-prevent runaway recursion or resource exhaustion.
+Nesting Depth Limit: A maximum nesting depth of 10 levels (layers of
+subagents beneath the primary agent) is strictly enforced to prevent
+runaway recursion or resource exhaustion.
 
 ## Permissions and Configuration Inheritance[link](#permissions-and-configuration-inheritance)
 
 Subagents inherit safety configurations from their parent agent to
 maintain security boundaries:
 
-- **Inherited Scopes**: Subagents automatically inherit the parent's
+- **Inherited Scopes**: Subagents automatically inherit the parent’s
   allowed terminal command prefixes, file read/write directory scopes,
   and sandbox settings.
 - **Workspace Access**: Parent agents retain full access to their
-  subagents' workspaces, including isolated Git worktrees.
+  subagents’ workspaces, including isolated Git worktrees.
 - **Permission Bubbling**: If a subagent encounters a tool execution
   requiring user authorization, the request automatically bubbles up to
   the main UI/Subagent panel.
@@ -201,9 +201,8 @@ complex high-level goals.
 
 star
 
-**Ultra Plan Exclusive**: The `/teamwork-preview` slash command is
-currently in preview and is exclusive to users on the [Ultra (\$200/mo)
-plan](https://antigravity.google/pricing).
+Ultra Plan Exclusive: The /teamwork-preview slash command is currently
+in preview and is exclusive to users on the Ultra (\$200/mo) plan.
 
 Using `/teamwork-preview` prompts the main agent to launch a
 collaborative multi-agent framework. This framework features built-in

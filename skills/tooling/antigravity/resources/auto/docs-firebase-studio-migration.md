@@ -5,7 +5,7 @@
 
 # Firebase Studio Migration[link](#firebase-studio-migration)
 
-Antigravity is Google's next-generation, agent-first platform. It’s
+Antigravity is Google’s next-generation, agent-first platform. It’s
 designed to be the primary home for high-velocity, autonomous
 development workflows. Instead of relying on just a cloud-based web
 editor, Antigravity brings the power of AI right into your local
@@ -32,12 +32,16 @@ in Firebase Studio:
 To help you settle in, here is where you can find your favorite Firebase
 Studio features in Antigravity:
 
+[](https://antigravity.google/docs/ide/overview)
+
 code
 
 Cloud IDE Code viewkeyboard_arrow_right
 
 Enjoy the familiar interface of VS Code, but supercharged with AI and
 running locally on your hardware.
+
+[](https://antigravity.google/docs/agent)
 
 auto_awesome
 
@@ -46,12 +50,16 @@ Agentic chatkeyboard_arrow_right
 The AI chat you used in Firebase Studio is now natively integrated into
 your IDE, capable of taking autonomous actions across your local files.
 
+[](https://antigravity.google/docs/tools)
+
 rocket_launch
 
 App Hosting deploymentskeyboard_arrow_right
 
 You can continue to deploy and manage your App Hosting URLs seamlessly
 using the Firebase CLI or built-in IDE integrations.
+
+[](https://antigravity.google/docs/ide/browser)
 
 important_devices
 
@@ -84,14 +92,12 @@ transformation.
 1.  In Firebase Studio, click the **Move now** button at the top of your
     workspace.
 2.  Follow the export method based on the window that appears:
-
-- If you see a **Zip and Download** button, click it.
-- Otherwise, open the command palette (`Cmd` + `Shift` + `P` on Mac or
-  `Ctrl` + `Shift` + `P` on ChromeOS, Windows, or Linux) and run the
-  **Firebase Studio: Zip & Download** command.
-
-1.  Extract the folder locally and open it in Antigravity.
-2.  In the Agent pane within Antigravity, enter the following prompt. To
+    - If you see a **Zip and Download** button, click it.
+    - Otherwise, open the command palette (`Cmd` + `Shift` + `P` on Mac
+      or `Ctrl` + `Shift` + `P` on ChromeOS, Windows, or Linux) and run
+      the **Firebase Studio: Zip & Download** command.
+3.  Extract the folder locally and open it in Antigravity.
+4.  In the Agent pane within Antigravity, enter the following prompt. To
     optimize your workflow and conserve tokens, we recommend selecting
     the **Gemini Flash** model. It’s designed for speed and efficiency
     in high-volume transformation tasks like file conversion.
@@ -132,7 +138,7 @@ npx firebase-tools@latest studio:export <path>
 
 warning
 
-The `studio:export` command is currently optimized for Next.js, Flutter,
+The studio:export command is currently optimized for Next.js, Flutter,
 and Angular workspaces. While you can use this command for other
 workspace types, the migration may not be fully successful. We’re
 actively working to improve the migration flow.
@@ -167,11 +173,11 @@ content_copy
 Publish my app
 ```
 
-1.  When prompted to run `firebase deploy`, choose **Yes**. The agent
+2.  When prompted to run `firebase deploy`, choose **Yes**. The agent
     will publish to your existing URL if you’ve previously published to
     App Hosting. If this is your first time publishing to App Hosting,
     the agent will walk you through the process.
-2.  For future updates, simply instruct the agent to `publish my app` in
+3.  For future updates, simply instruct the agent to `publish my app` in
     the Antigravity chat panel.
 
 ## Continue your work[link](#continue-your-work)
@@ -189,7 +195,7 @@ There are several ways you can continue your development in Antigravity.
   secrets.
 
 Thank you for being part of the Firebase Studio journey. Your prototypes
-and feedback have directly shaped Google's AI tools, and we can’t wait
+and feedback have directly shaped Google’s AI tools, and we can’t wait
 to see what you build next in Antigravity!
 
 ## Need help?[link](#need-help)

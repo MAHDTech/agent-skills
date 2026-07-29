@@ -107,7 +107,7 @@ $ devenv init
 
 - `devenv search <NAME>` searches packages matching NAME in Nixpkgs input.
 - `devenv update` updates and pins inputs from `devenv.yaml` into `devenv.lock`.
-- `devenv inputs add <name> <url>` adds an input to `devenv.yaml`.
+- `devenv inputs add \<name\> <url>` adds an input to `devenv.yaml`.
 
 ### Inspect & Debug
 

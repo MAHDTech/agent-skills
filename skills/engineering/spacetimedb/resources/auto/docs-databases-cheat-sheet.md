@@ -904,16 +904,3 @@ std::optional<T>, std::vector<T>
 // SpacetimeDB types
 Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt
 ```
-
-- [Project Setup](#project-setup)
-- [Tables](#tables)
-- [Reducers](#reducers)
-- [Lifecycle Reducers](#lifecycle-reducers)
-- [Schedule Tables](#schedule-tables)
-- [Procedures](#procedures)
-- [Views](#views)
-- [Context Properties](#context-properties)
-- [Logging](#logging)
-- [Common Mistakes](#common-mistakes)
-- [Common CLI Commands](#common-cli-commands)
-- [Common Types](#common-types)

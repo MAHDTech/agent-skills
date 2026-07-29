@@ -16,7 +16,7 @@ Manager, agents were strictly mapped to a single workspace folder).
   different security settings per project. This means you can have a
   more permissive setting for a trusted project and a more restrictive
   security setting for an untrusted folder. The main three presets are
-  "Default", "Full machine" and "Unrestricted" (see the settings tab for
+  “Default”, “Full machine” and “Unrestricted” (see the settings tab for
   the full list).
 - **Scoped Permissions**: Attach permission grants to projects to
   control what the agents are allowed to access. Permissions manually
@@ -45,7 +45,7 @@ schedule messages to be sent to their agents while they’re away.
 
 ### Secure by Default[link](#secure-by-default)
 
-We put you in the driver's seat with robust security controls:
+We put you in the driver’s seat with robust security controls:
 
 - **Interactive Approvals**: By default, agents will request your
   explicit permission before running any terminal commands.
@@ -78,8 +78,8 @@ to prompt agents and leave feedback using natural speech.
   conversation, you can use project-specific terminology and expect
   accurate results.
 
-**Availability** Voice input is available across all primary interaction
-surfaces:
+**Availability**  
+Voice input is available across all primary interaction surfaces:
 
 - **Agent Input**: For starting conversations and sending prompt
   updates.
@@ -89,8 +89,8 @@ surfaces:
 ### JSON Hooks[link](#json-hooks)
 
 JSON Hooks allow you to execute custom local shell scripts at critical
-stages of an Antigravity agent's execution cycle. You can intercept and
-control the agent's behavior before tool calls, after model responses,
+stages of an Antigravity agent’s execution cycle. You can intercept and
+control the agent’s behavior before tool calls, after model responses,
 or at loop stopping conditions—configured globally or per-workspace via
 simple JSON files.
 

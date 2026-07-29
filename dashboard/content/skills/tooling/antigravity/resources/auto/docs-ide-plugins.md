@@ -17,7 +17,7 @@ skill_name = "antigravity"
 
 # Plugins[link](#plugins)
 
-Plugins are namespaced bundles that allow you to extend Antigravity's
+Plugins are namespaced bundles that allow you to extend Antigravity’s
 capabilities by grouping skills, rules, MCP servers, and hooks into a
 single package.
 
@@ -44,7 +44,7 @@ plugins/<plugin-name>/
     └── <rule-name>.md
 ```
 
-### Manifest File (\`plugin.json\`)[link](#manifest-file-pluginjson)
+### Manifest File (`plugin.json`)[link](#manifest-file-pluginjson)
 
 Every plugin must have a `plugin.json` file at its root. This file
 identifies the directory as a plugin.
@@ -69,7 +69,7 @@ A plugin can contain the following components:
 1.  **Skills**: Located in the `skills/` subdirectory. Each skill must
     have a `SKILL.md` file containing instructions for the agent.
 2.  **Rules**: Located in the `rules/` subdirectory. These are markdown
-    files that define constraints or guidelines for the agent's
+    files that define constraints or guidelines for the agent’s
     behavior.
 3.  **MCP Servers**: Configured via `mcp_config.json` at the plugin
     root. This allows you to connect Antigravity to external tools and

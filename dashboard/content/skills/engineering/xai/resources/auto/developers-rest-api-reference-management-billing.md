@@ -152,11 +152,11 @@ List invoices that belong to a team.
 
 * `since.month` (integer)
 
-* `invoiceIds.invoiceIds` (array\<string>)
+* `invoiceIds.invoiceIds` (array\\<string\>)
 
 ### Response Body
 
-* `invoices` (array\<object>) — Invoices.
+* `invoices` (array\\<object\>) — Invoices.
 
   * `teamId` (string) — The Team ID.
 
@@ -170,7 +170,7 @@ List invoices that belong to a team.
 
   * `firstDesiredNextCycleTs` (string) — When customer is expected to be charged.
 
-  * `chargerAttempts` (array\<object>)
+  * `chargerAttempts` (array\\<object\>)
 
     * `ticket` (integer)
 
@@ -178,7 +178,7 @@ List invoices that belong to a team.
 
     * `paymentMethodId` (string) — The payment method that was tried in this attempt.
 
-  * `lines` (array\<object>) — List of items composing the invoice.
+  * `lines` (array\\<object\>) — List of items composing the invoice.
 
     * `clusterName` (string) — The cluster on which the resource is consumed.
 
@@ -308,7 +308,7 @@ List payment methods of a team. You can add or delete the payment methods on htt
 
 ### Response Body
 
-* `paymentMethods` (array\<object>) — Payment methods on file.
+* `paymentMethods` (array\\<object\>) — Payment methods on file.
 
   * `paymentMethodId` (string)
 
@@ -452,7 +452,7 @@ Preview the amount to pay for postpaid usage in the current billing period.
 
 * `coreInvoice` (object) — The invoice object.
 
-  * `lines` (array\<object>) — Line items on the invoice.
+  * `lines` (array\\<object\>) — Line items on the invoice.
 
     * `clusterName` (string) — The cluster on which the resource is consumed.
 
@@ -556,8 +556,8 @@ prepaid credits, and the postpaid usage amount has reached the user-set soft spe
 * `spendingLimits` (object) — Postpaid monthly spending limit.
 
   Override might not exist, hence optional (actually, this comes from
-  &#x20;either default hard\_spending\_limit override or monthly
-  &#x20;hard\_spending\_limit override).
+   either default hard\_spending\_limit override or monthly
+   hard\_spending\_limit override).
 
   * `hardSlOverride` (object) — Representation of USD Cents.
 
@@ -656,17 +656,17 @@ List the prepaid credit balance and balance changes of a team.
 
 ### Response Body
 
-* `changes` (array\<object>) — The changes of the prepaid credit balance.
+* `changes` (array\\<object\>) — The changes of the prepaid credit balance.
 
   * `teamId` (string) — The team ID.
 
   * `changeOrigin` ("INVALID\_ORIGIN" | "PURCHASE" | "SPEND" | "REFUND" | "MANUAL" | "AUTO\_PURCHASE") — The reason for the change.
 
-    &#x20;\- PURCHASE: Purchase by user. \`amount\` field will be negative.
-    &#x20;\- SPEND: Spending by user. \`amount\` field will be positive.
-    &#x20;\- REFUND: A refund issued to user. \`amount\` field will be negative.
-    &#x20;\- MANUAL: Can be either positive or negative, performed by xAI staff.
-    &#x20;\- AUTO\_PURCHASE: Can only be negative.
+     \- PURCHASE: Purchase by user. \`amount\` field will be negative.
+     \- SPEND: Spending by user. \`amount\` field will be positive.
+     \- REFUND: A refund issued to user. \`amount\` field will be negative.
+     \- MANUAL: Can be either positive or negative, performed by xAI staff.
+     \- AUTO\_PURCHASE: Can only be negative.
 
   * `topupStatus` ("INVALID\_STATUS" | "TO\_GENERATE\_INVOICE" | "FAILED\_TO\_GEMNERATE\_INVOICE" | "TO\_CHARGE" | "FAILED\_TO\_CHARGE" | "SUCCEEDED") — Status of the top up.
 
@@ -748,11 +748,11 @@ Top up prepaid credit using the default payment method.
 
   * `changeOrigin` ("INVALID\_ORIGIN" | "PURCHASE" | "SPEND" | "REFUND" | "MANUAL" | "AUTO\_PURCHASE") — The reason for the change.
 
-    &#x20;\- PURCHASE: Purchase by user. \`amount\` field will be negative.
-    &#x20;\- SPEND: Spending by user. \`amount\` field will be positive.
-    &#x20;\- REFUND: A refund issued to user. \`amount\` field will be negative.
-    &#x20;\- MANUAL: Can be either positive or negative, performed by xAI staff.
-    &#x20;\- AUTO\_PURCHASE: Can only be negative.
+     \- PURCHASE: Purchase by user. \`amount\` field will be negative.
+     \- SPEND: Spending by user. \`amount\` field will be positive.
+     \- REFUND: A refund issued to user. \`amount\` field will be negative.
+     \- MANUAL: Can be either positive or negative, performed by xAI staff.
+     \- AUTO\_PURCHASE: Can only be negative.
 
   * `topupStatus` ("INVALID\_STATUS" | "TO\_GENERATE\_INVOICE" | "FAILED\_TO\_GEMNERATE\_INVOICE" | "TO\_CHARGE" | "FAILED\_TO\_CHARGE" | "SUCCEEDED") — Status of the top up.
 
@@ -836,34 +836,34 @@ Get historical usage of the API over a time period, aggregated by fields.
 
   * `timeUnit` ("TIME\_UNIT\_INVALID" | "TIME\_UNIT\_MONTH" | "TIME\_UNIT\_CALENDAR\_WEEK" | "TIME\_UNIT\_DAY" | "TIME\_UNIT\_HOUR" | "TIME\_UNIT\_QUARTER\_HOUR" | "TIME\_UNIT\_MINUTE" | "TIME\_UNIT\_SECOND" | "TIME\_UNIT\_NONE") — Time series are created by aggregating value into buckets we call \`TimeUnit\`.
 
-    &#x20;\- TIME\_UNIT\_NONE: None means having one single time bucket for all events.
+     \- TIME\_UNIT\_NONE: None means having one single time bucket for all events.
     This can be used to count total number of events ever for example.
 
-  * `values` (array\<object>) — Name of the fields to aggregate.
+  * `values` (array\\<object\>) — Name of the fields to aggregate.
 
     * `name` (string) — Name of the field to measure.
 
     * `aggregation` ("AGGREGATION\_NONE" | "AGGREGATION\_SUM" | "AGGREGATION\_AVG" | "AGGREGATION\_VAR" | "AGGREGATION\_STD" | "AGGREGATION\_MIN" | "AGGREGATION\_MAX" | "AGGREGATION\_P50" | "AGGREGATION\_P90" | "AGGREGATION\_P99" | "AGGREGATION\_P999" | "AGGREGATION\_COUNT" | "AGGREGATION\_COUNT\_DISTINCT") — Each value is an aggregate of the individual values in the time bucket. Note that not every field
       supports every aggregation method.
 
-  * `groupBy` (array\<string>) — For each value of the group-by tuple, we return one time series.
+  * `groupBy` (array\\<string\>) — For each value of the group-by tuple, we return one time series.
 
-  * `filters` (array\<string>) — All filter conditions are combined using AND.
+  * `filters` (array\\<string\>) — All filter conditions are combined using AND.
 
 ### Response Body
 
-* `timeSeries` (array\<object>) — For each value of the group-by clause, we return one time series.
+* `timeSeries` (array\\<object\>) — For each value of the group-by clause, we return one time series.
 
-  * `group` (array\<string>) — Values of the fields that were grouped by.
+  * `group` (array\\<string\>) — Values of the fields that were grouped by.
 
-  * `groupLabels` (array\<string>) — Values to group the time series by.
+  * `groupLabels` (array\\<string\>) — Values to group the time series by.
 
-  * `dataPoints` (array\<object>) — Data points ordered by timestamp. Data points are dense in the range provided (meaning we
+  * `dataPoints` (array\\<object\>) — Data points ordered by timestamp. Data points are dense in the range provided (meaning we
     return one data point for every interval in the requested time range).
 
     * `timestamp` (string) — The timestamp (in UTC) when the data point was recorded.
 
-    * `values` (array\<number>) — The values that were recorded at that datapoint.
+    * `values` (array\\<number\>) — The values that were recorded at that datapoint.
 
 * `limitReached` (boolean) — If this is true, the maximum cardinality of the query has been reached and only a subset of
   results is returned.

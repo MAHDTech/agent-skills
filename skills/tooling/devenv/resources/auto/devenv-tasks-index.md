@@ -369,7 +369,7 @@ This ensures that cleanup tasks like removing PID files or clearing caches are e
 
 Setup tasks attached to processes and `devenv up`
 
-A task that runs *after* a process — a setup or configure step wired with `processes.<name>.before = [ "devenv:<name>:configure" ]`, or equivalently `tasks."devenv:<name>:configure".after = [ "devenv:processes:<name>" ]` — is *downstream* of that process. `devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** its downstream tasks, so the setup step is skipped and never runs.
+A task that runs *after* a process — a setup or configure step wired with `processes.\<name\>.before = [ "devenv:\<name\>:configure" ]`, or equivalently `tasks."devenv:\<name\>:configure".after = [ "devenv:processes:\<name\>" ]` — is *downstream* of that process. `devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** its downstream tasks, so the setup step is skipped and never runs.
 
 Until this is resolved ([#2852](https://github.com/cachix/devenv/issues/2852)), run `devenv up --mode all` to include downstream setup tasks. `devenv test` already runs in `all` mode, so these tasks run there. See [Execution modes](#execution-modes).
 

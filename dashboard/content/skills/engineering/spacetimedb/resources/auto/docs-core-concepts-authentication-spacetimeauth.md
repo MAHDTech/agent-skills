@@ -123,15 +123,4 @@ Check out our [Creating a project
 guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/creating-a-project)
 to learn how to create and configure a SpacetimeAuth project.
 
-- [Features](#features)
-  - [Authentication methods](#authentication-methods)
-  - [User & role management](#user--role-management)
-  - [Customization](#customization)
-- [Terminology](#terminology)
-  - [Projects](#projects)
-  - [Users](#users)
-  - [Clients](#clients)
-  - [Roles](#roles)
-- [Getting Started](#getting-started)
-
 {% endraw %}

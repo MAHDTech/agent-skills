@@ -1,3 +1,4 @@
+{% raw %}
 ===/overview===
 # Get started
 
@@ -269,7 +270,7 @@ try {
 
 # CLI Reference
 
-Running `grok` with no arguments starts the interactive TUI. This page lists the subcommands and the flags you are most likely to use; run `grok --help` or `grok <subcommand> --help` for the complete set.
+Running `grok` with no arguments starts the interactive TUI. This page lists the subcommands and the flags you are most likely to use; run `grok --help` or `grok \<subcommand\> --help` for the complete set.
 
 ## Subcommands
 
@@ -283,7 +284,7 @@ Running `grok` with no arguments starts the interactive TUI. This page lists the
 | `grok plugin <list\|install\|uninstall\|update\|enable\|disable\|details\|validate>` | Manage plugins |
 | `grok plugin marketplace <list\|add\|remove\|update>` | Manage marketplace sources |
 | `grok sessions <list\|search\|delete>` | List, search, or delete sessions — see [Sessions](https://docs.x.ai/build/features/sessions) |
-| `grok export <session-id> [output]` | Export a session transcript as Markdown |
+| `grok export \<session-id\> [output]` | Export a session transcript as Markdown |
 | `grok import [targets...]` | Import sessions from Claude Code |
 | `grok memory clear [--workspace\|--global\|--all]` | Clear cross-session memory files |
 | `grok worktree <list\|show\|rm\|gc>` | Manage git worktrees created for sessions — see [Worktrees](https://docs.x.ai/build/features/worktrees) |
@@ -302,11 +303,11 @@ Flags for headless runs (`-p`, `--output-format`, and related) are covered in [H
 | Flag | What it does |
 | ---- | ------------ |
 | `--cwd <PATH>` | Working directory |
-| `-r, --resume [<ID>]` | Resume a session by ID, or the most recent if omitted |
+| `-r, --resume [\<ID\>]` | Resume a session by ID, or the most recent if omitted |
 | `-c, --continue` | Continue the most recent session for the current directory |
 | `-s, --session-id <UUID>` | Use a specific UUID for a new session |
 | `--fork-session` | When resuming, fork into a new session ID |
-| `-w, --worktree [<NAME>]` | Start the session in a new git worktree |
+| `-w, --worktree [\<NAME\>]` | Start the session in a new git worktree |
 | `--ref <REF>` | Branch, tag, or commit to base the worktree on |
 | `-m, --model <MODEL>` | Model ID to use |
 | `--effort <LEVEL>` | Reasoning effort |
@@ -767,7 +768,7 @@ Grok also loads MCP configurations from `~/.claude.json`, `.cursor/mcp.json`, an
 
 ## Troubleshooting
 
-`grok mcp doctor` is the first stop. For stdio servers that start but fail to connect, Grok captures stderr to `~/.grok/logs/mcp/<server>.stderr.log`. Cold-start `npx` servers that download packages on first launch may need a higher `startup_timeout_sec`.
+`grok mcp doctor` is the first stop. For stdio servers that start but fail to connect, Grok captures stderr to `~/.grok/logs/mcp/\<server\>.stderr.log`. Cold-start `npx` servers that download packages on first launch may need a higher `startup_timeout_sec`.
 
 
 ===/build/features/permissions===
@@ -1006,7 +1007,7 @@ Todos are separate from [background tasks](https://docs.x.ai/build/features/back
 | `grok sessions list` | List recent sessions for this directory |
 | `grok sessions search <query>` | Search session titles and prompts |
 | `grok sessions delete <id>` | Permanently delete a session |
-| `grok export <id> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |
+| `grok export \<id\> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |
 
 
 ===/build/features/skills-plugins-marketplaces===
@@ -1138,7 +1139,7 @@ For a denser layout, `/compact-mode` reduces padding and persists the choice. Fi
 
 # Worktrees
 
-A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/<repo>/<name>`, and start from your current HEAD, including uncommitted changes. [Subagents](https://docs.x.ai/build/features/subagents) can also request worktree isolation when the parent delegates parallel work.
+A worktree session runs in an isolated copy of your repository, so parallel agents cannot overwrite each other's files. Worktrees require a git repository, live under `~/.grok/worktrees/\<repo\>/<name>`, and start from your current HEAD, including uncommitted changes. [Subagents](https://docs.x.ai/build/features/subagents) can also request worktree isolation when the parent delegates parallel work.
 
 ## Starting one
 
@@ -1642,7 +1643,7 @@ Project `.grok/config.toml` only contributes **`[mcp_servers]`**, **`[plugins]`*
 | `hidden_models` | id list | Hide from the picker (still usable via `-m`). |
 | `disabled_models` | id list | Remove from the catalog (wins over hidden). |
 
-### `[model.<id>]`
+### `[model.\<id\>]`
 
 Custom / BYOK models (OpenAI-compatible or Anthropic Messages). Prefer `env_key` over hardcoding `api_key`.
 
@@ -1663,7 +1664,7 @@ Custom / BYOK models (OpenAI-compatible or Anthropic Messages). Prefer `env_key`
 | `stream_tool_calls` | `true` / `false` | Per-model tool-call streaming. |
 | `max_retries` / `inference_idle_timeout_secs` | numbers | Reliability. |
 
-### `[mcp_servers.<name>]`
+### `[mcp_servers.\<name\>]`
 
 String fields such as `url`, `command`, `args`, `env`, and `headers` support `${VAR}` expansion. Headers may also use `{{session_id}}`.
 
@@ -4217,7 +4218,7 @@ For reasoning models, you can maintain cache hits by either:
 * **Sending back the encrypted reasoning content** — Include the `reasoning_content` from the previous response. See [Encrypted Reasoning Content](https://docs.x.ai/developers/model-capabilities/text/reasoning#encrypted-reasoning-content) for details.
 * **Using stateful responses** — Use `previous_response_id` to automatically continue the conversation. See [Chaining the Conversation](https://docs.x.ai/developers/model-capabilities/text/generate-text#chaining-the-conversation) for details.
 
-## &#x20;Cache hit — appending a new message
+##  Cache hit — appending a new message
 
 The prompt prefix is identical to the previous request, with only a new user message appended:
 
@@ -4329,7 +4330,7 @@ console.log(
 );
 ```
 
-## &#x20;Cache miss — editing an earlier message
+##  Cache miss — editing an earlier message
 
 Changing the content of any earlier message breaks the prefix match:
 
@@ -4353,7 +4354,7 @@ curl https://api.x.ai/v1/chat/completions \
 
 **What changed:** The assistant response on line 11 was shortened to `"It stores KV pairs."` (line 12).
 
-## &#x20;Cache miss — removing a message
+##  Cache miss — removing a message
 
 Removing any message from the conversation breaks the prefix:
 
@@ -4376,7 +4377,7 @@ curl https://api.x.ai/v1/chat/completions \
 
 **What changed:** The assistant message on line 11 was removed entirely.
 
-## &#x20;Cache miss — reordering messages
+##  Cache miss — reordering messages
 
 Changing the order of messages also breaks the prefix:
 
@@ -6062,6 +6063,20 @@ If you do not see the ZDR option, you may not be a team admin, self-serve ZDR ma
 * **Team picker:** the [xAI Console](https://console.x.ai/) team picker shows a **ZDR** badge next to your team name (tooltip: Zero Data Retention).
 * **Response header:** every API response includes an `x-zero-data-retention` header set to `"true"` or `"false"`, so your application can programmatically confirm whether ZDR is active.
 * **Audit logs:** administrative events (key creation, team changes, etc.) still appear in the Console audit log, but the content of API requests and responses does not.
+
+## Grok Build CLI
+
+If you are using the Grok Build CLI with ZDR enabled, no trace or code data is retained.
+
+When using the Grok Build CLI without ZDR, privacy settings are available as a slash command (`/privacy`) and in settings (`/settings`). You can disable code data retention with these settings, even if ZDR is not enabled.
+
+On using the Grok Build CLI, you will also see a screen to allow us to retain data to improve the product and model. We will also provide a setting to change your choice.
+
+## Grok.com Build mode
+
+If you are using the Build mode in grok.com or via the mobile apps, chats and build sessions are retained for product functionality in order to allow developing and publishing apps across multiple sessions. Unlike for regular chat, Private Chats on grok.com and mobile are not available for Build mode currently to ensure publishing and building apps across multiple sessions is possible.
+
+If the "improve the model" toggle is enabled from grok.com or mobile data controls settings, these chats via Build mode and build sessions, including data from created apps, may be used for product and model improvements.
 
 ## Is the xAI API HIPAA compliant?
 
@@ -11711,7 +11726,7 @@ The model is also capable of generating speech in additional languages beyond th
 
 ## Speech Tags
 
-*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \<whisper>It was a secret the whole time.\</whisper> Pretty cool, right?
+*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \\<whisper\>It was a secret the whole time.\</whisper> Pretty cool, right?
 
 Add inline speech tags to your text for expressive delivery. There are two types of tags:
 
@@ -11873,7 +11888,7 @@ try whisperData.write(to: URL(fileURLWithPath: "whisper.mp3"))
 * Combine tags with punctuation — `"Really? [laugh] That's incredible!"` produces more natural results than stacking tags
 * Use `[pause]` or `[long-pause]` to add dramatic timing or let a thought land
 * Wrapping tags work best around complete phrases — `<whisper>It is a secret.</whisper>` reads more naturally than wrapping individual words
-* Combine styles for effect — `<slow><soft>Goodnight, sleep well.</soft></slow>`
+* Combine styles for effect — `<slow>\<soft\>Goodnight, sleep well.</soft></slow>`
 
 ## Output Formats
 
@@ -19839,10 +19854,10 @@ done
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-video | $0.050 / sec |
+| grok-imagine-image | $0.02 / image |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 
@@ -20088,10 +20103,10 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-image | $0.02 / image |
-| grok-imagine-video | $0.050 / sec |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 
@@ -20466,10 +20481,10 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image | 5 | — |
 | grok-imagine-image-quality | 5 | — |
-| grok-imagine-video | 10 | — |
+| grok-imagine-image | 5 | — |
 | grok-imagine-video-1.5 | 10 | — |
+| grok-imagine-video | 10 | — |
 
 ### What counts toward TPM
 
@@ -20926,7 +20941,7 @@ Create a collection.
   Version number of the Collection API used under the hood.
   This is an internal only setting so it is okay to be left ambiguous (no enum).
 
-* `field_definitions` (array\<object>)
+* `field_definitions` (array\\<object\>)
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
 
@@ -21024,7 +21039,7 @@ Create a collection.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -21112,14 +21127,14 @@ List all the collections a team has.
 * `filter` (string) — Filter expression to narrow down results.
   Supports filtering on: collection\_id, collection\_name (partial string matching), created\_at, documents\_count
   Examples:
-  &#x20; \- 'collection\_id = "collection\_123"'
-  &#x20; \- 'collection\_name:"SEC" AND documents\_count:>10'
-  &#x20; \- 'collection\_name = "report"' (partial match)
-  &#x20; \- 'created\_at:>2025-01-01T00:00:00Z'
+    \- 'collection\_id = "collection\_123"'
+    \- 'collection\_name:"SEC" AND documents\_count:>10'
+    \- 'collection\_name = "report"' (partial match)
+    \- 'created\_at:>2025-01-01T00:00:00Z'
 
 ### Response Body
 
-* `collections` (array\<object>) — List of collections.
+* `collections` (array\\<object\>) — List of collections.
 
   * `collection_id` (string) — UUIDv4 that represents an ID of the collection.
 
@@ -21199,7 +21214,7 @@ List all the collections a team has.
 
   * `documents_count` (integer) — How many files the collection contains.
 
-  * `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+  * `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
     Defines what fields documents can have and their constraints.
 
     * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -21344,7 +21359,7 @@ Get a collection's metadata.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -21491,7 +21506,7 @@ Update collection's config.
 
   * `inject_name_into_chunks` (boolean) — Inject name into produced chunks.
 
-* `field_definition_updates` (array\<object>) — Field definition updates to apply to this collection (ADD or DELETE).
+* `field_definition_updates` (array\\<object\>) — Field definition updates to apply to this collection (ADD or DELETE).
 
   * `field_definition` (object, required) — Definition of a field that can be attached to documents in a collection.
     Field definitions specify constraints and behaviors for document metadata within a collection.
@@ -21512,10 +21527,10 @@ Update collection's config.
 
   * `operation` ("FIELD\_DEFINITION\_ADD" | "FIELD\_DEFINITION\_DELETE") — Operation to perform on a collection's field definition.
 
-    &#x20;\- FIELD\_DEFINITION\_ADD: Add a new field definition or update an existing one.
+     \- FIELD\_DEFINITION\_ADD: Add a new field definition or update an existing one.
     If the field key already exists, the definition will be updated.
     Note: New fields with \`required=true\` are not allowed (existing documents would fail validation).
-    &#x20;\- FIELD\_DEFINITION\_DELETE: Delete an existing field definition.
+     \- FIELD\_DEFINITION\_DELETE: Delete an existing field definition.
     CASCADE behavior: Also removes the field value from all documents in the collection.
 
 * `collection_description` (string) — Optional description of the collection.
@@ -21600,7 +21615,7 @@ Update collection's config.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -21729,14 +21744,14 @@ List documents in a collection.
   Supports filtering on file metadata (name, content\_type, size\_bytes, created\_at)
   and document fields (status, fields.\{key})
   Examples:
-  &#x20; \- 'status:DOCUMENT\_STATUS\_PROCESSED'
-  &#x20; \- 'name:"quarterly" AND status:!DOCUMENT\_STATUS\_FAILED'
-  &#x20; \- 'fields.isbn:"978-1-234567-89-0"'
-  &#x20; \- 'size\_bytes:>5000000 AND content\_type:application/pdf'
+    \- 'status:DOCUMENT\_STATUS\_PROCESSED'
+    \- 'name:"quarterly" AND status:!DOCUMENT\_STATUS\_FAILED'
+    \- 'fields.isbn:"978-1-234567-89-0"'
+    \- 'size\_bytes:>5000000 AND content\_type:application/pdf'
 
 ### Response Body
 
-* `documents` (array\<object>) — List of documents.
+* `documents` (array\\<object\>) — List of documents.
 
   * `file_metadata` (object) — Metadata of an uploaded file.
 
@@ -21932,11 +21947,11 @@ Get documents metadata in a batch request.
 * `team_id` (string) — The ID of the team that owns the document.
   If \`None\`, the team ID will be derived from your request credentials.
 
-* `file_ids` (array\<string>, required) — The IDs of the files to retrieve the document metadata from.
+* `file_ids` (array\\<string\>, required) — The IDs of the files to retrieve the document metadata from.
 
 ### Response Body
 
-* `documents` (array\<object>) — Documents' metadata requested.
+* `documents` (array\\<object\>) — Documents' metadata requested.
 
   * `file_metadata` (object) — Metadata of an uploaded file.
 
@@ -22044,7 +22059,7 @@ Search for content related to the query within the given collections.
 
   * `aggregate` (object | object)
 
-  * `keys` (array\<string>, required) — Metadata key(s) to group results by (e.g. "category", "department").
+  * `keys` (array\\<string\>, required) — Metadata key(s) to group results by (e.g. "category", "department").
     At least one key is required.
 
 * `instructions` (string | null) — User-defined instructions to be included in the search query. Defaults to generic search instructions.
@@ -22062,19 +22077,19 @@ Search for content related to the query within the given collections.
 
 * `source` (object, required) — DocumentsSource defines the source of documents to search over.
 
-  * `collection_ids` (array\<string>, required) — The collection IDs to search in.
+  * `collection_ids` (array\\<string\>, required) — The collection IDs to search in.
 
   * `rag_pipeline` ("chroma\_db" | "es")
 
 ### Response Body
 
-* `matches` (array\<object>, required) — The search matches.
+* `matches` (array\\<object\>, required) — The search matches.
 
   * `chunk_content` (string, required) — The chunk content.
 
   * `chunk_id` (string, required) — The chunk ID.
 
-  * `collection_ids` (array\<string>, required) — The collection ID(s).
+  * `collection_ids` (array\\<string\>, required) — The collection ID(s).
 
   * `fields` (object, required) — Metadata fields belonging to the document of this chunk.
 
@@ -22192,7 +22207,7 @@ returned \`data\` array is shorter than \`limit\`.
 
 ### Response Body
 
-* `data` (array\<object>, required) — List of files.
+* `data` (array\\<object\>, required) — List of files.
 
   * `bytes` (integer, required) — The size of the file, in bytes.
 
@@ -22501,7 +22516,7 @@ List all batches for the current team.
 
 ### Response Body
 
-* `batches` (array\<object>, required) — The information about the batches.
+* `batches` (array\\<object\>, required) — The information about the batches.
 
   * `batch_id` (string, required) — The ID of the batch.
 
@@ -22649,7 +22664,7 @@ List metadata for all requests in a batch.
 
 ### Response Body
 
-* `batch_request_metadata` (array\<object>, required) — The batch request metadata for the given batch.
+* `batch_request_metadata` (array\\<object\>, required) — The batch request metadata for the given batch.
 
   * `batch_request_id` (string, required) — ID of the request. Unique within this batch.
 
@@ -22695,7 +22710,7 @@ Add multiple requests to an existing batch.
 
 ### Request Body
 
-* `batch_requests` (array\<object>, required) — List of batch requests to add to the batch
+* `batch_requests` (array\\<object\>, required) — List of batch requests to add to the batch
 
   * `batch_request` (object, required)
 
@@ -22713,7 +22728,7 @@ Add multiple requests to an existing batch.
 
       * `max_tokens` (integer | null) — \\\[DEPRECATED\\] The maximum number of tokens that can be generated in the chat completion. Deprecated in favor of \`max\_completion\_tokens\`.
 
-      * `messages` (array\<object | object | object | object | object>) — A list of messages that make up the the chat conversation. Different models support different message types, such as image and text.
+      * `messages` (array\\<object | object | object | object | object\>) — A list of messages that make up the the chat conversation. Different models support different message types, such as image and text.
 
       * `model` (string) — Model name for the model to use. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
@@ -22827,7 +22842,7 @@ List the processing results for a batch.
 
 * `pagination_token` (string | null) — The page token to retrieve results from the next page. Will be empty if this is the last page.
 
-* `results` (array\<object>, required) — The results that has been processed.
+* `results` (array\\<object\>, required) — The results that has been processed.
 
   * `batch_request_id` (string, required) — User-provided or generated identifier for the input request. If a user has provided \`batch\_request\_id\` in the
     \`BatchRequest\`, the value will match the user-provided value.
@@ -22841,7 +22856,7 @@ List the processing results for a batch.
 
       * `chat_get_completion` (object, required) — The chat response body for \`/v1/chat/completions\` endpoint.
 
-        * `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+        * `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
           * `finish_reason` (string | null) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -22879,7 +22894,7 @@ List the processing results for a batch.
 
           * `cache_write_input_bytes` (integer, required) — Size of cache write
 
-          * `chunks` (array\<string>, required) — The individual chunks returned from the pipeline of samplers.
+          * `chunks` (array\\<string\>, required) — The individual chunks returned from the pipeline of samplers.
 
           * `engine_request` (string, required) — JSON-serialized request sent to the inference engine.
 
@@ -22889,7 +22904,7 @@ List the processing results for a batch.
 
           * `request` (string, required) — The request received from the user.
 
-          * `responses` (array\<string>, required) — The response(s) received from the model.
+          * `responses` (array\\<string\>, required) — The response(s) received from the model.
 
           * `sampler_checkpoint_mount` (string, required) — The underlying checkpoint mount path for the sampler that served this request.
 
@@ -23069,7 +23084,7 @@ Create a chat response from text/image chat prompts. This is the endpoint for ma
 
 * `max_tokens` (integer | null) — \\\[DEPRECATED\\] The maximum number of tokens that can be generated in the chat completion. Deprecated in favor of \`max\_completion\_tokens\`.
 
-* `messages` (array\<object | object | object | object | object>) — A list of messages that make up the chat conversation. Different models support different message types, such as image and text.
+* `messages` (array\\<object | object | object | object | object\>) — A list of messages that make up the chat conversation. Different models support different message types, such as image and text.
 
 * `model` (string) — Model name for the model to use. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
@@ -23140,7 +23155,7 @@ Create a chat response from text/image chat prompts. This is the endpoint for ma
 
 ### Response Body
 
-* `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+* `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
   * `finish_reason` (string | null) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -23288,7 +23303,7 @@ Generates a response based on text or image prompts. The response ID can be used
   \`reasoning.encrypted\_content\` (encrypted reasoning tokens) and tool-output options.
   OpenAI's \`message.output\_text.logprobs\` is accepted for compatibility but silently ignored.
 
-* `input` (string | array\<object | object | object | object | object>, required) — Content of the input passed to a \`/v1/response\` request.
+* `input` (string | array\\<object | object | object | object | object\>, required) — Content of the input passed to a \`/v1/response\` request.
 
 * `instructions` (string | null) — An alternate way to specify the system prompt. Note that this cannot be used alongside \`previous\_response\_id\`, where the system prompt of the previous message will be used.
 
@@ -23397,7 +23412,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
 * `object` (string, required) — The object type of this resource. Always set to \`response\`.
 
-* `output` (array\<object | object | object | object | object | object | object | object | object | object>, required) — The response generated by the model.
+* `output` (array\\<object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
 
 * `parallel_tool_calls` (boolean, required) — Whether to allow the model to run parallel tool calls.
 
@@ -23435,7 +23450,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
   * `type` (string, required) — Type is always \`"function"\`.
 
-* `tools` (array\<object | object | object | object | object | object | object | object>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
+* `tools` (array\\<object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
 
 * `top_logprobs` (integer, required) — An integer between 0 and 8 specifying the number of most likely tokens to return at each token position.
 
@@ -23618,7 +23633,7 @@ Compacts a full Responses API input window into a shorter canonical window.
 
 ### Request Body
 
-* `input` (string | array\<object | object | object | object | object>, required) — Content of the input passed to a \`/v1/response\` request.
+* `input` (string | array\\<object | object | object | object | object\>, required) — Content of the input passed to a \`/v1/response\` request.
 
 * `model` (string, required) — Model to use for compaction summarization (required).
 
@@ -23626,13 +23641,13 @@ Compacts a full Responses API input window into a shorter canonical window.
 
 * `created_at` (integer, required) — Unix timestamp (in seconds) when the compacted conversation was created.
 
-* `id` (string, required) — Unique ID for this compaction (e.g. \`cmp\_\<uuid>\`).
+* `id` (string, required) — Unique ID for this compaction (e.g. \`cmp\_\\<uuid\>\`).
 
 * `model` (string, required) — Model used for the compaction summary.
 
 * `object` (string, required) — Always \`"response.compaction"\`.
 
-* `output` (array\<object | object | object | object | object>, required) — Compacted output containing a single compaction item.
+* `output` (array\\<object | object | object | object | object\>, required) — Compacted output containing a single compaction item.
   Pass this verbatim as input to the next \`/v1/responses\` call.
 
 * `usage` (object)
@@ -23785,7 +23800,7 @@ Retrieve a previously generated response.
 
 * `object` (string, required) — The object type of this resource. Always set to \`response\`.
 
-* `output` (array\<object | object | object | object | object | object | object | object | object | object>, required) — The response generated by the model.
+* `output` (array\\<object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
 
 * `parallel_tool_calls` (boolean, required) — Whether to allow the model to run parallel tool calls.
 
@@ -23823,7 +23838,7 @@ Retrieve a previously generated response.
 
   * `type` (string, required) — Type is always \`"function"\`.
 
-* `tools` (array\<object | object | object | object | object | object | object | object>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
+* `tools` (array\\<object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
 
 * `top_logprobs` (integer, required) — An integer between 0 and 8 specifying the number of most likely tokens to return at each token position.
 
@@ -23996,7 +24011,7 @@ Tries to fetch a result for a previously-started deferred completion. Returns \`
 
 ### Response Body
 
-* `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+* `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
   * `finish_reason` (string | null) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -24146,7 +24161,7 @@ Generate an image based on a prompt. This is the endpoint for making generation 
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of generated image objects.
+* `data` (array\\<object\>, required) — A list of generated image objects.
 
   * `b64_json` (string | null) — A base64-encoded string representation of the generated image (without the data-URI prefix), if \`b64\_json\` is specified as \`response\_format\` in the request.
 
@@ -24262,7 +24277,7 @@ Edit an image based on a prompt. This is the endpoint for making edit requests t
     Also accepts \`image\_url\` for compatibility.
     Required when \`file\_id\` is not set.
 
-* `images` (array\<object>) — List of input images for multi-reference editing.
+* `images` (array\\<object\>) — List of input images for multi-reference editing.
   Mutually exclusive with \`image\`. When multiple images are provided,
   refer to them as \\\<IMAGE\_0\\>, \\\<IMAGE\_1\\>, etc. in the prompt.
 
@@ -24296,7 +24311,7 @@ Edit an image based on a prompt. This is the endpoint for making edit requests t
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of generated image objects.
+* `data` (array\\<object\>, required) — A list of generated image objects.
 
   * `b64_json` (string | null) — A base64-encoded string representation of the generated image (without the data-URI prefix), if \`b64\_json\` is specified as \`response\_format\` in the request.
 
@@ -24435,7 +24450,7 @@ print(json.dumps(response.json(), indent=2))
 
 * `presence_penalty` (number | null) — (Not supported by \`grok-3\` and reasoning models) Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
 
-* `prompt` (string | array\<string>)
+* `prompt` (string | array\\<string\>)
 
 * `seed` (integer | null) — If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system\_fingerprint response parameter to monitor changes in the backend.
 
@@ -24457,7 +24472,7 @@ print(json.dumps(response.json(), indent=2))
 
 ### Response Body
 
-* `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+* `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
   * `finish_reason` (string, required) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -24569,9 +24584,9 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 * `max_tokens` (integer) — The maximum number of tokens to generate before stopping. The model may stop before the max\_tokens when it reaches the stop sequence.
 
-* `messages` (array\<object>) — Input messages.
+* `messages` (array\\<object\>) — Input messages.
 
-  * `content` (string | array\<object | object | object | object | object | object>, required)
+  * `content` (string | array\\<object | object | object | object | object | object\>, required)
 
   * `role` (string, required) — The role that the message belongs to, \`"system"\` for system prompt, \`"user"\` for user prompt, and \`"assistant"\` for response from the model.
 
@@ -24585,7 +24600,7 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 * `stream` (boolean | null) — If set, partial message deltas will be sent. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a \`data: \[DONE]\` message.
 
-* `system` (string | array\<object>)
+* `system` (string | array\\<object\>)
 
 * `temperature` (number | null) — What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. It may not work well with reasoning models.
 
@@ -24599,7 +24614,7 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 ### Response Body
 
-* `content` (array\<object | object | object | object>, required) — Response message content.
+* `content` (array\\<object | object | object | object\>, required) — Response message content.
 
 * `id` (string, required) — Unique object identifier.
 
@@ -24742,9 +24757,9 @@ List all models available to the authenticating API key, including model names (
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of models with with minimalized information.
+* `data` (array\\<object\>, required) — A list of models with with minimalized information.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `cached_prompt_text_token_price` (integer | null) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -24834,7 +24849,7 @@ Get information about a model with its model\_id, including pricing.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `cached_prompt_text_token_price` (integer | null) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -24887,9 +24902,9 @@ List all chat and image understanding models available to the authenticating API
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available language models.
+* `models` (array\\<object\>, required) — Array of available language models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `cached_prompt_text_token_price` (integer, required) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -24907,14 +24922,14 @@ List all chat and image understanding models available to the authenticating API
 
   * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
   * `long_context_threshold` (integer, required) — Token count at or above which the long context prices apply.
     When 0, the model has no long context pricing tier.
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -25002,7 +25017,7 @@ Get full information about a chat or image understanding model with its model\_i
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `cached_prompt_text_token_price` (integer, required) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -25020,14 +25035,14 @@ Get full information about a chat or image understanding model with its model\_i
 
 * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
 * `long_context_threshold` (integer, required) — Token count at or above which the long context prices apply.
   When 0, the model has no long context pricing tier.
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
 * `owned_by` (string, required) — Owner of the model.
 
@@ -25077,9 +25092,9 @@ List all image generation models available to the authenticating API key with fu
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available image generation models.
+* `models` (array\\<object\>, required) — Array of available image generation models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -25089,13 +25104,13 @@ List all image generation models available to the authenticating API key with fu
 
   * `image_price` (integer, required) — Price of a single image in USD cents.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model.
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
   * `max_prompt_length` (integer, required)
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model.
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -25135,7 +25150,7 @@ Get full information about an image generation model with its model\_id.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -25145,13 +25160,13 @@ Get full information about an image generation model with its model\_id.
 
 * `image_price` (integer, required) — Price of a single image in USD cents.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model.
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
 * `max_prompt_length` (integer, required)
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model.
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
 * `owned_by` (string, required) — Owner of the model.
 
@@ -25183,9 +25198,9 @@ List all video generation models available to the authenticating API key with fu
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available video generation models.
+* `models` (array\\<object\>, required) — Array of available video generation models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -25193,11 +25208,11 @@ List all video generation models available to the authenticating API key with fu
 
   * `id` (string, required) — Model ID.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model (e.g. "text", "image").
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model (e.g. "video").
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model (e.g. "video").
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -25240,7 +25255,7 @@ Get full information about a video generation model with its model\_id.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -25248,11 +25263,11 @@ Get full information about a video generation model with its model\_id.
 
 * `id` (string, required) — Model ID.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model (e.g. "text", "image").
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model (e.g. "video").
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model (e.g. "video").
 
 * `owned_by` (string, required) — Owner of the model.
 
@@ -25291,7 +25306,7 @@ Get information about an API key, including name, status, permissions and users 
 
 ### Response Body
 
-* `acls` (array\<string>, required) — A list of ACLs authorized with the API key, e.g. \`"api-key:endpoint:\*"\`, \`"api-key:model:\*"\`.
+* `acls` (array\\<string\>, required) — A list of ACLs authorized with the API key, e.g. \`"api-key:endpoint:\*"\`, \`"api-key:model:\*"\`.
 
 * `api_key_blocked` (boolean, required) — Indicates whether the API key is blocked.
 
@@ -25353,11 +25368,11 @@ Tokenize text with the specified model
 
 ### Response Body
 
-* `token_ids` (array\<object>, required) — A list of tokens.
+* `token_ids` (array\\<object\>, required) — A list of tokens.
 
   * `string_token` (string, required) — The string of the token.
 
-  * `token_bytes` (array\<integer>, required) — The bytes that constituted the token.
+  * `token_bytes` (array\\<integer\>, required) — The bytes that constituted the token.
 
   * `token_id` (integer, required) — The integer representation of the token for the model.
 
@@ -25462,7 +25477,7 @@ Transcribe an audio file to text.
 
 * `diarize` ("true" | "false") — When \`true\`, enables speaker diarization. Each word in the response includes a \`speaker\` field (integer) identifying the detected speaker.
 
-* `keyterm` (array\<string>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
+* `keyterm` (array\\<string\>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
 
@@ -25476,7 +25491,7 @@ Transcribe an audio file to text.
 
 * `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
 
-* `words` (array\<object>) — Word-level segments with timestamps. Omitted when empty.
+* `words` (array\\<object\>) — Word-level segments with timestamps. Omitted when empty.
 
   * `text` (string, required) — The word text.
 
@@ -25488,7 +25503,7 @@ Transcribe an audio file to text.
 
   * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
 
-* `channels` (array\<object>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
+* `channels` (array\\<object\>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
 
   * `index` (integer, required) — Zero-based channel index in the source audio.
 
@@ -25496,7 +25511,7 @@ Transcribe an audio file to text.
 
   * `text` (string, required) — Full transcript text for this channel.
 
-  * `words` (array\<object>) — Word-level segments with timestamps for this channel.
+  * `words` (array\\<object\>) — Word-level segments with timestamps for this channel.
 
     * `text` (string, required) — The word text.
 
@@ -25684,7 +25699,7 @@ This is an asynchronous operation that returns a request\_id for polling.
   reference-to-video (R2V). Optional for image-to-video (I2V) — when
   omitted, the model generates a video from the image alone.
 
-* `reference_images` (array\<object>) — Optional reference images for reference-to-video (R2V) generation.
+* `reference_images` (array\\<object\>) — Optional reference images for reference-to-video (R2V) generation.
   When provided generates video using these images
   as style/content references.
 
@@ -26183,7 +26198,7 @@ Create a phone number for API-controlled SIP calls.
 
   * `auth_password` (string) — SIP digest password. Stored encrypted and never returned by read endpoints.
 
-  * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+  * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
 * `webhook` (object)
 
@@ -26221,7 +26236,7 @@ Create a phone number for API-controlled SIP calls.
 
     * `auth_username` (string) — SIP digest username. Present only when digest auth is configured.
 
-    * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+    * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
   * `created_at` (string)
 
@@ -26464,7 +26479,7 @@ Convert text into speech audio.
 
 ### Request Body
 
-* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\<soft>\`, \`\<whisper>\`, \`\<loud>\`, \`\<build-intensity>\`, \`\<decrease-intensity>\`, \`\<higher-pitch>\`, \`\<lower-pitch>\`, \`\<slow>\`, \`\<fast>\`, \`\<sing-song>\`, \`\<singing>\`, \`\<laugh-speak>\`, \`\<emphasis>\`.
+* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\\<soft\>\`, \`\\<whisper\>\`, \`\\<loud\>\`, \`\\<build-intensity\>\`, \`\\<decrease-intensity\>\`, \`\\<higher-pitch\>\`, \`\\<lower-pitch\>\`, \`\\<slow\>\`, \`\\<fast\>\`, \`\\<sing-song\>\`, \`\\<singing\>\`, \`\\<laugh-speak\>\`, \`\\<emphasis\>\`.
 
 * `voice_id` (string) — Voice identifier. Use a built-in voice from \`GET /v1/tts/voices\` (e.g. \`eve\`, \`ara\`) or a custom voice ID. Defaults to \`eve\` when omitted.
 
@@ -26496,9 +26511,9 @@ Convert text into speech audio.
 
 * `audio_timestamps` (object) — Per-character timings produced when \`with\_timestamps\` is \`true\`.
 
-  * `graph_chars` (array\<string>, required) — Each character of the original input text, in order.
+  * `graph_chars` (array\\<string\>, required) — Each character of the original input text, in order.
 
-  * `graph_times` (array\<object>, required) — Start/end seconds for each entry in \`graph\_chars\`.
+  * `graph_times` (array\\<object\>, required) — Start/end seconds for each entry in \`graph\_chars\`.
 
     * `start` (number, required) — Start time in seconds, measured from the beginning of the synthesized audio.
 
@@ -26742,7 +26757,7 @@ List all available TTS voices.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of available voices.
+* `voices` (array\\<object\>, required) — List of available voices.
 
   * `voice_id` (string, required) — Unique identifier for the voice (lowercase). Pass this value as \`voice\_id\` in TTS requests or as the \`voice\` parameter in Realtime API session configuration.
 
@@ -26910,7 +26925,7 @@ Transcribe an audio file to text.
 
 * `diarize` ("true" | "false") — When \`true\`, enables speaker diarization. Each word in the response includes a \`speaker\` field (integer) identifying the detected speaker.
 
-* `keyterm` (array\<string>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
+* `keyterm` (array\\<string\>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
 
@@ -26924,7 +26939,7 @@ Transcribe an audio file to text.
 
 * `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
 
-* `words` (array\<object>) — Word-level segments with timestamps. Omitted when empty.
+* `words` (array\\<object\>) — Word-level segments with timestamps. Omitted when empty.
 
   * `text` (string, required) — The word text.
 
@@ -26936,7 +26951,7 @@ Transcribe an audio file to text.
 
   * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
 
-* `channels` (array\<object>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
+* `channels` (array\\<object\>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
 
   * `index` (integer, required) — Zero-based channel index in the source audio.
 
@@ -26944,7 +26959,7 @@ Transcribe an audio file to text.
 
   * `text` (string, required) — Full transcript text for this channel.
 
-  * `words` (array\<object>) — Word-level segments with timestamps for this channel.
+  * `words` (array\\<object\>) — Word-level segments with timestamps for this channel.
 
     * `text` (string, required) — The word text.
 
@@ -27229,7 +27244,7 @@ List custom voices owned by your team.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of custom voices owned by the calling team.
+* `voices` (array\\<object\>, required) — List of custom voices owned by the calling team.
 
   * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
@@ -27658,7 +27673,7 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
 
 ### Response Body
 
-* `events` (array\<object>) — Requested events. Ordered by event\_time.
+* `events` (array\\<object\>) — Requested events. Ordered by event\_time.
 
   * `eventTime` (string)
 
@@ -27728,7 +27743,7 @@ them.
 
 * `name` (string, required) — Human-readable name for the API key. Should not be empty.
 
-* `acls` (array\<string>) — By default API keys don't have access to anything. In order to actually use an API key, you
+* `acls` (array\\<string\>) — By default API keys don't have access to anything. In order to actually use an API key, you
   must grant it access to (1) endpoints and (2) models.
 
   Access is granted via strings of the form \`api-key:endpoint:\[endpoint name]\` and
@@ -27779,7 +27794,7 @@ them.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -27841,13 +27856,13 @@ team API keys. If the caller user is a member, returns that user's API keys.
 * `paginationToken` (string) — Pagination token received from a previous call when using pagination. Set to \`undefined\` to
   retrieve the first page.
 
-* `aclFilters` (array\<string>) — Optional filter to only return API keys that match the given ACLs.
+* `aclFilters` (array\\<string\>) — Optional filter to only return API keys that match the given ACLs.
 
 * `activeOnly` (boolean) — If true, only return non-expired API keys. Defaults to false (return all keys).
 
 ### Response Body
 
-* `apiKeys` (array\<object>) — API keys belonging to the team.
+* `apiKeys` (array\\<object\>) — API keys belonging to the team.
 
   * `redactedApiKey` (string) — A redacted API key. We don't expose the full key after it has been created.
 
@@ -27878,7 +27893,7 @@ team API keys. If the caller user is a member, returns that user's API keys.
     The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
     limit to get exceeded will not be aborted.
 
-  * `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+  * `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
     all requests fail if this field is empty. There are two kind of permissions users can grant:
     (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
     \`api-key:model:\[model name]\` ACLs.
@@ -27955,7 +27970,7 @@ Selectively updates a subset of fields on an API key.
     The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
     limit to get exceeded will not be aborted.
 
-  * `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+  * `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
     all requests fail if this field is empty. There are two kind of permissions users can grant:
     (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
     \`api-key:model:\[model name]\` ACLs.
@@ -28000,7 +28015,7 @@ Selectively updates a subset of fields on an API key.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -28092,7 +28107,7 @@ Selectively updates a subset of fields on an API key.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -28177,9 +28192,9 @@ Lists all models that are accessible by a team.
 
 ### Response Body
 
-* `clusterConfigs` (array\<object>) — Contains the models accessible via the individual inference clusters.
+* `clusterConfigs` (array\\<object\>) — Contains the models accessible via the individual inference clusters.
 
-  * `languageModels` (array\<object>) — Available language models.
+  * `languageModels` (array\\<object\>) — Available language models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -28222,7 +28237,7 @@ Lists all models that are accessible by a team.
 
     * `maxPromptLength` (integer) — Maximum length of the prompt/input (this includes tokens of all kinds).
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `features` (object)
 
@@ -28260,7 +28275,7 @@ Lists all models that are accessible by a team.
 
     * `tier` (integer) — Effective integer rate-limiting tier for this team+model.
 
-  * `embeddingModels` (array\<object>) — Available embedding models.
+  * `embeddingModels` (array\\<object\>) — Available embedding models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -28285,7 +28300,7 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `rateLimits` (object)
 
@@ -28303,7 +28318,7 @@ Lists all models that are accessible by a team.
 
     * `tier` (integer) — Effective integer rate-limiting tier for this team+model.
 
-  * `imageGenerationModels` (array\<object>) — Available image generation models.
+  * `imageGenerationModels` (array\\<object\>) — Available image generation models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -28328,15 +28343,15 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
-    * `resolutionPricing` (array\<object>) — Resolution-based pricing tiers.
+    * `resolutionPricing` (array\\<object\>) — Resolution-based pricing tiers.
 
       * `resolution` ("IMAGE\_RESOLUTION\_UNSPECIFIED" | "IMAGE\_RESOLUTION\_1K" | "IMAGE\_RESOLUTION\_2K" | "IMAGE\_RESOLUTION\_4K") — Image resolution options for pricing.
 
-        &#x20;\- IMAGE\_RESOLUTION\_1K: ~1024x1024
-        &#x20;\- IMAGE\_RESOLUTION\_2K: ~2048x2048
-        &#x20;\- IMAGE\_RESOLUTION\_4K: ~4096x4096
+         \- IMAGE\_RESOLUTION\_1K: ~1024x1024
+         \- IMAGE\_RESOLUTION\_2K: ~2048x2048
+         \- IMAGE\_RESOLUTION\_4K: ~4096x4096
 
       * `pricePerImage` (string) — Price per image at this resolution (in 1/100,000,000th of a USD cent).
 
@@ -28356,7 +28371,7 @@ Lists all models that are accessible by a team.
 
       * `tokenMultiplier` (string)
 
-  * `audioModels` (array\<object>) — Available audio models.
+  * `audioModels` (array\\<object\>) — Available audio models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -28371,7 +28386,7 @@ Lists all models that are accessible by a team.
 
     * `completionTokenPrice` (string) — The price (in USD cents) per 100 million completion tokens.
 
-    * `supportedClients` (array\<object>) — Supported clients. For example, this is something you can pass as the
+    * `supportedClients` (array\\<object\>) — Supported clients. For example, this is something you can pass as the
       query parameter to the model websocket endpoint as "?client=...".
 
       * `clientName` (string) — Short ID-like string describing this client in the API.
@@ -28390,7 +28405,7 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `rateLimits` (object)
 
@@ -28406,7 +28421,7 @@ Lists all models that are accessible by a team.
 
       * `tokenMultiplier` (string)
 
-  * `videoGenerationModels` (array\<object>) — Available video generation models.
+  * `videoGenerationModels` (array\\<object\>) — Available video generation models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -28429,9 +28444,9 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
-    * `resolutionPricing` (array\<object>) — Resolution-based pricing tiers.
+    * `resolutionPricing` (array\\<object\>) — Resolution-based pricing tiers.
 
       * `resolution` ("VIDEO\_RESOLUTION\_UNSPECIFIED" | "VIDEO\_RESOLUTION\_480P" | "VIDEO\_RESOLUTION\_720P" | "VIDEO\_RESOLUTION\_1080P") — Video resolution options for pricing.
 
@@ -28778,7 +28793,7 @@ Lists all the endpoint ACLs that can be used on API keys.
 
 ### Response Body
 
-* `acls` (array\<object>) — List of ACLs that can be assigned to an API key.
+* `acls` (array\\<object\>) — List of ACLs that can be assigned to an API key.
 
   * `acl` (string) — The acl key to be used on an Api key.
 
@@ -28873,7 +28888,7 @@ API endpoint for GET requests to /auth/management-keys/validation.
 
 * `name` (string) — Name of this key (Just for humans).
 
-* `acls` (array\<string>) — ACLs of this key (controls what APIs can be accessed using the key).
+* `acls` (array\\<string\>) — ACLs of this key (controls what APIs can be accessed using the key).
 
 * `apiKey` (string) — Only set when the key is created.
 
@@ -28881,7 +28896,7 @@ API endpoint for GET requests to /auth/management-keys/validation.
 
 * `ipRanges` (object)
 
-  * `ipRanges` (array\<object>) — A list of IP ranges.
+  * `ipRanges` (array\\<object\>) — A list of IP ranges.
 
     * `address` (object)
 
@@ -29059,11 +29074,11 @@ List invoices that belong to a team.
 
 * `since.month` (integer)
 
-* `invoiceIds.invoiceIds` (array\<string>)
+* `invoiceIds.invoiceIds` (array\\<string\>)
 
 ### Response Body
 
-* `invoices` (array\<object>) — Invoices.
+* `invoices` (array\\<object\>) — Invoices.
 
   * `teamId` (string) — The Team ID.
 
@@ -29077,7 +29092,7 @@ List invoices that belong to a team.
 
   * `firstDesiredNextCycleTs` (string) — When customer is expected to be charged.
 
-  * `chargerAttempts` (array\<object>)
+  * `chargerAttempts` (array\\<object\>)
 
     * `ticket` (integer)
 
@@ -29085,7 +29100,7 @@ List invoices that belong to a team.
 
     * `paymentMethodId` (string) — The payment method that was tried in this attempt.
 
-  * `lines` (array\<object>) — List of items composing the invoice.
+  * `lines` (array\\<object\>) — List of items composing the invoice.
 
     * `clusterName` (string) — The cluster on which the resource is consumed.
 
@@ -29215,7 +29230,7 @@ List payment methods of a team. You can add or delete the payment methods on htt
 
 ### Response Body
 
-* `paymentMethods` (array\<object>) — Payment methods on file.
+* `paymentMethods` (array\\<object\>) — Payment methods on file.
 
   * `paymentMethodId` (string)
 
@@ -29359,7 +29374,7 @@ Preview the amount to pay for postpaid usage in the current billing period.
 
 * `coreInvoice` (object) — The invoice object.
 
-  * `lines` (array\<object>) — Line items on the invoice.
+  * `lines` (array\\<object\>) — Line items on the invoice.
 
     * `clusterName` (string) — The cluster on which the resource is consumed.
 
@@ -29463,8 +29478,8 @@ prepaid credits, and the postpaid usage amount has reached the user-set soft spe
 * `spendingLimits` (object) — Postpaid monthly spending limit.
 
   Override might not exist, hence optional (actually, this comes from
-  &#x20;either default hard\_spending\_limit override or monthly
-  &#x20;hard\_spending\_limit override).
+   either default hard\_spending\_limit override or monthly
+   hard\_spending\_limit override).
 
   * `hardSlOverride` (object) — Representation of USD Cents.
 
@@ -29563,17 +29578,17 @@ List the prepaid credit balance and balance changes of a team.
 
 ### Response Body
 
-* `changes` (array\<object>) — The changes of the prepaid credit balance.
+* `changes` (array\\<object\>) — The changes of the prepaid credit balance.
 
   * `teamId` (string) — The team ID.
 
   * `changeOrigin` ("INVALID\_ORIGIN" | "PURCHASE" | "SPEND" | "REFUND" | "MANUAL" | "AUTO\_PURCHASE") — The reason for the change.
 
-    &#x20;\- PURCHASE: Purchase by user. \`amount\` field will be negative.
-    &#x20;\- SPEND: Spending by user. \`amount\` field will be positive.
-    &#x20;\- REFUND: A refund issued to user. \`amount\` field will be negative.
-    &#x20;\- MANUAL: Can be either positive or negative, performed by xAI staff.
-    &#x20;\- AUTO\_PURCHASE: Can only be negative.
+     \- PURCHASE: Purchase by user. \`amount\` field will be negative.
+     \- SPEND: Spending by user. \`amount\` field will be positive.
+     \- REFUND: A refund issued to user. \`amount\` field will be negative.
+     \- MANUAL: Can be either positive or negative, performed by xAI staff.
+     \- AUTO\_PURCHASE: Can only be negative.
 
   * `topupStatus` ("INVALID\_STATUS" | "TO\_GENERATE\_INVOICE" | "FAILED\_TO\_GEMNERATE\_INVOICE" | "TO\_CHARGE" | "FAILED\_TO\_CHARGE" | "SUCCEEDED") — Status of the top up.
 
@@ -29655,11 +29670,11 @@ Top up prepaid credit using the default payment method.
 
   * `changeOrigin` ("INVALID\_ORIGIN" | "PURCHASE" | "SPEND" | "REFUND" | "MANUAL" | "AUTO\_PURCHASE") — The reason for the change.
 
-    &#x20;\- PURCHASE: Purchase by user. \`amount\` field will be negative.
-    &#x20;\- SPEND: Spending by user. \`amount\` field will be positive.
-    &#x20;\- REFUND: A refund issued to user. \`amount\` field will be negative.
-    &#x20;\- MANUAL: Can be either positive or negative, performed by xAI staff.
-    &#x20;\- AUTO\_PURCHASE: Can only be negative.
+     \- PURCHASE: Purchase by user. \`amount\` field will be negative.
+     \- SPEND: Spending by user. \`amount\` field will be positive.
+     \- REFUND: A refund issued to user. \`amount\` field will be negative.
+     \- MANUAL: Can be either positive or negative, performed by xAI staff.
+     \- AUTO\_PURCHASE: Can only be negative.
 
   * `topupStatus` ("INVALID\_STATUS" | "TO\_GENERATE\_INVOICE" | "FAILED\_TO\_GEMNERATE\_INVOICE" | "TO\_CHARGE" | "FAILED\_TO\_CHARGE" | "SUCCEEDED") — Status of the top up.
 
@@ -29743,34 +29758,34 @@ Get historical usage of the API over a time period, aggregated by fields.
 
   * `timeUnit` ("TIME\_UNIT\_INVALID" | "TIME\_UNIT\_MONTH" | "TIME\_UNIT\_CALENDAR\_WEEK" | "TIME\_UNIT\_DAY" | "TIME\_UNIT\_HOUR" | "TIME\_UNIT\_QUARTER\_HOUR" | "TIME\_UNIT\_MINUTE" | "TIME\_UNIT\_SECOND" | "TIME\_UNIT\_NONE") — Time series are created by aggregating value into buckets we call \`TimeUnit\`.
 
-    &#x20;\- TIME\_UNIT\_NONE: None means having one single time bucket for all events.
+     \- TIME\_UNIT\_NONE: None means having one single time bucket for all events.
     This can be used to count total number of events ever for example.
 
-  * `values` (array\<object>) — Name of the fields to aggregate.
+  * `values` (array\\<object\>) — Name of the fields to aggregate.
 
     * `name` (string) — Name of the field to measure.
 
     * `aggregation` ("AGGREGATION\_NONE" | "AGGREGATION\_SUM" | "AGGREGATION\_AVG" | "AGGREGATION\_VAR" | "AGGREGATION\_STD" | "AGGREGATION\_MIN" | "AGGREGATION\_MAX" | "AGGREGATION\_P50" | "AGGREGATION\_P90" | "AGGREGATION\_P99" | "AGGREGATION\_P999" | "AGGREGATION\_COUNT" | "AGGREGATION\_COUNT\_DISTINCT") — Each value is an aggregate of the individual values in the time bucket. Note that not every field
       supports every aggregation method.
 
-  * `groupBy` (array\<string>) — For each value of the group-by tuple, we return one time series.
+  * `groupBy` (array\\<string\>) — For each value of the group-by tuple, we return one time series.
 
-  * `filters` (array\<string>) — All filter conditions are combined using AND.
+  * `filters` (array\\<string\>) — All filter conditions are combined using AND.
 
 ### Response Body
 
-* `timeSeries` (array\<object>) — For each value of the group-by clause, we return one time series.
+* `timeSeries` (array\\<object\>) — For each value of the group-by clause, we return one time series.
 
-  * `group` (array\<string>) — Values of the fields that were grouped by.
+  * `group` (array\\<string\>) — Values of the fields that were grouped by.
 
-  * `groupLabels` (array\<string>) — Values to group the time series by.
+  * `groupLabels` (array\\<string\>) — Values to group the time series by.
 
-  * `dataPoints` (array\<object>) — Data points ordered by timestamp. Data points are dense in the range provided (meaning we
+  * `dataPoints` (array\\<object\>) — Data points ordered by timestamp. Data points are dense in the range provided (meaning we
     return one data point for every interval in the requested time range).
 
     * `timestamp` (string) — The timestamp (in UTC) when the data point was recorded.
 
-    * `values` (array\<number>) — The values that were recorded at that datapoint.
+    * `values` (array\\<number\>) — The values that were recorded at that datapoint.
 
 * `limitReached` (boolean) — If this is true, the maximum cardinality of the query has been reached and only a subset of
   results is returned.
@@ -30007,7 +30022,7 @@ In this section, we explore advanced usage patterns for agentic tool calling, in
 
 > [!NOTE]
 >
-> &#x20;Advanced tool usage patterns are not yet supported in the Vercel AI SDK. Please use the xAI SDK or OpenAI SDK for this functionality.
+>  Advanced tool usage patterns are not yet supported in the Vercel AI SDK. Please use the xAI SDK or OpenAI SDK for this functionality.
 
 ## Mixing Server-Side and Client-Side Tools
 
@@ -34181,7 +34196,7 @@ If you lack permissions, contact your team admin to provision the connectors you
 
 > [!NOTE]
 >
-> &#x20;For white-glove support, Enterprise upgrades, or connector setup
+>  For white-glove support, Enterprise upgrades, or connector setup
 > assistance, contact xAI sales at .
 
 
@@ -34252,7 +34267,7 @@ Copy the generated `*.trycloudflare.com` URL and use it as the server URL in Gro
 
 > [!CAUTION]
 >
-> &#x20;Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
+>  Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
 
 ## Things to keep in mind
 
@@ -35246,7 +35261,7 @@ Purchased licenses become immediately available for provisioning to users.
 
 > [!NOTE]
 >
-> &#x20;Ensure your team's billing is set up correctly to avoid
+>  Ensure your team's billing is set up correctly to avoid
 > interruptions. Visit [Billing Settings](https://console.x.ai/team/default/billing) for more
 > details.
 
@@ -35283,7 +35298,7 @@ Revocations take effect instantly, so ensure that you communicate changes to aff
 
 > [!CAUTION]
 >
-> &#x20;Revoking a license removes team workspace access. Users will
+>  Revoking a license removes team workspace access. Users will
 > retain personal workspace functionality.
 
 ## Canceling Licenses
@@ -35332,7 +35347,7 @@ If you encounter issues, such as invitations not provisioning due to insufficien
 
 > [!NOTE]
 >
-> &#x20;For white-glove support, Enterprise upgrades, or permission issues, contact xAI sales at .
+>  For white-glove support, Enterprise upgrades, or permission issues, contact xAI sales at .
 
 
 ===/grok/organization===
@@ -35346,7 +35361,7 @@ Access the organization dashboard by visiting [console.x.ai/organization](https:
 
 > [!NOTE]
 >
-> &#x20;Organizations are exclusive to the Enterprise tier. Contact xAI
+>  Organizations are exclusive to the Enterprise tier. Contact xAI
 > sales to upgrade if needed.
 
 ## Understanding Organizations
@@ -35402,7 +35417,7 @@ This ensures seamless, secure access without disrupting workflows.
 
 > [!NOTE]
 >
-> &#x20;Notify your users in advance about the SSO rollout to minimize
+>  Notify your users in advance about the SSO rollout to minimize
 > support queries.
 
 ## Setting up SCIM
@@ -35460,7 +35475,7 @@ This verification ensures a smooth transition.
 
 > [!WARNING]
 >
-> &#x20;SCIM is very disruptive. Users might lose or gain access to resources
+>  SCIM is very disruptive. Users might lose or gain access to resources
 > they did not have before. Notify your organization that you are undergoing this transition and
 > **verify everything is correct during the preview stage before proceeding.**
 
@@ -35527,7 +35542,7 @@ To switch between workspaces, use the workspace selector in the bottom left navi
 
 > [!NOTE]
 >
-> &#x20;You can only access the team workspace when you have an
+>  You can only access the team workspace when you have an
 > active license. If you lack access, contact your team admin.
 
 ## Privacy and Benefits
@@ -35570,7 +35585,7 @@ Once activated, your team workspace will become available on grok.com.
 
 > [!NOTE]
 >
-> &#x20;For white-glove support and Enterprise features, contact xAI sales at .
+>  For white-glove support and Enterprise features, contact xAI sales at .
 
 
 ===/integrations/hubspot-mcp-setup===
@@ -35638,3 +35653,4 @@ Grok will pull live data and give contextual, AI-powered answers.
 ## Troubleshooting
 
 Need help? Contact [xAI support](mailto:support@x.ai) or visit the [xAI Developer Discord](https://discord.gg/x-ai).
+{% endraw %}

@@ -15,7 +15,7 @@ skill_name = "antigravity"
   \>
 - Overview
 
-# Settings, rendering & keybindings[link](#settings-rendering-keybindings)
+# Settings, rendering & keybindings[link](#settings-rendering--keybindings)
 
 Configure persistent preferences, customize keyboard shortcuts, toggle
 terminal display buffers, and manage runtime CLI parameter overrides.
@@ -90,9 +90,9 @@ the session.
 The TUI operates in one of two visual rendering modes depending on your
 terminal capability and connection latency.
 
-### Alt-screen mode (\`always\`)[link](#alt-screen-mode-always)
+### Alt-screen mode (`always`)[link](#alt-screen-mode-always)
 
-This mode opens a dedicated display screen using the terminal's
+This mode opens a dedicated display screen using the terminal’s
 alternate buffer, creating an immersive, standalone app interface.
 
 - **Key features**: Integrated scrollback, mouse-wheel scrolling
@@ -101,51 +101,51 @@ alternate buffer, creating an immersive, standalone app interface.
 - **Best used for**: Standard local development sessions in advanced
   terminal emulators (such as iTerm2, Ghostty, or WezTerm).
 
-### Inline mode (\`never\`)[link](#inline-mode-never)
+### Inline mode (`never`)[link](#inline-mode-never)
 
-This mode renders output sequentially directly within your terminal's
+This mode renders output sequentially directly within your terminal’s
 standard stdout pipeline.
 
 - **Key features**: Preserves entire session history inside your
-  emulator's native scrollback buffer, does not capture mouse inputs,
+  emulator’s native scrollback buffer, does not capture mouse inputs,
   and works seamlessly alongside standard command outputs.
 - **Best used for**: Remote SSH terminals, terminal multiplexers like
   `tmux` or `screen`, and low-bandwidth remote sessions.
 
 info
 
-**Adaptive Rendering**: Setting Alt-Screen mode to `default` allows the
-TUI to automatically detect your environment. It defaults to Alt-Screen
-on advanced local shells and degrades to Inline mode when running over
-SSH or in non-interactive sessions.
+Adaptive Rendering: Setting Alt-Screen mode to default allows the TUI to
+automatically detect your environment. It defaults to Alt-Screen on
+advanced local shells and degrades to Inline mode when running over SSH
+or in non-interactive sessions.
 
 ## Configuration options reference[link](#configuration-options-reference)
 
 The interactive settings panel (`/config`) and `settings.json` allow you
-to customize the CLI's behavior across several categories.
+to customize the CLI’s behavior across several categories.
 
-### Safety & permissions[link](#safety-permissions)
+### Safety & permissions[link](#safety--permissions)
 
 Manage how the agent interacts with your system and codebase:
 
 - **Tool Permission (`toolPermission`)**: Controls the authorization
   flow for tools (such as running terminal commands).
-- `request-review` (Default): Prompts for your approval before running
-  write, bash, or web tools.
-- `proceed-in-sandbox`: Automatically runs terminal commands if they are
-  sandboxed; otherwise prompts for review.
-- `strict`: Prompts for all non-read tools, ensuring maximum control.
-- `always-proceed`: Runs all tools without prompting (highest risk, use
-  with caution).
+  - `request-review` (Default): Prompts for your approval before running
+    write, bash, or web tools.
+  - `proceed-in-sandbox`: Automatically runs terminal commands if they
+    are sandboxed; otherwise prompts for review.
+  - `strict`: Prompts for all non-read tools, ensuring maximum control.
+  - `always-proceed`: Runs all tools without prompting (highest risk,
+    use with caution).
 - **Artifact Review (`artifactReviewPolicy`)**: Controls when the agent
   prompts you to review generated artifacts (like code files) before
   writing them to disk.
-- `asks-for-review` (Default): Always prompts you to review changes.
-- `agent-decides`: The agent decides whether to prompt based on the
-  complexity of the change.
-- `always-proceed`: The agent writes changes directly without prompting
-  (maximizes autonomy, but increases risk of overwriting code without
-  review).
+  - `asks-for-review` (Default): Always prompts you to review changes.
+  - `agent-decides`: The agent decides whether to prompt based on the
+    complexity of the change.
+  - `always-proceed`: The agent writes changes directly without
+    prompting (maximizes autonomy, but increases risk of overwriting
+    code without review).
 - **Sandbox Mode (`enableTerminalSandbox`)**: When enabled (`on`),
   restricts all agent-initiated terminal commands to a secure OS
   container.
@@ -153,19 +153,19 @@ Manage how the agent interacts with your system and codebase:
   the agent can read or write files outside your active project
   directories. Set to `off` by default for safety.
 
-### Display & rendering[link](#display-rendering)
+### Display & rendering[link](#display--rendering)
 
 Customize the visual experience of the TUI:
 
 - **Rendering Mode (`altScreenMode`)**: Controls how the TUI utilizes
   your terminal buffer.
-- `default`: Adaptive mode. Uses Alt-screen on advanced local terminals
-  and degrades to inline mode over SSH.
-- `always`: Forces Alt-screen mode, providing an immersive, page-based
-  interface with mouse support and scrollbars.
-- `never` (configurable via `settings.json`): Forces inline mode,
-  rendering output sequentially and preserving history in your
-  emulator's scrollback.
+  - `default`: Adaptive mode. Uses Alt-screen on advanced local
+    terminals and degrades to inline mode over SSH.
+  - `always`: Forces Alt-screen mode, providing an immersive, page-based
+    interface with mouse support and scrollbars.
+  - `never` (configurable via `settings.json`): Forces inline mode,
+    rendering output sequentially and preserving history in your
+    emulator’s scrollback.
 - **Color Scheme (`colorScheme`)**: Selects the visual theme. Options
   include `terminal` (inherits shell colors), `dark`, `light`,
   `solarized dark/light`, `tokyo night`, and colorblind-friendly
@@ -176,7 +176,7 @@ Customize the visual experience of the TUI:
   agent thoughts and tool steps; `low` shows only minimal progress
   indicators.
 
-### Editor & notifications[link](#editor-notifications)
+### Editor & notifications[link](#editor--notifications)
 
 Configure integrations with your host environment:
 
@@ -187,13 +187,13 @@ Configure integrations with your host environment:
   system desktop notification and a terminal bell chime when a
   long-running task completes or requires your attention.
 
-### AI Credits & Feedback[link](#ai-credits-feedback)
+### AI Credits & Feedback[link](#ai-credits--feedback)
 
 Manage usage, tips, and telemetry:
 
 - **Use AI Credits (`useG1Credits`)**: *External builds only.* When
   enabled (`on`), allows the CLI to use your personal AI credits for
-  model calls if your plan's standard quota is exhausted.
+  model calls if your plan’s standard quota is exhausted.
 - **Enable Telemetry (`enableTelemetry`)**: Helps Google improve the
   tool by sending anonymous usage statistics and crash reports.
 - **Show Tips (`showTips`)**: Toggles the display of helpful usage tips
@@ -201,7 +201,7 @@ Manage usage, tips, and telemetry:
 - **Show Feedback Survey (`showFeedbackSurvey`)**: Enables periodic
   brief surveys after task completions to help improve the experience.
 
-## Custom status lines & terminal titles[link](#custom-status-lines-terminal-titles)
+## Custom status lines & terminal titles[link](#custom-status-lines--terminal-titles)
 
 For advanced TUI environment integrations, you can toggle active metrics
 or deploy custom scripts to generate dynamic status bars and modify your
@@ -262,9 +262,9 @@ mappings.
 
 warning
 
-**Protected Keys**: Crucial navigation shortcuts like `cli.exit`
-(`Ctrl+D` / `Ctrl+C`) and `cli.enter` (`Enter`) are protected by the
-system and cannot be disabled.
+Protected Keys: Crucial navigation shortcuts like cli.exit (Ctrl+D /
+Ctrl+C) and cli.enter (Enter) are protected by the system and cannot be
+disabled.
 
 ### Restoring defaults[link](#restoring-defaults)
 

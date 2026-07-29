@@ -17,8 +17,8 @@ skill_name = "antigravity"
 
 warning
 
-**Note**: Antigravity IDE is not supported for enterprise customers. To
-use Antigravity with enterprise configurations, use Antigravity 2.0 or
+Note: Antigravity IDE is not supported for enterprise customers. To use
+Antigravity with enterprise configurations, use Antigravity 2.0 or
 Antigravity CLI.
 
 [Enterprise Setup](https://antigravity.google/docs/enterprise)
@@ -35,6 +35,8 @@ generating reports.
 
 Main Features
 
+[](https://antigravity.google/)
+
 automatic_cluster
 
 AI-powered IDEkeyboard_arrow_right
@@ -42,12 +44,16 @@ AI-powered IDEkeyboard_arrow_right
 An AI-powered IDE with all of the AI features that developers have come
 to rely on such as Agent and Tab.
 
+[](https://antigravity.google/)
+
 automatic_cluster
 
 Asynchronous Agentskeyboard_arrow_right
 
 Asynchronous, local agents that can work in parallel on all of your
 workspaces.
+
+[](https://antigravity.google/)
 
 automatic_cluster
 
@@ -58,11 +64,15 @@ like dashboard reads, SCM actions, UI testing, etc. in the Browser.
 
 ## Core Surfaces[link](#core-surfaces)
 
+[](https://antigravity.google/)
+
 automatic_cluster
 
 Editorkeyboard_arrow_right
 
 A fully-functional AI-powered IDE that maps to a single workspace.
+
+[](https://antigravity.google/)
 
 automatic_cluster
 

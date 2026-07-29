@@ -30,7 +30,7 @@ Three ways a skill leaves the live set:
    - **Router** (`skills/authoring/skill-router/SKILL.md`) — remove the retired skill's entry. If a replacement took over its slot, the replacement's entry already covers it.
    - **Any other skill** that referenced `/<name>` — a mention now pointing at a deprecated skill is a dangling reference; send it to the replacement or drop it.
 
-4. **Regenerate the derived artifacts.** `devenv shell -- skills --action lint`, then `devenv shell -- skills --action sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree and stages them; commit what it changes.
+4. **Regenerate the derived artifacts.** `devenv --no-tui shell -- skills --action lint`, then `devenv --no-tui shell -- skills --action sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree and stages them; commit what it changes.
 
 ## Avoiding dangling references
 

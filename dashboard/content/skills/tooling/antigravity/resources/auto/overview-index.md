@@ -25,49 +25,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- check_circle
-
-- search_spark
-
-- merge
-
 - deployed_code
-
-- spark
-
-- file_copy
-
-- keyboard_tab
-
-- code
 
 - commit
 
-- device_hub
-
-- refresh
-
-- keyboard_return
-
-- developer_mode_tv
-
-- dashboard_customize
+- code_blocks
 
 - plus_code
 
-- terminal
-
-- spark
+- keyboard_tab
 
 - keyboard_command_key
 
-- pen_spark
+- search_spark
 
-- data_object
+- developer_mode_tv
 
 - folder
 
-- code_blocks
+- keyboard_return
+
+- data_object
+
+- code
+
+- device_hub
+
+- spark
+
+- refresh
+
+- pen_spark
+
+- dashboard_customize
+
+- merge
+
+- terminal
+
+- check_circle
+
+- file_copy
+
+- spark
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -324,49 +324,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- check_circle
-
-- search_spark
-
-- merge
-
 - deployed_code
-
-- spark
-
-- file_copy
-
-- keyboard_tab
-
-- code
 
 - commit
 
-- device_hub
-
-- refresh
-
-- keyboard_return
-
-- developer_mode_tv
-
-- dashboard_customize
+- code_blocks
 
 - plus_code
 
-- terminal
-
-- spark
+- keyboard_tab
 
 - keyboard_command_key
 
-- pen_spark
+- search_spark
 
-- data_object
+- developer_mode_tv
 
 - folder
 
-- code_blocks
+- keyboard_return
+
+- data_object
+
+- code
+
+- device_hub
+
+- spark
+
+- refresh
+
+- pen_spark
+
+- dashboard_customize
+
+- merge
+
+- terminal
+
+- check_circle
+
+- file_copy
+
+- spark
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 

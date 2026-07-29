@@ -42,31 +42,31 @@ Map of Nix inputs. See [Inputs](https://devenv.sh/inputs/index.md).
 
 *Type:* `attribute set of input` · *Default:* `inputs.nixpkgs.url: github:cachix/devenv-nixpkgs/rolling`
 
-## inputs.<name>.flake
+## inputs.\<name\>.flake
 
 Does the input contain `flake.nix` or `devenv.nix`.
 
 *Type:* `boolean` · *Default:* `true`
 
-## inputs.<name>.follows
+## inputs.\<name\>.follows
 
 Another input to "inherit" from by name. See [Following inputs](https://devenv.sh/inputs/#following-inputs).
 
 *Type:* `string`
 
-## inputs.<name>.inputs
+## inputs.\<name\>.inputs
 
 Override nested inputs by name. See [Following inputs](https://devenv.sh/inputs/#following-inputs).
 
 *Type:* `attribute set of input`
 
-## inputs.<name>.overlays
+## inputs.\<name\>.overlays
 
 A list of overlays to include from the input. See [Overlays](https://devenv.sh/overlays/index.md).
 
 *Type:* `list of string` · *Default:* `[]`
 
-## inputs.<name>.url
+## inputs.\<name\>.url
 
 URI specification of the input. See [Supported URI formats](https://devenv.sh/inputs/#supported-uri-formats).
 

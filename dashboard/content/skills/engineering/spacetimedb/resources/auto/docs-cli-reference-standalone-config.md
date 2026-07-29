@@ -186,10 +186,4 @@ not able to process them quickly enough. When the queue length exceeds
 this value, the server will start disconnecting clients. Note that the
 limit is per client, not across all clients of a particular database.
 
-- [`config.toml`](#configtoml)
-  - [`certificate-authority`](#certificate-authority)
-  - [`logs`](#logs)
-  - [`commitlog`](#commitlog)
-  - [`websocket`](#websocket)
-
 {% endraw %}

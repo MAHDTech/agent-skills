@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# tars-gate -- hub-only full verification gate.
+#
+# Usage (from any cwd):
+#   sh tars-gate [spoke-or-repo-dir]
+#
+# Reads .tars/run.env from the target directory (or TARS_RUN_ENV / parent
+# search). Takes the heavy-command mutex, cds into the target, and runs:
+#   install && hooks && tests
+# using the opaque commands prepare wrote into run.env.
+#
+# No language or toolchain knowledge. Prepare owns how those commands are
+# spelled (including any devenv / CI / secrets wrapper).
+#
+# Environment overrides (optional):
+#   TARS_RUN_ENV   absolute path to run.env
+#   TARS_CWD       directory to gate (default: first arg, else pwd)
+#
+# Exit: wrapped command status, or 64 on usage / missing run.env.
+#
+
+set -eu
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" 2>/dev/null && pwd -P)
+TARS_CWD="${TARS_CWD:-${1:-.}}"
+TARS_CWD=$(CDPATH='' cd -- "$TARS_CWD" 2>/dev/null && pwd -P) || {
+	echo "tars-gate: cannot cd to target directory" >&2
+	exit 64
+}
+
+find_run_env() {
+	if [ -n "${TARS_RUN_ENV:-}" ] && [ -f "$TARS_RUN_ENV" ]; then
+		echo "$TARS_RUN_ENV"
+		return 0
+	fi
+	# Prefer the target's .tars/run.env (symlink to parent is normal for spokes).
+	if [ -f "$TARS_CWD/.tars/run.env" ]; then
+		echo "$TARS_CWD/.tars/run.env"
+		return 0
+	fi
+	echo ""
+	return 1
+}
+
+RUN_ENV=$(find_run_env) || {
+	echo "tars-gate: no .tars/run.env found under $TARS_CWD (run tars-backlog-prepare first)" >&2
+	exit 64
+}
+
+# shellcheck disable=SC1090
+set -a
+# shellcheck source=/dev/null
+. "$RUN_ENV"
+set +a
+
+: "${TARS_LOCK:?tars-gate: TARS_LOCK missing from run.env}"
+: "${TARS_HEAVY_LOCK:?tars-gate: TARS_HEAVY_LOCK missing from run.env}"
+
+# Empty steps become POSIX no-op so `&&` chains stay valid.
+install_cmd=${TARS_INSTALL_COMMAND:-:}
+hook_cmd=${TARS_HOOK_COMMAND:-:}
+test_cmd=${TARS_TEST_COMMAND:-:}
+
+# Prefer lock helper beside this script when run.env path is stale after moves.
+if [ -f "$SCRIPT_DIR/tars-lock" ]; then
+	LOCK_HELPER="$SCRIPT_DIR/tars-lock"
+else
+	LOCK_HELPER="$TARS_LOCK"
+fi
+
+if [ "${TARS_GATE_WEAKENED:-0}" = "1" ] || [ "${TARS_GATE_WEAKENED:-}" = "true" ]; then
+	echo "tars-gate: WARNING gate is weakened: ${TARS_GATE_WEAKENED_REASON:-no reason recorded}" >&2
+fi
+
+# Single-quoted inner script: run.env values must not rely on further expansion
+# inside the locked shell beyond what prepare already baked in.
+# shellcheck disable=SC2086
+exec sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
+	sh -c 'cd "$1" && eval "$2" && eval "$3" && eval "$4"' \
+	gate \
+	"$TARS_CWD" \
+	"$install_cmd" \
+	"$hook_cmd" \
+	"$test_cmd"

@@ -23,8 +23,8 @@ follow behaviors particular to their own use cases and style.
 
 To get started with Rules:
 
-1.  Open the Customizations panel via the "..." dropdown at the top of
-    the editor's agent panel.
+1.  Open the Customizations panel via the “…” dropdown at the top of the
+    editor’s agent panel.
 2.  Navigate to the Rules panel.
 3.  Click **+ Global** to create new Global Rules, or **+ Workspace** to
     create new Workspace-specific rules.
@@ -58,7 +58,7 @@ At the rule level you can define how a rule should be activated:
 Note: Antigravity now defaults to .agents/rules, but still maintains
 backward support for .agent/rules.
 
-## @ Mentions[link](#mentions)
+## @ Mentions[link](#-mentions)
 
 You can reference other files using @filename in a Rules file. If
 filename is a relative path, it will be interpreted relative to the

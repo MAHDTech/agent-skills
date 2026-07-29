@@ -375,6 +375,9 @@ ${body}
             }
         } else {
             filesToStage.push(AGENTS_FILE, README_FILE, SKILLS_SH_FILE)
+            if (!process.env.SKILLS_SKIP_DASHBOARD) {
+                filesToStage.push(DASHBOARD_CONTENT_DIR)
+            }
         }
 
         if (filesToStage.length > 0) {

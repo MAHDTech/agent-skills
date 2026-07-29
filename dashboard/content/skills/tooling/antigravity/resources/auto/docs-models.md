@@ -21,7 +21,7 @@ For the core reasoning model, Antigravity offers leading frontier
 models. Availability depends on your plan:
 
 | Model | Free & Google AI Plus | Google AI Pro | Google AI Ultra | Enterprise |
-|----|----|----|----|----|
+|:---|:--:|:--:|:--:|:--:|
 | Gemini 3.6 Flash | ✅ | ✅ | ✅ | ✅ |
 | Gemini 3.5 Flash | ✅ | ✅ | ✅ | ✅ |
 | Gemini 3.1 Pro | ✅ | ✅ | ✅ | ✅ |
@@ -83,11 +83,9 @@ Antigravity uses a number of other models for various parts of the stack
 that are not customizable:
 
 - **Nano Banana 2**: Used by the generative image tool when the Agent
-  wants
-
-to produce a UI mockup, needs images to populate a web page or
-application, generate system or architecture diagrams, or other
-generative image tasks.
+  wants to produce a UI mockup, needs images to populate a web page or
+  application, generate system or architecture diagrams, or other
+  generative image tasks.
 
 On this Page
 

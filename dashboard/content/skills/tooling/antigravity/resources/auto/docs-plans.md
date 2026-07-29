@@ -15,7 +15,7 @@ skill_name = "antigravity"
 
 Google Antigravity is available with
 [terms](https://antigravity.google/terms) to individual accounts derived
-from Google's terms of service, and available to teams under Google
+from Google’s terms of service, and available to teams under Google
 Cloud terms through the Gemini Enterprise Agent Platform. To learn more,
 see [Enterprise Get Started](https://antigravity.google/docs/enterprise).
 
@@ -71,7 +71,7 @@ AI credits are consumed at standard Gemini Enterprise Agent Platform
 consumption pricing.
 
 Usage of credits once the baseline quota is exhausted for any particular
-model is controlled by the "AI Credit Overages" user setting, which can
+model is controlled by the “AI Credit Overages” user setting, which can
 be set to the following:
 
 - Never: Never use AI credits automatically, wait until the baseline

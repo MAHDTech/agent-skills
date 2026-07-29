@@ -32,7 +32,7 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
 
 ### Response Body
 
-* `events` (array\<object>) — Requested events. Ordered by event\_time.
+* `events` (array\\<object\>) — Requested events. Ordered by event\_time.
 
   * `eventTime` (string)
 

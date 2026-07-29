@@ -203,17 +203,4 @@ This action cannot be undone.
 - **Monitor your usage**: Check your energy consumption and plan limits
   on the [pricing page](https://spacetimedb.com/pricing).
 
-- [Prerequisites](#prerequisites)
-- [Publishing to Maincloud](#publishing-to-maincloud)
-- [Connecting Clients to Maincloud](#connecting-clients-to-maincloud)
-- [Viewing Your Database on the Web
-  Dashboard](#viewing-your-database-on-the-web-dashboard)
-  - [Finding your database](#finding-your-database)
-  - [Dashboard features](#dashboard-features)
-- [Database Lifecycle](#database-lifecycle)
-  - [Automatic suspension (Free tier)](#automatic-suspension-free-tier)
-  - [Manual pause and resume](#manual-pause-and-resume)
-- [Deleting a Database](#deleting-a-database)
-- [Next Steps](#next-steps)
-
 {% endraw %}

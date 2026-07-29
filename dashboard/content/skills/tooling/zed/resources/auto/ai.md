@@ -292,32 +292,32 @@ Shipped in 2025
 
 Magent: Improve error messaging for \`edit_file\` tool
 
-@mfeyg•\#61662•10h ago•View →
+@mfeyg•\#61662•1d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61621)
 
 Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
 files
 
-@amtoaer•\#61621•2d ago•View →
+@amtoaer•\#61621•3d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/60893)
 
 NTTreat blank spawn_agent session IDs as absent
 
-@nevo-ts•\#60893•3d ago•View →
+@nevo-ts•\#60893•4d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/58217)
 
 Hagent_ui: Fix agent terminal close behavior with keyboard shortcuts
 
-@hugh2slowmo•\#58217•3d ago•View →
+@hugh2slowmo•\#58217•4d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/57207)
 
 ZLAllow configuring adaptive thinking for Anthropic available_models
 
-@zerx-lab•\#57207•1w ago•View →
+@zerx-lab•\#57207•2w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/60552)
 

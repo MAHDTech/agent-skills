@@ -29,9 +29,9 @@ methods:
 
 info
 
-**Note**: By default, if you have an active project open, clicking
-Settings will automatically open the configurations for that specific
-project. Otherwise, it will open the global settings.
+Note: By default, if you have an active project open, clicking Settings
+will automatically open the configurations for that specific project.
+Otherwise, it will open the global settings.
 
 ### The Four Settings Categories[link](#the-four-settings-categories)
 
@@ -51,7 +51,7 @@ These are global settings that apply to everything:
   surfaces.
 - Model Usage: Choose and configure default reasoning models.
 - Customizations: Manage Model Context Protocol (MCP) servers, custom
-  skills, and "Build with Google" plugins.
+  skills, and “Build with Google” plugins.
 
 **2. Project Settings**
 
@@ -60,18 +60,19 @@ These settings apply exclusively within the scope of a specific Project:
 - Folders: Define the list of local folders associated with the project.
   Antigravity automatically detects Git configurations for these folders
   to handle conversation targets:
-- Local: Select this in the new conversation view to work directly in
-  the existing folders.
-- Worktree: Select this to start a new worktree in the folders. (Note:
-  If a folder does not have Git, the existing local folder is used
-  instead).
+  - Local: Select this in the new conversation view to work directly in
+    the existing folders.
+  - Worktree: Select this to start a new worktree in the folders. (Note:
+    If a folder does not have Git, the existing local folder is used
+    instead).
 - Agent Settings: Configure project-specific agent behaviors:
-- Terminal Execution Policy: Control how the agent runs shell commands.
-- Outside of Folder File Access Policy: Define how the agent accesses
-  files outside the project boundary (Always Allow, Always Ask, or
-  Always Deny).
-- Sandbox Mode: Toggle the terminal sandbox container on or off within
-  the custom security preset.
+  - Terminal Execution Policy: Control how the agent runs shell
+    commands.
+  - Outside of Folder File Access Policy: Define how the agent accesses
+    files outside the project boundary (Always Allow, Always Ask, or
+    Always Deny).
+  - Sandbox Mode: Toggle the terminal sandbox container on or off within
+    the custom security preset.
 - Project-level Permissions: Configure permissions at the project level.
   As you interact with an agent, you will accumulate permission requests
   that can be automatically added to the project permissions.
@@ -98,8 +99,8 @@ conversations):
 
 ## Data Collection Settings[link](#data-collection-settings)
 
-The "Enable Telemetry" setting can be found in the Settings panel under
-the "Account" section. When toggled on, Antigravity collects
+The “Enable Telemetry” setting can be found in the Settings panel under
+the “Account” section. When toggled on, Antigravity collects
 interactions for use in evaluating, developing, and improving
 Antigravity and models that support Antigravity.
 

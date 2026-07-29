@@ -8,6 +8,7 @@ skill_name = "spacetimedb"
 +++
 
 {% raw %}
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -247,7 +248,5 @@ export default function App() {
 }
 ```
 
-- [Prerequisites](#prerequisites)
-- [Getting started](#getting-started)
-
+{% endraw %}{% raw %}
 {% endraw %}

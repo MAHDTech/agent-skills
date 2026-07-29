@@ -24,9 +24,8 @@ requirements, and utilizing consumption-based billing.
 
 info
 
-**Note**: Integration is only supported for Antigravity 2.0 and
-Antigravity CLI. Antigravity IDE is not supported for enterprise
-customers.
+Note: Integration is only supported for Antigravity 2.0 and Antigravity
+CLI. Antigravity IDE is not supported for enterprise customers.
 
 [Supported Models](https://antigravity.google/docs/models)
 
@@ -46,16 +45,16 @@ create a Google Cloud project.
 
 ### Roles Required to Select or Create a Project[link](#roles-required-to-select-or-create-a-project)
 
-- **Select a project**: Selecting a project doesn't require a specific
-  IAM role—you can select any project that you've been granted a role
+- **Select a project**: Selecting a project doesn’t require a specific
+  IAM role—you can select any project that you’ve been granted a role
   on.
 
-info
+  info
 
-**Note**: To switch to a different Google Cloud project or location, you
-must first log out of the Antigravity CLI or Hub, then log back in and
-select your new project/location. Directly changing the project or
-location while logged in is currently not supported.
+  Note: To switch to a different Google Cloud project or location, you
+  must first log out of the Antigravity CLI or Hub, then log back in and
+  select your new project/location. Directly changing the project or
+  location while logged in is currently not supported.
 
 - **Create a project**: To create a project, you need the **Project
   Creator** role (`roles/resourcemanager.projectCreator`), which
@@ -65,8 +64,8 @@ location while logged in is currently not supported.
 
 info
 
-**Note**: If you don't plan to keep the resources that you create in
-this procedure, create a new project instead of selecting an existing
+Note: If you don’t plan to keep the resources that you create in this
+procedure, create a new project instead of selecting an existing
 project. After you finish these steps, you can delete the project to
 remove all associated resources.
 
@@ -156,7 +155,7 @@ eu, and multi-region us.
 
 info
 
-**Note**: Image generation is currently not available in `eu` and `us`
+Note: Image generation is currently not available in eu and us
 locations.
 
 For a full list of available locations and deployment endpoints, please

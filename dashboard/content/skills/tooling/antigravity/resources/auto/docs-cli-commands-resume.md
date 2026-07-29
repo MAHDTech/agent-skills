@@ -107,7 +107,7 @@ You can import and resume active threads initiated in the Antigravity
 You can bypass the TUI picker and resume sessions directly when
 launching `agy` from your host shell.
 
-### Quick Resume Last Session (\`-c\` / \`--continue\`)[link](#quick-resume-last-session-c-continue)
+### Quick Resume Last Session (`-c` / `--continue`)[link](#quick-resume-last-session--c----continue)
 
 To instantly resume the single most recent conversation associated with
 your active workspace:
@@ -122,7 +122,7 @@ agy -c
 
 *(Alternative: `agy --continue`)*
 
-### Resume Specific Session (\`--conversation\`)[link](#resume-specific-session-conversation)
+### Resume Specific Session (`--conversation`)[link](#resume-specific-session---conversation)
 
 To load a specific conversation directly by its unique ID:
 
@@ -147,15 +147,15 @@ session using a local workspace-keyed cache.
   `~/.gemini/antigravity-cli/cache/last_conversations.json`
 - **Format**: A JSON map associating absolute workspace directory paths
   with their most recently active conversation ID:
+  json
 
-content_copy
-
-```
-    {
-        "/usr/local/google/home/username/Develop/my-project": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "/usr/local/google/home/username/Develop/another-repo": "f9e8d7c6-b5a4-3210-fedc-ba9876543210"
-    }
-```
+  content_copy
+  ```
+  {
+    "/usr/local/google/home/username/Develop/my-project": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "/usr/local/google/home/username/Develop/another-repo": "f9e8d7c6-b5a4-3210-fedc-ba9876543210"
+  }
+  ```
 
 ### Resolution Workflow[link](#resolution-workflow)
 
@@ -165,10 +165,9 @@ content_copy
 3.  **Verification**: If an ID is found, the CLI queries the backend to
     verify the conversation still exists.
 4.  **Load**:
-
-- If verified, it loads the session.
-- If the conversation was deleted or the key is missing, it starts a
-  fresh session for that workspace.
+    - If verified, it loads the session.
+    - If the conversation was deleted or the key is missing, it starts a
+      fresh session for that workspace.
 
 ------------------------------------------------------------------------
 

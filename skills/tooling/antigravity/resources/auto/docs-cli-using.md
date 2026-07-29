@@ -15,20 +15,21 @@ style, and performance.
   `~/.gemini/antigravity-cli/settings.json`.
 - **Settings Panel**: Type `/config` or `/settings` to open a
   full-screen overlay menu listing all available options.
-- Select a setting to open its list of options or a text input field.
-- Immediately save your selection to the disk and return to the main
-  list.
+  - Select a setting to open its list of options or a text input field.
+  - Immediately save your selection to the disk and return to the main
+    list.
 - **Overrides**: Certain settings can be overridden at launch via CLI
   flags (e.g., `--sandbox` or `--dangerously-skip-permissions`).
-- The settings menu will display an indicator showing where the override
-  came from (e.g., *Sandbox Mode on overridden by `--sandbox`*).
-- You can still edit the persistent setting on disk, but the current
-  session will enforce the command-line override until restarted.
+  - The settings menu will display an indicator showing where the
+    override came from (e.g., *Sandbox Mode on overridden by
+    `--sandbox`*).
+  - You can still edit the persistent setting on disk, but the current
+    session will enforce the command-line override until restarted.
 
 ### Quick Tips[link](#quick-tips)
 
 | Action/Feature | Tip/Command |
-|----|----|
+|:---|:---|
 | **Auto-complete to file paths** | `@` will trigger path suggestions |
 | **Clear Prompt** | Type `esc esc` to clear your prompt box (when no streaming is active) |
 | **Terminal Commands** | Use `!` at the start of your prompt to run terminal commands directly |
@@ -52,7 +53,7 @@ AGY CLI allows for custom keybindings. You can edit them by typing
 **Default Keybindings**
 
 | Action/Command | Keys | Purpose |
-|----|----|----|
+|:---|:---|:---|
 | **Clear TUI Screen** | `ctrl+l` | Clear terminal output |
 | **Enter / Submit** | `enter` | Submit prompts or choices |
 | **Escape / Cancel** | `ctrl+c`, `esc` | Stop stream, close menus, or clear prompt |
@@ -84,7 +85,6 @@ for the broken actions.
 
 warning
 
-**Important**: Keybindings `cli.exit` and `cli.enter` cannot be
-disabled.
+Important: Keybindings cli.exit and cli.enter cannot be disabled.
 
 On this Page

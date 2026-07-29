@@ -36,15 +36,15 @@ migrate:
 1.  **Auto-conversion**: Select the extensions and global configurations
     you wish to convert.
 2.  **Keyring storage**: The CLI migrates your active session tokens
-    securely into your operating system's native keyring storage.
+    securely into your operating system’s native keyring storage.
 3.  **Settings alignment**: Default visual parameters and rendering
     buffers map automatically to your new settings profile.
 
 info
 
-**Partial Parity**: While we preserve support for workspace skills,
-rules, and MCP servers, certain customized terminal themes or
-experimental visual overlays from Gemini CLI may not be supported.
+Partial Parity: While we preserve support for workspace skills, rules,
+and MCP servers, certain customized terminal themes or experimental
+visual overlays from Gemini CLI may not be supported.
 
 ## Converting extensions to plugins[link](#converting-extensions-to-plugins)
 
@@ -88,7 +88,7 @@ Both CLI platforms utilize identical workspace context rules. No
 modifications are needed to your existing rule documents:
 
 - **Workspace local context**: The agent continues to parse and enforce
-  rule constraints defined inside your active directory's `GEMINI.md`
+  rule constraints defined inside your active directory’s `GEMINI.md`
   and `AGENTS.md` files.
 - **Global developer context**: The agent automatically consults and
   enforces your global constraints located at `~/.gemini/GEMINI.md`.
@@ -99,16 +99,16 @@ While global shared skills remain in your user home directory, the
 target folder path for local workspace-specific skills has been updated.
 
 | Configuration | Gemini CLI | Antigravity CLI |
-|----|----|----|
+|:---|:---|:---|
 | **Global shared path** | `~/.gemini/skills/` | `~/.gemini/antigravity-cli/skills/` |
 | **Workspace project path** | `.gemini/skills/` | `.agents/skills/` |
 
 warning
 
-**Action Required**: If your project contains custom workspace skills
-defined in `.gemini/skills/`, you must manually rename or relocate the
-folder to `.agents/skills/` for the Antigravity agent to recognize them
-as active slash commands.
+Action Required: If your project contains custom workspace skills
+defined in .gemini/skills/, you must manually rename or relocate the
+folder to .agents/skills/ for the Antigravity agent to recognize them as
+active slash commands.
 
 ## MCP config formatting changes[link](#mcp-config-formatting-changes)
 
@@ -122,8 +122,8 @@ preferences configuration.
   `~/.gemini/settings.json`.
 - **Antigravity CLI Config**: Servers are defined inside a standalone
   `mcp_config.json` profile:
-- Global servers: `~/.gemini/config/mcp_config.json`
-- Workspace servers: `.agents/mcp_config.json`
+  - Global servers: `~/.gemini/config/mcp_config.json`
+  - Workspace servers: `.agents/mcp_config.json`
 
 ### Required schema updates[link](#required-schema-updates)
 

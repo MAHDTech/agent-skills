@@ -622,15 +622,4 @@ connections to your database. Each of these will receive a unique
 **Energy** is the currency used to pay for data storage and compute
 operations in a SpacetimeDB host.
 
-- [Host](#host)
-- [Database](#database)
-- [Table](#table)
-- [Reducer](#reducer)
-- [Procedure](#procedure)
-- [View](#view)
-- [Client](#client)
-- [Identity](#identity)
-- [ConnectionId](#connectionid)
-- [Energy](#energy)
-
 {% endraw %}

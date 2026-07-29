@@ -1,0 +1,222 @@
++++
+title = "plugin-biometric-8d65e89a"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "tauri"
++++
+
+{% raw %}
+# Biometric
+
+[GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/biometric)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-biometric)[crates.io](https://crates.io/crates/tauri-plugin-biometric)
+
+API
+Reference[](https://v2.tauri.app/reference/javascript/biometric/)[](https://docs.rs/tauri-plugin-biometric)
+
+Prompt the user for biometric authentication on Android and iOS.
+
+## Supported Platforms
+
+*This plugin requires a Rust version of at least **1.77.2***
+
+[TABLE]
+
+## Setup
+
+Install the biometric plugin to get started.
+
+- [Automatic](#tab-panel-6274)
+- [Manual](#tab-panel-6275)
+
+Use your project’s package manager to add the dependency:
+
+- [npm](#tab-panel-6263)
+- [yarn](#tab-panel-6264)
+- [pnpm](#tab-panel-6265)
+- [deno](#tab-panel-6266)
+- [bun](#tab-panel-6267)
+- [cargo](#tab-panel-6268)
+
+```
+npm run tauri add biometric
+```
+
+```
+yarn run tauri add biometric
+```
+
+```
+pnpm tauri add biometric
+```
+
+```
+deno task tauri add biometric
+```
+
+```
+bun tauri add biometric
+```
+
+```
+cargo tauri add biometric
+```
+
+1.  Run the following command in the `src-tauri` folder to add the
+    plugin to the project’s dependencies in `Cargo.toml`:
+
+    ```
+    cargo add tauri-plugin-biometric --target 'cfg(any(target_os = "android", target_os = "ios"))'
+    ```
+
+2.  Modify `lib.rs` to initialize the plugin:
+
+    ```
+    #[cfg_attr(mobile, tauri::mobile_entry_point)]pub fn run() {    tauri::Builder::default()        .setup(|app| {            #[cfg(mobile)]            app.handle().plugin(tauri_plugin_biometric::Builder::new().build());            Ok(())        })        .run(tauri::generate_context!())        .expect("error while running tauri application");}
+    ```
+
+    src-tauri/src/lib.rs
+
+3.  Install the JavaScript Guest bindings using your preferred
+    JavaScript package manager:
+
+    - [npm](#tab-panel-6269)
+    - [yarn](#tab-panel-6270)
+    - [pnpm](#tab-panel-6271)
+    - [deno](#tab-panel-6272)
+    - [bun](#tab-panel-6273)
+
+    ```
+    npm install @tauri-apps/plugin-biometric
+    ```
+
+    ```
+    yarn add @tauri-apps/plugin-biometric
+    ```
+
+    ```
+    pnpm add @tauri-apps/plugin-biometric
+    ```
+
+    ```
+    deno add npm:@tauri-apps/plugin-biometric
+    ```
+
+    ```
+    bun add @tauri-apps/plugin-biometric
+    ```
+
+## Configuration
+
+On iOS the biometric plugin requires the `NSFaceIDUsageDescription`
+information property list value, which should describe why your app
+needs to use biometric authentication.
+
+In the `src-tauri/Info.ios.plist` file, add the following snippet:
+
+```
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0">  <dict>    <key>NSFaceIDUsageDescription</key>    <string>Authenticate with biometric</string>  </dict></plist>
+```
+
+src-tauri/Info.ios.plist
+
+## Usage
+
+This plugin enables you to verify the availability of Biometric
+Authentication on a device, prompt the user for biometric
+authentication, and check the result to determine if the authentication
+was successful or not.
+
+### Check Status
+
+You can check the status of Biometric Authentication, including its
+availability and the types of biometric authentication methods
+supported.
+
+- [JavaScript](#tab-panel-6259)
+- [Rust](#tab-panel-6260)
+
+```
+import { checkStatus } from '@tauri-apps/plugin-biometric';
+const status = await checkStatus();if (status.isAvailable) {  console.log('Yes! Biometric Authentication is available');} else {  console.log(    'No! Biometric Authentication is not available due to ' + status.error  );}
+```
+
+```
+use tauri_plugin_biometric::BiometricExt;
+fn check_biometric(app_handle: tauri::AppHandle) {    let status = app_handle.biometric().status().unwrap();    if status.is_available {        println!("Yes! Biometric Authentication is available");    } else {        println!("No! Biometric Authentication is not available due to: {}", status.error.unwrap());    }}
+```
+
+### Authenticate
+
+To prompt the user for Biometric Authentication, utilize the
+`authenticate()` method.
+
+- [JavaScript](#tab-panel-6261)
+- [Rust](#tab-panel-6262)
+
+```
+import { authenticate } from '@tauri-apps/plugin-biometric';
+const options = {  // Set true if you want the user to be able to authenticate using phone password  allowDeviceCredential: false,  cancelTitle: "Feature won't work if Canceled",
+  // iOS only feature  fallbackTitle: 'Sorry, authentication failed',
+  // Android only features  title: 'Tauri feature',  subtitle: 'Authenticate to access the locked Tauri function',  confirmationRequired: true,};
+try {  await authenticate('This feature is locked', options);  console.log(    'Hooray! Successfully Authenticated! We can now perform the locked Tauri function!'  );} catch (err) {  console.log('Oh no! Authentication failed because ' + err.message);}
+```
+
+```
+use tauri_plugin_biometric::{BiometricExt, AuthOptions};
+fn bio_auth(app_handle: tauri::AppHandle) {
+    let options = AuthOptions {        // Set True if you want the user to be able to authenticate using phone password        allow_device_credential:false,        cancel_title: Some("Feature won't work if Canceled".to_string()),
+        // iOS only feature        fallback_title: Some("Sorry, authentication failed".to_string()),
+        // Android only features        title: Some("Tauri feature".to_string()),        subtitle: Some("Authenticate to access the locked Tauri function".to_string()),        confirmation_required: Some(true),    };
+    // if the authentication was successful, the function returns Result::Ok()    // otherwise returns Result::Error()    match app_handle.biometric().authenticate("This feature is locked".to_string(), options) {        Ok(_) => {            println!("Hooray! Successfully Authenticated! We can now perform the locked Tauri function!");        }        Err(e) => {            println!("Oh no! Authentication failed because : {e}");        }    }}
+```
+
+## Permissions
+
+By default all potentially dangerous plugin commands and scopes are
+blocked and cannot be accessed. You must modify the permissions in your
+`capabilities` configuration to enable these.
+
+See the [Capabilities Overview](https://v2.tauri.app/security/capabilities/) for more
+information and the [step by step
+guide](https://v2.tauri.app/learn/security/using-plugin-permissions/) to use plugin
+permissions.
+
+```
+{  "$schema": "../gen/schemas/desktop-schema.json",  "identifier": "main-capability",  "description": "Capability for the main window",  "windows": ["main"],  "permissions": ["biometric:default"]}
+```
+
+src-tauri/capabilities/default.json
+
+## [Default Permission](#default-permission)
+
+This permission set configures which biometric features are by default
+exposed.
+
+#### [Granted Permissions](#granted-permissions)
+
+It allows acccess to all biometric commands.
+
+#### This default permission set includes the following:
+
+- `allow-authenticate`
+- `allow-status`
+
+## Permission Table
+
+| Identifier | Description |
+|----|----|
+| `biometric:allow-authenticate` | Enables the authenticate command without any pre-configured scope. |
+| `biometric:deny-authenticate` | Denies the authenticate command without any pre-configured scope. |
+| `biometric:allow-status` | Enables the status command without any pre-configured scope. |
+| `biometric:deny-status` | Denies the status command without any pre-configured scope. |
+
+------------------------------------------------------------------------
+
+[Support on Open Collective](https://opencollective.com/tauri)[Sponsor
+on GitHub](https://github.com/sponsors/tauri-apps)
+
+© 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

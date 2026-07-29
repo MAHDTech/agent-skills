@@ -30,14 +30,16 @@ operates on browser tabs as needed, capturing screenshots and saving
 action videos as interactive artifacts.
 
 To completely disable browser tools, you can toggle the **Browser
-Tools** setting in the "Browser" section of the User Settings.
+Tools** setting in the “Browser” section of the User Settings.
 
 ------------------------------------------------------------------------
 
 ## Deep Dive[link](#deep-dive)
 
-Explore the key security and privacy features of Antigravity's browser
+Explore the key security and privacy features of Antigravity’s browser
 integration:
+
+[](https://antigravity.google/docs/ide/allowlist-denylist)
 
 security
 
@@ -45,6 +47,8 @@ Allowlist & Denylistkeyboard_arrow_right
 
 Learn about the two-layer security model (Denylist and Allowlist) used
 to control URL access.
+
+[](https://antigravity.google/docs/ide/separate-chrome-profile)
 
 account_box
 

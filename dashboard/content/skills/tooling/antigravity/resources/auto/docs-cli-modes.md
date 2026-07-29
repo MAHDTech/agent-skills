@@ -32,7 +32,7 @@ autonomy and developer oversight. The table below shows how Antigravity
 CLI handles file operations and planning in each mode.
 
 | Mode | Behavior | Best for |
-|----|----|----|
+|:---|:---|:---|
 | `default` | Pauses for interactive diff review before modifying or creating files. | Standard development, reviewing sensitive code changes, and careful refactoring. |
 | `accept-edits` | Automatically approves file edits and creations (`mkdir`, `touch`, file writes). | Rapid prototyping, iterating on trusted code, and reducing prompt interruptions. |
 | `plan` | Prepends the `/plan` instruction prefix to analyze and outline steps before writing code. | Exploring unfamiliar architecture or designing complex multi-step features. |
@@ -47,11 +47,9 @@ You can switch execution modes mid-session without interrupting active
 tasks or restarting the terminal.
 
 1.  Press `Shift+Tab` inside the prompt box to cycle through the active
-    sequence:
+    sequence: `default` → `accept-edits` → `plan` → `default`
 
-`default` → `accept-edits` → `plan` → `default`
-
-1.  Observe the status bar indicator below the prompt input to confirm
+2.  Observe the status bar indicator below the prompt input to confirm
     your active mode (`[accept-edits]` or `[plan]`).
 
 > **Tip:** When Antigravity CLI pauses for a pending file edit
@@ -182,7 +180,7 @@ select your default (`default`, `accept-edits`, or `plan`), and press
 `Ctrl+S` to save. Modifying this option synchronizes your runtime
 `CycleMode` immediately.
 
-### Setting \`agentMode\` in \`settings.json\`[link](#setting-agentmode-in-settingsjson)
+### Setting `agentMode` in `settings.json`[link](#setting-agentmode-in-settingsjson)
 
 Set `agentMode` directly inside your user or project configuration file:
 
@@ -216,7 +214,7 @@ agy --mode=plan
 ## Common mistakes[link](#common-mistakes)
 
 | Mistake | Why it fails | Fix |
-|----|----|----|
+|:---|:---|:---|
 | Expecting `sandbox` in `Shift+Tab` cycling | `sandbox` is an OS containment permission setting, not an execution mode | Configure sandbox auto-approval rules inside `/permissions` |
 | Using legacy `/planning` or `/fast` commands | These vestigial commands were removed in `1.1.0` | Press `Shift+Tab` to cycle modes or type `/plan` before your prompt |
 | Passing `--permission-mode` | `agy` uses `--mode` (`--mode=accept-edits` or `--mode=plan`) for execution overrides | Run `agy --mode=accept-edits` or check `agy --help` |

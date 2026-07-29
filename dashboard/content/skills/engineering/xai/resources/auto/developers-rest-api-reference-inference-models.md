@@ -18,9 +18,9 @@ List all models available to the authenticating API key, including model names (
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of models with with minimalized information.
+* `data` (array\\<object\>, required) — A list of models with with minimalized information.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `cached_prompt_text_token_price` (integer | null) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -110,7 +110,7 @@ Get information about a model with its model\_id, including pricing.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `cached_prompt_text_token_price` (integer | null) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -163,9 +163,9 @@ List all chat and image understanding models available to the authenticating API
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available language models.
+* `models` (array\\<object\>, required) — Array of available language models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `cached_prompt_text_token_price` (integer, required) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -183,14 +183,14 @@ List all chat and image understanding models available to the authenticating API
 
   * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
   * `long_context_threshold` (integer, required) — Token count at or above which the long context prices apply.
     When 0, the model has no long context pricing tier.
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -278,7 +278,7 @@ Get full information about a chat or image understanding model with its model\_i
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `cached_prompt_text_token_price` (integer, required) — Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously.
 
@@ -296,14 +296,14 @@ Get full information about a chat or image understanding model with its model\_i
 
 * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
 * `long_context_threshold` (integer, required) — Token count at or above which the long context prices apply.
   When 0, the model has no long context pricing tier.
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model, e.g. \`"text"\`, \`"image"\`.
 
 * `owned_by` (string, required) — Owner of the model.
 
@@ -353,9 +353,9 @@ List all image generation models available to the authenticating API key with fu
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available image generation models.
+* `models` (array\\<object\>, required) — Array of available image generation models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -365,13 +365,13 @@ List all image generation models available to the authenticating API key with fu
 
   * `image_price` (integer, required) — Price of a single image in USD cents.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model.
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
   * `max_prompt_length` (integer, required)
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model.
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -411,7 +411,7 @@ Get full information about an image generation model with its model\_id.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -421,13 +421,13 @@ Get full information about an image generation model with its model\_id.
 
 * `image_price` (integer, required) — Price of a single image in USD cents.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model.
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
 * `max_prompt_length` (integer, required)
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model.
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
 * `owned_by` (string, required) — Owner of the model.
 
@@ -459,9 +459,9 @@ List all video generation models available to the authenticating API key with fu
 
 ### Response Body
 
-* `models` (array\<object>, required) — Array of available video generation models.
+* `models` (array\\<object\>, required) — Array of available video generation models.
 
-  * `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+  * `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
   * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -469,11 +469,11 @@ List all video generation models available to the authenticating API key with fu
 
   * `id` (string, required) — Model ID.
 
-  * `input_modalities` (array\<string>, required) — The input modalities supported by the model (e.g. "text", "image").
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
-  * `output_modalities` (array\<string>, required) — The output modalities supported by the model (e.g. "video").
+  * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model (e.g. "video").
 
   * `owned_by` (string, required) — Owner of the model.
 
@@ -516,7 +516,7 @@ Get full information about a video generation model with its model\_id.
 
 ### Response Body
 
-* `aliases` (array\<string>, required) — Alias ID(s) of the model that user can use in a request's model field.
+* `aliases` (array\\<string\>, required) — Alias ID(s) of the model that user can use in a request's model field.
 
 * `created` (integer, required) — Model creation time in Unix timestamp.
 
@@ -524,11 +524,11 @@ Get full information about a video generation model with its model\_id.
 
 * `id` (string, required) — Model ID.
 
-* `input_modalities` (array\<string>, required) — The input modalities supported by the model (e.g. "text", "image").
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
-* `output_modalities` (array\<string>, required) — The output modalities supported by the model (e.g. "video").
+* `output_modalities` (array\\<string\>, required) — The output modalities supported by the model (e.g. "video").
 
 * `owned_by` (string, required) — Owner of the model.
 

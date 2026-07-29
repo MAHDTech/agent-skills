@@ -20,8 +20,8 @@ The tree is the **single source of truth**; the generated README, `agents/AGENTS
 
 Two mechanical gates come first — they are cheap and catch drift a read-through would miss:
 
-1. `devenv shell -- skills --action lint` — frontmatter, naming, placement. Record every error; these are findings.
-2. `devenv shell -- skills --action sync`, then check `git status`. A diff means the generated artifacts had drifted from the tree — the drift is itself a finding.
+1. `devenv --no-tui shell -- skills --action lint` — frontmatter, naming, placement. Record every error; these are findings.
+2. `devenv --no-tui shell -- skills --action sync`, then check `git status`. A diff means the generated artifacts had drifted from the tree — the drift is itself a finding.
 
 ## The audit
 

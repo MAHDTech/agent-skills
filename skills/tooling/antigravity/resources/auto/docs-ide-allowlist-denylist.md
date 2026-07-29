@@ -5,7 +5,7 @@
   \>
 - Allowlist / Denylist
 
-# Allowlist / Denylist[link](#allowlist-denylist)
+# Allowlist / Denylist[link](#allowlist--denylist)
 
 The browser uses a two-layer security system to control which URLs can
 be accessed:
@@ -15,7 +15,7 @@ be accessed:
 
 ## How It Works[link](#how-it-works)
 
-### Denylist[link](#denylist-2)
+### Denylist[link](#denylist)
 
 The denylist is maintained and enforced using the Google Superroots’s
 BadUrlsChecker service (See documentation). When the browser attempts to
@@ -24,7 +24,7 @@ denylist via RPC.
 
 **NOTE:** If the server is unavailable, access is denied by default.
 
-### Allowlist[link](#allowlist-2)
+### Allowlist[link](#allowlist)
 
 The allowlist is a local text file that you can edit to explicitly trust
 specific URLs.

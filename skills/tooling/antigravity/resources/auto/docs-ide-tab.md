@@ -5,7 +5,7 @@
   \>
 - Tab
 
-# Antigravity IDE: Tab & Navigation[link](#antigravity-ide-tab-navigation)
+# Antigravity IDE: Tab & Navigation[link](#antigravity-ide-tab--navigation)
 
 This guide covers the core navigation and completion tools:
 **Supercomplete**, **Tab-to-Jump**, and **Tab-to-Import**.
@@ -31,9 +31,9 @@ place in your document to move your cursor to.
 
 ![Tab-to-Jump](https://antigravity.google/assets/image/docs/editor/tab_to_jump.png)
 
-### How it Works[link](#how-it-works-2)
+### How it Works[link](#how-it-works-1)
 
-- A "Tab to jump" icon will appear offering to move your cursor to where
+- A “Tab to jump” icon will appear offering to move your cursor to where
   your next logical edit will be. Pressing `Tab` instantly moves your
   cursor to that location.
 - **Accepting**: Press `Tab` to accept the jump.
@@ -44,9 +44,9 @@ Tab-to-Import handles missing dependencies without breaking your flow.
 
 ![Tab-to-Import](https://antigravity.google/assets/image/docs/editor/tab_to_import.png)
 
-### How it Works[link](#how-it-works-3)
+### How it Works[link](#how-it-works-2)
 
-- **Detection**: If you type a class or function that isn't imported,
+- **Detection**: If you type a class or function that isn’t imported,
   Antigravity suggests the import.
 - **Action**: Press `Tab` to complete the word and instantly add the
   import statement to the top of the file.
@@ -58,9 +58,9 @@ In your settings, you can customize the behavior of these features:
 - **Enable/Disable Features**: You can individually turn off
   Autocomplete, Tab-to-Jump, Supercomplete, or Tab-to-Import.
 - **Tab Speed**: Controls the responsiveness of suggestions.
-- `Slow`: Waits for more context before suggesting.
-- `Default`: Offers a balanced pace.
-- `Fast`: Provides rapid-fire suggestions.
+  - `Slow`: Waits for more context before suggesting.
+  - `Default`: Offers a balanced pace.
+  - `Fast`: Provides rapid-fire suggestions.
 - **Highlight Inserted Text**: When enabled, text inserted via Tab is
   highlighted to track changes easily.
 - **Clipboard Context**: When enabled, Antigravity uses the contents of

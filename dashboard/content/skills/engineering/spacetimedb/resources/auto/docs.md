@@ -173,11 +173,4 @@ deepen your understanding:
 - **[Client SDKs](https://spacetimedb.com/docs/clients)** - Connect your client applications to
   SpacetimeDB
 
-- [Installation](#installation)
-- [Log in to SpacetimeDB](#log-in-to-spacetimedb)
-- [Quickstart Guides](#quickstart-guides)
-- [Running SpacetimeDB Locally](#running-spacetimedb-locally)
-- [Next Steps: Learn SpacetimeDB](#next-steps-learn-spacetimedb)
-  - [Core Concepts](#core-concepts)
-
 {% endraw %}

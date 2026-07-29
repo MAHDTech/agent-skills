@@ -26,7 +26,7 @@ histories directly to your current working directory. When you launch
 `agy` from a specific directory, the agent only displays and resume
 sessions associated with that specific local repository or subdirectory.
 
-This prevents context pollution, ensuring that the agent's semantic
+This prevents context pollution, ensuring that the agent’s semantic
 memory and token limits remain focused solely on the relevant codebase.
 
 ## Resuming sessions[link](#resuming-sessions)
@@ -43,7 +43,7 @@ For a complete walkthrough of the interactive picker, keyboard
 shortcuts, and details on how the directory-scoped session cache works,
 see the dedicated **[Resume Command Guide](https://antigravity.google/docs/cli/commands/resume)**.
 
-## Branching with \`/fork\`[link](#branching-with-fork)
+## Branching with `/fork`[link](#branching-with-fork)
 
 When engineering a complex feature, you may want to explore multiple
 design alternatives without losing your progress. The `/fork` command
@@ -73,9 +73,9 @@ current turn into a new, independent session.
 
 lightbulb
 
-**Branching Filesystems**: Forking clones the *conversation thread*, not
-your local git checkout. To fully isolate files during parallel forks,
-use git branches or stash local changes before testing contrasting
+Branching Filesystems: Forking clones the conversation thread, not your
+local git checkout. To fully isolate files during parallel forks, use
+git branches or stash local changes before testing contrasting
 approaches.
 
 ## Next steps[link](#next-steps)

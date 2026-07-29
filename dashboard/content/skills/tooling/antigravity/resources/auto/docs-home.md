@@ -80,15 +80,15 @@ harness co-trained with Gemini models:
   product teams across Google to provide curated bundles of skills, MCP
   servers, and extensions that make building on Google platforms
   frictionless.
-- **Android**: Editor extension, CLI integrations, and Android developer
-  skills.
-- **Firebase**: Curated skills for Firebase Firestore, Cloud Functions,
-  and more.
-- **Web**: Chrome and Web MCP servers for autonomous browser research.
-- **Science**: Specialized DeepMind biology and chemistry skills to
-  accelerate scientific workflows.
-- **AGY SDK**: Skills that optimize your agent’s ability to use the
-  Antigravity SDK to build custom AI agents tailored to your workflow.
+  - **Android**: Editor extension, CLI integrations, and Android
+    developer skills.
+  - **Firebase**: Curated skills for Firebase Firestore, Cloud
+    Functions, and more.
+  - **Web**: Chrome and Web MCP servers for autonomous browser research.
+  - **Science**: Specialized DeepMind biology and chemistry skills to
+    accelerate scientific workflows.
+  - **AGY SDK**: Skills that optimize your agent’s ability to use the
+    Antigravity SDK to build custom AI agents tailored to your workflow.
 
 On this Page
 

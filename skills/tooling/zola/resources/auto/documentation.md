@@ -1,3 +1,4 @@
+{% raw %}
 \## \[🔗\](https://www.getzola.org/documentation/#zola-at-a-glance)Zola
 at a Glance Zola is a static site generator (SSG), similar to
 \[Hugo\](https://gohugo.io/), \[Pelican\](https://blog.getpelican.com/),
@@ -161,3 +162,5 @@ page) to link to our list of blog posts: \`\`\` {% extends "base.html"
 
 {% endblock content %} \`\`\` This has been a quick overview of Zola.
 You can now dive into the rest of the documentation.
+
+{% endraw %}

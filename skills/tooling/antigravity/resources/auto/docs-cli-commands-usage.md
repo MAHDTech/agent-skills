@@ -49,7 +49,7 @@ The panel displays:
 Use the following keyboard shortcuts to navigate the panel:
 
 | Key                      | Action                                    |
-|--------------------------|-------------------------------------------|
+|:-------------------------|:------------------------------------------|
 | `↑` / `↓` (or `j` / `k`) | Scroll up or down by one line.            |
 | `PgUp` / `PgDn`          | Scroll up or down by one page.            |
 | `g` / `G`                | Jump to the top or bottom of the list.    |

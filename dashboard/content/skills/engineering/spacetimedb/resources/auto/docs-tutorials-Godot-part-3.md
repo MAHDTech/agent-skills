@@ -1814,16 +1814,4 @@ there's a problem! We can't move yet. In the next part, we'll explore
 how to get your player moving and interacting with food and other
 objects.
 
-- [Spawning Food](#spawning-food)
-- [Logging Players In](#logging-players-in)
-- [Spawning Player Circles](#spawning-player-circles)
-- [Creating the Arena](#creating-the-arena)
-- [Instantiating Nodes](#instantiating-nodes)
-- [Hooking up the Data](#hooking-up-the-data)
-- [Camera Controller](#camera-controller)
-- [Entering the Game](#entering-the-game)
-- [Trying it out](#trying-it-out)
-- [Troubleshooting](#troubleshooting)
-- [Next Steps](#next-steps)
-
 {% endraw %}

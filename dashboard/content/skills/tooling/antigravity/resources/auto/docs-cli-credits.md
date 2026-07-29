@@ -13,7 +13,7 @@ skill_name = "antigravity"
   \>
 - AI Credits
 
-# Managing AI Credits & Quotas[link](#managing-ai-credits-quotas)
+# Managing AI Credits & Quotas[link](#managing-ai-credits--quotas)
 
 The Antigravity CLI integrates with your subscription to monitor and
 manage your AI Premium credits and usage quotas.
@@ -33,7 +33,7 @@ the CLI:
   warning threshold, the statusline indicator highlights to warn you
   that your limits are near.
 
-## Slash Commands & Managing Balance[link](#slash-commands-managing-balance)
+## Slash Commands & Managing Balance[link](#slash-commands--managing-balance)
 
 You can query your credits or buy additional quota directly from the
 CLI:

@@ -13,7 +13,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-filter-pane>
+# \<pagefind-filter-pane\>
 
 
 A full filter panel displaying all available filters. Filters automatically populate based on your indexed content.

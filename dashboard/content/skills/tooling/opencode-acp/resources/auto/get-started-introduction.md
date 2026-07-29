@@ -41,7 +41,7 @@ ACP is suitable for both local and remote scenarios:
 * **Local agents** run as sub-processes of the code editor, communicating via JSON-RPC over stdio.
 * **Remote agents** can be hosted in the cloud or on separate infrastructure, communicating over HTTP or WebSocket
 
-<Info>
+\<Info\>
   Full support for remote agents is a work in progress. We are actively
   collaborating with agentic platforms to ensure the protocol addresses the
   specific requirements of cloud-hosted and remote deployment scenarios.

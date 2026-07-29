@@ -26,7 +26,7 @@ skill_name = "xai"
         "type": "string",
         "required": false,
         "description": "Alternative authentication for browser clients. Pass the ephemeral token with prefix `xai-client-secret.`. When provided, the Authorization header is not required.",
-        "example": "xai-client-secret.<EPHEMERAL_TOKEN>"
+        "example": "xai-client-secret.\<EPHEMERAL_TOKEN\>"
       }
     ]
   },
@@ -411,7 +411,7 @@ skill_name = "xai"
       },
       "example": {
         "type": "input_audio_buffer.append",
-        "audio": "<Base64EncodedAudioData>"
+        "audio": "\<Base64EncodedAudioData\>"
       }
     },
     {
@@ -1992,7 +1992,7 @@ skill_name = "xai"
         "item_id": "msg_008",
         "output_index": 0,
         "content_index": 0,
-        "delta": "<Base64EncodedAudioDelta>"
+        "delta": "\<Base64EncodedAudioDelta\>"
       }
     },
     {

@@ -139,14 +139,3 @@ All SATS types are BSATN-encoded by converting them to an
 See [the SATN JSON Format](https://spacetimedb.com/docs/sats-json) for more details of the
 conversion to meta values. Note that these meta values are converted to
 BSATN and *not JSON*.
-
-- [Notes on notation](#notes-on-notation)
-- [Values](#values)
-  - [At a glance](#at-a-glance)
-  - [`AlgebraicValue`](#algebraicvalue)
-  - [`SumValue`](#sumvalue)
-  - [`ProductValue`](#productvalue)
-  - [`ArrayValue`](#arrayvalue)
-  - [Strings](#strings)
-  - [Primitives](#primitives)
-- [Types](#types)

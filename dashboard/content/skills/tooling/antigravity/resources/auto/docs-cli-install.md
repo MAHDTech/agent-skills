@@ -13,12 +13,12 @@ skill_name = "antigravity"
   \>
 - Installation & Auth
 
-# Installation & auth[link](#installation-auth)
+# Installation & auth[link](#installation--auth)
 
 Install Antigravity CLI, configure enterprise requirements, and
 establish secure authenticated sessions.
 
-## Installation[link](#installation-2)
+## Installation[link](#installation)
 
 Antigravity CLI runs natively on macOS, Linux, and Windows. Use the
 platform-specific scripts below to install or upgrade the binary on your
@@ -40,7 +40,7 @@ curl -fsSL https://antigravity.google/cli/install.sh | bash
 ### Windows[link](#windows)
 
 The installation script registers the `agy` binary to your local user
-directory: `C:\Users\<Username>\AppData\Local\agy\bin` (where
+directory: `C:\Users\\<Username\>\AppData\Local\agy\bin` (where
 `<Username>` represents your active Windows user profile).
 
 **PowerShell**: Open PowerShell and execute the following installation
@@ -73,7 +73,7 @@ customization flags:
   script from purging or updating legacy `agy` or `antigravity` shell
   aliases).
 - `--skip-path`: Bypasses shell profile `PATH` appending (prevents the
-  script from modifying your shell profile's dynamic environment
+  script from modifying your shell profile’s dynamic environment
   variables).
 
 ## Authentication workflows[link](#authentication-workflows)
@@ -84,7 +84,7 @@ communicate with the shared agent harness.
 ### Local silent keyring sign-in[link](#local-silent-keyring-sign-in)
 
 When launching `agy` on your local machine, the CLI attempts to access
-your operating system's native secure keyring (such as Apple Keychain,
+your operating system’s native secure keyring (such as Apple Keychain,
 Linux Secret Service/dbus, or Windows Credential Manager). If a valid
 token profile is found, the CLI authenticates your session silently
 without opening a browser.
@@ -118,7 +118,7 @@ directories.
 ### Logging out[link](#logging-out)
 
 To disconnect your account and purge saved authentication profiles from
-your operating system's keyring, run the following command in the CLI
+your operating system’s keyring, run the following command in the CLI
 prompt box:
 
 text

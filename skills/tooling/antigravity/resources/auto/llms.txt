@@ -70,6 +70,7 @@
 - [Features](https://antigravity.google/docs/cli/features): Learn about Features.
 - [Migration](https://antigravity.google/docs/cli/gcli-migration): Learn about Migration.
 - [Prompting & Interaction](https://antigravity.google/docs/cli/prompting): Learn about Prompting & Interaction.
+- [Headless mode](https://antigravity.google/docs/cli/headless): Learn about Headless mode.
 - [Reviewing Artifacts](https://antigravity.google/docs/cli/artifacts): Learn about Reviewing Artifacts.
 - [Managing Conversations](https://antigravity.google/docs/cli/conversations): Learn about Managing Conversations.
 - [Choose an execution mode](https://antigravity.google/docs/cli/modes): Learn about Choose an execution mode.
@@ -78,7 +79,7 @@
 - [Sandbox](https://antigravity.google/docs/cli/sandbox): Learn about Sandbox.
 - [Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings): Learn about Settings, Rendering & Keybindings.
 - [AI Credits](https://antigravity.google/docs/cli/credits): Learn about AI Credits.
-- [MCP](https://antigravity.google/docs/mcp): Learn about MCP.
+- [MCP](https://antigravity.google/docs/cli/mcp): Learn about MCP.
 - [Plugins & Skills](https://antigravity.google/docs/cli/plugins): Learn about Plugins & Skills.
 - [Permissions](https://antigravity.google/docs/cli/permissions): Learn about Permissions.
 - [Status Line Customization](https://antigravity.google/docs/cli/statusline): Learn about Status Line Customization.
@@ -98,7 +99,7 @@
 
 ### Antigravity SDK
 - [Overview + Quick Start](https://antigravity.google/docs/sdk/overview): Learn about Overview + Quick Start.
-- [MCP](https://antigravity.google/docs/mcp): Learn about MCP.
+- [MCP](https://antigravity.google/docs/sdk/mcp): Learn about MCP.
 
 ### Antigravity IDE
 - [Overview](https://antigravity.google/docs/ide/overview): Learn about Overview.
@@ -113,7 +114,7 @@
 - [Overview](https://antigravity.google/docs/ide/browser): Learn about Overview.
 - [Allowlist / Denylist](https://antigravity.google/docs/ide/allowlist-denylist): Learn about Allowlist / Denylist.
 - [Separate Chrome Profile](https://antigravity.google/docs/ide/separate-chrome-profile): Learn about Separate Chrome Profile.
-- [MCP](https://antigravity.google/docs/mcp): Learn about MCP.
+- [MCP](https://antigravity.google/docs/ide/mcp): Learn about MCP.
 - [Skills](https://antigravity.google/docs/ide/skills): Learn about Skills.
 - [Rules](https://antigravity.google/docs/ide/rules): Learn about Rules.
 - [Workflows](https://antigravity.google/docs/ide/workflows): Learn about Workflows.

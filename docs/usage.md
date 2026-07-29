@@ -24,14 +24,14 @@ If you add or change a skill, use the CLI to validate and regenerate the derived
 
 ```bash
 # Validate frontmatter and folder structure
-devenv shell -- skills --action lint
+devenv --no-tui shell -- skills --action lint
 
 # Regenerate the derived files from skills/
-devenv shell -- skills --action sync
+devenv --no-tui shell -- skills --action sync
 ```
 
 The `sync` action regenerates `README.md`, `agents/AGENTS.md`, the dashboard content, and `skills.sh.json`. Syncing is also enforced as a pre-commit hook when you use `devenv`, so these stay in step with the skills.
 
 ## Development
 
-Use `devenv shell` to enter the development environment with all required tools (Bun, Zola, and the rest) on your PATH.
+Use `devenv --no-tui shell` to enter the development environment with all required tools (Bun, Zola, and the rest) on your PATH.

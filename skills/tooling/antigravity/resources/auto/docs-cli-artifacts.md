@@ -55,16 +55,16 @@ content_copy
 >
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 Action required (10 left)
-› □ new release_notes.md   open  approve reject
+› [ ] new release_notes.md   open  approve reject
   utils.py
-  □ new performance_report.md
+  [ ] new performance_report.md
   api_client.py
   config_manager.py
-  □ new user_guide.md
+  [ ] new user_guide.md
   run_tests.py
   data_processor.py
-  □ new system_architecture.md
-  □ new project_overview.md
+  [ ] new system_architecture.md
+  [ ] new project_overview.md
 
 Keyboard: ↑/↓ Navigate  y/n Approve/reject  shift+a Approve all  p Preview  esc Done
 ```
@@ -74,7 +74,7 @@ Keyboard: ↑/↓ Navigate  y/n Approve/reject  shift+a Approve all  p Preview  
 Audit the file checklist using the following dedicated panel controls:
 
 | Key | TUI Command | Action Behavior |
-|----|----|----|
+|:---|:---|:---|
 | **`↑`** / **`↓`** | `nav.scroll_line` | Scrolls highlighted selections up and down through the list of entries. |
 | **`h`** / **`l`** | `nav.switch_button` | Focuses and toggles between inline row buttons: **open**, **approve**, and **reject** (Left/Right arrows also supported). |
 | **`p`** | `confirm.preview` | Toggles a **quick inline file preview**. This opens a 12-line truncated and indented code block preview directly under the selected row. |
@@ -94,11 +94,11 @@ types:
   plan markdowns that require explicit approvals.
 - **Collapsible Media Drawer**: Visual asset files (such as PNG, JPG,
   WebP, SVG, MP4, or WebM media) are grouped into a dedicated
-  **"Media"** drawer header.
-- Highlight the **Media** header row and press `Enter` to expand or
-  collapse the drawer list.
-- Highlight a specific media item and press `Enter` to open the file
-  inside your operating system's native media viewer.
+  **“Media”** drawer header.
+  - Highlight the **Media** header row and press `Enter` to expand or
+    collapse the drawer list.
+  - Highlight a specific media item and press `Enter` to open the file
+    inside your operating system’s native media viewer.
 
 ------------------------------------------------------------------------
 
@@ -177,7 +177,7 @@ implementation_plan.md
   l hide lines · esc close
 ```
 
-### Auditing & navigation[link](#auditing-navigation)
+### Auditing & navigation[link](#auditing--navigation)
 
 - **Scrolling**: Scroll page-by-page or line-by-line using `j`/`k` (or
   standard arrow keys).
@@ -206,11 +206,11 @@ relationships, or architectural layouts:
 
 - **Cycle Render Modes (`m`)**: Press `m` to cycle visual rendering
   modes:
-- **Kitty Graphics Image**: Renders diagrams natively as inline graphics
-  within Kitty-compatible terminal emulators.
-- **ASCII Box Art** (Default): Renders diagrams as clean,
-  high-performance text art compatible with all shells.
-- **Raw Code**: Shows the raw markdown code block fences.
+  - **Kitty Graphics Image**: Renders diagrams natively as inline
+    graphics within Kitty-compatible terminal emulators.
+  - **ASCII Box Art** (Default): Renders diagrams as clean,
+    high-performance text art compatible with all shells.
+  - **Raw Code**: Shows the raw markdown code block fences.
 - **Zooming Graphics**: When Kitty graphics image mode is active, press
   `ctrl+=` to zoom in and scale up the image, and `ctrl+-` to zoom out.
 

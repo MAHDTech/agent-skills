@@ -1,0 +1,118 @@
++++
+title = "secretspec-providers-lastpass-319a9554"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+{% raw %}
+# LastPass Provider
+
+The LastPass provider integrates with LastPass password manager for
+secure cloud-based secret storage.
+
+## At a glance
+
+|                 |                                        |
+|-----------------|----------------------------------------|
+| Provider        | `lastpass`                             |
+| URI             | `lastpass://[item_template]`           |
+| Access          | Read and write                         |
+| Best for        | Teams already using LastPass           |
+| Authentication  | An authenticated `lpass` CLI session   |
+| Default storage | `secretspec/{project}/{profile}/{key}` |
+
+## Quick start
+
+```
+# Set a secret$ secretspec set DATABASE_URL --provider lastpassEnter value for DATABASE_URL: postgresql://localhost/mydb
+# Get a secret$ secretspec get DATABASE_URL --provider lastpass
+# Run with secrets$ secretspec run --provider lastpass -- npm start
+```
+
+Terminal window
+
+## Setup
+
+### Prerequisites
+
+Install LastPass CLI:
+
+```
+# macOSbrew install lastpass-cli
+# Linux (apt)sudo apt install lastpass-cli
+# NixOSnix-env -iA nixpkgs.lastpass-cli
+```
+
+Terminal window
+
+### Authentication
+
+```
+# Standard login$ lpass login your-email@example.com
+# Trust device (reduces MFA prompts)$ lpass login --trust your-email@example.com
+```
+
+Terminal window
+
+## Configuration
+
+### URI format
+
+```
+lastpass://[item_template]
+```
+
+`item_template` is optional and replaces the default
+`secretspec/{project}/{profile}/{key}` layout. It supports the
+`{project}`, `{profile}`, and `{key}` placeholders. Include `{key}`
+unless every SecretSpec key should resolve to the same LastPass item.
+
+### URI examples
+
+```
+# Default SecretSpec layoutlastpass
+# Keep SecretSpec items in a team folderlastpass://Work/SecretSpec/{project}/{profile}/{key}
+```
+
+Terminal window
+
+### Project configuration
+
+```
+[providers]team = "lastpass://"
+[profiles.production]DATABASE_URL = { description = "Database URL", providers = ["team"] }
+```
+
+secretspec.toml
+
+## Storage model
+
+By default, each secret maps to an item named
+`secretspec/{project}/{profile}/{key}`. A custom `item_template`
+replaces that layout; include all placeholders needed to keep secrets
+distinct.
+
+## Use existing secrets
+
+A secret’s [`ref`](https://secretspec.dev/reference/configuration/#secret-references) field
+names an existing item instead: `item` is the full item name, including
+any folder (`field` is not supported). Reads and writes target that item
+in place.
+
+```
+[profiles.production]DATABASE_URL = { description = "DB", ref = { item = "Shared-Infra/Production DB" }, providers = ["lastpass"] }
+```
+
+## CI/CD
+
+```
+# Disable interactive pinentry and authenticate with a CI-managed password$ export LPASS_DISABLE_PINENTRY=1$ echo "$LASTPASS_PASSWORD" | lpass login --trust your-email@example.com
+$ secretspec run --provider lastpass -- deploy
+```
+
+Terminal window
+
+{% endraw %}

@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-filter-dropdown>
+# \<pagefind-filter-dropdown\>
 
 
 A dropdown selector for a single filter.

@@ -122,7 +122,7 @@ Create a phone number for API-controlled SIP calls.
 
   * `auth_password` (string) — SIP digest password. Stored encrypted and never returned by read endpoints.
 
-  * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+  * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
 * `webhook` (object)
 
@@ -160,7 +160,7 @@ Create a phone number for API-controlled SIP calls.
 
     * `auth_username` (string) — SIP digest username. Present only when digest auth is configured.
 
-    * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+    * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
   * `created_at` (string)
 
@@ -403,7 +403,7 @@ Convert text into speech audio.
 
 ### Request Body
 
-* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\<soft>\`, \`\<whisper>\`, \`\<loud>\`, \`\<build-intensity>\`, \`\<decrease-intensity>\`, \`\<higher-pitch>\`, \`\<lower-pitch>\`, \`\<slow>\`, \`\<fast>\`, \`\<sing-song>\`, \`\<singing>\`, \`\<laugh-speak>\`, \`\<emphasis>\`.
+* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\\<soft\>\`, \`\\<whisper\>\`, \`\\<loud\>\`, \`\\<build-intensity\>\`, \`\\<decrease-intensity\>\`, \`\\<higher-pitch\>\`, \`\\<lower-pitch\>\`, \`\\<slow\>\`, \`\\<fast\>\`, \`\\<sing-song\>\`, \`\\<singing\>\`, \`\\<laugh-speak\>\`, \`\\<emphasis\>\`.
 
 * `voice_id` (string) — Voice identifier. Use a built-in voice from \`GET /v1/tts/voices\` (e.g. \`eve\`, \`ara\`) or a custom voice ID. Defaults to \`eve\` when omitted.
 
@@ -435,9 +435,9 @@ Convert text into speech audio.
 
 * `audio_timestamps` (object) — Per-character timings produced when \`with\_timestamps\` is \`true\`.
 
-  * `graph_chars` (array\<string>, required) — Each character of the original input text, in order.
+  * `graph_chars` (array\\<string\>, required) — Each character of the original input text, in order.
 
-  * `graph_times` (array\<object>, required) — Start/end seconds for each entry in \`graph\_chars\`.
+  * `graph_times` (array\\<object\>, required) — Start/end seconds for each entry in \`graph\_chars\`.
 
     * `start` (number, required) — Start time in seconds, measured from the beginning of the synthesized audio.
 
@@ -681,7 +681,7 @@ List all available TTS voices.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of available voices.
+* `voices` (array\\<object\>, required) — List of available voices.
 
   * `voice_id` (string, required) — Unique identifier for the voice (lowercase). Pass this value as \`voice\_id\` in TTS requests or as the \`voice\` parameter in Realtime API session configuration.
 
@@ -849,7 +849,7 @@ Transcribe an audio file to text.
 
 * `diarize` ("true" | "false") — When \`true\`, enables speaker diarization. Each word in the response includes a \`speaker\` field (integer) identifying the detected speaker.
 
-* `keyterm` (array\<string>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
+* `keyterm` (array\\<string\>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
 
@@ -863,7 +863,7 @@ Transcribe an audio file to text.
 
 * `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
 
-* `words` (array\<object>) — Word-level segments with timestamps. Omitted when empty.
+* `words` (array\\<object\>) — Word-level segments with timestamps. Omitted when empty.
 
   * `text` (string, required) — The word text.
 
@@ -875,7 +875,7 @@ Transcribe an audio file to text.
 
   * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
 
-* `channels` (array\<object>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
+* `channels` (array\\<object\>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
 
   * `index` (integer, required) — Zero-based channel index in the source audio.
 
@@ -883,7 +883,7 @@ Transcribe an audio file to text.
 
   * `text` (string, required) — Full transcript text for this channel.
 
-  * `words` (array\<object>) — Word-level segments with timestamps for this channel.
+  * `words` (array\\<object\>) — Word-level segments with timestamps for this channel.
 
     * `text` (string, required) — The word text.
 
@@ -1168,7 +1168,7 @@ List custom voices owned by your team.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of custom voices owned by the calling team.
+* `voices` (array\\<object\>, required) — List of custom voices owned by the calling team.
 
   * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 

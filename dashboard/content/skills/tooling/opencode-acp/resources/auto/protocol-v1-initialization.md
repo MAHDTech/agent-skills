@@ -255,7 +255,7 @@ Optionally, they **MAY** support other session methods and notifications by spec
   Supplying `{}` means the Agent supports additional workspace roots.
 </ResponseField>
 
-<Note>
+\<Note\>
   `session/load` is still handled by the top-level `load_session` capability.
   This will be unified in future versions of the protocol.
 </Note>
@@ -279,7 +279,7 @@ Both Clients and Agents **SHOULD** provide information about their implementatio
   debugging or metrics purposes.
 </ParamField>
 
-<Info>
+\<Info\>
   Note: in future versions of the protocol, this information will be required.
 </Info>
 

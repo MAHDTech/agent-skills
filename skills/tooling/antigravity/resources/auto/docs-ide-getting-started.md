@@ -11,6 +11,8 @@ Please visit
 [antigravity.google/download](https://antigravity.google/download) to
 download Antigravity IDE.
 
+**Available platforms and minimum versions:**
+
 - **macOS**: macOS versions with Apple security update support. This is
   typically the current and two previous versions. Min Version 12
   (Monterey), X86 is not supported

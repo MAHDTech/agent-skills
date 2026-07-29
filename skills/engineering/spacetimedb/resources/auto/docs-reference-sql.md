@@ -654,31 +654,3 @@ column
     | identifier '.' identifier
     ;
 ```
-
-- [Subscriptions](#subscriptions)
-  - [SELECT](#select)
-  - [FROM](#from)
-  - [WHERE](#where)
-- [Query and DML (Data Manipulation
-  Language)](#query-and-dml-data-manipulation-language)
-  - [Statements](#statements)
-  - [SELECT](#select-1)
-  - [INSERT](#insert)
-  - [DELETE](#delete)
-  - [UPDATE](#update)
-  - [SET](#set)
-  - [SHOW](#show)
-- [System Variables](#system-variables)
-- [Data types](#data-types)
-- [Literals](#literals)
-  - [Booleans](#booleans)
-  - [Integers](#integers)
-  - [Floats](#floats)
-  - [Strings](#strings)
-  - [Hex](#hex)
-- [Identifiers](#identifiers)
-  - [Example](#example-2)
-- [Best Practices for Performance and
-  Scalability](#best-practices-for-performance-and-scalability)
-  - [Example](#example-3)
-- [Appendix](#appendix)

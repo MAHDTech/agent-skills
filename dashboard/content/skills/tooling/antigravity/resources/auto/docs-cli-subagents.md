@@ -15,7 +15,7 @@ skill_name = "antigravity"
   \>
 - Subagents
 
-# Background tasks & subagents[link](#background-tasks-subagents)
+# Background tasks & subagents[link](#background-tasks--subagents)
 
 Delegate slow builds, multi-file code generation, and research sweeps to
 parallel background agents while maintaining your active programming
@@ -39,7 +39,7 @@ processes. You can continue drafting code, submitting prompts, or
 inspecting files while multiple autonomous background threads execute
 validation tasks in parallel.
 
-## Managing agents: The \`/agents\` panel[link](#managing-agents-the-agents-panel)
+## Managing agents: The `/agents` panel[link](#managing-agents-the-agents-panel)
 
 The active agent-hierarchy and custom agent selection menu are fully
 transparent and manageable through the interactive [Agent Manager Panel
@@ -56,8 +56,8 @@ The panel displays a live checklist of all active, completed, killed, or
 failed background agents:
 
 - **Identifier**: The unique target subagent ID.
-- **Role**: The specialized role of the agent (such as "Codebase
-  Researcher" or "Database Debugger").
+- **Role**: The specialized role of the agent (such as “Codebase
+  Researcher” or “Database Debugger”).
 - **State**: Live status indicators (running, done, killed, or error).
 - **Step**: A real-time summary of the tool or reasoning step currently
   being executed.
@@ -72,8 +72,8 @@ failed background agents:
 In addition to built-in agents, the CLI automatically discovers custom
 agents defined in Markdown format (`.md`) with YAML frontmatter:
 
-- **Workspace Agents**: `.agents/agents/<name>.md` or
-  `.agents/agents/<name>/agent.md`
+- **Workspace Agents**: `.agents/agents/\<name\>.md` or
+  `.agents/agents/\<name\>/agent.md`
 - **Global Agents**: `~/.gemini/config/agents/`
 
 When a custom agent has `subagent: true` set in its YAML frontmatter,
@@ -92,12 +92,12 @@ background agent:
 1.  Open the `/agents` panel and highlight the target agent using
     `↑`/`↓`.
 2.  Press `Enter` to open the **Subagent Detail View**.
-3.  This full-screen view reveals the subagent's entire reasoning log,
+3.  This full-screen view reveals the subagent’s entire reasoning log,
     including its private internal thoughts, tool calls, and execution
     outputs.
 4.  Press `Esc` to exit and return to the main Agent Manager list.
 
-## Monitoring background tasks with \`/tasks\`[link](#monitoring-background-tasks-with-tasks)
+## Monitoring background tasks with `/tasks`[link](#monitoring-background-tasks-with-tasks)
 
 For non-agentic background operations, such as direct shell commands,
 testing suites, or simple background queries initiated via `/btw`, use
@@ -123,18 +123,18 @@ To reduce context-switching friction when subagents require manual
 interaction or tool authorizations, Antigravity CLI integrates
 high-efficiency shortcut paths.
 
-### Detailed "Teleport" navigation (\`Alt+J\`)[link](#detailed-teleport-navigation-altj)
+### Detailed “Teleport” navigation (`Alt+J`)[link](#detailed-teleport-navigation-altj)
 
 When a subagent encounters a tool requiring approval (e.g. writing a
 file or running a database migration), a status bar notification blinks.
 
-- Press `Alt+J` inside the main prompt panel to instantly "teleport"
+- Press `Alt+J` inside the main prompt panel to instantly “teleport”
   from your current conversation directly into the Detail View of the
   next subagent awaiting your approval.
 - Confirm or reject the action, and press `Esc` to teleport back to your
   primary thread.
 
-### "Fast-Path" confirmations (\`Ctrl+K\`)[link](#fast-path-confirmations-ctrlk)
+### “Fast-Path” confirmations (`Ctrl+K`)[link](#fast-path-confirmations-ctrlk)
 
 To authorize an agent action instantly without leaving your active
 workspace:

@@ -15,85 +15,90 @@ Complete the following sequential steps to launch your first session:
 
 1.  **Install the client (fast path)**
 
-Run the appropriate fast-path command for your operating system:
+    Run the appropriate fast-path command for your operating system:
 
-**macOS / Linux**:
+    **macOS / Linux**:
 
-content_copy
+    bash
 
-```
+    content_copy
+    ```
     curl -fsSL https://antigravity.google/cli/install.sh | bash
-```
+    ```
 
-**Windows (PowerShell)**:
+    **Windows (PowerShell)**:
 
-content_copy
+    powershell
 
-```
+    content_copy
+    ```
     irm https://antigravity.google/cli/install.ps1 | iex
-```
+    ```
 
-**Windows (CMD)**:
+    **Windows (CMD)**:
 
-content_copy
+    cmd
 
-```
+    content_copy
+    ```
     curl -fsSL https://antigravity.google/cli/install.cmd -o install.cmd && install.cmd && del install.cmd
-```
+    ```
 
-By default, the installer registers the `agy` binary to your
-platform-specific directory:
+    By default, the installer registers the `agy` binary to your
+    platform-specific directory:
 
-- **macOS / Linux**: `~/.local/bin/agy`
-- **Windows**: `C:\Users\<Username>\AppData\Local\agy\bin` (where
-  `<Username>` represents your active Windows profile name).
+    - **macOS / Linux**: `~/.local/bin/agy`
+    - **Windows**: `C:\Users\\<Username\>\AppData\Local\agy\bin` (where
+      `<Username>` represents your active Windows profile name).
 
-info
+    info
 
-**Advanced Setup**: For detailed enterprise credentials configuration,
-secure keyring auth permissions, proxy setups, or troubleshooting
-installation issues, consult the **[Installation & Auth
-Guide](https://antigravity.google/docs/cli/install)**.
+    Advanced Setup: For detailed enterprise credentials configuration,
+    secure keyring auth permissions, proxy setups, or troubleshooting
+    installation issues, consult the Installation & Auth Guide.
 
-1.  **Launch the TUI inside a project**
+2.  **Launch the TUI inside a project**
 
-Open a fresh terminal window, navigate to your target project codebase
-directory, and execute the launcher command:
+    Open a fresh terminal window, navigate to your target project
+    codebase directory, and execute the launcher command:
 
-content_copy
+    bash
 
-```
+    content_copy
+    ```
     agy
-```
+    ```
 
-1.  **Complete the first-launch setup**
+3.  **Complete the first-launch setup**
 
-On your very first launch, the TUI walks you through a brief interactive
-setup:
+    On your very first launch, the TUI walks you through a brief
+    interactive setup:
 
-- **Color Scheme**: Select your preferred visual theme (Solarized, Dark,
-  Solarized Light, or standard Terminal colors).
-- **Rendering Mode**: Choose Alt-Screen mode (alternate buffer with
-  full-screen scrolling) or Inline mode (sequential stream integrated
-  with your terminal's history).
-- **Workspace Trust**: Confirm that you trust the repository directory.
-  Once confirmed, the agent indexes the files and stands ready.
+    - **Color Scheme**: Select your preferred visual theme (Solarized,
+      Dark, Solarized Light, or standard Terminal colors).
+    - **Rendering Mode**: Choose Alt-Screen mode (alternate buffer with
+      full-screen scrolling) or Inline mode (sequential stream
+      integrated with your terminal’s history).
+    - **Workspace Trust**: Confirm that you trust the repository
+      directory. Once confirmed, the agent indexes the files and stands
+      ready.
 
-1.  **Run your first agent task**
+4.  **Run your first agent task**
 
-Type the following instruction in the prompt box at the bottom of your
-TUI screen and press `Enter`:
+    Type the following instruction in the prompt box at the bottom of
+    your TUI screen and press `Enter`:
 
-content_copy
+    text
 
-```
+    content_copy
+    ```
     Write a simple python script to fetch web page text
-```
+    ```
 
-The agent reads the workspace, reasons about the task, and proposes a
-plan. For a detailed step-by-step tutorial on reviewing code and running
-test commands inside the TUI, follow the **[Tutorial
-Guide](https://antigravity.google/docs/cli/tutorial)**.
+    The agent reads the workspace, reasons about the task, and proposes
+    a plan. For a detailed step-by-step tutorial on reviewing code and
+    running test commands inside the TUI, follow the **[Tutorial
+    Guide](https://antigravity.google/docs/cli/tutorial)**.
 
 ## Related resources[link](#related-resources)
 

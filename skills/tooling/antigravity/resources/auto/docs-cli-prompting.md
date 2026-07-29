@@ -3,7 +3,7 @@
   \>
 - Prompting
 
-# Prompting & interaction[link](#prompting-interaction)
+# Prompting & interaction[link](#prompting--interaction)
 
 Master primary interaction patterns, multiline composition workflows,
 session interruption controls, and terminal media pasting.
@@ -38,9 +38,9 @@ execution, press `Esc` to immediately halt the session.
 
 lightbulb
 
-**Universal Escape**: The `Esc` key acts as a global escape hatch.
-Pressing `Esc` instantly cancels any active agent turn, closes overlay
-panels, and returns focus to a clean prompt box.
+Universal Escape: The Esc key acts as a global escape hatch. Pressing
+Esc instantly cancels any active agent turn, closes overlay panels, and
+returns focus to a clean prompt box.
 
 ## Multiline composition[link](#multiline-composition)
 
@@ -58,14 +58,14 @@ instructions, use our built-in multiline features.
   of your active line and press `Enter`. The CLI automatically removes
   the backslash and inserts a newline.
 
-### Editing prompts in \`\$EDITOR\`[link](#editing-prompts-in-editor)
+### Editing prompts in `$EDITOR`[link](#editing-prompts-in-editor)
 
 To draft or edit extensive prompt structures in your primary development
 editor:
 
 1.  Press `ctrl+g` inside the empty prompt panel.
-2.  The CLI launches your system's default text editor (such as `vim`,
-    `nano`, or `code`, configured via `/config` or your environment's
+2.  The CLI launches your system’s default text editor (such as `vim`,
+    `nano`, or `code`, configured via `/config` or your environment’s
     `$EDITOR` variable).
 3.  Draft your multi-line instruction inside the temporary editor
     buffer.

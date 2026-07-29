@@ -60,7 +60,3 @@ If you already have a good understanding of the SpacetimeDB client and
 server, check out our completed tutorial project!
 
 [https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio](https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio)
-
-- [Blackhol.io Tutorial - Basic
-  Multiplayer](#blackholio-tutorial---basic-multiplayer)
-- [Blackhol.io Tutorial - Advanced](#blackholio-tutorial---advanced)

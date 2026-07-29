@@ -20,7 +20,7 @@ instead, you review high-level deliverables at key milestones.
 
 ## Reviewing Artifacts Across Surfaces[link](#reviewing-artifacts-across-surfaces)
 
-Artifacts are primarily generated during the agent's **Planning Mode**
+Artifacts are primarily generated during the agent’s **Planning Mode**
 and are accessible across both Antigravity 2.0 and the Antigravity CLI.
 
 ### Antigravity 2.0[link](#antigravity-20)
@@ -29,7 +29,7 @@ The desktop app features a visual sidebar and review pane specifically
 optimized for displaying, organizing, and managing rich Artifacts.
 
 - **Capabilities**: You can inspect interactive plans, review visual
-  code diffs, and play back browser recordings of the agent's UI actions
+  code diffs, and play back browser recordings of the agent’s UI actions
   directly within the app interface.
 
 ### Antigravity CLI[link](#antigravity-cli)
@@ -48,10 +48,10 @@ request review on its plans or code edits before executing them.
 
 - **Steering the Agent**: If an artifact (like an Implementation Plan)
   does not align with your goal, you can provide inline text feedback to
-  steer the agent's thinking in the proper direction before it modifies
+  steer the agent’s thinking in the proper direction before it modifies
   any local files.
 - **Granular Control**: This approval loop ensures that you remain in
-  the driver's seat, allowing the agent to operate with high autonomy
+  the driver’s seat, allowing the agent to operate with high autonomy
   while maintaining strict human-in-the-loop validation.
 
 On this Page

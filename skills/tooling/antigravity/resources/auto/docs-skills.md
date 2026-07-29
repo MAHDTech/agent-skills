@@ -30,12 +30,12 @@ task, the agent reads the full instructions and follows them.
 Antigravity supports two types of skills:
 
 | Location                                          | Scope                   |
-|---------------------------------------------------|-------------------------|
-| `<workspace-root>/.agents/skills/<skill-folder>/` | Workspace-specific      |
-| `~/.gemini/config/skills/<skill-folder>/`         | Global (all workspaces) |
+|:--------------------------------------------------|:------------------------|
+| `<workspace-root>/.agents/skills/\<skill-folder\>/` | Workspace-specific      |
+| `~/.gemini/config/skills/\<skill-folder\>/`         | Global (all workspaces) |
 
 **Workspace skills** are great for project-specific workflows, like your
-team's deployment process or testing conventions.
+team’s deployment process or testing conventions.
 
 **Global skills** work across all your projects. Use these for personal
 utilities or general-purpose tools you want everywhere.
@@ -85,13 +85,13 @@ Step-by-step guidance, conventions, and patterns the agent should follow.
 ### Frontmatter fields[link](#frontmatter-fields)
 
 | Field | Required | Description |
-|----|----|----|
+|:---|:---|:---|
 | `name` | No | A unique identifier for the skill (lowercase, hyphens for spaces). Defaults to the folder name if not provided. |
 | `description` | Yes | A clear description of what the skill does and when to use it. This is what the agent sees when deciding whether to apply the skill. |
 
 Tip: Write your description in third person and include keywords that
 help the agent recognize when the skill is relevant. For example:
-"Generates unit tests for Python code using pytest conventions."
+“Generates unit tests for Python code using pytest conventions.”
 
 ## Skill folder structure[link](#skill-folder-structure)
 
@@ -108,7 +108,7 @@ content_copy
 └─── resources/     # Templates and other assets (optional)
 ```
 
-The agent can read these files when following your skill's instructions.
+The agent can read these files when following your skill’s instructions.
 
 ## How the agent uses skills[link](#how-the-agent-uses-skills)
 
@@ -118,30 +118,30 @@ Skills follow a **progressive disclosure** pattern:
     available skills with their names and descriptions
 2.  **Activation**: If a skill looks relevant to your task, the agent
     reads the full `SKILL.md` content
-3.  **Execution**: The agent follows the skill's instructions while
+3.  **Execution**: The agent follows the skill’s instructions while
     working on your task
 
-You don't need to explicitly tell the agent to use a skill—it decides
+You don’t need to explicitly tell the agent to use a skill—it decides
 based on context. However, you can mention a skill by name if you want
-to ensure it's used.
+to ensure it’s used.
 
 ## Best practices[link](#best-practices)
 
 ### Keep skills focused[link](#keep-skills-focused)
 
-Each skill should do one thing well. Instead of a "do everything" skill,
+Each skill should do one thing well. Instead of a “do everything” skill,
 create separate skills for distinct tasks.
 
 ### Write clear descriptions[link](#write-clear-descriptions)
 
 The description is how the agent decides whether to use your skill. Make
-it specific about what the skill does and when it's useful.
+it specific about what the skill does and when it’s useful.
 
 ### Use scripts as black boxes[link](#use-scripts-as-black-boxes)
 
 If your skill includes scripts, encourage the agent to run them with
 `--help` first rather than reading the entire source code. This keeps
-the agent's context focused on the task.
+the agent’s context focused on the task.
 
 ### Include decision trees[link](#include-decision-trees)
 
@@ -150,7 +150,7 @@ approach based on the situation.
 
 ## Example: A code review skill[link](#example-a-code-review-skill)
 
-Here's a simple skill that helps the agent review code:
+Here’s a simple skill that helps the agent review code:
 
 content_copy
 

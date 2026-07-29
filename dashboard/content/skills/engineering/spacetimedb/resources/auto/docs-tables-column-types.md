@@ -122,7 +122,7 @@ These optimizations apply across all supported languages.
 | Primitive | `t.u256()` | `bigint` | Unsigned 256-bit integer |
 | Composite | `t.object(name, obj)` | `{ [K in keyof Obj]: T<Obj[K]> }` | Product/object type for nested data. Use `t.object`, not `t.struct` (which does not exist). |
 | Composite | `t.enum(name, variants)` | `{ tag: 'variant' } | { tag: 'variant', value: T }` | Sum/enum type (tagged union) |
-| Composite | `t.array(element)` | `T<Element>[]` | Array of elements |
+| Composite | `t.array(element)` | `T\<Element\>[]` | Array of elements |
 | Composite | `t.option(value)` | `Value | undefined` | Optional value |
 | Composite | `t.unit()` | `{}` | Zero-field product type |
 | Special | `t.identity()` | `Identity` | Unique identity for authentication |
@@ -387,11 +387,5 @@ SPACETIMEDB_STRUCT(Player, id, name, level, experience, health, score, is_online
 SPACETIMEDB_TABLE(Player, player, Public)
 FIELD_PrimaryKeyAutoInc(player, id)
 ```
-
-- [Representing Collections](#representing-collections)
-- [Binary Data and Files](#binary-data-and-files)
-- [Type Performance](#type-performance)
-- [Type Reference](#type-reference)
-- [Complete Example](#complete-example)
 
 {% endraw %}

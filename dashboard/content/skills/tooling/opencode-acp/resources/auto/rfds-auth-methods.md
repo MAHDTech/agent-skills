@@ -71,7 +71,7 @@ descriptor includes:
 
 The identifier and `env` wire shapes differ between protocol versions.
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 theme={null}
   {
     "id": "agent-login",
@@ -113,7 +113,7 @@ the Agent from selecting an unrelated program.
 Clients opt in because terminal authentication requires Client-side process and
 terminal support.
 
-<CodeGroup>
+\<CodeGroup\>
   ```json v1 theme={null}
   {
     "clientCapabilities": {

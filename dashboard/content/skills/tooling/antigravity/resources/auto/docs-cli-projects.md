@@ -63,9 +63,9 @@ agy --new-project
 
 If you resume a conversation (whether on startup via
 `--conversation=<conv_id>` or during a session using `/resume`), the
-conversation's associated project will automatically be used.
+conversation’s associated project will automatically be used.
 
-## Moving conversations between projects (\`/fork\`)[link](#moving-conversations-between-projects-fork)
+## Moving conversations between projects (`/fork`)[link](#moving-conversations-between-projects-fork)
 
 While interacting in an active session, you can copy and continue your
 current conversation to a different project using the `/fork` slash

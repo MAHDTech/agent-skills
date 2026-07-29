@@ -34,8 +34,8 @@ Description
 
 ------------------------------------------------------------------------
 
-[2.4.2](https://antigravity.google/releases?tab=hub&version=2.4.2 "View release 2.4.2")  
-July 24, 2026
+[2.4.3](https://antigravity.google/releases?tab=hub&version=2.4.3 "View release 2.4.3")  
+July 28, 2026
 
 ### Preview tabs, MCP timeouts, file attachments, and performance fixes
 
@@ -378,6 +378,53 @@ Fixes (3)
   importing from Antigravity 1.0.
 - Resolved an issue where Google One credits were not being applied or
   utilized.
+
+Patches (0)
+
+[1.1.8](https://antigravity.google/download#antigravity-cli "View release 1.1.8")  
+July 28, 2026
+
+### Print mode structured output formats, custom JSON schema enforcement, copyOnSelect TUI setting, and compound-command permission improvements
+
+Added structured output formats (`json`, `stream-json`) for print mode,
+support for custom JSON schema validation, enriched tool and subagent
+payloads, `copyOnSelect` configuration setting, and improved
+compound-command permission rules.
+
+Improvements (7)
+
+- Print mode (`-p` / `--print`) now supports structured,
+  machine-readable output via the `--output-format` flag (`text`
+  (default), `json`, or `stream-json`), so headless runs in CI, eval
+  harnesses, and scripts can consume the CLI's output programmatically;
+  these flags are now discoverable in `--help`.
+- Added the `stream-json` output format: a strongly-typed NDJSON event
+  stream that emits typed `init`, `step_update`, and terminal `result`
+  events with a stable, closed-vocabulary `step_type` discriminator, so
+  consumers receive progress incrementally instead of waiting for the
+  whole run to finish.
+- Added the `--json-schema` flag to enforce a custom JSON schema on the
+  structured output, accepting either an inline schema string or a path
+  to a schema file; for `stream-json` the schema applies to the final
+  `result` event.
+- Enriched the structured stream with a `tool_info` object for each tool
+  call (canonical tool name, parameters, and output) and a
+  `subagent_info` payload for delegated subagents (including
+  `conversation_id` and `log_uri`) so consumers can correlate child
+  trajectories.
+- The JSON usage object emitted by `json` and `stream-json` now reports
+  token accounting including `cache_read_tokens`, so non-interactive
+  consumers can attribute prompt-cache hits.
+- Added a `copyOnSelect` setting (default on, toggleable in `/settings`)
+  that controls whether releasing a mouse text-selection auto-copies it
+  to the system clipboard in the TUI's altscreen rendering mode; disable
+  it to stop the automatic copy on release — useful when the auto-copy
+  is unwanted or corrupts certain payloads.
+- Improved compound-command permissions so an exact chained command
+  (such as `git fetch && git rebase`) can be saved as an allow-always
+  rule and no longer re-prompts on the next identical run.
+
+Fixes (0)
 
 Patches (0)
 

@@ -21,7 +21,7 @@ agent harness that powers the Antigravity CLI and Antigravity 2.0,
 allowing you to integrate advanced agentic capabilities directly into
 your own applications and workflows.
 
-The SDK decouples your agent's logic from where it runs, allowing you to
+The SDK decouples your agent’s logic from where it runs, allowing you to
 focus on what the agent does; the SDK handles how and where it executes.
 
 ## Quick Start[link](#quick-start)
@@ -61,10 +61,10 @@ if __name__ == "__main__":
 
 ## Core Pillars[link](#core-pillars)
 
-**1. Governed Extensibility (Tools)** Every agent starts with a built-in
-toolset (file I/O, code editing, shell execution, directory search) and
-can be extended using four types of tools under a unified execution
-pipeline:
+**1. Governed Extensibility (Tools)**  
+Every agent starts with a built-in toolset (file I/O, code editing,
+shell execution, directory search) and can be extended using four types
+of tools under a unified execution pipeline:
 
 - **Built-in Tools:** Core file and system manipulation capabilities.
 - **Custom Python Functions:** Register any Python callable as an agent
@@ -73,9 +73,9 @@ pipeline:
   (stdio, SSE, or HTTP). See the [MCP Documentation](https://antigravity.google/docs/mcp).
 - **Agent Skills:** Load reusable packages of instructions and tools.
 
-**2. Declarative Safety Policies** Configure agent permissions using a
-declarative "deny by default" policy system to control when and how
-tools are executed:
+**2. Declarative Safety Policies**  
+Configure agent permissions using a declarative “deny by default” policy
+system to control when and how tools are executed:
 
 python
 
@@ -91,9 +91,10 @@ policies = [
 ]
 ```
 
-**3. Lifecycle Hooks** Gain granular control over agent execution with
-three categories of hooks across nine concrete lifecycle points (e.g.,
-session start, pre/post turn, pre/post tool call):
+**3. Lifecycle Hooks**  
+Gain granular control over agent execution with three categories of
+hooks across nine concrete lifecycle points (e.g., session start,
+pre/post turn, pre/post tool call):
 
 - **Inspect** (Read-Only, Non-Blocking): For logging, audit trails, and
   metrics.

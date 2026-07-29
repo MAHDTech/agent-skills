@@ -47,12 +47,12 @@ content_copy
 
 warning
 
-**Precedence Rule**: Conflicting rules are strictly evaluated in
-priority order: **Deny \> Ask \> Allow**. For example, if you configure
-`command(*)` in your `ask` list and `command(git)` in your `allow` list,
-the `ask` rule takes precedence and prompts before every command.
+Precedence Rule: Conflicting rules are strictly evaluated in priority
+order: Deny \> Ask \> Allow. For example, if you configure command(\*)
+in your ask list and command(git) in your allow list, the ask rule takes
+precedence and prompts before every command.
 
-## Supported actions & matching rules[link](#supported-actions-matching-rules)
+## Supported actions & matching rules[link](#supported-actions--matching-rules)
 
 Fine-grained permissions follow a standard schema pattern:
 
@@ -67,15 +67,7 @@ action(target)
 The supported actions, target format specifications, and matching
 algorithms are:
 
-| Action | Target Format | Matching Behavior | Default Fallback |  |  |
-|----|----|----|----|----|----|
-| **`read_file`** | `read_file(/path)`, `read_file(dir)`, or `read_file(*)` | Matches absolute paths or paths relative to workspace roots. Grants recursive read access to all contained files/folders. `read_file(*)` matches all files on the system. | **Ask** (Auto-allowed in workspace) |  |  |
-| **`write_file`** | `write_file(/path)` or `write_file(*)` | Same as `read_file`. Implicitly grants `read_file` for the exact same target path. | **Ask** (Auto-allowed in workspace) |  |  |
-| **`read_url`** | `read_url(domain)` or `read_url(*)` | Matches hostnames and subdomains (e.g., `google.com` covers `mail.google.com`). Ignores URL path segments. `read_url(*)` matches any domain. | **Ask** |  |  |
-| **`execute_url`** | `execute_url(domain)` or `execute_url(*)` | Actuating on web elements (clicking, typing) or driving interactive browser workflows on a domain. | **Ask** |  |  |
-| **`command`** | `command(prefix)`, `command(regex)`, or `command(*)` | Matches commands by exact word/token prefix. Each whitespace-separated token is evaluated as an anchored regular expression (`^(?:pattern)$`). E.g., \`command(npm run (build\\ | lint\\ | test))`matches`npm run build`and`npm run test\`. | **Ask** |
-| **`unsandboxed`** | `unsandboxed(prefix)` or `unsandboxed(*)` | Matches commands by exact word/token prefix. Commands matching this grant will be executed outside of container isolation (only applicable when terminal sandboxing is enabled). | **Ask** |  |  |
-| **`mcp`** | `mcp(server/tool)` or `mcp(*)` | Matches exact MCP tools or all tools on a specified server (applies to local `mcpl` servers and remote connections). `mcp(*)` matches any tool. | **Ask** |  |  |
+[TABLE]
 
 ### Global wildcard syntax[link](#global-wildcard-syntax)
 
@@ -101,7 +93,7 @@ forward slashes (`/`).
 
 ------------------------------------------------------------------------
 
-## Default system behaviors & guardrails[link](#default-system-behaviors-guardrails)
+## Default system behaviors & guardrails[link](#default-system-behaviors--guardrails)
 
 When an action is not explicitly listed in your `allow`, `deny`, or
 `ask` lists, the system falls back to secure system defaults:

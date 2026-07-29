@@ -18,14 +18,14 @@ extensionAntigravity SDK
 
 ## Antigravity 2.0
 
-[v2.4.2](https://antigravity.google/changelog?tab=hub "View Antigravity 2.0 Changelog")
+[v2.4.3](https://antigravity.google/changelog?tab=hub "View Antigravity 2.0 Changelog")
 
 ### macOS
 
 - [Download for Apple
-  Silicon](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/darwin-arm/Antigravity.dmg)
+  Silicon](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/darwin-arm/Antigravity.dmg)
 - [Download for
-  Intel](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/darwin-x64/Antigravity.dmg)
+  Intel](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/darwin-x64/Antigravity.dmg)
 
 Minimum Requirements
 
@@ -36,9 +36,9 @@ supported
 ### Windows
 
 - [Download for
-  x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/windows-x64/Antigravity-x64.exe)
+  x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/windows-x64/Antigravity-x64.exe)
 - [Download for
-  ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/windows-arm/Antigravity-arm64.exe)
+  ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/windows-arm/Antigravity-arm64.exe)
 
 Minimum Requirements
 
@@ -47,9 +47,9 @@ Windows 10 (64 bit)
 ### Linux
 
 - [Download for
-  x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/linux-x64/Antigravity.tar.gz)
+  x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/linux-x64/Antigravity.tar.gz)
 - [Download for
-  ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.2-6711062033203200/linux-arm/Antigravity.tar.gz)
+  ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.4.3-4510119262814208/linux-arm/Antigravity.tar.gz)
 
 Minimum Requirements
 
@@ -58,7 +58,7 @@ glibc \>= 2.28, glibcxx \>= 3.4.25 (e.g. Ubuntu 20. Debian 10, Fedora
 
 ## Antigravity CLI
 
-[v1.1.7](https://antigravity.google/changelog?tab=cli "View Antigravity CLI Changelog")
+[v1.1.8](https://antigravity.google/changelog?tab=cli "View Antigravity CLI Changelog")
 
 Work with Antigravity directly in your codebase. Build, debug, and ship
 from your terminal. Describe what you need, and Antigravity handles the
