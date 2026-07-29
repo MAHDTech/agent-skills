@@ -334,7 +334,7 @@ When the Agent receives this notification, it **SHOULD** stop all language model
 
 After all ongoing operations have been successfully aborted and pending updates have been sent, the Agent **MUST** respond to the original `session/prompt` request with the `cancelled` [stop reason](#stop-reasons).
 
-<Warning>
+\<Warning\>
   API client libraries and tools often throw an exception when their operation is aborted, which may propagate as an error response to `session/prompt`.
 
   Clients often display unrecognized errors from the Agent to the user, which would be undesirable for cancellations as they aren't considered errors.

@@ -5507,7 +5507,7 @@ When the resolved directory is inside the project root, no extra component is ad
 
 **Examples**:
 
-- `"../worktrees"` — `~/code/worktrees/<project>/` (default)
+- `"../worktrees"` — `~/code/worktrees/\<project\>/` (default)
 - `".git/zed-worktrees"` — `<project>/.git/zed-worktrees/`
 - `"my-worktrees"` — `<project>/my-worktrees/`
 

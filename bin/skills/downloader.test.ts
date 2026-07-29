@@ -27,11 +27,18 @@ const {
     isLlmsIndexUrl,
     isNonTextUrl,
     isNonTextContentType,
+    decodeHtmlEntities,
+    escapeOrphanTypeBrackets,
+    protectZolaDelimiters,
+    sanitizeControlCharacters,
+    normalizeMarkdownFormatting,
 } = await import("./downloader.ts")
 
 describe("isNonTextUrl & isNonTextContentType", () => {
     it("identifies binary and media file extensions", () => {
-        expect(isNonTextUrl("https://v2.tauri.app/_astro/image.webp")).toBe(true)
+        expect(isNonTextUrl("https://v2.tauri.app/_astro/image.webp")).toBe(
+            true
+        )
         expect(isNonTextUrl("https://example.com/logo.png")).toBe(true)
         expect(isNonTextUrl("https://example.com/diagram.svg")).toBe(true)
         expect(isNonTextUrl("https://example.com/doc.pdf")).toBe(true)
@@ -52,6 +59,50 @@ describe("isNonTextUrl & isNonTextContentType", () => {
         expect(isNonTextContentType("text/html; charset=utf-8")).toBe(false)
         expect(isNonTextContentType("text/markdown")).toBe(false)
         expect(isNonTextContentType("text/plain")).toBe(false)
+    })
+})
+
+describe("Markdown Post-Processing Helpers", () => {
+    it("decodes HTML entities in text and code blocks", () => {
+        expect(decodeHtmlEntities("array&lt;string&gt;")).toBe("array<string>")
+        expect(
+            decodeHtmlEntities("&quot;hello&quot; &amp; &apos;world&apos;")
+        ).toBe("\"hello\" & 'world'")
+        expect(decodeHtmlEntities("double &amp;#x26; entity")).toBe(
+            "double &#x26; entity"
+        )
+    })
+
+    it("escapes orphan type annotation brackets outside code fences", () => {
+        const input = "List of (array<string>, required)\n```\n<string>\n```"
+        const output = escapeOrphanTypeBrackets(input)
+        expect(output).toBe(
+            "List of (array\\<string\\>, required)\n```\n<string>\n```"
+        )
+    })
+
+    it("wraps raw Zola template tags in {% raw %} blocks", () => {
+        expect(protectZolaDelimiters("Hello {{ name }}")).toBe(
+            "{% raw %}\nHello {{ name }}\n{% endraw %}"
+        )
+        expect(
+            protectZolaDelimiters("{% raw %}Hello {{ name }}{% endraw %}")
+        ).toBe("{% raw %}Hello {{ name }}{% endraw %}")
+        expect(protectZolaDelimiters("Plain text")).toBe("Plain text")
+    })
+
+    it("strips null bytes, control characters, and U+FFFD", () => {
+        expect(sanitizeControlCharacters("hello\x00world\uFFFD\x07")).toBe(
+            "helloworld"
+        )
+    })
+
+    it("normalizes markdown formatting and empty link syntax", () => {
+        const input =
+            "Text [link]() and [anchor](#)\n```js\nconst x = 1\n```\nMore text"
+        const expected =
+            "Text link and anchor\n```js\nconst x = 1\n```\nMore text"
+        expect(normalizeMarkdownFormatting(input)).toBe(expected)
     })
 })
 

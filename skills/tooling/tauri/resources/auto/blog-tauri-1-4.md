@@ -145,11 +145,6 @@ security relevant changes.
     external security audit would create false impressions.
     [↩](#user-content-fnref-1)
 
-[Tauri Board Elections & Governance
-Update](https://v2.tauri.app/blog/tauri-board-elections-and-governance-updates/)
-
-[Announcing Tauri 1.3.0](https://v2.tauri.app/blog/tauri-1-3/)
-
 ------------------------------------------------------------------------
 
 [Support on Open Collective](https://opencollective.com/tauri)[Sponsor

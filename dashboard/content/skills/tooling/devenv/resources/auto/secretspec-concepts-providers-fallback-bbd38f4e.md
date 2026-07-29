@@ -21,7 +21,7 @@ SecretSpec selects each secret’s route in this order:
 1.  The `--provider` command-line option.
 2.  The `SECRETSPEC_PROVIDER` environment variable.
 3.  The secret’s effective `providers` list after profile inheritance
-    and `[profiles.<name>.defaults]` are applied.
+    and `[profiles.\<name\>.defaults]` are applied.
 4.  The default provider in the user configuration.
 
 `--provider` and `SECRETSPEC_PROVIDER` replace the configured route for

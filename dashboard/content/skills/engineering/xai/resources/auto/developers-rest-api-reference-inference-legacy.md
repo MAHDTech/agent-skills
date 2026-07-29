@@ -36,7 +36,7 @@ skill_name = "xai"
 
 * `presence_penalty` (number | null) — (Not supported by \`grok-3\` and reasoning models) Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
 
-* `prompt` (string | array\<string>)
+* `prompt` (string | array\\<string\>)
 
 * `seed` (integer | null) — If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system\_fingerprint response parameter to monitor changes in the backend.
 
@@ -58,7 +58,7 @@ skill_name = "xai"
 
 ### Response Body
 
-* `choices` (array\<object>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
+* `choices` (array\\<object\>, required) — A list of response choices from the model. The length corresponds to the \`n\` in request body (default to 1).
 
   * `finish_reason` (string, required) — Finish reason. \`"stop"\` means the inference has reached a model-defined or user-supplied stop sequence in \`stop\`. \`"length"\` means the inference result has reached models' maximum allowed token length or user defined value in \`max\_tokens\`. \`"end\_turn"\` or \`null\` in streaming mode when the chunk is not the last.
 
@@ -170,9 +170,9 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 * `max_tokens` (integer) — The maximum number of tokens to generate before stopping. The model may stop before the max\_tokens when it reaches the stop sequence.
 
-* `messages` (array\<object>) — Input messages.
+* `messages` (array\\<object\>) — Input messages.
 
-  * `content` (string | array\<object | object | object | object | object | object>, required)
+  * `content` (string | array\\<object | object | object | object | object | object\>, required)
 
   * `role` (string, required) — The role that the message belongs to, \`"system"\` for system prompt, \`"user"\` for user prompt, and \`"assistant"\` for response from the model.
 
@@ -186,7 +186,7 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 * `stream` (boolean | null) — If set, partial message deltas will be sent. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a \`data: \[DONE]\` message.
 
-* `system` (string | array\<object>)
+* `system` (string | array\\<object\>)
 
 * `temperature` (number | null) — What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. It may not work well with reasoning models.
 
@@ -200,7 +200,7 @@ Create a messages response. This endpoint is compatible with the Anthropic API.
 
 ### Response Body
 
-* `content` (array\<object | object | object | object>, required) — Response message content.
+* `content` (array\\<object | object | object | object\>, required) — Response message content.
 
 * `id` (string, required) — Unique object identifier.
 

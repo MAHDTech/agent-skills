@@ -120,9 +120,4 @@ If encrypted files fit your workflow, keep using SOPS. Just recognize
 the boundary: encryption at rest is not an application secrets
 interface.
 
-[SecretSpec 0.17: Scopes, secrets caching, SOPS, age, and systemd
-credentials](https://secretspec.dev/blog/secretspec-0-17-scopes-secrets-caching-age-and-systemd-credentials/)
-
-[Secrets Don’t Belong in Config](https://secretspec.dev/blog/secrets-dont-belong-in-config/)
-
 {% endraw %}

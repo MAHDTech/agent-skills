@@ -31,8 +31,8 @@ Antigravity supports two types of skills:
 
 | Location                                          | Scope                   |
 |:--------------------------------------------------|:------------------------|
-| `<workspace-root>/.agents/skills/<skill-folder>/` | Workspace-specific      |
-| `~/.gemini/antigravity/skills/<skill-folder>/`    | Global (all workspaces) |
+| `<workspace-root>/.agents/skills/\<skill-folder\>/` | Workspace-specific      |
+| `~/.gemini/antigravity/skills/\<skill-folder\>/`    | Global (all workspaces) |
 
 **Workspace skills** are great for project-specific workflows, like your
 team’s deployment process or testing conventions.

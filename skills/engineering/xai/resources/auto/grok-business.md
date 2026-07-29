@@ -39,7 +39,7 @@ SOC 2 Type II HIPAA GDPR & CCPA SSO & SCIM
 
 Summarize our recent order forms and put them into a pitch deck
 
-Summarize our recent order for
+Summarize our recent order forms
 
 Fast
 
@@ -131,7 +131,7 @@ Use Connectors to integrate your tools, automate workflows, and make your workpl
 *   Read and update records end-to-end
 *   Bring your own MCP server
 
-Build an account plan for Enterprise prospects
+Build an account plan for Enterprise prospects in
 
 Fast
 
@@ -180,7 +180,7 @@ Draft campaign copy, subject lines, and landing page content that matches your b
 *   Leverages real-time knowledge from X
 *   Localization across markets, not just translation
 
-Create customer marketing campaigns using agen
+Create customer marketing campaigns using agent b
 
 Fast
 
@@ -334,11 +334,11 @@ Raw Data
 
 Charts
 
-Revise Q4 projections with 15
+Revise Q4 projections with 15% higher bookings
 
 Fast
 
-Build an account plan for Enterprise prospects
+Build an account plan for Enterprise prospects in
 
 Fast
 

@@ -64,7 +64,7 @@ Copy the generated `*.trycloudflare.com` URL and use it as the server URL in Gro
 
 > [!CAUTION]
 >
-> &#x20;Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
+>  Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
 
 ## Things to keep in mind
 

@@ -57,7 +57,7 @@ When using profiles, inheritance works as follows:
 ## Profile-Level Defaults
 
 To reduce repetition when multiple secrets in a profile share the same
-settings, use the `profiles.<name>.defaults` section:
+settings, use the `profiles.\<name\>.defaults` section:
 
 ```
 [providers]prod_vault = "onepassword://Production"keyring = "keyring://"
@@ -70,7 +70,7 @@ overridden. The precedence order is:
 
 1.  **Secret-level configuration** (highest priority) — explicit
     settings in the secret definition
-2.  **Profile defaults** — from `profiles.<name>.defaults`
+2.  **Profile defaults** — from `profiles.\<name\>.defaults`
 3.  **Profile inheritance** — inherited from default profile
 4.  **Global defaults** (lowest priority) — from CLI, environment, or
     global config

@@ -57,7 +57,3 @@ means a view will never see partial updates from concurrent reducers.
 Views can be subscribed to just like tables and will automatically
 update clients when underlying data changes, making them ideal for
 real-time computed data.
-
-- [Reducers](#reducers)
-- [Procedures](#procedures)
-- [Views](#views)

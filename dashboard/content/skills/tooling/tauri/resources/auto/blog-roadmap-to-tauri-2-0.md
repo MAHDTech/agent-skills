@@ -159,11 +159,6 @@ and [joining the GitHub Discussion for this
 post](https://github.com/tauri-apps/tauri-docs/discussions/1522). Happy
 building!
 
-[Announcing Tauri 1.5.0](https://v2.tauri.app/blog/tauri-1-5/)
-
-[Tauri Board Elections & Governance
-Update](https://v2.tauri.app/blog/tauri-board-elections-and-governance-updates/)
-
 ------------------------------------------------------------------------
 
 [Support on Open Collective](https://opencollective.com/tauri)[Sponsor

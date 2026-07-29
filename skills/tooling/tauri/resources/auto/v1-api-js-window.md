@@ -2464,7 +2464,7 @@ Remote URL or local file path to open.
 
 - URL such as `https://github.com/tauri-apps` is opened directly on a
   Tauri window.
-- data: URL such as `data:text/html,<html>...` is only supported with
+- data: URL such as `data:text/html,\<html\>...` is only supported with
   the `window-data-url` Cargo feature for the `tauri` dependency.
 - local file path or route such as `/path/to/page.html` or `/users` is
   appended to the application URL (the devServer URL on development, or
@@ -2655,31 +2655,3 @@ const monitor = primaryMonitor();
 **Returns:**
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](https://tauri.app/v1/api/js/window#monitor)
 \| `null`\>
-
-- [Window events](#window-events)
-- [Enumerations](#enumerations)
-  - [`UserAttentionType`](#userattentiontype)
-- [Classes](#classes)
-  - [`CloseRequestedEvent`](#closerequestedevent)
-  - [`LogicalPosition`](#logicalposition)
-  - [`LogicalSize`](#logicalsize)
-  - [`PhysicalPosition`](#physicalposition)
-  - [`PhysicalSize`](#physicalsize)
-  - [`WebviewWindow`](#webviewwindow)
-- [Interfaces](#interfaces)
-  - [`Monitor`](#monitor)
-  - [`ScaleFactorChanged`](#scalefactorchanged)
-  - [`WindowOptions`](#windowoptions)
-- [Type Aliases](#type-aliases)
-  - [`CursorIcon`](#cursoricon)
-  - [`FileDropEvent`](#filedropevent)
-  - [`Theme`](#theme-2)
-  - [`TitleBarStyle`](#titlebarstyle-1)
-- [Variables](#variables)
-  - [`appWindow`](#appwindow)
-- [Functions](#functions)
-  - [`availableMonitors`](#availablemonitors)
-  - [`currentMonitor`](#currentmonitor)
-  - [`getAll`](#getall)
-  - [`getCurrent`](#getcurrent)
-  - [`primaryMonitor`](#primarymonitor)

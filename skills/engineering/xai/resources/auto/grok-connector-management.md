@@ -51,5 +51,5 @@ If you lack permissions, contact your team admin to provision the connectors you
 
 > [!NOTE]
 >
-> &#x20;For white-glove support, Enterprise upgrades, or connector setup
+>  For white-glove support, Enterprise upgrades, or connector setup
 > assistance, contact xAI sales at .

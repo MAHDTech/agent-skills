@@ -482,7 +482,7 @@ Text, or streaming text if `follow` is supplied, containing log lines.
 Run a SQL query against a database.
 
 Accessible through the CLI as
-`spacetime sql <name_or_identity> <query>`.
+`spacetime sql \<name_or_identity\> <query>`.
 
 #### Optional Headers
 
@@ -520,19 +520,3 @@ The `rows` will be an array of [JSON-encoded
 
 Access routes defined by a database using [HTTP
 handlers](https://spacetimedb.com/docs/functions/http-handlers).
-
-- [At a glance](#at-a-glance)
-- [`POST /v1/database`](#post-v1database)
-- [`PUT /v1/database/:name_or_identity`](#put-v1databasename_or_identity)
-- [`GET /v1/database/:name_or_identity`](#get-v1databasename_or_identity)
-- [`DELETE /v1/database/:name_or_identity`](#delete-v1databasename_or_identity)
-- [`GET /v1/database/:name_or_identity/names`](#get-v1databasename_or_identitynames)
-- [`POST /v1/database/:name_or_identity/names`](#post-v1databasename_or_identitynames)
-- [`PUT /v1/database/:name_or_identity/names`](#put-v1databasename_or_identitynames)
-- [`GET /v1/database/:name_or_identity/identity`](#get-v1databasename_or_identityidentity)
-- [`GET /v1/database/:name_or_identity/subscribe`](#get-v1databasename_or_identitysubscribe)
-- [`POST /v1/database/:name_or_identity/call/:reducer`](#post-v1databasename_or_identitycallreducer)
-- [`GET /v1/database/:name_or_identity/schema`](#get-v1databasename_or_identityschema)
-- [`GET /v1/database/:name_or_identity/logs`](#get-v1databasename_or_identitylogs)
-- [`POST /v1/database/:name_or_identity/sql`](#post-v1databasename_or_identitysql)
-- [`ANY /v1/database/:name_or_identity/route/{*path}`](#any-v1databasename_or_identityroutepath)

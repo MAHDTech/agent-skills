@@ -127,7 +127,7 @@ tauri.conf.json
 - **obsoletes**: Lists the RPM dependencies that your application
   obsoletes.
 
-&nbsp;
+ 
 
 - **desktopTemplate**: Adds a custom desktop file to the package.
 

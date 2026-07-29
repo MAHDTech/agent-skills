@@ -109,7 +109,7 @@ Can be any **ONE** of the following types:
 
   [TABLE]
 
-&nbsp;
+ 
 
 - `{ "use": "isolation", "options": { "dir": string } }`: Isolation
   pattern. Recommended for security purposes.
@@ -313,7 +313,7 @@ Can be any **ONE** of the following types:
 
   [TABLE]
 
-&nbsp;
+ 
 
 - `{ "type": "downloadBootstrapper", "silent": boolean }`: Download the
   bootstrapper and run it. Requires an internet connection. Results in a
@@ -321,7 +321,7 @@ Can be any **ONE** of the following types:
 
   [TABLE]
 
-&nbsp;
+ 
 
 - `{ "type": "embedBootstrapper", "silent": boolean }`: Embed the
   bootstrapper and run it. Requires an internet connection. Increases
@@ -330,7 +330,7 @@ Can be any **ONE** of the following types:
 
   [TABLE]
 
-&nbsp;
+ 
 
 - `{ "type": "offlineInstaller", "silent": boolean }`: Embed the offline
   installer and run it. Does not require an internet connection.
@@ -338,7 +338,7 @@ Can be any **ONE** of the following types:
 
   [TABLE]
 
-&nbsp;
+ 
 
 - `{ "type": "fixedRuntime", "path": string }`: Embed a fixed webview2
   version and use it at runtime. Increases the installer size by around
@@ -803,52 +803,3 @@ The plugin configs holds a HashMap mapping a plugin name to its
 configuration object.
 
 Type: `object`
-
-- [File Formats](#file-formats)
-- [Platform-Specific Configuration](#platform-specific-configuration)
-- [Configuration Structure](#configuration-structure)
-  - [PackageConfig](#packageconfig)
-  - [TauriConfig](#tauriconfig)
-    - [PatternKind](#patternkind)
-    - [WindowConfig](#windowconfig)
-      - [WindowUrl](#windowurl)
-      - [Theme](#theme)
-      - [TitleBarStyle](#titlebarstyle)
-    - [CliConfig](#cliconfig)
-      - [CliArg](#cliarg)
-    - [BundleConfig](#bundleconfig)
-      - [BundleTarget](#bundletarget)
-      - [BundleResources](#bundleresources)
-      - [AppImageConfig](#appimageconfig)
-      - [DebConfig](#debconfig)
-      - [RpmConfig](#rpmconfig)
-      - [DmgConfig](#dmgconfig)
-      - [MacConfig](#macconfig)
-      - [WindowsConfig](#windowsconfig)
-    - [AllowlistConfig](#allowlistconfig)
-      - [FsAllowlistConfig](#fsallowlistconfig)
-      - [WindowAllowlistConfig](#windowallowlistconfig)
-      - [ShellAllowlistConfig](#shellallowlistconfig)
-      - [DialogAllowlistConfig](#dialogallowlistconfig)
-      - [HttpAllowlistConfig](#httpallowlistconfig)
-      - [NotificationAllowlistConfig](#notificationallowlistconfig)
-      - [GlobalShortcutAllowlistConfig](#globalshortcutallowlistconfig)
-      - [OsAllowlistConfig](#osallowlistconfig)
-      - [PathAllowlistConfig](#pathallowlistconfig)
-      - [ProtocolAllowlistConfig](#protocolallowlistconfig)
-      - [ProcessAllowlistConfig](#processallowlistconfig)
-      - [ClipboardAllowlistConfig](#clipboardallowlistconfig)
-      - [AppAllowlistConfig](#appallowlistconfig)
-    - [SecurityConfig](#securityconfig)
-      - [Csp](#csp)
-      - [DisabledCspModificationKind](#disabledcspmodificationkind)
-      - [RemoteDomainAccessScope](#remotedomainaccessscope)
-    - [UpdaterConfig](#updaterconfig)
-      - [UpdaterEndpoint](#updaterendpoint)
-      - [UpdaterWindowsConfig](#updaterwindowsconfig)
-    - [SystemTrayConfig](#systemtrayconfig)
-  - [BuildConfig](#buildconfig)
-    - [AppUrl](#appurl)
-    - [BeforeDevCommand](#beforedevcommand)
-    - [HookCommand](#hookcommand)
-  - [PluginConfig](#pluginconfig)

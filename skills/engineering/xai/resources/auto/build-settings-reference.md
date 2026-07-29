@@ -1,3 +1,4 @@
+{% raw %}
 #### Settings
 
 # Reference
@@ -88,7 +89,7 @@ Project `.grok/config.toml` only contributes **`[mcp_servers]`**, **`[plugins]`*
 | `hidden_models` | id list | Hide from the picker (still usable via `-m`). |
 | `disabled_models` | id list | Remove from the catalog (wins over hidden). |
 
-### `[model.<id>]`
+### `[model.\<id\>]`
 
 Custom / BYOK models (OpenAI-compatible or Anthropic Messages). Prefer `env_key` over hardcoding `api_key`.
 
@@ -109,7 +110,7 @@ Custom / BYOK models (OpenAI-compatible or Anthropic Messages). Prefer `env_key`
 | `stream_tool_calls` | `true` / `false` | Per-model tool-call streaming. |
 | `max_retries` / `inference_idle_timeout_secs` | numbers | Reliability. |
 
-### `[mcp_servers.<name>]`
+### `[mcp_servers.\<name\>]`
 
 String fields such as `url`, `command`, `args`, `env`, and `headers` support `${VAR}` expansion. Headers may also use `{{session_id}}`.
 
@@ -225,3 +226,4 @@ Project-scoped and user-scoped. Evaluation order: **deny > ask > allow**.
 | `disabled` | `[skills]` / `[plugins]` | name lists | Discover but do not activate. |
 | `enabled` | `[plugins]` | name lists | Explicitly enable plugins (project plugins may default off). |
 | `skills` / `rules` / `agents` / `mcps` / `hooks` | `[compat.cursor]` / `[compat.claude]` | `true` / `false` (default `true`) | Scan Cursor or Claude harness directories. |
+{% endraw %}

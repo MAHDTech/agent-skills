@@ -21,7 +21,7 @@ In this section, we explore advanced usage patterns for agentic tool calling, in
 
 > [!NOTE]
 >
-> &#x20;Advanced tool usage patterns are not yet supported in the Vercel AI SDK. Please use the xAI SDK or OpenAI SDK for this functionality.
+>  Advanced tool usage patterns are not yet supported in the Vercel AI SDK. Please use the xAI SDK or OpenAI SDK for this functionality.
 
 ## Mixing Server-Side and Client-Side Tools
 

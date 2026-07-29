@@ -372,16 +372,3 @@ pointing to the directory containing your module's project file
 If your client doesn't see new tables or reducers, ensure you've
 regenerated the bindings after updating your module. Generated code is
 not automatically updated when the module changes.
-
-- [What Are Module Bindings?](#what-are-module-bindings)
-- [Generating Bindings](#generating-bindings)
-- [What Gets Generated](#what-gets-generated)
-  - [Tables](#tables)
-  - [Reducers](#reducers)
-  - [Procedures](#procedures)
-  - [Views](#views)
-- [Regenerating Bindings](#regenerating-bindings)
-- [Using the Generated Code](#using-the-generated-code)
-- [Troubleshooting](#troubleshooting)
-  - [Missing module directory](#missing-module-directory)
-  - [Outdated bindings](#outdated-bindings)

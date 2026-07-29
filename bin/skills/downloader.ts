@@ -206,7 +206,9 @@ export async function download(
                 const contentType =
                     proxyResponse.headers.get("content-type") || ""
                 if (isNonTextContentType(contentType)) {
-                    log.info(`  Skipping non-text resource (${contentType}): ${url}`)
+                    log.info(
+                        `  Skipping non-text resource (${contentType}): ${url}`
+                    )
                     return {content: "", isHtml: false, skipped: true}
                 }
                 const rawContent = await proxyResponse.text()
@@ -283,6 +285,14 @@ export async function cleanHtml(htmlContent: string): Promise<string> {
                 el.remove()
             },
         })
+        .on(
+            ".toc, #toc, .table-of-contents, .on-this-page, .breadcrumbs, .pagination, .edit-on-github, .edit-this-page, .sidebar-nav",
+            {
+                element(el) {
+                    el.remove()
+                },
+            }
+        )
 
     const response = new Response(htmlContent, {
         headers: {"Content-Type": "text/html; charset=utf-8"},
@@ -449,7 +459,7 @@ export function isNonTextUrl(urlStr: string): boolean {
     } catch {}
 
     const NON_TEXT_EXT_RE =
-        /\.(zip|pdf|png|jpg|jpeg|gif|webp|svg|ico|bmp|avif|tar|gz|tgz|bz2|xz|exe|dmg|iso|bin|mp4|mp3|wav|ogg|webm|mov|avi|flv|m4a|m4v|woff|woff2|ttf|eot|otf)$/i
+        /\.(zip|pdf|png|jpg|jpeg|gif|webp|svg|ico|bmp|avif|tar|gz|tgz|bz2|xz|exe|dmg|iso|bin|mp4|mp3|wav|ogg|webm|mov|avi|flv|m4a|m4v|woff|woff2|ttf|eot|otf|xml|rss)$/i
     return NON_TEXT_EXT_RE.test(pathname)
 }
 
@@ -470,11 +480,128 @@ export function isNonTextContentType(contentType: string): boolean {
         type === "application/zip" ||
         type === "application/octet-stream" ||
         type === "application/x-tar" ||
-        type === "application/gzip"
+        type === "application/gzip" ||
+        type === "application/xml" ||
+        type === "application/rss+xml" ||
+        type === "application/atom+xml"
     ) {
         return true
     }
     return false
+}
+
+// Decode HTML entities in Markdown body text and code blocks
+export function decodeHtmlEntities(content: string): string {
+    return content
+        .replace(/&amp;(#?[a-zA-Z0-9]+;)/g, "&$1")
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&#x20;/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+}
+
+// Escape orphan angle brackets outside code blocks so Markdown parsers render type parameters as text
+export function escapeOrphanTypeBrackets(content: string): string {
+    const KNOWN_TAGS = new Set([
+        "br",
+        "hr",
+        "img",
+        "a",
+        "p",
+        "div",
+        "span",
+        "code",
+        "pre",
+        "b",
+        "i",
+        "strong",
+        "em",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "ul",
+        "ol",
+        "li",
+        "table",
+        "tr",
+        "td",
+        "th",
+        "blockquote",
+        "details",
+        "summary",
+        "section",
+        "article",
+        "main",
+        "header",
+        "footer",
+        "nav",
+        "aside",
+    ])
+
+    const lines = content.split("\n")
+    let inCodeFence = false
+    const processedLines: string[] = []
+
+    for (const line of lines) {
+        if (line.trim().startsWith("```")) {
+            inCodeFence = !inCodeFence
+            processedLines.push(line)
+            continue
+        }
+        if (inCodeFence) {
+            processedLines.push(line)
+            continue
+        }
+
+        const fixed = line.replace(
+            /(?<!`)<([a-zA-Z0-9_\-|\s,]+)>(?!`)/g,
+            (match, inner) => {
+                const tagLower = inner.toLowerCase().trim()
+                if (
+                    KNOWN_TAGS.has(tagLower) ||
+                    tagLower.startsWith("http://") ||
+                    tagLower.startsWith("https://")
+                ) {
+                    return match
+                }
+                return "\\<" + inner.trim() + "\\>"
+            }
+        )
+        processedLines.push(fixed)
+    }
+
+    return processedLines.join("\n")
+}
+
+// Wrap document content containing raw {{ or {% in Zola {% raw %} blocks to prevent Tera template build errors
+export function protectZolaDelimiters(content: string): string {
+    if (/\{\{|\{%/.test(content) && !content.includes("{% raw %}")) {
+        return `{% raw %}\n${content}\n{% endraw %}`
+    }
+    return content
+}
+
+// Strip non-printable control characters, null bytes (\x00), and replacement characters (\uFFFD)
+export function sanitizeControlCharacters(content: string): string {
+    return (
+        content
+            // eslint-disable-next-line no-control-regex
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+            .replace(/\uFFFD/g, "")
+    )
+}
+
+// Normalize markdown formatting and clean up empty links
+export function normalizeMarkdownFormatting(content: string): string {
+    return content
+        .replace(/\[([^\]]*)\]\(\)/g, "$1")
+        .replace(/\[([^\]]*)\]\(#\)/g, "$1")
 }
 
 // Check if a URL matches an llms.txt index or sub-index pattern
@@ -886,7 +1013,9 @@ export async function downloadAction(
                                 options?.timeout
                             )
                             if (result.skipped) {
-                                log.info(`  [SKIP] Skipped non-text resource: ${candidate}`)
+                                log.info(
+                                    `  [SKIP] Skipped non-text resource: ${candidate}`
+                                )
                                 totalSkipped++
                                 return
                             }
@@ -909,7 +1038,9 @@ export async function downloadAction(
                 if (!content) {
                     const result = await download(job.url, options?.timeout)
                     if (result.skipped) {
-                        log.info(`  [SKIP] Skipped non-text resource: ${job.url}`)
+                        log.info(
+                            `  [SKIP] Skipped non-text resource: ${job.url}`
+                        )
                         totalSkipped++
                         return
                     }
@@ -950,11 +1081,6 @@ export async function downloadAction(
                         return
                     }
                 }
-
-                // Clean up empty markdown links that cause Zola build failures (e.g. [text]())
-                finalContent = finalContent
-                    .replace(/\[([^\]]*)\]\(\)/g, "$1")
-                    .replace(/\[([^\]]*)\]\(#\)/g, "$1")
 
                 // Rewrite root-relative links, relative links, and relative asset paths to be absolute or resolved
                 try {
@@ -1017,6 +1143,13 @@ export async function downloadAction(
                 } catch {
                     // Ignore invalid job URLs
                 }
+
+                // Apply automated Markdown scrubbing, decoding, escaping, and formatting passes
+                finalContent = sanitizeControlCharacters(finalContent)
+                finalContent = decodeHtmlEntities(finalContent)
+                finalContent = escapeOrphanTypeBrackets(finalContent)
+                finalContent = normalizeMarkdownFormatting(finalContent)
+                finalContent = protectZolaDelimiters(finalContent)
 
                 await fs.writeFile(job.destFile, finalContent, "utf-8")
                 savedFiles.add(path.basename(job.destFile))

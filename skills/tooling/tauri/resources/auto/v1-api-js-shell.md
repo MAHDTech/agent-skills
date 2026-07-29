@@ -813,18 +813,3 @@ await open('/path/to/file');
 
 **Returns:**
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
-
-- [Security](#security)
-  - [Restricting access to the `open`
-    API](#restricting-access-to-the-open-api)
-  - [Restricting access to the `Command`
-    APIs](#restricting-access-to-the-command-apis)
-- [Classes](#classes)
-  - [`Child`](#child)
-  - [`Command`](#command)
-  - [`EventEmitter<E>`](#eventemittere)
-- [Interfaces](#interfaces)
-  - [`ChildProcess`](#childprocess)
-  - [`SpawnOptions`](#spawnoptions)
-- [Functions](#functions)
-  - [`open`](#open)

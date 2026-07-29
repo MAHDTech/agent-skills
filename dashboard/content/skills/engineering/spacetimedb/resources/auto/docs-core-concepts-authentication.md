@@ -117,11 +117,4 @@ views and procedures via the context.
 for more information on how to access and use authentication claims in
 your module:
 
-- [Server-issued tokens and
-  reconnects](#server-issued-tokens-and-reconnects)
-- [SpacetimeAuth](#spacetimeauth)
-- [Third-party OIDC providers](#third-party-oidc-providers)
-- [Authenticate your services](#authenticate-your-services)
-- [Authorization in your module](#authorization-in-your-module)
-
 {% endraw %}

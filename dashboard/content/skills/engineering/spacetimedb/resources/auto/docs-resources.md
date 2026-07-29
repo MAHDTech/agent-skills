@@ -62,7 +62,4 @@ Detailed technical references.
   - [SATS JSON](https://spacetimedb.com/docs/sats-json) - JSON serialization format
   - [BSATN](https://spacetimedb.com/docs/bsatn) - Binary serialization format
 
-- [How-To Guides](#how-to-guides)
-- [Reference Documentation](#reference-documentation)
-
 {% endraw %}

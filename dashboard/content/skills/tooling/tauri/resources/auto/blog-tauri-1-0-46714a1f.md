@@ -411,9 +411,6 @@ What is your proudest moment/contribution with Tauri?
 > Published wry crate and particular in this commit:
 > <https://github.com/tauri-apps/wry/commit/722e1212a4795f5f81638667cbd31bc53a5d27ed>
 
-[Tauri Programme Turns 1 and Board
-Elections](https://v2.tauri.app/blog/tauri-programme-turns-1-and-board-elections/)
-
 ------------------------------------------------------------------------
 
 [Support on Open Collective](https://opencollective.com/tauri)[Sponsor

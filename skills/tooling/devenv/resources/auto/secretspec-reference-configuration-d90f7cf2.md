@@ -284,7 +284,7 @@ Behavior:
   changes which secrets are in play, never the semantics of one it
   admits. This is what lets a single scope be reused across profiles
   that declare different subsets.
-- Under project `extends`, a child `[scopes.<name>]` **replaces** the
+- Under project `extends`, a child `[scopes.\<name\>]` **replaces** the
   parent scope of the same name outright — the two `secrets` lists are
   not unioned (see [Configuration Inheritance](https://secretspec.dev/concepts/inheritance/)).
 - Selecting an undefined scope, or a scope that lists a secret no

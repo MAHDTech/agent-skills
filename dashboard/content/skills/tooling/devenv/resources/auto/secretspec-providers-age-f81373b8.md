@@ -23,7 +23,7 @@ recipients.
 |  |  |
 |----|----|
 | Provider | `age` |
-| URI | `age://<path>[?options]` |
+| URI | `age://\<path\>[?options]` |
 | Access | Read and write |
 | Best for | Encrypted secrets committed alongside code |
 | Authentication | An age identity (private key) |

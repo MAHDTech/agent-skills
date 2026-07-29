@@ -247,7 +247,7 @@ are exported. All others have been moved to plugins.
 
 The v1 plugins are now published as `@tauri-apps/plugin-<plugin-name>`.
 Previously they were available from git as
-`tauri-plugin-<plugin-name>-api`.
+`tauri-plugin-\<plugin-name\>-api`.
 
 ### Environment Variables Changes
 

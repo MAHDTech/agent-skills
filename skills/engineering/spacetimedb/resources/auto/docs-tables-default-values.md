@@ -152,7 +152,3 @@ const badTable = table(
   have been tracked historically
 - **Feature flags**: Add boolean columns with `default(false)` to enable
   new functionality gradually
-
-- [Defining Default Values](#defining-default-values)
-- [Restrictions](#restrictions)
-- [Use Cases](#use-cases)

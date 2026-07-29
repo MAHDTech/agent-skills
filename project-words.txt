@@ -6,6 +6,7 @@ Anthropic
 Antigravity
 antigravitycli
 antipatterns
+apos
 arcsize
 basenames
 blockquotes

@@ -29,7 +29,7 @@ The protocol follows the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) s
 
 A typical flow follows this pattern:
 
-<Steps>
+\<Steps\>
   <Step title="Initialization Phase">
     * Client → Agent: `initialize` to establish connection
     * Client → Agent: `authenticate` if required by the Agent

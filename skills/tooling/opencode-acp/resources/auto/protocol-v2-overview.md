@@ -23,7 +23,7 @@ handling requirements.
 
 A typical flow follows this pattern:
 
-<Steps>
+\<Steps\>
   <Step title="Initialization Phase">
     * Client → Agent: `initialize` to establish connection
     * Client → Agent: `auth/login` if required by the Agent

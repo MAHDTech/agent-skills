@@ -220,15 +220,3 @@ conform.
 indices into a typespace, like the one returned by the
 [`GET /v1/database/:name_or_identity/schema` HTTP
 endpoint](https://spacetimedb.com/docs/http/database#get-v1databasename_or_identityschema).
-
-- [Values](#values)
-  - [At a glance](#at-a-glance)
-  - [`AlgebraicValue`](#algebraicvalue)
-  - [`SumValue`](#sumvalue)
-  - [`ProductValue`](#productvalue)
-  - [`BuiltinValue`](#builtinvalue)
-- [Types](#types)
-  - [At a glance](#at-a-glance-1)
-  - [`ProductType`](#producttype)
-  - [`BuiltinType`](#builtintype)
-  - [`AlgebraicTypeRef`](#algebraictyperef)

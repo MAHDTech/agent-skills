@@ -1,3 +1,4 @@
+{% raw %}
 # Windows Code Signing
 
 Code signing is required on Windows to allow your application to be
@@ -320,3 +321,5 @@ and configure your environment variables.
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

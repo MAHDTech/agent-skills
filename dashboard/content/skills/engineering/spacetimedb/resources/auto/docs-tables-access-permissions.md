@@ -927,16 +927,4 @@ directly. See the [Subscriptions
 documentation](https://spacetimedb.com/docs/clients/subscriptions) for details on client-side
 table access.
 
-- [Public and Private Tables](#public-and-private-tables)
-- [Reducers - Read-Write Access](#reducers---read-write-access)
-- [Procedures with Transactions - Read-Write
-  Access](#procedures-with-transactions---read-write-access)
-- [Views - Read-Only Access](#views---read-only-access)
-- [Using Views for Fine-Grained Access
-  Control](#using-views-for-fine-grained-access-control)
-  - [Filtering Rows by Caller](#filtering-rows-by-caller)
-  - [Hiding Sensitive Columns](#hiding-sensitive-columns)
-  - [Combining Both Techniques](#combining-both-techniques)
-- [Client Access - Read-Only Access](#client-access---read-only-access)
-
 {% endraw %}

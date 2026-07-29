@@ -39,7 +39,7 @@ is provisioned at the image/host level, not by Composer). Install it one
 of three ways:
 
 - **Prebuilt binary** — download the
-  `secretspec-php-native-<php>-nts-<target>` shared object for your PHP
+  `secretspec-php-native-\<php\>-nts-<target>` shared object for your PHP
   version and platform from the [GitHub
   release](https://github.com/cachix/secretspec/releases), then enable
   it in `php.ini`:

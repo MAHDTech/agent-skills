@@ -16,7 +16,7 @@ skill_name = "opencode-acp"
 
 > How the ACP project is governed
 
-<Note>
+\<Note\>
   <p>
     The following is an interim governance model to provide clearer roles and
     responsibilities between the various parties collaborating on ACP.

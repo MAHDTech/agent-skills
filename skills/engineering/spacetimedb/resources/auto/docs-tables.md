@@ -612,21 +612,3 @@ See [Schedule Tables](https://spacetimedb.com/docs/tables/schedule-tables) for d
   execution
 - [Performance](https://spacetimedb.com/docs/tables/performance) - Best practices for table
   design
-
-- [Why Tables](#why-tables)
-  - [Tables and Data-Oriented Design](#tables-and-data-oriented-design)
-  - [Physical and Logical
-    Independence](#physical-and-logical-independence)
-  - [Table Decomposition](#table-decomposition)
-- [Defining Tables](#defining-tables)
-  - [Creating the schema (TypeScript)](#creating-the-schema-typescript)
-- [Table Naming and Accessors](#table-naming-and-accessors)
-  - [How Accessor Names Are Derived](#how-accessor-names-are-derived)
-  - [Recommended Naming Conventions](#recommended-naming-conventions)
-- [Table Visibility](#table-visibility)
-- [Multiple Tables for the Same
-  Type](#multiple-tables-for-the-same-type)
-- [Constraints](#constraints)
-- [Auto-Increment](#auto-increment)
-- [Schedule Tables](#schedule-tables)
-- [Next Steps](#next-steps)

@@ -84,7 +84,7 @@ Security boundaries remain explicit: declared roots communicate intended scope, 
 
 #### Non-goals
 
-* Defining any required directory names or layouts, such as `.agents/`, `skills/`, or `.<agent>/`.
+* Defining any required directory names or layouts, such as `.agents/`, `skills/`, or `.\<agent\>/`.
 * Defining a standard instruction, skill, or configuration file format.
 * Replacing `cwd` with a list-valued field.
 * Changing relative-path semantics.

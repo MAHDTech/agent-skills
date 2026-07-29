@@ -6,7 +6,7 @@
 
 > Switch between different agent operating modes
 
-<Note>
+\<Note\>
   You can now use [Session Config Options](https://agentclientprotocol.com/protocol/v1/session-config-options).
   Dedicated session mode methods will be removed in a future version of the
   protocol. Until then, you can offer both to clients for backwards

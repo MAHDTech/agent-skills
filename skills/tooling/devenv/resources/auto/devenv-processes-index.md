@@ -116,7 +116,7 @@ See [Dependency states](https://devenv.sh/tasks/#dependency-states) for the full
 
 Setup tasks that run after a process
 
-`devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** tasks that run *after* it. A setup or configure task wired downstream of a process — e.g. `processes.<name>.before = [ "devenv:<name>:configure" ]` — is skipped under `devenv up` and never runs. Use `devenv up --mode all`, or see [Processes as tasks](https://devenv.sh/tasks/#processes-as-tasks) for details.
+`devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** tasks that run *after* it. A setup or configure task wired downstream of a process — e.g. `processes.\<name\>.before = [ "devenv:\<name\>:configure" ]` — is skipped under `devenv up` and never runs. Use `devenv up --mode all`, or see [Processes as tasks](https://devenv.sh/tasks/#processes-as-tasks) for details.
 
 ## Using Pre-built Services
 
@@ -372,7 +372,7 @@ New in devenv 2.0
 
 Devenv can automatically allocate free ports for your processes, preventing conflicts when a port is already in use or when running multiple devenv projects simultaneously.
 
-Define ports using `ports.<name>.allocate` with a base port number. Devenv will find a free port starting from that base, incrementing until one is available:
+Define ports using `ports.\<name\>.allocate` with a base port number. Devenv will find a free port starting from that base, incrementing until one is available:
 
 devenv.nix
 
@@ -392,7 +392,7 @@ devenv.nix
 }
 ```
 
-The resolved port is available via `config.processes.<name>.ports.<port>.value`. If port 8080 is already in use, devenv will automatically try 8081, 8082, and so on until it finds an available port.
+The resolved port is available via `config.processes.\<name\>.ports.\<port\>.value`. If port 8080 is already in use, devenv will automatically try 8081, 8082, and so on until it finds an available port.
 
 Devenv holds the allocated ports during configuration evaluation to prevent race conditions, then releases them just before starting the processes so your application can bind to them.
 

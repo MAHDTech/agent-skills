@@ -181,7 +181,7 @@ Authentication RFD](rfds-auth-methods.md) for the terminal flow.
    * CI validates manifests on every PR: schema compliance, slug uniqueness, icon format (16×16 SVG, monochrome `currentColor`), URL accessibility for all distribution URLs, authentication support via ACP handshake, and binary OS coverage.
    * Push to `main` triggers a build that aggregates all entries into `registry.json` and publishes versioned + `latest` GitHub releases.
 3. **Aggregated outputs**:
-   * `registry.json`: deterministic list of all agents with icons copied to `dist/<id>.svg`.
+   * `registry.json`: deterministic list of all agents with icons copied to `dist/\<id\>.svg`.
 4. **Distribution & search**:
    * Clients fetch `registry.json` from `https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json`.
    * Static site offers filters for deployment model, license, and distribution type.

@@ -170,11 +170,4 @@ becomes remarkably simple:
 
 This is the Zen of SpacetimeDB: a simpler way to build and live.
 
-- [Everything is a Table](#everything-is-a-table)
-- [Everything is Persistent](#everything-is-persistent)
-- [Everything is Real-Time](#everything-is-real-time)
-- [Everything is Transactional](#everything-is-transactional)
-- [Everything is Programmable](#everything-is-programmable)
-- [The Result](#the-result)
-
 {% endraw %}

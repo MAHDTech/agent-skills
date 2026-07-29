@@ -479,7 +479,7 @@ Example HTTP transport configuration:
 
 When the Agent supports `mcpCapabilities.sse`, Clients can specify MCP servers configurations using the SSE transport.
 
-<Warning>This transport was deprecated by the MCP spec.</Warning>
+\<Warning\>This transport was deprecated by the MCP spec.</Warning>
 
 <ParamField path="type" type="string" required>
   Must be `"sse"` to indicate SSE transport

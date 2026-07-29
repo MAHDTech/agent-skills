@@ -61,10 +61,6 @@ website](https://v2.tauri.app).
   how to cross compile OpenSSL on Windows.
 - Currently running on a device is not supported when using Xcode 14.
 
-[Migration to webkit2gtk-4.1 on Linux port](https://v2.tauri.app/blog/tauri-2-0-0-alpha-3/)
-
-[Announcing Tauri 1.2.0](https://v2.tauri.app/blog/tauri-1-2/)
-
 ------------------------------------------------------------------------
 
 [Support on Open Collective](https://opencollective.com/tauri)[Sponsor

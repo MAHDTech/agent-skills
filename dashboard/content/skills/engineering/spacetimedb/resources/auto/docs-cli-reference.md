@@ -403,7 +403,7 @@ subject to breaking changes.
 Rename a database
 
 **Usage:**
-`spacetime rename [OPTIONS] --to <new-name> <database-identity>`
+`spacetime rename [OPTIONS] --to \<new-name\> <database-identity>`
 
 Run `spacetime rename --help` for more detailed information.
 
@@ -426,7 +426,7 @@ Run `spacetime rename --help` for more detailed information.
 Generate client files for a spacetime module.
 
 **Usage:**
-`spacetime generate [DATABASE] --lang <LANG> [--module-path <DIR> | --bin-path <PATH> | --js-path <PATH>] [--out-dir <DIR> | --uproject-dir <DIR>] [--unreal-module-name <MODULE_NAME>] [OPTIONS]`
+`spacetime generate [DATABASE] --lang \<LANG\> [--module-path \<DIR\> | --bin-path \<PATH\> | --js-path \<PATH\>] [--out-dir \<DIR\> | --uproject-dir \<DIR\>] [--unreal-module-name \<MODULE_NAME\>] [OPTIONS]`
 
 Run `spacetime help generate` for more detailed information.
 
@@ -627,7 +627,7 @@ Set the default server for future operations
 
 Add a new server configuration
 
-**Usage:** `spacetime server add [OPTIONS] --url <url> <name>`
+**Usage:** `spacetime server add [OPTIONS] --url \<url\> <name>`
 
 ###### **Arguments:**
 
@@ -803,34 +803,5 @@ Run `spacetime version --help` to see all options.
 
 This document was generated automatically by
 [`clap-markdown`](https://crates.io/crates/clap-markdown).
-
-- [`spacetime`](#spacetime)
-- [`spacetime publish`](#spacetime-publish)
-- [`spacetime delete`](#spacetime-delete)
-- [`spacetime logs`](#spacetime-logs)
-- [`spacetime call`](#spacetime-call)
-- [`spacetime describe`](#spacetime-describe)
-- [`spacetime dev`](#spacetime-dev)
-- [`spacetime sql`](#spacetime-sql)
-- [`spacetime rename`](#spacetime-rename)
-- [`spacetime generate`](#spacetime-generate)
-- [`spacetime list`](#spacetime-list)
-- [`spacetime login`](#spacetime-login)
-- [`spacetime login show`](#spacetime-login-show)
-- [`spacetime logout`](#spacetime-logout)
-- [`spacetime init`](#spacetime-init)
-- [`spacetime build`](#spacetime-build)
-- [`spacetime server`](#spacetime-server)
-- [`spacetime server list`](#spacetime-server-list)
-- [`spacetime server set-default`](#spacetime-server-set-default)
-- [`spacetime server add`](#spacetime-server-add)
-- [`spacetime server remove`](#spacetime-server-remove)
-- [`spacetime server fingerprint`](#spacetime-server-fingerprint)
-- [`spacetime server ping`](#spacetime-server-ping)
-- [`spacetime server edit`](#spacetime-server-edit)
-- [`spacetime server clear`](#spacetime-server-clear)
-- [`spacetime subscribe`](#spacetime-subscribe)
-- [`spacetime start`](#spacetime-start)
-- [`spacetime version`](#spacetime-version)
 
 {% endraw %}

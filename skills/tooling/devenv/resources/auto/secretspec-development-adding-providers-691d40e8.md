@@ -104,7 +104,7 @@ When adding a provider for an upcoming release:
 
 Update every provider location; names otherwise drift out of sync:
 
-1.  `docs/src/content/docs/providers/<provider>.md`
+1.  `docs/src/content/docs/providers/\<provider\>.md`
 2.  `docs/astro.config.ts` — sidebar and `starlightLlmsTxt` provider
     summary
 3.  `docs/src/content/docs/concepts/providers.md` — available providers

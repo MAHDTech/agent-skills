@@ -332,7 +332,7 @@ on the Key ID column on that table. You also need to download the
 private key, which can only be done once and is only visible after a
 page reload (the button is shown on the table row for the newly created
 key). The private key file path must be saved as
-`AuthKey\_<APPLE_API_KEY_ID>.p8` in one of these
+`AuthKey\_\<APPLE_API_KEY_ID\>.p8` in one of these
 directories:`<current-working-directory>/private_keys`,
 `~/private_keys`, `~/.private_keys`or`~/.appstoreconnect/private_keys`.
 

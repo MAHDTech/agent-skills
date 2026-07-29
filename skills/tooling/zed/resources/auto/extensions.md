@@ -82,7 +82,7 @@ Catppuccin
 
 Dockerfile
 
-919k
+920k
 
 Dockerfile support.
 
@@ -92,7 +92,7 @@ d1y, joshmeads
 
 SQL
 
-733k
+734k
 
 SQL language support.
 
@@ -102,7 +102,7 @@ nervenes, notpeter, phileix, tammyxiong
 
 PHP
 
-665k
+667k
 
 PHP support.
 
@@ -112,7 +112,7 @@ Piotr Osiewicz
 
 Vue
 
-635k
+636k
 
 Vue support.
 
@@ -273,7 +273,7 @@ Abdullah Alsigar, Flo, ybbond, nielsenko
 
 Swift
 
-261k
+262k
 
 Swift support.
 
@@ -303,7 +303,7 @@ Alvaro Gaona, 0xk1f0
 
 Github Theme
 
-239k
+240k
 
 GitHub themes for Zed
 

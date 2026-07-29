@@ -30,7 +30,7 @@ files. They can be defined in two locations:
 
 - Global sidecars: Under `~/.gemini/config/sidecars/`
 - Plugin sidecars: Under
-  `~/.gemini/config/plugins/<pluginName>/sidecars/`
+  `~/.gemini/config/plugins/\<pluginName\>/sidecars/`
 
 Each sidecar has its own directory and the directory name is used as the
 sidecar’s ID. Sidecars loaded from plugins have the ID
@@ -143,7 +143,7 @@ content_copy
 ### Runtime Data[link](#runtime-data)
 
 Runtime data produced by sidecars are stored in
-`~/.gemini/antigravity/sidecar_data/<sidecarId>/`.
+`~/.gemini/antigravity/sidecar_data/\<sidecarId\>/`.
 
 This includes:
 
@@ -185,7 +185,7 @@ and available as `agentapi`.
 
 - `agentapi new-conversation <prompt>`  
   Sidecars creating conversations must have a `projectId` set.
-- `agentapi send-message <conversation_id> <prompt>`
+- `agentapi send-message \<conversation_id\> <prompt>`
 
 On this Page
 

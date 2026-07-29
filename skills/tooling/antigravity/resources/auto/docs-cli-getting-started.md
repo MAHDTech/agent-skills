@@ -48,7 +48,7 @@ Complete the following sequential steps to launch your first session:
     platform-specific directory:
 
     - **macOS / Linux**: `~/.local/bin/agy`
-    - **Windows**: `C:\Users\<Username>\AppData\Local\agy\bin` (where
+    - **Windows**: `C:\Users\\<Username\>\AppData\Local\agy\bin` (where
       `<Username>` represents your active Windows profile name).
 
     info

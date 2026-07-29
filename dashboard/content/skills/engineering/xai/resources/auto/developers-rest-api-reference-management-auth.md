@@ -29,7 +29,7 @@ them.
 
 * `name` (string, required) — Human-readable name for the API key. Should not be empty.
 
-* `acls` (array\<string>) — By default API keys don't have access to anything. In order to actually use an API key, you
+* `acls` (array\\<string\>) — By default API keys don't have access to anything. In order to actually use an API key, you
   must grant it access to (1) endpoints and (2) models.
 
   Access is granted via strings of the form \`api-key:endpoint:\[endpoint name]\` and
@@ -80,7 +80,7 @@ them.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -142,13 +142,13 @@ team API keys. If the caller user is a member, returns that user's API keys.
 * `paginationToken` (string) — Pagination token received from a previous call when using pagination. Set to \`undefined\` to
   retrieve the first page.
 
-* `aclFilters` (array\<string>) — Optional filter to only return API keys that match the given ACLs.
+* `aclFilters` (array\\<string\>) — Optional filter to only return API keys that match the given ACLs.
 
 * `activeOnly` (boolean) — If true, only return non-expired API keys. Defaults to false (return all keys).
 
 ### Response Body
 
-* `apiKeys` (array\<object>) — API keys belonging to the team.
+* `apiKeys` (array\\<object\>) — API keys belonging to the team.
 
   * `redactedApiKey` (string) — A redacted API key. We don't expose the full key after it has been created.
 
@@ -179,7 +179,7 @@ team API keys. If the caller user is a member, returns that user's API keys.
     The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
     limit to get exceeded will not be aborted.
 
-  * `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+  * `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
     all requests fail if this field is empty. There are two kind of permissions users can grant:
     (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
     \`api-key:model:\[model name]\` ACLs.
@@ -256,7 +256,7 @@ Selectively updates a subset of fields on an API key.
     The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
     limit to get exceeded will not be aborted.
 
-  * `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+  * `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
     all requests fail if this field is empty. There are two kind of permissions users can grant:
     (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
     \`api-key:model:\[model name]\` ACLs.
@@ -301,7 +301,7 @@ Selectively updates a subset of fields on an API key.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -393,7 +393,7 @@ Selectively updates a subset of fields on an API key.
   The limiter engages when the limit is strictly exceeded. In-flight requests that cause the
   limit to get exceeded will not be aborted.
 
-* `aclStrings` (array\<string>) — The permissions the API key has. By default, API keys don't have any permissions, which means
+* `aclStrings` (array\\<string\>) — The permissions the API key has. By default, API keys don't have any permissions, which means
   all requests fail if this field is empty. There are two kind of permissions users can grant:
   (1) endpoints and (2) models via the \`api-key:endpoint:\[endpoint name]\` and
   \`api-key:model:\[model name]\` ACLs.
@@ -478,9 +478,9 @@ Lists all models that are accessible by a team.
 
 ### Response Body
 
-* `clusterConfigs` (array\<object>) — Contains the models accessible via the individual inference clusters.
+* `clusterConfigs` (array\\<object\>) — Contains the models accessible via the individual inference clusters.
 
-  * `languageModels` (array\<object>) — Available language models.
+  * `languageModels` (array\\<object\>) — Available language models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -523,7 +523,7 @@ Lists all models that are accessible by a team.
 
     * `maxPromptLength` (integer) — Maximum length of the prompt/input (this includes tokens of all kinds).
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `features` (object)
 
@@ -561,7 +561,7 @@ Lists all models that are accessible by a team.
 
     * `tier` (integer) — Effective integer rate-limiting tier for this team+model.
 
-  * `embeddingModels` (array\<object>) — Available embedding models.
+  * `embeddingModels` (array\\<object\>) — Available embedding models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -586,7 +586,7 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `rateLimits` (object)
 
@@ -604,7 +604,7 @@ Lists all models that are accessible by a team.
 
     * `tier` (integer) — Effective integer rate-limiting tier for this team+model.
 
-  * `imageGenerationModels` (array\<object>) — Available image generation models.
+  * `imageGenerationModels` (array\\<object\>) — Available image generation models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -629,15 +629,15 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
-    * `resolutionPricing` (array\<object>) — Resolution-based pricing tiers.
+    * `resolutionPricing` (array\\<object\>) — Resolution-based pricing tiers.
 
       * `resolution` ("IMAGE\_RESOLUTION\_UNSPECIFIED" | "IMAGE\_RESOLUTION\_1K" | "IMAGE\_RESOLUTION\_2K" | "IMAGE\_RESOLUTION\_4K") — Image resolution options for pricing.
 
-        &#x20;\- IMAGE\_RESOLUTION\_1K: ~1024x1024
-        &#x20;\- IMAGE\_RESOLUTION\_2K: ~2048x2048
-        &#x20;\- IMAGE\_RESOLUTION\_4K: ~4096x4096
+         \- IMAGE\_RESOLUTION\_1K: ~1024x1024
+         \- IMAGE\_RESOLUTION\_2K: ~2048x2048
+         \- IMAGE\_RESOLUTION\_4K: ~4096x4096
 
       * `pricePerImage` (string) — Price per image at this resolution (in 1/100,000,000th of a USD cent).
 
@@ -657,7 +657,7 @@ Lists all models that are accessible by a team.
 
       * `tokenMultiplier` (string)
 
-  * `audioModels` (array\<object>) — Available audio models.
+  * `audioModels` (array\\<object\>) — Available audio models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -672,7 +672,7 @@ Lists all models that are accessible by a team.
 
     * `completionTokenPrice` (string) — The price (in USD cents) per 100 million completion tokens.
 
-    * `supportedClients` (array\<object>) — Supported clients. For example, this is something you can pass as the
+    * `supportedClients` (array\\<object\>) — Supported clients. For example, this is something you can pass as the
       query parameter to the model websocket endpoint as "?client=...".
 
       * `clientName` (string) — Short ID-like string describing this client in the API.
@@ -691,7 +691,7 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
     * `rateLimits` (object)
 
@@ -707,7 +707,7 @@ Lists all models that are accessible by a team.
 
       * `tokenMultiplier` (string)
 
-  * `videoGenerationModels` (array\<object>) — Available video generation models.
+  * `videoGenerationModels` (array\\<object\>) — Available video generation models.
 
     * `name` (string) — The name under which the model is available in the API.
 
@@ -730,9 +730,9 @@ Lists all models that are accessible by a team.
 
     * `cluster` (string) — Name of the cluster on which the model is available.
 
-    * `aliases` (array\<string>) — Other names under which the model is available.
+    * `aliases` (array\\<string\>) — Other names under which the model is available.
 
-    * `resolutionPricing` (array\<object>) — Resolution-based pricing tiers.
+    * `resolutionPricing` (array\\<object\>) — Resolution-based pricing tiers.
 
       * `resolution` ("VIDEO\_RESOLUTION\_UNSPECIFIED" | "VIDEO\_RESOLUTION\_480P" | "VIDEO\_RESOLUTION\_720P" | "VIDEO\_RESOLUTION\_1080P") — Video resolution options for pricing.
 
@@ -1079,7 +1079,7 @@ Lists all the endpoint ACLs that can be used on API keys.
 
 ### Response Body
 
-* `acls` (array\<object>) — List of ACLs that can be assigned to an API key.
+* `acls` (array\\<object\>) — List of ACLs that can be assigned to an API key.
 
   * `acl` (string) — The acl key to be used on an Api key.
 
@@ -1174,7 +1174,7 @@ API endpoint for GET requests to /auth/management-keys/validation.
 
 * `name` (string) — Name of this key (Just for humans).
 
-* `acls` (array\<string>) — ACLs of this key (controls what APIs can be accessed using the key).
+* `acls` (array\\<string\>) — ACLs of this key (controls what APIs can be accessed using the key).
 
 * `apiKey` (string) — Only set when the key is created.
 
@@ -1182,7 +1182,7 @@ API endpoint for GET requests to /auth/management-keys/validation.
 
 * `ipRanges` (object)
 
-  * `ipRanges` (array\<object>) — A list of IP ranges.
+  * `ipRanges` (array\\<object\>) — A list of IP ranges.
 
     * `address` (object)
 

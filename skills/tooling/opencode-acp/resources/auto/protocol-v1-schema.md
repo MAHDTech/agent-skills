@@ -6,7 +6,7 @@
 
 > Schema definitions for the Agent Client Protocol
 
-<Note>
+\<Note\>
   The schema file can be downloaded directly from the [latest GitHub
   release](https://github.com/agentclientprotocol/agent-client-protocol/releases/latest/download/schema.json).
 </Note>

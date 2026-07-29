@@ -13,7 +13,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-modal-trigger>
+# \<pagefind-modal-trigger\>
 
 
 A button that opens the associated modal.

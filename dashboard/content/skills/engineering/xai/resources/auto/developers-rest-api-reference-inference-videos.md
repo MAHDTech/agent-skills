@@ -44,7 +44,7 @@ This is an asynchronous operation that returns a request\_id for polling.
   reference-to-video (R2V). Optional for image-to-video (I2V) — when
   omitted, the model generates a video from the image alone.
 
-* `reference_images` (array\<object>) — Optional reference images for reference-to-video (R2V) generation.
+* `reference_images` (array\\<object\>) — Optional reference images for reference-to-video (R2V) generation.
   When provided generates video using these images
   as style/content references.
 

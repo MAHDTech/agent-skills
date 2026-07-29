@@ -10,7 +10,7 @@ Nov 9, 2024
 - [`fabc2f283`](https://www.github.com/tauri-apps/tauri/commit/fabc2f283e38b62c721326e44645d47138418cbc)
   ([\#11485](https://www.github.com/tauri-apps/tauri/pull/11485) by
   [@39zde](https://www.github.com/tauri-apps/tauri/../../39zde)) Adds a
-  new configuration option `app &gt; security &gt; headers` to define
+  new configuration option `app > security > headers` to define
   headers that will be added to every http response from tauri to the
   web view. This doesn't include IPC messages and error responses.
 
@@ -42,7 +42,7 @@ Nov 9, 2024
 - [`cbc095ec5`](https://www.github.com/tauri-apps/tauri/commit/cbc095ec5fe7de29b5c9265576d4e071ec159c1c)
   ([\#11451](https://www.github.com/tauri-apps/tauri/pull/11451) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Add `app &gt; windows &gt; devtools` config option and when creating
+  Add `app > windows > devtools` config option and when creating
   the webview from JS, to enable or disable devtools for a specific
   webview.
 
@@ -59,18 +59,18 @@ Nov 9, 2024
 - [`f37e97d41`](https://www.github.com/tauri-apps/tauri/commit/f37e97d410c4a219e99f97692da05ca9d8e0ba3a)
   ([\#11477](https://www.github.com/tauri-apps/tauri/pull/11477) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Add `app &gt; windows &gt; useHttpsScheme` config option to choose
+  Add `app > windows > useHttpsScheme` config option to choose
   whether the custom protocols should use
-  `https://&lt;scheme&gt;.localhost` instead of the default
-  `http://&lt;scheme&gt;.localhost` on Windows and Android
+  `https://\<scheme\>.localhost` instead of the default
+  `http://\<scheme\>.localhost` on Windows and Android
 
 - [`f37e97d41`](https://www.github.com/tauri-apps/tauri/commit/f37e97d410c4a219e99f97692da05ca9d8e0ba3a)
   ([\#11477](https://www.github.com/tauri-apps/tauri/pull/11477) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
   Add `WebviewWindowBuilder/WebviewBuilder::use_https_scheme` to choose
   whether the custom protocols should use
-  `https://&lt;scheme&gt;.localhost` instead of the default
-  `http://&lt;scheme&gt;.localhost` on Windows and Android
+  `https://\<scheme\>.localhost` instead of the default
+  `http://\<scheme\>.localhost` on Windows and Android
 
 - [`cbc095ec5`](https://www.github.com/tauri-apps/tauri/commit/cbc095ec5fe7de29b5c9265576d4e071ec159c1c)
   ([\#11451](https://www.github.com/tauri-apps/tauri/pull/11451) by
@@ -87,7 +87,7 @@ Nov 9, 2024
 - [`2a75c64b5`](https://www.github.com/tauri-apps/tauri/commit/2a75c64b5431284e7340e8743d4ea56a62c75466)
   ([\#11469](https://www.github.com/tauri-apps/tauri/pull/11469) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Added `app &gt; windows &gt; windowClassname` config option to specify
+  Added `app > windows > windowClassname` config option to specify
   the name of the window class on Windows.
 
 - [`2a75c64b5`](https://www.github.com/tauri-apps/tauri/commit/2a75c64b5431284e7340e8743d4ea56a62c75466)

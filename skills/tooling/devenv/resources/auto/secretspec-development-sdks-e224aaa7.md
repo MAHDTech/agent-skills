@@ -130,7 +130,7 @@ Haskell job points GHC’s linker at them.
 ## Adding a new SDK
 
 1.  Create the binding crate/package as a workspace sibling
-    (`secretspec-<lang>/`), thin: marshal the JSON envelope, expose the
+    (`secretspec-\<lang\>/`), thin: marshal the JSON envelope, expose the
     builder/resolve API mirroring the existing SDKs’ vocabulary.
 2.  Wire the package manifest into `scripts/sync-sdk-versions.sh` so its
     version tracks the workspace.
@@ -140,7 +140,7 @@ Haskell job points GHC’s linker at them.
     (`ruby-gems.yml` and `python-wheels.yml` are the smallest),
     including publish-on-tag with trusted publishing where the registry
     supports it.
-5.  Document it: `docs/src/content/docs/sdk/<lang>.md`, the sidebar in
+5.  Document it: `docs/src/content/docs/sdk/\<lang\>.md`, the sidebar in
     `docs/astro.config.ts`, the [SDK overview](https://secretspec.dev/sdk/overview), and the
     platform tables on this page and the overview.
 6.  Follow the same release-visibility rules as providers: label

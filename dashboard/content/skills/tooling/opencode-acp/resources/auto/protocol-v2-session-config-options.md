@@ -151,7 +151,7 @@ Boolean config options use `type: "boolean"` for simple on/off toggles:
 
 Each config option **MAY** include a `category` field. Categories are semantic metadata intended to help Clients provide consistent UX, such as attaching keyboard shortcuts, choosing icons, or deciding placement.
 
-<Warning>
+\<Warning\>
   Categories are for UX purposes only and **MUST NOT** be required for
   correctness. Clients **MUST** handle missing or unknown categories gracefully.
 </Warning>
@@ -291,7 +291,7 @@ The Agent **MUST** respond with the complete list of all configuration options a
 }
 ```
 
-<Note>
+\<Note\>
   The response always contains the **complete** configuration state. This allows
   Agents to reflect dependent changes. For example, if changing the model
   affects available reasoning options, or if an option's available values change

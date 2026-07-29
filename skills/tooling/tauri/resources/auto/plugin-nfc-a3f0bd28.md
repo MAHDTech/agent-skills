@@ -108,7 +108,7 @@ The NFC plugin requires iOS 14+. This is the default for Tauri
 applications created with Tauri CLI v2.8 and above, but you can edit
 your Xcode project to configure it.
 
-In the `src-tauri/gen/apple/<project-name>.xcodeproj/project.pbxproj`
+In the `src-tauri/gen/apple/\<project-name\>.xcodeproj/project.pbxproj`
 file, set all `IPHONEOS_DEPLOYMENT_TARGET` properties to `14.0`:
 
 ```
@@ -145,7 +145,7 @@ selecting the “Near Field Communication Tag Reading” capability (see
 [Add a capability to a
 target](https://help.apple.com/xcode/mac/current/#/dev88ff319e7) for
 more information) or by adding the following configuration to the
-`gen/apple/<app-name>_iOS/<app-name>_iOS.entitlements` file:
+`gen/apple/\<app-name\>_iOS/\<app-name\>_iOS.entitlements` file:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>  <key>com.apple.developer.nfc.readersession.formats</key>  <array>    <string>TAG</string>  </array></dict></plist>

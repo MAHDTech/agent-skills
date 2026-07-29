@@ -657,18 +657,3 @@ options.
   beyond the database
 - Review [Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) for real-time
   client updates
-
-- [Defining Reducers](#defining-reducers)
-- [Transactional Execution](#transactional-execution)
-- [Accessing Tables](#accessing-tables)
-  - [Inserting Rows](#inserting-rows)
-  - [Finding Rows by Unique Column](#finding-rows-by-unique-column)
-  - [Filtering Rows by Indexed
-    Column](#filtering-rows-by-indexed-column)
-  - [Updating Rows](#updating-rows)
-  - [Deleting Rows](#deleting-rows)
-  - [Iterating All Rows](#iterating-all-rows)
-  - [Counting Rows](#counting-rows)
-- [Reducer Isolation](#reducer-isolation)
-- [Scheduling Procedures](#scheduling-procedures)
-- [Next Steps](#next-steps)

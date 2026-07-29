@@ -1,3 +1,4 @@
+{% raw %}
 # Calling Rust from the Frontend
 
 This document includes guides on how to communicate with your Rust code
@@ -549,3 +550,5 @@ documentation](https://v2.tauri.app/develop/calling-frontend/#event-system).
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

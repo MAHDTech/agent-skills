@@ -8,6 +8,7 @@ skill_name = "tauri"
 +++
 
 {% raw %}
+{% raw %}
 # Android Code Signing
 
 To publish on the Play Store, you need to sign your app with a digital
@@ -103,4 +104,5 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
+{% endraw %}{% raw %}
 {% endraw %}

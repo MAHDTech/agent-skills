@@ -182,7 +182,7 @@ shortcuts apply:
 | Mistake | Why it fails | Fix |
 |:---|:---|:---|
 | Expecting custom agent switches to modify the existing turn history | Switching agents inside an active thread forks the conversation to preserve historical integrity | Continue your workflow in the newly forked session with the new agent’s capabilities |
-| Putting custom agent markdown files directly inside `~/.gemini/config/` or `.agents/` | The CLI scanner looks specifically inside `agents/` subdirectories (`.agents/agents/` or `~/.gemini/config/agents/`) | Move your agent definition to `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` |
+| Putting custom agent markdown files directly inside `~/.gemini/config/` or `.agents/` | The CLI scanner looks specifically inside `agents/` subdirectories (`.agents/agents/` or `~/.gemini/config/agents/`) | Move your agent definition to `.agents/agents/\<name\>.md` or `.agents/agents/\<name\>/agent.md` |
 | Using `k` on completed subagents | `KeyKillSubagent` only targets active (`running`) subagent processes | Use `Enter` to inspect completed or failed subagent logs instead |
 
 ------------------------------------------------------------------------

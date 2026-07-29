@@ -98,7 +98,7 @@ It’s common to see
 in Rust to share ownership of a value across multiple threads (usually
 paired with a
 [`Mutex`](https://doc.rust-lang.org/stable/std/sync/struct.Mutex.html)
-in the form of `Arc<Mutex<T>>`). However, you don’t need to use
+in the form of `Arc<Mutex\<T\>>`). However, you don’t need to use
 [`Arc`](https://doc.rust-lang.org/stable/std/sync/struct.Arc.html) for
 things stored in
 [`State`](https://docs.rs/tauri/latest/tauri/struct.State.html) because

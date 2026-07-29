@@ -60,7 +60,7 @@ However, in many cases, an error code will result.
 
 Some functions will treat UTF-8 strings *lossily*. That is, if the slice
 identified by a `(ptr, len)` contains non-UTF-8 bytes, these bytes will
-be replaced with `�` in the read string.
+be replaced with `` in the read string.
 
 Most functions return a `u16` value. This is how these functions
 indicate an error where a `0` value means that there were no errors.
@@ -521,12 +521,3 @@ uint16_t _iter_start_filtered(
     BufferIter *out
 );
 ```
-
-- [General notes](#general-notes)
-- [Logging](#logging)
-- [Buffer handling](#buffer-handling)
-- [Reducer scheduling](#reducer-scheduling)
-- [Altering tables](#altering-tables)
-- [Inserting and deleting rows](#inserting-and-deleting-rows)
-- [Querying tables](#querying-tables)
-- [Appendix, `bindings.h`](#appendix-bindingsh)

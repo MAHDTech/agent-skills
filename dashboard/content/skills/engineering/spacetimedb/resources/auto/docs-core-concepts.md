@@ -81,10 +81,4 @@ Connect your frontend to SpacetimeDB.
   [C#](https://spacetimedb.com/docs/clients/c-sharp), [Unreal](https://spacetimedb.com/docs/clients/unreal) -
   Language-specific references
 
-- [Databases](#databases)
-- [Tables](#tables)
-- [Functions](#functions)
-- [Authentication](#authentication)
-- [Clients](#clients)
-
 {% endraw %}

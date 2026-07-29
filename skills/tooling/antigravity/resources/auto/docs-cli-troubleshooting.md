@@ -40,7 +40,7 @@ bash: agy: command not found
 ### Cause[link](#cause)
 
 The installation utility downloads the binary to `~/.local/bin` (or
-`C:\Users\<Username>\AppData\Local\agy\bin`), but your shell’s active
+`C:\Users\\<Username\>\AppData\Local\agy\bin`), but your shell’s active
 `$PATH` environment does not index this directory.
 
 ### Resolution[link](#resolution)

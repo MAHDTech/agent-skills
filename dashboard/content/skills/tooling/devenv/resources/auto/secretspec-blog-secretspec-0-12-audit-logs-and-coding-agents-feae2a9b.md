@@ -163,7 +163,4 @@ Remember the new default: agents must pass a reason: set
 Questions or feedback? Join us on
 [Discord](https://discord.gg/naMgvexb6q).
 
-[SecretSpec 0.13: SDKs for Python, Node.js, Go, Ruby, and
-Haskell](https://secretspec.dev/blog/secretspec-0-13-sdks/)
-
 {% endraw %}

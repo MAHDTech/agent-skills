@@ -320,7 +320,7 @@ Terminal window
 
 ### iOS
 
-To trigger an app link on iOS you can open the `https://<host>/path` URL
+To trigger an app link on iOS you can open the `https://\<host\>/path` URL
 in the browser. For simulators you can leverage the `simctl` CLI to
 directly open a link from the terminal:
 
@@ -332,7 +332,7 @@ Terminal window
 
 ### Android
 
-To trigger an app link on Android you can open the `https://<host>/path`
+To trigger an app link on Android you can open the `https://\<host\>/path`
 URL in the browser. For emulators you can leverage the `adb` CLI to
 directly open a link from the terminal:
 

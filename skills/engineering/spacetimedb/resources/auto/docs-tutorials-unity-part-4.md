@@ -922,7 +922,7 @@ the map.
 ## Connecting to Maincloud
 
 - Publish to Maincloud
-  `spacetime publish --server maincloud <your database name> --delete-data`
+  `spacetime publish --server maincloud \<your database name\> --delete-data`
   - `<your database name>` This name should be unique and cannot contain
     any special characters other than internal hyphens (`-`). You will
     have to update the database name in
@@ -1025,9 +1025,3 @@ issue](https://github.com/clockworklabs/SpacetimeDB/issues/new), or join
 our Discord
 ([https://discord.gg/SpacetimeDB](https://discord.gg/SpacetimeDB)) and
 chat with us!
-
-- [Moving the player](#moving-the-player)
-- [Moving on the Client](#moving-on-the-client)
-- [Collisions and Eating Food](#collisions-and-eating-food)
-- [Collisions and Eating Food](#collisions-and-eating-food-1)
-- [Connecting to Maincloud](#connecting-to-maincloud)

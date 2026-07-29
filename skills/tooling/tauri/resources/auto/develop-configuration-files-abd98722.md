@@ -1,3 +1,4 @@
+{% raw %}
 # Configuration Files
 
 Since Tauri is a toolkit for building applications there can be many
@@ -271,3 +272,5 @@ documentation](https://docs.npmjs.com/cli/v8/configuring-npm/package-json).
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

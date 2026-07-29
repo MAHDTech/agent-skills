@@ -39,7 +39,7 @@ Agents that also advertise `session.additionalDirectories` may
 include `additionalDirectories` in returned `SessionInfo` objects to report
 additional workspace roots for listed sessions.
 
-<Note>
+\<Note\>
   If the Agent advertises the `session.delete` capability, Clients can remove
   sessions from future `session/list` results with
   [`session/delete`](https://agentclientprotocol.com/protocol/v2/session-delete).

@@ -146,12 +146,4 @@ pub fn connect(ctx: &ReducerContext) -> Result<(), String> {
 }
 ```
 
-- [Creating a Steam Publisher Key](#creating-a-steam-publisher-key)
-- [Adding your Steam Publisher Key and allowed app IDs to
-  SpacetimeAuth](#adding-your-steam-publisher-key-and-allowed-app-ids-to-spacetimeauth)
-- [Getting a Steam Session Ticket](#getting-a-steam-session-ticket)
-- [Exchanging the Steam Session Ticket for a SpacetimeAuth ID
-  Token](#exchanging-the-steam-session-ticket-for-a-spacetimeauth-id-token)
-- [Checking App or DLC Ownership](#checking-app-or-dlc-ownership)
-
 {% endraw %}

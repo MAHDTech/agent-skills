@@ -8,6 +8,7 @@ skill_name = "tauri"
 +++
 
 {% raw %}
+{% raw %}
 # Calling Rust from the Frontend
 
 This document includes guides on how to communicate with your Rust code
@@ -560,4 +561,5 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
+{% endraw %}{% raw %}
 {% endraw %}

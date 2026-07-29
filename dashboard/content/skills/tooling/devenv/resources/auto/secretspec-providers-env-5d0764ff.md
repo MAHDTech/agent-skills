@@ -8,6 +8,7 @@ skill_name = "devenv"
 +++
 
 {% raw %}
+{% raw %}
 # Environment Variable Provider
 
 The Environment Variable provider reads secrets directly from process
@@ -85,4 +86,5 @@ the rest of this provider, references are read-only.
 - Testing with temporary environment variables
 - Working with containerized applications that use environment variables
 
+{% endraw %}{% raw %}
 {% endraw %}

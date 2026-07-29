@@ -13,7 +13,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-modal>
+# \<pagefind-modal\>
 
 
 A modal overlay container for search. Opens over the page content and traps focus until closed. Users can close it by pressing Escape, clicking the backdrop, or using the close button in the header (visible on mobile).

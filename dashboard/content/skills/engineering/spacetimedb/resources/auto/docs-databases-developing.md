@@ -267,18 +267,4 @@ After creating your database module:
   [Procedures](https://spacetimedb.com/docs/functions/procedures)
 - [Build and publish your module](https://spacetimedb.com/docs/databases/building-publishing)
 
-- [Prerequisites](#prerequisites)
-- [Interactive Development with
-  `spacetime dev`](#interactive-development-with-spacetime-dev)
-  - [Getting Started](#getting-started)
-  - [Client Type Options](#client-type-options)
-  - [What Happens Next](#what-happens-next)
-  - [Client Development Server](#client-development-server)
-  - [Project Structure](#project-structure)
-- [Alternative: Manual Project
-  Creation](#alternative-manual-project-creation)
-  - [Create a New Project with
-    `spacetime init`](#create-a-new-project-with-spacetime-init)
-- [Next Steps](#next-steps)
-
 {% endraw %}

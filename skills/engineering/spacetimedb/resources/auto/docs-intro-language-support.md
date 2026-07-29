@@ -37,7 +37,3 @@ SpacetimeDB was designed first and foremost as the backend for
 multiplayer Unity games. The C# SDK integrates seamlessly with Unity
 projects. Learn more in the [SpacetimeDB Unity
 Tutorial](https://spacetimedb.com/docs/tutorials/unity/part-1).
-
-- [Server Database Modules](#server-database-modules)
-- [Client SDKs](#client-sdks)
-  - [Unity](#unity)

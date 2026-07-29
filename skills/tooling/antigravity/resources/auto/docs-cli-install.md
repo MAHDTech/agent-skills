@@ -30,7 +30,7 @@ curl -fsSL https://antigravity.google/cli/install.sh | bash
 ### Windows[link](#windows)
 
 The installation script registers the `agy` binary to your local user
-directory: `C:\Users\<Username>\AppData\Local\agy\bin` (where
+directory: `C:\Users\\<Username\>\AppData\Local\agy\bin` (where
 `<Username>` represents your active Windows user profile).
 
 **PowerShell**: Open PowerShell and execute the following installation

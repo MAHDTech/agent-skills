@@ -72,8 +72,8 @@ failed background agents:
 In addition to built-in agents, the CLI automatically discovers custom
 agents defined in Markdown format (`.md`) with YAML frontmatter:
 
-- **Workspace Agents**: `.agents/agents/<name>.md` or
-  `.agents/agents/<name>/agent.md`
+- **Workspace Agents**: `.agents/agents/\<name\>.md` or
+  `.agents/agents/\<name\>/agent.md`
 - **Global Agents**: `~/.gemini/config/agents/`
 
 When a custom agent has `subagent: true` set in its YAML frontmatter,

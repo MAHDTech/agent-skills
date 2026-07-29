@@ -13,7 +13,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-config>
+# \<pagefind-config\>
 
 
 Declaratively configure a Pagefind instance. Optionally include this on the page to set options like bundle path.

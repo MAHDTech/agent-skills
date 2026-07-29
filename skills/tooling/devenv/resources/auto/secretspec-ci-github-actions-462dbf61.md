@@ -1,3 +1,4 @@
+{% raw %}
 # GitHub Actions
 
 In a GitHub or Forgejo Actions job, `secretspec-action` installs the CLI
@@ -49,3 +50,5 @@ anywhere the CLI is installed.
 
 Both resolve through the same provider chain and fail on a missing
 required secret.
+
+{% endraw %}

@@ -1,3 +1,4 @@
+{% raw %}
 # Continuous Integration
 
 It is possible to run [WebDriver](https://www.w3.org/TR/webdriver/)
@@ -47,3 +48,5 @@ jobs:  # a single job named test  test:    # the display name of the test job   
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

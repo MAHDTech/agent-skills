@@ -151,7 +151,7 @@ When you leave the file viewer with `Esc`, any pending comments are
 collected and the CLI asks whether to send them:
 
 - `y` — **send + close**: your comments are delivered to the agent as
-  your next message, formatted as `<file>:<line>: <comment>` so the
+  your next message, formatted as `<file>:\<line\>: <comment>` so the
   model knows exactly which lines you mean.
 - `n` — **discard + close**: exit without sending.
 - `Esc` — cancel and keep editing.

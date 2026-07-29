@@ -6,7 +6,7 @@
 
 > Schema definitions for the Agent Client Protocol
 
-<Note>
+\<Note\>
   This schema file is generated in this repository at
   [`schema/v2/schema.json`](https://github.com/agentclientprotocol/agent-client-protocol/blob/main/schema/v2/schema.json).
   GitHub releases for this schema are not published yet.

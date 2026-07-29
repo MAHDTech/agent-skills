@@ -63,9 +63,9 @@ following locations:
 
 | Location | Path | Scope |
 |:---|:---|:---|
-| **Workspace Customizations** | `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` | Workspace / Repository Root |
-| **Global Customizations** | `~/.gemini/config/agents/<name>.md` or `.../agents/<name>/agent.md` | Machine-wide / All Projects |
-| **Plugins** | `plugins/<plugin_name>/agents/` | Bundled Plugin Package |
+| **Workspace Customizations** | `.agents/agents/\<name\>.md` or `.agents/agents/\<name\>/agent.md` | Workspace / Repository Root |
+| **Global Customizations** | `~/.gemini/config/agents/\<name\>.md` or `.../agents/\<name\>/agent.md` | Machine-wide / All Projects |
+| **Plugins** | `plugins/\<plugin_name\>/agents/` | Bundled Plugin Package |
 
 ### Frontmatter Configuration (YAML)[link](#frontmatter-configuration-yaml)
 

@@ -549,16 +549,3 @@ This command will show the current version of Tauri.
 
 See more about the usage through this [complete
 guide](https://tauri.app/v1/guides/development/development-cycle).
-
-- [`info`](#info)
-- [`init`](#init)
-- [`plugin init`](#plugin-init)
-- [`dev`](#dev)
-- [`build`](#build)
-- [`icon`](#icon)
-- [`completions`](#completions)
-  - [Bash](#bash)
-  - [Zsh](#zsh)
-  - [PowerShell](#powershell)
-- [`version`](#version)
-- [CLI usage](#cli-usage)

@@ -234,11 +234,11 @@ table will receive an error message directing them to upgrade.
 
 Migrating from reducer callbacks
 
-If you previously used `ctx.reducers.on_<reducer_name>()` callbacks to
+If you previously used `ctx.reducers.on_\<reducer_name\>()` callbacks to
 receive transient data, event tables are the recommended replacement.
 Define an event table with the fields you want to publish, insert a row
 in your reducer, and register an `on_insert` callback on the client via
-`ctx.db.<event_table>().on_insert(...)`. See the [migration
+`ctx.db.\<event_table\>().on_insert(...)`. See the [migration
 guide](https://spacetimedb.com/docs/upgrade) for details.
 
 ## Row-Level Security
@@ -290,13 +290,3 @@ record:
   time-triggered actions
 - See [Row-Level Security](https://spacetimedb.com/docs/tables/access-permissions) for
   controlling data visibility
-
-- [Defining an Event Table](#defining-an-event-table)
-- [Publishing Events](#publishing-events)
-- [Constraints and Indexes](#constraints-and-indexes)
-- [Subscribing to Events](#subscribing-to-events)
-- [How It Works](#how-it-works)
-- [Row-Level Security](#row-level-security)
-- [Current Limitations](#current-limitations)
-- [Use Cases](#use-cases)
-- [Next Steps](#next-steps)

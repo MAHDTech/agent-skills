@@ -88,10 +88,6 @@ partnership.
 - [GitHub CrabNebula](https://github.com/crabnebula-dev)
 - [Website Crabnebula](https://crabnebula.dev)
 
-[Announcing the Tauri v2 Beta Release](https://v2.tauri.app/blog/tauri-2-0-0-beta/)
-
-[Announcing Tauri 1.5.0](https://v2.tauri.app/blog/tauri-1-5/)
-
 ------------------------------------------------------------------------
 
 [Support on Open Collective](https://opencollective.com/tauri)[Sponsor

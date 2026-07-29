@@ -16,7 +16,7 @@ skill_name = "opencode-acp"
 
 > The easiest way to find and install ACP-compatible agents.
 
-<style>
+\<style\>
   {`
     .agent-icon {
     width: 20px;
@@ -664,7 +664,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
     title="GLM Agent"
     href="https://github.com/stefandevo/glm-acp-agent"
     icon={
-  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" fillRule="evenodd"><title>Z.ai</title><path d="M8.07 1.333L6.618 3.302H.435L1.887 1.333h6.184zM15.503 12.699L14.052 14.667h-6.161l1.449-1.968h6.163zM16 1.333L6.176 14.667H0L9.824 1.333H16z"/></svg>
+  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" fillRule="evenodd">\<title\>Z.ai</title><path d="M8.07 1.333L6.618 3.302H.435L1.887 1.333h6.184zM15.503 12.699L14.052 14.667h-6.161l1.449-1.968h6.163zM16 1.333L6.176 14.667H0L9.824 1.333H16z"/></svg>
 }
   >
     ACP agent powered by Zhipu AI's GLM Coding Plan models (glm-5.1, glm-5-turbo, glm-4.7, glm-4.5-air). Supports streaming, tool calls, mid-session model switching, image input via Z.AI Coding Plan Vision MCP, and session load/fork/resume with on-disk persistence.

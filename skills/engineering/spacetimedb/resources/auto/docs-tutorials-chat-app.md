@@ -1,3 +1,4 @@
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -3093,16 +3094,4 @@ Congratulations! You've built a chat app with SpacetimeDB.
 - Learn about [Procedures](https://spacetimedb.com/docs/functions/procedures) for making
   external API calls
 
-- [Install SpacetimeDB](#install-spacetimedb)
-- [Project structure](#project-structure)
-- [Declare imports](#declare-imports)
-- [Define tables](#define-tables)
-- [Set users' names](#set-users-names)
-- [Send messages](#send-messages)
-- [Set users' online status](#set-users-online-status)
-- [Start the server](#start-the-server)
-- [Publish the module](#publish-the-module)
-- [Call reducers](#call-reducers)
-- [SQL queries](#sql-queries)
-- [Creating the Client](#creating-the-client)
-- [What's next?](#whats-next)
+{% endraw %}

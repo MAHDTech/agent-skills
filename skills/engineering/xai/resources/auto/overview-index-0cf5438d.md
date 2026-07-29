@@ -106,7 +106,7 @@ Non-inference
 
 us-west-2 us-west-2
 
-99.83%
+100%
 
 Inference
 

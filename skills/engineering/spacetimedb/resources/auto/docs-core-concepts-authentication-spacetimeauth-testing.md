@@ -103,9 +103,3 @@ You can decode the ID token using any JWT decoder (e.g.
   "name": "Example User"
 }
 ```
-
-- [Why Use OIDC Debugger?](#why-use-oidc-debugger)
-- [Step 1: Gather Your Configuration](#step-1-gather-your-configuration)
-- [Step 2: Open OIDC Debugger](#step-2-open-oidc-debugger)
-- [Step 3: Run the Flow](#step-3-run-the-flow)
-- [Step 4: Inspect your tokens](#step-4-inspect-your-tokens)

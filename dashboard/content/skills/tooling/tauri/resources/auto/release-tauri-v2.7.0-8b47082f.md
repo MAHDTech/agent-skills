@@ -34,7 +34,7 @@ Jul 20, 2025
   ([\#13609](https://www.github.com/tauri-apps/tauri/pull/13609) by
   [@Legend-Master](https://www.github.com/tauri-apps/tauri/../../Legend-Master))
   `tauri::plugin::Builder::js_init_script` now takes
-  `impl Into&lt;String&gt;` instead of `String`
+  `impl Into<String>` instead of `String`
 
 ### Bug Fixes
 

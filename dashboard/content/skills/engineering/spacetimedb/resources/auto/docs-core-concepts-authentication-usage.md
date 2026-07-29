@@ -376,11 +376,4 @@ For more information, refer to the [SpacetimeDB
 documentation](https://spacetimedb.com/docs/) or reach out to the
 SpacetimeDB community for help.
 
-- [Accessing Common Claims: Subject and
-  Issuer](#accessing-common-claims-subject-and-issuer)
-- [Example: Restricting auth
-  providers](#example-restricting-auth-providers)
-- [Accessing custom claims](#accessing-custom-claims)
-- [Summary and Best Practices](#summary-and-best-practices)
-
 {% endraw %}

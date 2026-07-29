@@ -154,16 +154,16 @@ recommended to manage the app versioning in the Tauri config.
 - **macOS**: Translates to the bundle’s CFBundleShortVersionString
   property and is used as the default CFBundleVersion. You can set an
   specific bundle version using
-  [`bundle &gt; macOS &gt; bundleVersion`](macconfig::bundle_version).
+  [`bundle > macOS > bundleVersion`](macconfig::bundle_version).
 - **iOS**: Translates to the bundle’s CFBundleShortVersionString
   property and is used as the default CFBundleVersion. You can set an
   specific bundle version using
-  [`bundle &gt; iOS &gt; bundleVersion`](iosconfig::bundle_version). The
-  `tauri ios build` CLI command has a `--build-number &lt;number&gt;`
+  [`bundle > iOS > bundleVersion`](iosconfig::bundle_version). The
+  `tauri ios build` CLI command has a `--build-number <number>`
   option that lets you append a build number to the app version.
 - **Android**: By default version 1.0 is used. You can set a version
   code using
-  [`bundle &gt; android &gt; versionCode`](androidconfig::version_code).
+  [`bundle > android > versionCode`](androidconfig::version_code).
 
 By default version 1.0 is used on Android.
 
@@ -1389,8 +1389,8 @@ The mime-type of the association, e.g. `'image/png'` or `'text/plain'`.
 - **macOS / iOS**: added as `public.mime-type` in the
   `UTTypeTagSpecification` dictionary of the
   `UTExportedTypeDeclarations` entry in `Info.plist`.
-- **Android**: used as `android:mimeType` in the `&lt;data&gt;` element
-  of an `&lt;intent-filter&gt;` in `AndroidManifest.xml`.
+- **Android**: used as `android:mimeType` in the `<data>` element
+  of an `<intent-filter>` in `AndroidManifest.xml`.
 
 ##### name
 
@@ -1504,9 +1504,9 @@ Since the resulting header values are always ‘string-like’. So depending
 on the what data type the HeaderSource is, they need to be converted.
 
 - `String`(JS/Rust): stay the same for the resulting header value
-- `Array`(JS)/`Vec\&lt;String\&gt;`(Rust): Item are joined by “, “ for
+- `Array`(JS)/`Vec\<String\>`(Rust): Item are joined by “, “ for
   the resulting header value
-- `Object`(JS)/ `Hashmap\&lt;String,String\&gt;`(Rust): Items are
+- `Object`(JS)/ `Hashmap\<String,String\>`(Rust): Items are
   composed from: key + space + value. Item are then joined by “; “ for
   the resulting header value
 
@@ -1625,7 +1625,7 @@ See
 
 The HTTP Permissions-Policy header provides a mechanism to allow and
 deny the use of browser features in a document or within any
-&lt;iframe&gt; elements in the document.
+\<iframe\> elements in the document.
 
 See
 \<<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy>\>
@@ -2126,7 +2126,7 @@ for the complete list of languages.
 `string` \| `null`
 
 Deprecated: use \[`WindowsConfig::minimum_webview2_version`\]
-(`bundle &gt; windows &gt; minimumWebview2Version`) instead.
+(`bundle > windows > minimumWebview2Version`) instead.
 
 Try to ensure that the WebView2 version is equal to or newer than this
 version, if the user’s WebView2 is older than this version, the
@@ -2153,9 +2153,9 @@ shortcut inside a folder.
 Examples:
 
 - `AwesomePublisher`, shortcut will be placed in
-  `%AppData%\Microsoft\Windows\Start Menu\Programs\AwesomePublisher\&lt;your-app&gt;.lnk`
+  `%AppData%\Microsoft\Windows\Start Menu\Programs\AwesomePublisher\\<your-app\>.lnk`
 - If unset, shortcut will be placed in
-  `%AppData%\Microsoft\Windows\Start Menu\Programs\&lt;your-app&gt;.lnk`
+  `%AppData%\Microsoft\Windows\Start Menu\Programs\\<your-app\>.lnk`
 
 ##### template
 
@@ -3232,7 +3232,7 @@ Note: If you set this to `true` make sure to add localhost and any
 used in this webview to tauri-src/Info.ios.plist:
 
 ```
-&lt;plist&gt;&lt;dict&gt;    &lt;key&gt;WKAppBoundDomains&lt;/key&gt;    &lt;array&gt;        &lt;string&gt;localhost&lt;/string&gt;        &lt;string&gt;aregistrabledomain.example&lt;/string&gt;    &lt;/array&gt;&lt;/dict&gt;&lt;/plist&gt;
+<plist><dict>    <key>WKAppBoundDomains</key>    <array>        <string>localhost</string>        <string>aregistrabledomain.example</string>    </array></dict></plist>
 ```
 
 You must add `localhost` if any webview with this set to true opens a
@@ -3485,7 +3485,7 @@ Requires titleBarStyle: Overlay and decorations: true.
 Whether the window is transparent or not.
 
 Note that on `macOS` this requires the `macos-private-api` feature flag,
-enabled under `tauri &gt; macOSPrivateApi`. WARNING: Using private APIs
+enabled under `tauri > macOSPrivateApi`. WARNING: Using private APIs
 on `macOS` prevents your application from being accepted to the
 `App Store`.
 
@@ -3505,15 +3505,15 @@ The window webview URL.
 `boolean`
 
 Sets whether the custom protocols should use
-`https://&lt;scheme&gt;.localhost` instead of the default
-`http://&lt;scheme&gt;.localhost` on Windows and Android. Defaults to
+`https://\<scheme\>.localhost` instead of the default
+`http://\<scheme\>.localhost` on Windows and Android. Defaults to
 `false`.
 
 ###### Note
 
 Using a `https` scheme will NOT allow mixed content when trying to fetch
 `http` endpoints and therefore will not match the behavior of the
-`&lt;scheme&gt;://localhost` protocols used on macOS and Linux.
+`<scheme>://localhost` protocols used on macOS and Linux.
 
 ###### Warning
 
@@ -3762,7 +3762,7 @@ This can be particularly useful when your application includes sidecars
 or DLLs that do not statically link the Visual C++ runtime and require
 the runtime DLLs at runtime, and you do not want to require users to
 install the Visual C++ Redistributable. This can also be useful when
-`build &gt; windows &gt; staticVCRuntime` is set to `false`.
+`build > windows > staticVCRuntime` is set to `false`.
 
 ##### certificateThumbprint
 
@@ -3963,7 +3963,7 @@ as a different app and your users will have duplicate versions of your
 app.
 
 By default, tauri generates this code by generating a Uuid v5 using the
-string `&lt;productName&gt;.exe.app.x64` in the DNS namespace. You can
+string `<productName>.exe.app.x64` in the DNS namespace. You can
 use Tauri’s CLI to generate and print this code for you, run
 `tauri inspect wix-upgrade-code`.
 

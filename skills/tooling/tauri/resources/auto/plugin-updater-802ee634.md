@@ -1,3 +1,4 @@
+{% raw %}
 # Updater
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/updater)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-updater)[crates.io](https://crates.io/crates/tauri-plugin-updater)
@@ -534,3 +535,5 @@ enabled.
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
+
+{% endraw %}

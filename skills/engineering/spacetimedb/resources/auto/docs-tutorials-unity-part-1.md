@@ -119,16 +119,3 @@ We've now got the very basics set up. In [part
 2](https://spacetimedb.com/docs/tutorials/unity/part-2) you'll learn the basics of how to
 create a SpacetimeDB server module and how to connect to it from your
 client.
-
-- [Setting up the Tutorial Unity
-  Project](#setting-up-the-tutorial-unity-project)
-  - [Step 1: Create a Blank Unity
-    Project](#step-1-create-a-blank-unity-project)
-  - [Import the SpacetimeDB Unity
-    SDK](#import-the-spacetimedb-unity-sdk)
-  - [Create the GameManager Script](#create-the-gamemanager-script)
-  - [Add the GameManager to the
-    Scene](#add-the-gamemanager-to-the-scene)
-  - [Add the SpacetimeDB Network
-    Manager](#add-the-spacetimedb-network-manager)
-  - [Create the Server Module](#create-the-server-module)

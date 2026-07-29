@@ -16,16 +16,16 @@ All pages below are available as markdown at their listed URLs.
 
 - [Component UI Guide](https://pagefind.app/llms-component-ui.txt): Complete reference for adding search UI using web components. Installation, component reference, templates, CSS theming, and custom components.
 - [Component System Overview](https://pagefind.app/docs/components/index.md): How the component system works
-- [<pagefind-modal>](https://pagefind.app/docs/components/modal/index.md): Full-screen search modal
-- [<pagefind-modal-trigger>](https://pagefind.app/docs/components/modal-trigger/index.md): Button to open the modal
-- [<pagefind-searchbox>](https://pagefind.app/docs/components/searchbox/index.md): Search input with dropdown results
-- [<pagefind-input>](https://pagefind.app/docs/components/input/index.md): Standalone search input
-- [<pagefind-results>](https://pagefind.app/docs/components/results/index.md): Results display with templates
-- [<pagefind-summary>](https://pagefind.app/docs/components/summary/index.md): Search status and result count
-- [<pagefind-keyboard-hints>](https://pagefind.app/docs/components/keyboard-hints/index.md): Keyboard navigation hints
-- [<pagefind-filter-dropdown>](https://pagefind.app/docs/components/filter-dropdown/index.md): Filter dropdown
-- [<pagefind-filter-pane>](https://pagefind.app/docs/components/filter-pane/index.md): Filter sidebar panel
-- [<pagefind-config>](https://pagefind.app/docs/components/config/index.md): Declarative configuration
+- [\<pagefind-modal\>](https://pagefind.app/docs/components/modal/index.md): Full-screen search modal
+- [\<pagefind-modal-trigger\>](https://pagefind.app/docs/components/modal-trigger/index.md): Button to open the modal
+- [\<pagefind-searchbox\>](https://pagefind.app/docs/components/searchbox/index.md): Search input with dropdown results
+- [\<pagefind-input\>](https://pagefind.app/docs/components/input/index.md): Standalone search input
+- [\<pagefind-results\>](https://pagefind.app/docs/components/results/index.md): Results display with templates
+- [\<pagefind-summary\>](https://pagefind.app/docs/components/summary/index.md): Search status and result count
+- [\<pagefind-keyboard-hints\>](https://pagefind.app/docs/components/keyboard-hints/index.md): Keyboard navigation hints
+- [\<pagefind-filter-dropdown\>](https://pagefind.app/docs/components/filter-dropdown/index.md): Filter dropdown
+- [\<pagefind-filter-pane\>](https://pagefind.app/docs/components/filter-pane/index.md): Filter sidebar panel
+- [\<pagefind-config\>](https://pagefind.app/docs/components/config/index.md): Declarative configuration
 - [CSS Variables](https://pagefind.app/docs/css-variables/index.md): Theming with CSS custom properties
 - [Custom Components](https://pagefind.app/docs/custom-components/index.md): Building your own components
 
