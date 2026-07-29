@@ -1,0 +1,49 @@
+# devenv
+
+> Fast, Declarative, Reproducible, and Composable Developer Environments using Nix
+
+devenv is a fast, declarative, reproducible, and composable development environment tool using Nix.
+It allows developers to define project-specific development environments with support for 50+ programming languages,
+100+ services, processes, containers, and automated testing.
+
+
+## Getting Started
+
+- [Getting started](https://devenv.sh/getting-started/index.md)
+- [Basics](https://devenv.sh/basics/index.md)
+
+## Core Features
+
+- [Overview](https://devenv.sh/languages/index.md)
+- [Packages](https://devenv.sh/packages/index.md)
+- [Scripts](https://devenv.sh/scripts/index.md)
+- [Tasks](https://devenv.sh/tasks/index.md)
+- [Overview](https://devenv.sh/processes/index.md)
+- [Overview](https://devenv.sh/services/index.md)
+
+## Configuration
+
+- [Configuration](https://devenv.sh/files-and-variables/index.md)
+
+## Advanced
+
+- [Tests](https://devenv.sh/tests/index.md)
+- [Git hooks](https://devenv.sh/git-hooks/index.md)
+- [Containers](https://devenv.sh/containers/index.md)
+- [Outputs](https://devenv.sh/outputs/index.md)
+- [Composing](https://devenv.sh/composing-using-imports/index.md)
+- [Profiles](https://devenv.sh/profiles/index.md)
+- [Extending](https://devenv.sh/extending/index.md)
+
+## Guides
+
+- [Ad-hoc environments](https://devenv.sh/ad-hoc-developer-environments/index.md)
+- [direnv](https://devenv.sh/integrations/direnv/index.md)
+- [Examples](https://devenv.sh/examples/index.md)
+- [Cloud](https://devenv.sh/cloud/index.md)
+
+## Reference
+
+- [devenv.nix](https://devenv.sh/reference/options/index.md)
+- [devenv.yaml](https://devenv.sh/reference/yaml-options/index.md)
+- [Environment variables](https://devenv.sh/reference/environment-variables/index.md)
