@@ -523,6 +523,44 @@ describe("Dashboard Lib Tests", () => {
                 spyProcessOn.mockRestore()
             }
         })
+
+        it("should trigger cleanup when tailwindChild exits with non-zero code while not finished", async () => {
+            mockSpawn.mockClear()
+            mockOutro.mockClear()
+            mockLogWarn.mockClear()
+
+            const originalExit = process.exit
+            const exitMock = mock((code?: number) => {
+                throw new Error(`exit:${code}`)
+            })
+            process.exit = exitMock as any
+
+            try {
+                await serveMod.serveAction()
+
+                const tailwindSpawnIndex = mockSpawn.mock.calls.findIndex(
+                    (call: any[]) => call[0] === "tailwindcss"
+                )
+                expect(tailwindSpawnIndex).toBeGreaterThanOrEqual(0)
+                const tailwindChild =
+                    mockSpawn.mock.results[tailwindSpawnIndex]?.value
+
+                const exitCalls = tailwindChild.on.mock.calls.filter(
+                    (call: any[]) => call[0] === "exit"
+                )
+                expect(exitCalls.length).toBeGreaterThan(0)
+                const exitListener = exitCalls[exitCalls.length - 1][1]
+
+                expect(() => exitListener(1)).toThrow("exit:0")
+
+                expect(mockLogWarn).toHaveBeenCalledWith(
+                    "⚠️ Tailwind watch exited with code 1"
+                )
+                expect(mockOutro).toHaveBeenCalledWith("Done!")
+            } finally {
+                process.exit = originalExit
+            }
+        })
     })
 
     describe("Watcher and Rebuild functions", () => {
