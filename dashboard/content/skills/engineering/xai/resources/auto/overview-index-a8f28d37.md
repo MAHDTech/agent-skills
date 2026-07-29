@@ -12,25 +12,6 @@ skill_name = "xai"
 
  Help Center 
 
-*   [Using X](https://help.x.com/en/using-x)   
-*   [Managing your account](https://help.x.com/en/managing-your-account)   
-*   [Safety and security](https://help.x.com/en/safety-and-security)   
-*   [Rules and policies](https://help.x.com/en/rules-and-policies)   
-*   
-Resources 
-
-    *   [New user FAQ](https://help.x.com/en/resources/new-user-faq)
-    *   [Glossary](https://help.x.com/en/resources/glossary)
-    *   [A safer X](https://help.x.com/en/resources/a-safer-twitter)
-    *   [Accessibility](https://help.x.com/en/resources/accessibility)
-
-    *   [Our rules](https://help.x.com/en/resources/rules)
-    *   [My privacy](https://help.x.com/en/resources/how-you-can-control-your-privacy)
-    *   [How we address misinformation on X](https://communitynotes.twitter.com/guide/en/about/introduction)
-    *   [Recommender Systems](https://help.x.com/en/resources/recommender-systems)
-
-[Contact Us](https://help.x.com/forms.html)
-
 Welcome to X Help Center
 
 # What can we help you find?
@@ -40,70 +21,6 @@ Welcome to X Help Center
 [Download X for Android](https://play.google.com/store/apps/details?id=com.twitter.android)
 
 ![Image 1](https://help.x.com/content/dam/help-twitter/x/masthead-desktop.png.twimg.1920.png)
-
-📝 Rules and Policies
-
-Last viewed[US Take It Down Act](https://help.x.com/en/rules-and-policies/us-tida)
-
-Last viewed[How we enforce our rules](https://help.x.com/en/resources/rules)
-
-Last viewed[Notices on X and what they mean](https://help.x.com/en/rules-and-policies/notices-on-x)
-
-Last viewed[How cookies are used on X](https://help.x.com/en/rules-and-policies/x-cookies)
-
-[See all articles](https://help.x.com/en/rules-and-policies)
-
-🔐 Managing your account
-
-Last viewed[About suspended accounts](https://help.x.com/en/managing-your-account/suspended-x-accounts)
-
-Last viewed[Help with locked or limited account](https://help.x.com/en/managing-your-account/locked-and-limited-accounts)
-
-Last viewed[How to add your phone number to your account](https://help.x.com/en/managing-your-account/how-to-add-a-phone-number-to-your-account)
-
-Last viewed[How to update your email address](https://help.x.com/en/managing-your-account/how-to-update-your-email-address)
-
-[See all articles](https://help.x.com/en/managing-your-account)
-
-📱 Using X
-
-Last viewed[How to Post](https://help.x.com/en/using-x/how-to-post)
-
-Last viewed[About X.com supported browsers](https://help.x.com/en/using-x/x-supported-browsers)
-
-Last viewed[About Direct Messages](https://help.x.com/en/using-x/direct-messages)
-
-[See all articles](https://help.x.com/en/using-x)
-
-🤳 Safety and security
-
-Last viewed[How to protect your personal information](https://help.x.com/en/safety-and-security/x-privacy-settings)
-
-Last viewed[About public and protected Posts](https://help.x.com/en/safety-and-security/public-and-protected-posts)
-
-Last viewed[Additional information sharing with business partners](https://help.x.com/en/safety-and-security/data-through-partnerships)
-
-Last viewed[Help with my compromised account](https://help.x.com/en/safety-and-security/x-account-compromised)
-
-[See all articles](https://help.x.com/en/safety-and-security)
-
-## More resources
-
-About X Premium Posts
-
-[Read more](https://help.x.com/en/using-x/x-premium)
-
-Identifying information for a post, Moment, List, X Space, Community or X Shop Posts
-
-[Read more](https://help.x.com/en/using-x/post-and-moment-url)
-
-About your For you timeline on X Posts
-
-[Read more](https://help.x.com/en/using-x/x-timeline)
-
-Undo Post Posts
-
-[Read more](https://help.x.com/en/using-x/undo-post)
 
 #### X platform
 

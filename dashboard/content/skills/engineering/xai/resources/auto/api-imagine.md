@@ -47,7 +47,11 @@ pixel-perfect reality.
 
 State-of-the-art image and video generation, editing, and restyling — one API for every visual modality.
 
-[Try Playground](https://console.x.ai/team/default/image?flow=explore&campaign=imagine-landing&utm_source=website&utm_medium=referral&utm_campaign=imagine-landing&utm_content=control)[Documentation](https://docs.x.ai/developers/model-capabilities/imagine?campaign=imagine-landing)
+[Explore playground](https://console.x.ai/team/default/image?flow=explore&mode=generate&campaign=imagine-landing&utm_source=website&utm_medium=referral&utm_campaign=imagine-landing&utm_content=composer-explore)[Docs](https://docs.x.ai/developers/model-capabilities/imagine?campaign=imagine-landing)
+
+Image Video
+
+Generate Generate in Playground
 
 Up to 2K resolution 10 images per request Video up to 15s From $0.02 / image
 
@@ -58,8 +62,6 @@ Up to 2K resolution 10 images per request Video up to 15s From $0.02 / image
 ![Image 4: Generated with Grok Imagine](https://x.ai/_next/image?url=%2Fimages%2Fimagine-demo%2Fnav%2Fnav-3.jpg&w=3840&q=75&dpl=9ea881ad5b6edaae48cab985a9c5a3291a7fef70)
 
 ![Image 5: Generated with Grok Imagine](https://x.ai/_next/image?url=%2Fimages%2Fimagine-demo%2Fnav%2Fnav-4.jpg&w=3840&q=75&dpl=9ea881ad5b6edaae48cab985a9c5a3291a7fef70)![Image 6: Generated with Grok Imagine](https://x.ai/_next/image?url=%2Fimages%2Fimagine-demo%2Fnav%2Fnav-4-night.jpg&w=3840&q=75&dpl=9ea881ad5b6edaae48cab985a9c5a3291a7fef70)
-
-![Image 7: Generated with Grok Imagine](https://x.ai/_next/image?url=%2Fimages%2Fimagine-demo%2Fnav%2Fnav-5.jpg&w=3840&q=75&dpl=9ea881ad5b6edaae48cab985a9c5a3291a7fef70)![Image 8: Generated with Grok Imagine](https://x.ai/_next/image?url=%2Fimages%2Fimagine-demo%2Fnav%2Fnav-5-night.jpg&w=3840&q=75&dpl=9ea881ad5b6edaae48cab985a9c5a3291a7fef70)
 
 ### Text & image to video
 
@@ -87,11 +89,11 @@ Upload a photo of a person and a clothing item — the API generates a video of 
 *   Preserves garment shape, texture, and color
 *   Returns ready-to-use video for product detail pages
 
-![Image 9: Product](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-dress.jpg&w=3840&q=75)
+![Image 7: Product](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-dress.jpg&w=3840&q=75)
 
 Product
 
-![Image 10: Client](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-person.jpg&w=3840&q=75)
+![Image 8: Client](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-person.jpg&w=3840&q=75)
 
 Client
 
@@ -107,15 +109,15 @@ Turn a single product photo into scroll-stopping content for every channel. Gene
 *   Add people, change perspective, or shift the scene
 *   Up to 10 images per request at 2K resolution
 
-![Image 11: Original](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520style%2520sofa.webp&w=3840&q=75)
+![Image 9: Original](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520style%2520sofa.webp&w=3840&q=75)
 
-![Image 12: Ad Mockup](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2FJapanese%2520bench%2520ikea%2520style.webp&w=3840&q=75)
+![Image 10: Ad Mockup](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2FJapanese%2520bench%2520ikea%2520style.webp&w=3840&q=75)
 
-![Image 13: Change Angle](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520side.webp&w=3840&q=75)
+![Image 11: Change Angle](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520side.webp&w=3840&q=75)
 
-![Image 14: Add a Family](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520woman%2520reading.webp&w=3840&q=75)
+![Image 12: Add a Family](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520woman%2520reading.webp&w=3840&q=75)
 
-![Image 15: Change Perspective](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520top.webp&w=3840&q=75)
+![Image 13: Change Perspective](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Flanding-bench%2Fjapanese%2520bench%2520top.webp&w=3840&q=75)
 
 Original Ad Mockup Change Angle Add a Family Change Perspective
 
@@ -179,7 +181,7 @@ Turn your rough ideas into multiple realities at the click of a button.
 *   Explore variations across mood, lighting, and style
 *   Bridge concept and production with a single prompt
 
-![Image 16: Sketch](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fmockups-into-reality%2Fsketch.jpg&w=3840&q=75)
+![Image 14: Sketch](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fmockups-into-reality%2Fsketch.jpg&w=3840&q=75)
 
 [Video 47](https://data.x.ai/releases/imagine/mockups-into-reality/3d.mp4)
 
@@ -197,11 +199,11 @@ Sketch 3D Moon prototype Earth prototype
 
 [Video 53](https://data.x.ai/releases/imagine/product-placement-ads/clothing-ad.mp4)
 
-![Image 17: Product](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-dress.jpg&w=3840&q=75)
+![Image 15: Product](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-dress.jpg&w=3840&q=75)
 
 Product
 
-![Image 18: Client](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-person.jpg&w=3840&q=75)
+![Image 16: Client](https://x.ai/_next/image?url=https%3A%2F%2Fdata.x.ai%2Freleases%2Fimagine%2Fproduct-placement-ads%2Ftry-on-person.jpg&w=3840&q=75)
 
 Client
 

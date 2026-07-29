@@ -14,7 +14,7 @@ skill_name = "zed"
 
 This is the complete reference for all Zed settings.
 
-You may also want to change your [theme](@/skills/tooling/zed/resources/auto/themes.md), configure your [key bindings](https://zed.dev/key-bindings.md), set up [tasks](https://zed.dev/tasks.md), or install [extensions](@/skills/tooling/zed/resources/auto/extensions.md).
+You may also want to change your [theme](themes.md), configure your [key bindings](https://zed.dev/key-bindings.md), set up [tasks](https://zed.dev/tasks.md), or install [extensions](@/skills/tooling/zed/resources/auto/extensions.md).
 
 # Settings
 

@@ -49,6 +49,20 @@ SOC 2 Type II HIPAA GDPR & CCPA SSO & SCIM
 
 Summarize our recent order forms and put them into a pitch deck
 
+I've compiled 3 documents from your recent orders:
+
+Order_Summary.xlsx
+
+Aggregated order data — 142 line items
+
+Supplier_Terms.docx
+
+Vendor terms extracted from 6 contracts
+
+Pitch_Deck.pptx
+
+Executive summary — 12 slides
+
 Ask Grok anything...
 
 Fast
@@ -141,6 +155,18 @@ Use Connectors to integrate your tools, automate workflows, and make your workpl
 *   Read and update records end-to-end
 *   Bring your own MCP server
 
+Build an account plan for Enterprise prospects in Q4 pipeline
+
+Here's a Q4 plan covering 12 enterprise targets, ranked by deal size and buying signals. 
+
+Research competitor pricing and create sales battlecards
+
+Analyzed 5 competitors. Key differentiators: real-time data, multi-model access, and 40% lower TCO. 
+
+Draft personalized outreach sequences for decision-makers
+
+Created 3 outreach sequences tailored to VP, Director, and C-suite personas with personalized hooks. 
+
 What do you want to know?
 
 Fast
@@ -178,7 +204,7 @@ Migrate from session-based authentication to a stateless JWT architecture with r
 
 POST /v2/auth/token
 
-What do you want to know?
+Draft a design doc for the auth service redesign
 
 Fast
 
@@ -189,6 +215,18 @@ Draft campaign copy, subject lines, and landing page content that matches your b
 *   Channel-aware format and length
 *   Leverages real-time knowledge from X
 *   Localization across markets, not just translation
+
+Create customer marketing campaigns using agent builder
+
+Built a 3-channel campaign targeting mid-market accounts with personalized messaging sequences. 
+
+Pull real-time user sentiment analysis to create copy
+
+Sentiment is 72% positive. Key themes: speed and reliability. Here's copy that leans into both. 
+
+Generate A/B test variants for email subject lines
+
+8 variants across urgency, curiosity, and social proof angles. Predicted top performer: 34% open rate. 
 
 What do you want to know?
 
@@ -344,9 +382,21 @@ Raw Data
 
 Charts
 
-What do you want to know?
+Revise Q4 projections with 15% higher bookings and recalculate YTD totals
 
 Fast
+
+Build an account plan for Enterprise prospects in Q4 pipeline
+
+Here's a Q4 plan covering 12 enterprise targets, ranked by deal size and buying signals. 
+
+Research competitor pricing and create sales battlecards
+
+Analyzed 5 competitors. Key differentiators: real-time data, multi-model access, and 40% lower TCO. 
+
+Draft personalized outreach sequences for decision-makers
+
+Created 3 outreach sequences tailored to VP, Director, and C-suite personas with personalized hooks. 
 
 What do you want to know?
 
@@ -534,6 +584,30 @@ Dedicated Data Plane
 
 Interested in bringing SpaceXAI to your organization? Fill out the form and a member of our team will be in touch shortly.
 
+First Name * 
+
+Last Name * 
+
+Email Address * 
+
+Company Name * 
+
+Company Size * 
+
+Select size
+
+Job Title/Role * 
+
+Number of Enterprise Licenses * 
+
+Monthly 
+
+Annual 
+
+Enterprise Needs * 
+
+Request Access
+
 © 2026 X.AI LLC
 
 [Built with Grok](https://grok.com/?referrer=website)
@@ -576,27 +650,7 @@ Social
 
 [Built with Grok](https://grok.com/?referrer=website)
 
-First Name * 
+Copy black SVG
 
-Last Name * 
-
-Email Address * 
-
-Company Name * 
-
-Company Size * 
-
-Select size
-
-Job Title/Role * 
-
-Number of Enterprise Licenses * 
-
-Monthly 
-
-Annual 
-
-Enterprise Needs * 
-
-Request Access
+Copy white SVG
 {% endraw %}
