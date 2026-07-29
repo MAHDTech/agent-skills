@@ -24,7 +24,56 @@ const {
     parseLlmsTxtLinks,
     checkPathTraversal,
     stripReaderMetadata,
+    isLlmsIndexUrl,
+    isNonTextUrl,
+    isNonTextContentType,
 } = await import("./downloader.ts")
+
+describe("isNonTextUrl & isNonTextContentType", () => {
+    it("identifies binary and media file extensions", () => {
+        expect(isNonTextUrl("https://v2.tauri.app/_astro/image.webp")).toBe(true)
+        expect(isNonTextUrl("https://example.com/logo.png")).toBe(true)
+        expect(isNonTextUrl("https://example.com/diagram.svg")).toBe(true)
+        expect(isNonTextUrl("https://example.com/doc.pdf")).toBe(true)
+        expect(isNonTextUrl("https://example.com/archive.zip")).toBe(true)
+        expect(isNonTextUrl("https://example.com/font.woff2")).toBe(true)
+        expect(isNonTextUrl("https://v2.tauri.app/start/frontend")).toBe(false)
+        expect(isNonTextUrl("https://v2.tauri.app/llms.txt")).toBe(false)
+        expect(isNonTextUrl("https://example.com/guide.md")).toBe(false)
+    })
+
+    it("identifies non-text MIME Content-Types", () => {
+        expect(isNonTextContentType("image/webp")).toBe(true)
+        expect(isNonTextContentType("image/png")).toBe(true)
+        expect(isNonTextContentType("image/svg+xml")).toBe(true)
+        expect(isNonTextContentType("application/pdf")).toBe(true)
+        expect(isNonTextContentType("application/zip")).toBe(true)
+        expect(isNonTextContentType("application/octet-stream")).toBe(true)
+        expect(isNonTextContentType("text/html; charset=utf-8")).toBe(false)
+        expect(isNonTextContentType("text/markdown")).toBe(false)
+        expect(isNonTextContentType("text/plain")).toBe(false)
+    })
+})
+
+describe("isLlmsIndexUrl", () => {
+    it("correctly identifies llms.txt index and sub-index patterns", () => {
+        expect(isLlmsIndexUrl("https://v2.tauri.app/llms.txt")).toBe(true)
+        expect(isLlmsIndexUrl("https://v2.tauri.app/_llms.txt")).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://v2.tauri.app/_llms-txt/guides.txt")
+        ).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://v2.tauri.app/_llms-txt/reference.txt")
+        ).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://pagefind.app/llms-component-ui.txt")
+        ).toBe(true)
+        expect(isLlmsIndexUrl("https://example.com/docs/page.md")).toBe(false)
+        expect(isLlmsIndexUrl("https://cli.github.com/manual/gh_pr")).toBe(
+            false
+        )
+    })
+})
 
 describe("stripReaderMetadata", () => {
     it("strips the jina reader preamble including the volatile Published Time", () => {
@@ -178,6 +227,50 @@ describe("downloader unit tests", () => {
         await expect(downloadAction(mockSkills, fakeRepo)).rejects.toThrow(
             "Download resources failed: 1 file(s) failed to download."
         )
+    })
+
+    it("should fall back to Jina proxy when a URL returns 403 Forbidden", async () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/test-skill/SKILL.md",
+                dirName: "test-skill",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "test-skill",
+                    description: "Test skill description",
+                    resources: ["https://blocked-site.com/docs/page.md"],
+                },
+                content: "",
+            },
+        ]
+
+        globalThis.fetch = mock(async (url: any) => {
+            const urlStr = String(url)
+            if (urlStr.startsWith("https://r.jina.ai/")) {
+                return new Response(
+                    "Title: Blocked Page\n\nURL Source: https://blocked-site.com/docs/page.md\n\nMarkdown Content:\n# Recovered Content\nThis content was recovered via proxy fallback and is long enough.",
+                    {status: 200, headers: {"content-type": "text/markdown"}}
+                )
+            }
+            return new Response("Forbidden", {
+                status: 403,
+                statusText: "Forbidden",
+                headers: {"content-type": "text/html"},
+            })
+        }) as any
+
+        await downloadAction(mockSkills, fakeRepo)
+
+        const resourcesDir = path.join(
+            fakeRepo,
+            "skills/engineering/test-skill/resources/auto"
+        )
+        const fileContent = await fs.readFile(
+            path.join(resourcesDir, "docs-page.md"),
+            "utf-8"
+        )
+        expect(fileContent).toContain("# Recovered Content")
     })
 
     it("should skip dead links discovered from an llms.txt index without failing the run", async () => {

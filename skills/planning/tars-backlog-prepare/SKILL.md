@@ -181,13 +181,13 @@ Determine, once, the three commands every spoke and gate will need, and verify e
 - **Install command** — what a fresh clone needs before it can build or typecheck. Use the **lockfile-respecting** form, because this command also runs inside the verification gate where the committed lockfile is the authority: `bun install --frozen-lockfile`, `npm ci`, `cargo fetch --locked`, `uv sync --frozen`, `go mod download`. Record an empty value for repositories that need no install step.
 - **Hook command** — how this repository runs its whole-repo hooks, which the gate invokes before the tests:
 
-  | Repository contains                          | Hook command                          |
-  | -------------------------------------------- | ------------------------------------- |
-  | `.pre-commit-config.yaml`, `prek` on PATH    | `prek run -a`                         |
-  | `.pre-commit-config.yaml`, `pre-commit` only | `pre-commit run --all-files`          |
-  | `lefthook.yml` / `lefthook.yaml`             | `lefthook run pre-commit --all-files` |
-  | `.husky/`                                    | the script the hook itself runs       |
-  | none of the above                            | empty — the gate runs tests only      |
+  | Repository contains                                   | Hook command                          |
+  | ----------------------------------------------------- | ------------------------------------- |
+  | `.pre-commit-config.yaml`, `prek` on PATH             | `prek run -a`                         |
+  | `.pre-commit-config.yaml`, `pre-commit` only (legacy) | `pre-commit run --all-files`          |
+  | `lefthook.yml` / `lefthook.yaml`                      | `lefthook run pre-commit --all-files` |
+  | `.husky/`                                             | the script the hook itself runs       |
+  | none of the above                                     | empty — the gate runs tests only      |
 
   An empty hook command is a legitimate answer, not a failure. Record it; the gate substitutes `:` for it.
 

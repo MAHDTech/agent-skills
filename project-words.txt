@@ -107,6 +107,7 @@ pagefind
 pandoc
 pathlib
 peaceiris
+pkgs
 Pocock
 prefactoring
 preheader

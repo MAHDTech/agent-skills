@@ -27,6 +27,13 @@ SECRETSPEC_REASON="<reason>" devenv --no-tui shell -- <command>
 
 ## Pre-commit Hooks and Testing
 
+> [!CAUTION]
+> **PRE-COMMIT VS PREK IN DEVENV.NIX:**
+> - **Terminology:** "pre-commit" refers strictly to the Git lifecycle hook stage (e.g. `.pre-commit-config.yaml`).
+> - **CLI Tool Deprecation:** The standalone `pre-commit` Python CLI tool and package are **DEPRECATED** and replaced by `prek`.
+> - **DO NOT add `pkgs.pre-commit` or `pre-commit` package/input to `devenv.nix`.** If a hook runner package is needed, use `pkgs.prek` or `git-hooks.git-hooks`.
+> - ALWAYS use `prek` to run or manage pre-commit hooks (e.g., `prek run -a`).
+
 Devenv gives us the ability to run tests and linters seamlessly. The project-level hooks are run via `prek` (see the [prek](../prek/SKILL.md) skill).
 - `SECRETSPEC_REASON="running tests" devenv --no-tui test`: This triggers all pre-commit hooks (managed by `prek`) and other defined tests and is **mandatory** as part of testing.
 

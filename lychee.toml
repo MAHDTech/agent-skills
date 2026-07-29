@@ -17,6 +17,7 @@ exclude_path = [
   "dashboard",
   ".out-of-scope",
   "bin/skills/lib.test.ts",
+  "bin/skills/downloader.test.ts",
 ]
 
 # URL patterns to ignore (regex):
@@ -24,6 +25,7 @@ exclude = [
   "http://127.0.0.1.*",
   "https://10.0.0.10.*",
   "http://localhost.*",
+  "https://blocked-site.com.*",
   '.*\$.*',           # any URL with a literal $ = shell/template placeholder in code, not a real link
   '.*skills\.sh.*',   # TODO: remove once the repo is published/indexed on skills.sh (404s until then)
 ]

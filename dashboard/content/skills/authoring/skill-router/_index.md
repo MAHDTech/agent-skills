@@ -132,7 +132,7 @@ Beyond `/code-review` on the main flow:
 - `/agent-guidelines` — reach for this when you want work checked against the behavioural guidelines for agents.
 - `/antigravity` — reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` — reach for this when a repo uses devenv for its shell and dependencies.
-- `/prek` — reach for this when running, configuring, or troubleshooting pre-commit hooks.
+- `/prek` — reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
 - `/opencode` — reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
 - `/opencode-acp` — reach for this when controlling OpenCode over the Agent Client Protocol.
 - [/pagefind](@/skills/tooling/pagefind/_index.md) — reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.

@@ -1,0 +1,400 @@
+\# Pagefind Component UI - LLM Reference Guide This document teaches LLM
+agents how to use and operate the Pagefind Component UI system. The
+Component UI is a set of web components for building search interfaces
+on static sites. \*\*Important:\*\* The Component UI
+(\`pagefind-component-ui.js\`, web components like \`\`) replaces the
+old "Default UI" (\`pagefind-ui.js\`, \`new PagefindUI()\`). The Default
+UI is legacy and no longer recommended. Always use the Component UI
+described in this document for new projects. \## How Pagefind Works
+Pagefind is a two-step system: 1. \*\*Build time:\*\* After your static
+site is built, you run the Pagefind CLI. It crawls the HTML output and
+generates a search index plus the UI assets in a \`/pagefind/\`
+directory inside your build output. 2. \*\*Browser:\*\* The Component UI
+loads from that generated \`/pagefind/\` directory and provides instant
+client-side search with no server required. The CLI step is typically
+added as a post-build command: \`\`\`bash \# After your site builds to a
+directory (e.g. "public", "\_site", "dist", "out"): npx -y pagefind
+--site public \`\`\` This generates \`public/pagefind/\` containing the
+search index, WASM binary, and UI files. The UI \`\` and \` \`\`\`
+That's it. The trigger renders a "Search" button with a
+\`Cmd+K\`/\`Ctrl+K\` shortcut. Clicking it opens a full modal with
+input, results, and keyboard navigation — all auto-generated. \##
+Choosing an Approach \*\*Modal\*\* (\`\` + \`\`) — Best default choice.
+Works on any site without tight layout integration. The trigger can go
+in a nav bar, sidebar, or anywhere. The modal overlays the page.
+\*\*Searchbox\*\* (\`\`) — A compact input with dropdown results. Use
+this when you want search embedded directly in your navigation or
+header, rather than in an overlay. Single element, self-contained.
+\*\*Building blocks\*\* (\`\`, \`\`, \`\`, etc.) — Use these when you
+need full control over layout, such as a dedicated search page with
+filters in a sidebar and results in the main content area. These
+components auto-connect when placed on the same page. \## Installation
+\### Option 1: Bundled Files (static sites, most common) Best for: Hugo,
+Eleventy, Jekyll, Astro, or any static site where you include assets via
+HTML tags. \`\`\`html \`\`\` \### Option 2: npm Package (JS framework
+sites) Best for: Next.js, SvelteKit, Nuxt, or other frameworks where you
+import modules in JavaScript. You will still need to run the Pagefind
+CLI as a post-build step to generate the search index. \`\`\`bash npm
+install @pagefind/component-ui \`\`\` \`\`\`javascript import
+'@pagefind/component-ui'; import '@pagefind/component-ui/css'; \`\`\` If
+your site is hosted on a subpath or your Pagefind bundle is in a
+non-standard location, use \`\` or \`configureInstance\` to point to the
+right directory. \## Overview Pagefind Component UI provides: - Web
+components that auto-connect and communicate via shared instances - Two
+prebuilt experiences: Modal search and Searchbox dropdown - Individual
+building blocks for custom layouts - Full accessibility (WAI-ARIA
+compliant) - Automatic translations for 40+ languages - CSS custom
+property theming --- \## Component Reference \### Prebuilt Full
+Experiences \#### \`\` + \`\` Modal overlay search dialog. Most
+universal search UI. \`\`\`html \`\`\` \*\*\`\` Attributes:\*\* \|
+Attribute \| Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`placeholder\` \|
+string \| Language dependent \| Text on trigger button \| \|
+\`shortcut\` \| string \| \`"mod+k"\` \| Keyboard shortcut to open modal
+\| \| \`hide-shortcut\` \| boolean \| \`false\` \| Hide keyboard
+shortcut display \| \| \`compact\` \| boolean \| \`false\` \| Show only
+search icon, no text \| \| \`instance\` \| string \| \`"default"\` \|
+Instance name \| \*\*\`\` Attributes:\*\* \| Attribute \| Type \|
+Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`reset-on-close\`
+\| boolean \| \`false\` \| Clear input when modal closes \| \|
+\`instance\` \| string \| \`"default"\` \| Instance name \| \*\*Modal
+Default Structure:\*\* An empty \`\` works out of the box with no
+configuration needed. It auto-generates a complete internal structure
+with input, summary, results, and keyboard hints. You only need to
+provide children if you want to customize the modal's contents:
+\`\`\`html \`\`\` \*\*Modal Structural Components:\*\* - \`\` - Fixed
+header (contains input, has mobile close button) - \`\` - Scrollable
+content area - \`\` - Optional fixed footer \*\*Keyboard
+Shortcuts:\*\* - \`Cmd+K\` (Mac) / \`Ctrl+K\` (Windows/Linux) opens
+modal from anywhere on page - Keyboard shortcut is suppressed when the
+user is focused on an \`\`, \`
+
+\`, or \`contentEditable\` element - \`Escape\` closes modal
+\*\*Programmatic Control:\*\* The modal element exposes public methods
+for JavaScript control: - \`modal.open()\` — open the modal -
+\`modal.close()\` — close the modal - \`modal.isOpen\` — boolean getter
+for current state \`\`\`javascript const modal =
+document.querySelector('pagefind-modal'); modal.open(); \`\`\` On open,
+the modal auto-focuses the \`\` (or first \`\`) inside it. On close,
+focus returns to the trigger button. \*\*Customizing the Keyboard
+Shortcut:\*\* The \`shortcut\` attribute accepts a shortcut string with
+the following syntax: - \*\*Platform modifier:\*\* \`mod\` (Ctrl on
+Windows/Linux, Cmd on Mac) - \*\*Explicit modifiers:\*\* \`ctrl\`,
+\`shift\`, \`alt\`, \`cmd\`/\`meta\` - \*\*Keys:\*\* Any single
+character (e.g. \`k\`, \`/\`) or key name - \*\*Case-insensitive:\*\*
+Keys are normalized to lowercase \`\`\`html \`\`\` The shortcut display
+auto-detects the platform to show the correct modifier symbol. --- \####
+\`\` All-in-one compact dropdown search. Often placed in navigation.
+\`\`\`html \`\`\` \*\*Attributes:\*\* \| Attribute \| Type \| Default \|
+Description \| \|-----------\|------\|---------\|-------------\| \|
+\`placeholder\` \| string \| Language dependent \| Input placeholder \|
+\| \`debounce\` \| number \| \`150\` \| Milliseconds wait after typing
+\| \| \`max-results\` \| number \| unlimited \| Limit results shown \|
+\| \`show-sub-results\` \| boolean \| \`false\` \| Show anchor
+sub-results \| \| \`show-keyboard-hints\` \| boolean \| \`true\` \| Show
+keyboard hints in footer \| \| \`autofocus\` \| boolean \| \`false\` \|
+Focus input on page load \| \| \`shortcut\` \| string \| \`"mod+k"\` \|
+Keyboard shortcut to focus input \| \| \`hide-shortcut\` \| boolean \|
+\`false\` \| Hide keyboard shortcut display \| \| \`instance\` \| string
+\| \`"default"\` \| Instance name \| The \`shortcut\` attribute accepts
+the same syntax as \`\`. Like the modal trigger, the shortcut is
+suppressed when the user is focused on an \`\`, \`
+
+\`, or \`contentEditable\` element. \*\*Keyboard Navigation:\*\* \| Key
+\| Action \| \|-----\|--------\| \| \`↓\` / \`↑\` \| Navigate results \|
+\| \`Enter\` \| Go to selected result \| \| \`Shift+Enter\` \| Open in
+new tab \| \| \`Ctrl+Enter\` / \`Cmd+Enter\` \| Open in new tab \| \|
+\`Escape\` \| Close dropdown \| \| \`Tab\` \| Move focus away \| When
+results appear, the first result is always auto-selected. The dropdown
+closes on outside click. \*\*Custom Templates:\*\* Searchbox templates
+implement the ARIA combobox pattern and \*\*must\*\* include specific
+attributes for keyboard navigation and screen readers to work:
+\`\`\`html
+
+\`\`\` \*\*Searchbox Template Requirements:\*\* - Each navigable item
+must be an \`\` element with a valid \`href\`, \`role="option"\`, and
+\`aria-selected="false"\` - Set \`id="{{ aria.result_id }}"\` (or \`{{
+sub.aria.result_id }}\` for sub-results) so the input can track the
+active selection - The root element of your template must have
+\`role="option"\` or \`role="group"\` - Without sub-results, your
+template root is the \`\` itself - With sub-results, your template root
+is a \`role="group"\` element wrapping the main result and its
+sub-results together \*\*Searchbox Template Data:\*\* \| Field \|
+Description \| \|-------\|-------------\| \| \`meta.title\` \| Page
+title \| \| \`meta.url\` \| Page URL \| \| \`meta.\*\` \| Any custom
+metadata \| \| \`excerpt\` \| Search excerpt with \`\` highlighting (use
+\`{{+ excerpt +}}\`) \| \| \`url\` \| Fallback URL \| \| \`sub_results\`
+\| Array of matching sections (when \`show-sub-results\` is set) \| \|
+\`options.show_sub_results\` \| Whether \`show-sub-results\` is set on
+the searchbox \| \| \`aria.result_id\` \| Unique ID for ARIA attributes
+\| \| \`aria.title_id\` \| ID for the title element \| \|
+\`aria.excerpt_id\` \| ID for the excerpt element \| Each sub-result
+has: \`title\`, \`url\`, \`excerpt\`, and its own \`aria\` object.
+\*\*Full Built-in Searchbox Template:\*\* Copy and customize: \`\`\`html
+
+\`\`\` --- \### Building Block Components \#### \`\` Search input field
+with debouncing. \`\`\`html \`\`\` \*\*Attributes:\*\* \| Attribute \|
+Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`placeholder\` \|
+string \| Language dependent \| Placeholder text \| \| \`debounce\` \|
+number \| \`300\` \| Milliseconds wait after typing \| \| \`autofocus\`
+\| boolean \| \`false\` \| Focus on page load \| \| \`instance\` \|
+string \| \`"default"\` \| Instance name \| \*\*Behavior:\*\* - Focusing
+begins loading Pagefind bundle - Value syncs when search triggered by
+other components - Registers keyboard shortcuts when focused - Renders a
+clear button (class \`pf-input-clear\`) that appears when text is
+entered \*\*Keyboard:\*\* \| Key \| Action \| \|-----\|--------\| \|
+\`Escape\` \| Clear input and reset search \| \| \`↓\` \| Move focus to
+results list \| --- \#### \`\` Displays search results with lazy loading
+(loads full data only when scrolled into view). \`\`\`html \`\`\`
+\*\*Attributes:\*\* \| Attribute \| Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`show-images\` \|
+boolean \| \`false\` \| Show result images \| \| \`hide-sub-results\` \|
+boolean \| \`false\` \| Hide anchor sub-results \| \|
+\`max-sub-results\` \| number \| \`3\` \| Max sub-results per result \|
+\| \`max-results\` \| number \| unlimited \| Limit results shown \| \|
+\`link-target\` \| string \| — \| Set \`target\` on links (e.g.,
+\`\_blank\`) \| \| \`instance\` \| string \| \`"default"\` \| Instance
+name \| \*\*Keyboard Navigation (when focused):\*\* \| Key \| Action \|
+\|-----\|--------\| \| \`↓\` / \`↑\` \| Navigate between results. \`↑\`
+at first result returns focus to the input. \`↓\` at the last loaded
+result triggers lazy-loading of the next. \| \| \`Enter\` \| Follow
+selected link (native browser behavior on focused \`\`) \| \|
+\`Backspace\` \| Focus input, delete last character \| \| \`/\` \| Focus
+search input \| \| Any letter \| Focus input and type character \|
+\*\*Custom Templates:\*\* \`\`\`html
+
+\`\`\` Keyboard navigation moves between \`\` elements in the results
+list, so ensure your main result link is an \`\` tag. \*\*Programmatic
+Template (JS property):\*\* Both \`\` and \`\` also accept a
+\`resultTemplate\` JavaScript property — a function that receives a
+result data object and returns an Element, array of Elements, or HTML
+string. This takes priority over \`
+
+\`\`\` \*\*Template Data Available:\*\* \| Field \| Description \|
+\|-------\|-------------\| \| \`meta.title\` \| Page title \| \|
+\`meta.url\` \| Page URL \| \| \`meta.image\` \| Page image (if set) \|
+\| \`meta.image_alt\` \| Image alt text \| \| \`meta.\*\` \| Any custom
+metadata \| \| \`excerpt\` \| Search excerpt with \`\` highlighting (use
+\`{{+ excerpt +}}\`) \| \| \`url\` \| Fallback URL \| \| \`sub_results\`
+\| Array of matching sections \| \| \`options.link_target\` \| Value of
+the \`link-target\` attribute (string or null) \| \|
+\`options.show_images\` \| Whether the \`show-images\` attribute is set
+(boolean) \| Each sub-result has: \`title\`, \`url\`, \`excerpt\`.
+\*\*Full Built-in Results Template:\*\* Copy and customize: \`\`\`html
+
+\`\`\` --- \#### \`\` Displays search status and result count.
+\`\`\`html \`\`\` \*\*Attributes:\*\* \| Attribute \| Type \| Default \|
+Description \| \|-----------\|------\|---------\|-------------\| \|
+\`default-message\` \| string \| \`""\` \| Message before any search \|
+\| \`instance\` \| string \| \`"default"\` \| Instance name \|
+\*\*States Displayed:\*\* \| State \| Display \| \|-------\|---------\|
+\| No search \| \`default-message\` value \| \| Searching \| \`Searching
+for {term}...\` \| \| Results found \| \`{count} result(s) for {term}\`
+\| \| Results (faceted mode, no search term) \| \`{count} result(s)\` \|
+\| No results \| \`0 results for {term}\` \| \| Error \| \`Error:
+{message}\` \| These messages are automatically translated to match the
+language of the website. --- \#### \`\` Displays contextual keyboard
+shortcuts based on focused component. \`\`\`html \`\`\`
+\*\*Attributes:\*\* \| Attribute \| Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`instance\` \|
+string \| \`"default"\` \| Instance name \| \*\*Contextual
+Shortcuts:\*\* \| Component Focus \| Shortcuts Shown \|
+\|-----------------\|-----------------\| \| Input \| \`↓ navigate\`,
+\`esc clear\` \| \| Results \| \`↑↓ navigate\`, \`↵ select\`, \`/
+search\` \| \| Modal \| \`esc close\` \| \| No focus \| Empty \|
+Notes: - Marked \`aria-hidden="true"\` (visual aid for sighted keyboard
+users) - Auto-hidden on touch-only devices --- \#### \`\` Dropdown
+selector for a single filter facet. The \`filter\` attribute value must
+match a \`data-pagefind-filter\` key from your indexed content.
+\*\*Important:\*\* Filter values only populate after a search has been
+triggered, or when using faceted mode (\`\`). Without either, the
+dropdown will be empty. \`\`\`html \`\`\` \*\*Attributes:\*\* \|
+Attribute \| Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`filter\` \|
+string \| — \| \*\*Required.\*\* Filter key to display \| \| \`label\`
+\| string \| filter name \| Text on trigger button \| \|
+\`single-select\` \| boolean \| \`false\` \| Allow only one selection \|
+\| \`show-empty\` \| boolean \| \`false\` \| Show options with zero
+results \| \| \`wrap\` \| boolean \| \`false\` \| Allow text wrapping \|
+\| \`sort\` \| string \| \`"default"\` \| Sort: \`default\`,
+\`alphabetical\`, \`count-desc\`, \`count-asc\` \| \| \`hide-clear\` \|
+boolean \| \`false\` \| Hide "Clear" button \| \| \`instance\` \| string
+\| \`"default"\` \| Instance name \| \*\*Keyboard (ARIA Combobox
+pattern):\*\* When closed: \`Enter\`/\`Space\` opens the dropdown. \`↓\`
+opens and focuses first option. \`↑\` opens and focuses last option.
+When open: \| Key \| Action \| \|-----\|--------\| \| \`↓\` / \`↑\` \|
+Navigate options \| \| \`Home\` / \`End\` \| Jump to first/last \| \|
+\`Enter\` / \`Space\` \| Toggle selection \| \| \`Escape\` \| Close
+dropdown \| \| \`Tab\` \| Close and move focus \| \| Type characters \|
+Type-ahead jump (500ms buffer) \| The dropdown also closes on outside
+click. --- \#### \`\` Full filter panel showing all available filters.
+Auto-populates from indexed content (unlike \`\` which shows a single
+named filter). \*\*Important:\*\* Like the filter dropdown, filter
+values only populate after a search has been triggered, or when using
+faceted mode (\`\`). \`\`\`html \`\`\` \*\*Attributes:\*\* \| Attribute
+\| Type \| Default \| Description \|
+\|-----------\|------\|---------\|-------------\| \| \`show-empty\` \|
+boolean \| \`false\` \| Show options with zero results \| \|
+\`expanded\` \| boolean \| \`false\` \| Always expanded
+(non-collapsible) \| \| \`open\` \| string \| \`""\` \| Comma-separated
+filters to start open \| \| \`sort\` \| string \| \`"default"\` \| Sort:
+\`default\`, \`alphabetical\`, \`count-desc\`, \`count-asc\` \| \|
+\`auto-open-threshold\` \| number \| \`6\` \| Max values to auto-open
+single group (0 to disable) \| \| \`instance\` \| string \|
+\`"default"\` \| Instance name \| \*\*Behavior:\*\* - Groups are
+collapsible by default - Single group with ≤ threshold options
+auto-opens - Options with zero results hidden unless \`show-empty\` or
+selected - Empty groups hidden entirely --- \### Configuration Component
+\#### \`\` Declaratively configure a Pagefind instance. \`\`\`html
+\`\`\` \*\*Attributes:\*\* \| Attribute \| Type \| Default \|
+Description \| \|-----------\|------\|---------\|-------------\| \|
+\`bundle-path\` \| string \| auto-detected \| Path to Pagefind bundle
+files \| \| \`base-url\` \| string \| \`"/"\` \| Base URL prepended to
+result links \| \| \`excerpt-length\` \| number \| \`30\` \| Excerpt
+length in words \| \| \`lang\` \| string \| auto-detected \| Override
+the detected language for stemming and translations \| \| \`instance\`
+\| string \| \`"default"\` \| Instance name \| \| \`preload\` \| boolean
+\| \`false\` \| Load Pagefind immediately \| \| \`faceted\` \| boolean
+\| \`false\` \| Enable faceted/browse mode \| \*\*Important:\*\*
+Attributes are read once when component connects. Dynamic changes have
+no effect; use JavaScript API instead. \*\*Bundle Path Detection:\*\* -
+Auto-detected from script location (e.g.,
+\`/assets/pagefind/pagefind-component-ui.js\` → \`/assets/pagefind/\`) -
+Falls back to \`/pagefind/\` \*\*Faceted Mode:\*\* For catalog-style
+browsing without requiring a search term: \`\`\`html \`\`\` When
+\`faceted\` is enabled: - Empty search returns all results - Results
+update immediately when filters change Combine with \`preload\` to show
+all results on page load. \*\*Programmatic Configuration:\*\*
+\*\*Important:\*\* \`configureInstance\` must run \*\*before\*\* any
+components with the same instance name connect to the DOM. If a
+component connects first, it creates the instance with defaults and the
+later \`configureInstance\` call is silently ignored. Place the script
+before your component elements, or use a \`\` element instead.
+\`\`\`javascript const { configureInstance } =
+window.PagefindComponents; configureInstance("default", { bundlePath:
+"/pagefind/", mergeIndex: \[ { bundlePath: "/other-site/pagefind/" } \],
+ranking: { termFrequency: 0.8 } }); \`\`\` --- \## Instance System
+Components auto-connect through shared instances. All components without
+an \`instance\` attribute use the \`"default"\` instance. \### Named
+Instances Create independent search interfaces: \`\`\`html \`\`\`
+Components with the same \`instance\` share state. Different instances
+are completely independent. --- \## Custom Templates Both \`\` and \`\`
+support custom templates using \`
+
+\`\`\` \### Template Filters \| Filter \| Description \|
+\|--------\|-------------\| \| \`default(value)\` \| Fallback if empty
+\| \| \`safeUrl\` \| Sanitize URL for href \| \### ARIA Data in
+Templates For accessibility, templates receive ARIA helper IDs: \| Field
+\| Description \| \|-------\|-------------\| \| \`aria.result_id\` \|
+Unique ID for result element \| \| \`aria.title_id\` \| ID for title
+element \| \| \`aria.excerpt_id\` \| ID for excerpt element \|
+Sub-results have their own \`aria\` object with the same fields.
+\*\*Important:\*\* ARIA IDs are critical for \`\` custom templates. See
+the searchbox section for template requirements. --- \## CSS
+Customization \### Style Isolation Pagefind components apply \`all:
+initial\` on their host elements, resetting all inherited CSS
+properties. This means site styles (fonts, colors, etc.) do \*\*not\*\*
+cascade into Pagefind components. The \`--pf-\*\` CSS custom properties
+listed below are the only way to theme them. Content inside custom
+templates (\`
+
+\`\`\` \### Events Subscribe with \`instance.on(event, callback,
+owner?)\`: The optional \`owner\` parameter (typically \`this\` in a web
+component) enables deduplication — only one callback per owner per event
+is stored. Use this in custom components to avoid duplicate listeners if
+the component reconnects. \| Event \| Callback Arguments \| Description
+\| \|-------\|-------------------\|-------------\| \| \`search\` \|
+\`(term, filters)\` \| Search triggered \| \| \`loading\` \| none \|
+Search loading \| \| \`results\` \| \`(searchResult)\` \| Results ready
+\| \| \`filters\` \| \`({ available, total })\` \| Filter counts updated
+\| \| \`error\` \| \`(error)\` \| Search error \| \| \`translations\` \|
+\`(translations, direction)\` \| Language changed \| \### Triggering
+Searches \`\`\`javascript // Search with current filters
+instance.triggerSearch('search term'); // Search with specific filters
+instance.triggerSearchWithFilters('search term', { category: \['blog',
+'docs'\] }); // Update filters only (re-runs current search)
+instance.triggerFilters({ category: \['blog'\] }); // Update single
+filter instance.triggerFilter('category', \['blog'\]); // Preload
+Pagefind bundle await instance.triggerLoad(); \`\`\` \### Working with
+Results \`\`\`javascript instance.on('results', async (searchResult) =\>
+{ for (const rawResult of searchResult.results) { const data = await
+rawResult.data(); console.log(data.url); // Page URL
+console.log(data.meta.title); // Page title console.log(data.excerpt);
+// Excerpt with tags console.log(data.sub_results); // Matching sections
+} }); // Get sub-results for display (excludes root, limits count) const
+subResults = instance.getDisplaySubResults(resultData, 3); \`\`\` \###
+Instance State \`\`\`javascript instance.name // Instance name (e.g.
+'default') instance.searchTerm // Current search term
+instance.searchFilters // Current filter selections
+instance.searchResult // Last search result instance.availableFilters //
+Filter counts for current search instance.totalFilters // Filter counts
+for all content instance.direction // 'ltr' or 'rtl' instance.faceted //
+Whether faceted mode is enabled \`\`\` \### Translations
+\`\`\`javascript // Get translated string const text =
+instance.translate('zero_results', { SEARCH_TERM: 'hello' }); //
+Override detected language instance.setLanguage('fr'); // Add custom
+translations instance.setTranslations({ 'placeholder': 'Search
+documentation...', 'zero_results': 'Nothing found for \[SEARCH_TERM\]'
+}); \`\`\` \### Screen Reader Announcements \`\`\`javascript // Announce
+with translation key instance.announce('zero_results', { SEARCH_TERM:
+term }, 'assertive'); // Announce raw text instance.announceRaw('5 new
+results loaded', 'polite'); \`\`\` \### Component Registration Register
+for keyboard navigation and ARIA features: \`\`\`javascript
+instance.registerInput(this, { keyboardNavigation: true });
+instance.registerResults(this, { keyboardNavigation: true,
+announcements: true }); instance.registerSummary(this, {});
+instance.registerFilter(this, {}); instance.registerSort(this, {});
+instance.registerUtility(this, 'hints', {}); \`\`\`
+\*\*Capabilities:\*\* \| Capability \| Description \|
+\|------------\|-------------\| \| \`keyboardNavigation\` \|
+Participates in arrow-key focus management \| \| \`announcements\` \|
+Handles own screen reader announcements \| Query components:
+\`\`\`javascript const inputs =
+instance.getInputs('keyboardNavigation'); const results =
+instance.getResults(); const summaries = instance.getSummaries(); const
+filters = instance.getFilters(); const sorts = instance.getSorts();
+const utilities = instance.getUtilities('modal'); \`\`\` \### Keyboard
+Shortcuts \`\`\`javascript // Register shortcut (appears in keyboard
+hints) instance.registerShortcut({ label: '↓', description: 'navigate'
+}, this); // Remove shortcuts instance.deregisterShortcut('↓', this);
+instance.deregisterAllShortcuts(this); // Get all active shortcuts const
+shortcuts = instance.getActiveShortcuts(); \`\`\` \### Focus Management
+\`\`\`javascript // Focus next results component, then its first link
+instance.focusNextResults(this); // Focus previous input component
+instance.focusPreviousInput(this); // Focus input and type character
+(triggers search) instance.focusInputAndType(this, 'a'); // Focus input
+and delete last character (triggers search)
+instance.focusInputAndDelete(this); \`\`\` \### ARIA Reconciliation
+\`\`\`javascript // Trigger ARIA update on all components
+instance.reconcileAria(); // Implement on your component to respond
+class MyComponent extends HTMLElement { reconcileAria() { // Update
+aria-controls, aria-labelledby, etc. } } \`\`\` \### Unique IDs
+\`\`\`javascript const id = instance.generateId('my-prefix'); //
+Returns: "my-prefix-abc-def" \`\`\` --- \## Example Custom Components
+\### Results Counter \`\`\`javascript import { getInstanceManager } from
+'@pagefind/component-ui'; class MyResultsCounter extends HTMLElement {
+connectedCallback() { const instanceName = this.getAttribute('instance')
+\|\| 'default'; const instance =
+getInstanceManager().getInstance(instanceName); instance.on('results',
+(searchResult) =\> { const count = searchResult.results?.length ?? 0;
+this.textContent = \`\${count} results found\`; });
+instance.on('loading', () =\> { this.textContent = 'Searching...'; }); }
+} customElements.define('my-results-counter', MyResultsCounter); \`\`\`
+\`\`\`html \`\`\` \### Quick Search Button \`\`\`javascript import {
+getInstanceManager } from '@pagefind/component-ui'; class
+QuickSearchButton extends HTMLElement { connectedCallback() { const term
+= this.getAttribute('term') \|\| ''; const instanceName =
+this.getAttribute('instance') \|\| 'default';
+this.addEventListener('click', () =\> { const instance =
+getInstanceManager().getInstance(instanceName);
+instance.triggerSearch(term); }); } }
+customElements.define('quick-search-button', QuickSearchButton); \`\`\`
+\`\`\`html Quick Start \`\`\` --- \## Accessibility Notes - All
+components follow WAI-ARIA patterns (modal, combobox, listbox) -
+Keyboard navigation is fully supported - Screen reader announcements are
+automatic - Focus management handled correctly - RTL languages supported
+(direction auto-detected) - Translations include assistive text - \`\`
+is \`aria-hidden\` (visual aid only) - Touch devices: keyboard hints
+auto-hidden
