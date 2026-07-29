@@ -17,6 +17,7 @@ cachix
 cfasync
 cheatsheet
 checkboxed
+checkpointing
 Codeberg
 colour
 commitlog
@@ -97,6 +98,7 @@ nixpkgs
 nonblock
 noninfringement
 npx
+ntnx
 nutanix
 nygard
 olshansk
@@ -108,6 +110,7 @@ pagefind
 pandoc
 pathlib
 peaceiris
+pgrep
 pkgs
 Pocock
 prefactoring
@@ -127,6 +130,7 @@ qcow
 quickstarts
 readlink
 realpath
+refspec
 reinstall
 reparented
 reparenting
@@ -141,11 +145,13 @@ scqa
 sculpt
 secretspec
 serde
+sess
 shortcutting
 sidequery
 Signups
 skimmability
 skimmable
+slugifying
 spacetimedb
 sqfs
 stfolder
@@ -191,5 +197,3 @@ worktree
 worktrees
 WSJF
 xclip
-ntnx
-slugifying

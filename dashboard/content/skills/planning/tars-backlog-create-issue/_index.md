@@ -34,6 +34,8 @@ component: "module/name"
 priority: "low" | "medium" | "high"
 type: "bug" | "feature" | "refactor" | "security"
 estimation: "2h"
+complexity: "normal" | "high"   # optional; high enables spoke checkpoint protocol
+risk: "normal" | "high"         # optional; high forces full implementation review
 dependencies: []
 status: "todo" | "rework" | "done" | "failed"
 attempts: 0
@@ -41,12 +43,19 @@ branch: null
 batch: null
 files:
   - path/to/file1.ts
+owns: [] # optional; path or path#symbol this ticket uniquely owns
 ---
 
 > [!IMPORTANT]
-> **`files:` is mandatory and must not be empty.** It is the only input to the File rule that decides which tickets may be implemented in parallel — see [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md). A ticket without it cannot be batched with anything and must run alone, so an omitted list silently serialises the backlog at best, and at worst gets treated as "no conflicts" and batched into a collision.
+> **`files:` is mandatory and must not be empty.** It is an input to the File rule that decides which tickets may be implemented in parallel — see [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md). A ticket without it cannot be batched with anything and must run alone, so an omitted list silently serialises the backlog at best, and at worst gets treated as "no conflicts" and batched into a collision.
 >
 > List every file the work will touch, including ones changed only incidentally: test files, fixtures, barrel/index re-exports, lockfiles, and shared append-only files such as a spellcheck dictionary. Under-declaring is the failure that matters; over-declaring only costs a little parallelism.
+>
+> **`owns:` (optional)** lists modules or exports this ticket is the authority for, as `path` or `path#SymbolName` (e.g. `packages/shared/src/git.ts#CONVENTIONAL_COMMIT_TYPES`). Overlapping `owns:` between tickets serialises them like overlapping `files:`. Use it when two tickets might both add the same constant or edit the same shared implementation even if their `files:` lists look disjoint.
+>
+> **Soft dependencies:** if ticket B needs an export or behaviour ticket A will introduce, put A in B's `dependencies:` even when the files do not overlap. "Must already be merged" is not the same as "must not collide on disk."
+>
+> **`risk: high`** (security, hooks, auth, shared core) and **`complexity: high`** (large multi-file work) steer review depth and spoke checkpointing during implement — set them honestly.
 
 # XXX — Issue Name
 
@@ -65,7 +74,7 @@ Detailed list of concrete developer tasks to complete:
 
 Explicit, checkable conditions that must be satisfied for the ticket to be considered complete:
 
-- [ ] Criterion 1 (e.g. `devenv --no-tui test` passes without error)
+- [ ] Criterion 1 (e.g. the project's full test gate passes without error)
 - [ ] Criterion 2 (e.g. Invalid input is caught and returns exit code 1)
 
 ## Evidence
@@ -92,15 +101,16 @@ The triage agent will review the ticket and append a `## Review` section contain
 - **Codebase Check**: Verification that all files/directories referenced in the ticket actually exist.
 - **Hallucination Check**: Ensuring no deprecated APIs or incorrect function signatures are referenced.
 - **Readiness Verdict**: A list of findings or a clear statement that the ticket is ready for implementation.
+- **Footprint check**: `files:` complete vs body; `owns:` suggested when shared exports are involved; soft-deps called out.
 
 ### During Backlog Implementation (`tars-backlog-implement`)
 
 The implementation agent must:
 
 1. Complete all checkboxes in the `## Tasks` and `## Acceptance Criteria` sections.
-2. Run `devenv --no-tui test` (or the project's test command) and verify the tests pass.
+2. Run verification using the repository commands frozen in `.tars/run.env` (spokes: targeted tests via `tars-spoke`; hub: full `tars-gate`).
 3. Document terminal outputs or test run success under the `## Evidence` section.
-4. Conventional commits must be used when committing the changes.
+4. Use the repository's commit message policy (conventional commits when the project requires them).
 
 ### During Backlog Review (`tars-backlog-review`)
 

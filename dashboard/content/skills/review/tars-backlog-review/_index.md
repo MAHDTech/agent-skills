@@ -32,10 +32,23 @@ This skill is invoked by the Hub for each branch implemented by a subagent. It c
 
 The Hub runs this review **after** the verification gate has passed, and before the merge — see [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md).
 
-Two consequences:
+Implement uses **risk-tiered** review. Run this full dual-axis skill only when the Hub selects the full tier (any of: `risk: high`; diff touches high-risk path patterns such as hooks/auth/secrets; post-conflict resolve on this ticket; rework with `attempts >= 2`; Hub marks security/shared-core). Otherwise the Hub uses a lightweight checklist and does **not** invoke this skill.
 
-- **Do not re-run the test suite or the whole-repo hook run.** They are already green for this branch. They are also starvation-sensitive commands that must be taken under the mutex, and re-running them here would occupy it for no new information.
-- **No workspace needs creating.** The spoke's clone is still alive with the branch checked out, so use it when a working tree is wanted. The branch also exists in the parent repository, because the Hub fetched it there for durability before gating — so diff extraction can run in the parent too, which needs no checkout and touches nothing.
+Two consequences when this skill does run:
+
+- **Do not re-run the test suite or the whole-repo hook run.** They are already green for this branch via `tars-gate`. They are starvation-sensitive; re-running them here occupies the mutex for no new information.
+- **No workspace needs creating.** The spoke's clone is still alive with the branch checked out. The branch also exists in the parent (fetched for durability before gating), so diff extraction can run in the parent without checkout.
+
+## Lightweight checklist (Hub default — not this skill)
+
+When full review is not required, the Hub still records a short pass under `## Implementation Review` covering:
+
+- Acceptance criteria vs diff (genuinely satisfied, not only ticked)
+- Diff paths covered by `files:` / `owns:` (report undeclared touches)
+- No `.tars/` staged; land/commit hygiene on the spoke branch
+- Spot-check of risky hunks
+
+Escalate to this full skill if the checklist surfaces doubt.
 
 ## Workflow
 

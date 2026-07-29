@@ -37,12 +37,12 @@ The Hub must run every audit, triage, implementation, and review step from a top
 Two rules hold across every phase below. Both are established in full by [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md):
 
 1. **Writers get private clones; readers get none.** Implementation spokes work in isolated clones outside the repository tree, so no spoke can write to the parent's shared git state. Audit and triage subagents only read, so they use the parent working tree directly and the Hub asserts it is unchanged afterwards.
-2. **Heavy commands are serialised.** Test suites, whole-repo hook runs, and nix/container builds produce false failures under CPU contention, so every agent — the Hub included — wraps them in the shared mutex. Cheap deterministic checks stay fully parallel.
+2. **Heavy commands are serialised.** Test suites, whole-repo hook runs, and nix/container builds produce false failures under CPU contention. The Hub runs the full gate only via `tars-gate`; spokes run targeted heavy tests only via `tars-spoke`. Cheap deterministic checks stay fully parallel.
 
 ### Step 0. Preparation Phase (`tars-backlog-prepare`)
 
-1. Execute [tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) inline to verify repository integrity, resolve the isolated spoke workspace root, and clean up leftovers from previous runs.
-2. Wait for the preparation phase to run to completion. It records the resolved workspace, clone mode, and lock paths to `.tars/run.env`, which every later phase reads. **Do not skip this step**: without it the implementation phase has no spoke root to clone into, and any corruption left in the shared git state goes undetected.
+1. Execute [tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) inline to verify repository integrity, resolve the isolated spoke workspace root, freeze opaque install/hooks/test commands (following the [devenv](@/skills/tooling/devenv/_index.md) skill when the project uses devenv), smoke the baseline gate, and clean up leftovers from previous runs.
+2. Wait for the preparation phase to run to completion. It records workspace, clone mode, lock/gate/spoke paths, land template, CI flags, and weaken banners to `.tars/run.env`, which every later phase reads. **Do not skip this step**: without it the implementation phase has no spoke root, no proven gate recipe, and any corruption left in the shared git state goes undetected. If prepare reports `TARS_GATE_WEAKENED=1`, carry that banner through the whole loop.
 3. Check the `.tars/issues/todo/` directory for any existing ticket files (`XXX.md` files where `XXX` is a 3-digit ID).
    - **If existing issues are present**: Skip directly to **Step 2. Triage Phase** to triage them, then proceed to **Step 3. Implementation & Review Phase** to resolve them. Once all existing issues are implemented or resolved, proceed to **Step 1. Audit Phase** to scan the updated codebase for any new issues.
    - **If no existing issues are present**: Proceed directly to **Step 1. Audit Phase**.
@@ -62,13 +62,13 @@ Two rules hold across every phase below. Both are established in full by [tars-b
 ### Step 3. Implementation & Review Phase (`tars-backlog-implement` & `tars-backlog-review`)
 
 1. Execute [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md) inline (it lives in the engineering category) to execute the tickets.
-2. The Hub will dynamically group tickets into batches that are conflict-free by file **and** free of dependency edges onto unmerged tickets, update their frontmatter `batch` number, and dispatch them to parallel spokes, each in its own isolated clone.
-3. As each spoke reports, the Hub fetches its branch into the parent for durability, then runs the full verification gate — the repository's whole-repo hook run plus its test suite, both resolved once by `tars-backlog-prepare` — **inside the spoke's clone, under the mutex, before merging anything**. A red gate goes straight back to the live spoke to fix, for up to 3 rounds.
-4. On a green gate, the Hub executes [tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) inline for the double-axis verdict. Approved branches merge sequentially into the topic branch and their tickets move to `.tars/issues/done/`; either way the spoke is told its ticket is resolved so it can stop.
-5. For rejected tickets, the Hub will update their status to `rework`, append the review comments, and return them to the todo queue while preserving the implementation branch for the next attempt.
-6. After the whole batch has merged, the Hub runs the full gate once more on the topic branch, catching interactions between tickets that were conflict-free by file but not by behaviour.
-7. If the topic branch is pushed and the repository runs CI, the Hub confirms CI agrees before starting the next batch — a green local gate is not a green CI, and an undiagnosed CI failure is worth recording against its ticket rather than carrying forward silently.
-8. Wait for the implementation and review phase to run to completion.
+2. The Hub groups tickets into batches that are conflict-free by `files:` **and** `owns:`, free of hard dependency edges onto unmerged tickets, and free of soft-ownership collisions, then dispatches parallel spokes in isolated clones (minimal spoke contract; checkpoint protocol when `complexity: high` or rework).
+3. As each spoke reports, the Hub force-updates topic refs, fetches the spoke branch into the parent for durability, runs **`tars-gate`** inside the clone (flake classify → isolate → one re-gate when appropriate), commits hook autofixes if the gate dirtied the tree, then reviews.
+4. On a green clean tree, the Hub uses a **risk-tiered** review: lightweight checklist by default; full [tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) when high-risk / post-conflict / rework. Approved branches merge sequentially with the prepare-frozen land commit subject; tickets move to `.tars/issues/done/`. Every terminal path dismisses the spoke.
+5. For rejected tickets, the Hub updates `rework`, appends review comments, and preserves the implementation branch for the next attempt.
+6. After the batch merges, the Hub runs **`tars-gate`** again on the topic branch for cross-ticket interactions.
+7. If `TARS_CI_CHECK=1` in `run.env`, the Hub confirms CI on the batch head before the next batch (blocks on red when `TARS_CI_BLOCK_ON_RED=1`). Local green is not CI green.
+8. Wait for the implementation and review phase to run to completion. Final reports must banner any weakened gate reason.
 
 ## Convergence
 

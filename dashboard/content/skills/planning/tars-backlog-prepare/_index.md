@@ -12,12 +12,75 @@ mermaid = false
 
 # Backlog Prepare
 
-Prepare the repository for a fresh run of the `tars-backlog-loop` by verifying the shared git state is uncorrupted, resolving where isolated spoke workspaces will live, and cleaning up orphaned workspaces and subagent branches.
+Prepare the repository for a fresh run of the `tars-backlog-loop` by verifying the shared git state is uncorrupted, resolving where isolated spoke workspaces will live, proving the verification gate recipe against the current baseline, and cleaning up orphaned workspaces and subagent branches.
 
 ## Targets and Pre-conditions
 
-- This skill modifies the local git repository state.
+- This skill modifies the local git repository state and writes `.tars/run.env` (and may create `.tars/config.yaml` only if you are documenting a new override — do not invent policy without need).
 - Run every step in order. Steps 1 through 4 are preconditions; abort the whole preparation if any of them fails rather than continuing with a warning.
+- **Config vs run.env (strict split):**
+  - **`.tars/config.yaml`** — project **policy** (stable across runs). Humans edit this. Prepare reads it; implement does **not**.
+  - **`.tars/run.env`** — **run facts** frozen for this prepare. Prepare writes it every run; implement, `tars-gate`, and `tars-spoke` read **only** this file for paths, commands, land template, CI flags, and weaken banners.
+
+## Configuration schema (`.tars/config.yaml`)
+
+Policy keys and skill defaults. Omit any key to keep the default. Prepare merges repo config over these defaults, then freezes concrete values into `run.env`.
+
+```yaml
+worktree:
+  spoke_dir: null # or absolute path; overrides TARS_SPOKE_DIR env
+  sync_markers: [] # extra replicated-folder markers
+  shared_append_files:
+    - "project-words.txt"
+    - "CHANGELOG.md"
+  transfer_files:
+    - ".pre-commit-config.yaml"
+    - ".env*"
+    - ".tars/"
+    - "devenv.local.nix"
+    - "devenv.local.yaml"
+
+concurrency:
+  heavy_commands:
+    - "test"
+    - "coverage"
+    - "run -a"
+    - "--all-files"
+    - "nix build"
+
+# Opaque command overrides (optional). When set, prepare uses them instead of
+# auto-detect — still wraps with devenv enter when applicable, still smokes them.
+commands:
+  install: null
+  hooks: null
+  test: null
+
+land:
+  # {{id}} and {{title}} are substituted by the Hub at merge time.
+  subject_template: "chore(backlog): land ticket {{id}}"
+
+review:
+  always_full:
+    - "hooks/**"
+    - "**/*secret*"
+    - "**/auth/**"
+  # Full dual-axis review when risk: high, post-conflict, rework attempts >= 2,
+  # or diff touches always_full. Otherwise Hub lightweight checklist.
+
+ci:
+  # null = auto-detect in prepare. true/false force on/off.
+  check: null
+  block_on_red: true
+  # Optional opaque check command; when null, prepare may set a gh-based default.
+  command: null
+
+gate:
+  # If true, prepare may record a weakened test command after classifying
+  # baseline-red product/coverage failure. Still requires reason in run.env.
+  allow_weaken: true
+```
+
+Implement never re-opens this file for gate, land, or CI decisions — only the frozen `run.env` keys.
 
 ## Preparation Workflow
 
@@ -169,23 +232,33 @@ df -P "$SPOKE_ROOT" | awk 'NR==2 {print $1}'
 - **Same filesystem** → clone mode `hardlink`: a plain `git clone`. Objects are hardlinked, so the clone is nearly free and stays safe even if the parent runs `git gc`, because the hardlink keeps any pruned object alive.
 - **Different filesystem** → clone mode `shared`: `git clone --shared`. Objects are borrowed through alternates rather than copied, which matters most in a sandbox where `/tmp` may be a RAM-backed tmpfs. The cost is that the parent must **not** run `git gc` or `git prune` while any spoke is alive, because pruning objects a spoke borrows will break it.
 
-#### 4c. Verify the lock mechanism
+#### 4c. Locate runners and verify the lock
 
-Heavy commands run under a mutex (see `tars-backlog-implement`). Confirm the helper that provides it is present and runnable:
+Resolve paths inside the installed `tars-backlog-implement` skill directory:
+
+| Key          | Path under skill              |
+| ------------ | ----------------------------- |
+| `TARS_LOCK`  | `resources/manual/tars-lock`  |
+| `TARS_GATE`  | `resources/manual/tars-gate`  |
+| `TARS_SPOKE` | `resources/manual/tars-spoke` |
+
+Always invoke helpers as `sh <path> …` so missing executable bits do not matter.
+
+Confirm the lock works:
 
 ```bash
 sh "$TARS_LOCK" /tmp/tars-preflight-probe true
 ```
 
-`$TARS_LOCK` is `resources/manual/tars-lock` inside the installed `tars-backlog-implement` skill directory. Always invoke it as `sh <path>` rather than executing it directly, so it works regardless of whether the install method preserved the executable bit. The helper prefers `flock(1)` and falls back to an atomic-mkdir lock where that is missing, which is the normal case on macOS — no action is needed either way, but note which path is active when reporting.
+Confirm gate and spoke scripts exist and are readable. Do **not** document platform-specific lock backends to the user — one consistent `sh tars-gate` / `sh tars-spoke` surface everywhere.
 
-#### 4d. Resolve the repository's own commands
+#### 4d. Resolve the repository's own commands (opaque strings)
 
-Determine, once, the three commands every spoke and gate will need, and verify each actually runs in this repository before recording it. Detect them from what the repository contains — never assume a specific toolchain:
+Determine, once, the three commands every spoke and gate will need. Detect them from what the repository contains — **never assume a specific toolchain** in implement prose later. Prefer `commands.*` overrides from `.tars/config.yaml` when set.
 
-- **Test command** — what the Hub's verification gate runs. `devenv --no-tui test` if `devenv.nix` or `devenv/default.nix` is present; otherwise the project's standard entry point (`bun test`, `npm test`, `cargo test`, `pytest`, `go test ./...`, `mix test`, …). Prefer the script the repository itself treats as its full suite, which is often not the bare runner: a `test:coverage` or `check` script may be the real gate.
-- **Install command** — what a fresh clone needs before it can build or typecheck. Use the **lockfile-respecting** form, because this command also runs inside the verification gate where the committed lockfile is the authority: `bun install --frozen-lockfile`, `npm ci`, `cargo fetch --locked`, `uv sync --frozen`, `go mod download`. Record an empty value for repositories that need no install step.
-- **Hook command** — how this repository runs its whole-repo hooks, which the gate invokes before the tests:
+- **Test command** — what the Hub's verification gate runs. Prefer the script the repository itself treats as its full suite (`test:coverage`, `check`, `devenv test` entry, `cargo test`, `pytest`, `go test ./...`, `dotnet test`, …).
+- **Install command** — what a fresh clone needs before it can build or typecheck. Use the **lockfile-respecting** form when the ecosystem has one (`bun install --frozen-lockfile`, `npm ci`, `cargo fetch --locked`, `uv sync --frozen`, `go mod download`). Empty is valid when there is no install step.
+- **Hook command** — whole-repo hooks the gate runs before tests:
 
   | Repository contains                                   | Hook command                          |
   | ----------------------------------------------------- | ------------------------------------- |
@@ -195,17 +268,64 @@ Determine, once, the three commands every spoke and gate will need, and verify e
   | `.husky/`                                             | the script the hook itself runs       |
   | none of the above                                     | empty — the gate runs tests only      |
 
-  An empty hook command is a legitimate answer, not a failure. Record it; the gate substitutes `:` for it.
+  An empty hook command is a legitimate answer. The gate substitutes `:` for empty steps.
+
+**Devenv projects:** if `devenv.nix`, `devenv.yaml`, or `devenv/default.nix` is present, **do not invent enter flags here.** Read and follow the [devenv](@/skills/tooling/devenv/_index.md) skill, then bake its non-interactive enter recipe into the **opaque** install/hooks/test strings (or a single outer wrapper that those strings already include). Other skills only point at devenv; prepare is the only backlog phase that expands it.
 
 **Then check for overlap, and subtract it.** Hook runners frequently include a hook that already runs the test suite — so a naive gate of `<hooks> && <tests>` runs the whole suite twice. Inspect the hook config: if a hook already covers typecheck, lint, build, or test, set the test command to only what the hooks do **not** cover. A common residue is a coverage-threshold run, which a plain test invocation does not enforce.
 
-> This matters more than ordinary waste, because the gate runs **while holding the mutex**. Every second spent re-running an already-green suite is a second no other spoke can test, so duplicated work in the gate does not merely cost time — it shrinks the whole batch's throughput by extending the one serialised section in the pipeline.
+> This matters more than ordinary waste, because the gate runs **while holding the mutex**. Every second spent re-running an already-green suite is a second no other spoke can test.
+>
+> Check whether the repository suppresses automatic dependency installation under CI-like env — several devenv setups do. Where it does, the install command is mandatory rather than a convenience.
 
-Resolving these here rather than per spoke means every spoke bootstraps the same way and the gate is a concrete command instead of a placeholder each Hub re-derives on a repository it may be seeing for the first time.
+#### 4e. Land commit template
 
-> Check whether the repository suppresses automatic dependency installation under `CI=true` — several `devenv.nix` setups do. Where it does, the install command is mandatory rather than a convenience, and a spoke that skips it fails with an error that names a missing type definition rather than a missing install.
+Resolve `land.subject_template` from config (default `chore(backlog): land ticket {{id}}`).
 
-#### 4e. Record the resolved values
+If the repo enforces conventional commits (commitlint config, convco, a `commit-msg` hook that rejects `merge(` subjects), keep a conventional template. If there is no commit policy, a plain `Land ticket {{id}}` is fine.
+
+Detect by reading common config files and hook samples — do not require a network. Freeze the template string into `run.env` as `TARS_LAND_SUBJECT_TEMPLATE`. Implement only substitutes `{{id}}` / `{{title}}`.
+
+#### 4f. CI check resolution
+
+Resolve whether the Hub must confirm CI after each batch:
+
+1. If `ci.check` is `true` or `false` in config, honour it.
+2. If `null` (default): turn **on** when a remote exists, the topic branch appears pushable/pushed, and a usable check is available (for example `gh` authenticated against a GitHub remote with Actions, or `ci.command` set). Otherwise **off**.
+3. Freeze:
+   - `TARS_CI_CHECK=0|1`
+   - `TARS_CI_CHECK_REASON="…"` (why on or off)
+   - `TARS_CI_COMMAND="…"` when on (opaque; Hub runs it for the batch head)
+   - `TARS_CI_BLOCK_ON_RED=0|1` from `ci.block_on_red` (default on)
+
+When off, implement still documents that local green ≠ CI green, but does not block the loop.
+
+#### 4g. Baseline gate smoke (prove the recipe)
+
+Before freezing commands, **run the real gate once** on the clean topic branch in the parent workspace — the same path hub will use:
+
+1. Write a **draft** `.tars/run.env` with the paths and candidate commands (weaken flags off).
+2. Export `PRE_COMMIT_HOME` to `$TARS_SPOKE_ROOT/hook-cache` when the hook runner uses it.
+3. Run:
+
+   ```bash
+   sh "$TARS_GATE" "$REPO_ROOT"
+   ```
+
+4. Classify the result:
+
+   | Outcome                                                                                                     | Action                                                                                                                                                                                                                                                                                                                                       |
+   | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | **Green**                                                                                                   | Freeze commands. `TARS_GATE_WEAKENED=0`.                                                                                                                                                                                                                                                                                                     |
+   | **Red — environment / tooling** (secrets prompt, missing toolchain, install failure, quoting, devenv enter) | **Fix or abort.** Do not weaken the suite to hide this. Re-read the [devenv](@/skills/tooling/devenv/_index.md) skill if the project uses devenv.                                                                                                                                                                                                |
+   | **Red — pre-existing product / coverage / known baseline**                                                  | Prefer narrowing `TARS_TEST_COMMAND` to the green subset the repo can honestly run. Only if `gate.allow_weaken` is true and no useful subset exists, set `TARS_TEST_COMMAND` to `:` (or the narrowed command), `TARS_GATE_WEAKENED=1`, and a precise `TARS_GATE_WEAKENED_REASON`. Never write a no-op test command without both weaken keys. |
+   | **Red — ambiguous / flaky**                                                                                 | Re-run the full gate **once**. Still red → report output and **ask the user** rather than auto-weaken.                                                                                                                                                                                                                                       |
+
+5. Re-write the final `.tars/run.env` with the frozen values. If the smoke left the working tree dirty (hook autofix), restore cleanliness before finishing prepare: the tree must be clean at the end of prepare (`git status --porcelain` empty). Prefer restoring autofixes with `git checkout -- .` / `git clean` only for smoke dirt **you** caused; if unsure, abort and ask the user.
+
+Report the smoke outcome and any weaken banner prominently in the prepare summary.
+
+#### 4h. Record the resolved values
 
 Write the results to `.tars/run.env` in the parent workspace:
 
@@ -213,11 +333,24 @@ Write the results to `.tars/run.env` in the parent workspace:
 TARS_SPOKE_ROOT="…"
 TARS_CLONE_MODE="hardlink"   # or "shared"
 TARS_LOCK="…/resources/manual/tars-lock"
+TARS_GATE="…/resources/manual/tars-gate"
+TARS_SPOKE="…/resources/manual/tars-spoke"
 TARS_HEAVY_LOCK="…/locks/<repo-name>.heavy"
 TARS_TOPIC_BRANCH="…"
-TARS_TEST_COMMAND="…"
-TARS_INSTALL_COMMAND="…"   # may be empty
-TARS_HOOK_COMMAND="…"      # may be empty
+TARS_PRE_COMMIT_HOME="…/hook-cache"   # may be empty if unused
+TARS_INSTALL_COMMAND="…"   # opaque; may be :
+TARS_HOOK_COMMAND="…"      # opaque; may be :
+TARS_TEST_COMMAND="…"      # opaque; may be : only if weakened
+TARS_GATE_WEAKENED=0       # or 1
+TARS_GATE_WEAKENED_REASON=""  # required when weakened
+TARS_LAND_SUBJECT_TEMPLATE="chore(backlog): land ticket {{id}}"
+TARS_CI_CHECK=0            # or 1
+TARS_CI_CHECK_REASON="…"
+TARS_CI_COMMAND=""         # opaque when CI check on
+TARS_CI_BLOCK_ON_RED=1
+TARS_HEAVY_COMMANDS="test,coverage,run -a,--all-files,nix build"
+# Comma-separated globs from review.always_full (frozen so implement never opens config)
+TARS_REVIEW_ALWAYS_FULL="hooks/**,**/*secret*,**/auth/**"
 ```
 
 Write these to disk rather than only holding them in context. A backlog run is long enough that the Hub's context may be compacted partway through, and a Hub that has forgotten where its spoke root is will resolve a different one mid-run. `.tars/` is already shared into every spoke workspace, so spokes can read the same file.
@@ -241,7 +374,7 @@ Write these to disk rather than only holding them in context. A backlog run is l
    - List all subagent branches: `git branch --list 'subagent-*'`
    - Force-delete only the branches that are NOT referenced in the active rework list: `git branch -D <branch-name>`
 
-Once these steps are complete and verified, the repository is ready for the `tars-backlog-loop` skill.
+Once these steps are complete and verified, the repository is ready for the `tars-backlog-loop` skill. If `TARS_GATE_WEAKENED=1`, the prepare report **must** end with a known-residual banner quoting `TARS_GATE_WEAKENED_REASON`.
 
 ## Portable Command Baseline
 
@@ -250,4 +383,9 @@ Every command this pipeline emits runs on both Linux and macOS. Three GNU-only i
 - `sed -i` — takes a mandatory suffix argument on BSD/macOS. Write through a temporary file and `mv` it into place instead.
 - `readlink -f` — GNU-only. Use `realpath`, or resolve the path with `cd` and `pwd -P`.
 - `stat -c` — GNU spelling; BSD uses `-f`. For filesystem identity use `df -P` instead.
+
+## Related Skills
+
+- [devenv](@/skills/tooling/devenv/_index.md) — when the project has `devenv.nix` / `devenv.yaml`, follow it to build non-interactive enter commands during step 4d.
+- [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md) — consumes `run.env` and runs `tars-gate` / `tars-spoke`.
 
