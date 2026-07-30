@@ -9153,7 +9153,7 @@ new WebSocket("wss://api.x.ai/v1/realtime", [\`xai-client-secret.\${OBTAINED_EPH
 ===/developers/model-capabilities/audio/speech-to-speech===
 #### Model Capabilities
 
-# Speech to Speech API
+# Speech to Speech
 
 Build real-time voice applications powered by Grok. Stream audio and text bidirectionally via WebSocket for voice assistants, phone agents, and interactive voice systems.
 
@@ -9286,8 +9286,9 @@ const url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
 
 | Model | Description |
 |-------|-------------|
-| `grok-voice-latest` | Alias that tracks the newest voice model |
-| `grok-voice-think-fast-1.0` | Flagship voice model |
+| `grok-voice-latest` | Alias for `grok-voice-think-fast-1.0`.Updates to `grok-voice-think-fast-2.0` on August 5, 2026. |
+| `grok-voice-think-fast-2.0` | Flagship voice model |
+| `grok-voice-think-fast-1.0` | Previous-generation voice model |
 
 ## Session Parameters
 
@@ -9296,7 +9297,7 @@ After the session has been created, clients may send the [session.update](https:
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `instructions` | string | System prompt |
-| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. |
+| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. |
 | `voice` | string | Voice selection: any built-in voice (e.g. `eve`, the default) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
 | `tools` | array | Tools available to the voice agent. Supports `file_search`, `web_search`, `x_search`, `mcp`, and `function` types. See [Using Tools](#using-tools-with-grok-speech-to-speech-api). |
 | `turn_detection.type` | string | null | `"server_vad"` for automatic detection, `null` for manual text turns |
@@ -10772,9 +10773,9 @@ const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
 
 ### Step 3 — Model-Specific Best Practices
 
-#### `grok-voice-think-fast-1.0` (Recommended)
+#### `grok-voice-think-fast-2.0` (Recommended)
 
-This is the flagship voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
+This is the newest voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
 
 * **Simplify your system prompt.** The model is significantly more capable, so your prompt should be much shorter. Ask Grok to generalize your existing system prompt rather than porting it verbatim.
 * **Remove workaround prompting.** Prompt hacks and edge-case fixes needed for GPT models are unnecessary. Strip out instructions added solely to patch bugs or limitations of the previous model.
@@ -10782,7 +10783,7 @@ This is the flagship voice model. Use `grok-voice-latest` for new integrations s
 
 > [!NOTE]
 >
-> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-1.0`). Pin to a versioned model name in production for stability.
+> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-2.0`). Pin to a versioned model name in production for stability.
 
 ## OpenAI Realtime API Compatibility
 
@@ -12769,7 +12770,7 @@ task.cancel(with: .normalClosure, reason: nil)
 
 The xAI Voice APIs offer a range of powerful voice capabilities, all powered by Grok, with enterprise-grade reliability and sub-second latency.
 
-## Speech to Speech API
+## Speech to Speech
 
 Build real-time, speech-to-speech voice agents over WebSockets, with low-latency turn-taking and tool use. For client-side apps, use [Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens) to connect securely without exposing your API key.
 
@@ -19854,19 +19855,19 @@ done
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-image | $0.02 / image |
-| grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-video | $0.050 / sec |
+| grok-imagine-video-1.5 | $0.080 / sec |
 
 ### Voice Pricing
 
 | Mode | Cost |
 | --- | --- |
-| Realtime | $0.05 / min ($3.00 / hr) |
-| Realtime Text Input | $0.004 / message (every conversation.item.create) |
-| Text to Speech | $15.00 / 1M chars |
+| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
+| Text to Speech | $15.00 / 1M chars |
 
 ## Which model should I choose?
 
@@ -19914,7 +19915,7 @@ For most users, the aliased `<modelname>` or `<modelname>-latest` are recommende
 ===/developers/models/speech-to-speech===
 #### Models
 
-# Speech to Speech API
+# Speech to Speech
 
 The Speech to Speech API enables real-time voice conversations over WebSocket, billed by minute of audio plus a flat fee per text input message. Supports function calling with web search, X search, collections, MCP, and custom functions.
 
@@ -19923,7 +19924,7 @@ The Speech to Speech API enables real-time voice conversations over WebSocket, b
 | | Details |
 |---|---|
 | **Modalities** | Text, Audio → Text, Audio |
-| **Audio pricing** |  / min ( / hr) |
+| **Audio pricing** | Starting at  / minute or  / hour |
 | **Text Input pricing** |  / message |
 | **Region** | us-east-1 |
 
@@ -19933,7 +19934,7 @@ The Speech to Speech API charges based on audio duration and text events sent wi
 
 | | Details |
 |---|---|
-| **Audio** |  / min of audio sent or received ( / hr) |
+| **Audio** | Starting at  / minute or  / hour of audio sent or received |
 | **Text Input** |  per `conversation.item.create` event |
 
 ### What counts as a text input message
@@ -20103,8 +20104,8 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
+| grok-imagine-image | $0.02 / image |
 | grok-imagine-video-1.5 | $0.080 / sec |
 | grok-imagine-video | $0.050 / sec |
 
@@ -20112,10 +20113,10 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Mode | Cost |
 | --- | --- |
-| Realtime | $0.05 / min ($3.00 / hr) |
-| Realtime Text Input | $0.004 / message (every conversation.item.create) |
-| Text to Speech | $15.00 / 1M chars |
+| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
+| Text to Speech | $15.00 / 1M chars |
 
 ## Tools Pricing
 
@@ -20481,10 +20482,10 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image-quality | 5 | — |
 | grok-imagine-image | 5 | — |
-| grok-imagine-video-1.5 | 10 | — |
+| grok-imagine-image-quality | 5 | — |
 | grok-imagine-video | 10 | — |
+| grok-imagine-video-1.5 | 10 | — |
 
 ### What counts toward TPM
 
@@ -20555,6 +20556,10 @@ def request_with_backoff(prompt, max_retries=5):
 # Release Notes
 
 ## July
+
+### Grok Voice Think Fast 2.0 is available
+
+`grok-voice-think-fast-2.0` is now available with Speech to Speech. `grok-voice-latest` will route to this model starting August 5, 2026. To get started, see the [Speech to Speech docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech). For more details, see our [announcement](https://x.ai/news/grok-voice-think-fast-2).
 
 ### Adjustable VAD threshold for Speech to Text
 
@@ -26100,11 +26105,11 @@ Create an ephemeral client secret for authenticating browser-side Realtime API c
 
 * `session` (object | null) — Optional initial session configuration to bind to the client secret. This JSON value is stored alongside the secret and applied when the WebSocket connection opens.
 
-  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
+  * `model` ("grok-voice-latest" | "grok-voice-think-fast-2.0" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
 
   * `reasoning` (object) — Reasoning settings for models that support them.
 
-    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with \`grok-voice-latest\` and \`grok-voice-think-fast-1.0\`.
+    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Response Body
 
@@ -26293,7 +26298,7 @@ Full schemas and examples: [`/voice-realtime.ws.json`](https://docs.x.ai/voice-r
 
 * `model` (string, optional, default: grok-voice-latest) — Model to use for the session. Ignored when \`call\_id\` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions.
 
-* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with grok-voice-latest and grok-voice-think-fast-1.0.
+* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Client Messages
 

@@ -32,7 +32,7 @@
       "type": "string",
       "required": false,
       "default": "grok-voice-latest",
-      "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0"],
+      "enum": ["grok-voice-latest", "grok-voice-think-fast-2.0", "grok-voice-think-fast-1.0"],
       "description": "Model to use for the session. Ignored when `call_id` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions."
     },
     {
@@ -41,7 +41,7 @@
       "required": false,
       "enum": ["high", "none"],
       "default": "high",
-      "description": "Controls whether the model uses reasoning. Defaults to `high`. Supported only with grok-voice-latest and grok-voice-think-fast-1.0."
+      "description": "Controls whether the model uses reasoning. Defaults to `high`."
     }
   ],
   "clientMessages": [
@@ -62,7 +62,11 @@
             "properties": {
               "model": {
                 "type": "string",
-                "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0"],
+                "enum": [
+                  "grok-voice-latest",
+                  "grok-voice-think-fast-2.0",
+                  "grok-voice-think-fast-1.0"
+                ],
                 "description": "Model to use for the session. Defaults to `grok-voice-latest`. Can also be set at connection time via the `model` query parameter."
               },
               "instructions": {
@@ -77,7 +81,7 @@
                     "type": "string",
                     "enum": ["high", "none"],
                     "default": "high",
-                    "description": "Controls whether the model uses reasoning. Defaults to `high`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. Can also be set at connection time via the `reasoning.effort` query parameter."
+                    "description": "Controls whether the model uses reasoning. Defaults to `high`. Can also be set at connection time via the `reasoning.effort` query parameter."
                   }
                 }
               },

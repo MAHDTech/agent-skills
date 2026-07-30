@@ -4,7 +4,7 @@
 
 The xAI Voice APIs offer a range of powerful voice capabilities, all powered by Grok, with enterprise-grade reliability and sub-second latency.
 
-## Speech to Speech API
+## Speech to Speech
 
 Build real-time, speech-to-speech voice agents over WebSockets, with low-latency turn-taking and tool use. For client-side apps, use [Ephemeral Tokens](https://docs.x.ai/developers/model-capabilities/audio/ephemeral-tokens) to connect securely without exposing your API key.
 

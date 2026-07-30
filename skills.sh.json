@@ -13,6 +13,7 @@
         "domain-modeling",
         "implement",
         "nutanix-api-v4",
+        "nutanix-files",
         "nutanix-kubernetes-platform",
         "nutanix-objects",
         "optimize-performance",

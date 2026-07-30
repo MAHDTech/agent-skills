@@ -1848,6 +1848,7 @@ While other options may be changed at a runtime and should be placed under `sett
   "global_lsp_settings": {
     "button": true,
     "request_timeout": 120,
+    "max_buffer_line_length": 20000,
     "notifications": {
       // Timeout in milliseconds for automatically dismissing language server notifications.
       // Set to 0 to disable auto-dismiss.
@@ -1861,6 +1862,7 @@ While other options may be changed at a runtime and should be placed under `sett
 
 - `button`: Whether to show the LSP status button in the status bar
 - `request_timeout`: The maximum amount of time to wait for responses from language servers, in seconds. A value of `0` will result in no timeout being applied (causing all LSP responses to wait indefinitely until completed). Default: `120`
+- `max_buffer_line_length`: The maximum line length a buffer may contain before Zed disables all language server features for that entire buffer. If any line exceeds this value, Zed does not open the buffer with language servers or send them buffer-specific requests. Default: `20000`
 - `notifications`: Notification-related settings.
   - `dismiss_timeout_ms`: Timeout in milliseconds for automatically dismissing language server notifications. Set to 0 to disable auto-dismiss.
 
@@ -4940,6 +4942,7 @@ Run the <code class="hljs">theme selector: toggle</code> action in the command p
   "title_bar": {
     "show_branch_status_icon": false,
     "show_branch_name": true,
+    "show_worktree_name": true,
     "show_project_items": true,
     "show_onboarding_banner": true,
     "show_user_picture": true,
@@ -4955,6 +4958,7 @@ Run the <code class="hljs">theme selector: toggle</code> action in the command p
 
 - `show_branch_status_icon`: Whether to show git status indicators on the branch icon in the titlebar
 - `show_branch_name`: Whether to show the branch name button in the titlebar
+- `show_worktree_name`: Whether to show the worktree name button in the titlebar
 - `show_project_items`: Whether to show the project host and name in the titlebar
 - `show_onboarding_banner`: Whether to show onboarding banners in the titlebar
 - `show_user_picture`: Whether to show user picture in the titlebar

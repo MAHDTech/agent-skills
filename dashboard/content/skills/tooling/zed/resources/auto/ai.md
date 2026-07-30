@@ -288,30 +288,36 @@ Shipped in 2026
 
 Shipped in 2025
 
+[](https://github.com/zed-industries/zed/pull/60575)
+
+JHandle SSE data fields without spaces
+
+@justjavac•\#60575•15h ago•View →
+
 [](https://github.com/zed-industries/zed/pull/61662)
 
 Magent: Improve error messaging for \`edit_file\` tool
 
-@mfeyg•\#61662•1d ago•View →
+@mfeyg•\#61662•2d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61621)
 
 Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
 files
 
-@amtoaer•\#61621•3d ago•View →
+@amtoaer•\#61621•4d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/60893)
 
 NTTreat blank spawn_agent session IDs as absent
 
-@nevo-ts•\#60893•4d ago•View →
+@nevo-ts•\#60893•5d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/58217)
 
 Hagent_ui: Fix agent terminal close behavior with keyboard shortcuts
 
-@hugh2slowmo•\#58217•4d ago•View →
+@hugh2slowmo•\#58217•5d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/57207)
 
@@ -330,12 +336,6 @@ Csettings_ui: Fix MCP server toggle not updating in UI
 Ragent_ui: Fix duplicate terminal when starting a new agent thread
 
 @rbstp•\#59586•2w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/60507)
-
-WHGuard OpenCode bell plugin in ACP mode
-
-@white-hat•\#60507•2w ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)

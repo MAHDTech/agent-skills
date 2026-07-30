@@ -1,5 +1,7 @@
+afsi
 agentclientprotocol
 agentic
+allssh
 anchorlock
 Andrej
 Anthropic
@@ -48,6 +50,8 @@ Fira
 Fire
 flexbox
 frontmatter
+fsvm
+fsvms
 functools
 gamedev
 ghostty
@@ -58,6 +62,7 @@ hardlink
 hardlinked
 hitl
 husky
+icap
 icat
 imgcat
 iseconds
@@ -75,10 +80,12 @@ leitwort
 lifecycle
 llms
 lockfiles
+logbay
 mahd
 MAHDTech
 makefiles
 mattpocock
+mcafee
 mcpc
 mdns
 mgmt
@@ -90,7 +97,9 @@ mmdc
 mocharc
 mockability
 mtimes
+multiprotocol
 navbars
+ncli
 Nextcloud
 nixfmt
 nixos
@@ -135,6 +144,7 @@ reinstall
 reparented
 reparenting
 respawn
+retrans
 rfds
 rgba
 roundrect
@@ -177,6 +187,7 @@ thumbsup
 tidewave
 timebox
 timeboxed
+timeo
 tmpfs
 TOCTOU
 todoread

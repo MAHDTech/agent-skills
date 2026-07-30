@@ -72,7 +72,7 @@ Max Brunsfeld, Ammar Arif
 
 Java
 
-1.0M
+1.1M
 
 Java support.
 
@@ -82,7 +82,7 @@ Java Extension Contributors
 
 Catppuccin
 
-960k
+961k
 
 🦀 Soothing pastel theme for Zed
 
@@ -92,7 +92,7 @@ Catppuccin
 
 Dockerfile
 
-920k
+921k
 
 Dockerfile support.
 
@@ -102,7 +102,7 @@ d1y, joshmeads
 
 SQL
 
-734k
+737k
 
 SQL language support.
 
@@ -112,7 +112,7 @@ nervenes, notpeter, phileix, tammyxiong
 
 PHP
 
-667k
+671k
 
 PHP support.
 
@@ -142,7 +142,7 @@ Vitaly Slobodin
 
 Catppuccin Icons
 
-469k
+470k
 
 🦊 Soothing pastel icons for Zed
 
@@ -162,7 +162,7 @@ Jason Lee
 
 SCSS & SASS
 
-434k
+435k
 
 SCSS and SASS support
 
@@ -172,7 +172,7 @@ Raunak Raj
 
 Material Icon Theme
 
-397k
+398k
 
 Material Design icons.
 
@@ -203,7 +203,7 @@ ssaunderss
 
 C#
 
-385k
+386k
 
 C# support.
 
@@ -213,7 +213,7 @@ fminkowski, Fabian Freimueller
 
 XML
 
-318k
+334k
 
 XML syntax support.
 
@@ -223,7 +223,7 @@ sweetppro
 
 Lua
 
-318k
+326k
 
 Lua support.
 
@@ -233,7 +233,7 @@ Max Brunsfeld
 
 Terraform
 
-289k
+290k
 
 Terraform support.
 
@@ -263,7 +263,7 @@ Marshall Bowers, Alonso Rocha Tapia
 
 LOG
 
-266k
+267k
 
 Syntax highlighting for log files.
 
@@ -273,7 +273,7 @@ nervenes, notpeter, d1y
 
 Dart
 
-264k
+265k
 
 Dart and Flutter development support.
 
@@ -303,7 +303,7 @@ Zed Industries
 
 Astro
 
-248k
+249k
 
 Astro support.
 
@@ -323,7 +323,7 @@ Pyae Sone Aung, Clay Tercek
 
 Dracula
 
-237k
+238k
 
 Official Dracula theme for Zed
 
@@ -353,7 +353,7 @@ Piotr Osiewicz
 
 LaTeX
 
-221k
+222k
 
 LaTeX language server and syntax highlighting for Zed. See wiki on
 GitHub for help.
@@ -364,7 +364,7 @@ Ruben Zukic, Oli Callaghan, Luke Naylor, Jan Solanti
 
 VSCode Dark Modern
 
-213k
+214k
 
 VSCode Dark Modern Theme for Zed
 
@@ -415,7 +415,7 @@ Hasit Mistry
 
 PowerShell
 
-173k
+174k
 
 PowerShell support
 
