@@ -1,6 +1,6 @@
 +++
 title = "store-plan"
-description = "Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's plans/ directory."
+description = "Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's docs/plans/ directory."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -48,7 +48,7 @@ Present the draft to the user before writing.
 **Step 3a — Write the file:**
 
 ```bash
-mkdir -p plans/
+mkdir -p docs/plans/
 ```
 
 Write to the path defined in [Output Path](#output-path).
@@ -60,14 +60,14 @@ Present the file path and a brief summary to the user. Ask if they want to adjus
 ## Output Path
 
 ```text
-plans/{YYYY}_{MM}_{DD}_{description}.md
+docs/plans/{YYYY}_{MM}_{DD}_{description}.md
 ```
 
 Examples:
 
-- `plans/2026_04_02_auth_refactor.md`
-- `plans/2026_04_02_frontend_split.md`
-- `plans/2026_04_02_migration_engine_redesign.md`
+- `docs/plans/2026_04_02_auth_refactor.md`
+- `docs/plans/2026_04_02_frontend_split.md`
+- `docs/plans/2026_04_02_migration_engine_redesign.md`
 
 ## Plan Format and Example
 

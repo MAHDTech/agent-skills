@@ -113,6 +113,8 @@ nygard
 olshansk
 olshansk's
 oneline
+Ondrej
+Ondrej's
 opencode
 ousterhout
 pagefind
