@@ -49,6 +49,7 @@ A starting situation that generates work, then merges onto the main flow:
 - `/diagnosing-bugs` — reach for this when something's broken, flaky, or slow; it builds a red-capable feedback loop before hypothesising, then fixes with a regression test.
 - `/gh-triage` — reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` — reach for this when the work is too big for one session and the way to the destination isn't visible yet.
+- `/software-factory` — reach for this when a feature is big enough that every decision should be signed off before code exists; it runs four approval gates, then rejoins the flow at `/to-tickets`.
 - `/research` — reach for this when you need facts gathered and verified against primary sources, delegated to a background agent while you keep working.
 
 ## Shaping the backlog
@@ -83,7 +84,7 @@ Not new features — working on code that already exists:
 ## Crossing sessions
 
 - `/handoff` — reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
-- `/store-plan` — reach for this when the current plan, decisions, and action items should be saved as a markdown file under `plans/` for later.
+- `/store-plan` — reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
 
 ## Reflection and quality
 

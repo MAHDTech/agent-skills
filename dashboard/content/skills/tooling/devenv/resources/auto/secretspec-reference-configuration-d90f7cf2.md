@@ -562,6 +562,7 @@ coordinates.
 | [pass](https://secretspec.dev/providers/pass/#use-existing-secrets) | Entry path | Rejected | Reads the entry | ✅ |
 | [Gopass (0.15+)](https://secretspec.dev/providers/gopass/#use-existing-secrets) | Entry path, including any mount-point prefix | Rejected | Reads the entry | ✅ |
 | [LastPass](https://secretspec.dev/providers/lastpass/#use-existing-secrets) | Item name | Rejected | Reads the item | ✅ |
+| [Dashlane (0.18+)](https://secretspec.dev/providers/dashlane/#use-existing-secrets) | Item title or identifier | Field name on the item | Reads the type’s default field (`content`, or `password` for a login) | — (read-only) |
 | [Proton Pass](https://secretspec.dev/providers/protonpass/#use-existing-secrets) | Item title | Rejected | Reads the note | ✅ |
 | [Vault](https://secretspec.dev/providers/vault/#use-existing-secrets) | KV path relative to the mount | Required (KV entries are maps) | Error | — (read-only) |
 | [OpenBao](https://secretspec.dev/providers/openbao/#use-existing-secrets) (0.17+) | KV path relative to the mount | Required (KV entries are maps) | Error | — (read-only) |

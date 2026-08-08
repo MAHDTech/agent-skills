@@ -270,7 +270,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Devin CLI coding agent by Cognition
 
-    **3000.2.17**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
+    **3000.3.22**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -284,7 +284,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.2.38**
+    **0.2.39**
   </Card>
 
   <Card
@@ -301,7 +301,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.4.28**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.4.29**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -313,7 +313,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.182.0**
+    **0.183.0**
   </Card>
 
   <Card
@@ -617,7 +617,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Code and build agents with comprehensive multi-provider support
 
-    **0.9.26**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
+    **0.9.27**, <a href="https://github.com/evalstate/fast-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -673,7 +673,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A local, extensible, open source AI agent that automates engineering tasks
 
-    **1.44.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
+    **1.45.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -687,7 +687,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **0.2.113**
+    **0.2.115**
   </Card>
 
   <Card
@@ -731,7 +731,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.4.16**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.4.17**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
   </Card>
 
   <Card

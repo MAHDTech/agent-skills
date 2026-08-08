@@ -45,6 +45,7 @@ secretspec.toml
 | [protonpass](https://secretspec.dev/providers/protonpass/) | Proton Pass | ✓ | ✓ | ✓ | — |
 | [onepassword](https://secretspec.dev/providers/onepassword/) | 1Password | ✓ | ✓ | ✓ | — |
 | [lastpass](https://secretspec.dev/providers/lastpass/) | LastPass | ✓ | ✓ | ✓ | — |
+| [dashlane](https://secretspec.dev/providers/dashlane/) (0.18+) | Dashlane, through the `dcli` CLI | ✓ | ✗ | ✓ | — |
 | [gcsm](https://secretspec.dev/providers/gcsm/) | Google Cloud Secret Manager (requires the `gcsm` build feature) | ✓ | ✓ | ✓ | — |
 | [awssm](https://secretspec.dev/providers/awssm/) | AWS Secrets Manager (requires the `awssm` build feature) | ✓ | ✓ | ✓ | — |
 | [scaleway](https://secretspec.dev/providers/scaleway/) (0.17+) | Scaleway Secret Manager (requires the `scaleway` build feature) | ✓ | ✓ | ✓ | — |

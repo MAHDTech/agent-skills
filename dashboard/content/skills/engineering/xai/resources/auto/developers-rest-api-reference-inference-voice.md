@@ -24,11 +24,11 @@ Create an ephemeral client secret for authenticating browser-side Realtime API c
 
 * `session` (object | null) — Optional initial session configuration to bind to the client secret. This JSON value is stored alongside the secret and applied when the WebSocket connection opens.
 
-  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
+  * `model` ("grok-voice-latest" | "grok-voice-think-fast-2.0" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
 
   * `reasoning` (object) — Reasoning settings for models that support them.
 
-    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with \`grok-voice-latest\` and \`grok-voice-think-fast-1.0\`.
+    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Response Body
 
@@ -217,7 +217,7 @@ Full schemas and examples: [`/voice-realtime.ws.json`](https://docs.x.ai/voice-r
 
 * `model` (string, optional, default: grok-voice-latest) — Model to use for the session. Ignored when \`call\_id\` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions.
 
-* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with grok-voice-latest and grok-voice-think-fast-1.0.
+* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Client Messages
 

@@ -4,6 +4,10 @@
 
 ## July
 
+### Grok Voice Think Fast 2.0 is available
+
+`grok-voice-think-fast-2.0` is now available with Speech to Speech. `grok-voice-latest` will route to this model starting August 5, 2026. To get started, see the [Speech to Speech docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech). For more details, see our [announcement](https://x.ai/news/grok-voice-think-fast-2).
+
 ### Adjustable VAD threshold for Speech to Text
 
 Speech to Text now accepts a `vad_threshold` parameter (streaming query param and batch multipart field) to tune the voice-activity gate that skips non-speech audio. Lower values transcribe quieter or noisier speech — useful for narrowband telephony — and `0` disables the gate. See the [Speech to Text docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text).

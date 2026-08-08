@@ -2449,7 +2449,7 @@ The latest version of devenv.
 *Default:*
 
 ```
-"2.1.2"
+"2.2.0"
 ```
 
 *Declared by:*

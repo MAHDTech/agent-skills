@@ -1,6 +1,6 @@
 #### Model Capabilities
 
-# Speech to Speech API
+# Speech to Speech
 
 Build real-time voice applications powered by Grok. Stream audio and text bidirectionally via WebSocket for voice assistants, phone agents, and interactive voice systems.
 
@@ -133,8 +133,9 @@ const url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
 
 | Model | Description |
 |-------|-------------|
-| `grok-voice-latest` | Alias that tracks the newest voice model |
-| `grok-voice-think-fast-1.0` | Flagship voice model |
+| `grok-voice-latest` | Alias for `grok-voice-think-fast-1.0`.Updates to `grok-voice-think-fast-2.0` on August 5, 2026. |
+| `grok-voice-think-fast-2.0` | Flagship voice model |
+| `grok-voice-think-fast-1.0` | Previous-generation voice model |
 
 ## Session Parameters
 
@@ -143,7 +144,7 @@ After the session has been created, clients may send the [session.update](https:
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `instructions` | string | System prompt |
-| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. |
+| `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. |
 | `voice` | string | Voice selection: any built-in voice (e.g. `eve`, the default) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
 | `tools` | array | Tools available to the voice agent. Supports `file_search`, `web_search`, `x_search`, `mcp`, and `function` types. See [Using Tools](#using-tools-with-grok-speech-to-speech-api). |
 | `turn_detection.type` | string | null | `"server_vad"` for automatic detection, `null` for manual text turns |
@@ -1619,9 +1620,9 @@ const rt = new OpenAIRealtimeWS({ model: "grok-voice-latest" }, client);
 
 ### Step 3 — Model-Specific Best Practices
 
-#### `grok-voice-think-fast-1.0` (Recommended)
+#### `grok-voice-think-fast-2.0` (Recommended)
 
-This is the flagship voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
+This is the newest voice model. Use `grok-voice-latest` for new integrations so your app tracks the current recommended model. When migrating:
 
 * **Simplify your system prompt.** The model is significantly more capable, so your prompt should be much shorter. Ask Grok to generalize your existing system prompt rather than porting it verbatim.
 * **Remove workaround prompting.** Prompt hacks and edge-case fixes needed for GPT models are unnecessary. Strip out instructions added solely to patch bugs or limitations of the previous model.
@@ -1629,7 +1630,7 @@ This is the flagship voice model. Use `grok-voice-latest` for new integrations s
 
 > [!NOTE]
 >
-> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-1.0`). Pin to a versioned model name in production for stability.
+> `grok-voice-latest` always points to the newest model (currently `grok-voice-think-fast-2.0`). Pin to a versioned model name in production for stability.
 
 ## OpenAI Realtime API Compatibility
 
