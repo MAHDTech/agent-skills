@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@clack/prompts": "1.7.0",
-        "fs-extra": "11.3.6",
+        "fs-extra": "11.4.0",
         "glob": "13.0.6",
         "js-yaml": "5.2.1"
     }
