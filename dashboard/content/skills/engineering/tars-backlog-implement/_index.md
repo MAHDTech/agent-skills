@@ -214,6 +214,31 @@ Branch inside the clone:
 
 A fresh clone has no hooks installed. Spoke commits are unhooked by design — never `--no-verify`, never install hooks.
 
+#### 2a-i. Spokes run git through `tars-git`
+
+Give every spoke `resources/manual/tars-git` and require it for **all** git operations:
+
+```bash
+sh "$TARS_GIT" checkout -b "subagent-$TICKET_ID"
+sh "$TARS_GIT" commit -m "..."
+```
+
+`tars-git` resolves the repository git would actually act on and **refuses (exit 65)** if it
+is not a clone under `$TARS_SPOKE_ROOT`. It also passes `-c commit.gpgsign=false`, because a
+signing prompt (e.g. 1Password `op-ssh-sign`) needs a human click and will hang a headless
+spoke while it holds the heavy-command mutex.
+
+This is structural, not advisory, and it exists because advice failed. On 2026-08-11 three
+spokes created branches — and one committed — in the developer's live repository. Each time a
+`cd "$SPOKE_DIR"` had failed while `set -e` was suppressed by a pipeline or a redirect, so the
+next bare `git` ran against whatever tree the shell was already in. The spoke brief was
+tightened twice, including an explicit "never run git against the main repo" rule, and it
+happened again — because the fault is a script falling through, not an agent disobeying.
+
+The Hub does **not** use `tars-git`; it legitimately fetches, merges and commits in the repo
+root. `tars-gate` and `tars-spoke` carry the weaker form of the same check: they refuse any
+target that is neither the run's repo root nor a spoke clone.
+
 #### 2b. Transfer gitignored files
 
 Defaults (overridable in config, applied by hub from prepare knowledge):

@@ -57,6 +57,7 @@ gamedev
 ghostty
 giphy
 Gitea
+gpgsign
 grabbable
 hardlink
 hardlinked
@@ -112,9 +113,9 @@ nutanix
 nygard
 olshansk
 olshansk's
-oneline
 Ondrej
 Ondrej's
+oneline
 opencode
 ousterhout
 pagefind
