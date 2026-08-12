@@ -13,7 +13,7 @@ Some chords differ by terminal; see [Terminal differences](#terminal-differences
 | `Esc` | Cancel the running turn |
 | `Esc Esc` | Clear the prompt, or open rewind when it is empty |
 | `Ctrl+C` | Cancel turn |
-| `Shift+Tab` | Cycle mode (Normal / Plan / Always-approve) |
+| `Shift+Tab` | Cycle mode (Normal / Plan / Auto when available / Always-approve) |
 | `Ctrl+P` or `?` | Command palette |
 | `Ctrl+.` / `Ctrl+X` | Keyboard shortcuts |
 | `F2` or `Ctrl+,` | Settings |
@@ -54,12 +54,12 @@ Focus the scrollback with `Tab`, then navigate. Bare-letter keys require vim mod
 
 | Keys | Action |
 | ---- | ------ |
-| `Ctrl+T` | Toggle todo pane |
-| `Ctrl+B` | Toggle tasks pane |
+| `Ctrl+T` | Toggle the [todo pane](https://docs.x.ai/build/features/sessions#todos) (agent screen) |
+| `Ctrl+B` | Send the running command to the background |
 | `Ctrl+;` or `Ctrl+'` | Toggle prompt queue |
 | `Ctrl+S` | Open sessions |
 | `Ctrl+L` | Open extensions |
-| `Ctrl+G` | Send the running command to the background |
+| `Ctrl+G` | Toggle the [tasks pane](https://docs.x.ai/build/features/background-tasks) |
 | `Ctrl+O` | Toggle always-approve |
 | `Ctrl+N` | New session (press twice) |
 | `Ctrl+M` | Pick model, when the prompt is not focused |

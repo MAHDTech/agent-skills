@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 [](https://zed.dev/)
 
 Agentic EngineeringPractical application of AI to create quality
@@ -222,3 +223,4 @@ Subscribe
 Agentic EngineeringPractical application of AI to create quality
 software
 
+{% endraw %}

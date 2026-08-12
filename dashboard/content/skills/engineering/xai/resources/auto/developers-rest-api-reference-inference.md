@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Inference API
 
 # Inference REST API Overview
@@ -25,3 +26,4 @@ The base for all routes is at `https://api.x.ai`. For all routes, you have to au
 * [Batches](https://docs.x.ai/developers/rest-api-reference/inference/batches)
 * [Other](https://docs.x.ai/developers/rest-api-reference/inference/other)
 * [Legacy & Deprecated](https://docs.x.ai/developers/rest-api-reference/inference/legacy)
+{% endraw %}

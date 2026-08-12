@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -80,9 +81,4 @@ Connect your frontend to SpacetimeDB.
   [C#](https://spacetimedb.com/docs/clients/c-sharp), [Unreal](https://spacetimedb.com/docs/clients/unreal) -
   Language-specific references
 
-- [Databases](#databases)
-- [Tables](#tables)
-- [Functions](#functions)
-- [Authentication](#authentication)
-- [Clients](#clients)
-
+{% endraw %}

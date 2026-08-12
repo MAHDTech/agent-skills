@@ -22,8 +22,8 @@ Here, `oneResult` will contain:
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
-  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the <body> of the page.",
 ~  "meta": {
 ~    "title": "The title from the first h1 element on the page",
 ~    "image": "/weka.png",

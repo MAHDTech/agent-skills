@@ -398,28 +398,3 @@ errors. In VSCode, this can be resolved by adding to your settings:
   "files.associations": { "spacetime.json": "jsonc" }
 }
 ```
-
-- [Config structure](#config-structure)
-- [Fields reference](#fields-reference)
-- [Generate configuration](#generate-configuration)
-  - [Example](#example)
-- [Children and inheritance](#children-and-inheritance)
-  - [What children inherit](#what-children-inherit)
-  - [Source conflict rule](#source-conflict-rule)
-  - [Multi-database example](#multi-database-example)
-  - [Different modules](#different-modules)
-- [`spacetime dev` configuration](#spacetime-dev-configuration)
-  - [Behavior](#behavior)
-  - [Config auto-generation](#config-auto-generation)
-  - [Safety prompt](#safety-prompt)
-- [Database selection](#database-selection)
-- [Flag overrides](#flag-overrides)
-  - [Global overrides](#global-overrides)
-  - [Per-database overrides](#per-database-overrides)
-  - [Per-generate-entry overrides](#per-generate-entry-overrides)
-- [`--no-config`](#--no-config)
-- [`--env` and environments](#--env-and-environments)
-  - [Precedence](#precedence)
-  - [Override behavior](#override-behavior)
-- [Config file discovery](#config-file-discovery)
-- [Editor support](#editor-support)

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -391,13 +392,4 @@ pub struct Item {
 Auto-increment **cannot** be combined with default values, since both
 attempt to populate the column automatically.
 
-- [Defining Auto-Increment Columns](#defining-auto-increment-columns)
-- [Trigger Value](#trigger-value)
-- [Sequences](#sequences)
-  - [Sequence Parameters](#sequence-parameters)
-  - [Wrapping Behavior](#wrapping-behavior)
-  - [Crash Recovery](#crash-recovery)
-  - [Uniqueness Considerations](#uniqueness-considerations)
-  - [Concurrency and Gaps](#concurrency-and-gaps)
-- [Combining with Other Attributes](#combining-with-other-attributes)
-
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Persisting Generated Output
@@ -437,3 +438,4 @@ curl -s -X DELETE "https://api.x.ai/v1/files/$FILE_ID" \
 * [Referencing Files as Input](https://docs.x.ai/developers/model-capabilities/imagine/files/inputs) — The input side: pass stored `file_id`s in place of URLs.
 * [Files → Public URLs](https://docs.x.ai/developers/files/public-urls) — Public URL lifecycle for any file, regardless of how it was created.
 * [Managing Files](https://docs.x.ai/developers/files/managing-files) — Upload, list, retrieve, update, and delete files.
+{% endraw %}

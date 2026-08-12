@@ -7,11 +7,10 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Ad-hoc Developer Environments
 
-New in 1.6
-
-[Read more about ad-hoc environments in the v1.6 release post](https://devenv.sh/blog/2025/04/25/devenv-16-extensible-ad-hoc-nix-environments/index.md)
+Added in `1.6`
 
 Instead of creating and maintaining a `devenv.nix` file, you can create ad-hoc developer environments directly from the command line using the `--option` flag.
 
@@ -99,3 +98,4 @@ While ad-hoc environments are convenient, they have some limitations:
 
 - Complex configurations are better managed in a `devenv.nix` file
 - Some complex options may be harder to express on the command line
+{% endraw %}

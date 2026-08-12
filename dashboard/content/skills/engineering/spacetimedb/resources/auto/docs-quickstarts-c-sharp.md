@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB C# app running in under 5 minutes.
@@ -132,3 +133,4 @@ spacetime logs
 - Read the [C# SDK Reference](https://spacetimedb.com/docs/clients/c-sharp) for detailed API
   docs
 
+{% endraw %}

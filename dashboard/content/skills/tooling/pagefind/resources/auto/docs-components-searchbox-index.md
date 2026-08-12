@@ -7,12 +7,14 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-searchbox>
+# \<pagefind-searchbox\>
 
 
 An all-in-one search component combining input, results dropdown, and keyboard navigation. Results appear in a floating dropdown below the input and load their full data only when scrolled into view using the Intersection Observer API.
@@ -156,3 +158,5 @@ The searchbox implements the [ARIA combobox](https://www.w3.org/WAI/ARIA/apg/pat
 - The root element of your template must have `role="option"` or `role="group"`
 - Without sub-results, your template root is the `<a role="option">` itself
 - With sub-results, your template root is a `role="group"` element wrapping the main result and its sub-results together, with each navigable item as a `role="option"` child (as shown in the full template above)
+{% endraw %}{% raw %}
+{% endraw %}

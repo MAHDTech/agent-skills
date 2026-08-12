@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode"
 +++
 
+{% raw %}
 [**OpenCode**](https://opencode.ai/) is an open source AI coding agent. It’s available as a terminal-based interface, desktop app, or IDE extension.
 
 ![Image 1: OpenCode TUI with the opencode theme](https://opencode.ai/docs/_astro/screenshot.CQjBbRyJ_1dLadc.webp)
@@ -218,3 +219,4 @@ Here’s an [example conversation](https://opencode.ai/s/4XP1fce5) with OpenCode
 And that’s it! You are now a pro at using OpenCode.
 
 To make it your own, we recommend [picking a theme](https://opencode.ai/docs/themes), [customizing the keybinds](https://opencode.ai/docs/keybinds), [configuring code formatters](https://opencode.ai/docs/formatters), [creating custom commands](https://opencode.ai/docs/commands), or playing around with the [OpenCode config](https://opencode.ai/docs/config).
+{% endraw %}

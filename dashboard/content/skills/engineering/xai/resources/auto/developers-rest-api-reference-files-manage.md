@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Files API
 
 # Manage
@@ -59,7 +60,7 @@ returned \`data\` array is shorter than \`limit\`.
 
 ### Response Body
 
-* `data` (array\<object>, required) — List of files.
+* `data` (array\\<object\>, required) — List of files.
 
   * `bytes` (integer, required) — The size of the file, in bytes.
 
@@ -178,3 +179,4 @@ be referenced in chat attachments.
   "deleted": true
 }
 ```
+{% endraw %}

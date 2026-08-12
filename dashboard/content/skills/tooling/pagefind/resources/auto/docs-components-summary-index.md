@@ -7,12 +7,13 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-summary>
+# \<pagefind-summary\>
 
 
 Displays search status and result count. Shows messages like "12 results for 'search term'".
@@ -47,3 +48,4 @@ The summary displays different messages based on search state:
 | Error | `Error: {message}` |
 
 These messages are automatically translated to match the language of the website.
+{% endraw %}

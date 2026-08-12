@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # X Search
@@ -357,3 +358,4 @@ const { text } = await generateText({
 ## Citations
 
 For details on how to retrieve and use citations from search results, see the [Citations](https://docs.x.ai/developers/tools/citations) page.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -84,3 +85,4 @@ Detailed discussions often happen on [Zulip](https://agentclientprotocol.zulipch
 All RFDs are licensed under Apache 2.0. The project remains open source.
 
 ##
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB Astro app running in under 5 minutes.
@@ -179,3 +180,4 @@ server island without changing the main real-time client flow.
 </DeferredPeopleSnapshot>
 ```
 
+{% endraw %}

@@ -563,11 +563,3 @@ Be mindful of unbounded table growth:
   client data sync
 - Review [Reducers](https://spacetimedb.com/docs/functions/reducers) for efficient data
   modification patterns
-
-- [Use Indexes for Lookups](#use-indexes-for-lookups)
-- [Keep Tables Focused](#keep-tables-focused)
-- [Choose Appropriate Types](#choose-appropriate-types)
-- [Consider Table Visibility](#consider-table-visibility)
-- [Batch Operations](#batch-operations)
-- [Monitor Table Growth](#monitor-table-growth)
-- [Next Steps](#next-steps)

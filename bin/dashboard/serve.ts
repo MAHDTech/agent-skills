@@ -42,8 +42,9 @@ export async function serveAction(options?: {
     try {
         const tailwindChild = watchCss()
         tailwindChild.on("exit", (code) => {
-            if (!finished && code !== null && code !== 0) {
+            if (!finished && code !== 0) {
                 log.warn(`⚠️ Tailwind watch exited with code ${code}`)
+                cleanup()
             }
         })
 

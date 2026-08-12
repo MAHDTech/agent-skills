@@ -4,8 +4,6 @@
 
 Grok 4.5 is SpaceXAI's frontier model built for coding, agentic tasks, and knowledge work. It was trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.
 
-> Grok 4.5 isn't available in the API console for EU users yet. Availability is expected later this month.
-
 ## Using the API
 
 If you already have an [API key](https://console.x.ai/team/default/api-keys), set the model name to `grok-4.5`:

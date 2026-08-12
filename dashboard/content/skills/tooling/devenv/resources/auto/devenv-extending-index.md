@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Extending devenv
 
 Projects can encode their best practices by creating custom modules with opinionated defaults in a central repository:
@@ -78,3 +79,4 @@ You can replace existing devenv modules using the `disabledModules` mechanism. T
   };
 }
 ```
+{% endraw %}

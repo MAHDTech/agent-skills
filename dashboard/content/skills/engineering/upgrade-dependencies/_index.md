@@ -16,7 +16,7 @@ An upgrade is a behaviour change you did not write. Read what is coming, move in
 
 The same discipline covers a single package bump, a major-version jump, a framework migration, and a language or runtime update — only the blast radius grows.
 
-Run the suite and the upgrade commands through the project's toolchain — for example `devenv shell -- <cmd>` — so the environment is the same before and after.
+Run the suite and the upgrade commands through the project's toolchain — for example `devenv --no-tui shell -- <cmd>` — so the environment is the same before and after.
 
 ## Phase 1 — Establish the safety net
 

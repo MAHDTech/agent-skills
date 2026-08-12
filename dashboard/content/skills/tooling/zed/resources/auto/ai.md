@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # AI coding at native speed
 
 Smoothly collaborate with agents in Zed, editing files, navigating code,
@@ -287,55 +288,54 @@ Shipped in 2026
 
 Shipped in 2025
 
-[](https://github.com/zed-industries/zed/pull/60552)
+[](https://github.com/zed-industries/zed/pull/60575)
 
-Csettings_ui: Fix MCP server toggle not updating in UI
+JHandle SSE data fields without spaces
 
-@counterfactual5•\#60552•16h ago•View →
+@justjavac•\#60575•15h ago•View →
 
-[](https://github.com/zed-industries/zed/pull/59586)
+[](https://github.com/zed-industries/zed/pull/61662)
 
-Ragent_ui: Fix duplicate terminal when starting a new agent thread
+Magent: Improve error messaging for \`edit_file\` tool
 
-@rbstp•\#59586•1w ago•View →
+@mfeyg•\#61662•2d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/61621)
+
+Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
+files
+
+@amtoaer•\#61621•4d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/60893)
+
+NTTreat blank spawn_agent session IDs as absent
+
+@nevo-ts•\#60893•5d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/58217)
+
+Hagent_ui: Fix agent terminal close behavior with keyboard shortcuts
+
+@hugh2slowmo•\#58217•5d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/57207)
 
 ZLAllow configuring adaptive thinking for Anthropic available_models
 
-@zerx-lab•\#57207•6d ago•View →
+@zerx-lab•\#57207•2w ago•View →
 
-[](https://github.com/zed-industries/zed/pull/60507)
+[](https://github.com/zed-industries/zed/pull/60552)
 
-WHGuard OpenCode bell plugin in ACP mode
+Csettings_ui: Fix MCP server toggle not updating in UI
 
-@white-hat•\#60507•1w ago•View →
+@counterfactual5•\#60552•1w ago•View →
 
-[](https://github.com/zed-industries/zed/pull/38278)
+[](https://github.com/zed-industries/zed/pull/59586)
 
-Zprompts: Improve inline assist prompt to reduce garbage from smaller
-models
+Ragent_ui: Fix duplicate terminal when starting a new agent thread
 
-@zanmato•\#38278•9mo ago•View →
-
-[](https://github.com/zed-industries/zed/pull/57861)
-
-Glmstudio: Fix context wheel by including token usage in streaming
-responses
-
-@GabrieleAncillai•\#57861•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/58225)
-
-Manthropic: Allow configured models to opt into fast mode
-
-@Moeblack•\#58225•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/52849)
-
-OFix MCP servers in multi root workspaces
-
-@OmChillure•\#52849•1w ago•View →
+@rbstp•\#59586•2w ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)
@@ -394,3 +394,4 @@ Code at the speed of thought.
 [Download nowD](https://zed.dev/download)[Clone
 sourceC](https://github.com/zed-industries/zed)
 
+{% endraw %}

@@ -1,57 +1,87 @@
----
-slug: ide/overview
-section: Antigravity IDE
-title: Overview
-path:
-  - Antigravity IDE
-  - Overview
----
+- side_navigation
+- Antigravity IDE
+  \>
+- Overview
 
-# Antigravity IDE
-<Announcement>
-icon: warning
-iconColor: var(--theme-primary)
-color: var(--theme-surface-surface-container)
-text: **Note**: Antigravity IDE is not supported for enterprise customers. To use Antigravity with enterprise configurations, use Antigravity 2.0 or Antigravity CLI.
-link: /docs/enterprise
-linktext: Enterprise Setup
-</Announcement>
-Antigravity IDE is an agentic development environment, evolving anyone to build in the agent-first era. It integrates agents directly into your development workspace, providing them the tools needed to autonomously operate across the editor, terminal, and browser—emphasizing verification and higher-level communication via tasks and artifacts. This capability enables agents to plan and execute more complex, end-to-end software tasks, elevating all aspects of development, from building features, UI iteration, and fixing bugs to research and generating reports.
+# Antigravity IDE[link](#antigravity-ide)
 
-<FeatureBlocks>
-name: Main Features
-blocks:
+warning
 
-- link: /
-  icon: automatic_cluster
-  title: AI-powered IDE
-  description: An AI-powered IDE with all of the AI features that developers have come to rely on such as Agent and Tab.
-- link: /
-  icon: automatic_cluster
-  title: Asynchronous Agents
-  description: Asynchronous, local agents that can work in parallel on all of your workspaces.
-- link: /
-  icon: automatic_cluster
-  title: Browser Agent
-  description: Agent that can actuate the browser for you and to accomplish dev tasks like dashboard reads, SCM actions, UI testing, etc. in the Browser.
-</FeatureBlocks>
+Note: Antigravity IDE is not supported for enterprise customers. To use
+Antigravity with enterprise configurations, use Antigravity 2.0 or
+Antigravity CLI.
 
-## Core Surfaces
+[Enterprise Setup](https://antigravity.google/docs/enterprise)
 
-<IconCardGroup>
+Antigravity IDE is an agentic development environment, evolving anyone
+to build in the agent-first era. It integrates agents directly into your
+development workspace, providing them the tools needed to autonomously
+operate across the editor, terminal, and browser—emphasizing
+verification and higher-level communication via tasks and artifacts.
+This capability enables agents to plan and execute more complex,
+end-to-end software tasks, elevating all aspects of development, from
+building features, UI iteration, and fixing bugs to research and
+generating reports.
 
-- link: /
-  icon: automatic_cluster
-  title: Editor
-  description: A fully-functional AI-powered IDE that maps to a single workspace.
-- link: /
-  icon: automatic_cluster
-  title: Browser
-  description: Browser-use agent capabilities to read & actuate on more surfaces beyond just the IDE.
-</IconCardGroup>
+Main Features
 
-## Key Terms
+[](https://antigravity.google/)
 
-- **Agent**: The primary AI modality within Antigravity. While the user can work tightly with an Agent within the Editor, they can also have multiple agents working across multiple codebases.
-- **Tab**: The other AI modality within Antigravity, specifically within the text editor part of the editor surface. Tab is a more powerful autocomplete helper.
-- **Artifacts**: We define an artifact as anything that the agent creates to allow it to get its work done or communicate its accomplishments to the human user. These include rich markdown files, diff views, architecture diagrams, images, browser recordings, etc.
+automatic_cluster
+
+AI-powered IDEkeyboard_arrow_right
+
+An AI-powered IDE with all of the AI features that developers have come
+to rely on such as Agent and Tab.
+
+[](https://antigravity.google/)
+
+automatic_cluster
+
+Asynchronous Agentskeyboard_arrow_right
+
+Asynchronous, local agents that can work in parallel on all of your
+workspaces.
+
+[](https://antigravity.google/)
+
+automatic_cluster
+
+Browser Agentkeyboard_arrow_right
+
+Agent that can actuate the browser for you and to accomplish dev tasks
+like dashboard reads, SCM actions, UI testing, etc. in the Browser.
+
+## Core Surfaces[link](#core-surfaces)
+
+[](https://antigravity.google/)
+
+automatic_cluster
+
+Editorkeyboard_arrow_right
+
+A fully-functional AI-powered IDE that maps to a single workspace.
+
+[](https://antigravity.google/)
+
+automatic_cluster
+
+Browserkeyboard_arrow_right
+
+Browser-use agent capabilities to read & actuate on more surfaces beyond
+just the IDE.
+
+## Key Terms[link](#key-terms)
+
+- **Agent**: The primary AI modality within Antigravity. While the user
+  can work tightly with an Agent within the Editor, they can also have
+  multiple agents working across multiple codebases.
+- **Tab**: The other AI modality within Antigravity, specifically within
+  the text editor part of the editor surface. Tab is a more powerful
+  autocomplete helper.
+- **Artifacts**: We define an artifact as anything that the agent
+  creates to allow it to get its work done or communicate its
+  accomplishments to the human user. These include rich markdown files,
+  diff views, architecture diagrams, images, browser recordings, etc.
+
+On this Page

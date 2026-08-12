@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Video Generation
@@ -724,3 +725,4 @@ asyncio.run(generate_concurrently())
 * [Image Generation](https://docs.x.ai/developers/model-capabilities/images/generation) — Generate still images from text
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
+{% endraw %}

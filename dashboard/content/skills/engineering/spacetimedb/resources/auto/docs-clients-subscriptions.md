@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -442,21 +443,4 @@ By following these best practices, you can optimize your data
 replication strategy and ensure your application remains efficient and
 responsive.
 
-- [Quick Start](#quick-start)
-- [How Subscriptions Work](#how-subscriptions-work)
-- [Common API Concepts](#common-api-concepts)
-  - [Builder and Lifecycle Callbacks](#builder-and-lifecycle-callbacks)
-  - [Query Forms](#query-forms)
-  - [Subscription Handles](#subscription-handles)
-  - [API References](#api-references)
-- [Best Practices for Optimizing Server Compute and Reducing
-  Serialization
-  Overhead](#best-practices-for-optimizing-server-compute-and-reducing-serialization-overhead)
-  - [1. Writing Efficient Subscription
-    Queries](#1-writing-efficient-subscription-queries)
-  - [2. Group Subscriptions with the Same Lifetime
-    Together](#2-group-subscriptions-with-the-same-lifetime-together)
-  - [3. Subscribe Before
-    Unsubscribing](#3-subscribe-before-unsubscribing)
-  - [4. Avoid Overlapping Queries](#4-avoid-overlapping-queries)
-
+{% endraw %}

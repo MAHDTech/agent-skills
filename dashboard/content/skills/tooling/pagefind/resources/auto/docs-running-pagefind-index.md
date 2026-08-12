@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -43,3 +44,4 @@ Next steps:
 Pagefind also exposes a NodeJS interface that can be used to programmatically build an index. Using this, you can index non-static websites, or even non-HTML content altogether. The NodeJS library can also be used to integrate Pagefind into developer tooling for static websites.
 
 You can find all of the details for this library on the [Indexing content using the NodeJS API](https://pagefind.app/docs/node-api/) page.
+{% endraw %}

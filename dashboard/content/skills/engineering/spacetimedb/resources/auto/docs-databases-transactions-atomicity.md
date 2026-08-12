@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -281,22 +282,4 @@ The `#[auto_inc]` sequence generator is not transactional:
 - **[Subscriptions](https://spacetimedb.com/docs/clients/subscriptions)** - How clients receive
   transactional updates
 
-- [What is a Transaction?](#what-is-a-transaction)
-- [ACID Properties](#acid-properties)
-  - [Atomicity](#atomicity)
-  - [Consistency](#consistency)
-  - [Isolation](#isolation)
-  - [Durability](#durability)
-- [Transaction Scope](#transaction-scope)
-  - [Reducers: Automatic Transactions](#reducers-automatic-transactions)
-  - [Nested Reducer Calls](#nested-reducer-calls)
-  - [Procedures: Manual Transactions](#procedures-manual-transactions)
-- [Best Practices](#best-practices)
-  - [Keep Transactions Short](#keep-transactions-short)
-  - [Handle Errors Gracefully](#handle-errors-gracefully)
-- [Limitations](#limitations)
-  - [No Nested Transactions](#no-nested-transactions)
-  - [Auto-Increment is Not
-    Transactional](#auto-increment-is-not-transactional)
-- [Related Topics](#related-topics)
-
+{% endraw %}

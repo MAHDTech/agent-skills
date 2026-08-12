@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -2491,7 +2492,7 @@ OnConnect_Event](https://spacetimedb.com/docs/assets/images/part-3-03-blueprint-
 OnConnect_Event](https://spacetimedb.com/docs/assets/images/part-3-03-blueprint-gamemanager-5-5c561bc306677541c09275150391206f.png)
 
 > **Note:** For the events the naming scheme for this tutorial is
-> `<Type>_<Event>_Event` for example `Circle_OnInsert_Event`.
+> `<Type>_\<Event\>_Event` for example `Circle_OnInsert_Event`.
 
 Update **Circle_OnInsert_Event** as follows: ![Update
 Circle_OnInsert_Event](https://spacetimedb.com/docs/assets/images/part-3-03-blueprint-gamemanager-6-55f57468708e9f1f56a70f6f4a01767d.png)
@@ -2715,19 +2716,4 @@ there's a problem! We can't move yet. In the next part, we'll explore
 how to get your player moving and interacting with food and other
 objects.
 
-- [Spawning Food](#spawning-food)
-- [Logging Players In](#logging-players-in)
-- [Spawning Player Circles](#spawning-player-circles)
-- [Creating the Arena](#creating-the-arena)
-- [Create Entity Blueprints](#create-entity-blueprints)
-- [Set Up the Nameplate Blueprint](#set-up-the-nameplate-blueprint)
-- [Set Up Circle Entity Blueprint](#set-up-circle-entity-blueprint)
-- [Set Up the Food Entity Blueprint](#set-up-the-food-entity-blueprint)
-- [Set Up the PlayerPawn Blueprint](#set-up-the-playerpawn-blueprint)
-- [Update Classes](#update-classes)
-- [Spawning Blueprints](#spawning-blueprints)
-- [Player Controller](#player-controller)
-- [Entering the Game](#entering-the-game)
-- [Trying It Out](#trying-it-out)
-- [Next Steps](#next-steps)
-
+{% endraw %}

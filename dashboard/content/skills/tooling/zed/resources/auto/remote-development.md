@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # Remote Development
 
 Open a project on any machine you can SSH into, while utilizing the
@@ -94,3 +95,4 @@ Code at the speed of thought.
 [Download nowD](https://zed.dev/download)[Clone
 sourceC](https://github.com/zed-industries/zed)
 
+{% endraw %}

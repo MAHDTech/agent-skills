@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -164,7 +165,7 @@ server {
 ```
 
 This configuration by default blocks all connections other than
-`/v1/identity` and `/v1/database/<database-name>/subscribe` which only
+`/v1/identity` and `/v1/database/\<database-name\>/subscribe` which only
 allows the most basic functionality. This will prevent all remote users
 from publishing to your SpacetimeDB instance.
 
@@ -316,27 +317,4 @@ If errors are found, check the logs:
 sudo journalctl -u nginx --no-pager | tail -20
 ```
 
-- [Prerequisites](#prerequisites)
-- [Step 1: Create a Dedicated User for
-  SpacetimeDB](#step-1-create-a-dedicated-user-for-spacetimedb)
-- [Step 2: Create a Systemd Service for
-  SpacetimeDB](#step-2-create-a-systemd-service-for-spacetimedb)
-- [Step 3: Install and Configure
-  Nginx](#step-3-install-and-configure-nginx)
-  - [Install Nginx](#install-nginx)
-  - [Configure Nginx Reverse Proxy](#configure-nginx-reverse-proxy)
-  - [Configure Firewall](#configure-firewall)
-- [Step 4: Secure with Let's Encrypt](#step-4-secure-with-lets-encrypt)
-  - [Install Certbot](#install-certbot)
-  - [Obtain an SSL Certificate](#obtain-an-ssl-certificate)
-  - [Auto-Renew SSL Certificates](#auto-renew-ssl-certificates)
-- [Step 5: Verify Installation](#step-5-verify-installation)
-- [Step 6: Updating SpacetimeDB
-  Version](#step-6-updating-spacetimedb-version)
-- [Step 7: Troubleshooting](#step-7-troubleshooting)
-  - [SpacetimeDB Service Fails to
-    Start](#spacetimedb-service-fails-to-start)
-  - [Let's Encrypt Certificate Renewal
-    Issues](#lets-encrypt-certificate-renewal-issues)
-  - [Nginx Fails to Start](#nginx-fails-to-start)
-
+{% endraw %}

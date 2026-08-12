@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Management API
 
 # Audit Logs
@@ -41,7 +42,7 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
 
 ### Response Body
 
-* `events` (array\<object>) — Requested events. Ordered by event\_time.
+* `events` (array\\<object\>) — Requested events. Ordered by event\_time.
 
   * `eventTime` (string)
 
@@ -87,3 +88,4 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
   "nextPageToken": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
+{% endraw %}

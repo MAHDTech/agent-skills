@@ -1,0 +1,156 @@
++++
+title = "protocol-v2-authentication"
+[extra]
+skill = false
+category = "tooling"
+mermaid = true
+skill_name = "opencode-acp"
++++
+
+{% raw %}
+> ## Documentation Index
+> Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Authentication
+
+> Authenticating with agents and logging out
+
+ACP authentication is negotiated during [initialization](https://agentclientprotocol.com/protocol/v2/initialization). Agents advertise available authentication methods in `authMethods`. A non-empty list makes `auth/login` and `auth/logout` available, while each authentication method type defines whether the Client invokes `auth/login`.
+
+<br />
+
+```mermaid theme={null}
+sequenceDiagram
+    participant Client
+    participant Agent
+
+    Client->>Agent: initialize
+    Agent-->>Client: initialize response (authMethods)
+
+    alt Agent advertises a protocol-driven login method
+        Client->>Agent: auth/login (methodId)
+        Agent-->>Client: auth/login response
+    end
+
+    Note over Client,Agent: Authenticated requests may proceed
+
+    alt Agent advertises authMethods and user logs out
+        Client->>Agent: auth/logout
+        Agent-->>Client: auth/logout response
+    end
+
+    Note over Client,Agent: Authentication-gated requests require authentication again
+```
+
+<br />
+
+## Advertising Authentication
+
+Agents advertise authentication options in the `authMethods` field of the `initialize` response. Each method has a `methodId`. The Client passes that ID to `auth/login` only when the method's type defines a protocol-driven login flow.
+
+Returning one or more valid entries in `authMethods` advertises the authentication surface. An Agent that does so **MUST** implement both `auth/login` and `auth/logout`. If `authMethods` is omitted or empty, the Agent does not advertise this surface and Clients **MUST NOT** call either method.
+
+`capabilities.auth` is orthogonal to this requirement. It advertises authentication-related extensions, not the availability of the baseline `auth/login` and `auth/logout` methods.
+
+```json highlight={8-15} theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "result": {
+    "protocolVersion": 2,
+    "capabilities": {},
+    "authMethods": [
+      {
+        "methodId": "agent-login",
+        "name": "Agent login",
+        "type": "agent",
+        "description": "Sign in using the agent's login flow"
+      }
+    ]
+  }
+}
+```
+
+Because this response contains an `agent` authentication method, the Agent must support both `auth/login` and `auth/logout`.
+
+### Authentication Method Types
+
+The standard authentication method type is `agent`, where the Agent handles authentication through `auth/login`. Every authentication method must include a `type` discriminator:
+
+```json theme={null}
+{
+  "methodId": "agent-login",
+  "name": "Agent login",
+  "type": "agent",
+  "description": "Sign in using the agent's login flow"
+}
+```
+
+Authentication method `type` values can be custom or future variants. Custom method types **MUST** begin with `_`. Unknown non-underscore method types are reserved for future ACP variants. Clients that do not understand a method type should preserve the raw method payload when storing, replaying, proxying, or forwarding initialization data, and otherwise ignore the method or display it generically.
+
+See the [schema](https://agentclientprotocol.com/protocol/v2/schema#authmethod) for the full stable `AuthMethod` definition.
+
+## Authenticating
+
+When an Agent requires authentication and the selected method's type defines a protocol-driven login flow, the Client calls `auth/login` with that advertised method's ID:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "auth/login",
+  "params": {
+    "methodId": "agent-login"
+  }
+}
+```
+
+<ParamField path="methodId" type="string" required>
+  The ID of an advertised authentication method whose type defines the
+  `auth/login` flow.
+</ParamField>
+
+On success, the Agent returns an empty result:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {}
+}
+```
+
+After successful authentication, the Client can create new sessions without receiving an `auth_required` error for authentication-gated requests.
+
+## Logging Out
+
+The `auth/logout` method allows Clients to end the current authenticated state. Clients may call it only when the Agent advertised one or more valid authentication methods during initialization; there is no separate logout capability marker.
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "auth/logout",
+  "params": {}
+}
+```
+
+On success, the Agent returns an empty result:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {}
+}
+```
+
+After a successful `auth/logout`, authentication-gated requests will require the user to complete one of the advertised authentication flows again.
+
+## Active Sessions
+
+The protocol does not guarantee what happens to already-running sessions after `auth/logout`. Agents may terminate them, keep them running, or return `auth_required` errors for future session activity.
+
+Clients **SHOULD** be prepared for active session operations to fail with authentication-related errors after logout and should prompt the user to authenticate again when appropriate.
+{% endraw %}

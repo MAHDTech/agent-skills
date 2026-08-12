@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Prompt Caching
 
 # What Breaks Caching
@@ -22,7 +23,7 @@ For reasoning models, you can maintain cache hits by either:
 * **Sending back the encrypted reasoning content** — Include the `reasoning_content` from the previous response. See [Encrypted Reasoning Content](https://docs.x.ai/developers/model-capabilities/text/reasoning#encrypted-reasoning-content) for details.
 * **Using stateful responses** — Use `previous_response_id` to automatically continue the conversation. See [Chaining the Conversation](https://docs.x.ai/developers/model-capabilities/text/generate-text#chaining-the-conversation) for details.
 
-## &#x20;Cache hit — appending a new message
+##  Cache hit — appending a new message
 
 The prompt prefix is identical to the previous request, with only a new user message appended:
 
@@ -134,7 +135,7 @@ console.log(
 );
 ```
 
-## &#x20;Cache miss — editing an earlier message
+##  Cache miss — editing an earlier message
 
 Changing the content of any earlier message breaks the prefix match:
 
@@ -158,7 +159,7 @@ curl https://api.x.ai/v1/chat/completions \
 
 **What changed:** The assistant response on line 11 was shortened to `"It stores KV pairs."` (line 12).
 
-## &#x20;Cache miss — removing a message
+##  Cache miss — removing a message
 
 Removing any message from the conversation breaks the prefix:
 
@@ -181,7 +182,7 @@ curl https://api.x.ai/v1/chat/completions \
 
 **What changed:** The assistant message on line 11 was removed entirely.
 
-## &#x20;Cache miss — reordering messages
+##  Cache miss — reordering messages
 
 Changing the order of messages also breaks the prefix:
 
@@ -207,3 +208,4 @@ curl https://api.x.ai/v1/chat/completions \
 ## Next
 
 * [Usage & Pricing](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing)
+{% endraw %}

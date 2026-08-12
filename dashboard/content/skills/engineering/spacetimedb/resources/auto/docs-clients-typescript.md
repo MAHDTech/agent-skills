@@ -7,6 +7,8 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1543,7 +1545,7 @@ import { SpacetimeDBProvider, useSpacetimeDB, useTable, useReducer } from 'space
 ```
 
 The Vue integration provides the same hooks as React. `useTable` returns
-`[DeepReadonly<Ref<readonly Row[]>>, DeepReadonly<Ref<boolean>>]` for
+`[DeepReadonly<Ref<readonly Row[]>>, DeepReadonly<Ref\<boolean\>>]` for
 Vue's reactivity system:
 
 ``` prism-code
@@ -1573,7 +1575,7 @@ import { SpacetimeDBProvider, useSpacetimeDB, useTable, useReducer } from 'space
 ```
 
 The Svelte integration provides the same hooks as React. `useTable`
-returns `[Readable<readonly Row[]>, Readable<boolean>]` using Svelte
+returns `[Readable<readonly Row[]>, Readable\<boolean\>]` using Svelte
 stores:
 
 ``` prism-code
@@ -1594,62 +1596,5 @@ const [onlineUsers] = useTable(
 {/if}
 ```
 
-- [Project setup](#project-setup)
-  - [Tip for utilities/scripts](#tip-for-utilitiesscripts)
-- [Generate module bindings](#generate-module-bindings)
-- [Type `DbConnection`](#type-dbconnection)
-  - [Connect to a database](#connect-to-a-database)
-  - [Access tables and reducers](#access-tables-and-reducers)
-- [Interface `DbContext`](#interface-dbcontext)
-  - [Method `disconnect`](#method-disconnect)
-  - [Subscribe to queries](#subscribe-to-queries)
-- [Query Builder API](#query-builder-api)
-  - [The `tables` export](#the-tables-export)
-  - [Building queries with `where`](#building-queries-with-where)
-  - [Column operators](#column-operators)
-  - [Boolean combinators](#boolean-combinators)
-  - [Semijoins](#semijoins)
-  - [Using query builders with
-    subscriptions](#using-query-builders-with-subscriptions)
-  - [Read connection metadata](#read-connection-metadata)
-- [Type `EventContext`](#type-eventcontext)
-  - [Field `event`](#field-event)
-  - [Field `db`](#field-db-2)
-  - [Field `reducers`](#field-reducers-2)
-  - [Type `Event`](#type-event)
-  - [Type `ReducerEvent`](#type-reducerevent)
-  - [Type `UpdateStatus`](#type-updatestatus)
-  - [Type `Reducer`](#type-reducer)
-- [Type `ReducerEventContext`](#type-reducereventcontext)
-  - [Field `event`](#field-event-1)
-  - [Field `db`](#field-db-3)
-  - [Field `reducers`](#field-reducers-3)
-- [Type `SubscriptionEventContext`](#type-subscriptioneventcontext)
-  - [Field `db`](#field-db-4)
-  - [Field `reducers`](#field-reducers-4)
-- [Type `ErrorContext`](#type-errorcontext)
-  - [Field `event`](#field-event-2)
-  - [Field `db`](#field-db-5)
-  - [Field `reducers`](#field-reducers-5)
-- [Access the client cache](#access-the-client-cache)
-  - [Accessing rows](#accessing-rows)
-  - [Callback `onInsert`](#callback-oninsert)
-  - [Callback `onDelete`](#callback-ondelete)
-  - [Callback `onUpdate`](#callback-onupdate)
-  - [Unique constraint index access](#unique-constraint-index-access)
-  - [BTree index access](#btree-index-access)
-- [Observe and invoke reducers](#observe-and-invoke-reducers)
-- [React Integration](#react-integration)
-  - [Component `SpacetimeDBProvider`](#component-spacetimedbprovider)
-  - [Hook `useSpacetimeDB`](#hook-usespacetimedb)
-  - [Hook `useTable`](#hook-usetable)
-  - [Hook `useReducer`](#hook-usereducer)
-- [Identify a client](#identify-a-client)
-  - [Type `Identity`](#type-identity)
-  - [Type `ConnectionId`](#type-connectionid)
-- [Framework Integrations](#framework-integrations)
-  - [React](#react)
-  - [SolidJS](#solidjs)
-  - [Vue](#vue)
-  - [Svelte](#svelte)
-
+{% endraw %}{% raw %}
+{% endraw %}

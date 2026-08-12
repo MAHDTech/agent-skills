@@ -7,6 +7,7 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -569,3 +570,4 @@ The canonical sources for those crates is currently the \[symposium-dev/symposiu
 
 * Initial draft based on working implementation in symposium-acp repository.
 * Split MCP-over-ACP transport into [separate RFD](@/skills/tooling/opencode-acp/resources/auto/rfds-mcp-over-acp.md) to enable independent use by any ACP component.
+{% endraw %}

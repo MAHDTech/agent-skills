@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Function Calling
@@ -501,3 +502,4 @@ for await (const chunk of result.fullStream) {
   }
 }
 ```
+{% endraw %}

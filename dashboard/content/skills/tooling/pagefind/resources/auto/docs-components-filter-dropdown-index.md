@@ -7,12 +7,13 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-filter-dropdown>
+# \<pagefind-filter-dropdown\>
 
 
 A dropdown selector for a single filter.
@@ -67,3 +68,4 @@ For catalog-style interfaces where users browse by filters without requiring a s
 ```
 
 In faceted mode, all results are shown initially and update immediately when filters are changed. See the [config component documentation](https://pagefind.app/docs/components/config/#faceted-search-mode) for details.
+{% endraw %}

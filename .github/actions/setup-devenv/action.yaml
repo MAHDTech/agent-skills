@@ -66,16 +66,17 @@ runs:
       shell: bash
       run: |
         # NOTE: cachix is already pre-install in the install nix step.
-        nix profile install --accept-flake-config nixpkgs#devenv nixpkgs#secretspec
+        # NOTE: secretspec is now included with devenv
+        nix profile install --accept-flake-config nixpkgs#devenv
 
     - id: version_check
       name: Version Check
       shell: bash
       run: |
-        devenv version
+        devenv --no-tui version
 
     - id: warmup_devenv
       name: Warm up Devenv shell
       shell: bash
       run: |
-        devenv shell -- hello --greeting "devenv cache warm-up complete!"
+        devenv --no-tui shell -- hello --greeting "devenv cache warm-up complete!"

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -254,8 +255,4 @@ where `$SPACETIMEDB_URI` is the SpacetimeDB host (usually
 `https://maincloud.spacetimedb.com`), and `$DATABASE` is the name of the
 database.
 
-- [Defining HTTP Handlers](#defining-http-handlers)
-- [Registering Handlers to Routes](#registering-handlers-to-routes)
-  - [Strict Routing](#strict-routing)
-- [Sending Requests](#sending-requests)
-
+{% endraw %}

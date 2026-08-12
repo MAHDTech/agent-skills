@@ -194,26 +194,3 @@ dependencies:
 | C#         | `<project>.csproj`    | `"SpacetimeDB.ClientSDK"`          |
 | Unity      | Unity Package Manager | `com.clockworklabs.spacetimedbsdk` |
 | Unreal     | `<Game>.Build.cs`     | `"SpacetimeDbSdk"`                 |
-
-- [Credentials](#credentials)
-  - [CLI login not accepted by
-    server](#cli-login-not-accepted-by-server)
-  - [Client connection rejected](#client-connection-rejected)
-- [In Modules](#in-modules)
-  - [Identity seen by reducers never
-    changes](#identity-seen-by-reducers-never-changes)
-  - [Code changes not taking effect](#code-changes-not-taking-effect)
-- [In Clients](#in-clients)
-  - [Connection completely
-    unresponsive](#connection-completely-unresponsive)
-  - [Rows never appear](#rows-never-appear)
-  - [Insert, update or delete callback not invoked when row
-    changes](#insert-update-or-delete-callback-not-invoked-when-row-changes)
-  - [Row seen by update callback is out of
-    date](#row-seen-by-update-callback-is-out-of-date)
-  - [Serialization errors](#serialization-errors)
-  - [Reducers, procedures, views not visible to
-    client](#reducers-procedures-views-not-visible-to-client)
-  - [Tables not visible to client](#tables-not-visible-to-client)
-  - [Compilation or type errors in generated
-    `module_bindings`](#compilation-or-type-errors-in-generated-module_bindings)

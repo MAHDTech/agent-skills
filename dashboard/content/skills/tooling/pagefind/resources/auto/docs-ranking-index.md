@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -192,3 +193,4 @@ await pagefind.options({
 +    }
 });
 ```
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1464,13 +1465,4 @@ warning
 storing them securely on the server side or using environment variables
 during development.
 
-- [Defining Procedures](#defining-procedures)
-  - [Accessing the database](#accessing-the-database)
-- [HTTP Requests](#http-requests)
-- [Calling Reducers from Procedures](#calling-reducers-from-procedures)
-- [Calling procedures](#calling-procedures)
-  - [Observing return values](#observing-return-values)
-- [Example: Calling an External AI
-  API](#example-calling-an-external-ai-api)
-  - [Calling from a client](#calling-from-a-client)
-
+{% endraw %}

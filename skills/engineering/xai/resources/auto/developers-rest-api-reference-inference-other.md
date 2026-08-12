@@ -8,7 +8,7 @@ Get information about an API key, including name, status, permissions and users 
 
 ### Response Body
 
-* `acls` (array\<string>, required) — A list of ACLs authorized with the API key, e.g. \`"api-key:endpoint:\*"\`, \`"api-key:model:\*"\`.
+* `acls` (array\\<string\>, required) — A list of ACLs authorized with the API key, e.g. \`"api-key:endpoint:\*"\`, \`"api-key:model:\*"\`.
 
 * `api_key_blocked` (boolean, required) — Indicates whether the API key is blocked.
 
@@ -70,11 +70,11 @@ Tokenize text with the specified model
 
 ### Response Body
 
-* `token_ids` (array\<object>, required) — A list of tokens.
+* `token_ids` (array\\<object\>, required) — A list of tokens.
 
   * `string_token` (string, required) — The string of the token.
 
-  * `token_bytes` (array\<integer>, required) — The bytes that constituted the token.
+  * `token_bytes` (array\\<integer\>, required) — The bytes that constituted the token.
 
   * `token_id` (integer, required) — The integer representation of the token for the model.
 

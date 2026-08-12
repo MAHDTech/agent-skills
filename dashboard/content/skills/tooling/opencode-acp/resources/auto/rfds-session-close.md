@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -91,3 +92,4 @@ seems like a good idea.
 * 2026-04-14: Move to preview and update capability docs to `sessionCapabilities.close`
 * 2026-03-09: Rename from session/stop to session/close
 * 2026-02-24: Initial draft
+{% endraw %}

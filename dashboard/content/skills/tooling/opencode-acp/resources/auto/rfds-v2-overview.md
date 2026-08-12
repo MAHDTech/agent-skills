@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -58,12 +59,12 @@ Other RFDs will progress separately and are not dependent on breaking changes (s
 
 * Remove the dedicated session modes API from v2. This includes the `modes` session response fields, `session/set_mode`, `current_mode_update`, and the `SessionMode*` types.
 * Agents should expose mode-like and model-related state through [Session Config Options](@/skills/tooling/opencode-acp/resources/auto/rfds-session-config-options.md) instead of dedicated mode or model selector APIs.
-* Remove the v1 Client filesystem and terminal execution surface from v2. This includes `clientCapabilities.fs`, the top-level `clientCapabilities.terminal` field, `fs/*` methods, `terminal/*` methods, and the Client-owned semantics of v1 terminal tool-call content. Terminal authentication remains separate under `clientCapabilities.auth.terminal`.
+* Remove the v1 Client filesystem and terminal execution surface from v2. This includes `clientCapabilities.fs`, the top-level `clientCapabilities.terminal` field, `fs/*` methods, `terminal/*` methods, and the Client-owned semantics of v1 terminal tool-call content. Terminal authentication remains separate under `capabilities.auth.terminal`.
 * Add [Agent-owned, display-only terminal output](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-terminal-output.md). Tool calls reference terminals by `terminalId`; terminal upserts carry `command`, absolute `cwd`, replay snapshots, and exit status; terminal output chunks append independently base64-encoded bytes. The display surface is baseline v2 and does not add Client execution or control methods.
 * Make [plan variants](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-plan-variants.md) the default v2 plan shape by replacing the old `plan` session update with item-based `plan_update`.
 * Replace the v1 split between `tool_call` and `tool_call_update` with a single [tool-call update](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-tool-call-updates.md) upsert shape keyed by `toolCallId`.
 * Add [tool-call content chunks](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-tool-call-updates.md) so Agents can stream individual `ToolCallContent` items that append to a tool call.
-* Replace the v1 `Diff` `oldText` / `newText` shape with [diff file states](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-diff-file-states.md): renderable `git_patch` text for text changes plus structured file operations for add, delete, modify, move, copy, and non-text changes.
+* Replace the v1 `Diff` `oldText` / `newText` shape with [diff file states](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-diff-file-states.md): optional Git `--patch` text (`git_patch`) plus structured file operations for add, delete, modify, move, copy, and non-text changes.
 * Make [permission requests](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-permission-requests.md) carry a required prompt `title` and optional extensible `subject` tagged union. Tool-call permissions use `subject.type: "tool_call"` with the same `ToolCallUpdate` payload shape as session updates, command permissions use `subject.type: "command"` with the command, required absolute working directory, and optional display associations, and subject-less permissions rely on the common prompt fields.
 * Add [whole-message updates](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-message-updates.md) for `user_message`, `agent_message`, and `agent_thought` alongside streamed chunks. Message updates are upserts keyed by `messageId`; their `content` arrays replace current message content, while chunks append to the current content.
 * Require [message IDs](@/skills/tooling/opencode-acp/resources/auto/rfds-message-id.md) on streamed message chunks.
@@ -71,7 +72,7 @@ Other RFDs will progress separately and are not dependent on breaking changes (s
 * Clean up capability naming and organization:
   * Use a single `capabilities` field in both `initialize` params and results, replacing the v1-style `clientCapabilities` and `agentCapabilities` fields.
   * Require implementation metadata in both `initialize` params and results with a single role-agnostic `info` field, replacing the v1-style `clientInfo` and `agentInfo` fields so agent-to-agent and other symmetric ACP connections do not need role-specific field names.
-  * Group authentication methods under `auth/*`: v2 uses `auth/login` and `auth/logout` instead of v1's top-level `authenticate` and `logout` method names. `auth/logout` is required for v2 Agents and no longer uses a `capabilities.auth.logout` support marker. The generated request and response type names follow the grouped method naming as `LoginAuthRequest` / `LoginAuthResponse` and `LogoutAuthRequest` / `LogoutAuthResponse`.
+  * Group authentication methods under `auth/*`: v2 uses `auth/login` and `auth/logout` instead of v1's top-level `authenticate` and `logout` method names. An Agent that returns one or more valid entries in `authMethods` advertises the authentication surface and **MUST** implement both methods; if the field is omitted or empty, Clients **MUST NOT** call either method. There is no `capabilities.auth.logout` support marker, and `capabilities.auth` remains orthogonal for authentication-related extensions. The generated request and response type names follow the grouped method naming as `LoginAuthRequest` / `LoginAuthResponse` and `LogoutAuthRequest` / `LogoutAuthResponse`.
   * Use concise capability group names such as `session` and `auth`, replacing names like `sessionCapabilities`.
   * Make `session` optional so non-session agents, such as NES-only agents, can omit it.
   * Require the baseline session lifecycle methods when `session` is present: `session/new`, `session/list`, `session/resume`, `session/close`, `session/prompt`, `session/cancel`, and `session/update`.
@@ -105,9 +106,9 @@ However, once all of this work is in place, it should be much easier to make add
 
 ### v2 + v1 Schema publishing
 
-I have created a [draft of the v2 schema](https://github.com/agentclientprotocol/agent-client-protocol/pull/1099), which is currently a direct duplicate of v1.
+I created the initial [draft of the v2 schema](https://github.com/agentclientprotocol/agent-client-protocol/pull/1099) as a direct duplicate of v1. The side-by-side Rust types still make the schema differences explicit as v2 evolves.
 
-This also has the necessary conversion types that are needed for Rust at least to convert between the two. But this has a nice side-effect of a clear diff of how the schema will change and also what conversion is necessary. So the plan is to start proposing draft RFDs with the relevant schema changes where possible for approval.
+The Rust schema does not provide cross-version conversion. Even initialize-request normalization depends on SDK routing policy, while many v2 lifecycle and update semantics require state that a schema-level conversion cannot supply. SDKs supporting both versions should expose explicit versioned implementations or build a purpose-specific adapter at their runtime boundary.
 
 Once we have more pieces in place, we can start publishing both schemas to assist SDK developers to start figuring out how to support this. **This should be done in an opt-in, off by default, clearly labeled unstable way for SDK consumers**. There will likely be bumps as we figure out the necessary plumbing and we shouldn't be shipping v2 in production without feature flags prior to a more stable release as we align all of the necessary pieces.
 
@@ -121,6 +122,9 @@ With the needed breaking changes, as much as possible I am targeting having a co
 
 ## Revision history
 
+* 2026-07-20: Clarified `git_patch` and renamed its payload from `diff` to `text`.
+* 2026-07-20: Clarified that `idle` means ready for a new prompt while background updates may continue; steering and queueing remain separate concerns.
+* 2026-07-20: Scoped the v2 authentication surface to Agents that return one or more valid `authMethods`; those Agents must implement both `auth/login` and `auth/logout`, while omission or an empty array means Clients must not call either method.
 * 2026-07-14: Added the v2 Terminal Output RFD for Agent-owned, display-only terminal output.
 * 2026-07-02: Added the v2 Diff File States RFD for renderable git patches, structured file operations, and non-text file changes.
 * 2026-07-02: Moved the v2 RFD collection to Active.
@@ -129,7 +133,7 @@ With the needed breaking changes, as much as possible I am targeting having a co
 * 2026-07-02: Added the v2 Required Session Methods RFD and recorded that `session/list`, `session/resume`, and `session/close` are baseline when `session` is present.
 * 2026-06-30: Recorded the v2 ID unification principle: prefer domain-specific ID field names.
 * 2026-06-25: Recorded the v2 initialize information cleanup: required role-agnostic `info` in both params and results, replacing `clientInfo` and `agentInfo`.
-* 2026-06-25: Recorded the v2 authentication method cleanup: grouped `auth/login` and required `auth/logout` method names replace v1's top-level `authenticate` and capability-gated `logout`, with matching generated type names for login and logout auth requests and responses.
+* 2026-06-25: Recorded the v2 authentication method cleanup: grouped `auth/login` and `auth/logout` method names replace v1's top-level `authenticate` and capability-gated `logout`, with matching generated type names for login and logout auth requests and responses.
 * 2026-06-09: Added tool-call content chunks for streaming individual `ToolCallContent` items.
 * 2026-06-09: Added the v2 Message Updates and Chunks RFD to define whole-message upserts alongside streamed message chunks.
 * 2026-06-08: Added the v2 Tool Call Updates RFD to make `tool_call_update` the single upsert-style tool-call session update.
@@ -140,3 +144,4 @@ With the needed breaking changes, as much as possible I am targeting having a co
 * 2026-06-01: Recorded that model selection should remain represented by session config options instead of a dedicated selector API.
 * 2026-05-28: Recorded the v2 decision to remove session modes in favor of session config options
 * 2026-05-06: Initial draft
+{% endraw %}

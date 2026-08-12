@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Tools
 
 # Web Search
@@ -352,3 +353,4 @@ In the xAI SDK, successful image search executions appear in `response.server_si
 ## Citations
 
 For details on how to retrieve and use citations from search results, see the [Citations](https://docs.x.ai/developers/tools/citations) page.
+{% endraw %}

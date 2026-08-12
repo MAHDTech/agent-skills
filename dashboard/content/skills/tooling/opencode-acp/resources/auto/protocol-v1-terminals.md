@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -114,7 +115,7 @@ This allows the command to run in the background while the Agent performs other 
 
 After creating the terminal, the Agent can use the `terminal/wait_for_exit` method to wait for the command to complete.
 
-<Note>
+\<Note\>
   The Agent **MUST** release the terminal using `terminal/release` when it's no
   longer needed.
 </Note>
@@ -288,3 +289,4 @@ The `terminal/release` kills the command if still running and releases all resou
 After release the terminal ID becomes invalid for all other `terminal/*` methods.
 
 If the terminal was added to a tool call, the client **SHOULD** continue to display its output after release.
+{% endraw %}

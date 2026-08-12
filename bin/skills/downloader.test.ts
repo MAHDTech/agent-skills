@@ -24,7 +24,107 @@ const {
     parseLlmsTxtLinks,
     checkPathTraversal,
     stripReaderMetadata,
+    isLlmsIndexUrl,
+    isNonTextUrl,
+    isNonTextContentType,
+    decodeHtmlEntities,
+    escapeOrphanTypeBrackets,
+    protectZolaDelimiters,
+    sanitizeControlCharacters,
+    normalizeMarkdownFormatting,
 } = await import("./downloader.ts")
+
+describe("isNonTextUrl & isNonTextContentType", () => {
+    it("identifies binary and media file extensions", () => {
+        expect(isNonTextUrl("https://v2.tauri.app/_astro/image.webp")).toBe(
+            true
+        )
+        expect(isNonTextUrl("https://example.com/logo.png")).toBe(true)
+        expect(isNonTextUrl("https://example.com/diagram.svg")).toBe(true)
+        expect(isNonTextUrl("https://example.com/doc.pdf")).toBe(true)
+        expect(isNonTextUrl("https://example.com/archive.zip")).toBe(true)
+        expect(isNonTextUrl("https://example.com/font.woff2")).toBe(true)
+        expect(isNonTextUrl("https://v2.tauri.app/start/frontend")).toBe(false)
+        expect(isNonTextUrl("https://v2.tauri.app/llms.txt")).toBe(false)
+        expect(isNonTextUrl("https://example.com/guide.md")).toBe(false)
+    })
+
+    it("identifies non-text MIME Content-Types", () => {
+        expect(isNonTextContentType("image/webp")).toBe(true)
+        expect(isNonTextContentType("image/png")).toBe(true)
+        expect(isNonTextContentType("image/svg+xml")).toBe(true)
+        expect(isNonTextContentType("application/pdf")).toBe(true)
+        expect(isNonTextContentType("application/zip")).toBe(true)
+        expect(isNonTextContentType("application/octet-stream")).toBe(true)
+        expect(isNonTextContentType("text/html; charset=utf-8")).toBe(false)
+        expect(isNonTextContentType("text/markdown")).toBe(false)
+        expect(isNonTextContentType("text/plain")).toBe(false)
+    })
+})
+
+describe("Markdown Post-Processing Helpers", () => {
+    it("decodes HTML entities in text and code blocks", () => {
+        expect(decodeHtmlEntities("array&lt;string&gt;")).toBe("array<string>")
+        expect(
+            decodeHtmlEntities("&quot;hello&quot; &amp; &apos;world&apos;")
+        ).toBe("\"hello\" & 'world'")
+        expect(decodeHtmlEntities("double &amp;#x26; entity")).toBe(
+            "double &#x26; entity"
+        )
+    })
+
+    it("escapes orphan type annotation brackets outside code fences", () => {
+        const input = "List of (array<string>, required)\n```\n<string>\n```"
+        const output = escapeOrphanTypeBrackets(input)
+        expect(output).toBe(
+            "List of (array\\<string\\>, required)\n```\n<string>\n```"
+        )
+    })
+
+    it("wraps raw Zola template tags in {% raw %} blocks", () => {
+        expect(protectZolaDelimiters("Hello {{ name }}")).toBe(
+            "{% raw %}\nHello {{ name }}\n{% endraw %}"
+        )
+        expect(
+            protectZolaDelimiters("{% raw %}Hello {{ name }}{% endraw %}")
+        ).toBe("{% raw %}Hello {{ name }}{% endraw %}")
+        expect(protectZolaDelimiters("Plain text")).toBe("Plain text")
+    })
+
+    it("strips null bytes, control characters, and U+FFFD", () => {
+        expect(sanitizeControlCharacters("hello\x00world\uFFFD\x07")).toBe(
+            "helloworld"
+        )
+    })
+
+    it("normalizes markdown formatting and empty link syntax", () => {
+        const input =
+            "Text [link]() and [anchor](#)\n```js\nconst x = 1\n```\nMore text"
+        const expected =
+            "Text link and anchor\n```js\nconst x = 1\n```\nMore text"
+        expect(normalizeMarkdownFormatting(input)).toBe(expected)
+    })
+})
+
+describe("isLlmsIndexUrl", () => {
+    it("correctly identifies llms.txt index and sub-index patterns", () => {
+        expect(isLlmsIndexUrl("https://v2.tauri.app/llms.txt")).toBe(true)
+        expect(isLlmsIndexUrl("https://v2.tauri.app/_llms.txt")).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://v2.tauri.app/_llms-txt/guides.txt")
+        ).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://v2.tauri.app/_llms-txt/reference.txt")
+        ).toBe(true)
+        expect(
+            isLlmsIndexUrl("https://pagefind.app/llms-component-ui.txt")
+        ).toBe(true)
+        expect(isLlmsIndexUrl("https://example.com/docs/page.md")).toBe(false)
+        expect(isLlmsIndexUrl("https://cli.github.com/manual/gh_pr")).toBe(
+            false
+        )
+    })
+})
 
 describe("stripReaderMetadata", () => {
     it("strips the jina reader preamble including the volatile Published Time", () => {
@@ -180,6 +280,50 @@ describe("downloader unit tests", () => {
         )
     })
 
+    it("should fall back to Jina proxy when a URL returns 403 Forbidden", async () => {
+        const mockSkills = [
+            {
+                path: "skills/engineering/test-skill/SKILL.md",
+                dirName: "test-skill",
+                category: "engineering",
+                promoted: false,
+                metadata: {
+                    name: "test-skill",
+                    description: "Test skill description",
+                    resources: ["https://blocked-site.com/docs/page.md"],
+                },
+                content: "",
+            },
+        ]
+
+        globalThis.fetch = mock(async (url: any) => {
+            const urlStr = String(url)
+            if (urlStr.startsWith("https://r.jina.ai/")) {
+                return new Response(
+                    "Title: Blocked Page\n\nURL Source: https://blocked-site.com/docs/page.md\n\nMarkdown Content:\n# Recovered Content\nThis content was recovered via proxy fallback and is long enough.",
+                    {status: 200, headers: {"content-type": "text/markdown"}}
+                )
+            }
+            return new Response("Forbidden", {
+                status: 403,
+                statusText: "Forbidden",
+                headers: {"content-type": "text/html"},
+            })
+        }) as any
+
+        await downloadAction(mockSkills, fakeRepo)
+
+        const resourcesDir = path.join(
+            fakeRepo,
+            "skills/engineering/test-skill/resources/auto"
+        )
+        const fileContent = await fs.readFile(
+            path.join(resourcesDir, "docs-page.md"),
+            "utf-8"
+        )
+        expect(fileContent).toContain("# Recovered Content")
+    })
+
     it("should skip dead links discovered from an llms.txt index without failing the run", async () => {
         const mockSkills = [
             {
@@ -286,10 +430,37 @@ describe("downloader unit tests", () => {
             )
         })
 
-        it("should fall back to index.md for empty slug from non-ASCII paths", () => {
+        it("should fall back to overview-index.md for empty or index slug to avoid Zola collisions", () => {
             expect(smartSlugify("https:/" + "/example.com/日本語/")).toBe(
-                "index.md"
+                "overview-index.md"
             )
+            expect(smartSlugify("https:/" + "/example.com/index.html")).toBe(
+                "overview-index.md"
+            )
+            expect(smartSlugify("https:/" + "/example.com/")).toBe(
+                "overview-index.md"
+            )
+        })
+
+        it("should strip hash fragments (#...) and query strings (?...) before slugifying", () => {
+            expect(
+                smartSlugify(
+                    "https:/" + "/docs.x.ai/llms.txt#audio-transport",
+                    "https:/" + "/docs.x.ai/"
+                )
+            ).toBe("llms.txt")
+            expect(
+                smartSlugify(
+                    "https:/" +
+                        "/docs.x.ai/developers/model-capabilities/text/generate-text#adding-encrypted-thinking-content",
+                    "https:/" + "/docs.x.ai/"
+                )
+            ).toBe("developers-model-capabilities-text-generate-text.md")
+            expect(
+                smartSlugify(
+                    "https:/" + "/example.com/docs/page?version=2#section"
+                )
+            ).toBe("docs-page.md")
         })
     })
 
@@ -378,12 +549,12 @@ describe("downloader unit tests", () => {
         )
         const files = await fs.readdir(resourcesDir)
 
-        // They should have resolved to distinct files since both originally mapped to index.md
+        // They should have resolved to distinct files since both originally mapped to overview-index.md
         expect(files.length).toBe(2)
 
-        // Each file name should be index-[hash].md
+        // Each file name should be overview-index-[hash].md
         for (const file of files) {
-            expect(file).toMatch(/^index-[a-f0-9]{8}\.md$/)
+            expect(file).toMatch(/^overview-index-[a-f0-9]{8}\.md$/)
         }
     })
 

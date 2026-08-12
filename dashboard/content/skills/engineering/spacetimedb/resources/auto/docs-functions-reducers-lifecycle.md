@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -363,8 +364,4 @@ client. Therefore:
 - `ctx.sender()` will be the module's own identity
 - `ctx.connection_id()` will be `None`/`null`/`undefined`
 
-- [Init Reducer](#init-reducer)
-- [Client Connected](#client-connected)
-- [Client Disconnected](#client-disconnected)
-- [Scheduled Reducers](#scheduled-reducers)
-
+{% endraw %}

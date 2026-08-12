@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Quickstart
 
 # Quickstart
@@ -210,3 +211,4 @@ Now that you've made your first request, explore what Grok can do:
 * [Tools](https://docs.x.ai/developers/tools/overview) - Web search, X search, code execution, and function calling
 * [Models](https://docs.x.ai/developers/models) - Compare available models and their capabilities
 * [Pricing](https://docs.x.ai/developers/pricing) - Tools, batch API, and other platform pricing
+{% endraw %}

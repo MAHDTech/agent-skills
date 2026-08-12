@@ -33,7 +33,7 @@ Generate an image based on a prompt. This is the endpoint for making generation 
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of generated image objects.
+* `data` (array\\<object\>, required) — A list of generated image objects.
 
   * `b64_json` (string | null) — A base64-encoded string representation of the generated image (without the data-URI prefix), if \`b64\_json\` is specified as \`response\_format\` in the request.
 
@@ -149,7 +149,7 @@ Edit an image based on a prompt. This is the endpoint for making edit requests t
     Also accepts \`image\_url\` for compatibility.
     Required when \`file\_id\` is not set.
 
-* `images` (array\<object>) — List of input images for multi-reference editing.
+* `images` (array\\<object\>) — List of input images for multi-reference editing.
   Mutually exclusive with \`image\`. When multiple images are provided,
   refer to them as \\\<IMAGE\_0\\>, \\\<IMAGE\_1\\>, etc. in the prompt.
 
@@ -183,7 +183,7 @@ Edit an image based on a prompt. This is the endpoint for making edit requests t
 
 ### Response Body
 
-* `data` (array\<object>, required) — A list of generated image objects.
+* `data` (array\\<object\>, required) — A list of generated image objects.
 
   * `b64_json` (string | null) — A base64-encoded string representation of the generated image (without the data-URI prefix), if \`b64\_json\` is specified as \`response\_format\` in the request.
 

@@ -62,8 +62,3 @@ configuring it to suit your application's needs. Check out our
 guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project)
 for more information on setting up identity providers, customizing
 templates, and managing users and roles.
-
-- [1. Enabling SpacetimeAuth for a
-  module](#1-enabling-spacetimeauth-for-a-module)
-- [2. Exploring the Dashboard](#2-exploring-the-dashboard)
-- [4. Next Steps](#4-next-steps)

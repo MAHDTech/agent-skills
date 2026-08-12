@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-keyboard-hints>
+# \<pagefind-keyboard-hints\>
 
 
 Displays contextual keyboard shortcuts based on which component currently has focus.

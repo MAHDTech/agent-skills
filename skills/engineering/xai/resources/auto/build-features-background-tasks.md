@@ -2,7 +2,7 @@
 
 # Background Tasks
 
-Grok can run commands, subagents, and monitors in the background while the conversation continues. Press `Ctrl+B` to open the tasks pane listing everything currently running, or run `/tasks` for a snapshot in the scrollback; press `Ctrl+G` to demote a running foreground command to the background instead of waiting for it.
+Grok can run commands, subagents, and monitors in the background while the conversation continues. Press `Ctrl+G` to open the tasks pane listing everything currently running, or run `/tasks` for a snapshot in the scrollback; press `Ctrl+B` to demote a running foreground command to the background instead of waiting for it. This is separate from the agent’s [todos](https://docs.x.ai/build/features/sessions#todos) (`Ctrl+T` on the agent screen), which track planned multi-step work rather than running processes.
 
 ## Background commands
 

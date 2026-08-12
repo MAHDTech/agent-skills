@@ -215,7 +215,7 @@ class UDbConnectionBuilder
 
 Finalize configuration and open the connection. This creates a WebSocket
 connection to
-`ws://<uri>/v1/database/<database>/subscribe?compression=<compression>`
+`ws://\<uri\>/v1/database/\<database\>/subscribe?compression=<compression>`
 and begins processing messages using the Unreal SDK's binary v2
 WebSocket subprotocol.
 
@@ -528,7 +528,7 @@ FUserType* FindUser(URemoteTables* Tables, FSpacetimeDBIdentity Id)
 
 For each btree index defined on a remote table, its corresponding table
 class has a property which is a btree index handle. This index handle
-has a method `TArray<RowType> Filter(Column value)` which will return
+has a method `TArray\<RowType\> Filter(Column value)` which will return
 `Row`s with `value` in the indexed `Column`, if there are any in the
 cache.
 
@@ -862,33 +862,3 @@ void AMyActor::SendMessage(const FString& Text)
     }
 }
 ```
-
-- [Project setup](#project-setup)
-  - [Using the Unreal Engine Plugin](#using-the-unreal-engine-plugin)
-  - [Generate module bindings](#generate-module-bindings)
-- [Type `DbConnection`](#type-dbconnection)
-  - [Connect to a database](#connect-to-a-database)
-  - [Advance the connection and process
-    messages](#advance-the-connection-and-process-messages)
-  - [Access tables and reducers](#access-tables-and-reducers)
-- [Context interfaces](#context-interfaces)
-  - [Type `FContextBase`](#type-fcontextbase)
-  - [Type `FEventContext`](#type-feventcontext)
-  - [Type `FReducerEventContext`](#type-freducereventcontext)
-  - [Type `FSubscriptionEventContext`](#type-fsubscriptioneventcontext)
-  - [Type `FErrorContext`](#type-ferrorcontext)
-- [Access the client cache](#access-the-client-cache)
-  - [Type `URemoteTable`](#type-uremotetable)
-  - [Unique constraint index access](#unique-constraint-index-access)
-  - [BTree index access](#btree-index-access)
-- [Observe and invoke reducers](#observe-and-invoke-reducers)
-  - [Invoke reducers](#invoke-reducers)
-  - [Observe reducer results](#observe-reducer-results)
-- [Subscriptions](#subscriptions)
-  - [Type `USubscriptionBuilder`](#type-usubscriptionbuilder)
-  - [Type `USubscriptionHandle`](#type-usubscriptionhandle)
-- [Identify a client](#identify-a-client)
-  - [Type `FSpacetimeDBIdentity`](#type-fspacetimedbidentity)
-  - [Type `FSpacetimeDBConnectionId`](#type-fspacetimedbconnectionid)
-  - [Type `FSpacetimeDBTimestamp`](#type-fspacetimedbtimestamp)
-- [Example usage](#example-usage)

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Connectors
 
 # Custom MCP Server Tunneling
@@ -73,10 +74,11 @@ Copy the generated `*.trycloudflare.com` URL and use it as the server URL in Gro
 
 > [!CAUTION]
 >
-> &#x20;Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
+>  Cloudflare quick tunnels do not support Server-Sent Events (SSE). If your MCP server uses the SSE transport, use ngrok instead. Servers using the newer Streamable HTTP transport work fine with Cloudflare.
 
 ## Things to keep in mind
 
 * **Tunnels are temporary.** Most free-tier tunnel URLs change each time you restart the tunnel. If you restart, you will need to remove the old connector in Grok and add a new one with the updated URL.
 * **Keep your MCP server running.** Grok calls your server on demand during conversations. If the tunnel or the local server is stopped, tool calls will fail.
 * **Authentication still applies.** If your MCP server requires OAuth or API keys, you will still complete that flow in Grok after providing the tunnel URL. The tunnel only handles network reachability.
+{% endraw %}

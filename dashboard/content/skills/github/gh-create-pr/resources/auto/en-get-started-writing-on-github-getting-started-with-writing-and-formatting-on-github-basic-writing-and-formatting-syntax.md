@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "gh-create-pr"
 +++
 
+{% raw %}
 Create sophisticated formatting for your prose and code on GitHub with simple syntax.
 
 ## Who can use this feature?
@@ -40,9 +41,9 @@ You can indicate emphasis with bold, italic, strikethrough, subscript, or supers
 | Strikethrough | `~~ ~~` or `~ ~` | None | `~~This was mistaken text~~` | ~~This was mistaken text~~ |
 | Bold and nested italic | `** **` and `_ _` | None | `**This text is _extremely_ important**` | **This text is _extremely_ important** |
 | All bold and italic | `*** ***` | None | `***All this text is important***` | _**All this text is important**_ |
-| Subscript | `<sub> </sub>` | None | `This is a <sub>subscript</sub> text` | This is a subscript text |
-| Superscript | `<sup> </sup>` | None | `This is a <sup>superscript</sup> text` | This is a superscript text |
-| Underline | `<ins> </ins>` | None | `This is an <ins>underlined</ins> text` | This is an underlined text |
+| Subscript | `<sub> </sub>` | None | `This is a \<sub\>subscript</sub> text` | This is a subscript text |
+| Superscript | `<sup> </sup>` | None | `This is a \<sup\>superscript</sup> text` | This is a superscript text |
+| Underline | `<ins> </ins>` | None | `This is an \<ins\>underlined</ins> text` | This is an underlined text |
 
 ## [Quoting text](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-text)
 
@@ -509,3 +510,4 @@ Disabling Markdown rendering enables you to use source view features, such as li
 *   [About writing and formatting on GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/about-writing-and-formatting-on-github)
 *   [Working with advanced formatting](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting)
 *   [Quickstart for writing on GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/quickstart-for-writing-on-github)
+{% endraw %}

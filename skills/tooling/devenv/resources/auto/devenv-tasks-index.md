@@ -1,8 +1,6 @@
 # Tasks
 
-New in version 1.2
-
-[Read more about tasks in the v1.2 release post](https://devenv.sh/blog/2024/09/24/devenv-12-tasks-for-convergent-configuration-with-nix/index.md)
+Added in `1.2`
 
 Tasks allow you to form dependencies between code, executed in parallel.
 
@@ -27,9 +25,7 @@ Succeeded         myapp:hello         9ms
 1 Succeeded                           10.14ms
 ```
 
-New in version 1.7
-
-[Read more about enhanced tasks in the v1.7 release post](https://devenv.sh/blog/2025/07/03/devenv-17-cuda-support-enhanced-tasks-and-mcp-support/index.md)
+Added in `1.7`
 
 You can also run all tasks in a namespace by providing just the namespace prefix:
 
@@ -306,9 +302,7 @@ Both flags can be combined. `--input-json` is applied first, then individual `--
 
 ## Processes as tasks
 
-New in version 1.4
-
-[Read more about process-task integration in the v1.4 release post](https://devenv.sh/blog/2025/02/13/devenv-14-generating-nix-developer-environments-using-ai/index.md)
+Added in `1.4`
 
 All processes defined in `processes` are automatically available as tasks with the `devenv:processes:` prefix. This allows you to:
 
@@ -375,13 +369,13 @@ This ensures that cleanup tasks like removing PID files or clearing caches are e
 
 Setup tasks attached to processes and `devenv up`
 
-A task that runs *after* a process — a setup or configure step wired with `processes.<name>.before = [ "devenv:<name>:configure" ]`, or equivalently `tasks."devenv:<name>:configure".after = [ "devenv:processes:<name>" ]` — is *downstream* of that process. `devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** its downstream tasks, so the setup step is skipped and never runs.
+A task that runs *after* a process — a setup or configure step wired with `processes.\<name\>.before = [ "devenv:\<name\>:configure" ]`, or equivalently `tasks."devenv:\<name\>:configure".after = [ "devenv:processes:\<name\>" ]` — is *downstream* of that process. `devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** its downstream tasks, so the setup step is skipped and never runs.
 
 Until this is resolved ([#2852](https://github.com/cachix/devenv/issues/2852)), run `devenv up --mode all` to include downstream setup tasks. `devenv test` already runs in `all` mode, so these tasks run there. See [Execution modes](#execution-modes).
 
 ## Git Integration
 
-New in version 1.10
+Added in `1.10`
 
 Tasks can reference the git repository root path using `${config.git.root}`, which is particularly useful in monorepo environments:
 

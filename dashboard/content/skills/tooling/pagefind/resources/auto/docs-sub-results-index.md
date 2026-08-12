@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -52,15 +53,15 @@ Which will return an object with the following structure:
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
-  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the <body> of the page.",
 ~  "sub_results": [
 ~    {
 ~        /* ... other result keys ... */
 ~        "title": "The title from the first h1 element on the page",
 ~        "url": "/url-of-the-page/",
-~        "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page",
-~        "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page"
+~        "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page",
+~        "plain_excerpt": "A small snippet of the static content, from the <body> of the page"
 ~    },
 ~    {
 ~        /* ... other result keys ... */
@@ -93,7 +94,7 @@ Within the data for a page result, the `anchors`, `locations`, and `content` key
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, with the search term(s) highlighted in &lt;mark&gt; elements.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, with the search term(s) highlighted in <mark> elements.",
 ~  "content": "The processed text content of this page ...",
 ~  "locations": [ 4, 18, 70 ],
   "weighted_locations": [
@@ -136,3 +137,4 @@ The `locations` key can be cross referenced with the list of `anchors` to determ
 The `content` key can be split on whitespace, and the `locations` will index into this content at the correct positions. This allows you to slice the content for each region of the page if you choose, and to generate a highlighted excerpt using that sliced content.
 
 Also available is the `weighted_locations` list, which can be used to further prioritise sections of the page if they contain higher value words.
+{% endraw %}

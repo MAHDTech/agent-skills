@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -142,12 +143,4 @@ from a transaction are fully applied. This ensures all callbacks see the
 fully consistent state of the cache, preventing callbacks from observing
 an inconsistent intermediate state.
 
-- [WebSocket Communication Channels](#websocket-communication-channels)
-  - [Ordering Guarantees](#ordering-guarantees)
-- [Subscription Workflow](#subscription-workflow)
-- [Transaction Update Workflow](#transaction-update-workflow)
-- [Multiple Subscription Sets](#multiple-subscription-sets)
-- [Client Cache Guarantees](#client-cache-guarantees)
-  - [Pending Callbacks and Cache
-    Consistency](#pending-callbacks-and-cache-consistency)
-
+{% endraw %}

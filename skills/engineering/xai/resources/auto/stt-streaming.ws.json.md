@@ -96,6 +96,13 @@
       "type": "integer",
       "required": false,
       "description": "Maximum silence duration in milliseconds before forcing `speech_final`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when `smart_turn` is enabled. Range: 1–5000. Example: `smart_turn_timeout=3000`."
+    },
+    {
+      "name": "vad_threshold",
+      "type": "number",
+      "required": false,
+      "default": 0.08,
+      "description": "Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; `0` disables the gate entirely. Does not affect endpointing or `speech_final` timing. Default: `0.08`."
     }
   ],
 

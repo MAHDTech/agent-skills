@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -178,7 +179,9 @@ To be listed in the registry, an agent **must support at least one** of the foll
 * **Agent Auth** — the agent handles the OAuth flow independently (opens the user's browser, runs a local callback server, exchanges the authorization code for tokens).
 * **Terminal Auth** — the agent provides an interactive terminal-based setup experience (launched with additional args/env specified in the auth method).
 
-CI verifies this by checking that the agent returns an `authMethods` array in its `initialize` response, with at least one method. See the [ACP auth methods RFD](@/skills/tooling/opencode-acp/resources/auto/rfds-auth-methods.md) for the full specification.
+CI verifies this by checking that the agent returns an `authMethods` array in
+its `initialize` response, with at least one method. See the [Terminal
+Authentication RFD](@/skills/tooling/opencode-acp/resources/auto/rfds-auth-methods.md) for the terminal flow.
 
 ## What we propose to do about it
 
@@ -188,7 +191,7 @@ CI verifies this by checking that the agent returns an `authMethods` array in it
    * CI validates manifests on every PR: schema compliance, slug uniqueness, icon format (16×16 SVG, monochrome `currentColor`), URL accessibility for all distribution URLs, authentication support via ACP handshake, and binary OS coverage.
    * Push to `main` triggers a build that aggregates all entries into `registry.json` and publishes versioned + `latest` GitHub releases.
 3. **Aggregated outputs**:
-   * `registry.json`: deterministic list of all agents with icons copied to `dist/<id>.svg`.
+   * `registry.json`: deterministic list of all agents with icons copied to `dist/\<id\>.svg`.
 4. **Distribution & search**:
    * Clients fetch `registry.json` from `https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json`.
    * Static site offers filters for deployment model, license, and distribution type.
@@ -216,3 +219,4 @@ CI verifies this by checking that the agent returns an `authMethods` array in it
 * 2025-11-28: Initial draft.
 * 2025-12-16: Minors.
 * 2026-02-04: Updated to match latest schema — removed `schema_version`, `homepage`, `capabilities`, and `auth` fields; added `icon` field; restructured `distribution` into `binary`, `npx`, and `uvx` types.
+{% endraw %}

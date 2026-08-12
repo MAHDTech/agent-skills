@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "store-plan"
 +++
 
+{% raw %}
 # Plan Document Format & Example
 
 Reference material for the store-plan skill: the section-by-section document structure, the formatting rules, and a full worked example. Follow this format when generating the plan.
@@ -118,7 +119,7 @@ Only include phases that were actually discussed. Don't invent phases.
 
 Bullet list of links, prior plans, or external resources mentioned:
 
-- `plans/prior_plan.md` — what it covers
+- `docs/plans/prior_plan.md` — what it covers
 - URL or resource — what it covers
 
 ## Formatting Rules
@@ -173,7 +174,7 @@ _tl;dr Replace time-based QC cache with fingerprint-based invalidation to elimin
 
 - QC results were cached with a 5-minute TTL, causing stale data after migration edits
 - Users reported QC tab showing pre-migration outliers after applying fixes
-- Prior plan: `plans/2026_03_28_staleness_system.md`
+- Prior plan: `docs/plans/2026_03_28_staleness_system.md`
 
 ## Decisions Made
 
@@ -243,3 +244,4 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 > 🔴 High risk · 🟡 Medium / open question · ⚪ Low / informational
 ```
 
+{% endraw %}

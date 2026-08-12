@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 # Processes
 
 Devenv provides built-in process management with supervision, socket activation, file watching, and dependency management.
@@ -54,6 +55,40 @@ $ devenv processes wait --timeout 120
 
 The default timeout is 120 seconds.
 
+## Attaching to running processes
+
+New in devenv 2.2
+
+When processes are already running in the background (started with `devenv up -d`), a second `devenv up` attaches to them instead of failing. It starts any processes that are enabled but not currently running, honoring their `after`/`before` dependencies, and streams a live view of process status and logs. Press Ctrl-C to detach, leaving the processes running.
+
+An attaching `devenv up` reports which processes it scheduled and which were already running, and exits nonzero when nothing could be started.
+
+You can also pass a subset of processes to start:
+
+```
+$ devenv up -d            # start everything in the background
+$ devenv processes stop api
+$ devenv up api           # attach and bring api back up
+```
+
+A bare `devenv up` starts only processes with `start.enable = true`; explicitly named processes always start, even when their `start.enable` is `false`. The same applies to `devenv processes start <name>`, which uses the same dependency-aware launch path: if a dependency is not running, the process waits for it instead of starting without it. When no process manager is running yet, `devenv processes start <name>` starts one in the background launching only the named process, like `devenv up -d <name>`.
+
+The attached session is a non-interactive live view: stdin is not connected to the processes, and Ctrl-C detaches while leaving them running (the TUI restart/stop keybindings still work).
+
+Configuration changes are not picked up by attach
+
+An attaching `devenv up <name>` schedules into the running process manager using the configuration that manager was started with. Edits to `devenv.nix` are not picked up by attach-scheduled processes, and names that are not part of the running manager's process set are rejected. Restart the manager to pick up changes:
+
+```
+$ devenv processes down && devenv up -d
+```
+
+To attach a live view without starting anything (native process manager only):
+
+```
+$ devenv processes attach
+```
+
 ## Dependencies
 
 Processes can depend on other processes and tasks using `after` and `before`:
@@ -91,7 +126,7 @@ See [Dependency states](https://devenv.sh/tasks/#dependency-states) for the full
 
 Setup tasks that run after a process
 
-`devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** tasks that run *after* it. A setup or configure task wired downstream of a process — e.g. `processes.<name>.before = [ "devenv:<name>:configure" ]` — is skipped under `devenv up` and never runs. Use `devenv up --mode all`, or see [Processes as tasks](https://devenv.sh/tasks/#processes-as-tasks) for details.
+`devenv up` schedules processes in `before` mode, which runs each process's upstream dependencies but **not** tasks that run *after* it. A setup or configure task wired downstream of a process — e.g. `processes.\<name\>.before = [ "devenv:\<name\>:configure" ]` — is skipped under `devenv up` and never runs. Use `devenv up --mode all`, or see [Processes as tasks](https://devenv.sh/tasks/#processes-as-tasks) for details.
 
 ## Using Pre-built Services
 
@@ -347,7 +382,7 @@ New in devenv 2.0
 
 Devenv can automatically allocate free ports for your processes, preventing conflicts when a port is already in use or when running multiple devenv projects simultaneously.
 
-Define ports using `ports.<name>.allocate` with a base port number. Devenv will find a free port starting from that base, incrementing until one is available:
+Define ports using `ports.\<name\>.allocate` with a base port number. Devenv will find a free port starting from that base, incrementing until one is available:
 
 devenv.nix
 
@@ -367,7 +402,7 @@ devenv.nix
 }
 ```
 
-The resolved port is available via `config.processes.<name>.ports.<port>.value`. If port 8080 is already in use, devenv will automatically try 8081, 8082, and so on until it finds an available port.
+The resolved port is available via `config.processes.\<name\>.ports.\<port\>.value`. If port 8080 is already in use, devenv will automatically try 8081, 8082, and so on until it finds an available port.
 
 Devenv holds the allocated ports during configuration evaluation to prevent race conditions, then releases them just before starting the processes so your application can bind to them.
 
@@ -415,3 +450,4 @@ devenv.nix
   process.manager.implementation = "process-compose";
 }
 ```
+{% endraw %}

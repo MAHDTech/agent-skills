@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -304,23 +305,4 @@ When you're ready to go live:
 - Review the [CLI Reference](https://spacetimedb.com/docs/cli-reference) for all available
   commands
 
-- [Module vs Database](#module-vs-database)
-- [What's in a Module?](#whats-in-a-module)
-- [Supported Languages](#supported-languages)
-- [Database Names](#database-names)
-- [Managing Databases](#managing-databases)
-  - [Creating and Updating Databases](#creating-and-updating-databases)
-  - [Deleting a Database](#deleting-a-database)
-  - [Querying with SQL](#querying-with-sql)
-  - [Viewing Logs](#viewing-logs)
-  - [Listing Your Databases](#listing-your-databases)
-- [Managing Databases via the
-  Website](#managing-databases-via-the-website)
-- [Projects and Teams](#projects-and-teams)
-- [Learning Path](#learning-path)
-  - [Getting Started](#getting-started)
-  - [Core Concepts](#core-concepts)
-  - [Advanced Features](#advanced-features)
-  - [Deployment](#deployment)
-- [Next Steps](#next-steps)
-
+{% endraw %}

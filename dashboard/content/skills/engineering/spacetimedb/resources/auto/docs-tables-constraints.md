@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -364,12 +365,4 @@ different purposes:
 | Update behavior | Delete + Insert | In-place update  |
 | Required        | No              | No               |
 
-- [Primary Keys](#primary-keys)
-  - [Primary Key Rules](#primary-key-rules)
-  - [Multi-Column Primary Keys](#multi-column-primary-keys)
-  - [Updates and Primary Keys](#updates-and-primary-keys)
-  - [Tables Without Primary Keys](#tables-without-primary-keys)
-  - [Common Primary Key Patterns](#common-primary-key-patterns)
-- [Unique Columns](#unique-columns)
-- [Primary Keys vs Unique Columns](#primary-keys-vs-unique-columns)
-
+{% endraw %}

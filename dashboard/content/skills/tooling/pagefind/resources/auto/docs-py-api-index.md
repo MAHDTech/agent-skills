@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 " "
 
 # Example HTML
@@ -17,3 +18,4 @@ This is an example HTML page.
 
 " "
 
+{% endraw %}

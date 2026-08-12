@@ -85,9 +85,7 @@ ncdu 2.2
 
 ## Changing environment if testing
 
-New in version 1.0.6
-
-[Read more about the Rust rewrite in the v1.0 release post](https://devenv.sh/blog/2024/03/20/devenv-10-rewrite-in-rust/index.md)
+Added in `1.0.6`
 
 devenv.nix
 
@@ -103,6 +101,6 @@ devenv.nix
 
 ## Provided functions for enterTest
 
-- `wait_for_port <port> <timeout>`: waits for a port to be open
+- `wait_for_port \<port\> <timeout>`: waits for a port to be open
 
 If you'd like more functions to be added, take a look at [NixOS tests](https://nixos.org/manual/nixos/stable/#sec-nixos-tests) and open an issue for what you need.

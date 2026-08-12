@@ -79,6 +79,12 @@ async function syncResources(
                 skillName
             )
         } else if (isFile) {
+            const outputName =
+                entry.name.toLowerCase() === "index.md"
+                    ? "index-page.md"
+                    : entry.name
+            const finalDestPath = path.join(dest, outputName)
+
             if (entry.name.endsWith(".md")) {
                 const raw = (await fs.readFile(realSrcPath, "utf-8")).replace(
                     /\r\n/g,
@@ -86,10 +92,18 @@ async function syncResources(
                 )
                 const body = rewriteSkillLinks(raw, contentBase, linkSrcDir)
                 const sibMermaid = body.includes("```mermaid")
+                let safeBody = body
+                if (safeBody.includes("{% endraw %}")) {
+                    safeBody = safeBody.replace(
+                        /\{% endraw %\}/g,
+                        "{% endraw %}{% raw %}"
+                    )
+                }
+
                 await fs.writeFile(
-                    destPath,
+                    finalDestPath,
                     `+++
-title = ${JSON.stringify(entry.name.replace(/\.md$/, ""))}
+title = ${JSON.stringify(outputName.replace(/\.md$/, ""))}
 [extra]
 skill = false
 category = ${JSON.stringify(key)}
@@ -97,11 +111,13 @@ mermaid = ${sibMermaid}
 skill_name = ${JSON.stringify(skillName)}
 +++
 
-${body}
+{% raw %}
+${safeBody}
+{% endraw %}
 `
                 )
             } else {
-                await fs.copy(realSrcPath, destPath)
+                await fs.copy(realSrcPath, finalDestPath)
             }
         }
     }
@@ -359,6 +375,9 @@ ${body}
             }
         } else {
             filesToStage.push(AGENTS_FILE, README_FILE, SKILLS_SH_FILE)
+            if (!process.env.SKILLS_SKIP_DASHBOARD) {
+                filesToStage.push(DASHBOARD_CONTENT_DIR)
+            }
         }
 
         if (filesToStage.length > 0) {

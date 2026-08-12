@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -208,7 +209,4 @@ SPACETIMEDB_REDUCER(process_data, ReducerContext ctx, Vec<uint8_t> data) {
 Programmer errors are logged and visible in your project dashboard.
 Consider setting up alerting to be notified when these occur.
 
-- [Error Handling](#error-handling)
-  - [Sender Errors](#sender-errors)
-  - [Programmer Errors](#programmer-errors)
-
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Key Information
 
 # Models
@@ -36,17 +37,17 @@ skill_name = "xai"
 | --- | --- |
 | grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 
 | Mode | Cost |
 | --- | --- |
-| Realtime | $0.05 / min ($3.00 / hr) |
-| Realtime Text Input | $0.004 / message (every conversation.item.create) |
-| Text to Speech | $15.00 / 1M chars |
+| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
+| Text to Speech | $15.00 / 1M chars |
 
 ## Which model should I choose?
 
@@ -89,3 +90,4 @@ Some models have aliases to help users automatically migrate to the next version
 * `<modelname>-<date>` refers directly to a specific model release. This will not be updated and is for workflows that demand consistency.
 
 For most users, the aliased `<modelname>` or `<modelname>-latest` are recommended, as you would receive the latest features automatically.
+{% endraw %}

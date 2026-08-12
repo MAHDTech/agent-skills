@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB app with TanStack Start running in under 5 minutes.
@@ -159,3 +160,4 @@ function App() {
 - Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
   detailed API docs
 
+{% endraw %}

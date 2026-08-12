@@ -267,7 +267,7 @@ The model is also capable of generating speech in additional languages beyond th
 
 ## Speech Tags
 
-*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \<whisper>It was a secret the whole time.\</whisper> Pretty cool, right?
+*Example:* So I walked in and \[pause] there it was. \[laugh] I honestly could not believe it! \\<whisper\>It was a secret the whole time.\</whisper> Pretty cool, right?
 
 Add inline speech tags to your text for expressive delivery. There are two types of tags:
 
@@ -429,7 +429,7 @@ try whisperData.write(to: URL(fileURLWithPath: "whisper.mp3"))
 * Combine tags with punctuation — `"Really? [laugh] That's incredible!"` produces more natural results than stacking tags
 * Use `[pause]` or `[long-pause]` to add dramatic timing or let a thought land
 * Wrapping tags work best around complete phrases — `<whisper>It is a secret.</whisper>` reads more naturally than wrapping individual words
-* Combine styles for effect — `<slow><soft>Goodnight, sleep well.</soft></slow>`
+* Combine styles for effect — `<slow>\<soft\>Goodnight, sleep well.</soft></slow>`
 
 ## Output Formats
 
@@ -1298,6 +1298,6 @@ task.cancel(with: .normalClosure, reason: nil)
 * [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) - Try voices and speech tags in your browser
 * [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts) - Get started with the API
 * [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) - Overview of all xAI voice capabilities
-* [Voice Agent API](https://docs.x.ai/developers/model-capabilities/audio/voice-agent) - Real-time voice conversations via WebSocket
+* [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) - Real-time voice conversations via WebSocket
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) - Full TTS endpoint specification
 * [List Voices](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---list-voices) - Programmatically discover available voices

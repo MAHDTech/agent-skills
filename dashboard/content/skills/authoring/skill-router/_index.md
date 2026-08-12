@@ -49,6 +49,7 @@ A starting situation that generates work, then merges onto the main flow:
 - `/diagnosing-bugs` — reach for this when something's broken, flaky, or slow; it builds a red-capable feedback loop before hypothesising, then fixes with a regression test.
 - `/gh-triage` — reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` — reach for this when the work is too big for one session and the way to the destination isn't visible yet.
+- `/software-factory` — reach for this when a feature is big enough that every decision should be signed off before code exists; it runs four approval gates, then rejoins the flow at `/to-tickets`.
 - `/research` — reach for this when you need facts gathered and verified against primary sources, delegated to a background agent while you keep working.
 
 ## Shaping the backlog
@@ -63,10 +64,10 @@ Before the main flow — deciding _what_ to build and _how big_ it is:
 Orchestrating the lifecycle of codebase issues in a continuous loop:
 
 - `/tars-backlog-loop` — reach for this when you want to run a complete loop of auditing the codebase, triaging tickets, and executing implementations.
-- [/tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) — reach for this to reset the environment and prepare the workspace before starting a full backlog loop, cleaning up git worktrees and branches.
+- [/tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) — reach for this to reset the environment before starting a full backlog loop: shared git integrity, spoke root, opaque gate commands (via devenv skill when applicable), baseline gate smoke, `run.env` freeze, and cleanup of orphaned workspaces/branches.
 - `/tars-backlog-audit` — reach for this when you want to dynamically partition the codebase, run parallel sub-agents to scan for bugs/vulnerabilities/features, and synthesize issues into `.tars/issues/todo/`.
 - `/tars-backlog-triage` — reach for this when you want parallel sub-agents to verify the accuracy and readiness of pending issues in `.tars/issues/todo/`.
-- `/tars-backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel, worktree-isolated sub-agents.
+- `/tars-backlog-implement` — reach for this when you want to dynamically batch and implement triaged issues using parallel sub-agents in isolated clones, with hub `tars-gate` / spoke `tars-spoke` runners.
 - [/tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) — reach for this during the implementation phase of the backlog loop to assess a subagent's code changes for compliance with the spec and repo standards.
 - `/tars-backlog-create-issue` — reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
 
@@ -83,7 +84,7 @@ Not new features — working on code that already exists:
 ## Crossing sessions
 
 - `/handoff` — reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
-- `/store-plan` — reach for this when the current plan, decisions, and action items should be saved as a markdown file under `plans/` for later.
+- `/store-plan` — reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
 
 ## Reflection and quality
 
@@ -132,8 +133,9 @@ Beyond `/code-review` on the main flow:
 - `/agent-guidelines` — reach for this when you want work checked against the behavioural guidelines for agents.
 - `/antigravity` — reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` — reach for this when a repo uses devenv for its shell and dependencies.
-- `/prek` — reach for this when running, configuring, or troubleshooting pre-commit hooks.
+- `/prek` — reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
 - `/opencode` — reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
+- [/acp](@/skills/engineering/acp/_index.md) — reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
 - `/opencode-acp` — reach for this when controlling OpenCode over the Agent Client Protocol.
 - [/pagefind](@/skills/tooling/pagefind/_index.md) — reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` — reach for this when temporary or experimental scripts need a gitignored `scratch/` home.

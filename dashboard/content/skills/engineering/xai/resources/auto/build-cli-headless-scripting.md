@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### CLI
 
 # Headless & Scripting
@@ -172,3 +173,4 @@ try {
   proc.kill();
 }
 ```
+{% endraw %}

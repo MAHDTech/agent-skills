@@ -194,7 +194,7 @@
       },
       "example": {
         "type": "audio.delta",
-        "delta": "<Base64EncodedAudioData>",
+        "delta": "\<Base64EncodedAudioData\>",
         "audio_timestamps": {
           "graph_chars": ["H", "e", "l", "l", "o"],
           "graph_times": [

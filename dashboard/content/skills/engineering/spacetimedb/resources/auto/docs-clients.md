@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -154,18 +155,4 @@ New to SpacetimeDB client development? Follow this progression:
 - Review [Reducers](https://spacetimedb.com/docs/functions/reducers) to understand server-side
   state changes
 
-- [Available SDKs](#available-sdks)
-- [Getting Started](#getting-started)
-- [Core Capabilities](#core-capabilities)
-  - [Connection Management](#connection-management)
-  - [Client-Side Data Cache](#client-side-data-cache)
-  - [Real-Time Updates](#real-time-updates)
-  - [Invoking Server Functions](#invoking-server-functions)
-  - [Type Safety](#type-safety)
-- [Choosing a Language](#choosing-a-language)
-  - [Team Expertise](#team-expertise)
-  - [Application Type](#application-type)
-  - [Platform and Ecosystem](#platform-and-ecosystem)
-- [Learning Path](#learning-path)
-- [Next Steps](#next-steps)
-
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB TypeScript app running in under 5 minutes.
@@ -122,3 +123,4 @@ spacetime logs
 - Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
   detailed API docs
 
+{% endraw %}

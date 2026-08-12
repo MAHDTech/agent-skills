@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -294,14 +295,4 @@ SPACETIMEDB_REDUCER(transfer_credits, ReducerContext ctx, uint64_t to_user, uint
   options
 - Set up monitoring and alerting for your production databases
 
-- [Writing Logs](#writing-logs)
-- [Viewing Logs](#viewing-logs)
-  - [Following Logs in Real-Time](#following-logs-in-real-time)
-  - [Filtering Logs](#filtering-logs)
-- [Best Practices](#best-practices)
-  - [Log Levels](#log-levels)
-  - [Performance Considerations](#performance-considerations)
-  - [Privacy and Security](#privacy-and-security)
-  - [Structured Logging](#structured-logging)
-- [Next Steps](#next-steps)
-
+{% endraw %}

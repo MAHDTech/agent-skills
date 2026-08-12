@@ -331,12 +331,3 @@ that rule is defined.
 2.  Follow the [SQL best
     practices](https://spacetimedb.com/docs/reference/sql#best-practices-for-performance-and-scalability)
     for optimizing your RLS rules.
-
-- [Enabling RLS](#enabling-rls)
-- [How It Works](#how-it-works)
-  - [`:sender`](#sender)
-  - [Semantic Constraints](#semantic-constraints)
-  - [Multiple Rules Per Table](#multiple-rules-per-table)
-  - [Recursive Application](#recursive-application)
-- [Usage in Subscriptions](#usage-in-subscriptions)
-- [Best Practices](#best-practices)

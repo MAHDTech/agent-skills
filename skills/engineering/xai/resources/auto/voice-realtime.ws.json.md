@@ -1,5 +1,5 @@
 {
-  "title": "Realtime Voice Agent",
+  "title": "Realtime Speech to Speech",
   "endpoint": "wss://api.x.ai/v1/realtime",
   "description": "Real-time voice conversations with Grok models via WebSocket. The connection begins with an HTTP GET that is upgraded to WebSocket (status 101). Once connected, the client and server exchange JSON messages to configure the session, stream audio, and receive responses. For SIP calls, connect with the `call_id` from a `realtime.call.incoming` webhook.",
   "authentication": {
@@ -16,7 +16,7 @@
         "type": "string",
         "required": false,
         "description": "Alternative authentication for browser clients. Pass the ephemeral token with prefix `xai-client-secret.`. When provided, the Authorization header is not required.",
-        "example": "xai-client-secret.<EPHEMERAL_TOKEN>"
+        "example": "xai-client-secret.\<EPHEMERAL_TOKEN\>"
       }
     ]
   },
@@ -32,7 +32,7 @@
       "type": "string",
       "required": false,
       "default": "grok-voice-latest",
-      "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0", "grok-voice-fast-1.0"],
+      "enum": ["grok-voice-latest", "grok-voice-think-fast-2.0", "grok-voice-think-fast-1.0"],
       "description": "Model to use for the session. Ignored when `call_id` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions."
     },
     {
@@ -41,7 +41,7 @@
       "required": false,
       "enum": ["high", "none"],
       "default": "high",
-      "description": "Controls whether the model uses reasoning. Defaults to `high`. Supported only with grok-voice-latest and grok-voice-think-fast-1.0."
+      "description": "Controls whether the model uses reasoning. Defaults to `high`."
     }
   ],
   "clientMessages": [
@@ -62,7 +62,11 @@
             "properties": {
               "model": {
                 "type": "string",
-                "enum": ["grok-voice-latest", "grok-voice-think-fast-1.0", "grok-voice-fast-1.0"],
+                "enum": [
+                  "grok-voice-latest",
+                  "grok-voice-think-fast-2.0",
+                  "grok-voice-think-fast-1.0"
+                ],
                 "description": "Model to use for the session. Defaults to `grok-voice-latest`. Can also be set at connection time via the `model` query parameter."
               },
               "instructions": {
@@ -77,7 +81,7 @@
                     "type": "string",
                     "enum": ["high", "none"],
                     "default": "high",
-                    "description": "Controls whether the model uses reasoning. Defaults to `high`. Supported only with `grok-voice-latest` and `grok-voice-think-fast-1.0`. Can also be set at connection time via the `reasoning.effort` query parameter."
+                    "description": "Controls whether the model uses reasoning. Defaults to `high`. Can also be set at connection time via the `reasoning.effort` query parameter."
                   }
                 }
               },
@@ -401,7 +405,7 @@
       },
       "example": {
         "type": "input_audio_buffer.append",
-        "audio": "<Base64EncodedAudioData>"
+        "audio": "\<Base64EncodedAudioData\>"
       }
     },
     {
@@ -1982,7 +1986,7 @@
         "item_id": "msg_008",
         "output_index": 0,
         "content_index": 0,
-        "delta": "<Base64EncodedAudioDelta>"
+        "delta": "\<Base64EncodedAudioDelta\>"
       }
     },
     {

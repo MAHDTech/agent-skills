@@ -379,12 +379,3 @@ different times depending on the kind of function being called:
   actions
 - Explore [Procedures](https://spacetimedb.com/docs/functions/procedures) for scheduled
   execution patterns
-
-- [Defining a Schedule Table](#defining-a-schedule-table)
-- [Inserting Schedules](#inserting-schedules)
-  - [Scheduling at Intervals](#scheduling-at-intervals)
-  - [Scheduling at Specific Times](#scheduling-at-specific-times)
-- [How It Works](#how-it-works)
-  - [Row Lifecycle](#row-lifecycle)
-- [Use Cases](#use-cases)
-- [Next Steps](#next-steps)

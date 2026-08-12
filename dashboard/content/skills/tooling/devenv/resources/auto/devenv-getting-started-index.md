@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "devenv"
 +++
 
+{% raw %}
 ## Installation
 
 ### 1. Install [Nix](https://nixos.org)
@@ -116,7 +117,7 @@ $ devenv init
 
 - `devenv search <NAME>` searches packages matching NAME in Nixpkgs input.
 - `devenv update` updates and pins inputs from `devenv.yaml` into `devenv.lock`.
-- `devenv inputs add <name> <url>` adds an input to `devenv.yaml`.
+- `devenv inputs add \<name\> <url>` adds an input to `devenv.yaml`.
 
 ### Inspect & Debug
 
@@ -171,3 +172,4 @@ Add a badge to your project's README to show it's built with devenv:
 ```
 [![Built with devenv](https://devenv.sh/assets/devenv-badge.svg)](https://devenv.sh)
 ```
+{% endraw %}

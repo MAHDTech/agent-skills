@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -293,14 +294,4 @@ async fn main() -> Result<(), anyhow::Error> {
 }
 ```
 
-- [Feature Support](#feature-support)
-- [Connection Parameters](#connection-parameters)
-  - [Auth Token](#auth-token)
-  - [Enabling *PGWire* in SpacetimeDB
-    Standalone](#enabling-pgwire-in-spacetimedb-standalone)
-- [Examples](#examples)
-  - [Using `psql`](#using-psql)
-  - [Using Python (`psycopg2`)](#using-python-psycopg2)
-  - [Using Rust (`tokio-postgres` +
-    `rustls`)](#using-rust-tokio-postgres--rustls)
-
+{% endraw %}

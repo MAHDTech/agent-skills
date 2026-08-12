@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -431,15 +432,4 @@ For language-specific details, see:
 - [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript)
 - [Unreal SDK Reference](https://spacetimedb.com/docs/clients/unreal)
 
-- [Prerequisites](#prerequisites)
-- [Basic Connection](#basic-connection)
-  - [Connecting to MainCloud](#connecting-to-maincloud)
-- [Authentication with Tokens](#authentication-with-tokens)
-- [Advancing the Connection](#advancing-the-connection)
-- [Connection Lifecycle](#connection-lifecycle)
-  - [Connection Callbacks](#connection-callbacks)
-  - [Disconnecting](#disconnecting)
-  - [Reconnection Behavior](#reconnection-behavior)
-- [Connection Identity](#connection-identity)
-- [Next Steps](#next-steps)
-
+{% endraw %}

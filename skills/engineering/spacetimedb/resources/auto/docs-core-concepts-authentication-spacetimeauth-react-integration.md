@@ -178,13 +178,3 @@ function App() {
 You're now set up to use SpacetimeAuth in your React application. When
 users access your app, they will be redirected to the SpacetimeAuth
 login page for authentication.
-
-- [Prerequisites](#prerequisites)
-- [Configuring react-oidc-context](#configuring-react-oidc-context)
-  - [1. Add an OIDC configuration
-    object](#1-add-an-oidc-configuration-object)
-  - [2. Create a debug component](#2-create-a-debug-component)
-  - [3. Wrap Your Application with
-    AuthProvider](#3-wrap-your-application-with-authprovider)
-  - [4. Implement Authentication Logic in Your
-    App](#4-implement-authentication-logic-in-your-app)

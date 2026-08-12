@@ -21,7 +21,7 @@ To switch between workspaces, use the workspace selector in the bottom left navi
 
 > [!NOTE]
 >
-> &#x20;You can only access the team workspace when you have an
+>  You can only access the team workspace when you have an
 > active license. If you lack access, contact your team admin.
 
 ## Privacy and Benefits
@@ -64,4 +64,4 @@ Once activated, your team workspace will become available on grok.com.
 
 > [!NOTE]
 >
-> &#x20;For white-glove support and Enterprise features, contact xAI sales at .
+>  For white-glove support and Enterprise features, contact xAI sales at .

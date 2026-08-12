@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -723,7 +724,7 @@ to your database.
 >
 > - `ReducerKind.Init` - Called the first time you publish your module
 >   and anytime you clear the database with
->   `spacetime publish --server local <name> --delete-data`.
+>   `spacetime publish --server local \<name\> --delete-data`.
 > - `ReducerKind.ClientConnected` - Called when a user connects to the
 >   SpacetimeDB database. Their identity can be found in the `Sender`
 >   value of the `ReducerContext`.
@@ -753,7 +754,7 @@ database.
 >
 > - `init` - Called the first time you publish your module and anytime
 >   you clear the database with
->   `spacetime publish --server local <name> --delete-data`.
+>   `spacetime publish --server local \<name\> --delete-data`.
 > - `client_connected` - Called when a user connects to the SpacetimeDB
 >   database. Their identity can be found in the `sender` value of the
 >   `ReducerContext`.
@@ -781,7 +782,7 @@ SpacetimeDB itself when a client connects to your database.
 >
 > - `SPACETIMEDB_INIT` - Called the first time you publish your module
 >   and anytime you clear the database with
->   `spacetime publish --server local <name> --delete-data`.
+>   `spacetime publish --server local \<name\> --delete-data`.
 > - `SPACETIMEDB_CLIENT_CONNECTED` - Called when a user connects to the
 >   SpacetimeDB database. Their identity can be found in the `sender`
 >   value of the `ReducerContext`.
@@ -1035,15 +1036,4 @@ In the [next part](https://spacetimedb.com/docs/tutorials/unity/part-3), we'll b
 functionality of the game and you'll learn how to access your table data
 and call reducers in Unity.
 
-- [Project Structure](#project-structure)
-- [Create a Server Module](#create-a-server-module)
-  - [SpacetimeDB Tables](#spacetimedb-tables)
-  - [Creating Entities](#creating-entities)
-  - [Representing Players](#representing-players)
-  - [Writing a Reducer](#writing-a-reducer)
-  - [Publishing the Module](#publishing-the-module)
-  - [Connecting our Client](#connecting-our-client)
-  - [Generating the Client](#generating-the-client)
-  - [Connecting to the Database](#connecting-to-the-database)
-  - [Next Steps](#next-steps)
-
+{% endraw %}

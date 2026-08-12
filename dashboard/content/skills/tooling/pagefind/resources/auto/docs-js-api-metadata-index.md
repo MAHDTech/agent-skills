@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -31,8 +32,8 @@ Here, `oneResult` will contain:
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
-  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the <body> of the page.",
 ~  "meta": {
 ~    "title": "The title from the first h1 element on the page",
 ~    "image": "/weka.png",
@@ -40,3 +41,4 @@ Here, `oneResult` will contain:
 ~  }
 }
 ```
+{% endraw %}

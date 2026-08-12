@@ -509,7 +509,7 @@ pkgs
 
 ## aws-vault.awscliWrapper.enable
 
-Whether to enable Wraps awscli2 binary as `aws-vault exec <profile> -- aws <args>`. .
+Whether to enable Wraps awscli2 binary as `aws-vault exec \<profile\> -- aws <args>`. .
 
 *Type:* boolean
 
@@ -563,7 +563,7 @@ pkgs
 
 ## aws-vault.opentofuWrapper.enable
 
-Whether to enable Wraps opentofu binary as `aws-vault exec <profile> -- opentofu <args>`. .
+Whether to enable Wraps opentofu binary as `aws-vault exec \<profile\> -- opentofu <args>`. .
 
 *Type:* boolean
 
@@ -627,7 +627,7 @@ pkgs
 
 ## aws-vault.terraformWrapper.enable
 
-Whether to enable Wraps terraform binary as `aws-vault exec <profile> -- terraform <args>`. .
+Whether to enable Wraps terraform binary as `aws-vault exec \<profile\> -- terraform <args>`. .
 
 *Type:* boolean
 
@@ -925,7 +925,7 @@ For more details, see: https://docs.anthropic.com/en/docs/claude-code/sub-agents
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.description
+## claude.code.agents.\<name\>.description
 
 What the sub-agent does
 
@@ -935,7 +935,7 @@ What the sub-agent does
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.model
+## claude.code.agents.\<name\>.model
 
 Override the model for this agent.
 
@@ -951,7 +951,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.permissionMode
+## claude.code.agents.\<name\>.permissionMode
 
 Permission mode for this specific sub-agent.
 
@@ -967,7 +967,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.proactive
+## claude.code.agents.\<name\>.proactive
 
 Whether Claude should use this sub-agent automatically
 
@@ -983,7 +983,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.prompt
+## claude.code.agents.\<name\>.prompt
 
 The system prompt for the sub-agent
 
@@ -993,7 +993,7 @@ The system prompt for the sub-agent
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.<name>.tools
+## claude.code.agents.\<name\>.tools
 
 List of allowed tools for this sub-agent
 
@@ -1179,7 +1179,7 @@ Hooks that run at different points in Claude Code’s workflow.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.hooks.<name>.enable
+## claude.code.hooks.\<name\>.enable
 
 Whether to enable this hook.
 
@@ -1191,13 +1191,13 @@ Whether to enable this hook.
 true
 ```
 
-## claude.code.hooks.<name>.command
+## claude.code.hooks.\<name\>.command
 
 The command to execute.
 
 *Type:* string
 
-## claude.code.hooks.<name>.hookType
+## claude.code.hooks.\<name\>.hookType
 
 The type of hook:
 
@@ -1227,7 +1227,7 @@ The type of hook:
 "PostToolUse"
 ```
 
-## claude.code.hooks.<name>.matcher
+## claude.code.hooks.\<name\>.matcher
 
 Regex pattern to match against tool names (for PreToolUse/PostToolUse hooks).
 
@@ -1239,7 +1239,7 @@ Regex pattern to match against tool names (for PreToolUse/PostToolUse hooks).
 ""
 ```
 
-## claude.code.hooks.<name>.name
+## claude.code.hooks.\<name\>.name
 
 The name of the hook (appears in logs).
 
@@ -1418,7 +1418,7 @@ MCP (Model Context Protocol) servers to configure. These servers provide additio
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.args
+## claude.code.mcpServers.\<name\>.args
 
 Arguments to pass to the command for stdio MCP servers.
 
@@ -1434,7 +1434,7 @@ Arguments to pass to the command for stdio MCP servers.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.command
+## claude.code.mcpServers.\<name\>.command
 
 Command to execute for stdio MCP servers.
 
@@ -1450,7 +1450,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.env
+## claude.code.mcpServers.\<name\>.env
 
 Environment variables for stdio MCP servers.
 
@@ -1466,7 +1466,7 @@ Environment variables for stdio MCP servers.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.headers
+## claude.code.mcpServers.\<name\>.headers
 
 HTTP headers for HTTP MCP servers (e.g., for authentication).
 
@@ -1482,7 +1482,7 @@ HTTP headers for HTTP MCP servers (e.g., for authentication).
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.type
+## claude.code.mcpServers.\<name\>.type
 
 Type of MCP server connection.
 
@@ -1492,7 +1492,7 @@ Type of MCP server connection.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.mcpServers.<name>.url
+## claude.code.mcpServers.\<name\>.url
 
 URL for HTTP MCP servers.
 
@@ -1570,7 +1570,7 @@ Fine-grained permissions for tool usage. Supports global settings and per-tool a
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.permissions.<name>.allow
+## claude.code.permissions.\<name\>.allow
 
 List of allowed patterns. An empty string emits a bare tool entry (e.g. `WebSearch` rather than `WebSearch(pattern)`), matching the tool regardless of input. Use this for tools without a matcher format such as `WebSearch` or `AskUserQuestion`.
 
@@ -1582,7 +1582,7 @@ List of allowed patterns. An empty string emits a bare tool entry (e.g. `WebSear
 [ ]
 ```
 
-## claude.code.permissions.<name>.ask
+## claude.code.permissions.\<name\>.ask
 
 List of patterns that require user approval. An empty string emits a bare tool entry (e.g. `WebSearch` rather than `WebSearch(pattern)`).
 
@@ -1594,7 +1594,7 @@ List of patterns that require user approval. An empty string emits a bare tool e
 [ ]
 ```
 
-## claude.code.permissions.<name>.deny
+## claude.code.permissions.\<name\>.deny
 
 List of denied patterns. An empty string emits a bare tool entry (e.g. `AskUserQuestion` rather than `AskUserQuestion(pattern)`), which is required to deny tools without a matcher format outright.
 
@@ -1696,7 +1696,7 @@ Per-tool permission rules. Preferred location for tool permissions.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.permissions.rules.<name>.allow
+## claude.code.permissions.rules.\<name\>.allow
 
 List of allowed patterns. An empty string emits a bare tool entry (e.g. `WebSearch` rather than `WebSearch(pattern)`), matching the tool regardless of input. Use this for tools without a matcher format such as `WebSearch` or `AskUserQuestion`.
 
@@ -1712,7 +1712,7 @@ List of allowed patterns. An empty string emits a bare tool entry (e.g. `WebSear
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.permissions.rules.<name>.ask
+## claude.code.permissions.rules.\<name\>.ask
 
 List of patterns that require user approval. An empty string emits a bare tool entry (e.g. `WebSearch` rather than `WebSearch(pattern)`).
 
@@ -1728,7 +1728,7 @@ List of patterns that require user approval. An empty string emits a bare tool e
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.permissions.rules.<name>.deny
+## claude.code.permissions.rules.\<name\>.deny
 
 List of denied patterns. An empty string emits a bare tool entry (e.g. `AskUserQuestion` rather than `AskUserQuestion(pattern)`), which is required to deny tools without a matcher format outright.
 
@@ -1786,7 +1786,7 @@ Container specifications that can be built, copied and ran using `devenv contain
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.enableLayerDeduplication
+## containers.\<name\>.enableLayerDeduplication
 
 Whether to enable layer deduplication using the approach described at https://blog.eigenvalue.net/2023-nix2container-everything-once/ .
 
@@ -1808,7 +1808,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.copyToRoot
+## containers.\<name\>.copyToRoot
 
 Add a path to the container. Defaults to the whole git repo.
 
@@ -1824,7 +1824,7 @@ self
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.defaultCopyArgs
+## containers.\<name\>.defaultCopyArgs
 
 Default arguments to pass to `skopeo copy`. You can override them by passing arguments to the script.
 
@@ -1840,7 +1840,7 @@ Default arguments to pass to `skopeo copy`. You can override them by passing arg
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.entrypoint
+## containers.\<name\>.entrypoint
 
 Entrypoint of the container.
 
@@ -1856,7 +1856,7 @@ Entrypoint of the container.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.fromImage
+## containers.\<name\>.fromImage
 
 An existing OCI base image to build on top of, built with nix2container’s pullImage.
 
@@ -1872,7 +1872,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.isBuilding
+## containers.\<name\>.isBuilding
 
 Set to true when the environment is building this container.
 
@@ -1888,7 +1888,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers
+## containers.\<name\>.layers
 
 The layers to create.
 
@@ -1904,7 +1904,7 @@ The layers to create.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.copyToRoot
+## containers.\<name\>.layers.\*.copyToRoot
 
 A list of derivations copied to the image root directory.
 
@@ -1922,7 +1922,7 @@ Store path prefixes `/nix/store/hash-path` are removed in order to relocate them
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.deps
+## containers.\<name\>.layers.\*.deps
 
 A list of store paths to include in the layer.
 
@@ -1938,7 +1938,7 @@ A list of store paths to include in the layer.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.ignore
+## containers.\<name\>.layers.\*.ignore
 
 A store path to ignore when building the layer. This is mainly useful to ignore the configuration file from the container layer.
 
@@ -1954,7 +1954,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.maxLayers
+## containers.\<name\>.layers.\*.maxLayers
 
 The maximum number of layers to create.
 
@@ -1970,7 +1970,7 @@ The maximum number of layers to create.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms
+## containers.\<name\>.layers.\*.perms
 
 A list of file permissions which are set when the tar layer is created.
 
@@ -1988,7 +1988,7 @@ These permissions are not written to the Nix store.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.gid
+## containers.\<name\>.layers.\*.perms.\*.gid
 
 The group ID to apply to all of the files matched by the `regex`.
 
@@ -2010,7 +2010,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.gname
+## containers.\<name\>.layers.\*.perms.\*.gname
 
 The group name to apply to all of the files matched by the `regex`.
 
@@ -2032,7 +2032,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.mode
+## containers.\<name\>.layers.\*.perms.\*.mode
 
 The numeric permissions mode to apply to all of the files matched by the `regex`.
 
@@ -2054,7 +2054,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.path
+## containers.\<name\>.layers.\*.perms.\*.path
 
 A store path.
 
@@ -2064,7 +2064,7 @@ A store path.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.regex
+## containers.\<name\>.layers.\*.perms.\*.regex
 
 A regex pattern to select files or directories to apply the `mode` to.
 
@@ -2086,7 +2086,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.uid
+## containers.\<name\>.layers.\*.perms.\*.uid
 
 The user ID to apply to all of the files matched by the `regex`.
 
@@ -2108,7 +2108,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.perms.\*.uname
+## containers.\<name\>.layers.\*.perms.\*.uname
 
 The user name to apply to all of the files matched by the `regex`.
 
@@ -2130,7 +2130,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.layers.\*.reproducible
+## containers.\<name\>.layers.\*.reproducible
 
 Whether the layer should be reproducible.
 
@@ -2146,7 +2146,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.maxLayers
+## containers.\<name\>.maxLayers
 
 Maximum number of container layers created.
 
@@ -2162,7 +2162,7 @@ Maximum number of container layers created.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.name
+## containers.\<name\>.name
 
 Name of the container.
 
@@ -2178,7 +2178,7 @@ Name of the container.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.registry
+## containers.\<name\>.registry
 
 Registry to push the container to.
 
@@ -2194,7 +2194,7 @@ Registry to push the container to.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.startupCommand
+## containers.\<name\>.startupCommand
 
 Command to run in the container.
 
@@ -2212,7 +2212,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.version
+## containers.\<name\>.version
 
 Version/tag of the container.
 
@@ -2228,7 +2228,7 @@ Version/tag of the container.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/containers.nix>
 
-## containers.<name>.workingDir
+## containers.\<name\>.workingDir
 
 Working directory of the container.
 
@@ -2449,7 +2449,7 @@ The latest version of devenv.
 *Default:*
 
 ```
-"2.1.2"
+"2.2.0"
 ```
 
 *Declared by:*
@@ -2600,7 +2600,7 @@ A set of files that will be linked into devenv root.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.copyMode
+## files.\<name\>.copyMode
 
 How to materialize the file in the project root:
 
@@ -2620,7 +2620,7 @@ How to materialize the file in the project root:
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.executable
+## files.\<name\>.executable
 
 Make the file executable
 
@@ -2636,7 +2636,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.ini
+## files.\<name\>.ini
 
 ini contents
 
@@ -2652,7 +2652,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.json
+## files.\<name\>.json
 
 json contents
 
@@ -2668,7 +2668,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.source
+## files.\<name\>.source
 
 source contents
 
@@ -2684,7 +2684,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.text
+## files.\<name\>.text
 
 text contents
 
@@ -2700,7 +2700,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.toml
+## files.\<name\>.toml
 
 toml contents
 
@@ -2716,7 +2716,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/files.nix>
 
-## files.<name>.yaml
+## files.\<name\>.yaml
 
 yaml contents
 
@@ -3643,7 +3643,7 @@ Beautifully format Clojure and Clojurescript source code and s-expressions.
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hooks.nix>
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/pre-commit.nix>
 
-## git-hooks.hooks.<name>.enable
+## git-hooks.hooks.\<name\>.enable
 
 Whether to enable this pre-commit hook.
 
@@ -3659,7 +3659,7 @@ false
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.package
+## git-hooks.hooks.\<name\>.package
 
 An optional package that provides the hook.
 
@@ -3675,7 +3675,7 @@ null
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.after
+## git-hooks.hooks.\<name\>.after
 
 List of hooks that should run before this hook.
 
@@ -3691,7 +3691,7 @@ List of hooks that should run before this hook.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.always_run
+## git-hooks.hooks.\<name\>.always_run
 
 if true this hook will run even if there are no matching files.
 
@@ -3707,7 +3707,7 @@ false
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.args
+## git-hooks.hooks.\<name\>.args
 
 List of additional parameters to pass to the hook.
 
@@ -3723,7 +3723,7 @@ List of additional parameters to pass to the hook.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.before
+## git-hooks.hooks.\<name\>.before
 
 List of hooks that should run after this hook.
 
@@ -3739,7 +3739,7 @@ List of hooks that should run after this hook.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.description
+## git-hooks.hooks.\<name\>.description
 
 Description of the hook. Used for metadata purposes only.
 
@@ -3755,7 +3755,7 @@ Description of the hook. Used for metadata purposes only.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.entry
+## git-hooks.hooks.\<name\>.entry
 
 The entry point - the executable to run. `entry` can also contain arguments that will not be overridden, such as `entry = "autopep8 -i";`.
 
@@ -3765,7 +3765,7 @@ The entry point - the executable to run. `entry` can also contain arguments that
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.exclude_types
+## git-hooks.hooks.\<name\>.exclude_types
 
 List of file types to exclude. See [Filtering files with types](https://pre-commit.com/#filtering-files-with-types).
 
@@ -3781,7 +3781,7 @@ List of file types to exclude. See [Filtering files with types](https://pre-comm
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.excludes
+## git-hooks.hooks.\<name\>.excludes
 
 Exclude files that were matched by these patterns.
 
@@ -3797,7 +3797,7 @@ Exclude files that were matched by these patterns.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.extraPackages
+## git-hooks.hooks.\<name\>.extraPackages
 
 Additional packages required to run the hook.
 
@@ -3815,7 +3815,7 @@ These are propagated to `enabledPackages` for constructing developer environment
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.fail_fast
+## git-hooks.hooks.\<name\>.fail_fast
 
 if true pre-commit will stop running hooks if this hook fails.
 
@@ -3831,7 +3831,7 @@ false
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.files
+## git-hooks.hooks.\<name\>.files
 
 The pattern of files to run on.
 
@@ -3847,7 +3847,7 @@ The pattern of files to run on.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.id
+## git-hooks.hooks.\<name\>.id
 
 The unique identifier for the hook.
 
@@ -3880,7 +3880,7 @@ The `id` is set to the attribute name the hook submodule is bound to in the pare
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.language
+## git-hooks.hooks.\<name\>.language
 
 The language of the hook - tells pre-commit how to install the hook.
 
@@ -3900,7 +3900,7 @@ Note: `"unsupported"` does not mean deprecated. Pre-commit >= 4.4.0 renamed `"sy
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.name
+## git-hooks.hooks.\<name\>.name
 
 The name of the hook. Shown during hook execution.
 
@@ -3916,7 +3916,7 @@ the attribute name the hook submodule is bound to, same as `id`
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.pass_filenames
+## git-hooks.hooks.\<name\>.pass_filenames
 
 Whether to pass filenames as arguments to the entry point.
 
@@ -3932,7 +3932,7 @@ true
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.priority
+## git-hooks.hooks.\<name\>.priority
 
 Defines the order in which the hooks are executed. Default priority is set by the order in the list of hooks. Evaluation goes from 0 and up. If two hooks have the same priority, they’ll run in parallel. This works only if cfg.package is set to prek.
 
@@ -3948,7 +3948,7 @@ null
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.raw
+## git-hooks.hooks.\<name\>.raw
 
 Raw fields of a pre-commit hook. This is mostly for internal use but exposed in case you need to work around something.
 
@@ -3960,7 +3960,7 @@ Default: taken from the other hook options.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.require_serial
+## git-hooks.hooks.\<name\>.require_serial
 
 if true this hook will execute using a single process instead of in parallel.
 
@@ -3976,7 +3976,7 @@ false
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.stages
+## git-hooks.hooks.\<name\>.stages
 
 Confines the hook to run at a particular stage.
 
@@ -3992,7 +3992,7 @@ default_stages
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.types
+## git-hooks.hooks.\<name\>.types
 
 List of file types to run on. See [Filtering files with types](https://pre-commit.com/#filtering-files-with-types).
 
@@ -4010,7 +4010,7 @@ List of file types to run on. See [Filtering files with types](https://pre-commi
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.types_or
+## git-hooks.hooks.\<name\>.types_or
 
 List of file types to run on, where only a single type needs to match.
 
@@ -4026,7 +4026,7 @@ List of file types to run on, where only a single type needs to match.
 
 - <https://github.com/cachix/git-hooks.nix/blob/master/modules/hook.nix>
 
-## git-hooks.hooks.<name>.verbose
+## git-hooks.hooks.\<name\>.verbose
 
 forces the output of the hook to be printed even when the hook passes.
 
@@ -10002,7 +10002,7 @@ Declarative generation of ignore files using gitnr templates.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/gitnr.nix>
 
-## integrations.gitnr.<name>.enableDefaultTemplates
+## integrations.gitnr.\<name\>.enableDefaultTemplates
 
 Prepend a sensible default set of TopTal templates.
 
@@ -10018,7 +10018,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/gitnr.nix>
 
-## integrations.gitnr.<name>.package
+## integrations.gitnr.\<name\>.package
 
 The gitnr package to use for generating templates.
 
@@ -10034,7 +10034,7 @@ pkgs.gitnr
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/gitnr.nix>
 
-## integrations.gitnr.<name>.content
+## integrations.gitnr.\<name\>.content
 
 Additional patterns to append to the generated ignore file. These patterns will be added after the templates are processed.
 
@@ -10059,7 +10059,7 @@ Additional patterns to append to the generated ignore file. These patterns will 
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/gitnr.nix>
 
-## integrations.gitnr.<name>.templates
+## integrations.gitnr.\<name\>.templates
 
 List of templates to include in the ignore file.
 
@@ -10880,7 +10880,7 @@ Which Erlang package to use.
 *Default:*
 
 ```
-pkgs.erlang
+pkgs.beamPackages.erlang
 ```
 
 *Declared by:*
@@ -13124,7 +13124,7 @@ PHP-FPM pools. If no pools are defined, the PHP-FPM service is disabled.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.extraConfig
+## languages.php.fpm.pools.\<name\>.extraConfig
 
 Extra lines that go into the pool configuration. See the documentation on `php-fpm.conf` for details on configuration directives.
 
@@ -13140,7 +13140,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.listen
+## languages.php.fpm.pools.\<name\>.listen
 
 The address on which to accept FastCGI requests.
 
@@ -13162,7 +13162,7 @@ The address on which to accept FastCGI requests.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.phpEnv
+## languages.php.fpm.pools.\<name\>.phpEnv
 
 Environment variables used for this PHP-FPM pool.
 
@@ -13189,7 +13189,7 @@ Environment variables used for this PHP-FPM pool.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.phpOptions
+## languages.php.fpm.pools.\<name\>.phpOptions
 
 Options appended to the PHP configuration file `php.ini` used for this PHP-FPM pool.
 
@@ -13199,7 +13199,7 @@ Options appended to the PHP configuration file `php.ini` used for this PHP-FPM p
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.phpPackage
+## languages.php.fpm.pools.\<name\>.phpPackage
 
 The PHP package to use for running this PHP-FPM pool.
 
@@ -13215,7 +13215,7 @@ phpfpm.phpPackage
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.settings
+## languages.php.fpm.pools.\<name\>.settings
 
 PHP-FPM pool directives. Refer to the “List of pool directives” section of [https://www.php.net/manual/en/install.fpm.configuration.php"](https://www.php.net/manual/en/install.fpm.configuration.php%22) the manual for details. Note that settings names must be enclosed in quotes (e.g. `"pm.max_children"` instead of `pm.max_children`).
 
@@ -13244,7 +13244,7 @@ PHP-FPM pool directives. Refer to the “List of pool directives” section of [
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/php.nix>
 
-## languages.php.fpm.pools.<name>.socket
+## languages.php.fpm.pools.\<name\>.socket
 
 Path to the Unix socket file on which to accept FastCGI requests.
 
@@ -16144,7 +16144,7 @@ Machines for NixOS, home-manager, and nix-darwin.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/machines.nix>
 
-## machines.<name>.home-manager
+## machines.\<name\>.home-manager
 
 Home Manager configuration for the machine.
 
@@ -16170,7 +16170,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/machines.nix>
 
-## machines.<name>.nix-darwin
+## machines.\<name\>.nix-darwin
 
 nix-darwin configuration for the machine.
 
@@ -16197,7 +16197,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/machines.nix>
 
-## machines.<name>.nixos
+## machines.\<name\>.nixos
 
 NixOS configuration for the machine.
 
@@ -16223,7 +16223,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/machines.nix>
 
-## machines.<name>.system
+## machines.\<name\>.system
 
 System architecture for the machine.
 
@@ -16456,9 +16456,9 @@ This option can either be:
 
 If an attribute set is used, each value can be:
 
-- inline content (creates `.opencode/skills/<name>/SKILL.md`)
-- a path to a file (creates `.opencode/skills/<name>/SKILL.md`)
-- a path to a directory (creates `.opencode/skills/<name>/`)
+- inline content (creates `.opencode/skills/\<name\>/SKILL.md`)
+- a path to a file (creates `.opencode/skills/\<name\>/SKILL.md`)
+- a path to a directory (creates `.opencode/skills/\<name\>/`)
 
 *Type:* (attribute set of (strings concatenated with “\\n” or absolute path or string)) or absolute path
 
@@ -16940,7 +16940,7 @@ Processes can be started with `devenv up` and run in the foreground.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.after
+## processes.\<name\>.after
 
 Tasks that must be ready before this process starts. Use task names like “devenv:processes:postgres” or “myapp:setup”. Supports @started, @ready (default for processes), and @completed suffixes for process dependencies. Supports @started, @succeeded (default for tasks), and @completed suffixes for task dependencies.
 
@@ -16965,7 +16965,7 @@ Tasks that must be ready before this process starts. Use task names like “deve
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.before
+## processes.\<name\>.before
 
 Tasks that should start after this process is ready.
 
@@ -16989,7 +16989,7 @@ Tasks that should start after this process is ready.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.cwd
+## processes.\<name\>.cwd
 
 Working directory to run the process in. If not specified, the current working directory will be used.
 
@@ -17005,7 +17005,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.env
+## processes.\<name\>.env
 
 Environment variables to set for this process.
 
@@ -17021,7 +17021,7 @@ Environment variables to set for this process.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.exec
+## processes.\<name\>.exec
 
 Bash code to run the process.
 
@@ -17031,7 +17031,7 @@ Bash code to run the process.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.linux
+## processes.\<name\>.linux
 
 Linux-specific process configuration.
 
@@ -17049,7 +17049,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.linux.capabilities
+## processes.\<name\>.linux.capabilities
 
 Linux capabilities to add as ambient capabilities for this process (e.g., “cap_net_admin”, “cap_sys_admin”).
 
@@ -17076,7 +17076,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen
+## processes.\<name\>.listen
 
 Socket activation configuration for systemd-style socket passing.
 
@@ -17112,7 +17112,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.address
+## processes.\<name\>.listen.\*.address
 
 TCP address (e.g., ‘127.0.0.1:8080’). Required for TCP sockets.
 
@@ -17128,7 +17128,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.backlog
+## processes.\<name\>.listen.\*.backlog
 
 Listen backlog size
 
@@ -17144,7 +17144,7 @@ Listen backlog size
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.kind
+## processes.\<name\>.listen.\*.kind
 
 Type of socket (tcp or unix_stream)
 
@@ -17154,7 +17154,7 @@ Type of socket (tcp or unix_stream)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.mode
+## processes.\<name\>.listen.\*.mode
 
 Unix socket file permissions (e.g., 384 for 0o600). Only for unix_stream.
 
@@ -17170,7 +17170,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.name
+## processes.\<name\>.listen.\*.name
 
 Name of the socket (e.g., ‘http’, ‘admin’)
 
@@ -17180,7 +17180,7 @@ Name of the socket (e.g., ‘http’, ‘admin’)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.listen.\*.path
+## processes.\<name\>.listen.\*.path
 
 Unix socket path. Required for unix_stream sockets.
 
@@ -17196,13 +17196,13 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ports
+## processes.\<name\>.ports
 
 Named ports with auto-allocation for this process.
 
 Define ports with a base value and devenv will automatically find a free port starting from that base, incrementing until available.
 
-The resolved port is available via `config.processes.<name>.ports.<port>.value`.
+The resolved port is available via `config.processes.\<name\>.ports.\<port\>.value`.
 
 Requires devenv 2.0+.
 
@@ -17227,7 +17227,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ports.<name>.allocate
+## processes.\<name\>.ports.\<name\>.allocate
 
 Base port for auto-allocation (increments until free)
 
@@ -17243,7 +17243,7 @@ Base port for auto-allocation (increments until free)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ports.<name>.value
+## processes.\<name\>.ports.\<name\>.value
 
 Resolved port value (allocated by devenv)
 
@@ -17255,7 +17255,7 @@ Resolved port value (allocated by devenv)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.process-compose
+## processes.\<name\>.process-compose
 
 process-compose.yaml specific process attributes.
 
@@ -17295,7 +17295,7 @@ Only used when using `process.manager.implementation = "process-compose";`
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready
+## processes.\<name\>.ready
 
 How to determine if this process is ready to serve.
 
@@ -17313,7 +17313,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.exec
+## processes.\<name\>.ready.exec
 
 Shell command to execute. Exit 0 = ready.
 
@@ -17335,7 +17335,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.failure_threshold
+## processes.\<name\>.ready.failure_threshold
 
 Consecutive failures before marking unhealthy.
 
@@ -17351,7 +17351,7 @@ Consecutive failures before marking unhealthy.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http
+## processes.\<name\>.ready.http
 
 HTTP readiness probe configuration.
 
@@ -17367,7 +17367,7 @@ HTTP readiness probe configuration.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http.get
+## processes.\<name\>.ready.http.get
 
 HTTP GET readiness check.
 
@@ -17383,7 +17383,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http.get.host
+## processes.\<name\>.ready.http.get.host
 
 Host to connect to.
 
@@ -17399,7 +17399,7 @@ Host to connect to.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http.get.path
+## processes.\<name\>.ready.http.get.path
 
 HTTP path to request.
 
@@ -17415,7 +17415,7 @@ HTTP path to request.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http.get.port
+## processes.\<name\>.ready.http.get.port
 
 Port to connect to.
 
@@ -17425,7 +17425,7 @@ Port to connect to.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.http.get.scheme
+## processes.\<name\>.ready.http.get.scheme
 
 URL scheme (http or https).
 
@@ -17441,7 +17441,7 @@ URL scheme (http or https).
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.initial_delay
+## processes.\<name\>.ready.initial_delay
 
 Seconds to wait before first probe.
 
@@ -17457,7 +17457,7 @@ Seconds to wait before first probe.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.notify
+## processes.\<name\>.ready.notify
 
 Enable systemd notify protocol for readiness signaling. The process must send READY=1 to the NOTIFY_SOCKET.
 
@@ -17473,7 +17473,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.period
+## processes.\<name\>.ready.period
 
 Seconds between probes.
 
@@ -17489,7 +17489,7 @@ Seconds between probes.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.probe_timeout
+## processes.\<name\>.ready.probe_timeout
 
 Seconds before a single probe times out.
 
@@ -17505,7 +17505,7 @@ Seconds before a single probe times out.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.success_threshold
+## processes.\<name\>.ready.success_threshold
 
 Consecutive successes needed to be considered ready.
 
@@ -17521,7 +17521,7 @@ Consecutive successes needed to be considered ready.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.ready.timeout
+## processes.\<name\>.ready.timeout
 
 Overall deadline in seconds for the process to become ready. null = no deadline.
 
@@ -17537,7 +17537,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.restart
+## processes.\<name\>.restart
 
 Process restart policy.
 
@@ -17553,7 +17553,7 @@ Process restart policy.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.restart.max
+## processes.\<name\>.restart.max
 
 Maximum restart attempts. null = unlimited.
 
@@ -17569,7 +17569,7 @@ Maximum restart attempts. null = unlimited.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.restart.on
+## processes.\<name\>.restart.on
 
 When to restart: never, always, or on_failure.
 
@@ -17585,7 +17585,7 @@ When to restart: never, always, or on_failure.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.restart.window
+## processes.\<name\>.restart.window
 
 Sliding window in seconds for restart rate limiting. null = lifetime limit.
 
@@ -17601,7 +17601,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.start
+## processes.\<name\>.start
 
 Auto-start configuration for this process.
 
@@ -17617,7 +17617,7 @@ Auto-start configuration for this process.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.start.enable
+## processes.\<name\>.start.enable
 
 Whether to start this process automatically with `devenv up`.
 
@@ -17635,7 +17635,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watch
+## processes.\<name\>.watch
 
 File watching configuration for automatic process restarts.
 
@@ -17663,7 +17663,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watch.extensions
+## processes.\<name\>.watch.extensions
 
 File extensions to watch (e.g., “rs”, “js”, “py”). If empty, all file extensions are watched.
 
@@ -17690,7 +17690,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watch.ignore
+## processes.\<name\>.watch.ignore
 
 Glob patterns to ignore (e.g., “.git”, “target”, “\*.log”).
 
@@ -17718,7 +17718,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watch.paths
+## processes.\<name\>.watch.paths
 
 Paths to watch for changes (files or directories). When files in these paths change, the process is restarted (or, for a one-shot command that exits immediately, re-run).
 
@@ -17744,7 +17744,7 @@ Requires devenv 2.0+.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watchdog
+## processes.\<name\>.watchdog
 
 Systemd watchdog configuration.
 
@@ -17771,7 +17771,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watchdog.require_ready
+## processes.\<name\>.watchdog.require_ready
 
 Require READY=1 notification before enforcing watchdog
 
@@ -17787,7 +17787,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
-## processes.<name>.watchdog.usec
+## processes.\<name\>.watchdog.usec
 
 Watchdog interval in microseconds
 
@@ -17860,7 +17860,7 @@ Profile definitions that can be activated manually or automatically.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/profiles.nix>
 
-## profiles.<name>.extends
+## profiles.\<name\>.extends
 
 List of profile names to extend/inherit from.
 
@@ -17881,7 +17881,7 @@ List of profile names to extend/inherit from.
 ]
 ```
 
-## profiles.<name>.module
+## profiles.\<name\>.module
 
 Additional configuration to merge when this profile is active.
 
@@ -17909,7 +17909,7 @@ Profile definitions that are automatically activated based on the machine’s ho
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/profiles.nix>
 
-## profiles.hostname.<name>.extends
+## profiles.hostname.\<name\>.extends
 
 List of profile names to extend/inherit from.
 
@@ -17934,7 +17934,7 @@ List of profile names to extend/inherit from.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/profiles.nix>
 
-## profiles.hostname.<name>.module
+## profiles.hostname.\<name\>.module
 
 Additional configuration to merge when this profile is active.
 
@@ -17966,7 +17966,7 @@ Profile definitions that are automatically activated based on the username.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/profiles.nix>
 
-## profiles.user.<name>.extends
+## profiles.user.\<name\>.extends
 
 List of profile names to extend/inherit from.
 
@@ -17991,7 +17991,7 @@ List of profile names to extend/inherit from.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/profiles.nix>
 
-## profiles.user.<name>.module
+## profiles.user.\<name\>.module
 
 Additional configuration to merge when this profile is active.
 
@@ -18023,7 +18023,7 @@ A set of scripts available when the environment is active.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/scripts.nix>
 
-## scripts.<name>.package
+## scripts.\<name\>.package
 
 The package to use to run the script.
 
@@ -18039,7 +18039,7 @@ pkgs.bash
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/scripts.nix>
 
-## scripts.<name>.packages
+## scripts.\<name\>.packages
 
 Packages to be available in PATH when the script runs.
 
@@ -18055,7 +18055,7 @@ Packages to be available in PATH when the script runs.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/scripts.nix>
 
-## scripts.<name>.binary
+## scripts.\<name\>.binary
 
 Override the binary name from the default `package.meta.mainProgram`
 
@@ -18071,7 +18071,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/scripts.nix>
 
-## scripts.<name>.description
+## scripts.\<name\>.description
 
 Description of the script.
 
@@ -18087,7 +18087,7 @@ Description of the script.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/scripts.nix>
 
-## scripts.<name>.exec
+## scripts.\<name\>.exec
 
 Shell code to execute when the script is run, or path to a script file.
 
@@ -18556,7 +18556,7 @@ Declarative vhost config.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/services/caddy.nix>
 
-## services.caddy.virtualHosts.<name>.extraConfig
+## services.caddy.virtualHosts.\<name\>.extraConfig
 
 These lines go into the vhost verbatim.
 
@@ -18572,7 +18572,7 @@ These lines go into the vhost verbatim.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/services/caddy.nix>
 
-## services.caddy.virtualHosts.<name>.serverAliases
+## services.caddy.virtualHosts.\<name\>.serverAliases
 
 Additional names of virtual hosts served by this virtual host configuration.
 
@@ -20569,7 +20569,7 @@ Specify the realms you want to import on start up and export on a manual start o
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/services/keycloak.nix>
 
-## services.keycloak.realms.<name>.export
+## services.keycloak.realms.\<name\>.export
 
 If you want to export that realm on process/script launch `keycloak-export-realms`.
 
@@ -20591,7 +20591,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/services/keycloak.nix>
 
-## services.keycloak.realms.<name>.import
+## services.keycloak.realms.\<name\>.import
 
 If you want to import that realm on start up, if the realm does not yet exist.
 
@@ -20613,7 +20613,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/services/keycloak.nix>
 
-## services.keycloak.realms.<name>.path
+## services.keycloak.realms.\<name\>.path
 
 The path (string, relative to `DEVENV_ROOT`) where you want to import (or export) this realm «name» to. If not set and `import` is `true` this realm is not imported. If not set and `export` is `true` its exported to `$DEVENV_STATE/keycloak/realm-export/«name».json`.
 
@@ -25542,7 +25542,7 @@ A set of tasks.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.package
+## tasks.\<name\>.package
 
 Package to install for this task.
 
@@ -25558,7 +25558,7 @@ pkgs.bash
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.after
+## tasks.\<name\>.after
 
 List of tasks that must complete before this task runs.
 
@@ -25585,7 +25585,7 @@ Example: `after = [ "pnpm:install@completed" ];` allows this task to run even if
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.before
+## tasks.\<name\>.before
 
 List of tasks that depend on this task completing first.
 
@@ -25610,7 +25610,7 @@ You can append a suffix to control dependency behavior:
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.binary
+## tasks.\<name\>.binary
 
 Override the binary name from the default `package.meta.mainProgram`.
 
@@ -25626,7 +25626,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.cwd
+## tasks.\<name\>.cwd
 
 Working directory to run the task in. If not specified, the current working directory will be used.
 
@@ -25642,7 +25642,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.description
+## tasks.\<name\>.description
 
 Description of the task.
 
@@ -25658,7 +25658,7 @@ Description of the task.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.env
+## tasks.\<name\>.env
 
 Environment variables to set for this task.
 
@@ -25674,7 +25674,7 @@ Environment variables to set for this task.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.exec
+## tasks.\<name\>.exec
 
 Command to execute the task.
 
@@ -25690,7 +25690,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.execIfModified
+## tasks.\<name\>.execIfModified
 
 Paths to files that should trigger a task execution if modified.
 
@@ -25706,7 +25706,7 @@ Paths to files that should trigger a task execution if modified.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.exports
+## tasks.\<name\>.exports
 
 List of environment variables to export.
 
@@ -25722,7 +25722,7 @@ List of environment variables to export.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.input
+## tasks.\<name\>.input
 
 Input values for the task, encoded as JSON.
 
@@ -25738,7 +25738,7 @@ Input values for the task, encoded as JSON.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process
+## tasks.\<name\>.process
 
 Process-specific configuration. Only used when type = “process”.
 
@@ -25754,7 +25754,7 @@ Process-specific configuration. Only used when type = “process”.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen
+## tasks.\<name\>.process.listen
 
 Socket activation configuration for systemd-style socket passing.
 
@@ -25788,7 +25788,7 @@ Socket activation configuration for systemd-style socket passing.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.address
+## tasks.\<name\>.process.listen.\*.address
 
 TCP address (e.g., ‘127.0.0.1:8080’). Required for TCP sockets.
 
@@ -25804,7 +25804,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.backlog
+## tasks.\<name\>.process.listen.\*.backlog
 
 Listen backlog size
 
@@ -25820,7 +25820,7 @@ Listen backlog size
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.kind
+## tasks.\<name\>.process.listen.\*.kind
 
 Type of socket (tcp or unix_stream)
 
@@ -25830,7 +25830,7 @@ Type of socket (tcp or unix_stream)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.mode
+## tasks.\<name\>.process.listen.\*.mode
 
 Unix socket file permissions (e.g., 384 for 0o600). Only for unix_stream.
 
@@ -25846,7 +25846,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.name
+## tasks.\<name\>.process.listen.\*.name
 
 Name of the socket (e.g., ‘http’, ‘admin’)
 
@@ -25856,7 +25856,7 @@ Name of the socket (e.g., ‘http’, ‘admin’)
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.listen.\*.path
+## tasks.\<name\>.process.listen.\*.path
 
 Unix socket path. Required for unix_stream sockets.
 
@@ -25872,7 +25872,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ports
+## tasks.\<name\>.process.ports
 
 Allocated ports for this process (name -> port number). Populated automatically from process port allocation.
 
@@ -25888,7 +25888,7 @@ Allocated ports for this process (name -> port number). Populated automatically 
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready
+## tasks.\<name\>.process.ready
 
 How to determine if this process task is ready to serve.
 
@@ -25904,7 +25904,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.exec
+## tasks.\<name\>.process.ready.exec
 
 Shell command to execute. Exit 0 = ready.
 
@@ -25926,7 +25926,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.failure_threshold
+## tasks.\<name\>.process.ready.failure_threshold
 
 Consecutive failures before marking unhealthy.
 
@@ -25942,7 +25942,7 @@ Consecutive failures before marking unhealthy.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http
+## tasks.\<name\>.process.ready.http
 
 HTTP readiness probe configuration.
 
@@ -25958,7 +25958,7 @@ HTTP readiness probe configuration.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http.get
+## tasks.\<name\>.process.ready.http.get
 
 HTTP GET readiness check.
 
@@ -25974,7 +25974,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http.get.host
+## tasks.\<name\>.process.ready.http.get.host
 
 Host to connect to.
 
@@ -25990,7 +25990,7 @@ Host to connect to.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http.get.path
+## tasks.\<name\>.process.ready.http.get.path
 
 HTTP path to request.
 
@@ -26006,7 +26006,7 @@ HTTP path to request.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http.get.port
+## tasks.\<name\>.process.ready.http.get.port
 
 Port to connect to.
 
@@ -26016,7 +26016,7 @@ Port to connect to.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.http.get.scheme
+## tasks.\<name\>.process.ready.http.get.scheme
 
 URL scheme (http or https).
 
@@ -26032,7 +26032,7 @@ URL scheme (http or https).
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.initial_delay
+## tasks.\<name\>.process.ready.initial_delay
 
 Seconds to wait before first probe.
 
@@ -26048,7 +26048,7 @@ Seconds to wait before first probe.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.notify
+## tasks.\<name\>.process.ready.notify
 
 Enable systemd notify protocol for readiness signaling. The process must send READY=1 to the NOTIFY_SOCKET.
 
@@ -26064,7 +26064,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.period
+## tasks.\<name\>.process.ready.period
 
 Seconds between probes.
 
@@ -26080,7 +26080,7 @@ Seconds between probes.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.probe_timeout
+## tasks.\<name\>.process.ready.probe_timeout
 
 Seconds before a single probe times out.
 
@@ -26096,7 +26096,7 @@ Seconds before a single probe times out.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.success_threshold
+## tasks.\<name\>.process.ready.success_threshold
 
 Consecutive successes needed to be considered ready.
 
@@ -26112,7 +26112,7 @@ Consecutive successes needed to be considered ready.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.ready.timeout
+## tasks.\<name\>.process.ready.timeout
 
 Overall deadline in seconds for the process to become ready. null = no deadline.
 
@@ -26128,7 +26128,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.restart
+## tasks.\<name\>.process.restart
 
 Process restart policy.
 
@@ -26144,7 +26144,7 @@ Process restart policy.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.restart.max
+## tasks.\<name\>.process.restart.max
 
 Maximum restart attempts. null = unlimited.
 
@@ -26160,7 +26160,7 @@ Maximum restart attempts. null = unlimited.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.restart.on
+## tasks.\<name\>.process.restart.on
 
 When to restart: never, always, or on_failure.
 
@@ -26176,7 +26176,7 @@ When to restart: never, always, or on_failure.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.restart.window
+## tasks.\<name\>.process.restart.window
 
 Sliding window in seconds for restart rate limiting. null = lifetime limit.
 
@@ -26192,7 +26192,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.start
+## tasks.\<name\>.process.start
 
 Auto-start configuration for this process.
 
@@ -26208,7 +26208,7 @@ Auto-start configuration for this process.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.start.enable
+## tasks.\<name\>.process.start.enable
 
 Whether to start this process automatically.
 
@@ -26224,7 +26224,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watch
+## tasks.\<name\>.process.watch
 
 File watching configuration for automatic process restarts.
 
@@ -26240,7 +26240,7 @@ File watching configuration for automatic process restarts.
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watch.extensions
+## tasks.\<name\>.process.watch.extensions
 
 File extensions to watch (e.g., “rs”, “js”, “py”). If empty, all file extensions are watched.
 
@@ -26256,7 +26256,7 @@ File extensions to watch (e.g., “rs”, “js”, “py”). If empty, all fil
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watch.ignore
+## tasks.\<name\>.process.watch.ignore
 
 Glob patterns to ignore (e.g., “.git”, “target”, “\*.log”).
 
@@ -26272,7 +26272,7 @@ Glob patterns to ignore (e.g., “.git”, “target”, “\*.log”).
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watch.paths
+## tasks.\<name\>.process.watch.paths
 
 Paths to watch for changes (files or directories). When files in these paths change, the process will be restarted.
 
@@ -26288,7 +26288,7 @@ Paths to watch for changes (files or directories). When files in these paths cha
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watchdog
+## tasks.\<name\>.process.watchdog
 
 Systemd watchdog configuration.
 
@@ -26313,7 +26313,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watchdog.require_ready
+## tasks.\<name\>.process.watchdog.require_ready
 
 Require READY=1 notification before enforcing watchdog
 
@@ -26329,7 +26329,7 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.process.watchdog.usec
+## tasks.\<name\>.process.watchdog.usec
 
 Watchdog interval in microseconds
 
@@ -26339,7 +26339,7 @@ Watchdog interval in microseconds
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.showOutput
+## tasks.\<name\>.showOutput
 
 Always show task output (stdout and stderr), regardless of whether the task succeeds or fails.
 
@@ -26355,7 +26355,7 @@ false
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.status
+## tasks.\<name\>.status
 
 Check if the command should be ran
 
@@ -26371,7 +26371,7 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
-## tasks.<name>.type
+## tasks.\<name\>.type
 
 Type of task:
 
@@ -30398,7 +30398,7 @@ Directories to run mypy in
 
 - <https://github.com/numtide/treefmt-nix/blob/main/programs/mypy.nix>
 
-## treefmt.config.programs.mypy.directories.<name>.directory
+## treefmt.config.programs.mypy.directories.\<name\>.directory
 
 Directory to run mypy in
 
@@ -30414,7 +30414,7 @@ Directory to run mypy in
 
 - <https://github.com/numtide/treefmt-nix/blob/main/programs/mypy.nix>
 
-## treefmt.config.programs.mypy.directories.<name>.extraPythonPackages
+## treefmt.config.programs.mypy.directories.\<name\>.extraPythonPackages
 
 Extra packages to add to PYTHONPATH
 
@@ -30432,7 +30432,7 @@ Extra packages to add to PYTHONPATH
 
 - <https://github.com/numtide/treefmt-nix/blob/main/programs/mypy.nix>
 
-## treefmt.config.programs.mypy.directories.<name>.extraPythonPaths
+## treefmt.config.programs.mypy.directories.\<name\>.extraPythonPaths
 
 Extra paths to add to PYTHONPATH. Paths are interpreted relative to the directory options and are added before extraPythonPackages.
 
@@ -30456,7 +30456,7 @@ Extra paths to add to PYTHONPATH. Paths are interpreted relative to the director
 
 - <https://github.com/numtide/treefmt-nix/blob/main/programs/mypy.nix>
 
-## treefmt.config.programs.mypy.directories.<name>.modules
+## treefmt.config.programs.mypy.directories.\<name\>.modules
 
 Modules to check
 
@@ -30483,7 +30483,7 @@ Modules to check
 
 - <https://github.com/numtide/treefmt-nix/blob/main/programs/mypy.nix>
 
-## treefmt.config.programs.mypy.directories.<name>.options
+## treefmt.config.programs.mypy.directories.\<name\>.options
 
 Options to pass to mypy
 
@@ -33744,7 +33744,7 @@ Set of formatters to use
 
 - <https://github.com/numtide/treefmt-nix/blob/main/module-options.nix>
 
-## treefmt.config.settings.formatter.<name>.command
+## treefmt.config.settings.formatter.\<name\>.command
 
 Executable obeying the treefmt formatter spec
 
@@ -33754,7 +33754,7 @@ Executable obeying the treefmt formatter spec
 
 - <https://github.com/numtide/treefmt-nix/blob/main/module-options.nix>
 
-## treefmt.config.settings.formatter.<name>.excludes
+## treefmt.config.settings.formatter.\<name\>.excludes
 
 List of files to exclude for formatting. Supports globbing. Takes precedence over the includes.
 
@@ -33770,7 +33770,7 @@ List of files to exclude for formatting. Supports globbing. Takes precedence ove
 
 - <https://github.com/numtide/treefmt-nix/blob/main/module-options.nix>
 
-## treefmt.config.settings.formatter.<name>.includes
+## treefmt.config.settings.formatter.\<name\>.includes
 
 List of files to include for formatting. Supports globbing.
 
@@ -33780,7 +33780,7 @@ List of files to include for formatting. Supports globbing.
 
 - <https://github.com/numtide/treefmt-nix/blob/main/module-options.nix>
 
-## treefmt.config.settings.formatter.<name>.options
+## treefmt.config.settings.formatter.\<name\>.options
 
 List of arguments to pass to the command
 

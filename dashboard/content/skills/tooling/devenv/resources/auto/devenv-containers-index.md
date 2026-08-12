@@ -7,9 +7,8 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-New in version 0.6
-
-[Read more about containers in the v0.6 release post](https://devenv.sh/blog/2023/03/02/devenv-06-generating-containers-and-instant-shell-activation/index.md)
+{% raw %}
+Added in `0.6`
 
 Note
 
@@ -202,3 +201,4 @@ devenv.nix
 ```
 
 You can also conditionalize based on the particular container that is being built, for example, `config.containers."processes".isBuilding`.
+{% endraw %}

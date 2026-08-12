@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -193,3 +194,4 @@ Matches pages that are authored by `Pagefind` with a tag of `Article`, or pages 
 ***
 
 To dive deeper into complex filtering, see the [compound_filtering](https://github.com/pagefind/pagefind/tree/main/pagefind/integration_tests/compound_filtering) test files in Pagefind's GitHub repository.
+{% endraw %}

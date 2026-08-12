@@ -122,12 +122,3 @@ We've now got the very basics set up. In [part
 2](https://spacetimedb.com/docs/tutorials/godot/part-2) you'll learn the basics of how to
 create a SpacetimeDB server module and how to connect to it from your
 client.
-
-- [Setting up the Tutorial Godot
-  Project](#setting-up-the-tutorial-godot-project)
-  - [Step 1: Create a Blank Godot
-    Project](#step-1-create-a-blank-godot-project)
-  - [Import the SpacetimeDB Godot
-    SDK](#import-the-spacetimedb-godot-sdk)
-  - [Create a new Scene](#create-a-new-scene)
-  - [Create the Server Module](#create-the-server-module)

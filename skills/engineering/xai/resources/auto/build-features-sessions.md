@@ -34,6 +34,14 @@ grok -p "Start the refactor" --output-format json | jq -r '.sessionId'
 
 `/compact [context]` compresses the conversation history to reclaim context window, with optional instructions about what to preserve. Grok also auto-compacts as the context window fills; check usage with `/context` or `/session-info`.
 
+## Todos
+
+For multi-step work, the agent keeps a structured todo list so you can see what is planned, what is in progress, and what is done. Items use statuses pending, in progress, completed, and cancelled (when a step is dropped).
+
+On the agent screen, press `Ctrl+T` to view the todo pane. The list is part of the session: resume the same session and the todos return with their last statuses.
+
+Todos are separate from [background tasks](https://docs.x.ai/build/features/background-tasks), which track long-running commands and monitors.
+
 ## Housekeeping
 
 | Command | What it does |
@@ -43,4 +51,4 @@ grok -p "Start the refactor" --output-format json | jq -r '.sessionId'
 | `grok sessions list` | List recent sessions for this directory |
 | `grok sessions search <query>` | Search session titles and prompts |
 | `grok sessions delete <id>` | Permanently delete a session |
-| `grok export <id> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |
+| `grok export \<id\> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |

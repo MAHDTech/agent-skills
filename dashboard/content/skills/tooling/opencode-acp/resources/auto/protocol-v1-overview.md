@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -28,7 +29,7 @@ The protocol follows the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) s
 
 A typical flow follows this pattern:
 
-<Steps>
+\<Steps\>
   <Step title="Initialization Phase">
     * Client → Agent: `initialize` to establish connection
     * Client → Agent: `authenticate` if required by the Agent
@@ -139,7 +140,17 @@ Clients provide the interface between users and agents. They are typically code 
   Kill terminal command without releasing (requires `terminal` capability).
 </ResponseField>
 
+<ResponseField name="elicitation/create" post={[<a href="/protocol/v1/schema#elicitation%2Fcreate">Schema</a>]}>
+  [Request structured information from the user](https://agentclientprotocol.com/protocol/v1/elicitation)
+  (requires the matching `elicitation` mode capability).
+</ResponseField>
+
 ### Notifications
+
+<ResponseField name="elicitation/complete" post={[<a href="/protocol/v1/schema#elicitation%2Fcomplete">Schema</a>]}>
+  [Report completion of an out-of-band URL
+  interaction](https://agentclientprotocol.com/protocol/v1/elicitation#url-completion) (no response expected).
+</ResponseField>
 
 <ResponseField name="session/update" post={[<a href="/protocol/v1/schema#session%2Fupdate">Schema</a>]}>
   [Send session updates](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) to
@@ -184,3 +195,4 @@ Learn about [protocol extensibility](https://agentclientprotocol.com/protocol/v1
 * Understand [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup) for creating and loading sessions
 * Review the [Prompt Turn](https://agentclientprotocol.com/protocol/v1/prompt-turn) lifecycle
 * Explore [Extensibility](https://agentclientprotocol.com/protocol/v1/extensibility) to add custom features
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -47,7 +48,4 @@ multiplayer Unity games. The C# SDK integrates seamlessly with Unity
 projects. Learn more in the [SpacetimeDB Unity
 Tutorial](https://spacetimedb.com/docs/tutorials/unity/part-1).
 
-- [Server Database Modules](#server-database-modules)
-- [Client SDKs](#client-sdks)
-  - [Unity](#unity)
-
+{% endraw %}

@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# tars-spoke -- spoke-only heavy-command runner.
+#
+# Usage (from the spoke clone, or with cwd set):
+#   sh tars-spoke -- <command> [args...]
+#   sh tars-spoke <command> [args...]
+#
+# Sources .tars/run.env, takes the heavy-command mutex, cds into the spoke
+# (TARS_CWD or pwd), and execs the remaining arguments. No language knowledge:
+# the spoke chooses the targeted test command; this wrapper only makes lock +
+# cwd mechanical.
+#
+# Hub must NOT use this for the full gate — use tars-gate instead.
+#
+# Environment:
+#   TARS_RUN_ENV   absolute path to run.env
+#   TARS_CWD       directory to run in (default: pwd)
+#
+# Exit: wrapped command status, or 64 on usage / missing run.env.
+#
+
+set -eu
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" 2>/dev/null && pwd -P)
+TARS_CWD="${TARS_CWD:-.}"
+TARS_CWD=$(CDPATH='' cd -- "$TARS_CWD" 2>/dev/null && pwd -P) || {
+	echo "tars-spoke: cannot cd to target directory" >&2
+	exit 64
+}
+
+# Drop a leading -- so `tars-spoke -- cargo test -p foo` works.
+if [ "${1:-}" = "--" ]; then
+	shift
+fi
+
+if [ "$#" -eq 0 ]; then
+	echo "tars-spoke: usage: tars-spoke -- <command> [args...]" >&2
+	echo "tars-spoke: run targeted heavy commands only; hub full gate is tars-gate" >&2
+	exit 64
+fi
+
+find_run_env() {
+	if [ -n "${TARS_RUN_ENV:-}" ] && [ -f "$TARS_RUN_ENV" ]; then
+		echo "$TARS_RUN_ENV"
+		return 0
+	fi
+	if [ -f "$TARS_CWD/.tars/run.env" ]; then
+		echo "$TARS_CWD/.tars/run.env"
+		return 0
+	fi
+	echo ""
+	return 1
+}
+
+RUN_ENV=$(find_run_env) || {
+	echo "tars-spoke: no .tars/run.env found under $TARS_CWD (run tars-backlog-prepare first)" >&2
+	exit 64
+}
+
+# shellcheck disable=SC1090
+set -a
+# shellcheck source=/dev/null
+. "$RUN_ENV"
+set +a
+
+: "${TARS_LOCK:?tars-spoke: TARS_LOCK missing from run.env}"
+: "${TARS_HEAVY_LOCK:?tars-spoke: TARS_HEAVY_LOCK missing from run.env}"
+
+# Refuse to run a heavy command in a directory that is neither the run's repo
+# root nor a spoke clone (a failed `cd` otherwise runs it in the wrong tree).
+if [ -f "$SCRIPT_DIR/tars-guard.sh" ]; then
+	# shellcheck source=./tars-guard.sh
+	. "$SCRIPT_DIR/tars-guard.sh"
+	tars_guard_check tars-spoke "$TARS_CWD" "$RUN_ENV"
+fi
+
+if [ -f "$SCRIPT_DIR/tars-lock" ]; then
+	LOCK_HELPER="$SCRIPT_DIR/tars-lock"
+else
+	LOCK_HELPER="$TARS_LOCK"
+fi
+
+# Preserve the caller's argv exactly (no eval): spoke passes the real command.
+exec sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
+	sh -c 'cd "$1" && shift && exec "$@"' \
+	spoke \
+	"$TARS_CWD" \
+	"$@"

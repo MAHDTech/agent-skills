@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Collections API
 
 # Search in Collections
@@ -32,7 +33,7 @@ Search for content related to the query within the given collections.
 
   * `aggregate` (object | object)
 
-  * `keys` (array\<string>, required) — Metadata key(s) to group results by (e.g. "category", "department").
+  * `keys` (array\\<string\>, required) — Metadata key(s) to group results by (e.g. "category", "department").
     At least one key is required.
 
 * `instructions` (string | null) — User-defined instructions to be included in the search query. Defaults to generic search instructions.
@@ -50,19 +51,19 @@ Search for content related to the query within the given collections.
 
 * `source` (object, required) — DocumentsSource defines the source of documents to search over.
 
-  * `collection_ids` (array\<string>, required) — The collection IDs to search in.
+  * `collection_ids` (array\\<string\>, required) — The collection IDs to search in.
 
   * `rag_pipeline` ("chroma\_db" | "es")
 
 ### Response Body
 
-* `matches` (array\<object>, required) — The search matches.
+* `matches` (array\\<object\>, required) — The search matches.
 
   * `chunk_content` (string, required) — The chunk content.
 
   * `chunk_id` (string, required) — The chunk ID.
 
-  * `collection_ids` (array\<string>, required) — The collection ID(s).
+  * `collection_ids` (array\\<string\>, required) — The collection ID(s).
 
   * `fields` (object, required) — Metadata fields belonging to the document of this chunk.
 
@@ -103,3 +104,4 @@ Search for content related to the query within the given collections.
   ]
 }
 ```
+{% endraw %}

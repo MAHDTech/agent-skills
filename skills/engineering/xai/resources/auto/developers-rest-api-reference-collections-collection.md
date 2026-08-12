@@ -100,7 +100,7 @@ Create a collection.
   Version number of the Collection API used under the hood.
   This is an internal only setting so it is okay to be left ambiguous (no enum).
 
-* `field_definitions` (array\<object>)
+* `field_definitions` (array\\<object\>)
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
 
@@ -198,7 +198,7 @@ Create a collection.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -286,14 +286,14 @@ List all the collections a team has.
 * `filter` (string) — Filter expression to narrow down results.
   Supports filtering on: collection\_id, collection\_name (partial string matching), created\_at, documents\_count
   Examples:
-  &#x20; \- 'collection\_id = "collection\_123"'
-  &#x20; \- 'collection\_name:"SEC" AND documents\_count:>10'
-  &#x20; \- 'collection\_name = "report"' (partial match)
-  &#x20; \- 'created\_at:>2025-01-01T00:00:00Z'
+    \- 'collection\_id = "collection\_123"'
+    \- 'collection\_name:"SEC" AND documents\_count:>10'
+    \- 'collection\_name = "report"' (partial match)
+    \- 'created\_at:>2025-01-01T00:00:00Z'
 
 ### Response Body
 
-* `collections` (array\<object>) — List of collections.
+* `collections` (array\\<object\>) — List of collections.
 
   * `collection_id` (string) — UUIDv4 that represents an ID of the collection.
 
@@ -373,7 +373,7 @@ List all the collections a team has.
 
   * `documents_count` (integer) — How many files the collection contains.
 
-  * `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+  * `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
     Defines what fields documents can have and their constraints.
 
     * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -518,7 +518,7 @@ Get a collection's metadata.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -665,7 +665,7 @@ Update collection's config.
 
   * `inject_name_into_chunks` (boolean) — Inject name into produced chunks.
 
-* `field_definition_updates` (array\<object>) — Field definition updates to apply to this collection (ADD or DELETE).
+* `field_definition_updates` (array\\<object\>) — Field definition updates to apply to this collection (ADD or DELETE).
 
   * `field_definition` (object, required) — Definition of a field that can be attached to documents in a collection.
     Field definitions specify constraints and behaviors for document metadata within a collection.
@@ -686,10 +686,10 @@ Update collection's config.
 
   * `operation` ("FIELD\_DEFINITION\_ADD" | "FIELD\_DEFINITION\_DELETE") — Operation to perform on a collection's field definition.
 
-    &#x20;\- FIELD\_DEFINITION\_ADD: Add a new field definition or update an existing one.
+     \- FIELD\_DEFINITION\_ADD: Add a new field definition or update an existing one.
     If the field key already exists, the definition will be updated.
     Note: New fields with \`required=true\` are not allowed (existing documents would fail validation).
-    &#x20;\- FIELD\_DEFINITION\_DELETE: Delete an existing field definition.
+     \- FIELD\_DEFINITION\_DELETE: Delete an existing field definition.
     CASCADE behavior: Also removes the field value from all documents in the collection.
 
 * `collection_description` (string) — Optional description of the collection.
@@ -774,7 +774,7 @@ Update collection's config.
 
 * `documents_count` (integer) — How many files the collection contains.
 
-* `field_definitions` (array\<object>) — Field definitions for documents in this collection.
+* `field_definitions` (array\\<object\>) — Field definitions for documents in this collection.
   Defines what fields documents can have and their constraints.
 
   * `key` (string, required) — The key/name of the field (e.g., "title", "author", "isbn").
@@ -903,14 +903,14 @@ List documents in a collection.
   Supports filtering on file metadata (name, content\_type, size\_bytes, created\_at)
   and document fields (status, fields.\{key})
   Examples:
-  &#x20; \- 'status:DOCUMENT\_STATUS\_PROCESSED'
-  &#x20; \- 'name:"quarterly" AND status:!DOCUMENT\_STATUS\_FAILED'
-  &#x20; \- 'fields.isbn:"978-1-234567-89-0"'
-  &#x20; \- 'size\_bytes:>5000000 AND content\_type:application/pdf'
+    \- 'status:DOCUMENT\_STATUS\_PROCESSED'
+    \- 'name:"quarterly" AND status:!DOCUMENT\_STATUS\_FAILED'
+    \- 'fields.isbn:"978-1-234567-89-0"'
+    \- 'size\_bytes:>5000000 AND content\_type:application/pdf'
 
 ### Response Body
 
-* `documents` (array\<object>) — List of documents.
+* `documents` (array\\<object\>) — List of documents.
 
   * `file_metadata` (object) — Metadata of an uploaded file.
 
@@ -1106,11 +1106,11 @@ Get documents metadata in a batch request.
 * `team_id` (string) — The ID of the team that owns the document.
   If \`None\`, the team ID will be derived from your request credentials.
 
-* `file_ids` (array\<string>, required) — The IDs of the files to retrieve the document metadata from.
+* `file_ids` (array\\<string\>, required) — The IDs of the files to retrieve the document metadata from.
 
 ### Response Body
 
-* `documents` (array\<object>) — Documents' metadata requested.
+* `documents` (array\\<object\>) — Documents' metadata requested.
 
   * `file_metadata` (object) — Metadata of an uploaded file.
 

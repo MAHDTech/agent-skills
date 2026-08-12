@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1503,23 +1504,4 @@ triggered the refresh.
 - Review [Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) for real-time
   client data access
 
-- [Why Use Views?](#why-use-views)
-- [Defining Views](#defining-views)
-- [ViewContext and
-  AnonymousViewContext](#viewcontext-and-anonymousviewcontext)
-  - [Performance: Why AnonymousViewContext
-    Matters](#performance-why-anonymousviewcontext-matters)
-  - [Example: Per-User View](#example-per-user-view)
-  - [Example: High Scores Leaderboard](#example-high-scores-leaderboard)
-  - [Example: Region-Based Design](#example-region-based-design)
-  - [Example: Counts](#example-counts)
-- [Querying Views](#querying-views)
-- [Why Views Cannot Use `.iter()`](#why-views-cannot-use-iter)
-- [Performance Considerations](#performance-considerations)
-- [Query Builder in Views](#query-builder-in-views)
-  - [Example](#example)
-  - [Why Use the Query Builder?](#why-use-the-query-builder)
-  - [API Reference](#api-reference)
-  - [Primary Keys for Views](#primary-keys-for-views)
-- [Next Steps](#next-steps)
-
+{% endraw %}

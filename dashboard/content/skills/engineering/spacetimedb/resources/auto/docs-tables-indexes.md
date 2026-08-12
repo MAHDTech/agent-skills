@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -629,20 +630,4 @@ benefit from fewer indexes.
 - See [Access Permissions](https://spacetimedb.com/docs/tables/access-permissions) for querying
   tables from reducers
 
-- [When to Use Indexes](#when-to-use-indexes)
-- [Index Types](#index-types)
-  - [Supported Column Types](#supported-column-types)
-  - [B-tree Indexes](#b-tree-indexes)
-  - [Direct Indexes](#direct-indexes)
-- [Single-Column Indexes](#single-column-indexes)
-  - [Field-Level Syntax](#field-level-syntax)
-  - [Table-Level Syntax](#table-level-syntax)
-- [Multi-Column Indexes](#multi-column-indexes)
-- [Querying with Indexes](#querying-with-indexes)
-  - [Equality Queries](#equality-queries)
-  - [Range Queries](#range-queries)
-  - [Multi-Column Queries](#multi-column-queries)
-- [Deleting with Indexes](#deleting-with-indexes)
-- [Index Design Guidelines](#index-design-guidelines)
-- [Next Steps](#next-steps)
-
+{% endraw %}

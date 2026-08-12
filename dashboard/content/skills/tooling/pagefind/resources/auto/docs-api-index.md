@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
+{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -93,8 +94,8 @@ Which will return an object with the following structure:
 {
   /* ... other result keys ... */
   "url": "/url-of-the-page/",
-  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
-  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the <body> of the page.",
   "meta": {
     "title": "The title from the first h1 element on the page",
     "image": "/weka.png"
@@ -104,8 +105,8 @@ Which will return an object with the following structure:
         /* ... other sub_result keys ... */
         "title": "The title from the first h1 element on the page",
         "url": "/url-of-the-page/",
-        "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page",
-        "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page",
+        "excerpt": "A small snippet of the <mark>static</mark> content, from the <body> of the page",
+        "plain_excerpt": "A small snippet of the static content, from the <body> of the page",
     },
     {
         /* ... other sub_result keys ... */
@@ -255,3 +256,4 @@ await pagefind.search( /* ... */ );
 Calling `pagefind.destroy()` will unload the active Pagefind, and also forget anything that was passed through `pagefind.options()`, resetting to the blank state after the script was first imported.
 
 After being destroyed, initializing Pagefind will look again at the active language, and use any new options you might pass in.
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "tailwind"
 +++
 
+{% raw %}
 Tailwind CSS works by scanning all of your HTML files, JavaScript
 components, and any other templates for class names, generating the
 corresponding styles and then writing them to a static CSS file. It's
@@ -45,3 +46,4 @@ included in the \`
 different across different build tools. Check our framework guides to
 see if we have more specific instructions for your particular setup.
 
+{% endraw %}

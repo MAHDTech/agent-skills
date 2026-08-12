@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Connectors
 
 # SharePoint
@@ -122,3 +123,4 @@ To disconnect the SharePoint connector:
 2. Find SharePoint in your connected list and click **Disconnect**.
 
 You can also revoke the app's access from your Microsoft account at [myapps.microsoft.com](https://myapps.microsoft.com).
+{% endraw %}

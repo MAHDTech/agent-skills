@@ -57,41 +57,179 @@ export function stripReaderMetadata(content: string): string {
     return content.slice(idx + marker.length).replace(/^\n+/, "")
 }
 
-// Download content using Bun-native fetch
+// Concurrency limit for proxy fallback to prevent hitting proxy rate limits (HTTP 429)
+let activeProxyCalls = 0
+const MAX_CONCURRENT_PROXY_CALLS = 2
+const proxyQueue: Array<() => void> = []
+
+async function acquireProxySlot(): Promise<void> {
+    if (activeProxyCalls < MAX_CONCURRENT_PROXY_CALLS) {
+        activeProxyCalls++
+        return
+    }
+    return new Promise((resolve) => {
+        proxyQueue.push(() => {
+            activeProxyCalls++
+            resolve()
+        })
+    })
+}
+
+function releaseProxySlot(): void {
+    activeProxyCalls--
+    const next = proxyQueue.shift()
+    if (next) {
+        next()
+    }
+}
+
+async function fetchWithRetry(
+    url: string,
+    options: RequestInit,
+    maxRetries = 4,
+    initialDelayMs = 1000
+): Promise<Response> {
+    let delay = initialDelayMs
+    let lastResponse: Response | undefined
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const res = await fetch(url, options)
+            lastResponse = res
+            // Retry on 429 (Too Many Requests), 502, 503, 504
+            if (
+                (res.status === 429 ||
+                    res.status === 502 ||
+                    res.status === 503 ||
+                    res.status === 504) &&
+                attempt < maxRetries
+            ) {
+                const retryAfterHeader = res.headers.get("retry-after")
+                const parsedMs = retryAfterHeader
+                    ? parseInt(retryAfterHeader, 10) * 1000
+                    : 0
+                const waitMs = parsedMs && !isNaN(parsedMs) ? parsedMs : delay
+                await new Promise((r) => setTimeout(r, waitMs))
+                delay *= 2
+                continue
+            }
+            return res
+        } catch (err) {
+            if (attempt >= maxRetries) throw err
+            await new Promise((r) => setTimeout(r, delay))
+            delay *= 2
+        }
+    }
+    return lastResponse!
+}
+
+// Download content using Bun-native fetch with modern browser headers and proxy fallback
 export async function download(
     url: string,
     timeout?: number
-): Promise<{content: string; isHtml: boolean}> {
-    const timeoutSeconds = timeout !== undefined ? timeout : HTTP_TIMEOUT
-    let response = await fetch(url, {
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            Accept: "text/markdown, text/plain, text/html;q=0.9, */*;q=0.8",
-        },
-        signal: AbortSignal.timeout(timeoutSeconds * 1000),
-    })
-
-    if (!response.ok) {
-        response = await fetch(url, {
-            headers: {
-                "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            },
-            signal: AbortSignal.timeout(timeoutSeconds * 1000),
-        })
+): Promise<{content: string; isHtml: boolean; skipped?: boolean}> {
+    if (isNonTextUrl(url)) {
+        log.info(`  Skipping non-text resource URL: ${url}`)
+        return {content: "", isHtml: false, skipped: true}
     }
 
-    if (!response.ok) {
+    const timeoutSeconds = timeout !== undefined ? timeout : HTTP_TIMEOUT
+    let response: Response | undefined
+
+    const browserHeaders = {
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        Accept: "text/markdown, text/plain, text/html;q=0.9, application/xhtml+xml, application/xml;q=0.8, */*;q=0.7",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Ch-Ua":
+            '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+    }
+
+    try {
+        response = await fetchWithRetry(url, {
+            headers: browserHeaders,
+            signal: AbortSignal.timeout(timeoutSeconds * 1000),
+        })
+
+        if (!response.ok) {
+            response = await fetchWithRetry(url, {
+                headers: {
+                    "User-Agent": browserHeaders["User-Agent"],
+                },
+                signal: AbortSignal.timeout(timeoutSeconds * 1000),
+            })
+        }
+    } catch {
+        // Direct fetch network error / timeout, proceed to fallback attempt
+    }
+
+    if (response && response.ok) {
+        const contentType = response.headers.get("content-type") || ""
+        if (isNonTextContentType(contentType)) {
+            log.info(`  Skipping non-text resource (${contentType}): ${url}`)
+            return {content: "", isHtml: false, skipped: true}
+        }
+        const isHtml = contentType.includes("text/html")
+        const content = await response.text()
+        return {content, isHtml, skipped: false}
+    }
+
+    // Proxy fallback via Jina AI Reader ONLY for WAF / anti-bot / 403 / network errors (NOT for explicit 404/410)
+    if (
+        (!response || (response.status !== 404 && response.status !== 410)) &&
+        !url.startsWith("https://r.jina.ai/")
+    ) {
+        const cleanTarget = stripReaderProxy(url)
+        const proxyUrl = `https://r.jina.ai/${cleanTarget}`
+        await acquireProxySlot()
+        try {
+            const proxyResponse = await fetchWithRetry(
+                proxyUrl,
+                {
+                    headers: {
+                        "User-Agent": browserHeaders["User-Agent"],
+                        Accept: "text/markdown, text/plain, */*",
+                    },
+                    signal: AbortSignal.timeout(timeoutSeconds * 1000),
+                },
+                4,
+                1000
+            )
+
+            if (proxyResponse.ok) {
+                const contentType =
+                    proxyResponse.headers.get("content-type") || ""
+                if (isNonTextContentType(contentType)) {
+                    log.info(
+                        `  Skipping non-text resource (${contentType}): ${url}`
+                    )
+                    return {content: "", isHtml: false, skipped: true}
+                }
+                const rawContent = await proxyResponse.text()
+                const content = stripReaderMetadata(rawContent)
+                const isHtml = contentType.includes("text/html")
+                return {content, isHtml, skipped: false}
+            }
+        } catch {
+            // Proxy failed, fall back to throwing original status or error
+        } finally {
+            releaseProxySlot()
+        }
+    }
+
+    if (response) {
         throw new Error(
             `HTTP Status ${response.status} (${response.statusText})`
         )
     }
 
-    const contentType = response.headers.get("content-type") || ""
-    const isHtml = contentType.includes("text/html")
-    const content = await response.text()
-    return {content, isHtml}
+    throw new Error(`Failed to fetch ${url}: Network or connection error`)
 }
 
 // Clean HTML content by stripping scripts, styles, layout noise, and SVGs using HTMLRewriter
@@ -147,6 +285,14 @@ export async function cleanHtml(htmlContent: string): Promise<string> {
                 el.remove()
             },
         })
+        .on(
+            ".toc, #toc, .table-of-contents, .on-this-page, .breadcrumbs, .pagination, .edit-on-github, .edit-this-page, .sidebar-nav",
+            {
+                element(el) {
+                    el.remove()
+                },
+            }
+        )
 
     const response = new Response(htmlContent, {
         headers: {"Content-Type": "text/html; charset=utf-8"},
@@ -303,53 +449,235 @@ export function getDomainPrefix(urlStr: string): string {
     }
 }
 
+// Check if a URL has a non-text / binary extension
+export function isNonTextUrl(urlStr: string): boolean {
+    const cleanUrl = stripReaderProxy(urlStr)
+    let pathname = cleanUrl
+    try {
+        const url = new URL(cleanUrl)
+        pathname = url.pathname
+    } catch {}
+
+    const NON_TEXT_EXT_RE =
+        /\.(zip|pdf|png|jpg|jpeg|gif|webp|svg|ico|bmp|avif|tar|gz|tgz|bz2|xz|exe|dmg|iso|bin|mp4|mp3|wav|ogg|webm|mov|avi|flv|m4a|m4v|woff|woff2|ttf|eot|otf|xml|rss)$/i
+    return NON_TEXT_EXT_RE.test(pathname)
+}
+
+// Check if an HTTP Content-Type header indicates non-text / binary media content
+export function isNonTextContentType(contentType: string): boolean {
+    const type = contentType.toLowerCase().split(";")[0]?.trim() || ""
+    if (!type) return false
+    if (
+        type.startsWith("image/") ||
+        type.startsWith("audio/") ||
+        type.startsWith("video/") ||
+        type.startsWith("font/")
+    ) {
+        return true
+    }
+    if (
+        type === "application/pdf" ||
+        type === "application/zip" ||
+        type === "application/octet-stream" ||
+        type === "application/x-tar" ||
+        type === "application/gzip" ||
+        type === "application/xml" ||
+        type === "application/rss+xml" ||
+        type === "application/atom+xml"
+    ) {
+        return true
+    }
+    return false
+}
+
+// Decode HTML entities in Markdown body text and code blocks
+export function decodeHtmlEntities(content: string): string {
+    return content
+        .replace(/&amp;(#?[a-zA-Z0-9]+;)/g, "&$1")
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&#x20;/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+}
+
+// Escape orphan angle brackets outside code blocks so Markdown parsers render type parameters as text
+export function escapeOrphanTypeBrackets(content: string): string {
+    const KNOWN_TAGS = new Set([
+        "br",
+        "hr",
+        "img",
+        "a",
+        "p",
+        "div",
+        "span",
+        "code",
+        "pre",
+        "b",
+        "i",
+        "strong",
+        "em",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "ul",
+        "ol",
+        "li",
+        "table",
+        "tr",
+        "td",
+        "th",
+        "blockquote",
+        "details",
+        "summary",
+        "section",
+        "article",
+        "main",
+        "header",
+        "footer",
+        "nav",
+        "aside",
+    ])
+
+    const lines = content.split("\n")
+    let inCodeFence = false
+    const processedLines: string[] = []
+
+    for (const line of lines) {
+        if (line.trim().startsWith("```")) {
+            inCodeFence = !inCodeFence
+            processedLines.push(line)
+            continue
+        }
+        if (inCodeFence) {
+            processedLines.push(line)
+            continue
+        }
+
+        const fixed = line.replace(
+            /(?<!`)<([a-zA-Z0-9_\-|\s,]+)>(?!`)/g,
+            (match, inner) => {
+                const tagLower = inner.toLowerCase().trim()
+                if (
+                    KNOWN_TAGS.has(tagLower) ||
+                    tagLower.startsWith("http://") ||
+                    tagLower.startsWith("https://")
+                ) {
+                    return match
+                }
+                return "\\<" + inner.trim() + "\\>"
+            }
+        )
+        processedLines.push(fixed)
+    }
+
+    return processedLines.join("\n")
+}
+
+// Wrap document content containing raw {{ or {% in Zola {% raw %} blocks to prevent Tera template build errors
+export function protectZolaDelimiters(content: string): string {
+    if (/\{\{|\{%/.test(content) && !content.includes("{% raw %}")) {
+        return `{% raw %}\n${content}\n{% endraw %}`
+    }
+    return content
+}
+
+// Strip non-printable control characters, null bytes (\x00), and replacement characters (\uFFFD)
+export function sanitizeControlCharacters(content: string): string {
+    return (
+        content
+            // eslint-disable-next-line no-control-regex
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+            .replace(/\uFFFD/g, "")
+    )
+}
+
+// Normalize markdown formatting and clean up empty links
+export function normalizeMarkdownFormatting(content: string): string {
+    return content
+        .replace(/\[([^\]]*)\]\(\)/g, "$1")
+        .replace(/\[([^\]]*)\]\(#\)/g, "$1")
+}
+
+// Check if a URL matches an llms.txt index or sub-index pattern
+export function isLlmsIndexUrl(urlStr: string): boolean {
+    if (isNonTextUrl(urlStr)) return false
+    try {
+        const cleanUrl = stripReaderProxy(urlStr)
+        const url = new URL(cleanUrl)
+        let pathname = url.pathname.toLowerCase()
+        const hashIdx = pathname.indexOf("#")
+        if (hashIdx !== -1) pathname = pathname.slice(0, hashIdx)
+        const queryIdx = pathname.indexOf("?")
+        if (queryIdx !== -1) pathname = pathname.slice(0, queryIdx)
+
+        if (pathname.endsWith("/llms.txt") || pathname.endsWith("/_llms.txt")) {
+            return true
+        }
+        if (
+            pathname.includes("llms") &&
+            (pathname.endsWith(".txt") || pathname.endsWith(".md"))
+        ) {
+            return true
+        }
+        return false
+    } catch {
+        return false
+    }
+}
+
 // Clean and format slug names for downloaded files
 export function smartSlugify(urlStr: string, commonPrefix?: string): string {
-    let pathStr = stripReaderProxy(urlStr)
-    if (commonPrefix && pathStr.startsWith(commonPrefix)) {
-        pathStr = pathStr.slice(commonPrefix.length)
-    } else {
-        try {
-            const url = new URL(pathStr)
-            pathStr = url.pathname
-        } catch {
-            // Fallback
+    const cleanUrl = stripReaderProxy(urlStr)
+
+    let pathname: string
+    try {
+        const url = new URL(cleanUrl)
+        if (commonPrefix && cleanUrl.startsWith(commonPrefix)) {
+            pathname = cleanUrl.slice(commonPrefix.length)
+            const hashIdx = pathname.indexOf("#")
+            if (hashIdx !== -1) pathname = pathname.slice(0, hashIdx)
+            const queryIdx = pathname.indexOf("?")
+            if (queryIdx !== -1) pathname = pathname.slice(0, queryIdx)
+        } else {
+            pathname = url.pathname
         }
+    } catch {
+        pathname = cleanUrl
     }
 
     try {
-        pathStr = decodeURIComponent(pathStr)
+        pathname = decodeURIComponent(pathname)
     } catch {}
 
-    // Remove leading/trailing slashes
-    pathStr = pathStr.replace(/^\/+|\/+$/g, "")
+    // Remove leading and trailing slashes
+    pathname = pathname.replace(/^\/+|\/+$/g, "")
 
-    if (!pathStr) {
-        return "index.md"
+    if (!pathname) {
+        return "overview-index.md"
     }
 
-    // Determine extension
+    // Determine extension and base pathname
     let ext = ".md"
-    if (pathStr.endsWith(".txt")) {
-        ext = ".txt"
-        pathStr = pathStr.slice(0, -4)
-    } else if (pathStr.endsWith(".md")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -3)
-    } else if (pathStr.endsWith(".mdx")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -4)
-    } else if (pathStr.endsWith(".html")) {
-        ext = ".md"
-        pathStr = pathStr.slice(0, -5)
+    const knownExts = [".txt", ".md", ".mdx", ".html"]
+    for (const kExt of knownExts) {
+        if (pathname.endsWith(kExt)) {
+            ext = kExt === ".txt" ? ".txt" : ".md"
+            pathname = pathname.slice(0, -kExt.length)
+            break
+        }
     }
 
     // Replace slashes with dashes and clean up characters
-    let slug = pathStr.replace(/\//g, "-")
-    slug = slug.replace(/[^a-zA-Z0-9.\-_]/g, "")
+    let slug = pathname.replace(/\//g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "")
 
-    if (!slug) {
-        slug = "index"
+    if (!slug || slug.toLowerCase() === "index") {
+        slug = "overview-index"
     }
 
     return `${slug}${ext}`
@@ -377,6 +705,7 @@ export function parseLlmsTxtLinks(content: string, baseUrl: string): string[] {
     for (const u of urls) {
         try {
             const resolvedUrl = new URL(u, base)
+            resolvedUrl.hash = ""
             // Only keep URLs sharing the same origin or base second-level domain name (e.g. bun.sh and bun.com)
             const resolvedDomain = getDomainPrefix(resolvedUrl.toString())
             const baseDomain = getDomainPrefix(base.toString())
@@ -391,9 +720,8 @@ export function parseLlmsTxtLinks(content: string, baseUrl: string): string[] {
                 .replace(/[.,]+$/, "")
                 .replace(/\/+$/, "")
 
-            // Exclude binary extensions
-            if (/\.(zip|pdf|png|jpg|jpeg|gif|tar|gz|exe|dmg)$/i.test(urlString))
-                continue
+            // Exclude non-text binary/media extensions
+            if (isNonTextUrl(urlString)) continue
 
             // Exclude the llms.txt URL itself
             if (urlString === baseUrl.replace(/\/+$/, "")) continue
@@ -520,34 +848,40 @@ export async function downloadAction(
 
         log.step(`Processing skill: ${skillName}`)
 
-        // Phase 1: Resolve all URLs (handle llms.txt index parsing)
-        for (const urlStr of urls) {
-            const isIndex = urlStr.endsWith("/llms.txt")
+        // Phase 1: Resolve all URLs (handle llms.txt index parsing recursively)
+        const processedIndexUrls = new Set<string>()
 
-            if (isIndex) {
-                log.info(`  Fetching index: ${urlStr}`)
-                try {
-                    const {content: indexContent} = await download(
-                        urlStr,
-                        options?.timeout
-                    )
-                    const childUrls = parseLlmsTxtLinks(indexContent, urlStr)
-                    log.info(`  Found ${childUrls.length} links in index.`)
+        const processIndexUrl = async (urlStr: string) => {
+            if (processedIndexUrls.has(urlStr)) return
+            processedIndexUrls.add(urlStr)
 
-                    const indexFilename = smartSlugify(urlStr)
-                    const indexDestFile = checkPathTraversal(
-                        resourcesDir,
-                        indexFilename
-                    )
-                    downloadJobs.push({
-                        url: urlStr,
-                        destFile: indexDestFile,
-                        skillName,
-                    })
+            log.info(`  Fetching index: ${urlStr}`)
+            try {
+                const {content: indexContent} = await download(
+                    urlStr,
+                    options?.timeout
+                )
+                const childUrls = parseLlmsTxtLinks(indexContent, urlStr)
+                log.info(`  Found ${childUrls.length} links in index.`)
 
-                    if (childUrls.length > 0) {
-                        const commonPrefix = getCommonPrefix(childUrls)
-                        for (const childUrl of childUrls) {
+                const indexFilename = smartSlugify(urlStr)
+                const indexDestFile = checkPathTraversal(
+                    resourcesDir,
+                    indexFilename
+                )
+                downloadJobs.push({
+                    url: urlStr,
+                    destFile: indexDestFile,
+                    skillName,
+                })
+
+                if (childUrls.length > 0) {
+                    const commonPrefix = getCommonPrefix(childUrls)
+                    for (const childUrl of childUrls) {
+                        if (isNonTextUrl(childUrl)) continue
+                        if (isLlmsIndexUrl(childUrl)) {
+                            await processIndexUrl(childUrl)
+                        } else {
                             const filename = smartSlugify(
                                 childUrl,
                                 commonPrefix
@@ -567,18 +901,23 @@ export async function downloadAction(
                             })
                         }
                     }
-                } catch (err: any) {
-                    log.error(
-                        `  Failed to process index ${urlStr}: ${err.message}`
-                    )
-                    failedDownloads.push({
-                        skillName,
-                        url: urlStr,
-                        error: err.message,
-                    })
-                    totalFailed++
-                    hasFailure = true
                 }
+            } catch (err: any) {
+                log.error(`  Failed to process index ${urlStr}: ${err.message}`)
+                failedDownloads.push({
+                    skillName,
+                    url: urlStr,
+                    error: err.message,
+                })
+                totalFailed++
+                hasFailure = true
+            }
+        }
+
+        for (const urlStr of urls) {
+            if (isNonTextUrl(urlStr)) continue
+            if (isLlmsIndexUrl(urlStr)) {
+                await processIndexUrl(urlStr)
             } else {
                 const filename = smartSlugify(urlStr)
                 const destFile = checkPathTraversal(resourcesDir, filename)
@@ -673,6 +1012,13 @@ export async function downloadAction(
                                 candidate,
                                 options?.timeout
                             )
+                            if (result.skipped) {
+                                log.info(
+                                    `  [SKIP] Skipped non-text resource: ${candidate}`
+                                )
+                                totalSkipped++
+                                return
+                            }
                             if (
                                 result.content.trim().length >=
                                 MIN_CONTENT_BYTES
@@ -691,6 +1037,13 @@ export async function downloadAction(
                 // If candidates are not available or they failed, try the main URL
                 if (!content) {
                     const result = await download(job.url, options?.timeout)
+                    if (result.skipped) {
+                        log.info(
+                            `  [SKIP] Skipped non-text resource: ${job.url}`
+                        )
+                        totalSkipped++
+                        return
+                    }
                     content = result.content
                     isResponseHtml = result.isHtml
                 }
@@ -728,11 +1081,6 @@ export async function downloadAction(
                         return
                     }
                 }
-
-                // Clean up empty markdown links that cause Zola build failures (e.g. [text]())
-                finalContent = finalContent
-                    .replace(/\[([^\]]*)\]\(\)/g, "$1")
-                    .replace(/\[([^\]]*)\]\(#\)/g, "$1")
 
                 // Rewrite root-relative links, relative links, and relative asset paths to be absolute or resolved
                 try {
@@ -795,6 +1143,13 @@ export async function downloadAction(
                 } catch {
                     // Ignore invalid job URLs
                 }
+
+                // Apply automated Markdown scrubbing, decoding, escaping, and formatting passes
+                finalContent = sanitizeControlCharacters(finalContent)
+                finalContent = decodeHtmlEntities(finalContent)
+                finalContent = escapeOrphanTypeBrackets(finalContent)
+                finalContent = normalizeMarkdownFormatting(finalContent)
+                finalContent = protectZolaDelimiters(finalContent)
 
                 await fs.writeFile(job.destFile, finalContent, "utf-8")
                 savedFiles.add(path.basename(job.destFile))

@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# <pagefind-input>
+# \<pagefind-input\>
 
 
 A search input field with debouncing.

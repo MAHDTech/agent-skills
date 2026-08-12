@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Model Capabilities
 
 # Referencing Files as Input
@@ -158,3 +159,4 @@ curl -s -X POST https://api.x.ai/v1/videos/generations \
 * [Files API Integration](https://docs.x.ai/developers/model-capabilities/imagine/files) — Overview + capstone example showing inputs and outputs together.
 * [Persisting Generated Output](https://docs.x.ai/developers/model-capabilities/imagine/files/outputs) — The output side: `storage_options`, public URLs, expiry semantics.
 * [Managing Files](https://docs.x.ai/developers/files/managing-files) — Upload, list, retrieve, update, and delete files.
+{% endraw %}

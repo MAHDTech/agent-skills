@@ -49,7 +49,7 @@ Marketplace sources come from `[[marketplace.sources]]` in `~/.grok/config.toml`
 
 ## Subagents
 
-Subagents spawn independent child sessions that handle tasks in parallel.
+Subagents spawn independent child sessions that handle tasks in parallel. Types and personas are under [Subagents](https://docs.x.ai/build/features/subagents).
 
 ## Claude Code compatibility
 

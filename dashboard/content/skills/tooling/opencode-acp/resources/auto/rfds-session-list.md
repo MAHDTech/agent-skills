@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -339,3 +340,4 @@ Corresponding response example:
 * **2025-11-11**: Remove `createdAt`, `updatedAt`, and `search` filters from the request parameters
 * **2025-11-23**: Remove `limit` parameter from request; make `createdAt` and `updatedAt` optional in SessionInfo
 * **2025-11-24**: Update capabilities schema, consolidate to single `updatedAt` timestamp
+{% endraw %}

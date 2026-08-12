@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -171,14 +172,4 @@ Check the [SpacetimeDB documentation](https://spacetimedb.com/docs) and
 [GitHub repository](https://github.com/clockworklabs/SpacetimeDB) for
 the latest migration features and capabilities.
 
-- [✅ Safe Changes (Always Allowed)](#-safe-changes-always-allowed)
-- [⚠️ Potentially Breaking Changes](#️-potentially-breaking-changes)
-- [❌ Forbidden Changes](#-forbidden-changes)
-- [Working with Forbidden Changes](#working-with-forbidden-changes)
-- [Best Practices](#best-practices)
-  - [During Development](#during-development)
-  - [For Production](#for-production)
-  - [Migration Strategies](#migration-strategies)
-- [Client Compatibility](#client-compatibility)
-- [Future Improvements](#future-improvements)
-
+{% endraw %}

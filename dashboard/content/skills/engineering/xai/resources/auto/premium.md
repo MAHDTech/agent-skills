@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 ![](data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIGFyaWEtbGFiZWw9IlggbG9nbyIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiB2aWV3Ym94PSIwIDAgMTI4IDEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICA8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg2Ljg5MTggMjguMjVIOTkuMDIxOUw3Mi41MjQzIDU4LjUzMzRMMTAzLjY5OCA5OS43NUg3OS4yODVMNjAuMTY0NyA3NC43NTM2TDM4LjI5MjkgOTkuNzVIMjYuMTYyN0w1NC41MDY5IDY3LjM1NjVMMjQuNTkzOCAyOC4yNUg0OS42MTk5TDY2LjkwMDQgNTEuMDk3NEw4Ni44OTE4IDI4LjI1Wk04Mi42MzM3IDkyLjQ5MDRIODkuMzU1NUw0NS45NzE2IDM1LjEzMDFIMzguNzU4NEw4Mi42MzM3IDkyLjQ5MDRaIiBmaWxsPSJibGFjayIgLz4KICAgICAgPC9zdmc+)
 
 # JavaScript is not available.
@@ -33,3 +34,4 @@ Try again
 ![⚠️](https://abs.twimg.com/emoji/v2/svg/26a0.svg) Some privacy related
 extensions may cause issues on x.com. Please disable them and try again.
 
+{% endraw %}

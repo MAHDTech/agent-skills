@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -75,7 +76,7 @@ The stable v2 `plan_update` shape does not require a capability. The unstable pl
 
 When converting a v1 single-plan update to v2, implementations should use the item-based `plan_update` shape with a stable synthetic plan ID of `main`.
 
-When converting v2 back to a v1 surface that does not support unstable plan operations, an item-based `plan_update` can be represented as the old v1 `plan` update by dropping the plan ID. Other plan content variants cannot be represented without the unstable v1 plan operations surface.
+When converting v2 back to a v1 surface that does not support unstable plan operations, an item-based `plan_update` whose entries use v1-representable priorities and statuses can be represented as the old v1 `plan` update by dropping the plan ID. Other plan content variants cannot be represented without the unstable v1 plan operations surface.
 
 ## Shiny future
 
@@ -95,7 +96,7 @@ Clients that only understand item-based plans can still preserve or display unkn
 4. Remove `SessionUpdate::Plan` from the v2 schema and make `SessionUpdate::PlanUpdate` the default plan variant.
 5. Keep the removed `sessionUpdate: "plan"` discriminator rejected so it cannot be accepted as an unknown v2 update.
 6. Require `id` on unknown `PlanUpdateContent` fallback payloads.
-7. Update v1/v2 conversion helpers so v1 `plan` maps to v2 `plan_update` with `id: "main"`.
+7. Document that adapters may map the v1 `plan` update to v2 `plan_update` with `id: "main"`.
 8. Regenerate v2 schema docs so the default v2 surface shows only the item-based tagged plan shape.
 
 ## Frequently asked questions
@@ -113,3 +114,4 @@ The v1 shape represents exactly one plan and has no plan ID. A stable synthetic 
 ## Revision history
 
 2026-06-02: Initial draft
+{% endraw %}

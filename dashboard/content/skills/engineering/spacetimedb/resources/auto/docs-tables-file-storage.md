@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -832,16 +833,4 @@ updates with other data, external storage may be more economical.
 The right choice depends on your file sizes, access patterns, and
 whether the data needs to participate in real-time subscriptions.
 
-- [Storing Binary Data Inline](#storing-binary-data-inline)
-  - [When to Use Inline Storage](#when-to-use-inline-storage)
-  - [Size Considerations](#size-considerations)
-- [External Storage with References](#external-storage-with-references)
-  - [External Storage Options](#external-storage-options)
-  - [Upload Flow](#upload-flow)
-  - [Example: Uploading to S3 from a
-    Procedure](#example-uploading-to-s3-from-a-procedure)
-  - [Alternative: Pre-signed URL Flow](#alternative-pre-signed-url-flow)
-- [Hybrid Approach: Thumbnails and
-  Originals](#hybrid-approach-thumbnails-and-originals)
-- [Choosing a Strategy](#choosing-a-strategy)
-
+{% endraw %}

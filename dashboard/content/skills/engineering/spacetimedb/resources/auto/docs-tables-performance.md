@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -573,11 +574,4 @@ Be mindful of unbounded table growth:
 - Review [Reducers](https://spacetimedb.com/docs/functions/reducers) for efficient data
   modification patterns
 
-- [Use Indexes for Lookups](#use-indexes-for-lookups)
-- [Keep Tables Focused](#keep-tables-focused)
-- [Choose Appropriate Types](#choose-appropriate-types)
-- [Consider Table Visibility](#consider-table-visibility)
-- [Batch Operations](#batch-operations)
-- [Monitor Table Growth](#monitor-table-growth)
-- [Next Steps](#next-steps)
-
+{% endraw %}

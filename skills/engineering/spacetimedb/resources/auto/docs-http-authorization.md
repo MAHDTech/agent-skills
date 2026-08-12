@@ -45,7 +45,3 @@ or viewing logs.
 
 Does nothing and returns no data. Clients can send requests to this
 endpoint to determine whether they are able to connect to SpacetimeDB.
-
-- [Generating identities and tokens](#generating-identities-and-tokens)
-- [`Authorization` headers](#authorization-headers)
-- [`GET /v1/ping`](#get-v1ping)

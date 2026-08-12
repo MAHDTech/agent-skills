@@ -36,10 +36,10 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Mode | Cost |
 | --- | --- |
-| Realtime | $0.05 / min ($3.00 / hr) |
-| Realtime Text Input | $0.004 / message (every conversation.item.create) |
-| Text to Speech | $15.00 / 1M chars |
+| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
+| Text to Speech | $15.00 / 1M chars |
 
 ## Tools Pricing
 

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
+{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -17,7 +18,7 @@ skill_name = "opencode-acp"
 
 Agents can provide an arbitrary list of configuration options for a session, allowing Clients to offer users customizable selectors for things like models, modes, reasoning levels, and more.
 
-<Info>
+\<Info\>
   Session Config Options are the preferred way to expose session-level
   configuration. If an Agent provides `configOptions`, Clients **SHOULD** use
   them instead of the [`modes`](https://agentclientprotocol.com/protocol/v1/session-modes) field. Modes will be
@@ -175,7 +176,7 @@ older Clients should omit the boolean option or provide a `select` fallback.
 
 Each config option **MAY** include a `category` field. Categories are semantic metadata intended to help Clients provide consistent UX, such as attaching keyboard shortcuts, choosing icons, or deciding placement.
 
-<Warning>
+\<Warning\>
   Categories are for UX purposes only and **MUST NOT** be required for
   correctness. Clients **MUST** handle missing or unknown categories gracefully.
 </Warning>
@@ -291,7 +292,7 @@ The Agent **MUST** respond with the complete list of all configuration options a
 }
 ```
 
-<Note>
+\<Note\>
   The response always contains the **complete** configuration state. This allows
   Agents to reflect dependent changes. For example, if changing the model
   affects available reasoning options, or if an option's available values change
@@ -353,3 +354,4 @@ If an Agent provides both `configOptions` and `modes` in the session response:
 <Card icon="gears" horizontal href="/protocol/v1/session-modes">
   Learn about the Session Modes API
 </Card>
+{% endraw %}

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
+{% raw %}
 # Build better with Zed
 
 All options include fast performance, multiplayer collaboration, and
@@ -177,3 +178,4 @@ Code at the speed of thought.
 [Download nowD](https://zed.dev/download)[Clone
 sourceC](https://github.com/zed-industries/zed)
 
+{% endraw %}

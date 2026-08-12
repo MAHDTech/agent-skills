@@ -14,11 +14,11 @@ Create an ephemeral client secret for authenticating browser-side Realtime API c
 
 * `session` (object | null) — Optional initial session configuration to bind to the client secret. This JSON value is stored alongside the secret and applied when the WebSocket connection opens.
 
-  * `model` ("grok-voice-latest" | "grok-voice-think-fast-1.0" | "grok-voice-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
+  * `model` ("grok-voice-latest" | "grok-voice-think-fast-2.0" | "grok-voice-think-fast-1.0") — Model to use for the session. Use grok-voice-latest for the best experience.
 
   * `reasoning` (object) — Reasoning settings for models that support them.
 
-    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with \`grok-voice-latest\` and \`grok-voice-think-fast-1.0\`.
+    * `effort` ("high" | "none") — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Response Body
 
@@ -112,7 +112,7 @@ Create a phone number for API-controlled SIP calls.
 
   * `auth_password` (string) — SIP digest password. Stored encrypted and never returned by read endpoints.
 
-  * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+  * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
 * `webhook` (object)
 
@@ -150,7 +150,7 @@ Create a phone number for API-controlled SIP calls.
 
     * `auth_username` (string) — SIP digest username. Present only when digest auth is configured.
 
-    * `allowed_addresses` (array\<string>) — Source CIDR ranges permitted to send INVITEs.
+    * `allowed_addresses` (array\\<string\>) — Source CIDR ranges permitted to send INVITEs.
 
   * `created_at` (string)
 
@@ -207,7 +207,7 @@ Full schemas and examples: [`/voice-realtime.ws.json`](https://docs.x.ai/voice-r
 
 * `model` (string, optional, default: grok-voice-latest) — Model to use for the session. Ignored when \`call\_id\` is provided because the session is bound to the inbound SIP call. Use grok-voice-latest for the best experience on direct WebSocket sessions.
 
-* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`. Supported only with grok-voice-latest and grok-voice-think-fast-1.0.
+* `reasoning.effort` (string, optional, default: high) — Controls whether the model uses reasoning. Defaults to \`high\`.
 
 ### Client Messages
 
@@ -393,7 +393,7 @@ Convert text into speech audio.
 
 ### Request Body
 
-* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\<soft>\`, \`\<whisper>\`, \`\<loud>\`, \`\<build-intensity>\`, \`\<decrease-intensity>\`, \`\<higher-pitch>\`, \`\<lower-pitch>\`, \`\<slow>\`, \`\<fast>\`, \`\<sing-song>\`, \`\<singing>\`, \`\<laugh-speak>\`, \`\<emphasis>\`.
+* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\\<soft\>\`, \`\\<whisper\>\`, \`\\<loud\>\`, \`\\<build-intensity\>\`, \`\\<decrease-intensity\>\`, \`\\<higher-pitch\>\`, \`\\<lower-pitch\>\`, \`\\<slow\>\`, \`\\<fast\>\`, \`\\<sing-song\>\`, \`\\<singing\>\`, \`\\<laugh-speak\>\`, \`\\<emphasis\>\`.
 
 * `voice_id` (string) — Voice identifier. Use a built-in voice from \`GET /v1/tts/voices\` (e.g. \`eve\`, \`ara\`) or a custom voice ID. Defaults to \`eve\` when omitted.
 
@@ -425,9 +425,9 @@ Convert text into speech audio.
 
 * `audio_timestamps` (object) — Per-character timings produced when \`with\_timestamps\` is \`true\`.
 
-  * `graph_chars` (array\<string>, required) — Each character of the original input text, in order.
+  * `graph_chars` (array\\<string\>, required) — Each character of the original input text, in order.
 
-  * `graph_times` (array\<object>, required) — Start/end seconds for each entry in \`graph\_chars\`.
+  * `graph_times` (array\\<object\>, required) — Start/end seconds for each entry in \`graph\_chars\`.
 
     * `start` (number, required) — Start time in seconds, measured from the beginning of the synthesized audio.
 
@@ -671,7 +671,7 @@ List all available TTS voices.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of available voices.
+* `voices` (array\\<object\>, required) — List of available voices.
 
   * `voice_id` (string, required) — Unique identifier for the voice (lowercase). Pass this value as \`voice\_id\` in TTS requests or as the \`voice\` parameter in Realtime API session configuration.
 
@@ -839,9 +839,11 @@ Transcribe an audio file to text.
 
 * `diarize` ("true" | "false") — When \`true\`, enables speaker diarization. Each word in the response includes a \`speaker\` field (integer) identifying the detected speaker.
 
-* `keyterm` (array\<string>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
+* `keyterm` (array\\<string\>) — Key terms to bias transcription toward (e.g. product names, proper nouns). Repeat the field for each term (e.g. \`keyterm=Understand+The+Universe\`). Max 100 terms, each up to 50 characters.
 
 * `filler_words` ("true" | "false") — When \`true\`, filler words (e.g. "uh", "um", "er") are included in the transcript. When \`false\` (default), filler words are automatically removed from the transcript text and the \`words\` array.
+
+* `vad_threshold` (number) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio segments scoring below the threshold are treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Default: \`0.5\`.
 
 ### Response Body
 
@@ -851,7 +853,7 @@ Transcribe an audio file to text.
 
 * `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
 
-* `words` (array\<object>) — Word-level segments with timestamps. Omitted when empty.
+* `words` (array\\<object\>) — Word-level segments with timestamps. Omitted when empty.
 
   * `text` (string, required) — The word text.
 
@@ -863,7 +865,7 @@ Transcribe an audio file to text.
 
   * `speaker` (integer) — Speaker index (0-based). Only present when \`diarize=true\`.
 
-* `channels` (array\<object>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
+* `channels` (array\\<object\>) — Per-channel transcripts. Only present when \`multichannel=true\`. Omitted for single-channel audio.
 
   * `index` (integer, required) — Zero-based channel index in the source audio.
 
@@ -871,7 +873,7 @@ Transcribe an audio file to text.
 
   * `text` (string, required) — Full transcript text for this channel.
 
-  * `words` (array\<object>) — Word-level segments with timestamps for this channel.
+  * `words` (array\\<object\>) — Word-level segments with timestamps for this channel.
 
     * `text` (string, required) — The word text.
 
@@ -979,6 +981,8 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 * `smart_turn_timeout` (integer, optional) — Maximum silence duration in milliseconds before forcing \`speech\_final\`, even when the Smart Turn model predicts the speaker hasn't finished. Acts as a safety net to prevent sessions from hanging during extended silence. Only applies when \`smart\_turn\` is enabled. Range: 1–5000. Example: \`smart\_turn\_timeout=3000\`.
 
+* `vad_threshold` (number, optional, default: 0.08) — Speech-probability threshold for the voice-activity gate (0.0–1.0). Audio in chunks scoring below the threshold is treated as non-speech and skipped for transcription. Lower values transcribe quieter or noisier speech (e.g. narrowband telephony) but may produce spurious text for background noise; \`0\` disables the gate entirely. Does not affect endpointing or \`speech\_final\` timing. Default: \`0.08\`.
+
 ### Client Messages
 
 * `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.
@@ -1047,7 +1051,7 @@ Create a custom voice from a reference audio clip.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 
@@ -1154,9 +1158,9 @@ List custom voices owned by your team.
 
 ### Response Body
 
-* `voices` (array\<object>, required) — List of custom voices owned by the calling team.
+* `voices` (array\\<object\>, required) — List of custom voices owned by the calling team.
 
-  * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+  * `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
   * `name` (string | null) — Display name.
 
@@ -1253,7 +1257,7 @@ Get a single custom voice.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 
@@ -1349,7 +1353,7 @@ Update custom voice metadata.
 
 ### Response Body
 
-* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Voice Agent \`session.update\` message.
+* `voice_id` (string, required) — 8-character lowercase alphanumeric voice identifier. Use this as \`voice\_id\` in \`POST /v1/tts\`, as the \`voice\` query parameter on the streaming TTS WebSocket, or as \`voice\` in a Speech to Speech \`session.update\` message.
 
 * `name` (string | null) — Display name.
 

@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "xai"
 +++
 
+{% raw %}
 #### Advanced API Usage
 
 # WebSocket Mode
@@ -246,3 +247,4 @@ Open a fresh WebSocket and reconnect using one of the patterns above.
 * [Streaming](https://docs.x.ai/developers/model-capabilities/text/streaming)
 * [Function Calling](https://docs.x.ai/developers/tools/function-calling)
 * [Responses API Reference](https://docs.x.ai/developers/rest-api-reference/inference/chat#create-new-response)
+{% endraw %}

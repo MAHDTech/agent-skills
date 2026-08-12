@@ -7,6 +7,7 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
+{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1285,7 +1286,7 @@ User? FindUser(RemoteTables tables, Identity id) => tables.User.Identity.Find(id
 For each btree index defined on a remote table, its corresponding table
 handle has a property which is a btree index handle and whose name is
 the name of the index. This index handle has a method
-`IEnumerable<Row> Filter(Column value)` which will return `Row`s with
+`IEnumerable\<Row\> Filter(Column value)` which will return `Row`s with
 `value` in the indexed `Column`, if there are any in the cache.
 
 #### Example
@@ -1359,109 +1360,4 @@ defining TaggedEnum types in a module, use `partial record`, not
 `partial class`. See the [module docs](https://spacetimedb.com/docs/tables/column-types) for
 more details.
 
-- [Server module quick reference](#server-module-quick-reference)
-- [Project setup](#project-setup)
-  - [Using the `dotnet` CLI tool](#using-the-dotnet-cli-tool)
-  - [Using Unity](#using-unity)
-- [Generate module bindings](#generate-module-bindings)
-- [Type `DbConnection`](#type-dbconnection)
-  - [Connect to a database](#connect-to-a-database)
-    - [Method `WithUri`](#method-withuri)
-    - [Method `WithDatabaseName`](#method-withdatabasename)
-    - [Method `WithConfirmedReads`](#method-withconfirmedreads)
-    - [Callback `OnConnect`](#callback-onconnect)
-    - [Callback `OnConnectError`](#callback-onconnecterror)
-    - [Callback `OnDisconnect`](#callback-ondisconnect)
-    - [Method `WithToken`](#method-withtoken)
-    - [Method `Build`](#method-build)
-  - [Advance the connection and process
-    messages](#advance-the-connection-and-process-messages)
-    - [Method `FrameTick`](#method-frametick)
-  - [Access tables and reducers](#access-tables-and-reducers)
-    - [Property `Db`](#property-db)
-    - [Property `Reducers`](#property-reducers)
-  - [Interface `IDbContext`](#interface-idbcontext)
-  - [Interface `IRemoteDbContext`](#interface-iremotedbcontext)
-    - [Method `Db`](#method-db)
-      - [Example](#example)
-    - [Method `Reducers`](#method-reducers)
-      - [Example](#example-1)
-    - [Method `Disconnect`](#method-disconnect)
-  - [Subscribe to queries](#subscribe-to-queries)
-    - [Type `SubscriptionBuilder`](#type-subscriptionbuilder)
-      - [Constructor
-        `ctx.SubscriptionBuilder()`](#constructor-ctxsubscriptionbuilder)
-      - [Callback `OnApplied`](#callback-onapplied)
-      - [Callback `OnError`](#callback-onerror)
-      - [Method `Subscribe`](#method-subscribe)
-      - [Method `AddQuery`](#method-addquery)
-      - [Method `SubscribeToAllTables`](#method-subscribetoalltables)
-    - [Type `TypedSubscriptionBuilder`](#type-typedsubscriptionbuilder)
-      - [Method `AddQuery`
-        (TypedSubscriptionBuilder)](#method-addquery-typedsubscriptionbuilder)
-      - [Method `Subscribe`
-        (TypedSubscriptionBuilder)](#method-subscribe-typedsubscriptionbuilder)
-- [Query Builder API](#query-builder-api)
-  - [Entry Point](#entry-point)
-  - [Building Queries with `Where` /
-    `Filter`](#building-queries-with-where--filter)
-  - [Comparison Operators](#comparison-operators)
-  - [Boolean Combinators](#boolean-combinators)
-  - [Semijoins](#semijoins)
-  - [Using Query Builders with
-    Subscriptions](#using-query-builders-with-subscriptions)
-    - [Type `SubscriptionHandle`](#type-subscriptionhandle)
-      - [Property `IsEnded`](#property-isended)
-      - [Property `IsActive`](#property-isactive)
-      - [Method `Unsubscribe`](#method-unsubscribe)
-      - [Method `UnsubscribeThen`](#method-unsubscribethen)
-  - [Read connection metadata](#read-connection-metadata)
-    - [Property `Identity`](#property-identity)
-    - [Property `ConnectionId`](#property-connectionid)
-    - [Property `IsActive`](#property-isactive-1)
-- [Type `EventContext`](#type-eventcontext)
-  - [Property `Event`](#property-event)
-  - [Property `Db`](#property-db-1)
-  - [Field `Reducers`](#field-reducers)
-  - [Record `Event`](#record-event)
-    - [Variant `Reducer`](#variant-reducer)
-    - [Variant `SubscribeApplied`](#variant-subscribeapplied)
-    - [Variant `UnsubscribeApplied`](#variant-unsubscribeapplied)
-    - [Variant `SubscribeError`](#variant-subscribeerror)
-    - [Variant `UnknownTransaction`](#variant-unknowntransaction)
-  - [Record `ReducerEvent`](#record-reducerevent)
-  - [Record `Status`](#record-status)
-    - [Variant `Committed`](#variant-committed)
-    - [Variant `Failed`](#variant-failed)
-    - [Variant `OutOfEnergy`](#variant-outofenergy)
-  - [Record `Reducer`](#record-reducer)
-- [Type `ReducerEventContext`](#type-reducereventcontext)
-  - [Property `Event`](#property-event-1)
-  - [Property `Db`](#property-db-2)
-  - [Property `Reducers`](#property-reducers-1)
-- [Type `SubscriptionEventContext`](#type-subscriptioneventcontext)
-  - [Property `Db`](#property-db-3)
-  - [Property `Reducers`](#property-reducers-2)
-- [Type `ErrorContext`](#type-errorcontext)
-  - [Property `Event`](#property-event-2)
-  - [Property `Db`](#property-db-4)
-  - [Property `Reducers`](#property-reducers-3)
-- [Access the client cache](#access-the-client-cache)
-  - [Type `RemoteTableHandle`](#type-remotetablehandle)
-    - [Type `Row`](#type-row)
-    - [Property `Count`](#property-count)
-    - [Method `Iter`](#method-iter)
-    - [Callback `OnInsert`](#callback-oninsert)
-    - [Callback `OnDelete`](#callback-ondelete)
-    - [Callback `OnUpdate`](#callback-onupdate)
-  - [Unique constraint index access](#unique-constraint-index-access)
-    - [Example](#example-2)
-  - [BTree index access](#btree-index-access)
-    - [Example](#example-3)
-- [Observe and invoke reducers](#observe-and-invoke-reducers)
-- [Identify a client](#identify-a-client)
-  - [Type `Identity`](#type-identity)
-  - [Type `ConnectionId`](#type-connectionid)
-  - [Type `Timestamp`](#type-timestamp)
-  - [Type `TaggedEnum`](#type-taggedenum)
-
+{% endraw %}

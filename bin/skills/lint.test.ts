@@ -134,4 +134,14 @@ describe("checkResourcesLayout", () => {
         expect(errors[0]).toContain("only contain 'auto/' and 'manual/'")
         expect(errors[0]).toContain("docs/")
     })
+
+    it("flags index.md inside resources/ subdirectories due to Zola collisions", async () => {
+        const resDir = path.join(tmp, "resources")
+        await fs.ensureDir(path.join(resDir, "auto"))
+        await fs.writeFile(path.join(resDir, "auto", "index.md"), "x")
+        const errors = await checkResourcesLayout(resDir)
+        expect(errors).toHaveLength(1)
+        expect(errors[0]).toContain("disallowed inside resources/")
+        expect(errors[0]).toContain("index.md")
+    })
 })

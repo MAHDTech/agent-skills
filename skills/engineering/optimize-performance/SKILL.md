@@ -9,7 +9,7 @@ You cannot make faster what you cannot measure. Every phase here defends one rul
 
 This is deliberate optimisation of code that was never fast enough. For code that _was_ fast and got slow — a performance **regression** — run /diagnosing-bugs, which bisects the slowdown like any other bug.
 
-Run measurements through the project's toolchain — for example `devenv shell -- <cmd>` — so results are comparable across runs.
+Run measurements through the project's toolchain — for example `devenv --no-tui shell -- <cmd>` — so results are comparable across runs.
 
 ## Phase 1 — Set the target
 
