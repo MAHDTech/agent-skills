@@ -67,6 +67,14 @@ set +a
 : "${TARS_LOCK:?tars-spoke: TARS_LOCK missing from run.env}"
 : "${TARS_HEAVY_LOCK:?tars-spoke: TARS_HEAVY_LOCK missing from run.env}"
 
+# Refuse to run a heavy command in a directory that is neither the run's repo
+# root nor a spoke clone (a failed `cd` otherwise runs it in the wrong tree).
+if [ -f "$SCRIPT_DIR/tars-guard.sh" ]; then
+	# shellcheck source=./tars-guard.sh
+	. "$SCRIPT_DIR/tars-guard.sh"
+	tars_guard_check tars-spoke "$TARS_CWD" "$RUN_ENV"
+fi
+
 if [ -f "$SCRIPT_DIR/tars-lock" ]; then
 	LOCK_HELPER="$SCRIPT_DIR/tars-lock"
 else

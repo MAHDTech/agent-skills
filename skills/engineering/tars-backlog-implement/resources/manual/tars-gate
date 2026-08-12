@@ -57,6 +57,14 @@ set +a
 : "${TARS_LOCK:?tars-gate: TARS_LOCK missing from run.env}"
 : "${TARS_HEAVY_LOCK:?tars-gate: TARS_HEAVY_LOCK missing from run.env}"
 
+# Refuse to gate a directory that is neither the run's repo root nor a spoke
+# clone (a failed `cd` otherwise runs the whole gate in the wrong tree).
+if [ -f "$SCRIPT_DIR/tars-guard.sh" ]; then
+	# shellcheck source=./tars-guard.sh
+	. "$SCRIPT_DIR/tars-guard.sh"
+	tars_guard_check tars-gate "$TARS_CWD" "$RUN_ENV"
+fi
+
 # Empty steps become POSIX no-op so `&&` chains stay valid.
 install_cmd=${TARS_INSTALL_COMMAND:-:}
 hook_cmd=${TARS_HOOK_COMMAND:-:}
