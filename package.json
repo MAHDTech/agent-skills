@@ -21,6 +21,6 @@
         "@clack/prompts": "1.7.0",
         "fs-extra": "11.4.0",
         "glob": "13.0.6",
-        "js-yaml": "5.2.1"
+        "js-yaml": "5.2.2"
     }
 }
