@@ -34,7 +34,8 @@ description: Single source of truth for agent instructions
 ## Planning
 
 - **estimate-work**: Size and estimate a body of work to set expectations and sequence delivery — turn a plan or ticket set into defensible estimates with ranges, named assumptions, and surfaced risk instead of false-precise point numbers. Use when the user wants to estimate or size work, forecast how long something will take, choose between relative sizing and time-based estimates, calibrate against past delivery, or decide whether to spike before committing.
-- **grilling**: Interview the user relentlessly, one question at a time, to stress-test a plan or design before any code is written. Use when the user wants to pressure-test an approach, resolve open design decisions, or asks you to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the decision tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
+- **grill-me-with-docs**: Relentlessly interview the user to stress-test a problem, architecture, or design from scratch, while actively maintaining a domain glossary (CONTEXT.md) and recording major architectural decisions as ADRs. Use when starting a new initiative, tackling ambiguous domain problems, or when the user asks to grill with docs or ADRs.
+- **grilling**: Interview the user relentlessly, one question at a time, to stress-test a plan, design, or architecture before any code is written. Use when the user asks to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the design tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
 - **handoff**: Compact the current conversation into a handoff document for another agent to pick up.
 - **prioritize-backlog**: Groom and prioritise a backlog — order, cut, cluster, and sequence a pile of work by value against cost and risk so the next thing to do is obvious. Use when the user wants to prioritise or rank a backlog, decide what to build next, trim or triage a pile of ideas, apply a lens like value-vs-effort, RICE, or cost-of-delay/WSJF, or sequence work around dependencies.
 - **software-factory**: Run a feature through four approval gates — Product, Architecture, Program Design, Slices — so every decision that matters is made and signed off before implementation code exists.
@@ -73,11 +74,13 @@ description: Single source of truth for agent instructions
 - **critical-thinking**: Analyze your own immediately preceding response with rigorous, skeptical critical thinking — surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
 - **scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done — to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed.
 - **self-review**: Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements
+- **wtf**: Re-pitch your own last message in plain language when it did not land. Use when the user reacts to your previous response with confusion — "wtf", "what?", "huh", "in English?", "that made no sense", "I don't understand", "say that again properly". Not for "wtf is this error/output/regex", where the confusion is about a thing rather than about your message — that is debugging.
 
 ## Writing
 
 - **proofread**: Proofread posts before publishing for spelling, grammar, repetition, logic, weak arguments, broken links, and optionally reformat for skimmability
 - **simplify-docs**: Simplify documentation for clarity and readability with approval-gated edits. Use when asked to simplify, rewrite, restructure, or de-clutter a doc — README, setup guide, reference or technical documentation — so it scans faster and leads with the shortest successful path.
+- **unslop**: Cut AI tells, tropes, puffery, and boilerplate from any writing and add human voice. Use when the user asks to "unslop", de-AI text, remove AI buzzwords, rewrite robotic or sterile text, or make content sound natural and human.
 
 ## Authoring
 

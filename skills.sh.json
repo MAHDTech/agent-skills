@@ -39,6 +39,7 @@
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
         "estimate-work",
+        "grill-me-with-docs",
         "grilling",
         "handoff",
         "prioritize-backlog",
@@ -86,7 +87,8 @@
       "skills": [
         "critical-thinking",
         "scope-sweep",
-        "self-review"
+        "self-review",
+        "wtf"
       ]
     },
     {
@@ -94,7 +96,8 @@
       "description": "Proofreading and documentation polish.",
       "skills": [
         "proofread",
-        "simplify-docs"
+        "simplify-docs",
+        "unslop"
       ]
     },
     {

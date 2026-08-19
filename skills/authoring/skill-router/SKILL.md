@@ -43,6 +43,7 @@ Two vocabulary layers the flow leans on — reach for them directly when the _wo
 
 A starting situation that generates work, then merges onto the main flow:
 
+- `/grill-me-with-docs` — reach for this when tackling an ambiguous problem from scratch; it runs a relentless decision interview while maintaining a `CONTEXT.md` glossary and capturing ADRs.
 - `/diagnosing-bugs` — reach for this when something's broken, flaky, or slow; it builds a red-capable feedback loop before hypothesising, then fixes with a regression test.
 - `/gh-triage` — reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` — reach for this when the work is too big for one session and the way to the destination isn't visible yet.
@@ -88,6 +89,7 @@ Not new features — working on code that already exists:
 - `/self-review` — reach for this right after implementing, to surface missed work and simplification opportunities.
 - `/scope-sweep` — reach for this as a final breadth pass before calling a scope done, to catch missed items, edge cases, and risks.
 - `/critical-thinking` — reach for this when you want your own last response analysed for flaws, biases, and unstated assumptions.
+- `/wtf` — reach for this when your last message did not land, to re-pitch it in plain language rather than explain it again.
 
 ## Reviewing deeper
 
@@ -117,6 +119,7 @@ Beyond `/code-review` on the main flow:
 
 - `/proofread` — reach for this before publishing a post: spelling, grammar, logic, weak arguments, broken links.
 - `/simplify-docs` — reach for this when documentation needs to read more clearly, with edits gated on approval.
+- `/unslop` — reach for this when editing text to cut AI tells, tropes, puffery, and robotic boilerplate, and inject authentic human voice.
 
 ## Authoring
 

@@ -1,6 +1,6 @@
 ---
 name: grilling
-description: Interview the user relentlessly, one question at a time, to stress-test a plan or design before any code is written. Use when the user wants to pressure-test an approach, resolve open design decisions, or asks you to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the decision tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
+description: Interview the user relentlessly, one question at a time, to stress-test a plan, design, or architecture before any code is written. Use when the user asks to 'grill me', 'poke holes in this', 'stress-test this plan', or 'interview me about this design'. Walk every branch of the design tree, look up facts in the codebase, and put each real decision to the user with a recommended answer before proceeding.
 metadata:
   source: mattpocock/skills
   license: MIT
@@ -8,14 +8,31 @@ metadata:
 
 # Grilling
 
-Interview the user relentlessly about every aspect of this plan until you reach a shared understanding. Walk down each branch of the design tree, resolving the dependencies between decisions one by one. For each question, provide your recommended answer.
+Interview the user relentlessly about every aspect of a plan, feature, or architecture until you reach a shared understanding. Map the problem as a **design tree**: root decisions branch into dependent technical and product decisions.
 
-Ask the questions one at a time, waiting for feedback on each before continuing. Asking several questions at once is bewildering.
+## The Interview Rules
 
-If a _fact_ can be found by exploring the codebase, look it up rather than asking. The _decisions_, though, belong to the user — put each one to them and wait for an answer.
+1. **One decision at a time.** Ask questions strictly one at a time. Never dump multiple questions in a single turn—asking several questions at once creates cognitive overload and tangles branching decisions.
+2. **Always give a recommended answer.** Never ask open-ended questions without guidance. State the options, explain the trade-offs, and state your clear recommendation (e.g. `(Recommended)`).
+3. **Lookup facts yourself; ask the user for decisions.**
+   - **Facts belong to the agent.** If a detail can be determined by reading the codebase, configuration, git history, or documentation, search for it autonomously. Never ask the user questions you could answer yourself.
+   - **Decisions belong to the user.** Scope, trade-offs, architecture choices, and product behavior require user intent.
+4. **Use interactive question tools when available.** If the agent environment provides an interactive choice tool (e.g. `ask_question`), use it to present structured choices. Otherwise, format the decision cleanly in Markdown with bold options and a clear recommendation.
+5. **Walk the branches systematically.** When a decision is made, advance down that specific branch of the design tree. Recompute the next unblocked decision until no unresolved branches remain.
+6. **Do not enact code prematurely.** Continue the interview until the frontier of decisions is empty and the user confirms a shared understanding.
 
-Do not enact the plan until the user confirms you have reached a shared understanding.
+## Question Format (when tool is unavailable)
 
-This is a reusable primitive: other planning skills invoke it to run their interview step.
+```text
+❓ **<Decision Title>**
 
-> Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
+<Context, constraints, and trade-offs>
+
+- **Option A (Recommended):** <Details and rationale>
+- **Option B:** <Details and rationale>
+```
+
+## Handoffs
+
+- When the interview concludes and the plan is locked in, hand off to `/to-spec` (to generate a PRD/spec) or `/to-tickets` (to decompose into implementation tasks).
+- If the problem involves domain vocabulary modeling or requires formal Architectural Decision Records, use `/grill-me-with-docs`.
