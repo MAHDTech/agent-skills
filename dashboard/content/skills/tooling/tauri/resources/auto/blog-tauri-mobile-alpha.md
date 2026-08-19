@@ -28,10 +28,10 @@ published.
 Make sure to update both NPM and Cargo dependencies to the 2.0.0-alpha.0
 release. You can update the dependencies with:
 
-- [npm](#tab-panel-4521)
-- [yarn](#tab-panel-4522)
-- [pnpm](#tab-panel-4523)
-- [cargo](#tab-panel-4524)
+- [npm](#tab-panel-4398)
+- [yarn](#tab-panel-4399)
+- [pnpm](#tab-panel-4400)
+- [cargo](#tab-panel-4401)
 
 ```
 npm install @tauri-apps/cli@next @tauri-apps/api@next

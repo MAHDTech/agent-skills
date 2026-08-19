@@ -332,11 +332,18 @@ ctx.procedures.makeRequest().then(
 );
 ```
 
-C# modules currently cannot define procedures. Support for defining
-procedures in C# modules will be released shortly.
+C# modules can define procedures:
 
-A C# [client](#client) can call a procedure defined by a Rust or
-TypeScript module:
+``` codeBlockStandalone_LlrK
+[SpacetimeDB.Procedure]
+public static string MakeRequest(ProcedureContext ctx)
+{
+    // ...
+    return "result";
+}
+```
+
+A C# [client](#client) can call a procedure defined by a module:
 
 ``` codeBlockStandalone_LlrK
 void Main()
@@ -373,7 +380,7 @@ in to the `unstable` feature in their `Cargo.toml`:
 
 ``` codeBlockStandalone_LlrK
 [dependencies]
-spacetimedb = { version = "1.x", features = ["unstable"] }
+spacetimedb = { version = "2.*", features = ["unstable"] }
 ```
 
 Then, that module can define a procedure:
@@ -422,8 +429,8 @@ SPACETIMEDB_PROCEDURE(std::string, make_request, ProcedureContext ctx) {
 Use the other tabs (TypeScript/C#/Rust/Unreal C++/Blueprint) for client
 call examples.
 
-An Unreal C++ [client](#client) can call a procedure defined by a Rust
-or TypeScript module:
+An Unreal C++ [client](#client) can call a procedure defined by a
+module:
 
 ``` codeBlockStandalone_LlrK
 {
@@ -452,8 +459,7 @@ void AGameManager::OnMakeRequestComplete(const FProcedureEventContext& Context, 
 }
 ```
 
-An Unreal [client](#client) can call a procedure defined by a Rust or
-TypeScript module:
+An Unreal [client](#client) can call a procedure defined by a module:
 
 ![MakeRequest without
 callback](https://spacetimedb.com/docs/assets/images/ue-blueprint-makerequest-nocallback-efc6cbd196a714a61f15f8a5f581f221.png)

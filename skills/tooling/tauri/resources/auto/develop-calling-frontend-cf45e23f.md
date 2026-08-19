@@ -176,9 +176,9 @@ When using a frontend framework, you should clean up event listeners
 when a component is unmounted to avoid memory leaks and duplicate
 handlers.
 
-- [React](#tab-panel-4560)
-- [Vue](#tab-panel-4561)
-- [Svelte](#tab-panel-4562)
+- [React](#tab-panel-4437)
+- [Vue](#tab-panel-4438)
+- [Svelte](#tab-panel-4439)
 
 ```
 import { useEffect, useState } from 'react';import { listen } from '@tauri-apps/api/event';

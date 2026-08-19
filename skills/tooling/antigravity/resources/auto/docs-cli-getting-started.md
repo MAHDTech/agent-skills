@@ -1,15 +1,16 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Getting Started
+Markdownkeyboard_arrow_down
 
-# Getting Started with Antigravity CLI[link](#getting-started-with-antigravity-cli)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Getting Started with Antigravity CLI
 
 Welcome to Antigravity CLI! This guide provides a direct, high-level
 developer roadmap to install the client, launch the Terminal User
 Interface (TUI), and begin collaborating with autonomous agents.
 
-## Roadmap checklist[link](#roadmap-checklist)
+## Roadmap checklist
 
 Complete the following sequential steps to launch your first session:
 
@@ -19,28 +20,19 @@ Complete the following sequential steps to launch your first session:
 
     **macOS / Linux**:
 
-    bash
-
-    content_copy
-    ```
+    ``` astro-code
     curl -fsSL https://antigravity.google/cli/install.sh | bash
     ```
 
     **Windows (PowerShell)**:
 
-    powershell
-
-    content_copy
-    ```
+    ``` astro-code
     irm https://antigravity.google/cli/install.ps1 | iex
     ```
 
     **Windows (CMD)**:
 
-    cmd
-
-    content_copy
-    ```
+    ``` astro-code
     curl -fsSL https://antigravity.google/cli/install.cmd -o install.cmd && install.cmd && del install.cmd
     ```
 
@@ -48,24 +40,15 @@ Complete the following sequential steps to launch your first session:
     platform-specific directory:
 
     - **macOS / Linux**: `~/.local/bin/agy`
-    - **Windows**: `C:\Users\\<Username\>\AppData\Local\agy\bin` (where
-      `<Username>` represents your active Windows profile name).
-
-    info
-
-    Advanced Setup: For detailed enterprise credentials configuration,
-    secure keyring auth permissions, proxy setups, or troubleshooting
-    installation issues, consult the Installation & Auth Guide.
+    - **Windows**: `C:\Users\\<username\>\AppData\Local\agy\bin` (where
+      `<username>` represents your active Windows profile name).
 
 2.  **Launch the TUI inside a project**
 
     Open a fresh terminal window, navigate to your target project
     codebase directory, and execute the launcher command:
 
-    bash
-
-    content_copy
-    ```
+    ``` astro-code
     agy
     ```
 
@@ -86,12 +69,9 @@ Complete the following sequential steps to launch your first session:
 4.  **Run your first agent task**
 
     Type the following instruction in the prompt box at the bottom of
-    your TUI screen and press `Enter`:
+    your TUI screen and press Enter:
 
-    text
-
-    content_copy
-    ```
+    ``` astro-code
     Write a simple python script to fetch web page text
     ```
 
@@ -100,7 +80,7 @@ Complete the following sequential steps to launch your first session:
     running test commands inside the TUI, follow the **[Tutorial
     Guide](https://antigravity.google/docs/cli/tutorial)**.
 
-## Related resources[link](#related-resources)
+## Related resources
 
 Optimize your local environment configurations and master advanced
 collaboration tools:
@@ -111,5 +91,3 @@ collaboration tools:
   keyring, or SSH forwarding errors.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Dense reference sheets
   cataloging all slash commands, shortcuts, and JSON keys.
-
-On this Page

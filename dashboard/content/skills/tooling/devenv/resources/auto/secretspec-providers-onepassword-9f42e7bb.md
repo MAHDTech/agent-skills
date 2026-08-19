@@ -8,10 +8,10 @@ skill_name = "devenv"
 +++
 
 {% raw %}
-# OnePassword Provider
+# 1Password Provider
 
-The OnePassword provider integrates with OnePassword for team-based
-secret management with advanced access controls.
+The 1Password provider integrates with 1Password for team-based secret
+management with advanced access controls.
 
 ## At a glance
 
@@ -27,7 +27,7 @@ secret management with advanced access controls.
 ## Quick start
 
 ```
-# Set a secret$ secretspec set DATABASE_URL --provider onepassword://ProductionEnter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret DATABASE_URL saved to OnePassword
+# Set a secret$ secretspec set DATABASE_URL --provider onepassword://ProductionEnter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to onepassword (profile: default)
 # Get a secret$ secretspec get DATABASE_URL --provider onepassword://Production
 # Run with secrets$ secretspec run --provider onepassword://Production -- npm start
 ```
@@ -38,8 +38,8 @@ Terminal window
 
 ### Prerequisites
 
-- OnePassword CLI (`op`)
-- OnePassword account
+- 1Password CLI (`op`)
+- 1Password account
 
 Choose one of the following authentication methods.
 
@@ -72,8 +72,8 @@ setups.
 ### Service account token
 
 In SecretSpec 0.15 and later, you can declare the token as a [provider
-credential](https://secretspec.dev/concepts/providers/#provider-credentials), for example to
-load it from your keyring:
+credential](https://secretspec.dev/reference/provider-credentials/), for example to load it
+from your keyring:
 
 ```
 [providers]op = { uri = "onepassword://Production", credentials = { service_account_token = "keyring" } }
@@ -82,8 +82,9 @@ load it from your keyring:
 secretspec.toml
 
 When no explicit `service_account_token` is supplied, the provider falls
-back to `OP_SERVICE_ACCOUNT_TOKEN` or the `onepassword+token://` URI
-scheme. These fallbacks also work in SecretSpec 0.14.
+back to `OP_SERVICE_ACCOUNT_TOKEN`. The `onepassword+token://` scheme
+selects service account authentication and takes the token from one of
+those two sources.
 
 ### Manual signin (legacy)
 
@@ -91,17 +92,30 @@ Run `eval $(op signin)` to set per-shell `OP_SESSION_*` tokens. These
 expire after 30 minutes of inactivity; if they expire mid-session,
 `secretspec` falls back to desktop integration when available.
 
+## Provider credentials
+
+| Credential              | Environment fallback       | Available since |
+|-------------------------|----------------------------|-----------------|
+| `service_account_token` | `OP_SERVICE_ACCOUNT_TOKEN` | 0.15+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
+
 ## Configuration
 
 ### URI format
 
 ```
-onepassword://[account@]vaultonepassword+token://[token@]vault
+onepassword://[account@]vaultonepassword+token://vault
 ```
 
 - `account`: Optional account shorthand
 - `vault`: Target vault name (defaults to “Private”)
-- `token`: Service account token
+
+The `onepassword+token://` form selects service account authentication;
+supply the token as the `service_account_token` provider credential or
+through `OP_SERVICE_ACCOUNT_TOKEN`.
 
 The URI names a vault only; item paths (e.g.
 `onepassword://Vault/item/field`) are rejected. To name a specific item,
@@ -110,7 +124,7 @@ see [Use existing secrets](#use-existing-secrets).
 ### URI examples
 
 ```
-onepassword://Productiononepassword://work@DevVaultonepassword+token://ops_token123@Productiononepassword://
+onepassword://Productiononepassword://work@DevVaultonepassword+token://Productiononepassword://
 ```
 
 ### Project configuration

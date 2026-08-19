@@ -8,7 +8,7 @@ skill_name = "software-factory"
 +++
 
 {% raw %}
-# Gate 2 — Architecture
+# Gate 2 - Architecture
 
 Saved as `docs/plans/<feature-slug>/02-architecture.md`. Written after reading the code this feature touches, so every line describes the real system.
 
@@ -21,12 +21,12 @@ Saved as `docs/plans/<feature-slug>/02-architecture.md`. Written after reading t
 
 ## Endpoints
 
-<route + verb + purpose, one line each — or "none">
+<route + verb + purpose, one line each - or "none">
 
 ## Data
 
 <new or changed tables, collections, or files, with an outline of the queries that will
-hit them — enough to see whether the shape supports the access pattern>
+hit them - enough to see whether the shape supports the access pattern>
 
 ## Flow
 
@@ -34,7 +34,7 @@ hit them — enough to see whether the shape supports the access pattern>
 
 ## External
 
-<third-party APIs, webhooks, and env var NAMES — never values — or "none">
+<third-party APIs, webhooks, and env var NAMES - never values - or "none">
 
 ## Rejected alternatives
 

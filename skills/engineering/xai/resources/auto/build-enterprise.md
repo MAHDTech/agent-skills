@@ -104,7 +104,9 @@ Point Grok at an executable that produces a token on stdout:
 auth_provider_command = "/usr/local/bin/your-auth-provider"
 ```
 
-The command must print either a bare token string or JSON: `{"access_token": "...", "refresh_token": "...", "expires_in": 3600}` (`refresh_token` and `expires_in` are optional). When the token expires, Grok re-runs the command with `GROK_AUTH_EXPIRED=1` set. Interactive login allows up to 300 seconds for the command to complete. Background token refresh uses a 10-second timeout; if the command hangs (e.g., waiting for interactive input), Grok kills it and reports the failure.
+The command must print either a bare token string or JSON: `{"access_token": "...", "refresh_token": "...", "expires_in": 3600}` (`refresh_token` and `expires_in` are optional).
+
+Grok runs the command on two contracts and sets `GROK_AUTH_EXPIRED` to tell them apart. It is `1` on a background refresh over a credential Grok already holds: nobody is watching, and the command has a few seconds before Grok kills it — so mint silently or exit non-zero, never wait for input. It is unset on a sign-in, where a user is attached, the command's stderr is shown to them, and there are up to 300 seconds for a browser round trip or a device code. A command that exits promptly on `GROK_AUTH_EXPIRED=1` rather than prompting is what makes the handover to the sign-in screen fast.
 
 ### API key
 
@@ -222,4 +224,4 @@ A session moves data through six phases:
 
 ### Zero Data Retention
 
-ZDR is enforced at the team level. When enabled for a team or enterprise, zero data retention occurs when using Grok Build.
+ZDR is enforced at the team level. When enabled for a team or enterprise, zero data retention occurs when using Grok Build. Video tools under ZDR require user-supplied output storage — see [Video Output Storage under ZDR](https://docs.x.ai/build/settings/zdr-video-storage).

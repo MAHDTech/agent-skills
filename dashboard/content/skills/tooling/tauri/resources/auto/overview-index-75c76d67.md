@@ -16,15 +16,15 @@ Create small, fast, secure, cross-platform applications
 
 Create a Project
 
-- [Bash](#tab-panel-5023)
-- [PowerShell](#tab-panel-5024)
-- [Fish](#tab-panel-5025)
-- [npm](#tab-panel-5026)
-- [Yarn](#tab-panel-5027)
-- [pnpm](#tab-panel-5028)
-- [deno](#tab-panel-5029)
-- [bun](#tab-panel-5030)
-- [Cargo](#tab-panel-5031)
+- [Bash](#tab-panel-4908)
+- [PowerShell](#tab-panel-4909)
+- [Fish](#tab-panel-4910)
+- [npm](#tab-panel-4911)
+- [Yarn](#tab-panel-4912)
+- [pnpm](#tab-panel-4913)
+- [deno](#tab-panel-4914)
+- [bun](#tab-panel-4915)
+- [Cargo](#tab-panel-4916)
 
 ```
 sh <(curl https://create.tauri.app/sh)
@@ -107,11 +107,11 @@ little as 600KB.
 [![VPS
 Server](https://v2.tauri.app/_astro/256_ZswXSI.webp)](https://www.vpsserver.com/?ref=tauri.app&utm_source=tauri.app)
 
+[![Conductor](https://v2.tauri.app/_astro/256_ZQDQxp.webp)](https://opencollective.com/conductor?ref=tauri.app&utm_source=tauri.app)
+
 [![Keygen](https://v2.tauri.app/_astro/256_10C0Rz.webp)](https://keygen.sh/?ref=tauri.app&utm_source=tauri.app)
 
 [![Sourcegraph](https://v2.tauri.app/_astro/256_EdBIX.webp)](https://about.sourcegraph.com/?ref=tauri.app&utm_source=tauri.app)
-
-[![Conductor](https://v2.tauri.app/_astro/256_ZQDQxp.webp)](https://opencollective.com/conductor?ref=tauri.app&utm_source=tauri.app)
 
 [![Daniel
 Thompson-Yvetot](https://v2.tauri.app/_astro/256_1qm1Uc.webp)](https://github.com/nothingismagick?ref=tauri.app&utm_source=tauri.app)
@@ -129,9 +129,9 @@ Campbell](https://v2.tauri.app/_astro/256_z2IY6.webp)](https://opencollective.co
 [![Thad
 Guidry](https://v2.tauri.app/_astro/256_ZP4Yb9.webp)](https://opencollective.com/thad-guidry1?ref=tauri.app&utm_source=tauri.app)
 
-[![Improving](https://v2.tauri.app/_astro/256_ZecSWH.webp)](https://www.improving.com/?ref=tauri.app&utm_source=tauri.app)
-
 [![Controla](https://v2.tauri.app/_astro/256_2vRYKR.webp)](https://www.controla.ai/?ref=tauri.app&utm_source=tauri.app)
+
+[![Improving](https://v2.tauri.app/_astro/256_ZecSWH.webp)](https://www.improving.com/?ref=tauri.app&utm_source=tauri.app)
 
 [![Pete
 Thomas](https://v2.tauri.app/_astro/256_Gpcxx.webp)](https://opencollective.com/user-44f56a2f?ref=tauri.app&utm_source=tauri.app)
@@ -175,17 +175,17 @@ Bartlett](https://v2.tauri.app/_astro/256_Z2j3F53.webp)](https://opencollective.
 [![Gyuri
 Lajos](https://v2.tauri.app/_astro/256_1nXUkS.webp)](https://trailmarks.co/?ref=tauri.app&utm_source=tauri.app)
 
-[![Open
-Collective](https://v2.tauri.app/_astro/256_2dN5r6.webp)](https://opencollective.com/?ref=tauri.app&utm_source=tauri.app)
-
-[![Luke
-Parker](https://v2.tauri.app/_astro/256_Z2tMvyS.webp)](https://opencollective.com/luke-parker?ref=tauri.app&utm_source=tauri.app)
-
 [![Clemens
 Koza](https://v2.tauri.app/_astro/256_ZmmlGT.webp)](https://opencollective.com/clemens-koza?ref=tauri.app&utm_source=tauri.app)
 
 [![Martin
 Kramer](https://v2.tauri.app/_astro/256_13cCPW.webp)](https://opencollective.com/martin-kramer?ref=tauri.app&utm_source=tauri.app)
+
+[![Open
+Collective](https://v2.tauri.app/_astro/256_2dN5r6.webp)](https://opencollective.com/?ref=tauri.app&utm_source=tauri.app)
+
+[![Luke
+Parker](https://v2.tauri.app/_astro/256_Z2tMvyS.webp)](https://opencollective.com/luke-parker?ref=tauri.app&utm_source=tauri.app)
 
 [![Riley
 Seaburg](https://v2.tauri.app/_astro/256_1LJsEQ.webp)](https://opencollective.com/guest-7ba71ea5?ref=tauri.app&utm_source=tauri.app)
@@ -252,12 +252,12 @@ Online](https://v2.tauri.app/_astro/256_ZEu5fQ.webp)](https://www.nonogramonline
 [![Braden
 Neufeld](https://v2.tauri.app/_astro/256_eaKXu.webp)](https://opencollective.com/braden-neufeld?ref=tauri.app&utm_source=tauri.app)
 
+[![Jan](https://v2.tauri.app/_astro/256_Z1j7t5A.webp)](https://opencollective.com/jan50?ref=tauri.app&utm_source=tauri.app)
+
 [![Seth
 Lowie](https://v2.tauri.app/_astro/256_1pED2p.webp)](https://opencollective.com/seth-lowie?ref=tauri.app&utm_source=tauri.app)
 
 [![Jacob](https://v2.tauri.app/_astro/256_Z1Aux4t.webp)](https://opencollective.com/jacob7?ref=tauri.app&utm_source=tauri.app)
-
-[![Jan](https://v2.tauri.app/_astro/256_Z1j7t5A.webp)](https://opencollective.com/jan50?ref=tauri.app&utm_source=tauri.app)
 
 [![Pochoclin](https://v2.tauri.app/_astro/256_ZRjP5z.webp)](https://opencollective.com/pochoclin?ref=tauri.app&utm_source=tauri.app)
 
@@ -280,14 +280,14 @@ Herrmann](https://v2.tauri.app/_astro/256_Z7o5c4.webp)](https://opencollective.c
 
 [![Secdude](https://v2.tauri.app/_astro/256_2nCnFh.webp)](https://opencollective.com/secdude?ref=tauri.app&utm_source=tauri.app)
 
+[![Alexander
+Eden](https://v2.tauri.app/_astro/256_ZDTVDV.webp)](https://github.com/alexeden?ref=tauri.app&utm_source=tauri.app)
+
 [![Robert
 Collins](https://v2.tauri.app/_astro/256_1MrKoX.webp)](https://opencollective.com/rcollins?ref=tauri.app&utm_source=tauri.app)
 
 [![Seokju
 Na](https://v2.tauri.app/_astro/256_wUz7w.webp)](https://opencollective.com/seokju-na1?ref=tauri.app&utm_source=tauri.app)
-
-[![Alexander
-Eden](https://v2.tauri.app/_astro/256_ZDTVDV.webp)](https://github.com/alexeden?ref=tauri.app&utm_source=tauri.app)
 
 [![Proxyman](https://v2.tauri.app/_astro/256_C01Fl.webp)](https://proxyman.com/?ref=tauri.app&utm_source=tauri.app)
 
@@ -328,6 +328,9 @@ Dorfman](https://v2.tauri.app/_astro/256_Z1DNYup.webp)](https://www.justindorfma
 
 [![Ivan](https://v2.tauri.app/_astro/256_HgoFX.webp)](https://opencollective.com/ivan13?ref=tauri.app&utm_source=tauri.app)
 
+[![Daniele
+Dellafiore](https://v2.tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ildella?ref=tauri.app&utm_source=tauri.app)
+
 #### GitHub Sponsors
 
 [![3colorr](https://v2.tauri.app/_astro/19345951_jyc4A.webp)](https://github.com/3colorr)
@@ -338,7 +341,7 @@ Dorfman](https://v2.tauri.app/_astro/256_Z1DNYup.webp)](https://www.justindorfma
 
 [![alexeden](https://v2.tauri.app/_astro/10469676_2kFmGL.webp)](https://github.com/alexeden)
 
-[![alprimak](https://v2.tauri.app/_astro/9585448_ZAcox2.webp)](https://github.com/alprimak)
+[![alprimak](https://v2.tauri.app/_astro/9585448_2qXJrg.webp)](https://github.com/alprimak)
 
 [![austenc](https://v2.tauri.app/_astro/575421_25DHJ2.webp)](https://github.com/austenc)
 
@@ -360,7 +363,11 @@ Dorfman](https://v2.tauri.app/_astro/256_Z1DNYup.webp)](https://www.justindorfma
 
 [![jorge-menjivar](https://v2.tauri.app/_astro/16660534_mtFC6.webp)](https://github.com/jorge-menjivar)
 
+[![kawana77b](https://v2.tauri.app/_astro/73901165_Z1A4fy8.webp)](https://github.com/kawana77b)
+
 [![kibertoad](https://v2.tauri.app/_astro/1847934_Z1IYkFy.webp)](https://github.com/kibertoad)
+
+[![Lavanic](https://v2.tauri.app/_astro/58156322_dCbf3.webp)](https://github.com/Lavanic)
 
 [![Leay15](https://v2.tauri.app/_astro/32212558_1ttLLR.webp)](https://github.com/Leay15)
 

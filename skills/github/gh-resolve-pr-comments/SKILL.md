@@ -3,7 +3,7 @@ name: gh-resolve-pr-comments
 description: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
 disable-model-invocation: true
 resources:
-  - https://r.jina.ai/https://cli.github.com/manual/gh_pr
+  - https://cli.github.com/manual/gh_pr
 ---
 
 <!-- omit in toc -->
@@ -130,26 +130,26 @@ For each comment or thread, read the comment body, the referenced file at the in
 
 ### Fix ({count})
 
-- [ ] **{file}:{line}** — {summary of what to change}
+- [ ] **{file}:{line}** - {summary of what to change}
   > {abbreviated reviewer comment}
 
 ### Investigate ({count})
 
-- [ ] **{file}:{line}** — {what to explore and why}
+- [ ] **{file}:{line}** - {what to explore and why}
   > {abbreviated reviewer comment}
 
 ### Discuss ({count})
 
-- [ ] **{file}:{line}** — {question or design decision}
+- [ ] **{file}:{line}** - {question or design decision}
   > {abbreviated reviewer comment}
 
 ### Acknowledge ({count})
 
-- {comment summary} — will resolve, no action needed
+- {comment summary} - will resolve, no action needed
 
 ### Outdated ({count})
 
-- {comment summary} — code has changed, will resolve
+- {comment summary} - code has changed, will resolve
 ```
 
 Ask the user:
@@ -168,9 +168,9 @@ Ask the user:
 
 Work through the approved plan in this order:
 
-1. **Fix** items first — make code changes one at a time
-2. **Investigate** items — explore the codebase, then either fix or surface findings to the user
-3. **Discuss** items — present findings and context, ask the user for direction
+1. **Fix** items first - make code changes one at a time
+2. **Investigate** items - explore the codebase, then either fix or surface findings to the user
+3. **Discuss** items - present findings and context, ask the user for direction
 
 If an Investigate or Discuss item becomes clear during execution, reclassify it to Fix and proceed.
 
@@ -188,7 +188,7 @@ After all items are addressed, show a summary:
 
 ## 7. Resolve Comment Threads
 
-**Immediately after execution completes**, resolve all addressed comment threads on GitHub. Do NOT wait for user confirmation — this happens automatically for all Fix, Investigate (that were resolved), Acknowledge, and Outdated items.
+**Immediately after execution completes**, resolve all addressed comment threads on GitHub. Do NOT wait for user confirmation - this happens automatically for all Fix, Investigate (that were resolved), Acknowledge, and Outdated items.
 
 Skip resolution only for **Discuss** items the user explicitly deferred.
 

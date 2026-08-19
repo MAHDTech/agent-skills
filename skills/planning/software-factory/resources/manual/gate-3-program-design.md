@@ -1,4 +1,4 @@
-# Gate 3 — Program Design
+# Gate 3 - Program Design
 
 Saved as `docs/plans/<feature-slug>/03-program-design.md`. This is the gate that catches the decisions an agent otherwise makes silently at implementation time.
 
@@ -11,7 +11,7 @@ Saved as `docs/plans/<feature-slug>/03-program-design.md`. This is the gate that
 
 ## Types and signatures
 
-<code blocks defining the types, interfaces, and method signatures — no bodies.
+<code blocks defining the types, interfaces, and method signatures - no bodies.
 A reader scans these and says "right" or "wrong" in seconds.>
 
 ## Call stack
@@ -21,7 +21,7 @@ A reader scans these and says "right" or "wrong" in seconds.>
 ## Test plan
 
 <the test case names and what each one asserts, written before any of them exist.
-Name the seam each test drives — prefer the highest existing seam.>
+Name the seam each test drives - prefer the highest existing seam.>
 
 ## Least confident decisions
 

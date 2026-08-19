@@ -124,8 +124,8 @@ trial, make sure you're logged in, and then visit [your Account
 page](https://dashboard.zed.dev/account) to upgrade. The trial ends once
 you've used up your prompts or the two weeks pass–whatever comes first.
 
-> Note that Anthropic's Opus models are not available in the free trial,
-> even though they are available in Zed Pro.
+> Claude Fable, Claude Opus, and GPT Pro models are not available during
+> the free trial.
 
 ### [What is a token?](#what-is-a-token)
 

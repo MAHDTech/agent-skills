@@ -2,7 +2,7 @@
 name: tailwind
 description: Use when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
 resources:
-  - https://r.jina.ai/https://tailwindcss.com/docs
+  - https://tailwindcss.com/docs
 ---
 
 # Tailwind CSS v4

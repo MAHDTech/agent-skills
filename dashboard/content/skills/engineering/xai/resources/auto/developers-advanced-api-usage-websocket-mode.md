@@ -54,7 +54,7 @@ ws.send(
     json.dumps(
         {
             "type": "response.create",
-            "model": "grok-4.5",
+            "model": "grok-4.6",
             "store": False,
             "input": [
                 {
@@ -82,7 +82,7 @@ ws.on("open", () => {
   ws.send(
     JSON.stringify({
       type: "response.create",
-      model: "grok-4.5",
+      model: "grok-4.6",
       store: false,
       input: [
         {
@@ -122,7 +122,7 @@ ws.send(
     json.dumps(
         {
             "type": "response.create",
-            "model": "grok-4.5",
+            "model": "grok-4.6",
             "store": False,
             "previous_response_id": "resp_123",
             "input": [
@@ -147,7 +147,7 @@ ws.send(
 ws.send(
   JSON.stringify({
     type: "response.create",
-    model: "grok-4.5",
+    model: "grok-4.6",
     store: false,
     previous_response_id: "resp_123",
     input: [

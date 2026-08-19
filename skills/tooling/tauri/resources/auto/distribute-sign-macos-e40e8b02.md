@@ -124,8 +124,8 @@ To notarize your application, you must provide credentials for Tauri to
 authenticate with Apple. This can be done via the App Store Connect API,
 or via your Apple ID.
 
-- [App Store Connect](#tab-panel-4727)
-- [Apple ID](#tab-panel-4728)
+- [App Store Connect](#tab-panel-4612)
+- [Apple ID](#tab-panel-4613)
 
 1.  Open the [App Store Connect’s Users and Access
     page](https://appstoreconnect.apple.com/access/users), select the

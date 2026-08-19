@@ -22,7 +22,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
       {"role": "user", "content": "What is prompt caching?"}
@@ -39,7 +39,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[
         {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
         {"role": "user", "content": "What is prompt caching?"},
@@ -63,7 +63,7 @@ const client = new OpenAI({
 
 const response = await client.chat.completions.create(
   {
-    model: 'grok-4.5',
+    model: 'grok-4.6',
     messages: [
       {
         role: 'system',
@@ -95,7 +95,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": "What is prompt caching?",
     "prompt_cache_key": "b79ad29b-b3f9-463c-bca6-041d5058d366"
   }'
@@ -110,7 +110,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input="What is prompt caching?",
     extra_body={
         "prompt_cache_key": "b79ad29b-b3f9-463c-bca6-041d5058d366",
@@ -130,7 +130,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-  model: 'grok-4.5',
+  model: 'grok-4.6',
   input: 'What is prompt caching?',
   // @ts-expect-error -- xAI-specific field
   prompt_cache_key: 'b79ad29b-b3f9-463c-bca6-041d5058d366',
@@ -147,7 +147,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text, usage } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is prompt caching?',
   providerOptions: {
     xai: {
@@ -173,7 +173,7 @@ client = Client(
     metadata=(("x-grok-conv-id", "conv_abc123"),),
 )
 
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 chat.append(system("You are Grok, a helpful and truthful AI assistant built by xAI."))
 chat.append(user("What is prompt caching?"))
 

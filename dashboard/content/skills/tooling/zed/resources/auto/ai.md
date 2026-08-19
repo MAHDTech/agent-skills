@@ -288,54 +288,54 @@ Shipped in 2026
 
 Shipped in 2025
 
+[](https://github.com/zed-industries/zed/pull/62670)
+
+Agoogle_ai: Add Gemini 3.7 Flash
+
+@ArneshBanerjee•\#62670•2d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/61497)
+
+ERagent: Add ask_user tool using elicitation forms
+
+@e-r-w•\#61497•2d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/51139)
+
+Aedit_prediction: Support self-hosted Sweep Next Edit models
+
+@avoidthekitchen•\#51139•2w ago•View →
+
+[](https://github.com/zed-industries/zed/pull/59806)
+
+Vai: Add Max reasoning effort
+
+@Vlaaaaaaad•\#59806•1mo ago•View →
+
 [](https://github.com/zed-industries/zed/pull/60575)
 
 JHandle SSE data fields without spaces
 
-@justjavac•\#60575•15h ago•View →
+@justjavac•\#60575•2w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61662)
 
 Magent: Improve error messaging for \`edit_file\` tool
 
-@mfeyg•\#61662•2d ago•View →
+@mfeyg•\#61662•3w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61621)
 
 Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
 files
 
-@amtoaer•\#61621•4d ago•View →
+@amtoaer•\#61621•3w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/60893)
 
 NTTreat blank spawn_agent session IDs as absent
 
-@nevo-ts•\#60893•5d ago•View →
-
-[](https://github.com/zed-industries/zed/pull/58217)
-
-Hagent_ui: Fix agent terminal close behavior with keyboard shortcuts
-
-@hugh2slowmo•\#58217•5d ago•View →
-
-[](https://github.com/zed-industries/zed/pull/57207)
-
-ZLAllow configuring adaptive thinking for Anthropic available_models
-
-@zerx-lab•\#57207•2w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/60552)
-
-Csettings_ui: Fix MCP server toggle not updating in UI
-
-@counterfactual5•\#60552•1w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/59586)
-
-Ragent_ui: Fix duplicate terminal when starting a new agent thread
-
-@rbstp•\#59586•2w ago•View →
+@nevo-ts•\#60893•3w ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)

@@ -199,6 +199,7 @@ toolsdirectory
 toplevel
 unitless
 unmirrored
+unslop
 velero
 venv
 vercel
@@ -211,3 +212,4 @@ worktree
 worktrees
 WSJF
 xclip
+docstrings

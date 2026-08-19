@@ -8,17 +8,18 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Best Practices
+Markdownkeyboard_arrow_down
 
-# Best practices for Antigravity CLI[link](#best-practices-for-antigravity-cli)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Best practices for Antigravity CLI
 
 Master the workflows, prompt architectures, and local configuration
 choices to maximize agent velocity while maintaining robust control.
 
-## Establish verification loops[link](#establish-verification-loops)
+## Establish verification loops
 
 The single most effective way to ensure reliable, correct modifications
 from an autonomous agent is to provide the agent with a local
@@ -35,15 +36,11 @@ Before asking the agent to implement a code change:
 4.  Watch the agent execute the command and iterate on the test outputs
     automatically.
 
-text
-
-content_copy
-
-```
+``` astro-code
 > Implement feature X in main.py. Run npm test afterward to verify the build.
 ```
 
-## Explore, plan, then execute[link](#explore-plan-then-execute)
+## Explore, plan, then execute
 
 Autonomous local agents operate with highest accuracy when complex
 changes are partitioned into distinct exploration, planning, and
@@ -58,46 +55,42 @@ execution phases.
 - **Execution**: Once you approve the structured plan, direct the agent
   to apply the edits.
 
-text
-
-content_copy
-
-```
+``` astro-code
 > Explore how our router resolves `/docs/:page`. Write down an implementation plan to add `/docs/best-practices`.
 ```
 
-## Enrich your prompting context[link](#enrich-your-prompting-context)
+## Enrich your prompting context
 
 Give local agents high-fidelity indicators to narrow down reasoning
 boundaries and minimize token overhead.
 
-### Target file autocompletion[link](#target-file-autocompletion)
+### Target file autocompletion
 
 Type `@` within your prompt box to trigger the **Interactive Path
 Suggestion** overlay. Highlighting and selecting a path imports the
 absolute workspace file path directly into your prompt. This helps the
 agent target its code searches.
 
-### Attaching visual evidence[link](#attaching-visual-evidence)
+### Attaching visual evidence
 
 If debugging visual UI issues, rendering bugs, or frontend layout
 inconsistencies, capture a screenshot or video recording, copy it, and
 press `ctrl+v` inside the prompt box to attach it. The agent will
 consult the media file to diagnose the issue.
 
-## Configure your workspace environment[link](#configure-your-workspace-environment)
+## Configure your workspace environment
 
 Optimize your local workstation rules and security boundaries to match
 your engineering flow.
 
-### Write a codebase rule file[link](#write-a-codebase-rule-file)
+### Write a codebase rule file
 
 Create a `GEMINI.md` or `AGENTS.md` file at your workspace root to
 outline specific directory standards, styling paradigms, test command
 parameters, and deprecation warnings. The agent automatically parses
 these rules on startup and consults them before suggesting changes.
 
-### Establish structured permissions[link](#establish-structured-permissions)
+### Establish structured permissions
 
 Tune your safety barriers in `~/.gemini/antigravity-cli/settings.json`
 based on your project risk level:
@@ -110,37 +103,33 @@ based on your project risk level:
 - **`strict`**: Always prompts for all non-read operations, providing
   complete line-by-line transparency.
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "toolPermission": "proceed-in-sandbox",
-  "enableTerminalSandbox": true
+    "toolPermission": "proceed-in-sandbox",
+    "enableTerminalSandbox": true
 }
 ```
 
-## Manage TUI sessions proactively[link](#manage-tui-sessions-proactively)
+## Manage TUI sessions proactively
 
 Use active session navigation tools to recover from engineering
 dead-ends or course-correct intermediate agent loops.
 
-### Course-correct early (`esc`)[link](#course-correct-early-esc)
+### Course-correct early (`esc`)
 
 If you watch an agent execute an incorrect search pattern or write code
 that deviates from your intentions, press the global escape hatch key
 `esc` immediately to interrupt the turn and regain focus of a clean
 prompt.
 
-### Rewind history with `/rewind`[link](#rewind-history-with-rewind)
+### Rewind history with `/rewind`
 
 If an agent has made several successive changes that introduce build
 errors, you do not need to discard the session. Type `/rewind` (or
 `/undo`) to roll back your conversation thread to a previous stable
 checkout.
 
-### Branch experiments with `/fork`[link](#branch-experiments-with-fork)
+### Branch experiments with `/fork`
 
 If you are unsure of the best implementation path:
 
@@ -150,32 +139,28 @@ If you are unsure of the best implementation path:
 4.  If the approach fails, run `/resume` to swap back to your stable
     main branch.
 
-## Automate and script[link](#automate-and-script)
+## Automate and script
 
 Antigravity CLI is designed to operate seamlessly within standard shell
 pipeline tools.
 
-### Run non-interactive commands (`-p`)[link](#run-non-interactive-commands--p)
+### Run non-interactive commands (`-p`)
 
 To automate quick queries or integrate agents into git hooks, use the
 one-shot prompt flag `-p`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Review this git diff and draft a conventional commit message" --cwd $(pwd)
 ```
 
-### Fan out using parallel subagents[link](#fan-out-using-parallel-subagents)
+### Fan out using parallel subagents
 
 For large-scale sweeps or multi-file refactoring, direct the primary
 agent to spawn concurrent background subagents. The agent manager
 handles background threads autonomously while you continue working on
 your primary screen.
 
-## Related resources[link](#related-resources)
+## Related resources
 
 Learn how to configure settings and customize visual layouts:
 
@@ -185,7 +170,5 @@ Learn how to configure settings and customize visual layouts:
   containment.
 - **[Plugins & Skills](https://antigravity.google/docs/cli/plugins)**: Create your own custom
   slash commands.
-
-On this Page
 
 {% endraw %}

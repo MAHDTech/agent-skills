@@ -14,7 +14,7 @@ recipients.
 |----|----|
 | Provider | `age` |
 | URI | `age://\<path\>[?options]` |
-| Access | Read and write |
+| Access | Read, write, and delete (0.20+) |
 | Best for | Encrypted secrets committed alongside code |
 | Authentication | An age identity (private key) |
 | Build feature | `age` |
@@ -27,7 +27,9 @@ Rust age library currently accesses this key type through the
 non-interactive `age-plugin-pq` compatibility plugin:
 
 ```
-$ mkdir -p "$HOME/.config/age"$ age-keygen -pq -o "$HOME/.config/age/keys.txt"Public key: age1pq1...$ age-plugin-pq -identity -o "$HOME/.config/age/plugin-identity.txt" "$HOME/.config/age/keys.txt"
+$ mkdir -p "$HOME/.config/age"
+$ age-keygen -pq -o "$HOME/.config/age/keys.txt"Public key: age1pq1...
+$ age-plugin-pq -identity -o "$HOME/.config/age/plugin-identity.txt" "$HOME/.config/age/keys.txt"
 $ secretspec set DATABASE_URL --provider "age://secrets.age?identity=$HOME/.config/age/plugin-identity.txt"Enter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to age (profile: default)
 $ secretspec get DATABASE_URL --provider "age://secrets.age?identity=$HOME/.config/age/plugin-identity.txt"
 ```
@@ -111,7 +113,33 @@ together in a roster. Age intentionally rejects a mixture of
 post-quantum and classic recipients, because the classic recipient would
 remove the file’s post-quantum protection.
 
+## Provider credentials
+
+| Credential | Environment fallback | Available since |
+|------------|----------------------|-----------------|
+| `identity` | `AGE_IDENTITY`       | 0.17+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
+
 ## Configuration
+
+### Discover declarations (0.18+)
+
+SecretSpec 0.18+ can initialize a manifest from the key names already in
+an age file. Reflection decrypts the file in memory to enumerate its
+keys but never writes their values to `secretspec.toml`:
+
+```
+$ secretspec init --from "age://secrets.age?identity=$HOME/.config/age/plugin-identity.txt"
+```
+
+Terminal window
+
+The provider must have enough identity configuration to open the file.
+Use `--project` and `--profile` to choose the metadata written to the
+new manifest.
 
 ### URI format
 
@@ -153,6 +181,11 @@ secret name. Project and profile do not appear in the file; point
 separate profiles at separate blobs to keep them apart, for example
 `secrets.prod.age` and `secrets.dev.age`.
 
+Starting in SecretSpec 0.20+, this plaintext uses dotenv-ng syntax: `$`
+remains literal, and values are quoted only when needed to round-trip.
+Keys may include hyphens, leading digits, leading dots, and Unicode, but
+not whitespace, `=`, `#`, or control characters.
+
 ## Use existing secrets
 
 A secret’s [`ref`](https://secretspec.dev/reference/configuration/#secret-references) names
@@ -174,7 +207,8 @@ credential (sourced from another provider) or the `AGE_IDENTITY`
 environment variable:
 
 ```
-$ export AGE_IDENTITY="$CI_AGE_IDENTITY"$ secretspec run --provider "age://secrets.age" -- deploy
+$ export AGE_IDENTITY="$CI_AGE_IDENTITY"
+$ secretspec run --provider "age://secrets.age" -- deploy
 ```
 
 Terminal window

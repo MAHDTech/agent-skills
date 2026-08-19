@@ -8,18 +8,17 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Commands
-  \>
-- AI Credits (/credits)
+Markdownkeyboard_arrow_down
 
-# AI Credits Command (/credits)[link](#ai-credits-command-credits)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# AI Credits Command (/credits)
 
 View and manage your AI Premium credits interactively.
 
-## Overview[link](#overview)
+## Overview
 
 The `/credits` command opens a dedicated panel in the TUI that displays
 your current AI Premium credit balance, consumption history, and links
@@ -29,18 +28,14 @@ For details on how credits are tracked, low credit alerts, and settings
 configuration, see the conceptual **[AI Credits
 Guide](https://antigravity.google/docs/cli/credits)**.
 
-## Using the Credits Command[link](#using-the-credits-command)
+## Using the Credits Command
 
 To view your credit status:
 
 1.  Type `/credits` in the prompt box.
 2.  Press `Enter`.
 
-text
-
-content_copy
-
-```
+``` astro-code
 /credits
 ```
 
@@ -54,7 +49,7 @@ The credits panel will display:
 
 Press `Esc` to close the panel and return to the main prompt.
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - **[AI Credits Guide](https://antigravity.google/docs/cli/credits)**: Learn about credit
   consumption, alerts, and settings.
@@ -62,7 +57,5 @@ Press `Esc` to close the panel and return to the main prompt.
   model-specific API quotas.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands.
-
-On this Page
 
 {% endraw %}

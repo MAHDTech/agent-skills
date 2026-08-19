@@ -42,12 +42,12 @@ file along with any other assets loaded by your frontend.
 
 To develop your application for desktop, run the `tauri dev` command.
 
-- [npm](#tab-panel-4527)
-- [yarn](#tab-panel-4528)
-- [pnpm](#tab-panel-4529)
-- [deno](#tab-panel-4530)
-- [bun](#tab-panel-4531)
-- [cargo](#tab-panel-4532)
+- [npm](#tab-panel-4404)
+- [yarn](#tab-panel-4405)
+- [pnpm](#tab-panel-4406)
+- [deno](#tab-panel-4407)
+- [bun](#tab-panel-4408)
+- [cargo](#tab-panel-4409)
 
 ```
 npm run tauri dev
@@ -94,12 +94,12 @@ shortcut on macOS.
 Developing for mobile is similar to how desktop development works, but
 you must run `tauri android dev` or `tauri ios dev` instead:
 
-- [npm](#tab-panel-4533)
-- [yarn](#tab-panel-4534)
-- [pnpm](#tab-panel-4535)
-- [deno](#tab-panel-4536)
-- [bun](#tab-panel-4537)
-- [cargo](#tab-panel-4538)
+- [npm](#tab-panel-4410)
+- [yarn](#tab-panel-4411)
+- [pnpm](#tab-panel-4412)
+- [deno](#tab-panel-4413)
+- [bun](#tab-panel-4414)
+- [cargo](#tab-panel-4415)
 
 ```
 npm run tauri [android|ios] dev
@@ -166,12 +166,12 @@ connected device, and falls back to prompting you to select a simulator
 to use. To define the run target upfront, you can provide the device or
 simulator name as an argument:
 
-- [npm](#tab-panel-4539)
-- [yarn](#tab-panel-4540)
-- [pnpm](#tab-panel-4541)
-- [deno](#tab-panel-4542)
-- [bun](#tab-panel-4543)
-- [cargo](#tab-panel-4544)
+- [npm](#tab-panel-4416)
+- [yarn](#tab-panel-4417)
+- [pnpm](#tab-panel-4418)
+- [deno](#tab-panel-4419)
+- [bun](#tab-panel-4420)
+- [cargo](#tab-panel-4421)
 
 ```
 npm run tauri ios dev 'iPhone 15'
@@ -205,12 +205,12 @@ by using the IDE instead of the command line tools. To open the mobile
 IDE instead of running on a connected device or simulator, use the
 `--open` flag:
 
-- [npm](#tab-panel-4545)
-- [yarn](#tab-panel-4546)
-- [pnpm](#tab-panel-4547)
-- [deno](#tab-panel-4548)
-- [bun](#tab-panel-4549)
-- [cargo](#tab-panel-4550)
+- [npm](#tab-panel-4422)
+- [yarn](#tab-panel-4423)
+- [pnpm](#tab-panel-4424)
+- [deno](#tab-panel-4425)
+- [bun](#tab-panel-4426)
+- [cargo](#tab-panel-4427)
 
 ```
 npm run tauri [android|ios] dev --open

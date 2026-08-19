@@ -5,7 +5,7 @@ GitHub](https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.7.0)
 
 Jul 20, 2025
 
-### New Features
+##### New Features
 
 - [`7bc77a038`](https://www.github.com/tauri-apps/tauri/commit/7bc77a038af062a02aabeaf9b228577447bad5e5)
   ([\#13609](https://www.github.com/tauri-apps/tauri/pull/13609) by
@@ -13,7 +13,7 @@ Jul 20, 2025
   Added `tauri::plugin::Builder::js_init_script_on_all_frames` that
   allows plugins to add initialization scripts that runs on all frames
 
-### Enhancements
+##### Enhancements
 
 - [`7f3c98911`](https://www.github.com/tauri-apps/tauri/commit/7f3c989111e007d7eeb5da118421214848e4bfcd)
   ([\#13837](https://www.github.com/tauri-apps/tauri/pull/13837) by
@@ -23,10 +23,10 @@ Jul 20, 2025
 - [`7bc77a038`](https://www.github.com/tauri-apps/tauri/commit/7bc77a038af062a02aabeaf9b228577447bad5e5)
   ([\#13609](https://www.github.com/tauri-apps/tauri/pull/13609) by
   [@Legend-Master](https://www.github.com/tauri-apps/tauri/../../Legend-Master))
-  `tauri::plugin::Builder::js_init_script` now takes
-  `impl Into<String>` instead of `String`
+  `tauri::plugin::Builder::js_init_script` now takes `impl Into<String>`
+  instead of `String`
 
-### Bug Fixes
+##### Bug Fixes
 
 - [`6a4451bcd`](https://www.github.com/tauri-apps/tauri/commit/6a4451bcd9cf5a2428857d2e47ea25e3d74712ae)
   ([\#13849](https://www.github.com/tauri-apps/tauri/pull/13849) by
@@ -41,7 +41,7 @@ Jul 20, 2025
   [@tasgon](https://www.github.com/tauri-apps/tauri/../../tasgon))
   Forward request body on the mobile frontend proxy.
 
-### Dependencies
+##### Dependencies
 
 - Upgraded to `tauri-runtime-wry@2.7.2`
 - Upgraded to `tauri-utils@2.6.0`

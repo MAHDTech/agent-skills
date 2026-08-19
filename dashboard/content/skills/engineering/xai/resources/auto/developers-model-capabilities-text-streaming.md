@@ -36,7 +36,7 @@ client = Client(
     timeout=3600, # Override default timeout with longer timeout for reasoning models
 )
 
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 chat.append(
     system("You are Grok, a helpful and maximally truthful AI built by xAI."),
 )
@@ -63,7 +63,7 @@ client = OpenAI(
 )
 
 stream = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[
         {"role": "system", "content": "You are Grok, a helpful and maximally truthful AI built by xAI."},
         {"role": "user", "content": "Explain how neural networks learn in two sentences."},
@@ -84,7 +84,7 @@ const openai = new OpenAI({
 });
 
 const stream = await openai.chat.completions.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     messages: [
         { role: "system", content: "You are Grok, a helpful and maximally truthful AI built by xAI." },
         {
@@ -105,7 +105,7 @@ import { xai } from '@ai-sdk/xai';
 import { streamText } from 'ai';
 
 const result = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system:
     "You are Grok, a helpful and maximally truthful AI built by xAI.",
   prompt: 'Explain how neural networks learn in two sentences.',
@@ -132,7 +132,7 @@ curl https://api.x.ai/v1/chat/completions \\
             "content": "Explain how neural networks learn in two sentences."
         }
     ],
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "stream": true
 }'
 ```
@@ -142,7 +142,7 @@ You'll get the event streams like these:
 ```json
 data: {
     "id":"<completion_id>","object":"chat.completion.chunk","created":<creation_time>,
-    "model":"grok-4.5",
+    "model":"grok-4.6",
     "choices":[{"index":0,"delta":{"content":"Ah","role":"assistant"}}],
     "usage":{"prompt_tokens":41,"completion_tokens":1,"total_tokens":42,
     "prompt_tokens_details":{"text_tokens":41,"audio_tokens":0,"image_tokens":0,"cached_tokens":0}},
@@ -151,7 +151,7 @@ data: {
 
 data: {
     "id":"<completion_id>","object":"chat.completion.chunk","created":<creation_time>,
-    "model":"grok-4.5",
+    "model":"grok-4.6",
     "choices":[{"index":0,"delta":{"content":",","role":"assistant"}}],
     "usage":{"prompt_tokens":41,"completion_tokens":2,"total_tokens":43,
     "prompt_tokens_details":{"text_tokens":41,"audio_tokens":0,"image_tokens":0,"cached_tokens":0}},

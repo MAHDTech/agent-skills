@@ -114,6 +114,7 @@
 - **[Community Forum](https://github.com/zed-industries/zed/discussions)**: Discussions and feature requests
 - **[Agentic Engineering](https://zed.dev/agentic-engineering)**: Learn how to combine human craftsmanship with AI tools
 - **[Twitter/X](https://twitter.com/zeddotdev)**: Latest news and updates
+- **[Instagram](https://www.instagram.com/zed.industries/)**: News, updates and behind-the-scenes content
 - **[YouTube Channel](https://youtube.com/@zeddotdev)**: Tutorials, feature demos and more
 
 ## Company

@@ -22,7 +22,7 @@ with open("photo.png", "rb") as f:
 
 response = client.image.sample(
     prompt="Render this as a pencil sketch with detailed shading",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     image_url=f"data:image/png;base64,{image_data}",
 )
 
@@ -35,7 +35,7 @@ curl -X POST https://api.x.ai/v1/images/edits \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "Render this as a pencil sketch with detailed shading",
     "image": {
       "url": "https://docs.x.ai/assets/api-examples/images/style-realistic.png",
@@ -54,7 +54,7 @@ const imageBuffer = fs.readFileSync("photo.png");
 const base64Image = imageBuffer.toString("base64");
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: {
         text: "Render this as a pencil sketch with detailed shading",
         images: [`data:image/png;base64,${base64Image}`],
@@ -76,7 +76,7 @@ Chain multiple edits together by using each output as the input for the next. Th
 
 ## Style transfer
 
-The `grok-imagine-image-quality` model supports a wide range of visual styles, from ultra-realistic photography to anime, oil paintings, and pencil sketches. Transform existing images by describing the desired aesthetic in your prompt.
+The `grok-imagine-image-2.0` model supports a wide range of visual styles, from ultra-realistic photography to anime, oil paintings, and pencil sketches. Transform existing images by describing the desired aesthetic in your prompt.
 
 ## Related
 

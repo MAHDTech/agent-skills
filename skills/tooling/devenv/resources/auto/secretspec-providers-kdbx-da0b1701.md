@@ -14,7 +14,7 @@ KeePass or KeePassXC to be installed.
 | Best for | Local, portable KeePass-compatible encrypted storage |
 | Authentication | Master password, key file, or both |
 | Build feature | `kdbx` (0.17+) |
-| Default storage | Entry `secretspec/{project}/{profile}/{key}`, field `Password` |
+| Default storage | Nested groups `secretspec` → `{project}` → `{profile}`; entry titled `{key}`; field `Password` |
 
 ## Quick start
 
@@ -41,9 +41,9 @@ builds must enable the `kdbx` feature.
 ### Authentication
 
 Load the semantic `password` [provider
-credential](https://secretspec.dev/concepts/providers/#provider-credentials) from a bootstrap
-provider such as the system keyring. This keeps the KDBX master password
-out of shell profiles and child-process environments:
+credential](https://secretspec.dev/reference/provider-credentials/) from a bootstrap provider
+such as the system keyring. This keeps the KDBX master password out of
+shell profiles and child-process environments:
 
 ```
 [providers]kdbx = {  uri = "kdbx:./secrets.kdbx",  credentials = { password = "keyring" }}
@@ -67,6 +67,16 @@ Use `?keyfile=PATH` for a KeePass key file. When both a password and key
 file are configured, both are required to unlock the database, matching
 KeePass. Relative database and key-file paths resolve from the directory
 containing `secretspec.toml`.
+
+## Provider credentials
+
+| Credential | Environment fallback       | Available since |
+|------------|----------------------------|-----------------|
+| `password` | `SECRETSPEC_KDBX_PASSWORD` | 0.17+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -100,13 +110,47 @@ secretspec.toml
 
 ## Storage model
 
-The default convention address creates groups for `secretspec`, the
-project, and the profile. The final path component is the entry title,
-and the value is stored as its protected `Password` field:
+Yes: the `/` characters in the default convention address separate
+nested KeePass groups. The path starts inside the database’s root group;
+neither the database filename nor the root group’s display name is part
+of it. SecretSpec then uses the final path component as the entry title
+and stores the value in the entry’s protected `Password` field.
+
+For this configuration:
 
 ```
-secretspec/myapp/production/DATABASE_URL└── Password = <secret value>
+[project]name = "my-app"revision = "1.0"
+[profiles.default]DATABASE_URL = { description = "Database URL" }
 ```
+
+secretspec.toml
+
+the KeePass tree is:
+
+```
+Database root (its name does not matter)└── secretspec                         group    └── my-app                         group ([project].name)        └── default                    group (active profile)            └── DATABASE_URL           entry (secret key)                └── Password = <secret value>
+```
+
+### Set up an entry manually
+
+1.  Open the database file named by the provider URI, such as
+    `secrets.kdbx` for `kdbx:./secrets.kdbx`. The file itself can have
+    any name.
+2.  Directly below the database’s root group, create a group named
+    `secretspec`.
+3.  Inside it, create a group whose name exactly matches
+    `[project].name` in `secretspec.toml`.
+4.  Inside the project group, create a group whose name exactly matches
+    the active profile, such as `default`.
+5.  Inside the profile group, create an entry whose **Title** exactly
+    matches the secret key, such as `DATABASE_URL`, and put the secret
+    value in its **Password** field.
+
+Do not rename the database or its root group to `secretspec`;
+`secretspec` is a child group of the root. Group names and entry titles
+are case-sensitive. If you want SecretSpec to write to a manually
+created database, save it as KDBX 4. You can also let `secretspec set`
+create the missing groups and entry automatically.
 
 Reads open KDBX 3 and KDBX 4 databases. Writes create KDBX 4 databases
 and atomically replace an existing KDBX 4 file only after the complete

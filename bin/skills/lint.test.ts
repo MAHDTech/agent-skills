@@ -2,7 +2,11 @@ import {describe, it, expect, afterEach} from "bun:test"
 import fs from "fs-extra"
 import path from "path"
 import os from "os"
-import {checkDuplicateSkills, checkResourcesLayout} from "./lint.ts"
+import {
+    checkDuplicateSkills,
+    checkResourcesLayout,
+    checkNoEmDashes,
+} from "./lint.ts"
 import type {Skill} from "./lib.ts"
 
 describe("checkDuplicateSkills", () => {
@@ -94,6 +98,21 @@ describe("checkDuplicateSkills", () => {
     })
 })
 
+describe("checkNoEmDashes", () => {
+    it("returns no errors when content has standard hyphens and no em-dashes", () => {
+        const content = "# Title\n\nThis is a skill - it does things."
+        expect(checkNoEmDashes(content, "SKILL.md")).toEqual([])
+    })
+
+    it("flags em-dash instances in content", () => {
+        const content = "# Title\n\nThis is a skill \u2014 it does things."
+        const errors = checkNoEmDashes(content, "SKILL.md")
+        expect(errors).toHaveLength(1)
+        expect(errors[0]).toContain("contains em-dash (Unicode U+2014)")
+        expect(errors[0]).toContain("CRITICAL STYLE RULE violation")
+    })
+})
+
 describe("checkResourcesLayout", () => {
     const tmp = path.join(
         os.tmpdir(),
@@ -143,5 +162,17 @@ describe("checkResourcesLayout", () => {
         expect(errors).toHaveLength(1)
         expect(errors[0]).toContain("disallowed inside resources/")
         expect(errors[0]).toContain("index.md")
+    })
+
+    it("flags em-dash inside manual resources files", async () => {
+        const resDir = path.join(tmp, "resources")
+        await fs.ensureDir(path.join(resDir, "manual"))
+        await fs.writeFile(
+            path.join(resDir, "manual", "guide.md"),
+            "This has an em\u2014dash."
+        )
+        const errors = await checkResourcesLayout(resDir)
+        expect(errors).toHaveLength(1)
+        expect(errors[0]).toContain("contains em-dash (Unicode U+2014)")
     })
 })

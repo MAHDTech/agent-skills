@@ -8,19 +8,20 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Antigravity CLI Overview[link](#antigravity-cli-overview)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Antigravity CLI Overview
 
 The Antigravity CLI is the lightweight Terminal User Interface (TUI)
 surface of Antigravity. It brings the same core agentic capabilities as
 Antigravity 2.0 (such as multi-step reasoning, multi-file editing, tool
 calling, and conversation history) directly to your terminal.
 
-## Why Antigravity CLI?[link](#why-antigravity-cli)
+## Why Antigravity CLI?
 
 Antigravity CLI brings the reasoning, execution, and orchestration
 capabilities of our shared agent harness directly into your local shell.
@@ -28,7 +29,7 @@ While Antigravity 2.0 offers a comprehensive visual editor interface,
 the CLI is custom-built for speed, lightweight operation, and seamless
 integration with terminal-first workflows.
 
-### Platform comparison[link](#platform-comparison)
+### Platform comparison
 
 | Feature | Antigravity CLI | Antigravity 2.0 |
 |:---|:---|:---|
@@ -38,7 +39,7 @@ integration with terminal-first workflows.
 | **Navigation** | Universal keyboard shortcuts | Mouse and multi-panel layout |
 | **Remote usability** | Native SSH, tmux, and terminal multiplexers | Local workspace or remote development containers |
 
-## Integration features[link](#integration-features)
+## Integration features
 
 Antigravity CLI operates in tandem with Antigravity 2.0, sharing
 configurations and enabling frictionless transitions between interfaces:
@@ -55,14 +56,14 @@ configurations and enabling frictionless transitions between interfaces:
   visual orchestration, export the conversation to Antigravity 2.0 to
   continue with the visual editor interface.
 
-## Migrating from Gemini CLI[link](#migrating-from-gemini-cli)
+## Migrating from Gemini CLI
 
 If you are transitioning from Gemini CLI, the onboarding process
 supports a one-time import to automatically migrate your existing Gemini
 CLI extensions, skills, and settings. To learn more, read [Migrating
 from Gemini CLI](https://antigravity.google/docs/cli/gcli-migration).
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Explore the guides below to set up your environment and begin working
 with autonomous agents:
@@ -83,7 +84,5 @@ with autonomous agents:
   skills slash commands, manage hooks, and configure MCP servers.
 - **[Best Practices](https://antigravity.google/docs/cli/best-practices)**: Master workflow
   pipelines, verification loops, and session course-corrections.
-
-On this Page
 
 {% endraw %}

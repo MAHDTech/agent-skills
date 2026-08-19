@@ -96,7 +96,7 @@ For more details, check [Identifying Tool Call Types](https://docs.x.ai/develope
        ),
    ]
 
-   model = "grok-4.5"
+   model = "grok-4.6"
    ```
 
 2. Perform the tool loop with conversation continuation:
@@ -227,7 +227,7 @@ For more details, see [Identifying Tool Call Types](https://docs.x.ai/developers
        # In a real app, this would query your database
        return f"The weather in {city} is sunny."
 
-   model = "grok-4.5"
+   model = "grok-4.6"
    tools = [
        {
            "type": "function",
@@ -392,7 +392,7 @@ from xai_sdk.tools import web_search, x_search
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 # First turn.
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[web_search(), x_search()],
     store_messages=True,
 )
@@ -404,7 +404,7 @@ print("\\n\\nUsage for first turn:", response.server_side_tool_usage)
 
 # Second turn.
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[web_search(), x_search()],
     # pass the response id of the first turn to continue the conversation
     previous_response_id=response.id,
@@ -437,7 +437,7 @@ from xai_sdk.tools import web_search, x_search
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 # First turn.
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[web_search(), x_search()],
     use_encrypted_content=True,
 )
@@ -522,7 +522,7 @@ from xai_sdk.tools import web_search, x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[
         web_search(),
         x_search(),
@@ -565,7 +565,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -595,7 +595,7 @@ headers = {
     "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}"
 }
 payload = {
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "user",
@@ -620,7 +620,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -651,7 +651,7 @@ from xai_sdk.tools import web_search, code_execution
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     # research_tools
     tools=[
         web_search(),
@@ -676,7 +676,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -707,7 +707,7 @@ headers = {
     "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}"
 }
 payload = {
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "user",
@@ -733,7 +733,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -767,7 +767,7 @@ from xai_sdk.tools import web_search, x_search
 # Create the client and define the server-side tools to use
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[web_search(), x_search()],
     include=["verbose_streaming"],
 )

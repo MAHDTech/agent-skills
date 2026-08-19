@@ -4,7 +4,7 @@ This project includes work adapted from other open-source projects. Their licens
 
 ## mattpocock/skills
 
-A number of the skills in this repository — across the `engineering/`, `planning/`, `review/`, and `authoring/` categories — are adapted from Matt Pocock's skills collection at <https://github.com/mattpocock/skills>, used under the MIT License.
+A number of the skills in this repository - across the `engineering/`, `planning/`, `review/`, and `authoring/` categories - are adapted from Matt Pocock's skills collection at <https://github.com/mattpocock/skills>, used under the MIT License.
 
 ```text
 MIT License

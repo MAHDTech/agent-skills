@@ -8,21 +8,20 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Agent Capabilities
-  \>
-- Permissions
+Markdownkeyboard_arrow_down
 
-# Permissions[link](#permissions)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Permissions
 
 Secure your local workstation, restrict absolute file paths, configure
 custom allow/deny/ask policies, and manage interactive approvals. You
 can also manage these rules interactively using the **[Permissions
 Command](https://antigravity.google/docs/cli/commands/permissions)**.
 
-## Fine-grained permissions[link](#fine-grained-permissions)
+## Fine-grained permissions
 
 To secure your workstation while enabling autonomous workflows,
 Antigravity CLI integrates a robust **Fine-Grained Permissions Engine**.
@@ -32,11 +31,7 @@ Every sensitive operation the agent performs is represented as a
 Permissions are evaluated across three distinct access lists configured
 inside your global settings:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/settings.json
 ```
 
@@ -45,22 +40,11 @@ content_copy
   before proceeding.
 - **`allow`**: The action is auto-approved without prompting.
 
-warning
-
-Precedence Rule: Conflicting rules are strictly evaluated in priority
-order: Deny \> Ask \> Allow. For example, if you configure command(\*)
-in your ask list and command(git) in your allow list, the ask rule takes
-precedence and prompts before every command.
-
-## Supported actions & matching rules[link](#supported-actions--matching-rules)
+## Supported actions & matching rules
 
 Fine-grained permissions follow a standard schema pattern:
 
-text
-
-content_copy
-
-```
+``` astro-code
 action(target)
 ```
 
@@ -69,20 +53,20 @@ algorithms are:
 
 [TABLE]
 
-### Global wildcard syntax[link](#global-wildcard-syntax)
+### Global wildcard syntax
 
 Across all supported action types, passing the global wildcard `*` (such
 as `read_file(*)`, `command(*)`, `mcp(*)`) matches all targets within
 that entire action namespace.
 
-### Implicit permission rules[link](#implicit-permission-rules)
+### Implicit permission rules
 
 - **Write implies Read**: Allowing `write_file` on a path automatically
   grants `read_file` on that path.
 - **Deny Read implies Deny Write**: Denying `read_file` on a path
   immediately blocks `write_file` on that path.
 
-### Cross-platform path normalization[link](#cross-platform-path-normalization)
+### Cross-platform path normalization
 
 Antigravity ensures your permission rules work flawlessly whether you
 are developing on macOS, Linux, or Windows. On macOS and Linux, paths
@@ -93,7 +77,7 @@ forward slashes (`/`).
 
 ------------------------------------------------------------------------
 
-## Default system behaviors & guardrails[link](#default-system-behaviors--guardrails)
+## Default system behaviors & guardrails
 
 When an action is not explicitly listed in your `allow`, `deny`, or
 `ask` lists, the system falls back to secure system defaults:
@@ -111,7 +95,7 @@ When an action is not explicitly listed in your `allow`, `deny`, or
 
 ------------------------------------------------------------------------
 
-## Interactive permission prompts[link](#interactive-permission-prompts)
+## Interactive permission prompts
 
 When the agent encounters an operation requiring approval (**Ask**
 mode), an interactive prompt card appears in your TUI.
@@ -127,43 +111,35 @@ commands).*
 
 ------------------------------------------------------------------------
 
-## Configuration examples[link](#configuration-examples)
+## Configuration examples
 
 Add these rules to your `~/.gemini/antigravity-cli/settings.json` file:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "permissions": {
-    "allow": [
-      "command(git)",
-      "command(npm run (build|lint|test))",
-      "unsandboxed(git push)",
-      "read_file(/var/log/app)",
-      "write_file(src/)",
-      "read_url(google.com)",
-      "mcp(linter/*)"
-    ],
-    "deny": [
-      "command(rm -rf)",
-      "command(curl .*)",
-      "command(sudo)",
-      "write_file(.git/)",
-      "write_file(/home/user/.ssh)"
-    ],
-    "ask": [
-      "command(*)",
-      "execute_url(aws.amazon.com)",
-      "mcp(sql/execute_mutation)"
-    ]
-  }
+    "permissions": {
+        "allow": [
+            "command(git)",
+            "command(npm run (build|lint|test))",
+            "unsandboxed(git push)",
+            "read_file(/var/log/app)",
+            "write_file(src/)",
+            "read_url(google.com)",
+            "mcp(linter/*)"
+        ],
+        "deny": [
+            "command(rm -rf)",
+            "command(curl .*)",
+            "command(sudo)",
+            "write_file(.git/)",
+            "write_file(/home/user/.ssh)"
+        ],
+        "ask": ["command(*)", "execute_url(aws.amazon.com)", "mcp(sql/execute_mutation)"]
+    }
 }
 ```
 
-## See also[link](#see-also)
+## See also
 
 - **[Permissions Command](https://antigravity.google/docs/cli/commands/permissions)**: Manage
   rules interactively in the TUI.
@@ -173,7 +149,5 @@ content_copy
   skills slash commands.
 - **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Customize
   keyboard hotkeys and buffers.
-
-On this Page
 
 {% endraw %}

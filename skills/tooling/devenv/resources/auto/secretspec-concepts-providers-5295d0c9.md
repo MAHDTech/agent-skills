@@ -38,21 +38,29 @@ secretspec.toml
 | [keyring](https://secretspec.dev/providers/keyring/) | [macOS Keychain](https://support.apple.com/guide/security/keychain-data-protection-secb0694df1a/web), [Windows Credential Manager](https://learn.microsoft.com/windows/win32/secauthn/credentials-management), or [Linux Secret Service](https://gnome.pages.gitlab.gnome.org/libsecret/) | ✓ | ✓ | ✓ | — |
 | [kdbx](https://secretspec.dev/providers/kdbx/) (0.17+) | KeePass KDBX file (requires the `kdbx` build feature) | ✓ | KDBX 4 | ✓ | — |
 | [dotenv](https://secretspec.dev/providers/dotenv/) | A `.env` file | ✓ | ✓ | ✗ | — |
+| [file](https://secretspec.dev/providers/file/) (0.19+) | One plaintext UTF-8 file per secret | ✓ | ✓ | ✗ | — |
 | [env](https://secretspec.dev/providers/env/) | Current process environment | ✓ | ✗ | ✗ | — |
+| [null](https://secretspec.dev/providers/null/) (0.19+) | No storage; uses a manifest default, ephemeral generation, or an ephemeral run prompt | ✗ | ✗ | N/A | — |
 | [systemd-credential](https://secretspec.dev/providers/systemd-credential/) (0.17+) | Credentials passed to the current systemd service | ✓ | ✗ | Depends on the unit’s credential source | [Via systemd-creds](https://www.freedesktop.org/software/systemd/man/latest/systemd-creds.html) |
+| [fly](https://secretspec.dev/providers/fly/) (0.20+) | Fly.io application secrets through `flyctl` | ✗ | ✓ | ✓ | — |
 | [pass](https://secretspec.dev/providers/pass/) | Unix `pass` password store | ✓ | ✓ | ✓ | [Via GnuPG](https://gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html) |
 | [gopass](https://secretspec.dev/providers/gopass/) (0.15+) | `gopass` password store (git-synced, GPG-encrypted) | ✓ | ✓ | ✓ | [Via GnuPG](https://gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html) |
 | [protonpass](https://secretspec.dev/providers/protonpass/) | Proton Pass | ✓ | ✓ | ✓ | — |
+| [passbolt](https://secretspec.dev/providers/passbolt/) (0.19+) | Self-hosted Passbolt through `go-passbolt-cli` | ✓ | ✓ | ✓ | — |
 | [onepassword](https://secretspec.dev/providers/onepassword/) | 1Password | ✓ | ✓ | ✓ | — |
 | [lastpass](https://secretspec.dev/providers/lastpass/) | LastPass | ✓ | ✓ | ✓ | — |
 | [dashlane](https://secretspec.dev/providers/dashlane/) (0.18+) | Dashlane, through the `dcli` CLI | ✓ | ✗ | ✓ | — |
+| [keeper](https://secretspec.dev/providers/keeper/) (0.18+) | Keeper Secrets Manager (requires the `keeper` build feature) | ✓ | ✓ | ✓ | — |
 | [gcsm](https://secretspec.dev/providers/gcsm/) | Google Cloud Secret Manager (requires the `gcsm` build feature) | ✓ | ✓ | ✓ | — |
 | [awssm](https://secretspec.dev/providers/awssm/) | AWS Secrets Manager (requires the `awssm` build feature) | ✓ | ✓ | ✓ | — |
+| [awsps](https://secretspec.dev/providers/awsps/) (0.18+) | AWS Systems Manager Parameter Store (requires the `awsps` build feature in 0.18+) | ✓ | ✓ | ✓ (`SecureString`) | — |
 | [scaleway](https://secretspec.dev/providers/scaleway/) (0.17+) | Scaleway Secret Manager (requires the `scaleway` build feature) | ✓ | ✓ | ✓ | — |
 | [vault](https://secretspec.dev/providers/vault/) | HashiCorp Vault (requires the `vault` build feature) | ✓ | ✓ | ✓ | — |
 | [openbao](https://secretspec.dev/providers/openbao/) (0.17+) | OpenBao (requires the `openbao` build feature; 0.16 uses `openbao://` through `vault`) | ✓ | ✓ | ✓ | — |
+| [bw](https://secretspec.dev/providers/bw/) (0.18+) | Bitwarden Password Manager via the `bw` CLI (requires the `bw` build feature) | ✓ | ✓ | ✓ | — |
 | [bws](https://secretspec.dev/providers/bws/) | Bitwarden Secrets Manager (official `bws` CLI in SecretSpec 0.17+; requires the `bws` build feature) | ✓ | ✓ | ✓ | — |
 | [akv](https://secretspec.dev/providers/akv/) | Azure Key Vault (requires the `akv` build feature) | ✓ | ✓ | ✓ | — |
+| [aac](https://secretspec.dev/providers/aac/) (0.20+) | Azure App Configuration, including Key Vault-reference resolution (included by default; `aac` feature for custom builds) | ✓ | ✓ | ✓ | — |
 | [infisical](https://secretspec.dev/providers/infisical/) (0.16+) | Infisical (requires the `infisical` build feature) | ✓ | ✓ | ✓ | — |
 | [age](https://secretspec.dev/providers/age/) (0.17+) | An age-encrypted file (requires the `age` build feature) | ✓ | ✓ | ✓ | — |
 | [sops](https://secretspec.dev/providers/sops/) (0.17+) | SOPS-encrypted files (requires the `sops` build feature and SOPS CLI) | ✓ | ✓ | ✓ | Depends on the configured SOPS key service |
@@ -113,10 +121,23 @@ commands in the current shell or CI job:
 
 ```
 # Route every secret in this command to a project .env file.$ secretspec run --provider dotenv -- npm start
-# Route every secret in subsequent commands to existing environment variables.$ export SECRETSPEC_PROVIDER=env$ secretspec check
+# Route every secret in subsequent commands to existing environment variables.$ export SECRETSPEC_PROVIDER=env
+$ secretspec check
 ```
 
 Terminal window
+
+`SECRETSPEC_PROVIDER` is a whole-resolution override: it replaces every
+per-secret fallback chain. Integrations such as devenv should only
+export it when the user explicitly configures a whole-resolution
+provider override.
+
+When consuming a JSON or SDK resolution, do not feed its top-level
+`provider` display label back into `SECRETSPEC_PROVIDER`; mixed
+per-secret routes cannot be represented by one provider string. Only
+export `SECRETSPEC_PROVIDER` when the user explicitly selected a
+whole-resolution override. Per-secret `source_provider` remains the
+authoritative provenance.
 
 A provider URI can configure the selected backend more precisely:
 
@@ -157,10 +178,31 @@ URIs:
 
 secretspec.toml
 
+### Alias ref templates (0.19+)
+
+A leaf alias can map the logical `{project}`, `{profile}`, and `{key}`
+into its provider’s native coordinates. This lets every link in a
+fallback chain—and each side of an import—use a different address:
+
+```
+[providers]remote = { uri = "onepassword://Production", ref = { item = "{project}-{profile}", field = "{key}" } }local = { uri = "dotenv://.env", ref = { item = "{key}" } }
+[profiles.production]API_KEY = { description = "API key", providers = ["remote", "local"] }
+```
+
+secretspec.toml
+
+Use per-secret `refs = { alias = { item = "..." } }` for exceptions. See
+[Secret
+References](https://secretspec.dev/concepts/references/#different-coordinates-per-provider-019)
+for precedence, import-only source aliases, and cached-route
+restrictions.
+
 Use the CLI to manage user-level aliases:
 
 ```
-# SecretSpec 0.17+$ secretspec config global provider add prod_vault "onepassword://Production"$ secretspec config global provider list$ secretspec config global provider remove prod_vault
+# SecretSpec 0.17+$ secretspec config global provider add prod_vault "onepassword://Production"
+$ secretspec config global provider list
+$ secretspec config global provider remove prod_vault
 ```
 
 Terminal window
@@ -178,6 +220,10 @@ Azure service-principal credentials.
 An alias can load these credentials from another provider. This avoids
 storing long-lived provider credentials in a shell profile or CI
 variable when a secure store is available.
+
+The [provider credential reference](https://secretspec.dev/reference/provider-credentials/)
+lists every accepted semantic name, its environment fallbacks, and the
+SecretSpec version that introduced it.
 
 ### Use the convention address
 
@@ -225,7 +271,8 @@ You can also create a user-level alias with a convention-address
 credential source from the CLI:
 
 ```
-$ secretspec config global provider add bws "bws://project-uuid" --credential access_token=keyring # 0.17+$ secretspec config provider login bws
+$ secretspec config global provider add bws "bws://project-uuid" --credential access_token=keyring # 0.17+
+$ secretspec config provider login bws
 ```
 
 Terminal window
@@ -246,20 +293,20 @@ Provider credentials follow these rules:
 - **Convention addresses are profile-specific.** A string source uses
   the active project and profile. Use a `ref` source when multiple
   projects or profiles should share one provider credential.
-- **Names are provider-specific.** Bitwarden accepts `access_token`;
-  Vault accepts `token`, `role_id`, and `secret_id`; 1Password accepts
-  `service_account_token`; Azure Key Vault accepts `tenant_id`,
-  `client_id`, and `client_secret`; SOPS (0.17+) accepts `age_key`,
-  `aws_secret_access_key`, `azure_client_secret`,
-  `google_oauth_access_token`, `hc_vault_token`, `huawei_sdk_ak`, and
-  `huawei_sdk_sk`. Unsupported names are rejected before any source is
-  read.
+- **Names are provider-specific.** The catalog above is exhaustive.
+  Unsupported names are rejected before any source is read.
+- **A URI may not carry a credential (0.19+).** A provider URI with a
+  password (`scheme://user:PASSWORD@host`) is rejected, as is a service
+  account token in the `onepassword+token://` userinfo. A URI is
+  committed to `secretspec.toml`, echoed into shell history, and printed
+  by CI, so a credential written there is already disclosed. Use a
+  provider credential or the provider’s environment variable instead.
 
 ## Next steps
 
 - Learn how [Provider fallback](https://secretspec.dev/concepts/providers/fallback/) selects
   and orders sources.
-- Cache slow remote routes with [Provider
+- Cache slow remote routes and diagnose remaining latency with [Provider
   caching](https://secretspec.dev/concepts/providers/caching/) (0.17+).
 - Review the URI and authentication details for an individual provider
   in the [Providers](https://secretspec.dev/providers/keyring/) section.

@@ -53,6 +53,18 @@ Select an authentication mode with the URI’s `auth` option:
 - `managed_identity`: system-assigned managed identity.
 - `workload_identity`: AKS workload identity federation.
 
+## Provider credentials
+
+| Credential      | Environment fallback  | Available since |
+|-----------------|-----------------------|-----------------|
+| `tenant_id`     | `AZURE_TENANT_ID`     | 0.15+           |
+| `client_id`     | `AZURE_CLIENT_ID`     | 0.15+           |
+| `client_secret` | `AZURE_CLIENT_SECRET` | 0.15+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
+
 ## Configuration
 
 ### URI format
@@ -114,14 +126,17 @@ component separators cannot be confused with component data.
 
 A secret’s [`ref`](https://secretspec.dev/reference/configuration/#secret-references) field
 names an existing secret instead: `item` is the secret name (`field` and
-`version` are not yet supported). References are **read-only** in this
-provider, and `item` must already be a valid Azure Key Vault secret name
-(letters, digits, and hyphens only) — unlike convention secrets, it is
-validated but never rewritten, since silently rewriting a `ref` could
-point at a different secret than the one you named.
+`version` are both rejected through SecretSpec 0.18). `field` remains
+unsupported. SecretSpec 0.20+ accepts `version` as a 32-character ASCII
+alphanumeric Azure Key Vault version identifier; omission reads the
+latest version. References are **read-only** in this provider, and
+`item` must already be a valid Azure Key Vault secret name (letters,
+digits, and hyphens only) — unlike convention secrets, it is validated
+but never rewritten, since silently rewriting a `ref` could point at a
+different secret than the one you named.
 
 ```
-[profiles.production]DATABASE_URL = { description = "DB", ref = { item = "database-url" }, providers = ["akv://myvault"] }
+[profiles.production]DATABASE_URL = {  description = "DB",  ref = { item = "database-url", version = "0123456789abcdef0123456789abcdef" }, # version: 0.20+  providers = ["akv://myvault"]}
 ```
 
 ## CI/CD
@@ -130,8 +145,8 @@ point at a different secret than the one you named.
 
 The `auth=env` mode accepts `tenant_id`, `client_id`, and
 `client_secret` as [provider
-credentials](https://secretspec.dev/concepts/providers/#provider-credentials). For example,
-the credentials can be stored in the system keyring instead of a shell
+credentials](https://secretspec.dev/reference/provider-credentials/). For example, the
+credentials can be stored in the system keyring instead of a shell
 profile:
 
 ```
@@ -144,7 +159,8 @@ secretspec.toml
 Store all three declared credentials, then use the alias:
 
 ```
-$ secretspec config provider login azure$ secretspec run --provider azure -- deploy
+$ secretspec config provider login azure
+$ secretspec run --provider azure -- deploy
 ```
 
 Terminal window
@@ -153,7 +169,9 @@ When a semantic credential is not explicitly configured, SecretSpec
 falls back to its matching conventional environment variable:
 
 ```
-# Set credentials$ export AZURE_TENANT_ID="..."$ export AZURE_CLIENT_ID="..."$ export AZURE_CLIENT_SECRET="..."
+# Set credentials$ export AZURE_TENANT_ID="..."
+$ export AZURE_CLIENT_ID="..."
+$ export AZURE_CLIENT_SECRET="..."
 # Run command$ secretspec run --provider akv://myvault -- deploy
 ```
 

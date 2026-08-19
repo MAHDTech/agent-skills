@@ -18,7 +18,7 @@ The reasoning content is encrypted by us and can be returned if you pass `includ
 
 ## The `reasoning_effort` parameter
 
-`grok-4.5` supports the `reasoning_effort` parameter, which controls how much effort the model spends thinking before responding.
+`grok-4.6` and `grok-4.5` support the `reasoning_effort` parameter, which controls how much effort the model spends thinking before responding.
 
 If not specified, `reasoning_effort` defaults to `"high"`. Reasoning cannot be disabled.
 
@@ -31,10 +31,15 @@ If not specified, `reasoning_effort` defaults to `"high"`. Reasoning cannot be d
 | `"low"` | Uses some reasoning tokens, but still fast | Latency-sensitive agentic use and simple tool calling. |
 | `"medium"` | More thinking for less-latency sensitive applications | Complex data analysis and long-context reasoning. |
 | `"high"` (default) | Uses more reasoning tokens for deeper thinking | Very challenging problems, complex math, multi-step logic, competition-level tasks |
+| `"xhigh"` | Maximum reasoning depth, with correspondingly higher latency | The hardest problems, where answer quality matters more than response time |
+
+> [!TIP]
+>
+> `"xhigh"` is available on `grok-4.6` and later. On models that do not support it, such as `grok-4.5`, requests with `"xhigh"` are treated as `"high"`.
 
 ### Setting reasoning effort
 
-The following example sets `reasoning_effort` to `"high"` for a challenging math proof. You can substitute `"low"` or `"medium"` as needed.
+The following example sets `reasoning_effort` to `"high"` for a challenging math proof. You can substitute `"low"`, `"medium"`, or (on supported models) `"xhigh"` as needed.
 
 ```python customLanguage="pythonXAI" highlightedLines="13"
 import os
@@ -48,7 +53,7 @@ client = Client(
 )
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     reasoning_effort="high",
     messages=[system("You are a highly intelligent AI assistant.")],
 )
@@ -72,7 +77,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     reasoning={"effort": "high"},
     input=[
         {"role": "system", "content": "You are a highly intelligent AI assistant."},
@@ -92,7 +97,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const result = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: 'You are a highly intelligent AI assistant.',
   prompt: 'Find all prime numbers p such that p^2 + 2 is also prime. Prove your answer.',
   providerOptions: {
@@ -109,7 +114,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "reasoning": {"effort": "high"},
     "input": [
         {
@@ -132,12 +137,13 @@ For `grok-4.20-multi-agent`, the `reasoning.effort` parameter controls **how man
 
 | Model | `reasoning` parameter | Behavior |
 |---|---|---|
+| `grok-4.6` | `reasoning.effort`: `"low"` / `"medium"` / `"high"` (default) / `"xhigh"` | Controls reasoning depth (cannot be disabled) |
 | `grok-4.5` | `reasoning.effort`: `"low"` / `"medium"` / `"high"` (default) | Controls reasoning depth (cannot be disabled) |
 | `grok-4.20-multi-agent` | `reasoning.effort`: `"low"` / `"medium"` / `"high"` / `"xhigh"` | Controls agent count (4 or 16) |
 
 ## Summarized Reasoning Content
 
-For `grok-4.5`, we expose summarizations of the model's internal reasoning. Here's an example of how to stream the reasoning summary deltas alongside the final response:
+For `grok-4.6`, we expose summarizations of the model's internal reasoning. Here's an example of how to stream the reasoning summary deltas alongside the final response:
 
 ```python customLanguage="pythonXAI"
 import os
@@ -151,7 +157,7 @@ client = Client(
 )
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[system("You are a highly intelligent AI assistant.")],
 )
 chat.append(user("A projectile is launched at 30 m/s at 37° above horizontal from a 45 m cliff. Find its speed on impact. (g=10 m/s²)"))
@@ -178,7 +184,7 @@ client = OpenAI(
 )
 
 stream = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are a highly intelligent AI assistant."},
         {"role": "user", "content": "A projectile is launched at 30 m/s at 37° above horizontal from a 45 m cliff. Find its speed on impact. (g=10 m/s²)"},
@@ -197,7 +203,7 @@ import { xai } from '@ai-sdk/xai';
 import { streamText } from 'ai';
 
 const result = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: 'You are a highly intelligent AI assistant.',
   prompt: 'A projectile is launched at 30 m/s at 37° above horizontal from a 45 m cliff. Find its speed on impact. (g=10 m/s²)'
 });
@@ -227,7 +233,7 @@ curl https://api.x.ai/v1/responses \
             "content": "A ball is thrown upward at 25 m/s from the top of a 60 m building. Find the maximum height above the ground. (g=10 m/s²)"
         }
     ],
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "stream": true
 }'
 ```

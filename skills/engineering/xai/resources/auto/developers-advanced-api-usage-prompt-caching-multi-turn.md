@@ -24,7 +24,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
       {"role": "user", "content": "What is prompt caching?"},
@@ -38,7 +38,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
       {"role": "user", "content": "What is prompt caching?"},
@@ -64,7 +64,7 @@ messages = [
 
 # Turn 1: Initial request (establishes the cache)
 response = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=messages,
     extra_headers={"x-grok-conv-id": conversation_id},
 )
@@ -76,7 +76,7 @@ messages.append({"role": "user", "content": "Show me a code example."})
 
 # Turn 2: Cache HIT — prefix is unchanged, only new messages appended
 response = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=messages,
     extra_headers={"x-grok-conv-id": conversation_id},
 )
@@ -103,7 +103,7 @@ const messages = [
 
 // Turn 1: Initial request (establishes the cache)
 const turn1 = await client.chat.completions.create(
-  { model: 'grok-4.5', messages },
+  { model: 'grok-4.6', messages },
   { headers: { 'x-grok-conv-id': conversationId } },
 );
 console.log(
@@ -117,7 +117,7 @@ messages.push({ role: 'user', content: 'Show me a code example.' });
 
 // Turn 2: Cache HIT — prefix unchanged, new message appended
 const turn2 = await client.chat.completions.create(
-  { model: 'grok-4.5', messages },
+  { model: 'grok-4.6', messages },
   { headers: { 'x-grok-conv-id': conversationId } },
 );
 console.log(
@@ -136,7 +136,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
       {"role": "user", "content": "What is prompt caching?"},
@@ -160,7 +160,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},
       {"role": "user", "content": "What is prompt caching?"},
@@ -183,7 +183,7 @@ curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "x-grok-conv-id: conv_abc123" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "messages": [
       {"role": "user", "content": "What is prompt caching?"},
       {"role": "system", "content": "You are Grok, a helpful and truthful AI assistant built by xAI."},

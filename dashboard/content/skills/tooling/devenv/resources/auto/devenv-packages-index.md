@@ -45,7 +45,79 @@ Entering shell ...
 jq-1.6
 ```
 
-If you need a newer (or older) version of a certain package, you can [fetch them from another nixpkgs input](https://devenv.sh/recipes/nix/index.md).
+## Package outputs
+
+Nixpkgs splits many packages into several outputs, such as `bin`, `dev`, `lib`, `man` or `doc`. Adding a package to `packages` gives the shell its `dev` output (or `out` when there is none) together with the `bin`, `lib` and `include` outputs it propagates, so headers, pkg-config files and libraries are available to compilers and linkers. Outputs like `doc`, `debug` and `static` are left out.
+
+To get exactly one output, select it explicitly:
+
+devenv.nix
+
+```
+{ pkgs, ... }:
+
+{
+  packages = [
+    # Only the shared libraries, without the `openssl` command line tool.
+    pkgs.openssl.out
+  ];
+}
+```
+
+## Installing a specific version
+
+Add the [nixpkgs-multiverse](https://github.com/fzakaria/nixpkgs-multiverse) input once:
+
+```
+devenv inputs add nixpkgs-multiverse github:fzakaria/nixpkgs-multiverse
+```
+
+Packages are then available by their Nixpkgs attribute and version:
+
+devenv.nix
+
+```
+{ pkgs, multiverse, ... }:
+
+{
+  packages = [
+    pkgs.git
+    multiverse.cmake."3.16.5"
+    multiverse.bun."0.7.0"
+  ];
+}
+```
+
+The `nixpkgs-multiverse` input is pinned in `devenv.lock`. Historical Nixpkgs revisions are fetched lazily, so only revisions providing packages you use are downloaded. The unmodified input remains available as `inputs."nixpkgs-multiverse"` for advanced use. See [Pinning an individual package version](https://devenv.sh/pinning/#pinning-an-individual-package-version) for the reproducibility and update workflow.
+
+### Pinning several packages
+
+New in version 2.2.3
+
+`multiverse.pins` needs a recent `nixpkgs-multiverse`. Run `devenv update nixpkgs-multiverse` if you added the input earlier.
+
+A multiverse costs one fetch and one evaluation per Nixpkgs revision it touches, not per package. Each version above resolves to the newest revision that shipped it, so two pins from different years mean two Nixpkgs trees.
+
+`multiverse.pins` takes the whole set at once, resolves it through the fewest revisions that can serve it, and returns the packages:
+
+devenv.nix
+
+```
+{ multiverse, ... }:
+
+{
+  packages = multiverse.pins {
+    cmake = "3.26.4";
+    bun = "0.7.0";
+  };
+}
+```
+
+Both packages come back at exactly the versions you asked for. What minimizing decides is which revision serves each, so a pin can land on an older build of the same version.
+
+The `mvs solve` command spells out the plan behind the answer from a terminal, and [the raw input](https://devenv.sh/inputs/index.md) exposes it to Nix as data. See [the fewest nixpkgs](https://fzakaria.com/2026/08/17/nixpkgs-multiverse-the-fewest-nixpkgs) for how the plan is computed and why it is minimal.
+
+Multiverse indexes top-level package attributes from published Nixpkgs releases and `nixos-unstable` channel revisions. If a package or version is not indexed, you can still [fetch it from another nixpkgs input](https://devenv.sh/recipes/nix/index.md).
 
 ## Searching
 

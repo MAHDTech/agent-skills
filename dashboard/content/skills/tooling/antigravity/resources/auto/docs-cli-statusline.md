@@ -8,50 +8,40 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Customizations
-  \>
-- Status Line
+Markdownkeyboard_arrow_down
 
-# Status line customization[link](#status-line-customization)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Status line customization
 
 Define custom scripting configurations and format dynamic JSON state
 payloads to customize your TUI status line.
 
-info
-
-To toggle the status line on/off or configure it from the TUI, see the
-Status Line Command.
-
-## Overview[link](#overview)
+## Overview
 
 The status line is positioned at the bottom of the TUI prompt panel. It
 provides at-a-glance context regarding active agent cycles, workspace
 environments, context token window usages, and background execution
 tasks.
 
-## Custom status line scripting[link](#custom-status-line-scripting)
+## Custom status line scripting
 
 For advanced terminal layouts or custom status bar displays, you can
 route active agent metadata into a custom script.
 
-### Configuration[link](#configuration)
+### Configuration
 
 Add a `statusLine` configuration block to your
 `~/.gemini/antigravity-cli/settings.json` file:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "statusLine": {
-    "type": "command",
-    "command": "~/.gemini/antigravity-cli/statusline.sh"
-  }
+    "statusLine": {
+        "type": "command",
+        "command": "~/.gemini/antigravity-cli/statusline.sh"
+    }
 }
 ```
 
@@ -60,7 +50,13 @@ pipes a detailed state JSON payload directly to the script’s `stdin`,
 reads your formatted string from `stdout`, and renders the result in the
 prompt’s status line. Full ANSI color codes are supported.
 
-### Available JSON fields[link](#available-json-fields)
+The block accepts three more optional keys: `padding` adds blank lines
+above the status line, `enabled` set to `false` suspends the script
+while keeping the command on file, and `stack_with_default` set to
+`true` renders your script below the built-in line instead of replacing
+it.
+
+### Available JSON fields
 
 The JSON payload piped to your script contains the following top-level
 fields:
@@ -89,72 +85,69 @@ fields:
 | `task_count` | int | Number of running background tasks. |
 | `terminal_width` | int | Live width of the interactive terminal. |
 | `execution_mode` | string | Current active prompt execution mode (e.g., `planning`, `fast`). |
+| `vim` | object | Vim editing state: `mode` is `NORMAL`, `INSERT`, `VISUAL`, or `VISUAL LINE`. Present only when [Vim editor mode](https://antigravity.google/docs/cli/vim-editor-mode) is enabled. |
 
-### JSON payload example[link](#json-payload-example)
+### JSON payload example
 
 Here is a fully sanitized, typical JSON payload piped to your status
 line script:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "cwd": "/home/user/my-project",
-  "session_id": "12345678-abcd-ef01-2345-6789abcdef01",
-  "conversation_id": "12345678-abcd-ef01-2345-6789abcdef01",
-  "transcript_path": "/home/user/.gemini/antigravity/brain/12345678-abcd-ef01-2345-6789abcdef01/.system_generated/logs/transcript.jsonl",
-  "model": {
-    "id": "Gemini 3.5 Flash (High)",
-    "display_name": "Gemini 3.5 Flash (High)"
-  },
-  "workspace": {
-    "current_dir": "/home/user/my-project",
-    "project_dir": "/home/user/my-project"
-  },
-  "version": "1.0.13",
-  "context_window": {
-    "total_input_tokens": 88244,
-    "total_output_tokens": 61074,
-    "context_window_size": 1048576,
-    "used_percentage": 14.24,
-    "remaining_percentage": 85.76,
-    "current_usage": {
-      "input_tokens": 63382,
-      "output_tokens": 346,
-      "cache_creation_input_tokens": 0,
-      "cache_read_input_tokens": 20857
-    }
-  },
-  "exceeds_200k_tokens": false,
-  "product": "antigravity",
-  "quota": {
-    "gemini-weekly": {
-      "remaining_fraction": 0.9378,
-      "reset_time": "2026-07-06T07:50:32Z",
-      "reset_in_seconds": 560580
-    }
-  },
-  "agent_state": "idle",
-  "vcs": {
-    "type": "git",
-    "branch": "main",
-    "dirty": false
-  },
-  "sandbox": {
-    "enabled": false
-  },
-  "artifact_count": 2,
-  "plan_tier": "Pro",
-  "email": "developer@email.com",
-  "task_count": 1,
-  "terminal_width": 111,
-  "execution_mode": "planning"
+    "cwd": "/home/user/my-project",
+    "session_id": "12345678-abcd-ef01-2345-6789abcdef01",
+    "conversation_id": "12345678-abcd-ef01-2345-6789abcdef01",
+    "transcript_path": "/home/user/.gemini/antigravity/brain/12345678-abcd-ef01-2345-6789abcdef01/.system_generated/logs/transcript.jsonl",
+    "model": {
+        "id": "Gemini 3.5 Flash (High)",
+        "display_name": "Gemini 3.5 Flash (High)"
+    },
+    "workspace": {
+        "current_dir": "/home/user/my-project",
+        "project_dir": "/home/user/my-project"
+    },
+    "version": "1.0.13",
+    "context_window": {
+        "total_input_tokens": 88244,
+        "total_output_tokens": 61074,
+        "context_window_size": 1048576,
+        "used_percentage": 14.24,
+        "remaining_percentage": 85.76,
+        "current_usage": {
+            "input_tokens": 63382,
+            "output_tokens": 346,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 20857
+        }
+    },
+    "exceeds_200k_tokens": false,
+    "product": "antigravity",
+    "quota": {
+        "gemini-weekly": {
+            "remaining_fraction": 0.9378,
+            "reset_time": "2026-07-06T07:50:32Z",
+            "reset_in_seconds": 560580
+        }
+    },
+    "agent_state": "idle",
+    "vcs": {
+        "type": "git",
+        "branch": "main",
+        "dirty": false
+    },
+    "sandbox": {
+        "enabled": false
+    },
+    "artifact_count": 2,
+    "plan_tier": "Pro",
+    "email": "developer@email.com",
+    "task_count": 1,
+    "terminal_width": 111,
+    "execution_mode": "planning"
 }
 ```
 
-### Example script[link](#example-script)
+### Example script
 
 You can download a complete, layout-adaptive script from the official
 [statusline.sh example on
@@ -165,15 +158,11 @@ context window progress bars dynamically.
 Save the script to `~/.gemini/antigravity-cli/statusline.sh` and make it
 executable:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 chmod +x ~/.gemini/antigravity-cli/statusline.sh
 ```
 
-## See also[link](#see-also)
+## See also
 
 - **[Status Line Command](https://antigravity.google/docs/cli/commands/statusline)**: Toggle
   status line elements interactively.
@@ -183,7 +172,5 @@ chmod +x ~/.gemini/antigravity-cli/statusline.sh
   keyboard hotkeys and buffers.
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Manage secure
   directory permissions.
-
-On this Page
 
 {% endraw %}

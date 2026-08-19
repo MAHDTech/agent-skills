@@ -1,22 +1,16 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Agent Capabilities
-  \>
-- Subagents
+Markdownkeyboard_arrow_down
 
-# Background tasks & subagents[link](#background-tasks--subagents)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Background tasks & subagents
 
 Delegate slow builds, multi-file code generation, and research sweeps to
 parallel background agents while maintaining your active programming
 flow.
 
-> **Antigravity 2.0 & Hub Docs:** For core platform capabilities,
-> subagent lifecycle state diagrams, inter-agent messaging, and nesting
-> depth limits, see the [Antigravity 2.0 Subagents
-> Documentation](https://antigravity.google/docs/subagents).
-
-## Asynchronous execution model[link](#asynchronous-execution-model)
+## Asynchronous execution model
 
 To maximize developer velocity, Antigravity CLI leverages a
 multi-threaded asynchronous execution architecture. Instead of locking
@@ -29,18 +23,18 @@ processes. You can continue drafting code, submitting prompts, or
 inspecting files while multiple autonomous background threads execute
 validation tasks in parallel.
 
-## Managing agents: The `/agents` panel[link](#managing-agents-the-agents-panel)
+## Managing agents: The `/agents` panel
 
 The active agent-hierarchy and custom agent selection menu are fully
 transparent and manageable through the interactive [Agent Manager Panel
 (`/agents`)](https://antigravity.google/docs/cli/commands/agents).
 
-### Opening the panel[link](#opening-the-panel)
+### Opening the panel
 
-Type `/agents` in the prompt and press `Enter` to open the interactive
+Type `/agents` in the prompt and press Enter to open the interactive
 **Agent Manager Panel**.
 
-### Panel overview[link](#panel-overview)
+### Panel overview
 
 The panel displays a live checklist of all active, completed, killed, or
 failed background agents:
@@ -52,12 +46,7 @@ failed background agents:
 - **Step**: A real-time summary of the tool or reasoning step currently
   being executed.
 
-> **Tip:** You can also select and switch between custom agents (or fork
-> conversations) from this panel. See the [`/agents` command
-> reference](https://antigravity.google/docs/cli/commands/agents) for full details on custom agent
-> discovery and panel keybindings.
-
-## Custom Agents (Markdown Format)[link](#custom-agents-markdown-format)
+## Custom Agents (Markdown Format)
 
 In addition to built-in agents, the CLI automatically discovers custom
 agents defined in Markdown format (`.md`) with YAML frontmatter:
@@ -74,57 +63,51 @@ panel menu.
 For the complete schema, frontmatter parameters, and code examples, see
 [Custom Subagents Specification](https://antigravity.google/docs/subagents#custom-subagents).
 
-## Deep-dive monitoring[link](#deep-dive-monitoring)
+## Deep-dive monitoring
 
 To inspect the inner reasoning, thoughts, and logs of a specific
 background agent:
 
-1.  Open the `/agents` panel and highlight the target agent using
-    `↑`/`↓`.
-2.  Press `Enter` to open the **Subagent Detail View**.
-3.  This full-screen view reveals the subagent’s entire reasoning log,
-    including its private internal thoughts, tool calls, and execution
-    outputs.
-4.  Press `Esc` to exit and return to the main Agent Manager list.
+1.  Open the `/agents` panel and highlight the target agent using ↑/↓.
+2.  Press Enter to open the **Subagent Detail View**.
+3.  Inspect the subagent’s entire reasoning log, including its private
+    internal thoughts, tool calls, and execution outputs.
+4.  Press Esc to exit and return to the main Agent Manager list.
 
-## Monitoring background tasks with `/tasks`[link](#monitoring-background-tasks-with-tasks)
+## Monitoring background tasks with `/tasks`
 
 For non-agentic background operations, such as direct shell commands,
 testing suites, or simple background queries initiated via `/btw`, use
 the `/tasks` command.
 
-text
-
-content_copy
-
-```
+``` astro-code
 /tasks
 ```
 
 The tasks tracking list lets you:
 
 - Track standard non-interactive background processes.
-- Select a task using `↑`/`↓` and press `Enter` to view stdout logs.
+- Select a task using ↑/↓ and press Enter to view stdout logs.
 - Terminate runaway terminal processes safely.
 
-## Keyboard ergonomics[link](#keyboard-ergonomics)
+## Keyboard ergonomics
 
 To reduce context-switching friction when subagents require manual
 interaction or tool authorizations, Antigravity CLI integrates
 high-efficiency shortcut paths.
 
-### Detailed “Teleport” navigation (`Alt+J`)[link](#detailed-teleport-navigation-altj)
+### Detailed “Teleport” navigation (`Alt+J`)
 
 When a subagent encounters a tool requiring approval (e.g. writing a
 file or running a database migration), a status bar notification blinks.
 
-- Press `Alt+J` inside the main prompt panel to instantly “teleport”
+- Press Alt + J inside the main prompt panel to instantly “teleport”
   from your current conversation directly into the Detail View of the
   next subagent awaiting your approval.
-- Confirm or reject the action, and press `Esc` to teleport back to your
+- Confirm or reject the action, and press Esc to teleport back to your
   primary thread.
 
-### “Fast-Path” confirmations (`Ctrl+K`)[link](#fast-path-confirmations-ctrlk)
+### “Fast-Path” confirmations (`Ctrl+K`)
 
 To authorize an agent action instantly without leaving your active
 workspace:
@@ -132,10 +115,10 @@ workspace:
 1.  Look at the inline status notification displayed right above your
     active prompt box. It summarizes the pending action (e.g.,
     `Subagent 12 asks to run "npm test"`).
-2.  Press `Ctrl+K` to instantly approve the pending fast-path action
+2.  Press Ctrl + K to instantly approve the pending fast-path action
     without switching panels or opening overlays.
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Configure the visual shell behavior and customize your configuration
 profiles:
@@ -146,5 +129,3 @@ profiles:
   containment rings on background processes.
 - **[Plugins & Skills](https://antigravity.google/docs/cli/plugins)**: Create your own custom
   skills and slash commands.
-
-On this Page

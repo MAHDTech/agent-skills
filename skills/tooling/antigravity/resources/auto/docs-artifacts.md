@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Artifacts
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Artifacts[link](#artifacts)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Artifacts
 
 An **Artifact** is a structured deliverable created by the agent to
 accomplish its task and communicate its progress and thinking to the
@@ -18,12 +17,12 @@ periods, Artifacts enable asynchronous collaboration. You do not need to
 carefully monitor every individual tool call or step synchronously;
 instead, you review high-level deliverables at key milestones.
 
-## Reviewing Artifacts Across Surfaces[link](#reviewing-artifacts-across-surfaces)
+## Reviewing Artifacts Across Surfaces
 
 Artifacts are primarily generated during the agent’s **Planning Mode**
 and are accessible across both Antigravity 2.0 and the Antigravity CLI.
 
-### Antigravity 2.0[link](#antigravity-20)
+### Antigravity 2.0
 
 The desktop app features a visual sidebar and review pane specifically
 optimized for displaying, organizing, and managing rich Artifacts.
@@ -32,7 +31,7 @@ optimized for displaying, organizing, and managing rich Artifacts.
   code diffs, and play back browser recordings of the agent’s UI actions
   directly within the app interface.
 
-### Antigravity CLI[link](#antigravity-cli)
+### Antigravity CLI
 
 In the lightweight terminal interface, Artifacts are managed using a
 fast, keyboard-driven review panel.
@@ -40,7 +39,7 @@ fast, keyboard-driven review panel.
 - **Workflow**: When the agent generates or modifies files that require
   your approval, a notification appears in your terminal status bar.
 
-## Interactive Steering and Feedback[link](#interactive-steering-and-feedback)
+## Interactive Steering and Feedback
 
 Feedback is a core mechanism of the Artifact workflow. Depending on your
 configuration, the agent will pause at intermediate milestones and
@@ -53,5 +52,3 @@ request review on its plans or code edits before executing them.
 - **Granular Control**: This approval loop ensures that you remain in
   the driver’s seat, allowing the agent to operate with high autonomy
   while maintaining strict human-in-the-loop validation.
-
-On this Page

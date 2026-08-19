@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/global-shortcut)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-global-shortcut)[crates.io](https://crates.io/crates/tauri-plugin-global-shortcut)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/global-shortcut/)[](https://docs.rs/tauri-plugin-global-shortcut)
+Reference:[](https://v2.tauri.app/reference/javascript/global-shortcut/)[](https://docs.rs/tauri-plugin-global-shortcut)
 
 Register global shortcuts.
 
@@ -17,17 +17,17 @@ Register global shortcuts.
 
 Install the global-shortcut plugin to get started.
 
-- [Automatic](#tab-panel-6375)
-- [Manual](#tab-panel-6376)
+- [Automatic](#tab-panel-5994)
+- [Manual](#tab-panel-5995)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6364)
-- [yarn](#tab-panel-6365)
-- [pnpm](#tab-panel-6366)
-- [deno](#tab-panel-6367)
-- [bun](#tab-panel-6368)
-- [cargo](#tab-panel-6369)
+- [npm](#tab-panel-5983)
+- [yarn](#tab-panel-5984)
+- [pnpm](#tab-panel-5985)
+- [deno](#tab-panel-5986)
+- [bun](#tab-panel-5987)
+- [cargo](#tab-panel-5988)
 
 ```
 npm run tauri add global-shortcut
@@ -71,11 +71,11 @@ cargo tauri add global-shortcut
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6370)
-    - [yarn](#tab-panel-6371)
-    - [pnpm](#tab-panel-6372)
-    - [deno](#tab-panel-6373)
-    - [bun](#tab-panel-6374)
+    - [npm](#tab-panel-5989)
+    - [yarn](#tab-panel-5990)
+    - [pnpm](#tab-panel-5991)
+    - [deno](#tab-panel-5992)
+    - [bun](#tab-panel-5993)
 
     ```
     npm install @tauri-apps/plugin-global-shortcut
@@ -101,8 +101,8 @@ cargo tauri add global-shortcut
 
 The global-shortcut plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6362)
-- [Rust](#tab-panel-6363)
+- [JavaScript](#tab-panel-5981)
+- [Rust](#tab-panel-5982)
 
 ```
 import { register } from '@tauri-apps/plugin-global-shortcut';// when using `"withGlobalTauri": true`, you may use// const { register } = window.__TAURI__.globalShortcut;

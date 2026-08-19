@@ -8,17 +8,18 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Reference
+Markdownkeyboard_arrow_down
 
-# CLI reference[link](#cli-reference)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# CLI reference
 
 Scan scannable tables listing all TUI slash commands, default keyboard
 shortcuts, and JSON configuration parameters.
 
-## Core slash commands[link](#core-slash-commands)
+## Core slash commands
 
 Type `/` inside the prompt box to open the typeahead command selection
 menu.
@@ -57,12 +58,12 @@ menu.
 | **[`/title`](https://antigravity.google/docs/cli/commands/title) \[on/off\]** | Configurations | — | Toggle or set terminal window title updates. |
 | **[`/usage`](https://antigravity.google/docs/cli/commands/usage)** | Utilities | `/quota` | Display model quota usage. |
 
-## Default keybindings[link](#default-keybindings)
+## Default keybindings
 
 Keyboard shortcut commands mapping global, prompt, navigation, and
 approval operations.
 
-### Global controls[link](#global-controls)
+### Global controls
 
 These hotkeys are always active regardless of which panel, overlay, or
 prompt is currently focused.
@@ -74,7 +75,7 @@ prompt is currently focused.
 | **`Ctrl+D`** | `cli.exit` | Exits the CLI session (only when the prompt box is empty). |
 | **`Ctrl+L`** | `cli.clear_screen` | Refreshes and clears the visual terminal buffer. |
 
-### Prompt focus keys[link](#prompt-focus-keys)
+### Prompt focus keys
 
 These keys are active when writing instructions inside the prompt box.
 
@@ -94,7 +95,7 @@ These keys are active when writing instructions inside the prompt box.
 | **`Ctrl+Shift+Z`** | `prompt.redo_text` | Redoes the last undone text operation. |
 | **`Ctrl+D`** | `—` | Forward delete (only when the prompt box is non-empty). |
 
-### Navigation & scrolling[link](#navigation--scrolling)
+### Navigation & scrolling
 
 Used inside select panels, menus, and scrollable text boxes.
 
@@ -106,7 +107,7 @@ Used inside select panels, menus, and scrollable text boxes.
 | **`←`** / **`→`** | `navigation.left` / `navigation.right` | Swaps pages inside multipage structures (like the Session Picker). |
 | **`Tab`** | `navigation.tab` | Confirms the highlighted slash-command autofill option. |
 
-### Tool confirmations[link](#tool-confirmations)
+### Tool confirmations
 
 Active during confirmation prompts.
 
@@ -116,24 +117,20 @@ Active during confirmation prompts.
 | **`n`** | `confirm.no` | Rejects the proposed tool, command, or active artifact. |
 | **`A`** | `—` | (Inside Review Panel) Approves all generated artifacts in one action (built-in shortcut). |
 
-## Configuration keys (`settings.json`)[link](#configuration-keys-settingsjson)
+## Configuration keys (`settings.json`)
 
 Primary settings key names, data types, system defaults, and expected
 parameters.
 
-### Example `settings.json`[link](#example-settingsjson)
+### Example `settings.json`
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "colorScheme": "tokyo night",
-  "altScreenMode": "always",
-  "toolPermission": "request-review",
-  "notifications": true,
-  "enableTerminalSandbox": true
+    "colorScheme": "tokyo night",
+    "altScreenMode": "always",
+    "toolPermission": "request-review",
+    "notifications": true,
+    "enableTerminalSandbox": true
 }
 ```
 
@@ -147,6 +144,8 @@ content_copy
 | **`showTips`** | boolean | `true` | Displays helpful agentic tips above the prompt panel during generation turns. |
 | **`showFeedbackSurvey`** | boolean | `true` | Displays periodic quality feedback surveys upon active task completions. |
 | **`editor`** | string | `"auto"` | Target text editor utility: `"auto"` (consults system `$EDITOR`), `"vim"`, `"emacs"`, or custom text labels. |
+| **`editorMode`** | string | `"default"` | Prompt editing model: `"default"` (flat text editing) or `"vim"` (modal editing). Distinct from `editor`, which selects an external program. See [Vim Editor Mode](https://antigravity.google/docs/cli/vim-editor-mode). |
+| **`vimInsertFirst`** | boolean | `false` | Starts Vim editing in Insert mode and makes a bare `Enter` submit. Requires `editorMode` set to `"vim"`. |
 | **`allowNonWorkspaceAccess`** | boolean | `false` | Permits the agent’s file read and write tools to navigate outside recognized Git/workspace roots. |
 | **`enableTerminalSandbox`** | boolean | `false` | Restricts all local execution commands launched by agents to OS containment rings. |
 | **`useG1Credits`** | boolean | `false` | *External builds only.* Uses personal AI credits for model calls once plan quotas are exhausted. |
@@ -154,7 +153,7 @@ content_copy
 | **`verbosity`** | string | `"high"` | Visual verbosity level: `"high"` (renders full thoughts and tool outputs) or `"low"` (displays only minimal visual progress indicators). |
 | **`runningLightSpeed`** | string | `"medium"` | Visual running light progress animation speed: `"fast"`, `"medium"`, `"slow"`, or `"off"`. |
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Learn how to safely deploy permission policies, sandboxes, and customize
 plugins:
@@ -164,7 +163,5 @@ plugins:
 - **[Plugins & Skills](https://antigravity.google/docs/cli/plugins)**: Create your own custom
   skills slash commands.
 - **[Installation & Auth](https://antigravity.google/docs/cli/install)**: Update your CLI install.
-
-On this Page
 
 {% endraw %}

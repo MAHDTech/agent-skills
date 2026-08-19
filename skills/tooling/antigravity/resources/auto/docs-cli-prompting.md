@@ -1,53 +1,44 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Prompting
+Markdownkeyboard_arrow_down
 
-# Prompting & interaction[link](#prompting--interaction)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Prompting & interaction
 
 Master primary interaction patterns, multiline composition workflows,
 session interruption controls, and terminal media pasting.
 
-## The prompt box[link](#the-prompt-box)
+## The prompt box
 
 Antigravity CLI features a sticky prompt panel positioned at the bottom
 of your terminal screen. This panel handles standard user entries,
 multiline scripts, and direct media pasting.
 
-text
-
-content_copy
-
-```
+``` astro-code
 ───────────────────────────────────────────────────────────────────────────
 > Describe your next engineering task here...
 ───────────────────────────────────────────────────────────────────────────
 ```
 
-### Submitting prompts[link](#submitting-prompts)
+### Submitting prompts
 
 To initiate an agent turn, type your instruction into the prompt panel
 and press `Enter`. The agent immediately analyzes your current directory
 workspace, reads required configurations, and begins formulating an
 execution plan.
 
-### Interrupting active sessions[link](#interrupting-active-sessions)
+### Interrupting active sessions
 
 If the agent initiates an undesired task or loops during command
 execution, press `Esc` to immediately halt the session.
 
-lightbulb
-
-Universal Escape: The Esc key acts as a global escape hatch. Pressing
-Esc instantly cancels any active agent turn, closes overlay panels, and
-returns focus to a clean prompt box.
-
-## Multiline composition[link](#multiline-composition)
+## Multiline composition
 
 For complex directives, structured test scenarios, or multi-paragraph
 instructions, use our built-in multiline features.
 
-### Shorthand newline insertions[link](#shorthand-newline-insertions)
+### Shorthand newline insertions
 
 - **Standard**: Press `Shift+Enter` or `ctrl+j` to insert a clean
   newline within your active prompt window without submitting.
@@ -58,7 +49,7 @@ instructions, use our built-in multiline features.
   of your active line and press `Enter`. The CLI automatically removes
   the backslash and inserts a newline.
 
-### Editing prompts in `$EDITOR`[link](#editing-prompts-in-editor)
+### Editing prompts in `$EDITOR`
 
 To draft or edit extensive prompt structures in your primary development
 editor:
@@ -72,18 +63,18 @@ editor:
 4.  Save and exit the editor. The CLI automatically imports the edited
     buffer directly back into the terminal prompt.
 
-## Attaching media[link](#attaching-media)
+## Attaching media
 
 Antigravity CLI supports pasting rich media formats directly from your
 system clipboard. Press `ctrl+v` (or native terminal paste) inside the
 prompt panel to attach screenshot mockups or video recordings.
 
-### Supported file types[link](#supported-file-types)
+### Supported file types
 
 - **Images**: PNG, JPEG, GIF, WebP, BMP, TIFF, and SVG.
 - **Videos**: MP4, MOV, WebM, and AVI.
 
-## Next steps[link](#next-steps)
+## Next steps
 
 After mastering interaction patterns, explore how the agent presents
 actions and requests verification:
@@ -94,5 +85,3 @@ actions and requests verification:
   threads and fork active sessions.
 - **[Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents)**: Monitor
   asynchronous background agents.
-
-On this Page

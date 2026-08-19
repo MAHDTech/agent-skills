@@ -1,20 +1,22 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Models
+Markdownkeyboard_arrow_down
 
-# Models[link](#models)
+content_copyCopy Markdown
 
-## Reasoning Model[link](#reasoning-model)
+open_in_newView Markdown
+
+# Models
+
+## Reasoning Model
 
 For the core reasoning model, Antigravity offers leading frontier
 models. Availability depends on your plan:
 
 | Model | Free & Google AI Plus | Google AI Pro | Google AI Ultra | Enterprise |
 |:---|:--:|:--:|:--:|:--:|
-| Gemini 3.6 Flash | ✅ | ✅ | ✅ | ✅ |
-| Gemini 3.5 Flash | ✅ | ✅ | ✅ | ✅ |
-| Gemini 3.1 Pro | ✅ | ✅ | ✅ | ✅ |
+| [Gemini 3.7 Flash](https://antigravity.google/blog/gemini-3-7-flash-in-google-antigravity) | ✅ | ✅ | ✅ | ✅ |
+| [Gemini 3.6 Flash](https://antigravity.google/blog/gemini-3-6-flash-in-google-antigravity) | ✅ | ✅ | ✅ | ✅ |
+| [Gemini 3.5 Flash](https://antigravity.google/blog/gemini-3-5-flash-in-google-antigravity) | ✅ | ✅ | ✅ | ✅ |
+| [Gemini 3.1 Pro](https://antigravity.google/blog/gemini-3-1-pro-in-google-antigravity) | ✅ | ✅ | ✅ | ✅ |
 | Claude Sonnet 4.6 (thinking) | ✅ | ✅ | ✅ | ❌ |
 | Claude Opus 4.6 (thinking) | ✅ | ✅ | ✅ | ❌ |
 | GPT-OSS-120b | ✅ | ✅ | ✅ | ❌ |
@@ -24,39 +26,69 @@ selector drop-down under the conversation prompt box:
 
 Model
 
-Gemini 3.6 Flash (Medium)
+Gemini 3.7 FlashMedium
 
 Fast
 
-Gemini 3.6 Flash (High)
+Low
+
+Medium
+
+High
+
+Gemini 3.6 FlashMedium
 
 Fast
 
-Gemini 3.6 Flash (Low)
+Low
+
+Medium
+
+High
+
+Gemini 3.5 FlashMedium
 
 Fast
 
-Gemini 3.5 Flash (Medium)
+Low
 
-Fast
+Medium
 
-Gemini 3.5 Flash (High)
+High
 
-Fast
+Gemini 3.1 ProHigh
 
-Gemini 3.5 Flash (Low)
+Low
 
-Fast
-
-Gemini 3.1 Pro (Low)
-
-Gemini 3.1 Pro (High)
+High
 
 Claude Sonnet 4.6 (Thinking)
 
 Claude Opus 4.6 (Thinking)
 
 GPT-OSS 120B (Medium)
+
+View Usage
+
+Gemini Models
+
+Weekly Limit Remaining
+
+100%
+
+Five Hour Limit Remaining
+
+100%
+
+Claude and GPT models
+
+Weekly Limit Remaining
+
+100%
+
+Five Hour Limit Remaining
+
+100%
 
 The choice of reasoning model is sticky between user messages within a
 conversation, so if you change the reasoning model while the Agent is
@@ -67,14 +99,12 @@ the current execution).
 Learn more about reasoning model rate limits in [our plans
 page](https://antigravity.google/docs/plans).
 
-## Additional Models[link](#additional-models)
+## Additional Models
 
 Antigravity uses a number of other models for various parts of the stack
 that are not customizable:
 
-- **Nano Banana 2**: Used by the generative image tool when the Agent
-  wants to produce a UI mockup, needs images to populate a web page or
-  application, generate system or architecture diagrams, or other
-  generative image tasks.
-
-On this Page
+- **[Nano Banana 2](https://antigravity.google/blog/nano-banana-pro)**: Used by the generative
+  image tool when the Agent wants to produce a UI mockup, needs images
+  to populate a web page or application, generate system or architecture
+  diagrams, or other generative image tasks.

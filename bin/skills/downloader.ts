@@ -123,13 +123,27 @@ async function fetchWithRetry(
     return lastResponse!
 }
 
+// Extract meta-refresh redirect URL from HTML content if present
+export function extractMetaRefreshUrl(htmlContent: string): string | null {
+    const match1 = htmlContent.match(
+        /<meta[^>]*http-equiv=["']?refresh["']?[^>]*content=["']?\d+;\s*url=([^"'>]+)["']?/i
+    )
+    if (match1 && match1[1]) return match1[1].trim()
+    const match2 = htmlContent.match(
+        /<meta[^>]*content=["']?\d+;\s*url=([^"'>]+)["']?[^>]*http-equiv=["']?refresh["']?/i
+    )
+    if (match2 && match2[1]) return match2[1].trim()
+    return null
+}
+
 // Download content using Bun-native fetch with modern browser headers and proxy fallback
 export async function download(
     url: string,
     timeout?: number
 ): Promise<{content: string; isHtml: boolean; skipped?: boolean}> {
-    if (isNonTextUrl(url)) {
-        log.info(`  Skipping non-text resource URL: ${url}`)
+    const directUrl = stripReaderProxy(url)
+    if (isNonTextUrl(directUrl)) {
+        log.info(`  Skipping non-text resource URL: ${directUrl}`)
         return {content: "", isHtml: false, skipped: true}
     }
 
@@ -152,13 +166,13 @@ export async function download(
     }
 
     try {
-        response = await fetchWithRetry(url, {
+        response = await fetchWithRetry(directUrl, {
             headers: browserHeaders,
             signal: AbortSignal.timeout(timeoutSeconds * 1000),
         })
 
         if (!response.ok) {
-            response = await fetchWithRetry(url, {
+            response = await fetchWithRetry(directUrl, {
                 headers: {
                     "User-Agent": browserHeaders["User-Agent"],
                 },
@@ -172,21 +186,38 @@ export async function download(
     if (response && response.ok) {
         const contentType = response.headers.get("content-type") || ""
         if (isNonTextContentType(contentType)) {
-            log.info(`  Skipping non-text resource (${contentType}): ${url}`)
+            log.info(
+                `  Skipping non-text resource (${contentType}): ${directUrl}`
+            )
             return {content: "", isHtml: false, skipped: true}
         }
         const isHtml = contentType.includes("text/html")
         const content = await response.text()
+
+        // Follow HTML meta-refresh redirects if content is a redirect stub
+        if (isHtml && content.length < 4096) {
+            const refreshTarget = extractMetaRefreshUrl(content)
+            if (refreshTarget) {
+                try {
+                    const resolvedRedirect = new URL(
+                        refreshTarget,
+                        directUrl
+                    ).toString()
+                    if (resolvedRedirect !== directUrl) {
+                        return await download(resolvedRedirect, timeout)
+                    }
+                } catch {
+                    // Ignore redirect resolution failure and proceed with content
+                }
+            }
+        }
+
         return {content, isHtml, skipped: false}
     }
 
     // Proxy fallback via Jina AI Reader ONLY for WAF / anti-bot / 403 / network errors (NOT for explicit 404/410)
-    if (
-        (!response || (response.status !== 404 && response.status !== 410)) &&
-        !url.startsWith("https://r.jina.ai/")
-    ) {
-        const cleanTarget = stripReaderProxy(url)
-        const proxyUrl = `https://r.jina.ai/${cleanTarget}`
+    if (!response || (response.status !== 404 && response.status !== 410)) {
+        const proxyUrl = `https://r.jina.ai/${directUrl}`
         await acquireProxySlot()
         try {
             const proxyResponse = await fetchWithRetry(
@@ -207,7 +238,7 @@ export async function download(
                     proxyResponse.headers.get("content-type") || ""
                 if (isNonTextContentType(contentType)) {
                     log.info(
-                        `  Skipping non-text resource (${contentType}): ${url}`
+                        `  Skipping non-text resource (${contentType}): ${directUrl}`
                     )
                     return {content: "", isHtml: false, skipped: true}
                 }
@@ -229,7 +260,7 @@ export async function download(
         )
     }
 
-    throw new Error(`Failed to fetch ${url}: Network or connection error`)
+    throw new Error(`Failed to fetch ${directUrl}: Network or connection error`)
 }
 
 // Clean HTML content by stripping scripts, styles, layout noise, and SVGs using HTMLRewriter
@@ -691,9 +722,18 @@ export function parseLlmsTxtLinks(content: string, baseUrl: string): string[] {
     while ((match = linkRe.exec(content)) !== null) {
         const matchedUrl = match[1]
         if (matchedUrl) {
-            const urlStr = matchedUrl.trim().split(/\s+/)[0]
+            let urlStr = matchedUrl.trim().split(/\s+/)[0]
             if (urlStr) {
-                urls.push(urlStr)
+                // Decode URL-encoded angle brackets and strip enclosing brackets/quotes (CommonMark spec)
+                try {
+                    urlStr = decodeURIComponent(urlStr)
+                } catch {}
+                urlStr = urlStr
+                    .replace(/^<|>$/g, "")
+                    .replace(/^["']|["']$/g, "")
+                if (urlStr) {
+                    urls.push(urlStr)
+                }
             }
         }
     }
@@ -825,7 +865,7 @@ export async function downloadAction(
         url: string
         error: string
     }> = []
-    // Dead links discovered from upstream llms.txt indexes — reported as
+    // Dead links discovered from upstream llms.txt indexes - reported as
     // warnings, never fatal.
     const staleLinks: Array<{
         skillName: string
@@ -957,7 +997,7 @@ export async function downloadAction(
                     `  Filename collision detected for path: ${path.basename(destFile)}. Colliding URLs:`
                 )
                 for (const job of jobs) {
-                    log.warn(`    - ${job.url}`)
+                    log.warn(`   - ${job.url}`)
                 }
 
                 for (const job of jobs) {
@@ -1233,7 +1273,7 @@ export async function downloadAction(
         for (const [skill, items] of Object.entries(groupedStale)) {
             log.warn(`  ● Skill: ${skill}`)
             for (const item of items) {
-                log.warn(`    - ${item.url}`)
+                log.warn(`   - ${item.url}`)
             }
         }
     }
@@ -1252,7 +1292,7 @@ export async function downloadAction(
         for (const [skill, items] of Object.entries(grouped)) {
             log.error(`  ● Skill: ${skill}`)
             for (const item of items) {
-                log.error(`    - URL: ${item.url}`)
+                log.error(`   - URL: ${item.url}`)
                 log.error(`      Error: ${item.error}`)
             }
         }

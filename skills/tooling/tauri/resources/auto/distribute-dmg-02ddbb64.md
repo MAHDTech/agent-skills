@@ -20,12 +20,12 @@ guide](https://v2.tauri.app/distribute/app-store/).
 To create an Apple Disk Image for your app you can use the Tauri CLI and
 run the `tauri build` command in a Mac computer:
 
-- [npm](#tab-panel-4656)
-- [yarn](#tab-panel-4657)
-- [pnpm](#tab-panel-4658)
-- [deno](#tab-panel-4659)
-- [bun](#tab-panel-4660)
-- [cargo](#tab-panel-4661)
+- [npm](#tab-panel-4533)
+- [yarn](#tab-panel-4534)
+- [pnpm](#tab-panel-4535)
+- [deno](#tab-panel-4536)
+- [bun](#tab-panel-4537)
+- [cargo](#tab-panel-4538)
 
 ```
 npm run tauri build -- --bundles dmg

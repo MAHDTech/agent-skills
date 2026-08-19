@@ -32,12 +32,12 @@ for more information.
 After running `tauri android init` to setup the Android Studio project,
 you can use the `tauri icon` command to update the app icons.
 
-- [npm](#tab-panel-4662)
-- [yarn](#tab-panel-4663)
-- [pnpm](#tab-panel-4664)
-- [deno](#tab-panel-4665)
-- [bun](#tab-panel-4666)
-- [cargo](#tab-panel-4667)
+- [npm](#tab-panel-4547)
+- [yarn](#tab-panel-4548)
+- [pnpm](#tab-panel-4549)
+- [deno](#tab-panel-4550)
+- [bun](#tab-panel-4551)
+- [cargo](#tab-panel-4552)
 
 ```
 npm run tauri icon /path/to/app-icon.png
@@ -75,12 +75,12 @@ guide you through all the required forms and setup tasks.
 You can build an Android App Bundle (AAB) to upload to Google Play by
 running the following command:
 
-- [npm](#tab-panel-4668)
-- [yarn](#tab-panel-4669)
-- [pnpm](#tab-panel-4670)
-- [deno](#tab-panel-4671)
-- [bun](#tab-panel-4672)
-- [cargo](#tab-panel-4673)
+- [npm](#tab-panel-4553)
+- [yarn](#tab-panel-4554)
+- [pnpm](#tab-panel-4555)
+- [deno](#tab-panel-4556)
+- [bun](#tab-panel-4557)
+- [cargo](#tab-panel-4558)
 
 ```
 npm run tauri android build -- --aab
@@ -126,12 +126,12 @@ but it is also possible to generate APKs that can be used for testing or
 distribution outside the store. To compile APKs for your app you can use
 the `--apk` argument:
 
-- [npm](#tab-panel-4674)
-- [yarn](#tab-panel-4675)
-- [pnpm](#tab-panel-4676)
-- [deno](#tab-panel-4677)
-- [bun](#tab-panel-4678)
-- [cargo](#tab-panel-4679)
+- [npm](#tab-panel-4559)
+- [yarn](#tab-panel-4560)
+- [pnpm](#tab-panel-4561)
+- [deno](#tab-panel-4562)
+- [bun](#tab-panel-4563)
+- [cargo](#tab-panel-4564)
 
 ```
 npm run tauri android build -- --apk
@@ -163,12 +163,12 @@ By default Tauri builds your app for all supported architectures
 (aarch64, armv7, i686 and x86_64). To only compile for a subset of
 targets, you can use the `--target` argument:
 
-- [npm](#tab-panel-4680)
-- [yarn](#tab-panel-4681)
-- [pnpm](#tab-panel-4682)
-- [deno](#tab-panel-4683)
-- [bun](#tab-panel-4684)
-- [cargo](#tab-panel-4685)
+- [npm](#tab-panel-4565)
+- [yarn](#tab-panel-4566)
+- [pnpm](#tab-panel-4567)
+- [deno](#tab-panel-4568)
+- [bun](#tab-panel-4569)
+- [cargo](#tab-panel-4570)
 
 ```
 npm run tauri android build -- --aab --target aarch64 --target armv7
@@ -200,12 +200,12 @@ By default the generated AAB and APK is universal, containing all
 supported targets. To generate individual bundles per target, use the
 `--split-per-abi` argument.
 
-- [npm](#tab-panel-4686)
-- [yarn](#tab-panel-4687)
-- [pnpm](#tab-panel-4688)
-- [deno](#tab-panel-4689)
-- [bun](#tab-panel-4690)
-- [cargo](#tab-panel-4691)
+- [npm](#tab-panel-4571)
+- [yarn](#tab-panel-4572)
+- [pnpm](#tab-panel-4573)
+- [deno](#tab-panel-4574)
+- [bun](#tab-panel-4575)
+- [cargo](#tab-panel-4576)
 
 ```
 npm run tauri android build -- --apk --split-per-abi

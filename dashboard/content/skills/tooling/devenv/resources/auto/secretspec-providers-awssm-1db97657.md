@@ -55,14 +55,27 @@ AWS Secrets Manager uses the standard AWS SDK credential chain:
 
 ### Required IAM permissions
 
+For identities used only to read secrets, such as those running
+`secretspec get`, `secretspec check`, or `secretspec run`, use a
+read-only policy. Replace the example region and account ID with your
+own:
+
 ```
-{  "Version": "2012-10-17",  "Statement": [    {      "Effect": "Allow",      "Action": [        "secretsmanager:GetSecretValue",        "secretsmanager:BatchGetSecretValue",        "secretsmanager:CreateSecret",        "secretsmanager:PutSecretValue"      ],      "Resource": "arn:aws:secretsmanager:*:*:secret:secretspec/*"    }  ]}
+{  "Version": "2012-10-17",  "Statement": [    {      "Sid": "SecretspecBatchFetch",      "Effect": "Allow",      "Action": "secretsmanager:BatchGetSecretValue",      "Resource": "*",      "Condition": {        "StringEquals": {          "aws:RequestedRegion": "us-east-1"        }      }    },    {      "Sid": "SecretspecRead",      "Effect": "Allow",      "Action": "secretsmanager:GetSecretValue",      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:secretspec/*"    }  ]}
 ```
 
-If you use a prefix such as `?prefix=myteam`, adjust the resource ARN:
+Identities that run `secretspec set` also need this statement in the
+policy’s `Statement` array:
 
 ```
-arn:aws:secretsmanager:*:*:secret:myteam/secretspec/*
+{  "Sid": "SecretspecWrite",  "Effect": "Allow",  "Action": [    "secretsmanager:CreateSecret",    "secretsmanager:PutSecretValue"  ],  "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:secretspec/*"}
+```
+
+If you use a prefix such as `?prefix=myteam`, adjust the secret ARN in
+the read and write statements:
+
+```
+arn:aws:secretsmanager:us-east-1:123456789012:secret:myteam/secretspec/*
 ```
 
 ## Configuration
@@ -141,7 +154,9 @@ and the optional `field` selects one key of a JSON secret value. Without
 ## CI/CD
 
 ```
-# Using environment variables$ export AWS_ACCESS_KEY_ID=AKIA...$ export AWS_SECRET_ACCESS_KEY=...$ export AWS_DEFAULT_REGION=us-east-1
+# Using environment variables$ export AWS_ACCESS_KEY_ID=AKIA...
+$ export AWS_SECRET_ACCESS_KEY=...
+$ export AWS_DEFAULT_REGION=us-east-1
 # Run command$ secretspec run --provider awssm://us-east-1 -- deploy
 # Or with IAM roles (no credentials needed)$ secretspec run --provider awssm://us-east-1 -- deploy
 ```

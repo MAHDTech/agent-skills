@@ -180,8 +180,8 @@ iOS options:
   foreground scene. When not set, it is automatically inherited from the
   manager.
 
-- [JavaScript](#tab-panel-6163)
-- [Rust](#tab-panel-6164)
+- [JavaScript](#tab-panel-5782)
+- [Rust](#tab-panel-5783)
 
 ```
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
@@ -200,8 +200,8 @@ let window = builder.build()?;
 Once a window has been created, you can retrieve its platform-specific
 identifier:
 
-- [JavaScript](#tab-panel-6165)
-- [Rust](#tab-panel-6166)
+- [JavaScript](#tab-panel-5784)
+- [Rust](#tab-panel-5785)
 
 ```
 const activityName = await window.activityName();const sceneId = await window.sceneIdentifier();

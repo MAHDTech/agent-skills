@@ -18,10 +18,10 @@ to Tauri 2.0 release candidate.
 The Tauri v2 CLI includes a `migrate` command that automates most of the
 process and helps you finish the migration:
 
-- [npm](#tab-panel-7026)
-- [yarn](#tab-panel-7027)
-- [pnpm](#tab-panel-7028)
-- [cargo](#tab-panel-7029)
+- [npm](#tab-panel-6645)
+- [yarn](#tab-panel-6646)
+- [pnpm](#tab-panel-6647)
+- [cargo](#tab-panel-6648)
 
 ```
 npm install @tauri-apps/cli@latestnpm run tauri migrate

@@ -1,9 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Build with Google
+Markdownkeyboard_arrow_down
 
-# Build with Google[link](#build-with-google)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Build with Google
 
 Antigravity 2.0 makes it seamless to build with popular Google
 technology stacks. We have partnered with teams across Google to create
@@ -14,7 +15,7 @@ Instead of searching for individual tools, you can enable these bundles
 to instantly empower your agents with deep knowledge of Google
 platforms.
 
-### How to Enable[link](#how-to-enable)
+### How to Enable
 
 You can enable “Build with Google” integrations at two points:
 
@@ -24,9 +25,9 @@ You can enable “Build with Google” integrations at two points:
   `Settings > Customizations > Build with Google Plugins` to add or
   remove integrations at any time.
 
-### Available Bundles[link](#available-bundles)
+### Available Bundles
 
-### Modern Web Guidance[link](#modern-web-guidance)
+### Modern Web Guidance
 
 Keep your coding agent up to date with the latest web best practices.
 
@@ -37,7 +38,7 @@ Keep your coding agent up to date with the latest web best practices.
   - **Learn more**: [Read the Modern Web
     Guidance](http://goo.gle/modern-web-guidance)
 
-### Firebase Bundle[link](#firebase-bundle)
+### Firebase Bundle
 
 Transform your AI coding agent into a specialized Firebase expert that
 can write code, configure Firebase Security Rules, and manage live
@@ -58,7 +59,7 @@ resources.
 - **Learn More**: [Explore the Firebase Agent Skills
   Guide](https://firebase.google.com/docs/ai-assistance/agent-skills)
 
-### Google Antigravity SDK[link](#google-antigravity-sdk)
+### Google Antigravity SDK
 
 Using the Antigravity Python SDK to build AI agents
 
@@ -79,7 +80,7 @@ Using the Antigravity Python SDK to build AI agents
 - **Learn more**: [Visit the Antigravity SDK
   Repository](https://github.com/google-antigravity/antigravity-sdk-python)
 
-### Android CLI[link](#android-cli)
+### Android CLI
 
 Core tools and knowledge required to develop for Android
 
@@ -96,7 +97,7 @@ Core tools and knowledge required to develop for Android
 - **Learn more**: [Explore the Android Agent Developer
   Tools](http://developer.android.com/tools/agents)
 
-### Science[link](#science)
+### Science
 
 Curated collection of agent skills for science.
 
@@ -107,7 +108,7 @@ Curated collection of agent skills for science.
 - **Learn more**: [Review the DeepMind Science Skills
   Repository](https://github.com/google-deepmind/science-skills)
 
-### Chrome DevTools[link](#chrome-devtools)
+### Chrome DevTools
 
 Reliable automation, in-depth debugging, and performance analysis in
 Chrome using Chrome DevTools and Puppeteer
@@ -120,7 +121,7 @@ Chrome using Chrome DevTools and Puppeteer
 - **Learn more**: [Explore the Chrome DevTools
   Repository](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-### Dart and Flutter[link](#dart-and-flutter)
+### Dart and Flutter
 
 The official Dart and Flutter plugin for building natively compiled,
 visually stunning applications for mobile, web, desktop, and embedded
@@ -140,4 +141,49 @@ devices from a single codebase.
 - **Learn more**: [Explore Flutter Agentic
   tools](https://docs.flutter.dev/ai/create-with-ai)
 
-On this Page
+### Data Agent Kit Starter Pack
+
+Specialized suite of skills and MCP tools for data engineers and
+database practitioners building end-to-end analytics, ETL, and AI
+workflows on Google Cloud.
+
+- **What’s Included**:
+  - Curated domain skills for BigQuery SQL & ML, dbt transformations,
+    Apache Spark, Dataflow, Cloud Spanner, BigLake Iceberg catalogs, and
+    workflow orchestration.
+  - Integration with Google Cloud data MCP servers for database
+    introspection, query execution, and pipeline troubleshooting.
+  - Notebook, dashboard (Streamlit), and semantic modeling guidance.
+- **Key Capabilities**:
+  - **End-to-End Medallion Pipelines**: Prompt your agent in natural
+    language to ingest raw data from Cloud Storage, transform it through
+    bronze/silver/gold layers with dbt or Spark, and serve it via
+    BigQuery or Spanner.
+  - **SQL & ML Code Generation**: Write optimized BigQuery SQL, train
+    BigQuery ML models (XGBoost, K-Means), or build interactive LookML
+    and Streamlit data apps.
+  - **Pipeline Orchestration & Debugging**: Automatically scaffold
+    orchestration workflows and debug failed Dataflow or Dataproc jobs
+    across the GCP data ecosystem.
+
+### Google Maps Platform
+
+Equip your AI coding agent with Google Maps specific knowledge and
+workflows to design, build, and deploy location-aware features across
+Web, Android, iOS, and Web Services.
+
+- **What’s Included**: Package of agent skills covering core Google Maps
+  Platform APIs and SDKs - including Maps (2D/3D, Street View, Static,
+  Styling, Clustering), Places, Address Validation, Geocoding, Routes &
+  ETA (including eco-friendly routing), Geofencing, Heatmaps, and
+  Environmental APIs (Air Quality, Pollen, Solar, Weather).
+- **Key Capabilities**:
+  - **Build location-rich experiences**: Enable your agent to write
+    production-ready code for interactive mapping, place lookup, route
+    optimization, geofencing, and environmental insights across mobile,
+    web, and backend services.
+  - **Low-friction prototyping**: Get started using Maps Demo Key
+    without needing immediate billing setup, with guided prompts to
+    create account and restrict key when transitioning to production.
+- **Learn more**: [Explore the Google Maps Platform Agent Skills
+  Repository](https://github.com/googlemaps/agent-skills)

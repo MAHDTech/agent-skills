@@ -603,7 +603,7 @@ For more information, see Deleting an Object Using the Nutanix Objects Browser o
 
 For more information, see Searching an Objects Using Nutanix Objects Browser on page 233. Object Naming ConventionsThe object key name is a sequence of UTF-8 characters not exceeding 1024 bytes.You can use the following characters to create an object key name or prefixes:
 
-- Alphanumeric characters—lowercase letters (a-z), uppercase letters (A-Z), and numbers (0-9)• Special characters—forward slash (/), exclamation mark (!), hyphen (-), underscore (_), period (.),
+- Alphanumeric characters - lowercase letters (a-z), uppercase letters (A-Z), and numbers (0-9)• Special characters - forward slash (/), exclamation mark (!), hyphen (-), underscore (_), period (.),
 
 asterisk (*), single quote ('), open parenthesis ((), and close parenthesis ()) Consider the following limitations before you create an object key name:
 
@@ -1120,7 +1120,7 @@ IAM users cannot be managed from Objects Browser.
 
 - Users can only view, manage, or delete the access keys that they create. Keys created using the Prism
 
-Central UI are owned by the admin and are not visible or editable by other users—even if those keys are associated with their username.
+Central UI are owned by the admin and are not visible or editable by other users - even if those keys are associated with their username.
 
 - A user who creates keys for another user becomes the owner of those keys. As a result, the recipient
 

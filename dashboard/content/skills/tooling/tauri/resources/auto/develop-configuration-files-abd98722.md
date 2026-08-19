@@ -87,7 +87,7 @@ configuration object following the [JSON Merge Patch (RFC
 For example, given the following base `tauri.conf.json`:
 
 ```
-{  "productName": "MyApp",  "bundle": {    "resources": ["./resources"]  },  "plugins": {    "deep-link": {}  }}
+{  "productName": "MyApp",  "bundle": {    "resources": ["./resources", "./shared-assets"]  },  "plugins": {    "deep-link": {}  }}
 ```
 
 tauri.conf.json
@@ -137,12 +137,12 @@ src-tauri/tauri.beta.conf.json
 And to distribute this separate *beta* app you provide this
 configuration file when building it:
 
-- [npm](#tab-panel-4566)
-- [yarn](#tab-panel-4567)
-- [pnpm](#tab-panel-4568)
-- [deno](#tab-panel-4569)
-- [bun](#tab-panel-4570)
-- [cargo](#tab-panel-4571)
+- [npm](#tab-panel-4443)
+- [yarn](#tab-panel-4444)
+- [pnpm](#tab-panel-4445)
+- [deno](#tab-panel-4446)
+- [bun](#tab-panel-4447)
+- [cargo](#tab-panel-4448)
 
 ```
 npm run tauri build -- --config src-tauri/tauri.beta.conf.json

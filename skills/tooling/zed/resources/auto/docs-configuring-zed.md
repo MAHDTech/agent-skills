@@ -127,7 +127,7 @@ Non-negative `float` values
 }
 ```
 
-Note: This setting has no effect in Vim mode, as rewrap is already allowed everywhere.
+> Note: This setting has no effect in Vim mode, as rewrap is already allowed everywhere.
 
 ## Auto Indent
 
@@ -301,11 +301,19 @@ Note that a save will be triggered when an unsaved tab is closed, even if this i
 
 - Description: Base key bindings scheme. Base keymaps can be overridden with user keymaps.
 - Setting: `base_keymap`
-- Default: `VSCode`
+- Default: `Zed`
 
 **Options**
 
-1. VS Code
+1. Zed
+
+```json 
+{
+  "base_keymap": "Zed"
+}
+```
+
+2. VS Code
 
 ```json 
 {
@@ -313,7 +321,7 @@ Note that a save will be triggered when an unsaved tab is closed, even if this i
 }
 ```
 
-2. Atom
+3. Atom
 
 ```json 
 {
@@ -321,19 +329,11 @@ Note that a save will be triggered when an unsaved tab is closed, even if this i
 }
 ```
 
-3. JetBrains
+4. JetBrains
 
 ```json 
 {
   "base_keymap": "JetBrains"
-}
-```
-
-4. None
-
-```json 
-{
-  "base_keymap": "None"
 }
 ```
 
@@ -350,6 +350,30 @@ Note that a save will be triggered when an unsaved tab is closed, even if this i
 ```json 
 {
   "base_keymap": "TextMate"
+}
+```
+
+7. Emacs
+
+```json 
+{
+  "base_keymap": "Emacs"
+}
+```
+
+8. Cursor
+
+```json 
+{
+  "base_keymap": "Cursor"
+}
+```
+
+9. None
+
+```json 
+{
+  "base_keymap": "None"
 }
 ```
 
@@ -473,7 +497,7 @@ left and right padding of the central pane from the workspace when the centered 
 
 When enabled, this setting will automatically close tabs for files that have been deleted from the file system. This is particularly useful for workflows involving temporary or scratch files that are frequently created and deleted. When disabled (default), deleted files remain open with a strikethrough through their tab title.
 
-Note: Dirty files (files with unsaved changes) will not be automatically closed even when this setting is enabled, ensuring you don't lose unsaved work.
+> Note: Dirty files (files with unsaved changes) will not be automatically closed even when this setting is enabled, ensuring you don't lose unsaved work.
 
 ## Code Lens
 
@@ -811,7 +835,8 @@ List of `string` values
     "runnables": true,
     "breakpoints": true,
     "folds": true,
-    "min_line_number_digits": 4
+    "min_line_number_digits": 4,
+    "git_gutter_width": null
   }
 }
 ```
@@ -823,6 +848,7 @@ List of `string` values
 - `breakpoints`: Whether to show breakpoints in the gutter
 - `folds`: Whether to show fold buttons in the gutter
 - `min_line_number_digits`: Minimum number of characters to reserve space for in the gutter
+- `git_gutter_width`: The width, in pixels, of the git diff hunk indicators in the gutter. When `null`, the width scales with the buffer font size
 
 ## Hide Mouse
 
@@ -2001,6 +2027,8 @@ Similar to `modifications`, but behaves like `on` when range formatting cannot b
 }
 ```
 
+Tools that rewrite files on disk instead of printing the formatted contents to stdout (such as `cargo fmt`) are not compatible with `"external"`: since Zed reads the formatted buffer from stdout, a formatter that emits nothing there will not update the buffer. For Rust, use `"formatter": "language_server"` or invoke `rustfmt` directly (which supports stdin/stdout via `--emit stdout`) instead of `cargo fmt`.
+
 3. External formatters may optionally include a `{buffer_path}` placeholder which at runtime will include the path of the buffer being formatted. Formatters operate by receiving file content via standard input, reformatting it and then outputting it to standard output and so normally don't know the filename of what they are formatting. Tools like Prettier support receiving the file path via a command line argument which can then be used to impact formatting decisions.
 
 WARNING: `{buffer_path}` should not be used to direct your formatter to read from a filename. Your formatter should only read from standard input and should not read or write files directly.
@@ -2511,6 +2539,42 @@ Example:
 {
   "git": {
     "hunk_style": "unstaged_hollow"
+  }
+}
+```
+
+### Diff Base
+
+- Description: Whether git features show changes relative to HEAD (uncommitted changes) or to the default branch (all changes on the current branch). Also available in the editor controls menu as "Diff Against Default Branch".
+- Setting: `diff_base`
+- Default:
+
+```json 
+{
+  "git": {
+    "diff_base": "head"
+  }
+}
+```
+
+**Options**
+
+1. Show working changes relative to HEAD:
+
+```json 
+{
+  "git": {
+    "diff_base": "head"
+  }
+}
+```
+
+2. Show all branch changes relative to the merge base with the repository's default branch:
+
+```json 
+{
+  "git": {
+    "diff_base": "default_branch"
   }
 }
 ```
@@ -4471,6 +4535,24 @@ The name of any font family installed on the user's system
 }
 ```
 
+### Terminal: Font Fallbacks
+
+- Description: The font fallbacks to use for text in the terminal. Uses the buffer's font fallback if unset.
+- Setting: "font_fallbacks"
+- Default: `null`
+
+**Options**
+
+For example, to use Nerd Font as a fallback, add the following to your settings:
+
+```json 
+{
+  "terminal": {
+    "font_fallbacks": ["Nerd Font"]
+  }
+}
+```
+
 ### Terminal: Font Features
 
 - Description: What font features to use for the terminal. When not set, defaults to matching the editor's font features.
@@ -4967,6 +5049,32 @@ Run the <code class="hljs">theme selector: toggle</code> action in the command p
 - `show_menus`: Whether to show the menus in the titlebar
 - `button_layout`: The layout of window control buttons in the title bar (Linux only). Can be set to `"platform_default"` to follow the system setting, `"standard"` to use Zed's built-in layout, or a custom format like `"close:minimize,maximize"`
 
+## Window Decorations
+
+- Description: Controls whether Zed or the window manager or compositor draws window decorations.
+- Setting: `window_decorations`
+- Default: `"client"`
+
+**Options**
+
+1. To have Zed draw its own window decorations, use `"client"`:
+
+```json 
+{
+  "window_decorations": "client"
+}
+```
+
+2. To have the window manager or compositor draw the window decorations, use `"server"`:
+
+```json 
+{
+  "window_decorations": "server"
+}
+```
+
+> Note: This setting only affects Linux. GNOME Wayland does not support server-side decorations. Changes only apply to newly created windows. Restart Zed to apply the setting to all windows.
+
 ## Vim
 
 - Description: Whether or not to enable vim mode.
@@ -5016,7 +5124,7 @@ Run the <code class="hljs">theme selector: toggle</code> action in the command p
   "project_panel": {
     "button": true,
     "default_width": 240,
-    "dock": "left",
+    "dock": "right",
     "entry_spacing": "comfortable",
     "file_icons": true,
     "folder_icons": true,
@@ -5052,7 +5160,7 @@ Run the <code class="hljs">theme selector: toggle</code> action in the command p
 
 - Description: Control the position of the dock
 - Setting: `dock`
-- Default: `left`
+- Default: `right`
 
 **Options**
 

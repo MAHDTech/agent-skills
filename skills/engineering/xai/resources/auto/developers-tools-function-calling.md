@@ -21,7 +21,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {"role": "user", "content": "What is the temperature in San Francisco?"}
   ],
@@ -69,7 +69,7 @@ tools = [
 ]
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=tools,
 )
 chat.append(user("What is the temperature in San Francisco?"))
@@ -116,7 +116,7 @@ tools = [
 ]
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is the temperature in San Francisco?"}],
     tools=tools,
 )
@@ -128,7 +128,7 @@ for item in response.output:
         result = {"location": args["location"], "temperature": 59, "unit": args.get("unit", "fahrenheit")}
 
         response = client.responses.create(
-            model="grok-4.5",
+            model="grok-4.6",
             input=[{"type": "function_call_output", "call_id": item.call_id, "output": json.dumps(result)}],
             tools=tools,
             previous_response_id=response.id,
@@ -145,7 +145,7 @@ import { streamText, tool, stepCountIs } from 'ai';
 import { z } from 'zod';
 
 const result = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   tools: {
     getTemperature: tool({
       description: 'Get current temperature for a location',
@@ -289,7 +289,7 @@ for item in response.output:
             output = json.dumps(tools_map[name](https://docs.x.ai/developers/tools/**args))
 
         response = client.responses.create(
-            model="grok-4.5",
+            model="grok-4.6",
             input=[{"type": "function_call_output", "call_id": item.call_id, "output": output}],
             tools=tools,
             previous_response_id=response.id,
@@ -325,7 +325,7 @@ tools = [
 ]
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=tools,
 )
 ```
@@ -447,7 +447,7 @@ import { streamText, tool, stepCountIs } from 'ai';
 import { z } from 'zod';
 
 const result = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   tools: {
     getCurrentTemperature: tool({
       description: 'Get current temperature for a location',

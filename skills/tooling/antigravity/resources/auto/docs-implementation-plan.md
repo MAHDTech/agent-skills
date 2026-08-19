@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Artifacts
-  \>
-- Plan
+Markdownkeyboard_arrow_down
 
-# Implementation Plan[link](#implementation-plan)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Implementation Plan
 
 Agent utilizes the implementation plan artifact to architect changes
 within your codebase to accomplish a task. These plans contain technical
@@ -48,5 +47,3 @@ review or beginning with its work!
 
 ![Artifact Implementation Plan
 Proceeded](https://antigravity.google/assets/image/docs/artifacts/artifact-implementation-plan-proceeded.png)
-
-On this Page

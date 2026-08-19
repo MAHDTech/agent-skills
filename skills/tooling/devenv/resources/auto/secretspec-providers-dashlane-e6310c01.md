@@ -60,6 +60,16 @@ unregistered device or a locked vault. It never answers a `dcli` prompt
 — reads run with stdin closed, so an unauthenticated CLI fails
 immediately rather than leaving `secretspec run` waiting on a password.
 
+## Provider credentials
+
+| Credential            | Environment fallback           | Available since |
+|-----------------------|--------------------------------|-----------------|
+| `service_device_keys` | `DASHLANE_SERVICE_DEVICE_KEYS` | 0.18+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
+
 ## Configuration
 
 ### URI format

@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/cli)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-cli)[crates.io](https://crates.io/crates/tauri-plugin-cli)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/cli/)[](https://docs.rs/tauri-plugin-cli)
+Reference:[](https://v2.tauri.app/reference/javascript/cli/)[](https://docs.rs/tauri-plugin-cli)
 
 Tauri enables your app to have a CLI through
 [clap](https://github.com/clap-rs/clap), a robust command line argument
@@ -27,17 +27,17 @@ JavaScript and/or Rust.
 
 Install the CLI plugin to get started.
 
-- [Automatic](#tab-panel-6289)
-- [Manual](#tab-panel-6290)
+- [Automatic](#tab-panel-5908)
+- [Manual](#tab-panel-5909)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6278)
-- [yarn](#tab-panel-6279)
-- [pnpm](#tab-panel-6280)
-- [deno](#tab-panel-6281)
-- [bun](#tab-panel-6282)
-- [cargo](#tab-panel-6283)
+- [npm](#tab-panel-5897)
+- [yarn](#tab-panel-5898)
+- [pnpm](#tab-panel-5899)
+- [deno](#tab-panel-5900)
+- [bun](#tab-panel-5901)
+- [cargo](#tab-panel-5902)
 
 ```
 npm run tauri add cli
@@ -81,11 +81,11 @@ cargo tauri add cli
     3.  Install the JavaScript Guest bindings using your preferred
         JavaScript package manager:
 
-    - [npm](#tab-panel-6284)
-    - [yarn](#tab-panel-6285)
-    - [pnpm](#tab-panel-6286)
-    - [deno](#tab-panel-6287)
-    - [bun](#tab-panel-6288)
+    - [npm](#tab-panel-5903)
+    - [yarn](#tab-panel-5904)
+    - [pnpm](#tab-panel-5905)
+    - [deno](#tab-panel-5906)
+    - [bun](#tab-panel-5907)
 
     ```
     npm install @tauri-apps/plugin-cli
@@ -188,8 +188,8 @@ with the `description`, `longDescription`, `args`, etc.
 
 The CLI plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6276)
-- [Rust](#tab-panel-6277)
+- [JavaScript](#tab-panel-5895)
+- [Rust](#tab-panel-5896)
 
 ```
 import { getMatches } from '@tauri-apps/plugin-cli';// when using `"withGlobalTauri": true`, you may use// const { getMatches } = window.__TAURI__.cli;

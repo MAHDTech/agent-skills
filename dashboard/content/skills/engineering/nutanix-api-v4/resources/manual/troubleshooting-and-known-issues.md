@@ -163,7 +163,7 @@ Release-specific information for release pc.7.3
 
 This release includes the following new or updated features: Life Cycle Management
 
-| • | FEAT-16388The Lifecycle APIs—/inventory, /upgrade, and /prechecks now support a dryrun capability. When the dryRun parameter is set to true, these APIs validate the provided credentialsor credential store references on the underlying cluster and return the validation response. This releasealso enhances the existing Lifecycle namespace APIs /inventory, /upgrade, /prechecks, and/computeNotifications to support upgrades for ESXi and Cisco intersight using either direct |
+| • | FEAT-16388The Lifecycle APIs - /inventory, /upgrade, and /prechecks now support a dryrun capability. When the dryRun parameter is set to true, these APIs validate the provided credentialsor credential store references on the underlying cluster and return the validation response. This releasealso enhances the existing Lifecycle namespace APIs /inventory, /upgrade, /prechecks, and/computeNotifications to support upgrades for ESXi and Cisco intersight using either direct |
 | --- | --- |
 
 credentials or credential store references. Credential store references can be created using the CredentialStore APIs available in the Security namespace. Virtual Machine Management

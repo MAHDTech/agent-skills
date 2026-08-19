@@ -1,15 +1,18 @@
-- side_navigation
-- Home
+Markdownkeyboard_arrow_down
 
-# Welcome to Google Antigravity[link](#welcome-to-google-antigravity)
+content_copyCopy Markdown
 
-## Choose Your Surface[link](#choose-your-surface)
+open_in_newView Markdown
+
+# Welcome to Google Antigravity
+
+## Choose Your Surface
 
 Google Antigravity offers multiple product surfaces tailored to your
 specific development workflow. Select the interface that best fits your
 needs:
 
-### Antigravity 2.0[link](#antigravity-20)
+### Antigravity 2.0
 
 Your standalone desktop command center for your agents. Start agents
 inside Projects, work across multiple workspaces and worktrees, and
@@ -20,7 +23,7 @@ orchestrate complex tasks using parallel local subagents.
 - **Get Started**: Read the [Getting Started
   Guide](https://antigravity.google/docs/getting-started)
 
-### Antigravity CLI[link](#antigravity-cli)
+### Antigravity CLI
 
 The lightweight, keyboard-centric Terminal User Interface surface. It
 brings the same core agentic capabilities as the desktop app directly to
@@ -31,7 +34,7 @@ sessions.
   parallel subagent management.
 - **Get Started**: Explore the [CLI Quick Overview](https://antigravity.google/docs/cli/overview)
 
-### Antigravity SDK[link](#antigravity-sdk)
+### Antigravity SDK
 
 A programmatic Python framework for researchers and developers who want
 complete control over their agent deployments. Custom build an agent,
@@ -42,7 +45,7 @@ Antigravity Harness.
   inspect/decide/transform hooks, and programmatic subagent spawning.
 - **Get Started**: Review the [SDK Overview](https://antigravity.google/docs/sdk/overview)
 
-### Antigravity IDE[link](#antigravity-ide)
+### Antigravity IDE
 
 The fully-featured, AI-powered developer environment. Standardize your
 daily coding with powerful tightly integrated coding agents, deep
@@ -51,7 +54,7 @@ context awareness, tools like MCP and skills, and more.
 - **Get Started**: Read the [IDE Getting Started
   Guide](https://antigravity.google/docs/ide/getting-started)
 
-### Core Agent Capabilities[link](#core-agent-capabilities)
+### Core Agent Capabilities
 
 Every Antigravity surface runs on a shared, highly-optimized agent
 harness co-trained with Gemini models:
@@ -79,5 +82,3 @@ harness co-trained with Gemini models:
     accelerate scientific workflows.
   - **AGY SDK**: Skills that optimize your agent’s ability to use the
     Antigravity SDK to build custom AI agents tailored to your workflow.
-
-On this Page

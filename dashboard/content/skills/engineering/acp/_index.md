@@ -1,6 +1,6 @@
 +++
 title = "acp"
-description = "Expert guidance for Agent Client Protocol (ACP) — building, integrating, or debugging ACP agents and clients, implementing JSON-RPC 2.0 schemas, managing session lifecycles, elicitation, tool calls, v1/v2 migration, and using official SDKs (TypeScript, Rust, Python, Java, Kotlin). Use when working with ACP protocols, building ACP-compatible AI agent servers or client applications, or inspecting ACP specifications and RFDs."
+description = "Expert guidance for Agent Client Protocol (ACP) - building, integrating, or debugging ACP agents and clients, implementing JSON-RPC 2.0 schemas, managing session lifecycles, elicitation, tool calls, v1/v2 migration, and using official SDKs (TypeScript, Rust, Python, Java, Kotlin). Use when working with ACP protocols, building ACP-compatible AI agent servers or client applications, or inspecting ACP specifications and RFDs."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -187,5 +187,5 @@ ACP v2 introduces several protocol refinements:
 
 Detailed specifications and RFD documents are downloaded into `resources/auto/` for deep reference:
 
-- [LLMs Index](resources/auto/llms.txt) — Master listing of all ACP specs, announcements, and RFDs.
+- [LLMs Index](resources/auto/llms.txt) - Master listing of all ACP specs, announcements, and RFDs.
 

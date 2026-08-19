@@ -1,16 +1,15 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Commands
-  \>
-- Permissions (/permissions)
+Markdownkeyboard_arrow_down
 
-# Permissions Command (/permissions)[link](#permissions-command-permissions)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Permissions Command (/permissions)
 
 Manage your fine-grained agent permission rules interactively within the
 TUI.
 
-## Overview[link](#overview)
+## Overview
 
 Antigravity CLI uses a fine-grained permissions engine to secure your
 workstation. While you can configure these rules manually in your
@@ -22,22 +21,18 @@ For details on how the permission engine works, supported actions, and
 manual configuration, see the conceptual **[Permissions
 Guide](https://antigravity.google/docs/cli/permissions)**.
 
-## Managing permissions interactively[link](#managing-permissions-interactively)
+## Managing permissions interactively
 
 To open the Permissions Manager:
 
 1.  Type `/permissions` in the prompt box.
-2.  Press `Enter`.
+2.  Press Enter.
 
-text
-
-content_copy
-
-```
+``` astro-code
 /permissions
 ```
 
-### Navigation and controls[link](#navigation-and-controls)
+### Navigation and controls
 
 The Permissions Manager operates in three panels:
 
@@ -48,51 +43,49 @@ The Permissions Manager operates in three panels:
     - **Shared**: Rules shared across all Antigravity products.
     - **Global**: Global rules applying to all your sessions.
 
-    Use `↑`/`↓` (or `j`/`k`) to navigate, `Enter` to select, and `Esc`
-    to exit.
+    Use ↑/↓ (or J/K) to navigate, Enter to select, and Esc to exit.
 
 2.  **Rule Viewer**: View the rules configured for the selected scope.
 
     - Switch between **allowlist**, **denylist**, and **asklist** tabs
-      using `←`/`→` (or `Tab`).
-    - Scroll through the rules using `↑`/`↓` (or `j`/`k`).
-    - Press `a` to add a new rule.
-    - Press `e` (or `Ctrl+G`) to edit the highlighted rule.
-    - Press `d` (or `Backspace`) to delete the highlighted rule.
-    - Press `Esc` to return to the Scope Picker.
+      using ←/→ (or Tab).
+    - Scroll through the rules using ↑/↓ (or J/K).
+    - Press A to add a new rule.
+    - Press E (or Ctrl + G) to edit the highlighted rule.
+    - Press D (or Backspace) to delete the highlighted rule.
+    - Press Esc to return to the Scope Picker.
 
 3.  **Add/Edit Rule**: Type or edit a rule in the input field.
 
     - Rules must follow the `action(target)` format (e.g.,
       `command(git)`).
-    - Press `Enter` to validate and save the rule.
-    - Press `Esc` to cancel.
+    - Press Enter to validate and save the rule.
+    - Press Esc to cancel.
 
 ------------------------------------------------------------------------
 
-## Step-by-step walkthrough[link](#step-by-step-walkthrough)
+## Step-by-step walkthrough
 
 Here is how to view, add, edit, and delete rules live in the TUI.
 
-### 1. Selecting a scope and viewing rules[link](#1-selecting-a-scope-and-viewing-rules)
+### 1. Selecting a scope and viewing rules
 
 When you run `/permissions`, you first see the **Scope Picker**. Select
 **Global** to manage your global rules:
 
 ![Selecting Global Scope](https://antigravity.google/assets/image/docs/cli/permissions-scope.png)
 
-Press `Enter` to open the **Rule Viewer** for the selected scope. You
-can use `←`/`→` to switch between the **allow**, **deny**, and **ask**
-tabs:
+Press Enter to open the **Rule Viewer** for the selected scope. You can
+use ←/→ to switch between the **allow**, **deny**, and **ask** tabs:
 
 ![Global Rule Viewer](https://antigravity.google/assets/image/docs/cli/permissions-viewer.png)
 
-### 2. Adding a permission rule[link](#2-adding-a-permission-rule)
+### 2. Adding a permission rule
 
 To allow the agent to run `git` commands automatically without
 prompting:
 
-1.  In the Rule Viewer, press `a`. The **Add Rule** panel opens at the
+1.  In the Rule Viewer, press A. The **Add Rule** panel opens at the
     bottom:
 
     ![Add Rule Panel](https://antigravity.google/assets/image/docs/cli/permissions-add.png)
@@ -101,33 +94,33 @@ prompting:
 
     ![Typing the Rule](https://antigravity.google/assets/image/docs/cli/permissions-add-typed.png)
 
-3.  Press `Enter`. The rule is validated and saved. You are returned to
+3.  Press Enter. The rule is validated and saved. You are returned to
     the Rule Viewer, and `command(git)` now appears in your allowlist:
 
     ![Rule Saved
     Successfully](https://antigravity.google/assets/image/docs/cli/permissions-viewer-with-rule.png)
 
-### 3. Editing a permission rule[link](#3-editing-a-permission-rule)
+### 3. Editing a permission rule
 
 If you want to restrict the agent so it can only run `git diff`
 automatically, you can edit the rule:
 
-1.  In the Rule Viewer, use `↑`/`↓` to highlight `command(git)`.
-2.  Press `e` (or `Ctrl+G`). The input panel opens, prefilled with
+1.  In the Rule Viewer, use ↑/↓ to highlight `command(git)`.
+2.  Press E (or Ctrl + G). The input panel opens, prefilled with
     `command(git)`.
 3.  Modify the text to `command(git diff)`.
-4.  Press `Enter` to save. The old rule is replaced by the new one.
+4.  Press Enter to save. The old rule is replaced by the new one.
 
-### 4. Deleting a permission rule[link](#4-deleting-a-permission-rule)
+### 4. Deleting a permission rule
 
 To remove a rule and revert to prompting for those actions:
 
 1.  In the Rule Viewer, highlight the rule you want to delete (e.g.,
     `command(git diff)`).
-2.  Press `d` (or `Backspace`).
+2.  Press D (or Backspace).
 3.  The rule is immediately removed from the list.
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - **[Permissions Guide](https://antigravity.google/docs/cli/permissions)**: Learn about the
   security model, action types, and wildcard matching.
@@ -135,5 +128,3 @@ To remove a rule and revert to prompting for those actions:
   container for running commands.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands and keybindings.
-
-On this Page

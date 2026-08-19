@@ -18,6 +18,11 @@
 
 * [acp-csharp](https://github.com/nuskey8/acp-csharp)
 * [Acp.Net](https://github.com/MertBasar0/acp-net)
+* [Agentic.ACPLibrary](https://github.com/AgenticDesktop/ACPLibrary)
+
+## Elixir
+
+* [raxol\_agent\_client\_protocol](https://github.com/DROOdotFOO/raxol/tree/master/packages/raxol_agent_client_protocol)
 
 ## Emacs
 

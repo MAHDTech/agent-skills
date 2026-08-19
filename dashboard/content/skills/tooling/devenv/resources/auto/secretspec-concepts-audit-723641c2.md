@@ -12,8 +12,9 @@ skill_name = "devenv"
 
 secretspec records every secret access to a local audit log so you can
 review, after the fact, **what** secret was accessed, **when**, by
-**whom**, with what **reason, if supplied**, and what the **outcome**
-was. Auditing is **on by default**.
+**whom**, with what **reason, if supplied**, which software integration
+called SecretSpec (0.20+), and what the **outcome** was. Auditing is
+**on by default**.
 
 Secret values are never written to the log. Only metadata is recorded,
 and any credentials embedded in a provider URI are redacted.
@@ -40,7 +41,7 @@ turn it off.
 ## What a record looks like
 
 ```
-{  "v": 1,  "id": "386987e6-291f-4e8f-a08b-73db9d80897b",  "ts": "2026-06-04T17:04:00.893Z",  "session_id": "d59e0f0f-ed2f-456f-a2b6-be25a24b7ec7",  "seq": 0,  "action": "get",  "project": "my-app",  "profile": "production",  "key": "DATABASE_URL",  "provider": "keyring://",  "outcome": "found",  "reason": "deploy web frontend",  "actor": { "user": "alice", "agent": "claude-code", "is_agent": true },  "version": "0.11.0"}
+{  "v": 1,  "id": "386987e6-291f-4e8f-a08b-73db9d80897b",  "ts": "2026-06-04T17:04:00.893Z",  "session_id": "d59e0f0f-ed2f-456f-a2b6-be25a24b7ec7",  "seq": 0,  "action": "get",  "project": "my-app",  "profile": "production",  "key": "DATABASE_URL",  "provider": "keyring://",  "outcome": "found",  "reason": "deploy web frontend",  "caller": {    "name": "git",    "version": "2.51.0",    "operation": "credential_get",    "resource": "github.com"  },  "actor": { "user": "alice", "agent": "claude-code", "is_agent": true },  "version": "0.20.0"}
 ```
 
 | Field | Meaning |
@@ -50,10 +51,10 @@ turn it off.
 | `ts` | RFC 3339 UTC timestamp |
 | `session_id` | Shared by every event from one `secretspec` invocation |
 | `seq` | Monotonic sequence within that invocation |
-| `action` | The operation: `get`, `set`, `check`, `run`, `import`, `export`, or `cache_clear` / `cache_refresh` (0.17+) |
+| `action` | The operation: `get`, `set`, `check`, `run`, `import`, `export`, `cache_clear` / `cache_refresh` (0.17+), or `delete` (0.18+) |
 | `project` / `profile` | The project and profile in effect |
 | `scope` | The named scope for a scoped `check`, `run`, or `export`; omitted otherwise (SecretSpec 0.17+) |
-| `key` | The secret name for single-secret actions (`get`/`set`); never its value |
+| `key` | The secret name for single-secret actions (`get`/`set`, and `delete` in 0.18+); never its value |
 | `keys` | The set of secret names for bulk actions (`check`/`run`/`import`/`export`) |
 | `command` | For `run`, the executed program (argv\[0\] only — never its arguments, which may contain secrets) |
 | `provider` | The provider URI that served the access, with credentials redacted |
@@ -61,6 +62,7 @@ turn it off.
 |  | A cached route writing its local entry is recorded as `cache_refresh`/`written`, never as `set`: no authoritative store was written. Dropping an entry — `cache clear`, or an entry a write superseded — is `cache_clear`/`deleted`. |
 | `error_kind` | A non-sensitive tag when `outcome` is `error` |
 | `reason` | The reason supplied via `--reason` / `SECRETSPEC_REASON` / the SDK, if any |
+| `caller` | Caller-asserted software integration context: `name`, and optional `version`, `operation`, and non-secret `resource` (SecretSpec 0.20+) |
 | `actor` | The OS user, the detected coding agent (if any), and whether this is an agent session |
 
 This pairs naturally with the
@@ -69,6 +71,12 @@ policy: when that policy applies, SecretSpec requires the caller to
 state *why* before proceeding and records the supplied reason alongside
 the access.
 
+Caller context answers *what software* requested access; `reason`
+answers *why the user* requested it. Caller context is informational, is
+not an authenticated identity, and never satisfies `require_reason`.
+Integrations must not place a credential or secret value in any caller
+field.
+
 ## Reading the log
 
 The log is plain JSON Lines, so any tool works (`cat`, `tail -f`, `jq`).
@@ -76,9 +84,9 @@ The [`secretspec audit`](https://secretspec.dev/reference/cli/#audit) command re
 with filters and a readable summary:
 
 ```
-# Last 20 entries, formattedsecretspec audit -n 20
-# Only `run` events for one projectsecretspec audit --project my-app --action run
-# Raw JSON Lines, piped to jqsecretspec audit --json | jq 'select(.outcome == "missing")'
+# Last 20 entries, formatted$ secretspec audit -n 20
+# Only `run` events for one project$ secretspec audit --project my-app --action run
+# Raw JSON Lines, piped to jq$ secretspec audit --json | jq 'select(.outcome == "missing")'
 ```
 
 Terminal window

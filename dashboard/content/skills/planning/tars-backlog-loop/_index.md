@@ -22,7 +22,7 @@ To run a full backlog loop, execute the following steps in sequence. Only run on
 
 ### Invoking the Phase Skills
 
-These skills are marked **user-invoked** — in Claude Code that is `disable-model-invocation: true`; other runtimes spell it differently. Wherever that marking is honoured, the effect is the same: only the user typing the skill's name can invoke it, and **no skill can invoke another**. So a "call `tars-backlog-<phase>`" instruction will simply be refused.
+These skills are marked **user-invoked** - in Claude Code that is `disable-model-invocation: true`; other runtimes spell it differently. Wherever that marking is honoured, the effect is the same: only the user typing the skill's name can invoke it, and **no skill can invoke another**. So a "call `tars-backlog-<phase>`" instruction will simply be refused.
 
 **When it is refused, read that skill's `SKILL.md` and execute its steps inline.** Each call site gives the path. If your runtime does permit skill-to-skill invocation, calling it directly is equivalent and fine.
 
@@ -30,7 +30,7 @@ Keeping the marking costs nothing at rest; removing it would load all seven desc
 
 ### Topic Branch Workflow (Hub Only)
 
-The Hub must run every audit, triage, implementation, and review step from a topic branch (never the default branch). Implementation spokes branch off — and merge back into — that active topic branch; audit and triage subagents are read-only and take no branch of their own. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) for the full policy and commands.
+The Hub must run every audit, triage, implementation, and review step from a topic branch (never the default branch). Implementation spokes branch off - and merge back into - that active topic branch; audit and triage subagents are read-only and take no branch of their own. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) for the full policy and commands.
 
 ### Isolation & Concurrency Model
 
@@ -75,5 +75,5 @@ Two rules hold across every phase below. Both are established in full by [tars-b
 - If any tickets fail implementation (exceeding 5 attempts), they will reside in `.tars/issues/failed/`.
 - The loop continues until all tickets in `.tars/issues/todo/` are resolved (moved to `done/` or `failed/`), and the audit phase reports no further issues.
 
-**Guard against a non-terminating loop.** The convergence condition is an empty `todo/`, so any ticket that can never be scheduled would spin forever. Two cases do this, and both are swept in step 6 of `tars-backlog-implement`'s batching: a ticket whose `dependencies` name a ticket now in `failed/`, and a dependency cycle where no member can ever go first. If a full pass over `todo/` schedules nothing and resolves nothing, stop and report rather than looping — that is the signature of a blocked backlog, not a slow one.
+**Guard against a non-terminating loop.** The convergence condition is an empty `todo/`, so any ticket that can never be scheduled would spin forever. Two cases do this, and both are swept in step 6 of `tars-backlog-implement`'s batching: a ticket whose `dependencies` name a ticket now in `failed/`, and a dependency cycle where no member can ever go first. If a full pass over `todo/` schedules nothing and resolves nothing, stop and report rather than looping - that is the signature of a blocked backlog, not a slow one.
 

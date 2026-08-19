@@ -1,13 +1,13 @@
 ---
 name: bevy-development
-description: Expert guidance for building 2D and 3D games in Bevy 0.19, Rust's data-driven ECS game engine — components, systems, scheduling, states, queries, input, assets, messages, and performance. Use when writing or modernizing Bevy code, laying out ECS data and systems, scheduling or gating systems, handling input/assets/messages, or migrating off deprecated Bevy APIs like bundles, delta_seconds, EventReader, or Parent.
+description: Expert guidance for building 2D and 3D games in Bevy 0.19, Rust's data-driven ECS game engine - components, systems, scheduling, states, queries, input, assets, messages, and performance. Use when writing or modernizing Bevy code, laying out ECS data and systems, scheduling or gating systems, handling input/assets/messages, or migrating off deprecated Bevy APIs like bundles, delta_seconds, EventReader, or Parent.
 resources:
-  - https://r.jina.ai/https://bevy.org/learn/migration-guides/
+  - https://bevy.org/learn/migration-guides/
 ---
 
 # Bevy Game Engine Expert
 
-Patterns for building high-performance, modular games with Bevy — the data-driven ECS
+Patterns for building high-performance, modular games with Bevy - the data-driven ECS
 game engine built in Rust.
 
 **Targets Bevy 0.19** (latest stable). Bevy moves fast and breaks APIs between releases;
@@ -27,7 +27,7 @@ these snippets. The migration cheat sheet below covers the churn since ~0.14.
 
 Load these for depth:
 
-- `resources/auto/learn-migration-guides.md` — Bevy migration guides and release notes.
+- `resources/auto/learn-migration-guides.md` - Bevy migration guides and release notes.
 
 ## Migration Cheat Sheet (older Bevy -> 0.19)
 
@@ -74,7 +74,7 @@ fn movement_system(
     mut query: Query<(&mut Transform, &Velocity), With<Player>>,
 ) {
     for (mut transform, velocity) in &mut query {
-        // delta_secs() — renamed from delta_seconds() in 0.16.
+        // delta_secs() - renamed from delta_seconds() in 0.16.
         transform.translation += velocity.0.extend(0.0) * time.delta_secs();
     }
 }
@@ -167,7 +167,7 @@ struct Scored(u32);
 ## 5. Performance Patterns
 
 - **Parallel iteration:** for large independent workloads, use `par_iter_mut()`.
-- **SparseSet storage:** for frequently added/removed components (buffs, statuses) —
+- **SparseSet storage:** for frequently added/removed components (buffs, statuses) -
   use `#[component(storage = "SparseSet")]` to optimize storage access patterns.
 - **Batch spawning:** `commands.spawn_batch(..)` beats a loop of individual `spawn`
   calls.
@@ -204,7 +204,7 @@ cargo run --release
 
 ## 7. Best Practices
 
-- **Do:** access singletons with `Res<T>` rather than `ResMut<T>` unless you mutate —
+- **Do:** access singletons with `Res<T>` rather than `ResMut<T>` unless you mutate -
   read-only access lets the scheduler run more systems concurrently.
 - **Do:** use marker components / ZSTs to filter queries cheaply.
 - **Do:** apply `Changed<T>` to reactive systems (UI updates, animation) to skip stable
@@ -212,5 +212,5 @@ cargo run --release
 - **Do:** prefer required components over reintroducing bundle-shaped wrapper structs.
 - **Don't:** run heavy nested loops over >1,000 entities without `par_iter_mut()` or a
   cached query.
-- **Don't:** poll asset-loaded checks inside gameplay frames — gate them behind a
+- **Don't:** poll asset-loaded checks inside gameplay frames - gate them behind a
   loading state.

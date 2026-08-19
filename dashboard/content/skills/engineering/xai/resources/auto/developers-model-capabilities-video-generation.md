@@ -12,7 +12,11 @@ skill_name = "xai"
 
 # Video Generation
 
-Generate videos from text prompts with Grok video models. The API supports configurable duration, aspect ratio, and resolution, and the SDK handles asynchronous polling automatically.
+Generate videos from text prompts with Grok video models. The API supports configurable duration, aspect ratio, and resolution, and the SDK handles asynchronous polling automatically. On `grok-imagine-video-1.5`, text-to-video supports native 1080p.
+
+> [!NOTE]
+>
+> On , text-to-video uses text-to-image then image-to-video under the hood: the model generates a first frame from your prompt, then animates it. You still make a single text-to-video request; the intermediate image is not returned.
 
 ## Quick Start
 
@@ -26,7 +30,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 
 response = client.video.generate(
     prompt="A glowing crystal-powered rocket launching from the red dunes of Mars, ancient alien ruins lighting up in the background as it soars into a sky full of unfamiliar constellations",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=10,
     aspect_ratio="16:9",
     resolution="720p",
@@ -49,7 +53,7 @@ response = requests.post(
     "https://api.x.ai/v1/videos/generations",
     headers=headers,
     json={
-        "model": "grok-imagine-video",
+        "model": "grok-imagine-video-1.5",
         "prompt": "A glowing crystal-powered rocket launching from the red dunes of Mars, ancient alien ruins lighting up in the background as it soars into a sky full of unfamiliar constellations",
         "duration": 10,
         "aspect_ratio": "16:9",
@@ -80,7 +84,7 @@ import { xai } from "@ai-sdk/xai";
 import { experimental_generateVideo as generateVideo } from "ai";
 
 const result = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "A glowing crystal-powered rocket launching from the red dunes of Mars, ancient alien ruins lighting up in the background as it soars into a sky full of unfamiliar constellations",
     duration: 10,
     aspectRatio: "16:9",
@@ -99,7 +103,7 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "A glowing crystal-powered rocket launching from the red dunes of Mars, ancient alien ruins lighting up in the background as it soars into a sky full of unfamiliar constellations",
     "duration": 10,
     "aspect_ratio": "16:9",
@@ -126,14 +130,13 @@ Video generation is an **asynchronous process** that typically takes up to sever
 
 * **Prompt complexity** — More detailed scenes require additional processing
 * **Duration** — Longer videos take more time to generate
-* **Resolution** — Higher resolutions (720p vs 480p) increase processing time
+* **Resolution** — Higher resolutions (1080p vs 480p) increase processing time
 * **Video editing** — Editing existing videos adds overhead compared to image-to-video or text-to-video
 
 ## Video workflows
 
 Use the page that matches the kind of video output you want to create:
 
-* [Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation) — Generate videos from text prompts.
 * [Image-to-Video](https://docs.x.ai/developers/model-capabilities/video/image-to-video) — Animate a still image.
 * [Video Editing](https://docs.x.ai/developers/model-capabilities/video/editing) — Modify an existing video.
 * [Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video) — Guide a generated video with one or more reference images.
@@ -157,7 +160,7 @@ curl -X POST https://api.x.ai/v1/videos/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "A glowing crystal-powered rocket launching from Mars"
   }'
 ```
@@ -196,7 +199,7 @@ Response (when complete):
     "duration": 8,
     "respect_moderation": true
   },
-  "model": "grok-imagine-video"
+  "model": "grok-imagine-video-1.5"
 }
 ```
 
@@ -204,7 +207,7 @@ Videos are returned as temporary URLs. Access the xAI-hosted URL directly when y
 
 ## Configuration
 
-The video generation API lets you control the output format of your generated videos. You can specify the duration, aspect ratio, and resolution to match your specific use case.
+The video generation API lets you control the output format of your generated videos. You can specify the duration, aspect ratio, resolution, and (on reference-to-video) a preset voice to match your specific use case.
 
 ### Duration
 
@@ -233,9 +236,25 @@ Video editing does not support custom `aspect_ratio` — the output matches the 
 | `720p` | HD quality |
 | `480p` | Standard definition, faster processing (default) |
 
-> **Note:** `1080p` is only supported on `grok-imagine-video-1.5` for image-to-video generation.
+**Note:** `1080p` is supported on `grok-imagine-video-1.5` for text-to-video and image-to-video. Reference-to-video is capped at 720p.
 
 Video editing does not support custom `resolution`. The output resolution matches the input video's resolution, capped at 720p (e.g., a 1080p input will be downsized to 720p).
+
+### Audio
+
+> [!WARNING]
+>
+> Preset voices are generally available. Voice references with your own audio files are available to trusted partners, on request. .
+
+On `grok-imagine-video-1.5`, [reference-to-video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video#reference-audio) can carry a voice via `reference_audios`. Voices come from the built-in roster and are named by `voice_id`; voice references with your own audio files are available to trusted partners [on request](https://x.ai/contact-sales?interest=imagine):
+
+| Property | Description |
+|----------|-------------|
+| Source | A preset `voice_id` (e.g. `{"voice_id": "eve"}`), from the same roster as [Text to Speech](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech#voices). Identifiers are case-insensitive |
+| Limit | Max **3** voices per request |
+| Prompt | Reference voices by index: `<AUDIO_0>`, `<AUDIO_1>`, `<AUDIO_2>` |
+
+Generated videos include an audio track by default.
 
 ### Example
 
@@ -247,7 +266,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 
 response = client.video.generate(
     prompt="Timelapse of a flower blooming in a sunlit garden",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=10,
     aspect_ratio="16:9",
     resolution="720p",
@@ -271,7 +290,7 @@ response = requests.post(
     "https://api.x.ai/v1/videos/generations",
     headers=headers,
     json={
-        "model": "grok-imagine-video",
+        "model": "grok-imagine-video-1.5",
         "prompt": "Timelapse of a flower blooming in a sunlit garden",
         "duration": 10,
         "aspect_ratio": "16:9",
@@ -302,7 +321,7 @@ import { xai } from "@ai-sdk/xai";
 import { experimental_generateVideo as generateVideo } from "ai";
 
 const result = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "Timelapse of a flower blooming in a sunlit garden",
     duration: 10,
     aspectRatio: "16:9",
@@ -321,7 +340,7 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "Timelapse of a flower blooming in a sunlit garden",
     "duration": 10,
     "aspect_ratio": "16:9",
@@ -352,7 +371,7 @@ The video generation endpoint supports multiple modes, determined by which field
 |------|-----------------|--------------|-------------|
 | Text-to-video | `prompt` only | `prompt: "..."` | Generates video from a text prompt alone. |
 | Image-to-video | `prompt` + `image` | `prompt: { image, text }` | Generates video with the provided image as the starting frame. |
-| Reference-to-video | `prompt` + `reference_images` | `prompt: "..."` + `providerOptions.xai.{ mode: "reference-to-video", referenceImageUrls }` | Generates video guided by one or more reference images. |
+| Reference-to-video | `prompt` + `reference_images` or `reference_audios` | `prompt: "..."` + `providerOptions.xai.{ mode: "reference-to-video", referenceImageUrls }` | Generates video guided by reference images and/or a preset voice on `grok-imagine-video-1.5`. |
 | Edit-video | `/v1/videos/edits` + `video` | `prompt: "..."` + `providerOptions.xai.{ mode: "edit-video", videoUrl }` | Modifies an existing video based on the prompt. |
 | Extend-video | `/v1/videos/extensions` + `video` | `prompt: "..."` + `providerOptions.xai.{ mode: "extend-video", videoUrl }` | Extends an existing video from its last frame. |
 
@@ -381,7 +400,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 
 response = client.video.generate(
     prompt="Epic cinematic drone shot flying through mountain peaks",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=15,
     timeout=timedelta(minutes=15),  # Wait up to 15 minutes
     interval=timedelta(seconds=5),  # Check every 5 seconds
@@ -395,7 +414,7 @@ import { xai } from "@ai-sdk/xai";
 import { experimental_generateVideo as generateVideo } from "ai";
 
 const result = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "Epic cinematic drone shot flying through mountain peaks",
     duration: 15,
     providerOptions: {
@@ -429,7 +448,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 # Start the generation request
 start_response = client.video.start(
     prompt="A cat lounging in a sunbeam, tail gently swishing",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=5,
 )
 
@@ -468,7 +487,7 @@ response = requests.post(
     "https://api.x.ai/v1/videos/generations",
     headers=headers,
     json={
-        "model": "grok-imagine-video",
+        "model": "grok-imagine-video-1.5",
         "prompt": "A cat lounging in a sunbeam, tail gently swishing",
         "duration": 5,
     },
@@ -508,7 +527,7 @@ const response = await fetch("https://api.x.ai/v1/videos/generations", {
         "Authorization": `Bearer ${process.env.XAI_API_KEY}`,
     },
     body: JSON.stringify({
-        model: "grok-imagine-video",
+        model: "grok-imagine-video-1.5",
         prompt: "A cat lounging in a sunbeam, tail gently swishing",
         duration: 5,
     }),
@@ -547,7 +566,7 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "A cat lounging in a sunbeam, tail gently swishing",
     "duration": 5
   }' | jq -r '.request_id')
@@ -594,7 +613,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 try:
     response = client.video.generate(
         prompt="A cat lounging in a sunbeam, tail gently swishing",
-        model="grok-imagine-video",
+        model="grok-imagine-video-1.5",
         duration=5,
     )
     print(response.url)
@@ -646,7 +665,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 try:
     response = client.video.generate(
         prompt="A cat lounging in a sunbeam, tail gently swishing",
-        model="grok-imagine-video",
+        model="grok-imagine-video-1.5",
         duration=5,
     )
     print(response.url)
@@ -672,7 +691,7 @@ print(f"Model: {response.model}")
 
 ```javascript customLanguage="javascriptAISDK"
 const result = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "A futuristic city skyline at dusk",
     duration: 5,
 });
@@ -701,7 +720,7 @@ async def generate_concurrently():
     tasks = [
         client.video.generate(
             prompt=prompt,
-            model="grok-imagine-video",
+            model="grok-imagine-video-1.5",
             duration=5,
         )
         for prompt in prompts

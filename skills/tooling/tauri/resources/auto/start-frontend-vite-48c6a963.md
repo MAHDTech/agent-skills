@@ -25,10 +25,10 @@ as of Vite 5.4.8.
     and dist folder along with the hooks to automatically run the Vite
     scripts:
 
-    - [npm](#tab-panel-6996)
-    - [yarn](#tab-panel-6997)
-    - [pnpm](#tab-panel-6998)
-    - [deno](#tab-panel-6999)
+    - [npm](#tab-panel-6615)
+    - [yarn](#tab-panel-6616)
+    - [pnpm](#tab-panel-6617)
+    - [deno](#tab-panel-6618)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run build",    "devUrl": "http://localhost:5173",    "frontendDist": "../dist"  }}

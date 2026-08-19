@@ -283,7 +283,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 # SDK handles polling automatically and returns the completed video.
 response = client.video.generate(
     prompt="A ball bouncing slowly on a flat surface",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=5,
     storage_options={"filename": "bouncing-ball.mp4", "public_url": True},
 )
@@ -299,7 +299,7 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "A ball bouncing slowly on a flat surface",
     "duration": 5,
     "storage_options": {"filename": "bouncing-ball.mp4", "public_url": true}

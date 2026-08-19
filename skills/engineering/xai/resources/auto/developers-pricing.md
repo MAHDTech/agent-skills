@@ -8,6 +8,8 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Context | Input / 1M tokens | Cached input / 1M tokens | Output / 1M tokens |
 | --- | --- | --- | --- | --- |
+| grok-4.6 (< 200k prompt tokens) | 500k | $2.00 | $0.50 | $6.00 |
+| grok-4.6 (≥ 200k prompt tokens) | 500k | $4.00 | $1.00 | $12.00 |
 | grok-4.5 (< 200k prompt tokens) | 500k | $2.00 | $0.30 | $6.00 |
 | grok-4.5 (≥ 200k prompt tokens) | 500k | $4.00 | $0.60 | $12.00 |
 | grok-4.3 (< 200k prompt tokens) | 1M | $1.25 | $0.20 | $2.50 |
@@ -27,17 +29,18 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
-| grok-imagine-image-quality | $0.05 / image |
+| grok-imagine-image-2.0 | $0.04 / image |
 | grok-imagine-image | $0.02 / image |
-| grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-video | $0.050 / sec |
+| grok-imagine-video-1.5 | $0.080 / sec |
 
 ### Voice Pricing
 
 | Mode | Cost |
 | --- | --- |
-| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
 | Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-1.0) — Deprecated | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
 | Text to Speech | $15.00 / 1M chars |
 
@@ -62,6 +65,7 @@ All standard token types are billed for the model used in the request:
 | Web Search | `web_search` | Search the internet and browse web pages | $5 |
 | X Search | `x_search` | Search X posts, user profiles, and threads | $5 |
 | Code Execution | `code_execution`, `code_interpreter`† | Run Python code in a sandboxed environment | $5 |
+| Image Generation | `image_generation` | Generate and edit images | [Imagine API rates](https://docs.x.ai/developers/pricing#imagine-api-pricing) |
 | File Attachments | `attachment_search` | Search through files attached to messages | $10 |
 | Collections Search | `collections_search`, `file_search`† | Query your uploaded document collections (RAG) | $2.50 |
 | Image Understanding | `view_image` | Analyze images found during Web Search and X Search\* | Token-based |

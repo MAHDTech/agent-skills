@@ -143,9 +143,9 @@ const url = `wss://api.x.ai/v1/realtime?model=${MODEL}`;
 
 | Model | Description |
 |-------|-------------|
-| `grok-voice-latest` | Alias for `grok-voice-think-fast-1.0`.Updates to `grok-voice-think-fast-2.0` on August 5, 2026. |
+| `grok-voice-latest` | Alias for `grok-voice-think-fast-2.0` |
 | `grok-voice-think-fast-2.0` | Flagship voice model |
-| `grok-voice-think-fast-1.0` | Previous-generation voice model |
+| `grok-voice-think-fast-1.0`  | Previous-generation voice model |
 
 ## Session Parameters
 
@@ -153,9 +153,9 @@ After the session has been created, clients may send the [session.update](https:
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `instructions` | string | System prompt |
+| `instructions` | string | System prompt. See the [Prompting Guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide) for the recommended structure. |
 | `reasoning.effort` | `"high"` | `"none"` | optional | Controls whether the model uses reasoning. Defaults to `"high"`. |
-| `voice` | string | Voice selection: any built-in voice (e.g. `eve`, the default) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
+| `voice` | string | Voice selection: any built-in voice (e.g. `eve`) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) (see [Available Voices](#available-voices)) |
 | `tools` | array | Tools available to the voice agent. Supports `file_search`, `web_search`, `x_search`, `mcp`, and `function` types. See [Using Tools](#using-tools-with-grok-speech-to-speech-api). |
 | `turn_detection.type` | string | null | `"server_vad"` for automatic detection, `null` for manual text turns |
 | `turn_detection.threshold` | number | optional | VAD activation threshold (0.1–0.9). Higher values require louder audio to trigger. Default: `0.85`. |
@@ -174,6 +174,10 @@ After the session has been created, clients may send the [session.update](https:
 | `audio.output.speed` | number | Playback speed multiplier for assistant audio output. Range: 0.7–1.5. Default: `1.0`. Values below 1.0 slow down speech; values above 1.0 speed it up. |
 | `replace` | object | optional | Map of phrases to spoken substitutions applied to the model's output before TTS, e.g. `{"Acme Mobile": "Acme Mobull"}`. Fixes pronunciation by changing the spoken audio without altering the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
 
+## Prompting
+
+`instructions` is the system prompt. Write it in second person with a fixed section order so the agent stays close to the training distribution. See the [Prompting Guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide) for the recommended structure, tool hygiene, and escalation patterns.
+
 ## Available Voices
 
 The same roster of voices works across the Speech to Speech API and Text to Speech API. Browse the full list with tone descriptions and samples in the [voice table](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech#voices), or fetch it programmatically via [`GET /v1/tts/voices`](https://docs.x.ai/developers/rest-api-reference/inference/voice). Pass the lowercase voice ID as the `voice` parameter on `session.update`.
@@ -191,7 +195,7 @@ Specify the voice in your session configuration using the `voice` parameter:
 session_config = {
     "type": "session.update",
     "session": {
-        "voice": "eve",  # eve, ara, rex, sal, leo, or custom voice ID
+        "voice": "eve",  # any built-in voice or custom voice ID
         "instructions": "You are a helpful assistant.",
         # Audio format settings (these are the defaults if not specified)
         "audio": {
@@ -209,7 +213,7 @@ await ws.send(json.dumps(session_config))
 const sessionConfig = {
   type: "session.update",
   session: {
-    voice: "eve", // eve, ara, rex, sal, leo, or custom voice ID
+    voice: "eve", // any built-in voice or custom voice ID
     instructions: "You are a helpful assistant.",
     // Audio format settings (these are the defaults if not specified)
     audio: {

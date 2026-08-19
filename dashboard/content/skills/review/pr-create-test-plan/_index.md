@@ -1,6 +1,6 @@
 +++
 title = "pr-create-test-plan"
-description = "Generate a manual test plan for a branch's changes — hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR."
+description = "Generate a manual test plan for a branch's changes - hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,7 +12,7 @@ mermaid = false
 
 # PR Test Plan
 
-Generate a manual test plan for the changes in the current branch. The plan should focus on what a developer/reviewer needs to **manually verify** — real user flows, integration behavior, and observable outcomes. Leave input validation, error branches, and edge cases to unit tests.
+Generate a manual test plan for the changes in the current branch. The plan should focus on what a developer/reviewer needs to **manually verify** - real user flows, integration behavior, and observable outcomes. Leave input validation, error branches, and edge cases to unit tests.
 
 ## Instructions
 
@@ -86,9 +86,9 @@ Tag every test step with one of these emojis in the step title:
 
 | Emoji | Meaning          | When to use                                                                  |
 | ----- | ---------------- | ---------------------------------------------------------------------------- |
-| 🔴    | **Critical**     | Core functionality — if this fails, the feature is broken                    |
-| 🟢    | **Expected**     | Standard behavior that should work — moderate confidence but worth verifying |
-| 🔵    | **Nice-to-have** | Polish, UX, non-blocking — skip if short on time                             |
+| 🔴    | **Critical**     | Core functionality - if this fails, the feature is broken                    |
+| 🟢    | **Expected**     | Standard behavior that should work - moderate confidence but worth verifying |
+| 🔵    | **Nice-to-have** | Polish, UX, non-blocking - skip if short on time                             |
 
 Example: `1a. 🔴 **Pre-register a profile end-to-end**`
 
@@ -105,17 +105,17 @@ Example: `1a. 🔴 **Pre-register a profile end-to-end**`
 
 #### What to focus on (and what to skip)
 
-**DO include — things you must verify manually:**
+**DO include - things you must verify manually:**
 
 - Happy-path user flows end-to-end (the main thing the feature does)
-- Integration points — does component A actually talk to component B correctly?
-- State transitions — does data persist, propagate, and display correctly across the system?
-- Resumption / retry behavior — if a multi-step process fails midway, does retry work?
-- UI rendering — does the new section/field/page show up and look right?
-- API response shape — do new fields appear in real responses?
-- Existing behavior preserved — does the change break anything that was already working?
+- Integration points - does component A actually talk to component B correctly?
+- State transitions - does data persist, propagate, and display correctly across the system?
+- Resumption / retry behavior - if a multi-step process fails midway, does retry work?
+- UI rendering - does the new section/field/page show up and look right?
+- API response shape - do new fields appear in real responses?
+- Existing behavior preserved - does the change break anything that was already working?
 
-**DO NOT include — leave these for unit tests:**
+**DO NOT include - leave these for unit tests:**
 
 - Invalid input validation (wrong types, missing fields, malformed data)
 - Boundary values and off-by-one checks

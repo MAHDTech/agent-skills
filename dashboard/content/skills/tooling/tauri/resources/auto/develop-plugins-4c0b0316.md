@@ -53,7 +53,7 @@ the plugin with Android and/or iOS support, use the `--android` and/or
 
 After installing, you can run the following to create a plugin project:
 
-- [npm](#tab-panel-4583)
+- [npm](#tab-panel-4460)
 
 ```
 npx @tauri-apps/cli plugin new [name]
@@ -71,6 +71,31 @@ If you have an existing plugin and would like to add Android or iOS
 capabilities to it, you can use `plugin android add` and
 `plugin ios add` to bootstrap the mobile library projects and guide you
 through the changes needed.
+
+## Declaring Platform Support
+
+Plugins can declare which platforms they support, and to what extent, in
+the `[package.metadata.platforms.support]` section of the crate’s
+`Cargo.toml`:
+
+```
+[package.metadata.platforms.support]windows = { level = "full" }linux = { level = "full" }macos = { level = "full" }android = { level = "partial", notes = "Access is restricted to the Application folder by default" }ios = { level = "none" }
+```
+
+Cargo.toml
+
+Each key is a platform (`windows`, `linux`, `macos`, `android`, `ios`)
+and accepts two fields:
+
+- `level` (required): `"full"` if the plugin works as intended,
+  `"partial"` if it works with limitations, or `"none"` if the platform
+  isn’t supported.
+- `notes` (optional): a short description of the caveats or limitations.
+  It renders as Markdown on the plugin’s page. In the [support
+  table](https://v2.tauri.app/plugin/#support-table) it shows up as plain text in a tooltip.
+
+The support table and the platform filter on the [Features &
+Recipes](https://v2.tauri.app/plugin/) page are generated from this metadata.
 
 ## Mobile Plugin Development
 

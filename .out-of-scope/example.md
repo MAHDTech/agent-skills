@@ -8,4 +8,4 @@ Distribution already works well through the `skills.sh` CLI (`npx skills add MAH
 
 ## Prior requests
 
-- <https://github.com/MAHDTech/agent-skills/issues/000> — asked for a GitHub Action to publish on push to `trunk`
+- <https://github.com/MAHDTech/agent-skills/issues/000> - asked for a GitHub Action to publish on push to `trunk`

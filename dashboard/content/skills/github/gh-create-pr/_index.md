@@ -20,7 +20,7 @@ Generate a concise PR description by analyzing the diff against a base branch.
 
 Output the result in a markdown file named `PR_DESCRIPTION.md`.
 
-Copy to clipboard if handy — e.g. `pbcopy < PR_DESCRIPTION.md` (macOS) or `xclip -selection clipboard < PR_DESCRIPTION.md` (Linux).
+Copy to clipboard if handy - e.g. `pbcopy < PR_DESCRIPTION.md` (macOS) or `xclip -selection clipboard < PR_DESCRIPTION.md` (Linux).
 
 - [Instructions](#instructions)
   - [1. Determine the base branch](#1-determine-the-base-branch)
@@ -101,9 +101,9 @@ Do NOT proceed to step 5 until the user explicitly approves.
 
 Once the user approves, execute the following steps in order:
 
-**Step 5a — Commit unstaged changes (if any):**
+**Step 5a - Commit unstaged changes (if any):**
 
-Stage only the specific files this PR should include — never blanket-stage with `git add -A`, which sweeps in unrelated changes:
+Stage only the specific files this PR should include - never blanket-stage with `git add -A`, which sweeps in unrelated changes:
 
 ```bash
 git add <specific intended files>
@@ -112,13 +112,13 @@ git commit -m "<generated title>"
 
 If there are no unstaged/staged changes, skip this step.
 
-**Step 5b — Push the branch:**
+**Step 5b - Push the branch:**
 
 ```bash
 git push -u origin HEAD
 ```
 
-**Step 5c — Create or update the PR:**
+**Step 5c - Create or update the PR:**
 
 Check if a PR already exists for the current branch:
 
@@ -148,8 +148,8 @@ PR titles must follow this format:
 
 **Rules:**
 
-- `KEYWORD` is an uppercase word that best categorizes the PR — not a fixed list. Common examples: `FEAT`, `FEATURE`, `FIX`, `BUG`, `REFACTOR`, `TECHDEBT`, `DOCS`, `TEST`, `CHORE`, `PERF`, `PERFORMANCE`, `CI`, `BUILD`, `STYLE`, `CLI`, `CONFIG`, `MIGRATION`, `SECURITY`, `API`, `UI`, `INFRA`
-- Pick whichever keyword most accurately describes the PR — invent a new one if none of the above fit
+- `KEYWORD` is an uppercase word that best categorizes the PR - not a fixed list. Common examples: `FEAT`, `FEATURE`, `FIX`, `BUG`, `REFACTOR`, `TECHDEBT`, `DOCS`, `TEST`, `CHORE`, `PERF`, `PERFORMANCE`, `CI`, `BUILD`, `STYLE`, `CLI`, `CONFIG`, `MIGRATION`, `SECURITY`, `API`, `UI`, `INFRA`
+- Pick whichever keyword most accurately describes the PR - invent a new one if none of the above fit
 - `Summary` is a concise imperative phrase (e.g., "Add session-based auth", "Fix null pointer in user lookup")
 - Max 70 characters total
 - No period at the end
@@ -179,7 +179,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 | 🟢/🔴/… | 1-3 words describing the component | 1 sentence describing how it worked before | 1 sentence describing how it works after |
 | …       | …                                  | …                                          | …                                        |
 
-> _(legend blockquote — see the Feature Diff section rules for the exact line)_
+> _(legend blockquote - see the Feature Diff section rules for the exact line)_
 
 ## Details
 
@@ -201,7 +201,7 @@ _tl;dr Single sentence, 120 characters max, summarizing the most important outco
 
 ## GitHub Admonitions
 
-Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default — only when one of the situations below applies.
+Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-started-writing-on-github-getting-started-with-writing-and-formatting-on-github-basic-writing-and-formatting-syntax.md#alerts) at the **very top** of the description (before the tl;dr) when the PR has important context that reviewers need upfront. Do NOT use admonitions by default - only when one of the situations below applies.
 
 **Syntax:**
 
@@ -235,7 +235,7 @@ Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-star
 **Rules:**
 
 - Maximum ONE admonition per PR description (pick the most important)
-- Keep it to 1-3 sentences — enough context to orient the reviewer, not a full explanation
+- Keep it to 1-3 sentences - enough context to orient the reviewer, not a full explanation
 - Reference related PRs/issues by number (e.g., #509) so GitHub auto-links them
 - Place BEFORE the tl;dr line
 
@@ -255,7 +255,7 @@ Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-star
 - Plain language after the dash: one sentence, no jargon
 - No implementation details: reviewers will read the diff for that
 - No fluff: skip "minor cleanup", "refactor", "update docs" unless they deliver real value
-- **Order by priority/impact, highest first** — the first bullet should be the most important change in the PR
+- **Order by priority/impact, highest first** - the first bullet should be the most important change in the PR
 - Use backticks for code references: file names, paths, commands, config keys, env vars, endpoints, function names
 
 ### Feature Diff
@@ -266,11 +266,11 @@ Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-star
 - "Component" = the thing that changed (endpoint, table, config key, module, behavior, etc.)
 - "Before" = previous state, or `N/A` if new
 - "After" = new state, or `Removed` if deleted
-- Keep cells concise — short phrases, not sentences
+- Keep cells concise - short phrases, not sentences
 - Group related rows; aim for 3-10 rows
 - Good component examples: API endpoint, DB table/column, config key, env var, dependency version, CLI flag, permission, error behavior
 - Use backticks for code references in Component, Before, and After cells (e.g., `sessions` table, `/auth/login`, `TOKEN_TTL`)
-- **Legend**: Every Feature Diff table is followed by this exact one-line legend as a blockquote. This is the single definition of the severity symbols — the Output Format and Example Output templates above just reference it:
+- **Legend**: Every Feature Diff table is followed by this exact one-line legend as a blockquote. This is the single definition of the severity symbols - the Output Format and Example Output templates above just reference it:
 
   > 🔴 Critical fix · 🟡 Improvement · 🟢 New feature · ⚪ Neutral · ⚙️ Infra/tooling · ⚠️ Breaking
 
@@ -296,7 +296,7 @@ Use [GitHub admonitions](@/skills/github/gh-create-pr/resources/auto/en-get-star
 
 ### General Details
 
-- **Use backticks everywhere for code references** — this applies to ALL sections (tl;dr excluded): file names (`file.py`), file paths (`src/auth/`), commands (`npm run build`), config keys (`TOKEN_TTL`), env vars (`NODE_ENV`), endpoints (`/api/v1/users`), function names (`getUser()`), table/column names (`sessions.token`)
+- **Use backticks everywhere for code references** - this applies to ALL sections (tl;dr excluded): file names (`file.py`), file paths (`src/auth/`), commands (`npm run build`), config keys (`TOKEN_TTL`), env vars (`NODE_ENV`), endpoints (`/api/v1/users`), function names (`getUser()`), table/column names (`sessions.token`)
 - Italicize or bold keywords if it helps readability
 
 ## Example Output
@@ -321,7 +321,7 @@ _tl;dr Users can now log in with email/password and stay authenticated across br
 | 🟢  | `/auth/login`    | `N/A`                      | New endpoint                                    |
 | 🟢  | `/auth/logout`   | `N/A`                      | New endpoint                                    |
 
-> _(legend blockquote — see the Feature Diff section rules for the exact line)_
+> _(legend blockquote - see the Feature Diff section rules for the exact line)_
 
 ## Details
 

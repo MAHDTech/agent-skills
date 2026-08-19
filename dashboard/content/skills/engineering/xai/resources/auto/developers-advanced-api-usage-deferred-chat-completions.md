@@ -46,7 +46,7 @@ from xai_sdk.chat import user, system
 client = Client(api_key=os.getenv('XAI_API_KEY'))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[system("You are Zaphod Beeblebrox.")]
 )
 chat.append(user("126/3=?"))
@@ -79,7 +79,7 @@ payload = {
         {"role": "system", "content": "You are Zaphod Beeblebrox."},
         {"role": "user", "content": "126/3=?"}
     ],
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "deferred": True
 }
 
@@ -119,7 +119,7 @@ const payload = {
         { role: 'system', content: 'You are Zaphod Beeblebrox.' },
         { role: 'user', content: '126/3=?' }
     ],
-    model: 'grok-4.5',
+    model: 'grok-4.6',
     deferred: true
 };
 
@@ -159,7 +159,7 @@ RESPONSE=$(curl -s https://api.x.ai/v1/chat/completions \\
         {"role": "system", "content": "You are Zaphod Beeblebrox."},
         {"role": "user", "content": "126/3=?"}
     ],
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "deferred": true
 }')
 
@@ -179,7 +179,7 @@ The response body will be the same as what you would expect with non-deferred ch
   "id": "3f4ddfca-b997-3bd4-80d4-8112278a1508",
   "object": "chat.completion",
   "created": 1752077400,
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "choices": [
     {
       "index": 0,

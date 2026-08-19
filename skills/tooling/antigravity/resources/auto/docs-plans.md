@@ -1,7 +1,10 @@
-- side_navigation
-- Plans
+Markdownkeyboard_arrow_down
 
-# Plans[link](#plans)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Plans
 
 Google Antigravity is available with
 [terms](https://antigravity.google/terms) to individual accounts derived
@@ -13,7 +16,7 @@ Rate limits and model availability differs based on usage of [Google
 AI](https://one.google.com/about/google-ai-plans/) plans. See
 [Models](https://antigravity.google/docs/models) for a breakdown of model availability.
 
-## Baseline Quota[link](#baseline-quota)
+## Baseline Quota
 
 All plans receive a baseline of:
 
@@ -52,7 +55,7 @@ Usage limits for this service are subject to modification. These
 adjustments may be necessary to manage system capacity and maintain
 service stability.
 
-## Overages[link](#overages)
+## Overages
 
 Users on Google AI Pro or Ultra plans can utilize [purchased AI
 credits](http://one.google.com/ai/credits) (or any one-time promotional
@@ -72,12 +75,10 @@ be set to the following:
 
 Baseline quota usage across models can be viewed in the settings page.
 
-## Other[link](#other)
+## Other
 
 There is currently no support for:
 
 - Bring-your-own-key or bring-your-own-endpoint for additional rate
   limits
 - Organizational tiers via contract
-
-On this Page

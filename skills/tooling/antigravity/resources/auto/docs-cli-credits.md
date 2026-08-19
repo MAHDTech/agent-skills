@@ -1,9 +1,10 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- AI Credits
+Markdownkeyboard_arrow_down
 
-# Managing AI Credits & Quotas[link](#managing-ai-credits--quotas)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Managing AI Credits & Quotas
 
 The Antigravity CLI integrates with your subscription to monitor and
 manage your AI Premium credits and usage quotas.
@@ -12,7 +13,7 @@ For a detailed explanation of baseline quotas, how credits are consumed,
 and plan eligibility, please refer to the main **[Plans](https://antigravity.google/docs/plans)**
 page.
 
-## Quota Tracking[link](#quota-tracking)
+## Quota Tracking
 
 You can monitor your active quota and credit consumption directly inside
 the CLI:
@@ -23,7 +24,7 @@ the CLI:
   warning threshold, the statusline indicator highlights to warn you
   that your limits are near.
 
-## Slash Commands & Managing Balance[link](#slash-commands--managing-balance)
+## Slash Commands & Managing Balance
 
 You can query your credits or buy additional quota directly from the
 CLI:
@@ -35,18 +36,14 @@ CLI:
   your subscription, which opens a panel containing direct pricing and
   subscription portal links.
 
-## Settings Configuration[link](#settings-configuration)
+## Settings Configuration
 
 To control when and how your AI credits are used, you can toggle credit
 settings in your `settings.json` file:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "useG1Credits": true
+    "useG1Credits": true
 }
 ```
 
@@ -57,11 +54,9 @@ content_copy
   learn more, see the **[Plans](https://antigravity.google/docs/plans#overages)** overages
   section).
 
-## See also[link](#see-also)
+## See also
 
 - **[AI Credits Command](https://antigravity.google/docs/cli/commands/credits)**: View and manage
   your credits interactively in the TUI.
 - **[Model Quotas Command](https://antigravity.google/docs/cli/commands/usage)**: Monitor your
   model-specific API quotas.
-
-On this Page

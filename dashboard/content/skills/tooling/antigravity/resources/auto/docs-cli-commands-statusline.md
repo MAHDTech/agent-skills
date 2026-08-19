@@ -8,18 +8,17 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Commands
-  \>
-- Status Line (/statusline)
+Markdownkeyboard_arrow_down
 
-# Status Line Command (/statusline)[link](#status-line-command-statusline)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Status Line Command (/statusline)
 
 Toggle the TUI status line or configure a custom rendering command.
 
-## Overview[link](#overview)
+## Overview
 
 The `/statusline` command allows you to quickly enable or disable the
 status line at the bottom of your TUI, or configure a custom shell
@@ -30,83 +29,63 @@ For details on how to write custom status line scripts and the JSON
 state payload schema, see the conceptual **[Status Line Customization
 Guide](https://antigravity.google/docs/cli/statusline)**.
 
-## Usage[link](#usage)
+## Usage
 
 Run the `/statusline` command with the following arguments to control
 its behavior:
 
-### Toggle Status Line[link](#toggle-status-line)
+### Toggle Status Line
 
 Type `/statusline` with no arguments to toggle the status line on and
 off:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /statusline
 ```
 
-### Enable or Disable Explicitly[link](#enable-or-disable-explicitly)
+### Enable or Disable Explicitly
 
 You can explicitly enable or disable the status line:
 
 - **Enable**: `/statusline on` or `/statusline enable`
 - **Disable**: `/statusline off` or `/statusline disable`
 
-bash
-
-content_copy
-
-```
+``` astro-code
 /statusline off
 ```
 
-### Configure a Custom Command[link](#configure-a-custom-command)
+### Configure a Custom Command
 
 To route the agent state JSON payload to a custom script and render its
 output in the status line, pass the command as an argument:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 /statusline ~/.gemini/antigravity-cli/statusline.sh
 ```
 
 This immediately updates your settings and starts running the script to
 render the status line.
 
-### Revert to Default[link](#revert-to-default)
+### Revert to Default
 
 To delete your custom command configuration and revert to the built-in
 default status line:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 /statusline delete
 ```
 
 *(Note: `/statusline reset` is also supported).*
 
-### Show Help[link](#show-help)
+### Show Help
 
 To view the quick command reference:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 /statusline help
 ```
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - **[Status Line Guide](https://antigravity.google/docs/cli/statusline)**: Learn how to write
   custom scripts and handle the JSON payload.
@@ -114,7 +93,5 @@ content_copy
   dynamic terminal window titles.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands.
-
-On this Page
 
 {% endraw %}

@@ -16,7 +16,10 @@ visible to clients.
 Use the standard `console` API to write logs from your reducers:
 
 ``` codeBlockStandalone_LlrK
-import { spacetimedb } from 'spacetimedb/server';
+import { schema, t } from 'spacetimedb/server';
+
+const spacetimedb = schema({ /* tables */ });
+export default spacetimedb;
 
 export const process_data = spacetimedb.reducer({ value: t.u32() }, (ctx, { value }) => {
   console.log(`Processing data with value: ${value}`);

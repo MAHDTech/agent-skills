@@ -30,10 +30,10 @@ improvements.
 Make sure to update both NPM and Cargo dependencies to the 1.4.0
 release. You can update the dependencies with:
 
-- [npm](#tab-panel-4484)
-- [yarn](#tab-panel-4485)
-- [pnpm](#tab-panel-4486)
-- [cargo](#tab-panel-4487)
+- [npm](#tab-panel-4361)
+- [yarn](#tab-panel-4362)
+- [pnpm](#tab-panel-4363)
+- [cargo](#tab-panel-4364)
 
 ```
 npm install @tauri-apps/cli@latest @tauri-apps/api@latest

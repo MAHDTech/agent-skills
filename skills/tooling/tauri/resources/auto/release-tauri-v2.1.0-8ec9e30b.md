@@ -5,14 +5,14 @@ GitHub](https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.1.0)
 
 Nov 9, 2024
 
-### New Features
+##### New Features
 
 - [`fabc2f283`](https://www.github.com/tauri-apps/tauri/commit/fabc2f283e38b62c721326e44645d47138418cbc)
   ([\#11485](https://www.github.com/tauri-apps/tauri/pull/11485) by
   [@39zde](https://www.github.com/tauri-apps/tauri/../../39zde)) Adds a
-  new configuration option `app > security > headers` to define
-  headers that will be added to every http response from tauri to the
-  web view. This doesn't include IPC messages and error responses.
+  new configuration option `app > security > headers` to define headers
+  that will be added to every http response from tauri to the web view.
+  This doesn't include IPC messages and error responses.
 
 - [`8036c78e0`](https://www.github.com/tauri-apps/tauri/commit/8036c78e08715b1bc6b9fcb0c59a570eec98014f)
   ([\#11455](https://www.github.com/tauri-apps/tauri/pull/11455) by
@@ -42,9 +42,8 @@ Nov 9, 2024
 - [`cbc095ec5`](https://www.github.com/tauri-apps/tauri/commit/cbc095ec5fe7de29b5c9265576d4e071ec159c1c)
   ([\#11451](https://www.github.com/tauri-apps/tauri/pull/11451) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Add `app > windows > devtools` config option and when creating
-  the webview from JS, to enable or disable devtools for a specific
-  webview.
+  Add `app > windows > devtools` config option and when creating the
+  webview from JS, to enable or disable devtools for a specific webview.
 
 - [`f0da0bde8`](https://www.github.com/tauri-apps/tauri/commit/f0da0bde87a80fdca20c588cefcad86e03b9627c)
   ([\#11439](https://www.github.com/tauri-apps/tauri/pull/11439) by
@@ -59,18 +58,17 @@ Nov 9, 2024
 - [`f37e97d41`](https://www.github.com/tauri-apps/tauri/commit/f37e97d410c4a219e99f97692da05ca9d8e0ba3a)
   ([\#11477](https://www.github.com/tauri-apps/tauri/pull/11477) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Add `app > windows > useHttpsScheme` config option to choose
-  whether the custom protocols should use
-  `https://\<scheme\>.localhost` instead of the default
-  `http://\<scheme\>.localhost` on Windows and Android
+  Add `app > windows > useHttpsScheme` config option to choose whether
+  the custom protocols should use `https://\<scheme\>.localhost` instead
+  of the default `http://\<scheme\>.localhost` on Windows and Android
 
 - [`f37e97d41`](https://www.github.com/tauri-apps/tauri/commit/f37e97d410c4a219e99f97692da05ca9d8e0ba3a)
   ([\#11477](https://www.github.com/tauri-apps/tauri/pull/11477) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
   Add `WebviewWindowBuilder/WebviewBuilder::use_https_scheme` to choose
-  whether the custom protocols should use
-  `https://\<scheme\>.localhost` instead of the default
-  `http://\<scheme\>.localhost` on Windows and Android
+  whether the custom protocols should use `https://\<scheme\>.localhost`
+  instead of the default `http://\<scheme\>.localhost` on Windows and
+  Android
 
 - [`cbc095ec5`](https://www.github.com/tauri-apps/tauri/commit/cbc095ec5fe7de29b5c9265576d4e071ec159c1c)
   ([\#11451](https://www.github.com/tauri-apps/tauri/pull/11451) by
@@ -87,8 +85,8 @@ Nov 9, 2024
 - [`2a75c64b5`](https://www.github.com/tauri-apps/tauri/commit/2a75c64b5431284e7340e8743d4ea56a62c75466)
   ([\#11469](https://www.github.com/tauri-apps/tauri/pull/11469) by
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
-  Added `app > windows > windowClassname` config option to specify
-  the name of the window class on Windows.
+  Added `app > windows > windowClassname` config option to specify the
+  name of the window class on Windows.
 
 - [`2a75c64b5`](https://www.github.com/tauri-apps/tauri/commit/2a75c64b5431284e7340e8743d4ea56a62c75466)
   ([\#11469](https://www.github.com/tauri-apps/tauri/pull/11469) by
@@ -96,7 +94,7 @@ Nov 9, 2024
   Added `WindowBuilder/WebviewWindowBuilder::window_classname` method to
   specify the name of the window class on Windows.
 
-### Enhancements
+##### Enhancements
 
 - [`17c6952ae`](https://www.github.com/tauri-apps/tauri/commit/17c6952aec965fa41e6695ad68461a218afc20f1)
   ([\#11522](https://www.github.com/tauri-apps/tauri/pull/11522) by
@@ -108,7 +106,7 @@ Nov 9, 2024
   [@kornelski](https://www.github.com/tauri-apps/tauri/../../kornelski))
   Include the path in ACL I/O errors.
 
-### Bug Fixes
+##### Bug Fixes
 
 - [`229d7f8e2`](https://www.github.com/tauri-apps/tauri/commit/229d7f8e220cc8d5ca06eff1ed85cb7d047c1d6c)
   ([\#11616](https://www.github.com/tauri-apps/tauri/pull/11616) by
@@ -136,7 +134,7 @@ Nov 9, 2024
   [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir))
   Fix webview not focused by default.
 
-### Dependencies
+##### Dependencies
 
 - Upgraded to `tauri-utils@2.1.0`
 - Upgraded to `tauri-runtime@2.2.0`

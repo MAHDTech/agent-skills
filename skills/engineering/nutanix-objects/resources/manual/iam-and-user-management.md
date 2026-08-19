@@ -13,7 +13,7 @@ console. They have the ability to create user accounts and perform all operation
 
 Central. Within Nutanix Objects, you can create the following three different users:
 
-- Full access to Nutanix Objects service (Nutanix Objects only—full access)• Read-only access to Nutanix Objects service (Nutanix Objects only—view access)• Restricted access to Nutanix Objects service (user can customize the access)
+- Full access to Nutanix Objects service (Nutanix Objects only - full access)• Read-only access to Nutanix Objects service (Nutanix Objects only - view access)• Restricted access to Nutanix Objects service (user can customize the access)
 
 - Prism Central admin role with no access to Nutanix Objects service at all within Prism Central (No
 
@@ -235,7 +235,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -304,7 +304,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -350,7 +350,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.
 
 Objects | Directory Configuration and Access Key Generation |
 

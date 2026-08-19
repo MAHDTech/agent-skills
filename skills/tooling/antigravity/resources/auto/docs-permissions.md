@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Agent Capabilities
-  \>
-- Permissions
+Markdownkeyboard_arrow_down
 
-# Agent Permissions[link](#agent-permissions)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Agent Permissions
 
 Antigravity uses a robust, unified permission engine to secure your
 environment while enabling autonomous workflows. Every sensitive
@@ -19,14 +18,7 @@ Permissions are evaluated across three distinct access lists:
   before proceeding.
 - **Allow**: The action is auto-approved without prompting.
 
-warning
-
-Precedence Rule: Conflicting rules are strictly evaluated in priority
-order: Deny \> Ask \> Allow. For example, if you configure command(\*)
-in Ask and command(git) in Allow, the Ask rule takes precedence and
-prompts before every command.
-
-## Supported Actions & Matching Rules[link](#supported-actions--matching-rules)
+## Supported Actions & Matching Rules
 
 | Action | Target Format | Matching Behavior | Default Fallback |
 |:---|:---|:---|:---|
@@ -38,13 +30,7 @@ prompts before every command.
 | `unsandboxed` | `unsandboxed(prefix)`, `unsandboxed(regex)`, or `unsandboxed(*)` | Matches commands by exact word/token prefix. Commands matching this grant will be executed outside of container isolation (only applicable when terminal sandboxing is enabled). | **Ask** |
 | `mcp` | `mcp(server/tool)`, `mcp(server/*)`, or `mcp(*)` | Matches exact MCP tools or all tools on a specified server (applies equally to local `mcpl` servers and remote connections). Using `mcp(*)` matches any tool. | **Ask** |
 
-info
-
-Global Wildcard Syntax (*): Across all supported action types (e.g.,
-read_file(*), command(*), mcp(*)), passing the global wildcard \*
-matches all targets within that entire action namespace.
-
-### Understanding read_url vs execute_url Across the Platform[link](#understanding-read_url-vs-execute_url-across-the-platform)
+### Understanding read_url vs execute_url Across the Platform
 
 The `read_url` permission governs outbound web connectivity across three
 distinct areas of Antigravity:
@@ -61,7 +47,7 @@ distinct areas of Antigravity:
     network allowlist (`AllowedDomains`), permitting commands like
     `curl` or `npm` to connect to authorized hosts.
 
-### Cross-Platform Command & Path Matching[link](#cross-platform-command--path-matching)
+### Cross-Platform Command & Path Matching
 
 Antigravity ensures your permission rules work flawlessly whether you
 are developing on macOS, Linux, or Windows. On macOS and Linux, paths
@@ -70,14 +56,14 @@ automatically normalizes paths prior to rule evaluation by stripping
 drive letters (e.g., `C:`) and converting all backslashes (`\`) to
 forward slashes (`/`).
 
-## Implicit Permission Rules[link](#implicit-permission-rules)
+## Implicit Permission Rules
 
 - **Write implies Read:** Allowing `write_file` on a path automatically
   grants `read_file` on that path.
 - **Deny Read implies Deny Write:** Denying `read_file` on a path
   immediately blocks `write_file` on that path.
 
-## Interactive Permission Prompts[link](#interactive-permission-prompts)
+## Interactive Permission Prompts
 
 When the Agent encounters an operation requiring approval (**Ask**
 mode), an interactive card appears in your editor. Before clicking
@@ -90,7 +76,7 @@ remainder of the turn, preventing repeated prompts for related
 operations. *(Note: Scope editing is not supported for terminal
 commands).*
 
-## Terminal Sandboxing (Preview)[link](#terminal-sandboxing-preview)
+## Terminal Sandboxing (Preview)
 
 Permission grants also apply to commands when sandbox is enabled:
 
@@ -101,12 +87,7 @@ Permission grants also apply to commands when sandbox is enabled:
 - Domains granted under `read_url` define outbound network access
   policies.
 
-info
-
-Sandbox Availability: Terminal sandboxing is currently in preview on
-macOS / Linux, and coming soon to Windows.
-
-## Default System Behaviors & Guardrails[link](#default-system-behaviors--guardrails)
+## Default System Behaviors & Guardrails
 
 When an action is not explicitly listed in your Allow, Deny, or Ask
 lists, Antigravity falls back to secure system defaults:
@@ -120,15 +101,11 @@ lists, Antigravity falls back to secure system defaults:
     allowed. All other unconfigured actions (`command`, `mcp`,
     `execute_url`, non-workspace files) default to **Ask**.
 
-## Configuration Examples[link](#configuration-examples)
+## Configuration Examples
 
 **Allow list** — actions that run without prompting:
 
-text
-
-content_copy
-
-```
+``` astro-code
 command(git)                       # Standard git commands
 command(npm run (build|lint|test)) # Allow safe npm scripts via regex
 unsandboxed(git push)              # Allow git push outside sandbox
@@ -140,11 +117,7 @@ mcp(linter/*)                      # Run linter MCP tools
 
 **Deny list** — actions that are permanently blocked:
 
-text
-
-content_copy
-
-```
+``` astro-code
 command(rm -rf)                    # Block destructive deletions
 command(curl .*)                   # Block unvetted curl downloads
 command(sudo)                      # Block sudo privileges
@@ -154,14 +127,8 @@ write_file(/home/user/.ssh)        # Safeguard SSH keys
 
 **Ask list** — actions that pause for manual confirmation:
 
-text
-
-content_copy
-
-```
+``` astro-code
 command(*)                         # Prompt all commands
 execute_url(aws.amazon.com)        # Prompt AWS console actuation
 mcp(sql/execute_mutation)          # Prompt modifying SQL queries
 ```
-
-On this Page

@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/autostart)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-autostart)[crates.io](https://crates.io/crates/tauri-plugin-autostart)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/autostart/)[](https://docs.rs/tauri-plugin-autostart)
+Reference:[](https://v2.tauri.app/reference/javascript/autostart/)[](https://docs.rs/tauri-plugin-autostart)
 
 Automatically launch your application at system startup.
 
@@ -17,17 +17,17 @@ Automatically launch your application at system startup.
 
 Install the autostart plugin to get started.
 
-- [Automatic](#tab-panel-6244)
-- [Manual](#tab-panel-6245)
+- [Automatic](#tab-panel-5863)
+- [Manual](#tab-panel-5864)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6233)
-- [yarn](#tab-panel-6234)
-- [pnpm](#tab-panel-6235)
-- [deno](#tab-panel-6236)
-- [bun](#tab-panel-6237)
-- [cargo](#tab-panel-6238)
+- [npm](#tab-panel-5852)
+- [yarn](#tab-panel-5853)
+- [pnpm](#tab-panel-5854)
+- [deno](#tab-panel-5855)
+- [bun](#tab-panel-5856)
+- [cargo](#tab-panel-5857)
 
 ```
 npm run tauri add autostart
@@ -71,11 +71,11 @@ cargo tauri add autostart
 3.  You can install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6239)
-    - [yarn](#tab-panel-6240)
-    - [pnpm](#tab-panel-6241)
-    - [deno](#tab-panel-6242)
-    - [bun](#tab-panel-6243)
+    - [npm](#tab-panel-5858)
+    - [yarn](#tab-panel-5859)
+    - [pnpm](#tab-panel-5860)
+    - [deno](#tab-panel-5861)
+    - [bun](#tab-panel-5862)
 
     ```
     npm install @tauri-apps/plugin-autostart
@@ -101,8 +101,8 @@ cargo tauri add autostart
 
 The autostart plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6231)
-- [Rust](#tab-panel-6232)
+- [JavaScript](#tab-panel-5850)
+- [Rust](#tab-panel-5851)
 
 ```
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';// when using `"withGlobalTauri": true`, you may use// const { enable, isEnabled, disable } = window.__TAURI__.autostart;

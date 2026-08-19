@@ -67,8 +67,7 @@ New!
 
 ## Organization plan via Google Cloud
 
-Google Cloud customers can now access Antigravity 2.0 and CLI with
-Gemini Enterprise Agent Platform
+Google Cloud customers can now access Antigravity 2.0 and CLI.
 
 [Get started](https://antigravity.google/docs/enterprise)
 
@@ -78,6 +77,10 @@ Now Available:
 
 - checkAccess under Google Cloud Terms of Service
 - checkGoogle Cloud Project Integration
-- checkConsumption-Based API Pricing
+- checkConsumption-Based API Pricing with Gemini Enterprise Agent
+  Platform
+- checkIncluded in select Gemini Enterprise app subscriptions\*  
+    
+  \*Rolling out to select customers
 
 {% endraw %}

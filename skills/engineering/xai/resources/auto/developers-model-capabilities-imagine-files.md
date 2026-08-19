@@ -42,7 +42,7 @@ edit = client.image.sample(
 # 3. Animate the edited result into a video
 vid = client.video.generate(
     prompt="A camera pulls back through the city",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=5,
     image_file_id=edit.file_output.file_id,
 )

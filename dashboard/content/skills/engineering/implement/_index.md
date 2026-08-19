@@ -12,7 +12,7 @@ mermaid = false
 
 # Implement
 
-Implement the work described in the spec or tickets, then verify and land it. This skill is a thin orchestrator — it chains the focused skills together rather than reinventing them.
+Implement the work described in the spec or tickets, then verify and land it. This skill is a thin orchestrator - it chains the focused skills together rather than reinventing them.
 
 This is **serial** implementation from a spec or a set of tickets. To clear a queue of `.tars/issues/` tickets in parallel, conflict-free batches, use `/tars-backlog-implement` instead.
 

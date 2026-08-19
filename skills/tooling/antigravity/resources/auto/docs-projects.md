@@ -1,16 +1,17 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Projects
+Markdownkeyboard_arrow_down
 
-# Projects[link](#projects)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Projects
 
 In Antigravity 2.0, we are transitioning from the legacy
 repository-centric workspace model to a more flexible and secure
 **Project-centric** model. This document outlines what Projects are, how
 they work, and how they differ from the original workspace structure.
 
-### What is a Project?[link](#what-is-a-project)
+### What is a Project?
 
 A **Project** is a configuration of folders defining the environment and
 the scope of your agent. Instead of forcing an agent to operate within a
@@ -20,7 +21,7 @@ the context required for your codebase. All projects have their own
 isolated agent settings, allowing you to customize different projects’
 security settings independently.
 
-### Key Differences: Workspace vs. Projects[link](#key-differences-workspace-vs-projects)
+### Key Differences: Workspace vs. Projects
 
 | Feature | Original Model (Workspace) | New Model (Project) |
 |:---|:---|:---|
@@ -30,7 +31,7 @@ security settings independently.
 | **Permissions** | Broad, global permissions. | Global permissions are inherited. Projects can have their own permissions in addition to global permissions. |
 | **Customizations** | Skills/MCPs managed globally or per-workspace. | Reusable skills, MCPs, and hooks are managed globally. |
 
-### Core Project Concepts[link](#core-project-concepts)
+### Core Project Concepts
 
 **1. Folders**  
 A Project is composed of **folders**, which define the directories and
@@ -62,7 +63,7 @@ Settings and permissions are both scoped at the project level:
   augment them at the Project level, ensuring agents only have the exact
   access required for that specific project’s tasks.
 
-### Workflows Using Projects[link](#workflows-using-projects)
+### Workflows Using Projects
 
 - **Working in a Single Folder**: Create a project with a folder and
   then configure its settings.
@@ -79,5 +80,3 @@ Settings and permissions are both scoped at the project level:
   Git worktree for all active Git checkouts, allowing the agent to
   operate inside the new worktrees and the existing non-git local
   folders simultaneously.
-
-On this Page

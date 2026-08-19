@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/barcode-scanner)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-barcode-scanner)[crates.io](https://crates.io/crates/tauri-plugin-barcode-scanner)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/barcode-scanner/)[](https://docs.rs/tauri-plugin-barcode-scanner)
+Reference:[](https://v2.tauri.app/reference/javascript/barcode-scanner/)[](https://docs.rs/tauri-plugin-barcode-scanner)
 
 Allows your mobile application to use the camera to scan QR codes,
 EAN-13 and other kinds of barcodes.
@@ -28,17 +28,17 @@ EAN-13 and other kinds of barcodes.
 
 Install the barcode-scanner plugin to get started.
 
-- [Automatic](#tab-panel-6257)
-- [Manual](#tab-panel-6258)
+- [Automatic](#tab-panel-5876)
+- [Manual](#tab-panel-5877)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6246)
-- [yarn](#tab-panel-6247)
-- [pnpm](#tab-panel-6248)
-- [deno](#tab-panel-6249)
-- [bun](#tab-panel-6250)
-- [cargo](#tab-panel-6251)
+- [npm](#tab-panel-5865)
+- [yarn](#tab-panel-5866)
+- [pnpm](#tab-panel-5867)
+- [deno](#tab-panel-5868)
+- [bun](#tab-panel-5869)
+- [cargo](#tab-panel-5870)
 
 ```
 npm run tauri add barcode-scanner
@@ -82,11 +82,11 @@ cargo tauri add barcode-scanner
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6252)
-    - [yarn](#tab-panel-6253)
-    - [pnpm](#tab-panel-6254)
-    - [deno](#tab-panel-6255)
-    - [bun](#tab-panel-6256)
+    - [npm](#tab-panel-5871)
+    - [yarn](#tab-panel-5872)
+    - [pnpm](#tab-panel-5873)
+    - [deno](#tab-panel-5874)
+    - [bun](#tab-panel-5875)
 
     ```
     npm install @tauri-apps/plugin-barcode-scanner

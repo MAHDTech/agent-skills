@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/http)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-http)[crates.io](https://crates.io/crates/tauri-plugin-http)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/http/)[](https://docs.rs/tauri-plugin-http)
+Reference:[](https://v2.tauri.app/reference/javascript/http/)[](https://docs.rs/tauri-plugin-http)
 
 Make HTTP requests with the http plugin.
 
@@ -17,17 +17,17 @@ Make HTTP requests with the http plugin.
 
 Install the http plugin to get started.
 
-- [Automatic](#tab-panel-6401)
-- [Manual](#tab-panel-6402)
+- [Automatic](#tab-panel-6020)
+- [Manual](#tab-panel-6021)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6390)
-- [yarn](#tab-panel-6391)
-- [pnpm](#tab-panel-6392)
-- [deno](#tab-panel-6393)
-- [bun](#tab-panel-6394)
-- [cargo](#tab-panel-6395)
+- [npm](#tab-panel-6009)
+- [yarn](#tab-panel-6010)
+- [pnpm](#tab-panel-6011)
+- [deno](#tab-panel-6012)
+- [bun](#tab-panel-6013)
+- [cargo](#tab-panel-6014)
 
 ```
 npm run tauri add http
@@ -71,11 +71,11 @@ cargo tauri add http
 3.  If you’d like to make http requests in JavaScript then install the
     npm package as well:
 
-    - [npm](#tab-panel-6396)
-    - [yarn](#tab-panel-6397)
-    - [pnpm](#tab-panel-6398)
-    - [deno](#tab-panel-6399)
-    - [bun](#tab-panel-6400)
+    - [npm](#tab-panel-6015)
+    - [yarn](#tab-panel-6016)
+    - [pnpm](#tab-panel-6017)
+    - [deno](#tab-panel-6018)
+    - [bun](#tab-panel-6019)
 
     ```
     npm install @tauri-apps/plugin-http

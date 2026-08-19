@@ -6,6 +6,8 @@
 
 | Model | Context | Input / 1M tokens | Cached input / 1M tokens | Output / 1M tokens |
 | --- | --- | --- | --- | --- |
+| grok-4.6 (< 200k prompt tokens) | 500k | $2.00 | $0.50 | $6.00 |
+| grok-4.6 (≥ 200k prompt tokens) | 500k | $4.00 | $1.00 | $12.00 |
 | grok-4.5 (< 200k prompt tokens) | 500k | $2.00 | $0.30 | $6.00 |
 | grok-4.5 (≥ 200k prompt tokens) | 500k | $4.00 | $0.60 | $12.00 |
 | grok-4.3 (< 200k prompt tokens) | 1M | $1.25 | $0.20 | $2.50 |
@@ -25,31 +27,32 @@
 
 | Model | Cost |
 | --- | --- |
+| grok-imagine-image-2.0 | $0.04 / image |
 | grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-video-1.5 | $0.080 / sec |
 | grok-imagine-video | $0.050 / sec |
+| grok-imagine-video-1.5 | $0.080 / sec |
 
 ### Voice Pricing
 
 | Mode | Cost |
 | --- | --- |
-| Speech to Speech (grok-voice-think-fast-1.0) | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
 | Speech to Speech (grok-voice-think-fast-2.0) | $0.08 / min ($4.80 / hr) audio<br />$0.004 / text input |
+| Speech to Speech (grok-voice-think-fast-1.0) — Deprecated | $0.05 / min ($3.00 / hr) audio<br />$0.004 / text input |
 | Speech to Text | $0.10 / hr (REST), $0.20 / hr (Streaming) |
 | Text to Speech | $15.00 / 1M chars |
 
 ## Which model should I choose?
 
-Your choice depends on your use case. We have dedicated models and APIs for audio, image, and video capabilities. For everything else, including code, use Grok 4.5. It is the most intelligent and fastest model we’ve built.
+Your choice depends on your use case. We have dedicated models and APIs for audio, image, and video capabilities. For everything else, including code, use Grok 4.6. It is the most intelligent and fastest model we’ve built.
 
-Code: [Grok 4.5](https://docs.x.ai/developers/models/grok-4.5)
+Code: [Grok 4.6](https://docs.x.ai/developers/models/grok-4.6)
 
-Chat: [Grok 4.5](https://docs.x.ai/developers/models/grok-4.5)
+Chat: [Grok 4.6](https://docs.x.ai/developers/models/grok-4.6)
 
-Images: [Grok Imagine API](https://docs.x.ai/developers/models/grok-imagine-image-quality)
+Images: [Grok Imagine Image 2.0](https://docs.x.ai/developers/models/grok-imagine-image-2.0)
 
-Videos: [Grok Imagine API](https://docs.x.ai/developers/models/grok-imagine-video)
+Videos: [Grok Imagine Video 1.5](https://docs.x.ai/developers/models/grok-imagine-video-1.5)
 
 Voice: [Grok Voice API](https://docs.x.ai/developers/model-capabilities/audio/voice)
 
@@ -69,7 +72,7 @@ Voice: [Grok Voice API](https://docs.x.ai/developers/model-capabilities/audio/vo
 
 > [!NOTE]
 >
-> The knowledge cut-off date of Grok 4.5 is February 1, 2026.
+> The knowledge cut-off date of Grok 4.6 is February 1, 2026.
 
 ## Model Aliases
 

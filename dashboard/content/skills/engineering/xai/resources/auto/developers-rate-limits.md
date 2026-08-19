@@ -43,16 +43,18 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 
 | Model | RPS | TPM |
 | --- | --- | --- |
+| grok-4.6 | T0: 150, T1: 172, T2: 208, T3: 312, T4: 500 | T0: 50M, T1: 53M, T2: 60M, T3: 74M, T4: 100M |
 | grok-4.5 | T0: 150, T1: 172, T2: 208, T3: 312, T4: 500 | T0: 50M, T1: 53M, T2: 60M, T3: 74M, T4: 100M |
 | grok-4.3 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-0309-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image-quality | 5 | — |
-| grok-imagine-image | 5 | — |
-| grok-imagine-video-1.5 | 10 | — |
-| grok-imagine-video | 10 | — |
+| grok-imagine-image-quality | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
+| grok-imagine-image | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
+| grok-imagine-image-2.0 | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
+| grok-imagine-video-1.5 | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
+| grok-imagine-video | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
 
 ### What counts toward TPM
 
@@ -80,7 +82,7 @@ def request_with_backoff(messages, max_retries=5):
     for attempt in range(max_retries):
         try:
             return client.chat.completions.create(
-                model="grok-4.5",
+                model="grok-4.6",
                 messages=messages,
             )
         except RateLimitError:
@@ -99,7 +101,7 @@ from xai_sdk.exceptions import RateLimitError
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 def request_with_backoff(prompt, max_retries=5):
-    chat = client.chat.create(model="grok-4.5")
+    chat = client.chat.create(model="grok-4.6")
     chat.append(user(prompt))
     for attempt in range(max_retries):
         try:

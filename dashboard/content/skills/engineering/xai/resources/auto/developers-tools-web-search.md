@@ -35,7 +35,7 @@ from xai_sdk.tools import web_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[web_search()],
     include=["verbose_streaming"],
 )
@@ -69,7 +69,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -91,7 +91,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text, sources } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is xAI?',
   tools: {
     web_search: xai.tools.webSearch(),
@@ -107,7 +107,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -148,7 +148,7 @@ from xai_sdk.tools import web_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(allowed_domains=["grokipedia.com"]),
     ],
@@ -160,7 +160,7 @@ chat.append(user("What is xAI?"))
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is xAI?"}],
     tools=[
         {
@@ -173,7 +173,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is xAI?',
   tools: {
     web_search: xai.tools.webSearch({
@@ -189,7 +189,7 @@ Use `excluded_domains` to prevent the model from including the specified domains
 
 ```pythonXAI
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(excluded_domains=["grokipedia.com"]),
     ],
@@ -198,7 +198,7 @@ chat = client.chat.create(
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is xAI?"}],
     tools=[
         {
@@ -228,7 +228,7 @@ from xai_sdk.tools import web_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(enable_image_understanding=True),
     ],
@@ -240,7 +240,7 @@ chat.append(user("What is included in the image in xAI's official website?"))
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -258,7 +258,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: "What is included in the image in xAI's official website?",
   tools: {
     web_search: xai.tools.webSearch({
@@ -283,7 +283,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -308,7 +308,7 @@ from xai_sdk.tools import web_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(enable_image_search=True),
     ],
@@ -322,7 +322,7 @@ print(response.server_side_tool_usage)
 
 ```python customLanguage="pythonOpenAISDK"
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",

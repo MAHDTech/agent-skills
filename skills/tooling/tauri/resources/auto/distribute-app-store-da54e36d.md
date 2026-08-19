@@ -22,12 +22,12 @@ Additionally, you must setup code signing for
 After running `tauri ios init` to setup the Xcode project, you can use
 the `tauri icon` command to update the app icons.
 
-- [npm](#tab-panel-4632)
-- [yarn](#tab-panel-4633)
-- [pnpm](#tab-panel-4634)
-- [deno](#tab-panel-4635)
-- [bun](#tab-panel-4636)
-- [cargo](#tab-panel-4637)
+- [npm](#tab-panel-4509)
+- [yarn](#tab-panel-4510)
+- [pnpm](#tab-panel-4511)
+- [deno](#tab-panel-4512)
+- [bun](#tab-panel-4513)
+- [cargo](#tab-panel-4514)
 
 ```
 npm run tauri icon /path/to/app-icon.png -- --ios-color '#fff'
@@ -85,12 +85,12 @@ Note that Tauri leverages Xcode for the iOS app so you can use Xcode to
 archive and distribute for iOS instead of the Tauri CLI. To open the iOS
 project in Xcode for building you must run the following command:
 
-- [npm](#tab-panel-4638)
-- [yarn](#tab-panel-4639)
-- [pnpm](#tab-panel-4640)
-- [deno](#tab-panel-4641)
-- [bun](#tab-panel-4642)
-- [cargo](#tab-panel-4643)
+- [npm](#tab-panel-4515)
+- [yarn](#tab-panel-4516)
+- [pnpm](#tab-panel-4517)
+- [deno](#tab-panel-4518)
+- [bun](#tab-panel-4519)
+- [cargo](#tab-panel-4520)
 
 ```
 npm run tauri ios build -- --open
@@ -258,12 +258,12 @@ approved.
 
 To build your iOS app, run the `tauri ios build` command:
 
-- [npm](#tab-panel-4650)
-- [yarn](#tab-panel-4651)
-- [pnpm](#tab-panel-4652)
-- [deno](#tab-panel-4653)
-- [bun](#tab-panel-4654)
-- [cargo](#tab-panel-4655)
+- [npm](#tab-panel-4527)
+- [yarn](#tab-panel-4528)
+- [pnpm](#tab-panel-4529)
+- [deno](#tab-panel-4530)
+- [bun](#tab-panel-4531)
+- [cargo](#tab-panel-4532)
 
 ```
 npm run tauri ios build -- --export-method app-store-connect

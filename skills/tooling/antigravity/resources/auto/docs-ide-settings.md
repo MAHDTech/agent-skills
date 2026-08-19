@@ -1,16 +1,17 @@
-- side_navigation
-- Antigravity IDE
-  \>
-- Settings
+Markdownkeyboard_arrow_down
 
-# Settings[link](#settings)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Settings
 
 Configure how the Antigravity Agent interacts with your environment,
 executes commands, and secures your workspace.
 
-## Command Execution & File Access[link](#command-execution--file-access)
+## Command Execution & File Access
 
-### Terminal Command Auto Execution[link](#terminal-command-auto-execution)
+### Terminal Command Auto Execution
 
 Controls how the agent executes generated shell commands:
 
@@ -21,7 +22,7 @@ Controls how the agent executes generated shell commands:
   without prompting (except those explicitly added to your configurable
   Deny list). High autonomy, high risk.
 
-### Agent Non-Workspace File Access[link](#agent-non-workspace-file-access)
+### Agent Non-Workspace File Access
 
 Allows the agent to view and edit files outside of the active project
 folders.
@@ -33,14 +34,14 @@ folders.
 - Enforcing this boundary protects your local sensitive data. Enable
   non-workspace access with caution.
 
-## Strict Mode[link](#strict-mode)
+## Strict Mode
 
 Strict mode provides enhanced security controls for the Agent, allowing
 you to restrict its access to external resources and sensitive
 operations. When strict mode is enabled, several security measures are
 enforced to protect your environment.
 
-### Browser URL Allowlist/Denylist[link](#browser-url-allowlistdenylist)
+### Browser URL Allowlist/Denylist
 
 In strict mode, the Agent’s ability to interact with external websites
 is governed by the browser’s Allowlist and Denylist. This applies to:
@@ -50,7 +51,7 @@ is governed by the browser’s Allowlist and Denylist. This applies to:
 - **Read URL Tool**: The Read URL tool will only auto-execute for
   allowed URLs.
 
-### Terminal, Browser, and Artifact Review Policies[link](#terminal-browser-and-artifact-review-policies)
+### Terminal, Browser, and Artifact Review Policies
 
 Strict mode enforces the following behavior for terminal, browser, and
 artifact interactions:
@@ -64,7 +65,7 @@ artifact interactions:
 - **Artifact Review**: Set to “Request Review”. The Agent will always
   prompt for confirmation before acting on plans laid out in artifacts.
 
-### File System Access[link](#file-system-access)
+### File System Access
 
 Strict mode restricts the Agent’s access to the file system to ensure it
 only interacts with authorized files:
@@ -75,7 +76,7 @@ only interacts with authorized files:
   disabled. The Agent can only view and edit files within the designated
   workspace.
 
-## Terminal Sandboxing[link](#terminal-sandboxing)
+## Terminal Sandboxing
 
 Sandboxing provides kernel-level isolation for terminal commands
 executed by the Agent. When enabled, commands run in a restricted
@@ -87,7 +88,7 @@ future releases. It is supported on macOS and Linux. On macOS, it
 leverages Seatbelt (`sandbox-exec`), Apple’s kernel-level sandboxing
 mechanism. On Linux, it uses `nsjail` for process isolation.
 
-### Enabling Sandboxing[link](#enabling-sandboxing)
+### Enabling Sandboxing
 
 You can enable or disable sandboxing in Antigravity User Settings.
 Toggle “Enable Terminal Sandboxing” to turn sandboxing on or off. When
@@ -97,7 +98,7 @@ enabled, you can also control network access separately using the
 ![Sandbox settings
 toggles](https://antigravity.google/assets/image/docs/sandbox-settings-toggle.png)
 
-### Restrictions[link](#restrictions)
+### Restrictions
 
 When sandboxing is enabled, the Agent’s terminal commands are subject to
 the following restrictions:
@@ -120,7 +121,7 @@ restrictions:
 ![Sandbox network denial
 example](https://antigravity.google/assets/image/docs/sandbox-network-denied.png)
 
-### Interaction with Strict Mode[link](#interaction-with-strict-mode)
+### Interaction with Strict Mode
 
 When strict mode is enabled, sandboxing is automatically activated with
 network access denied. This ensures maximum protection when operating in
@@ -128,5 +129,3 @@ a strict environment.
 
 ![Sandbox settings in strict
 mode](https://antigravity.google/assets/image/docs/sandbox-secure-mode-settings.png)
-
-On this Page

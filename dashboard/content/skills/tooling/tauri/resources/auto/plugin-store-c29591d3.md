@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-store)[crates.io](https://crates.io/crates/tauri-plugin-store)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/store/)[](https://docs.rs/tauri-plugin-store)
+Reference:[](https://v2.tauri.app/reference/javascript/store/)[](https://docs.rs/tauri-plugin-store)
 
 This plugin provides a persistent key-value store. This is one of many
 options to handle state in your application. See the [state management
@@ -35,17 +35,17 @@ It can be used both in the webview or within Rust.
 
 Install the store plugin to get started.
 
-- [Automatic](#tab-panel-6587)
-- [Manual](#tab-panel-6588)
+- [Automatic](#tab-panel-6206)
+- [Manual](#tab-panel-6207)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6576)
-- [yarn](#tab-panel-6577)
-- [pnpm](#tab-panel-6578)
-- [deno](#tab-panel-6579)
-- [bun](#tab-panel-6580)
-- [cargo](#tab-panel-6581)
+- [npm](#tab-panel-6195)
+- [yarn](#tab-panel-6196)
+- [pnpm](#tab-panel-6197)
+- [deno](#tab-panel-6198)
+- [bun](#tab-panel-6199)
+- [cargo](#tab-panel-6200)
 
 ```
 npm run tauri add store
@@ -89,11 +89,11 @@ cargo tauri add store
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6582)
-    - [yarn](#tab-panel-6583)
-    - [pnpm](#tab-panel-6584)
-    - [deno](#tab-panel-6585)
-    - [bun](#tab-panel-6586)
+    - [npm](#tab-panel-6201)
+    - [yarn](#tab-panel-6202)
+    - [pnpm](#tab-panel-6203)
+    - [deno](#tab-panel-6204)
+    - [bun](#tab-panel-6205)
 
     ```
     npm install @tauri-apps/plugin-store
@@ -117,8 +117,8 @@ cargo tauri add store
 
 ## Usage
 
-- [JavaScript](#tab-panel-6572)
-- [Rust](#tab-panel-6573)
+- [JavaScript](#tab-panel-6191)
+- [Rust](#tab-panel-6192)
 
 ```
 import { load } from '@tauri-apps/plugin-store';// when using `"withGlobalTauri": true`, you may use// const { load } = window.__TAURI__.store;
@@ -152,8 +152,8 @@ const store = new LazyStore('settings.json');
 
 ## Migrating from v1 and v2 beta/rc
 
-- [JavaScript](#tab-panel-6574)
-- [Rust](#tab-panel-6575)
+- [JavaScript](#tab-panel-6193)
+- [Rust](#tab-panel-6194)
 
 ```
 import { Store } from '@tauri-apps/plugin-store';import { LazyStore } from '@tauri-apps/plugin-store';

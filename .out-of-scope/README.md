@@ -22,7 +22,7 @@ not belong in this project. Name the trade-off and any alternative.>
 
 ## Prior requests
 
-- <link to issue / PR / discussion> — short note on what was asked
+- <link to issue / PR / discussion> - short note on what was asked
 ```
 
 ## Adding an entry

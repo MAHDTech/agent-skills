@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/sql)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-sql)[crates.io](https://crates.io/crates/tauri-plugin-sql)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/sql/)[](https://docs.rs/tauri-plugin-sql)
+Reference:[](https://v2.tauri.app/reference/javascript/sql/)[](https://docs.rs/tauri-plugin-sql)
 
 Plugin providing an interface for the frontend to communicate with SQL
 databases through [sqlx](https://github.com/launchbadge/sqlx). It
@@ -30,17 +30,17 @@ feature.
 
 Install the SQL plugin to get started.
 
-- [Automatic](#tab-panel-6570)
-- [Manual](#tab-panel-6571)
+- [Automatic](#tab-panel-6189)
+- [Manual](#tab-panel-6190)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6559)
-- [yarn](#tab-panel-6560)
-- [pnpm](#tab-panel-6561)
-- [deno](#tab-panel-6562)
-- [bun](#tab-panel-6563)
-- [cargo](#tab-panel-6564)
+- [npm](#tab-panel-6178)
+- [yarn](#tab-panel-6179)
+- [pnpm](#tab-panel-6180)
+- [deno](#tab-panel-6181)
+- [bun](#tab-panel-6182)
+- [cargo](#tab-panel-6183)
 
 ```
 npm run tauri add sql
@@ -84,11 +84,11 @@ cargo tauri add sql
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6565)
-    - [yarn](#tab-panel-6566)
-    - [pnpm](#tab-panel-6567)
-    - [deno](#tab-panel-6568)
-    - [bun](#tab-panel-6569)
+    - [npm](#tab-panel-6184)
+    - [yarn](#tab-panel-6185)
+    - [pnpm](#tab-panel-6186)
+    - [deno](#tab-panel-6187)
+    - [bun](#tab-panel-6188)
 
     ```
     npm install @tauri-apps/plugin-sql
@@ -115,9 +115,9 @@ engine. The available engines are Sqlite, MySQL and PostgreSQL. Run the
 following command in the `src-tauri` folder to enable your preferred
 engine:
 
-- [SQLite](#tab-panel-6550)
-- [MySQL](#tab-panel-6551)
-- [PostgreSQL](#tab-panel-6552)
+- [SQLite](#tab-panel-6169)
+- [MySQL](#tab-panel-6170)
+- [PostgreSQL](#tab-panel-6171)
 
 ```
 cargo add tauri-plugin-sql --features sqlite
@@ -136,9 +136,9 @@ cargo add tauri-plugin-sql --features postgres
 All the plugin’s APIs are available through the JavaScript guest
 bindings:
 
-- [SQLite](#tab-panel-6553)
-- [MySQL](#tab-panel-6554)
-- [PostgreSQL](#tab-panel-6555)
+- [SQLite](#tab-panel-6172)
+- [MySQL](#tab-panel-6173)
+- [PostgreSQL](#tab-panel-6174)
 
 The path is relative to
 [`tauri::api::path::BaseDirectory::AppConfig`](https://docs.rs/tauri/2.0.0/tauri/path/enum.BaseDirectory.html#variant.AppConfig).
@@ -163,9 +163,9 @@ const db = await Database.load('postgres://user:password@host/test');await db.ex
 We use [sqlx](https://docs.rs/sqlx/latest/sqlx/) as the underlying
 library and adopt their query syntax.
 
-- [SQLite](#tab-panel-6556)
-- [MySQL](#tab-panel-6557)
-- [PostgreSQL](#tab-panel-6558)
+- [SQLite](#tab-panel-6175)
+- [MySQL](#tab-panel-6176)
+- [PostgreSQL](#tab-panel-6177)
 
 Use the “\$#” syntax when substituting query data
 

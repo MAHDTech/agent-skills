@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/dialog)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-dialog)[crates.io](https://crates.io/crates/tauri-plugin-dialog)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/dialog/)[](https://docs.rs/tauri-plugin-dialog)
+Reference:[](https://v2.tauri.app/reference/javascript/dialog/)[](https://docs.rs/tauri-plugin-dialog)
 
 Native system dialogs for opening and saving files along with message
 dialogs.
@@ -18,17 +18,17 @@ dialogs.
 
 Install the dialog plugin to get started.
 
-- [Automatic](#tab-panel-6332)
-- [Manual](#tab-panel-6333)
+- [Automatic](#tab-panel-5951)
+- [Manual](#tab-panel-5952)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6321)
-- [yarn](#tab-panel-6322)
-- [pnpm](#tab-panel-6323)
-- [deno](#tab-panel-6324)
-- [bun](#tab-panel-6325)
-- [cargo](#tab-panel-6326)
+- [npm](#tab-panel-5940)
+- [yarn](#tab-panel-5941)
+- [pnpm](#tab-panel-5942)
+- [deno](#tab-panel-5943)
+- [bun](#tab-panel-5944)
+- [cargo](#tab-panel-5945)
 
 ```
 npm run tauri add dialog
@@ -72,11 +72,11 @@ cargo tauri add dialog
 3.  If you’d like create dialogs in JavaScript, install the npm package
     as well:
 
-    - [npm](#tab-panel-6327)
-    - [yarn](#tab-panel-6328)
-    - [pnpm](#tab-panel-6329)
-    - [deno](#tab-panel-6330)
-    - [bun](#tab-panel-6331)
+    - [npm](#tab-panel-5946)
+    - [yarn](#tab-panel-5947)
+    - [pnpm](#tab-panel-5948)
+    - [deno](#tab-panel-5949)
+    - [bun](#tab-panel-5950)
 
     ```
     npm install @tauri-apps/plugin-dialog

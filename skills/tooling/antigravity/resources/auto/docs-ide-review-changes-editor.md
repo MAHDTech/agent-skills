@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity IDE
-  \>
-- Features
-  \>
-- Review Changes
+Markdownkeyboard_arrow_down
 
-# Review Changes[link](#review-changes)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Review Changes
 
 Once the agent has begun writing code within a conversation, you’ll see
 a `Review Changes` section within the Agent panel’s [bottom
@@ -18,5 +17,3 @@ Changes](https://antigravity.google/assets/image/docs/editor/review_changes_edit
 
 Just like with artifacts, you can comment on any of the file diffs to
 communicate with the agent.
-
-On this Page

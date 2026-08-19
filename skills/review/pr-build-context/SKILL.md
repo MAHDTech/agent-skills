@@ -1,6 +1,6 @@
 ---
 name: pr-build-context
-description: Build high-signal context for a pull request before review — diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
+description: Build high-signal context for a pull request before review - diff analysis, risk assessment, key files, and questions for the author. Use when you want a briefing on a PR (or the whole repo when on the base branch) before reviewing it.
 context: fork
 agent: general-purpose
 ---

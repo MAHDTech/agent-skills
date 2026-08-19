@@ -12,7 +12,7 @@ skill_name = "tauri"
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/localhost)[crates.io](https://crates.io/crates/tauri-plugin-localhost)
 
-API Reference[](https://docs.rs/tauri-plugin-localhost)
+API Reference:[](https://docs.rs/tauri-plugin-localhost)
 
 Expose your app’s assets through a localhost server instead of the
 default custom protocol.
@@ -27,17 +27,17 @@ default custom protocol.
 
 Install the localhost plugin to get started.
 
-- [Automatic](#tab-panel-6409)
-- [Manual](#tab-panel-6410)
+- [Automatic](#tab-panel-6028)
+- [Manual](#tab-panel-6029)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6403)
-- [yarn](#tab-panel-6404)
-- [pnpm](#tab-panel-6405)
-- [deno](#tab-panel-6406)
-- [bun](#tab-panel-6407)
-- [cargo](#tab-panel-6408)
+- [npm](#tab-panel-6022)
+- [yarn](#tab-panel-6023)
+- [pnpm](#tab-panel-6024)
+- [deno](#tab-panel-6025)
+- [bun](#tab-panel-6026)
+- [cargo](#tab-panel-6027)
 
 ```
 npm run tauri add localhost

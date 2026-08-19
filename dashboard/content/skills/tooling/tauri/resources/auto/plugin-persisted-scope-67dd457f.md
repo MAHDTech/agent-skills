@@ -12,7 +12,7 @@ skill_name = "tauri"
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/persisted-scope)[crates.io](https://crates.io/crates/tauri-plugin-persisted-scope)
 
-API Reference[](https://docs.rs/tauri-plugin-persisted-scope)
+API Reference:[](https://docs.rs/tauri-plugin-persisted-scope)
 
 Save filesystem and asset scopes and restore them when the app is
 reopened.
@@ -27,17 +27,17 @@ reopened.
 
 Install the persisted-scope plugin to get started.
 
-- [Automatic](#tab-panel-6497)
-- [Manual](#tab-panel-6498)
+- [Automatic](#tab-panel-6116)
+- [Manual](#tab-panel-6117)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6491)
-- [yarn](#tab-panel-6492)
-- [pnpm](#tab-panel-6493)
-- [deno](#tab-panel-6494)
-- [bun](#tab-panel-6495)
-- [cargo](#tab-panel-6496)
+- [npm](#tab-panel-6110)
+- [yarn](#tab-panel-6111)
+- [pnpm](#tab-panel-6112)
+- [deno](#tab-panel-6113)
+- [bun](#tab-panel-6114)
+- [cargo](#tab-panel-6115)
 
 ```
 npm run tauri add persisted-scope

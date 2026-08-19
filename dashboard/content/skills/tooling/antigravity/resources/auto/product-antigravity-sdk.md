@@ -21,7 +21,7 @@ bash
 
 content_copy
 
-```
+``` astro-4g3kud3p
 pip install google-antigravity
 ```
 

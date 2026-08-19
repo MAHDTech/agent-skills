@@ -18,7 +18,7 @@ skill_name = "antigravity"
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | \
   sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
@@ -30,7 +30,7 @@ echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-cent
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo apt update
 ```
 
@@ -38,7 +38,7 @@ sudo apt update
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo apt install antigravity
 ```
 
@@ -48,7 +48,7 @@ sudo apt install antigravity
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo tee /etc/yum.repos.d/antigravity.repo << EOL
 [antigravity-rpm]
 name=Antigravity RPM Repository
@@ -62,7 +62,7 @@ EOL
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo dnf makecache
 ```
 
@@ -70,7 +70,7 @@ sudo dnf makecache
 
 content_copy
 
-```
+``` astro-xt55xqye
 sudo dnf install antigravity
 ```
 

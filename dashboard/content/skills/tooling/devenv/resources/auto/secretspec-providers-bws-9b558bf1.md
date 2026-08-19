@@ -56,9 +56,8 @@ Generate a machine account access token from the Bitwarden Secrets
 Manager web interface.
 
 In SecretSpec 0.15 and later, you can declare the access token as a
-[provider credential](https://secretspec.dev/concepts/providers/#provider-credentials), for
-example to store it in your system keyring so it never lives in a shell
-profile:
+[provider credential](https://secretspec.dev/reference/provider-credentials/), for example to
+store it in your system keyring so it never lives in a shell profile:
 
 ```
 [providers]bitwarden = { uri = "bws://a9230ec4-5507-4870-b8b5-b3f500587e4c", credentials = { access_token = "keyring" } }
@@ -70,12 +69,22 @@ When no explicit `access_token` credential is supplied, the provider
 falls back to `BWS_ACCESS_TOKEN`:
 
 ```
-export BWS_ACCESS_TOKEN="0.your-access-token..."
+$ export BWS_ACCESS_TOKEN="0.your-access-token..."
 ```
 
 Terminal window
 
 SecretSpec 0.14 supports only the environment-variable form.
+
+## Provider credentials
+
+| Credential     | Environment fallback | Available since |
+|----------------|----------------------|-----------------|
+| `access_token` | `BWS_ACCESS_TOKEN`   | 0.15+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -87,8 +96,8 @@ bws://[SERVER_BASE@]PROJECT_UUID
 
 - `PROJECT_UUID`: Your Bitwarden Secrets Manager project UUID
 - `SERVER_BASE` (optional): Hostname of the Bitwarden instance for EU
-  cloud or self hosted deployments. Defaults to `bitwarden.com` (US
-  cloud) when omitted.
+  cloud or self hosted deployments. Defaults to `vault.bitwarden.com`
+  (US cloud) when omitted.
 
 In SecretSpec 0.17 and later, `SERVER_BASE` is passed to each CLI
 invocation as `--server-url https://SERVER_BASE`, overriding the CLI’s

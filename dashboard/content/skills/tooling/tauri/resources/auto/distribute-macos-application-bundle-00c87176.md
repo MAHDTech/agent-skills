@@ -18,12 +18,12 @@ resources, the Info.plist file and other files such as macOS frameworks.
 To package your app as a macOS application bundle you can use the Tauri
 CLI and run the `tauri build` command in a Mac computer:
 
-- [npm](#tab-panel-4692)
-- [yarn](#tab-panel-4693)
-- [pnpm](#tab-panel-4694)
-- [deno](#tab-panel-4695)
-- [bun](#tab-panel-4696)
-- [cargo](#tab-panel-4697)
+- [npm](#tab-panel-4577)
+- [yarn](#tab-panel-4578)
+- [pnpm](#tab-panel-4579)
+- [deno](#tab-panel-4580)
+- [bun](#tab-panel-4581)
+- [cargo](#tab-panel-4582)
 
 ```
 npm run tauri build -- --bundles app

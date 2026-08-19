@@ -172,6 +172,13 @@ manages the WebSocket connection. The provider is wrapped in
 `ClientOnly` so it only runs in the browser, while SSR uses the server
 API route for initial data.
 
+With no token, SpacetimeDB issues a server-issued identity and a
+non-expiring token; persist it and pass it back on reconnect to keep the
+same identity. A lost token can't be recovered, so self-issued
+identities are for development. For production, authenticate with an
+OIDC provider such as SpacetimeAuth, which handles token lifecycle. See
+[Authentication](https://spacetimedb.com/docs/core-concepts/authentication).
+
 ``` prism-code
 <!-- app.vue -->
 <template>

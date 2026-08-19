@@ -96,10 +96,10 @@ either a `int` or a `float`.
 
 Let's start by spawning food into the map. The first thing we need to do
 is create a new, special reducer called the `init` reducer. SpacetimeDB
-calls the `init` reducer automatically when first publish your module,
-and also after any time you run with `publish --delete-data`. It gives
-you an opportGodot to initialize the state of your database before any
-clients connect.
+calls the `init` reducer automatically when you first publish your
+module, and also after any time you run with `publish --delete-data`. It
+gives you an opportunity to initialize the state of your database before
+any clients connect.
 
 Add this new reducer above our `connect` reducer.
 
@@ -186,7 +186,7 @@ Let's start by spawning food into the map. The first thing we need to do
 is create a new, special reducer called the `SPACETIMEDB_INIT` reducer.
 SpacetimeDB calls the `SPACETIMEDB_INIT` reducer automatically when you
 first publish your module, and also after any time you run with
-`publish --delete-data`. It gives you an opportGodot to initialize the
+`publish --delete-data`. It gives you an opportunity to initialize the
 state of your database before any clients connect.
 
 Add this new reducer above our `connect` reducer.
@@ -802,7 +802,7 @@ const START_PLAYER_MASS: i32 = 15;
 #[spacetimedb::reducer]
 pub fn enter_game(ctx: &ReducerContext, name: String) -> Result<(), String> {
     log::info!("Creating player with name {}", name);
-    let mut player: Player = ctx.db.player().identity().find(ctx.sender).ok_or("")?;
+    let mut player: Player = ctx.db.player().identity().find(ctx.sender()).ok_or("")?;
     let player_id = player.player_id;
     player.name = name;
     ctx.db.player().identity().update(player);
@@ -873,11 +873,11 @@ pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
         .db
         .player()
         .identity()
-        .find(&ctx.sender)
+        .find(&ctx.sender())
         .ok_or("Player not found")?;
     let player_id = player.player_id;
     ctx.db.logged_out_player().insert(player);
-    ctx.db.player().identity().delete(&ctx.sender);
+    ctx.db.player().identity().delete(&ctx.sender());
 
     // Remove any circles from the arena
     for circle in ctx.db.circle().player_id().filter(&player_id) {
@@ -1728,7 +1728,7 @@ screen](https://spacetimedb.com/docs/assets/images/part-3-player-on-screen-2e752
 
 - If you get an error in your Unity console when starting the game,
   double check that you have published your module and you have the
-  correct module name specified in your `GameManager`.
+  correct database name specified in your `GameManager`.
 
 ### Next Steps
 

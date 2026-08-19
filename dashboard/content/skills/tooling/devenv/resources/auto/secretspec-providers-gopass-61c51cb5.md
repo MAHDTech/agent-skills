@@ -43,9 +43,9 @@ Terminal window
 Install the `gopass` CLI and initialize a password store:
 
 ```
-# macOSbrew install gopass
-# Debian/Ubuntusudo apt install gopass
-# NixOSnix-env -iA nixpkgs.gopass
+# macOS$ brew install gopass
+# Debian/Ubuntu$ sudo apt install gopass
+# NixOS$ nix-env -iA nixpkgs.gopass
 ```
 
 Terminal window

@@ -8,12 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Headless mode
+Markdownkeyboard_arrow_down
 
-# Headless mode[link](#headless-mode)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Headless mode
 
 Run Antigravity CLI non-interactively to script agent tasks, integrate
 with CI pipelines, and capture machine-readable output.
@@ -22,24 +23,16 @@ Headless mode (also called print mode) sends a single prompt to the
 agent, streams or returns the response, and exits. Use it whenever you
 need the agent’s output in a program instead of a terminal UI.
 
-## Run a single prompt[link](#run-a-single-prompt)
+## Run a single prompt
 
 Pass a prompt with `-p` (or its aliases `--print` and `--prompt`) to run
 once and exit:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "In one sentence, what is a git rebase?"
 ```
 
-text
-
-content_copy
-
-```
+``` astro-code
 A git rebase rewrites the commit history by transplanting a sequence of commits onto a new base commit, imposing a strictly linear progression of changes that eliminates arbitrary merge artifacts.
 ```
 
@@ -47,11 +40,7 @@ The response goes to `stdout`. Diagnostics — errors, authentication
 prompts, progress, and permission notices — go to `stderr`. This split
 keeps the captured response clean:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Capture only the model response; diagnostics still print to the terminal.
 answer=$(agy -p "Name three popular version control systems, comma-separated.")
 ```
@@ -62,7 +51,7 @@ answer=$(agy -p "Name three popular version control systems, comma-separated.")
 > already authenticated exits with an `authentication required` error
 > instead of hanging.
 
-## Output formats[link](#output-formats)
+## Output formats
 
 The `--output-format` flag controls the shape of `stdout`. It accepts
 three values:
@@ -73,46 +62,30 @@ three values:
 | `json` | One JSON object printed on completion | Capturing a result plus metadata |
 | `stream-json` | Newline-delimited JSON (NDJSON) events | Monitoring progress, tools, and token usage |
 
-### Text[link](#text)
+### Text
 
 The default. The response text goes straight to `stdout` with no
 wrapping:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "In one sentence, what does the command git bisect do?"
 ```
 
-text
-
-content_copy
-
-```
+``` astro-code
 Git bisect executes a binary search algorithm across a project's commit history to rapidly isolate the precise commit responsible for introducing a defect.
 ```
 
-### JSON[link](#json)
+### JSON
 
 Set `--output-format json` to get a single JSON envelope after the run
 completes. The CLI emits it on one line; pipe through `jq` to
 pretty-print:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "In one sentence, what is a git rebase?" --output-format json | jq
 ```
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "conversation_id": "055a398f-db14-4c5f-abbb-1bf03f8120a7",
   "status": "SUCCESS",
@@ -149,58 +122,30 @@ Pass `--json-schema` to constrain the answer to a schema. The parsed
 object appears in `structured_output`, and `response` holds the same
 payload serialized as a string:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Parse the semantic version string v2.14.3 into an object with integer fields major, minor, and patch." \
   --output-format json \
   --json-schema '{"type":"object","properties":{"major":{"type":"integer"},"minor":{"type":"integer"},"patch":{"type":"integer"}},"required":["major","minor","patch"]}' | jq
 ```
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "conversation_id": "4e502687-290c-4030-b908-5ed6c68fa5dc",
   "status": "SUCCESS",
   "response": "{\"major\":2,\"minor\":14,\"patch\":3}\n",
   "duration_seconds": 4.45,
   "num_turns": 1,
-  "structured_output": {
-    "major": 2,
-    "minor": 14,
-    "patch": 3
-  },
+  "structured_output": { "major": 2, "minor": 14, "patch": 3 },
   "json_schema": {
     "type": "object",
     "properties": {
-      "major": {
-        "type": "integer"
-      },
-      "minor": {
-        "type": "integer"
-      },
-      "patch": {
-        "type": "integer"
-      }
+      "major": { "type": "integer" },
+      "minor": { "type": "integer" },
+      "patch": { "type": "integer" }
     },
-    "required": [
-      "major",
-      "minor",
-      "patch"
-    ]
+    "required": ["major", "minor", "patch"]
   },
-  "usage": {
-    "input_tokens": 10522,
-    "output_tokens": 354,
-    "thinking_tokens": 329,
-    "cache_read_tokens": 8112,
-    "total_tokens": 10876
-  }
+  "usage": { "input_tokens": 10522, "output_tokens": 354, "thinking_tokens": 329, "cache_read_tokens": 8112, "total_tokens": 10876 }
 }
 ```
 
@@ -208,28 +153,20 @@ The flag accepts a schema string, a path to a `.json` schema file, or a
 primitive type name (`string`, `number`, `integer`, `boolean`). Read the
 parsed value from `structured_output`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Parse the semantic version string v2.14.3 into an object with integer fields major, minor, and patch." \
   --output-format json \
   --json-schema '{"type":"object","properties":{"major":{"type":"integer"},"minor":{"type":"integer"},"patch":{"type":"integer"}},"required":["major","minor","patch"]}' \
   | jq '.structured_output'
 ```
 
-### Streaming JSON[link](#streaming-json)
+### Streaming JSON
 
 Set `--output-format stream-json` to emit one JSON object per line
 (NDJSON) as the run progresses. Use this format to observe tool calls
 and token usage in real time.
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "In one sentence, what is a git rebase?" --output-format stream-json
 ```
 
@@ -237,11 +174,7 @@ The stream begins with one `init` event, followed by any number of
 `step_update` events, and ends with exactly one `result` event (the
 `cwd` and `tools` array are abbreviated below):
 
-json
-
-content_copy
-
-```
+``` astro-code
 {"event":"init","conversation_id":"c3b66b04-872b-4fbe-a3a4-058a026ef20a","init":{"cwd":"/home/user/project","tools":["ask_permission","run_command","write_to_file","..."],"permission_mode":"request-review"}}
 {"event":"step_update","step_update":{"conversation_id":"c3b66b04-872b-4fbe-a3a4-058a026ef20a","step_index":0,"state":"DONE","step_type":"user_input"}}
 {"event":"step_update","step_update":{"conversation_id":"c3b66b04-872b-4fbe-a3a4-058a026ef20a","step_index":3,"state":"DONE","step_type":"agent_response","text_delta":"Git rebase destructively rewrites a branch's commit history by systematically detaching its unique commits and sequentially reapplying them onto a new base commit.\n","duration_seconds":6.28,"usage":{"input_tokens":10302,"output_tokens":582,"thinking_tokens":551,"cache_read_tokens":8113,"total_tokens":10884}}}
@@ -298,29 +231,8 @@ values include `user_input`, `agent_response`, `tool`, and `checkpoint`;
 On tool steps, `tool_info` carries the call and its result. This is a
 real tool step from a run that executed `echo hello_headless_demo`:
 
-json
-
-content_copy
-
-```
-{
-  "event": "step_update",
-  "step_update": {
-    "conversation_id": "edb1c8c1-50ba-4f3f-87eb-412d0e9d47c3",
-    "step_index": 4,
-    "state": "DONE",
-    "step_type": "tool",
-    "tool_name": "run_command",
-    "duration_seconds": 0.07,
-    "tool_info": {
-      "name": "run_command",
-      "parameters": {
-        "CommandLine": "echo hello_headless_demo"
-      },
-      "output": "hello_headless_demo\r\n"
-    }
-  }
-}
+``` astro-code
+{"event":"step_update","step_update":{"conversation_id":"edb1c8c1-50ba-4f3f-87eb-412d0e9d47c3","step_index":4,"state":"DONE","step_type":"tool","tool_name":"run_command","duration_seconds":0.07,"tool_info":{"name":"run_command","parameters":{"CommandLine":"echo hello_headless_demo"},"output":"hello_headless_demo\r\n"}}}
 ```
 
 `tool_info` holds `name`, `parameters`, `output`, and — when the tool
@@ -335,46 +247,30 @@ With `--json-schema`, the schema applies to the terminal `result` event,
 which carries the same `structured_output` and `json_schema` fields as
 the `json` envelope.
 
-## Parse output with jq[link](#parse-output-with-jq)
+## Parse output with jq
 
 `stdout` is machine-readable, so `jq` extracts exactly what you need.
 
 Get the response text from a JSON run:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Name three popular version control systems, comma-separated." --output-format json | jq -r '.response'
 ```
 
-text
-
-content_copy
-
-```
+``` astro-code
 Git, Subversion, Mercurial.
 ```
 
 Concatenate streaming text as it arrives:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Explain what a merge conflict is in two sentences." --output-format stream-json \
   | jq -j 'select(.event=="step_update") | .step_update.text_delta // empty'
 ```
 
 Read token usage from the terminal `result` event:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "In one sentence, what is a git rebase?" --output-format stream-json \
   | jq 'select(.event=="result") | .result.usage'
 ```
@@ -382,17 +278,13 @@ agy -p "In one sentence, what is a git rebase?" --output-format stream-json \
 > **Tip:** Use `jq -j` (join output) when concatenating `text_delta`
 > fragments so `jq` does not insert newlines between them.
 
-## Continue a conversation[link](#continue-a-conversation)
+## Continue a conversation
 
 Headless runs are stateless by default. Resume prior context with
 `--continue` (`-c`) for the most recent conversation, or
 `--conversation` with an ID from a previous run’s `conversation_id`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Continue the most recent conversation.
 agy -p "Now explain your previous answer in more detail" --continue
 
@@ -400,23 +292,19 @@ agy -p "Now explain your previous answer in more detail" --continue
 agy -p "Summarize what we discussed" --conversation 055a398f-db14-4c5f-abbb-1bf03f8120a7
 ```
 
-## Select a model, effort, or agent[link](#select-a-model-effort-or-agent)
+## Select a model, effort, or agent
 
 List the available model slugs, then pin one for the run:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy models
 ```
 
-text
-
 content_copy
 
-```
+``` astro-4g3kud3p
+gemini-3.7-flash-high     Gemini 3.7 Flash (High)
+gemini-3.7-flash-medium   Gemini 3.7 Flash (Medium)
 gemini-3.6-flash-high     Gemini 3.6 Flash (High)
 gemini-3.6-flash-medium   Gemini 3.6 Flash (Medium)
 gemini-3.5-flash-medium   Gemini 3.5 Flash (Medium)
@@ -425,11 +313,7 @@ claude-sonnet-4-6         Claude Sonnet 4.6 (Thinking)
 ...
 ```
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Pin a model by slug.
 agy -p "Reverse the string antigravity." --model gemini-3.5-flash-medium
 
@@ -445,7 +329,7 @@ when `--model` names an unknown model. It exits non-zero with an `ERROR`
 status so a pinned pipeline fails loudly instead of running the wrong
 model.
 
-## Permissions in headless mode[link](#permissions-in-headless-mode)
+## Permissions in headless mode
 
 There is no interactive prompt in headless mode, so tools that would
 normally ask for confirmation are handled by policy.
@@ -460,18 +344,10 @@ workspace is auto-allowed; actions such as shell commands default to
 Grant a tool ahead of time by adding an `action(target)` rule under
 `permissions.allow` in `~/.gemini/antigravity-cli/settings.json`:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "permissions": {
-    "allow": [
-      "command(git)",
-      "command(npm run (build|lint|test))",
-      "write_file(src/)"
-    ]
+    "allow": ["command(git)", "command(npm run (build|lint|test))", "write_file(src/)"]
   }
 }
 ```
@@ -479,11 +355,7 @@ content_copy
 To auto-approve every tool for a run, pass
 `--dangerously-skip-permissions`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Run the test suite and report failures" --dangerously-skip-permissions
 ```
 
@@ -493,7 +365,7 @@ agy -p "Run the test suite and report failures" --dangerously-skip-permissions
 > environment. See [Permissions](https://antigravity.google/docs/cli/permissions) for the full
 > rule syntax.
 
-## Handle exit codes and errors[link](#handle-exit-codes-and-errors)
+## Handle exit codes and errors
 
 A successful run exits `0`. A run that fails to produce a response exits
 non-zero and writes the reason to `stderr`. In `json` and `stream-json`
@@ -502,41 +374,15 @@ modes, the failure also appears in the `status` and `error` fields.
 For example, pinning an unknown model exits `1` and returns an error
 envelope:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "hi" --model does-not-exist-model --output-format json; echo "exit=$?"
 ```
 
-json
-
-content_copy
-
-```
-{
-  "conversation_id": "",
-  "status": "ERROR",
-  "response": "",
-  "error": "invalid model selection (--model \"does-not-exist-model\" --effort \"\"): model does-not-exist-model is not recognized as a known model or custom model in settings\nAvailable models:\n  Gemini 3.6 Flash (High)\n  ...",
-  "duration_seconds": 0,
-  "num_turns": 0,
-  "usage": {
-    "input_tokens": 0,
-    "output_tokens": 0,
-    "thinking_tokens": 0,
-    "cache_read_tokens": 0,
-    "total_tokens": 0
-  }
-}
+``` astro-code
+{"conversation_id":"","status":"ERROR","response":"","error":"invalid model selection (--model \"does-not-exist-model\" --effort \"\"): model does-not-exist-model is not recognized as a known model or custom model in settings\nAvailable models:\n  Gemini 3.6 Flash (High)\n  ...","duration_seconds":0,"num_turns":0,"usage":{"input_tokens":0,"output_tokens":0,"thinking_tokens":0,"cache_read_tokens":0,"total_tokens":0}}
 ```
 
-text
-
-content_copy
-
-```
+``` astro-code
 exit=1
 ```
 
@@ -555,15 +401,11 @@ The `status` field reports the terminal state of the run:
 By default, a run waits up to five minutes for a response. Adjust the
 ceiling with `--print-timeout`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy -p "Summarize the design tradeoffs of optimistic locking." --print-timeout 15m
 ```
 
-## Flag reference[link](#flag-reference)
+## Flag reference
 
 | Flag | Default | Description |
 |----|----|----|
@@ -579,15 +421,11 @@ agy -p "Summarize the design tradeoffs of optimistic locking." --print-timeout 1
 | `--print-timeout` | `5m` | Maximum time to wait for a response |
 | `--sandbox` | `false` | Run with terminal sandbox restrictions enabled |
 
-## Example: run the agent in CI[link](#example-run-the-agent-in-ci)
+## Example: run the agent in CI
 
 Fail the job on error and save the response:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -604,7 +442,7 @@ fi
 echo "$result" | jq -r '.response' > result.txt
 ```
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - [Prompting & Interaction](https://antigravity.google/docs/cli/prompting): Write effective
   prompts for the agent.
@@ -613,7 +451,5 @@ echo "$result" | jq -r '.response' > result.txt
 - [Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents): Delegate work to
   specialized agents.
 - [Reference](https://antigravity.google/docs/cli/reference): Full command and flag reference.
-
-On this Page
 
 {% endraw %}

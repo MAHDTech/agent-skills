@@ -18,6 +18,18 @@ skill_name = "opencode-acp"
 
 This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](https://agentclientprotocol.com/updates).
 
+<Update label="August 5, 2026" tags={["Draft"]}>
+  ## Session Notices RFD moves to Draft stage
+
+  The RFD for fire-and-forget, Client-presented session notices in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-notices) for more information and provide feedback on the event and presentation semantics.
+</Update>
+
+<Update label="August 5, 2026" tags={["Draft"]}>
+  ## Session Compaction RFD moves to Draft stage
+
+  The RFD for reporting ID-addressed context compaction lifecycle and optional retained summaries in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-compaction) for more information and provide feedback while the entity and replay semantics are refined.
+</Update>
+
 <Update label="July 27, 2026" tags={["Preview"]}>
   ## Terminal Authentication RFD moves to Preview
 

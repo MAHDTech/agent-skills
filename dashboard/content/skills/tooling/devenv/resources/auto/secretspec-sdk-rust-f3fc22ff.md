@@ -11,87 +11,292 @@ skill_name = "devenv"
 # Rust SDK
 
 SecretSpec provides a Rust library with type-safe access to secrets
-through a derive macro that generates strongly-typed structs from your
-`secretspec.toml` file at compile time.
+through a derive macro. The macro reads `secretspec.toml` at compile
+time and generates Rust types for its profiles and secrets.
 
-## Quick Start
+## Quick start
 
-Add to your `Cargo.toml`:
-
-```
-[dependencies]secretspec = { version = "0.2.0" }secretspec-derive = { version = "0.2.0" }
-```
-
-Basic example:
+Add the runtime, derive macro, and the generated code’s direct
+dependencies to your `Cargo.toml`:
 
 ```
-// Generate typed structs from secretspec.tomlsecretspec_derive::declare_secrets!("secretspec.toml");
-fn main() -> Result<(), Box<dyn std::error::Error>> {    // Load secrets using the builder pattern    let secretspec = SecretSpec::builder()        .with_provider("keyring")  // Can use provider name or URI like "dotenv:/path/to/.env"        .with_profile("development")  // Can use string or Profile enum        .load()?;  // All conversions and errors are handled here
-    // Access secrets (field names are lowercased)    println!("Database: {}", secretspec.secrets.database_url);  // DATABASE_URL → database_url
-    // Secrets that may be absent are Option<String>. A manifest default makes    // the generated field String because successful resolution always supplies it.    if let Some(redis) = &secretspec.secrets.redis_url {        println!("Redis: {}", redis);    }
-    // Access profile and provider information    println!("Using profile: {}", secretspec.profile);    println!("Using provider: {}", secretspec.provider);
-    // From backwards compatibility, you can tell it to set environment variables    secretspec.secrets.set_as_env_vars();
-    Ok(())}
+[dependencies]secretspec = "0.18"secretspec-derive = "0.18"secrecy = { version = "0.10", features = ["serde"] }serde = { version = "1", features = ["derive"] }
 ```
 
-## Loading with Profile-Specific Types
+The examples on this page are compiled as Cargo examples in
+`secretspec-derive`. They generate their types from this manifest:
 
-The `load_profile()` method on the builder provides profile-specific
-types for your secrets:
+``` astro-code
+[project]
+name = "rust-sdk-example"
+revision = "1.0"
 
+[profiles.default]
+DATABASE_URL = { description = "PostgreSQL connection string", required = true }
+REDIS_URL = { description = "Redis connection string", required = false }
+TLS_CERT = { description = "TLS certificate", required = true, as_path = true }
+TLS_KEY = { description = "TLS private key", required = false, as_path = true }
+
+[profiles.development]
+DATABASE_URL = { default = "postgresql://localhost/development" }
+
+[profiles.production]
+DATABASE_URL = { required = true }
+API_KEY = { description = "Production API key", required = true }
+
+[scopes.api]
+secrets = ["DATABASE_URL"]
 ```
+
+`declare_secrets!` generates `SecretSpec`, `Profile`, and
+`SecretSpecProfile`. The standard loader returns the union type that is
+safe to use with any declared profile:
+
+``` astro-code
 secretspec_derive::declare_secrets!("secretspec.toml");
-fn main() -> Result<(), Box<dyn std::error::Error>> {    // Load secrets with profile-specific types    let secrets = Secrets::builder()        .with_provider("keyring")        .with_profile(Profile::Production)        .load_profile()?;
-    // Access profile and provider information    println!("Loaded profile: {}", secrets.profile);    println!("Using provider: {}", secrets.provider);
-    // Access secrets through profile-specific enum    match secrets.secrets {        SecretsProfile::Production { database_url, api_key, .. } => {            // In production: these are String (required)            println!("Database: {}", database_url);            println!("API Key: {}", api_key);        }        SecretsProfile::Development { database_url, api_key, .. } => {            // Defaulted fields are String: the default guarantees a value.            println!("Database: {}", database_url);        }        _ => {}    }
-    Ok(())}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let resolved = SecretSpec::builder()
+        .with_provider("keyring://")
+        .with_profile("development")
+        .with_reason("start application")
+        .load()?;
+
+    println!("Database: {}", resolved.secrets.database_url);
+
+    if let Some(redis_url) = &resolved.secrets.redis_url {
+        println!("Redis: {redis_url}");
+    }
+
+    resolved.secrets.set_as_env_vars();
+
+    println!("Profile: {}", resolved.profile);
+    println!("Provider: {}", resolved.provider);
+
+    Ok(())
+}
 ```
 
-Profile-specific variants use the effective profile shape. They include
-common fields inherited from `[profiles.default]`, so the type exactly
-matches the map returned when that profile resolves.
+Required and defaulted secrets are generated as `String`; secrets that
+may be absent are `Option<String>`. Field names use Rust snake case, so
+`DATABASE_URL` becomes `database_url`.
+
+## Describing secrets in Rust (0.20+)
+
+Starting with SecretSpec 0.20, `Spec` is the format-independent
+declaration API. Build one directly in Rust when an application owns its
+secret contract in code, then pass the validated specification to
+`Secrets::from_spec`:
+
+``` astro-code
+use secretspec::{Profile, Secret, Secrets, Spec};
+
+fn main() -> secretspec::Result<()> {
+    let spec = Spec::builder("checkout")
+        .provider("env", "env://")
+        .secret(
+            "DATABASE_URL",
+            Secret::required("PostgreSQL connection URL").providers(["env"]),
+        )
+        .secret(
+            "SENTRY_DSN",
+            Secret::optional("Sentry error-reporting endpoint"),
+        )
+        .profile(
+            "production",
+            Profile::new().secret("SENTRY_DSN", Secret::required("Production Sentry endpoint")),
+        )
+        .scope("web", ["DATABASE_URL", "SENTRY_DSN"])
+        .build()?;
+
+    let mut secrets = Secrets::from_spec(spec)?;
+    secrets.set_profile("production");
+    secrets.set_scope("web");
+
+    let resolved = secrets.resolve()?;
+    println!("resolved profile: {}", resolved.profile);
+    Ok(())
+}
+```
+
+`Spec::from_toml` and `Spec::try_from(path)` produce the same type
+through the same validation and compilation path. Convert from a path
+for manifests with `extends`, because a TOML string has no directory
+from which to resolve relative paths. A spec loaded from a file retains
+that file’s directory for relative provider paths. A Rust-built
+declaration resolves them from the current working directory by default;
+`Secrets::from_spec_at` selects another logical base directory.
+
+`Spec` is immutable so its declarations and compiled view cannot drift
+apart. Use `to_builder()` to edit a copy, or `into_builder()` to consume
+the original, then rebuild to validate the result:
+
+```
+let edited = spec    .to_builder()    .remove_secret("default", "LEGACY_TOKEN")    .add_secret(        "production",        "DEPLOY_TOKEN",        Secret::required("Production deployment token"),    )    .build()?;
+```
+
+`remove_secret` removes the declaration from that profile. Removing an
+override can reveal the declaration inherited from `default`; removing
+it from `default` also removes it from profiles that only inherited it.
+`build()` rejects dangling scope membership, invalid compositions, empty
+profiles, and other semantic errors introduced by an edit. These
+operations edit the in-memory specification; they do not rewrite or
+preserve the formatting of a TOML document.
+
+The Rust-first API complements `declare_secrets!`: `Spec` describes and
+resolves names dynamically, while the macro continues to generate
+statically typed fields from a manifest at compile time.
+
+## Profile-specific types
+
+Use `load_profile()` when code should receive the exact shape of the
+selected profile. It returns a `SecretSpecProfile` enum whose variants
+contain that profile’s effective fields, including fields inherited from
+`[profiles.default]`:
+
+``` astro-code
+secretspec_derive::declare_secrets!("secretspec.toml");
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let resolved = SecretSpec::builder()
+        .with_provider("keyring://")
+        .with_profile(Profile::Production)
+        .with_reason("start production application")
+        .load_profile()?;
+
+    match resolved.secrets {
+        SecretSpecProfile::Production {
+            database_url,
+            api_key,
+            ..
+        } => {
+            println!("Database: {database_url}");
+            println!("API key loaded: {} bytes", api_key.len());
+        }
+        _ => unreachable!("the production profile was selected"),
+    }
+
+    Ok(())
+}
+```
 
 ## Scopes (0.17+)
 
 A [scope](https://secretspec.dev/concepts/scopes/) resolves only a named subset of a profile.
-In Rust it is available on the untyped `Secrets` API, through
-`set_scope`:
+Scopes are available through the untyped `Secrets` API:
 
-```
+``` astro-code
 use secretspec::Secrets;
-let mut spec = Secrets::load()?;spec.set_scope("api");let resolved = spec.resolve()?;      // only the `api` subsetassert_eq!(resolved.scope.as_deref(), Some("api"));
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut spec = Secrets::load()?;
+    spec.set_scope("api");
+
+    let resolved = spec.resolve()?;
+    assert_eq!(resolved.scope.as_deref(), Some("api"));
+
+    Ok(())
+}
 ```
 
-`resolve()` and `report()` both return the active scope, and the untyped
-path also honors an ambient `SECRETSPEC_SCOPE` when no scope is set
-explicitly.
+`resolve()` and `report()` both return the active scope. The untyped API
+also honors `SECRETSPEC_SCOPE` when no scope is selected explicitly.
 
-The **typed** loaders generated by `declare_secrets!` deliberately do
-not: a generated struct has a field per declared secret, so a scope that
-hides one would leave that field unfillable. `SecretSpec::builder()`
-therefore has no `with_scope`, and a `SECRETSPEC_SCOPE` in the
-environment is ignored, so `load()` and `load_profile()` always resolve
-the full profile. If a component needs a narrowed set, either give it
-its own manifest or resolve it through the untyped `Secrets` API above.
+Typed loaders generated by `declare_secrets!` deliberately do not
+support scopes. A generated struct has a field for every declared
+secret, so hiding one would leave that field unfillable.
+`SecretSpec::builder()` therefore has no `with_scope`, and typed
+`load()` and `load_profile()` always resolve the full profile. Use a
+separate manifest or the untyped API when a component needs a narrowed
+set.
 
-## Secrets as File Paths
+## Resolving one secret (0.19+)
 
-Secrets with `as_path = true` are generated as `PathBuf` instead of
-`String`:
+`resolve()` answers whether the whole profile can be satisfied, so a
+single missing required secret fails it and returns nothing. When a
+component needs one secret, `resolve_named()` reads only that secret and
+the inputs it composes from, and reports the outcomes separately:
+
+``` astro-code
+use secretspec::{NamedResolution, Secrets};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Resolving one secret reads only that secret and its composition inputs,
+    // so an unrelated missing required secret cannot fail the call.
+    let spec = Secrets::load()?.with_default_reason("cache warmup");
+
+    match spec.resolve_named("REDIS_URL")? {
+        NamedResolution::Resolved(secret) => {
+            // Exactly one of `value` and `path` is set; `path` for `as_path`.
+            println!("resolved from {:?}", secret.source);
+        }
+        // Declared, but nothing provided it. `required` says whether a
+        // whole-profile resolve would treat that as an error.
+        NamedResolution::Missing { required } => {
+            println!("no value (required: {required})");
+        }
+        // Not declared in this profile, or hidden by the active scope.
+        NamedResolution::Undeclared => println!("not on this profile's surface"),
+    }
+
+    Ok(())
+}
+```
+
+`NamedResolution::Undeclared` covers both a name the profile does not
+declare and one the active [scope](https://secretspec.dev/concepts/scopes/) hides, since
+neither is on the surface this session resolves. Provider and
+configuration failures stay `Err` rather than turning into a missing
+value, and whole-profile presence constraints (`at_least_one`,
+`exactly_one`) are not evaluated for a single-secret read.
+
+`with_default_reason()` (also 0.19+) supplies a reason only when the
+caller has not already set one through `with_reason()` or
+`SECRETSPEC_REASON`, so a wrapper can describe itself without
+overwriting the more specific reason it was given. When a wrapper only
+needs to identify the software integration, use the separate caller
+context below; unlike a default reason, it cannot satisfy
+`require_reason`.
+
+## Caller context (0.20+)
+
+Software integrations can record what invoked SecretSpec without
+replacing the user-supplied access reason:
 
 ```
-[profiles.default]TLS_CERT = { description = "TLS certificate", as_path = true }TLS_KEY = { description = "TLS private key", as_path = true, required = false }
+use secretspec::{CallerContext, Secrets};
+let spec = Secrets::load()?.with_caller(    CallerContext::new("git")        .with_version("2.51.0")        .with_operation("credential_get")        .with_resource("github.com"),);
 ```
 
-secretspec.toml
+Generated builders expose the same `with_caller()` method. Caller
+context is caller-asserted audit metadata, not an authenticated
+identity, and never satisfies `require_reason`. Do not put credentials
+or secret values in it.
 
-```
+## Secrets as file paths
+
+Secrets declared with `as_path = true` are generated as `PathBuf`
+instead of `String`. Optional file-shaped secrets use `Option<PathBuf>`:
+
+``` astro-code
 secretspec_derive::declare_secrets!("secretspec.toml");
-fn main() -> Result<(), Box<dyn std::error::Error>> {    let validated = Secrets::builder().check()?;
-    // Required as_path secrets are PathBuf    let cert_path: &std::path::PathBuf = &validated.secrets.tls_cert;
-    // Optional as_path secrets are Option<PathBuf>    if let Some(key_path) = &validated.secrets.tls_key {        println!("Key at: {}", key_path.display());    }
-    // Temporary files are cleaned up when `validated` is dropped    // To persist files beyond the struct's lifetime:    let paths = validated.keep_temp_files()?;
-    Ok(())}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let resolved = SecretSpec::builder()
+        .with_provider("keyring://")
+        .with_reason("configure TLS")
+        .load()?;
+
+    let certificate: &std::path::PathBuf = &resolved.secrets.tls_cert;
+    println!("Certificate: {}", certificate.display());
+
+    if let Some(private_key) = &resolved.secrets.tls_key {
+        println!("Private key: {}", private_key.display());
+    }
+
+    // The materialized files remain valid until `resolved` is dropped.
+    Ok(())
+}
 ```
 
 {% endraw %}

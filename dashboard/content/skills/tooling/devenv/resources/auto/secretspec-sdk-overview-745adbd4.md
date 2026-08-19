@@ -11,9 +11,9 @@ skill_name = "devenv"
 # SDK Overview
 
 SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript,
-Haskell, PHP, and C# (0.16+). They all resolve secrets from the same
-declarative `secretspec.toml`, and they all behave identically, because
-they share one resolver.
+Haskell, PHP, C# (0.16+), and Swift (0.18+). They all resolve secrets
+from the same declarative `secretspec.toml`, and they all behave
+identically, because they share one resolver.
 
 > **C# compatibility:** Available since SecretSpec 0.16. The 0.15.0
 > NuGet package is an unsupported package-ID bootstrap; use version 0.16
@@ -33,6 +33,9 @@ over that core rather than a reimplementation:
 - **Haskell** links the same C ABI at build time via the GHC FFI.
 - **C# (0.16+)** loads the same C ABI with P/Invoke from a
   runtime-specific native asset in the NuGet package.
+- **Swift (0.18+)** imports the same C ABI as a Clang module from a
+  macOS XCFramework and maps the shared JSON envelope to `Codable` value
+  types.
 - **Python** uses a [pyo3](https://pyo3.rs/) native extension, and
   **Node.js/TypeScript** uses a [napi-rs](https://napi.rs/) native
   addon; both embed the same resolver directly and exchange the same
@@ -64,8 +67,8 @@ resolved = SecretSpec.builder().with_provider("keyring://").with_reason("boot").
 
 See each language’s page for the idiomatic spelling: [Rust](https://secretspec.dev/sdk/rust),
 [Python](https://secretspec.dev/sdk/python), [Go](https://secretspec.dev/sdk/go), [Ruby](https://secretspec.dev/sdk/ruby),
-[Node.js](https://secretspec.dev/sdk/nodejs), [Haskell](https://secretspec.dev/sdk/haskell), [PHP](https://secretspec.dev/sdk/php), and
-[C# (0.16+)](https://secretspec.dev/sdk/csharp).
+[Node.js](https://secretspec.dev/sdk/nodejs), [Haskell](https://secretspec.dev/sdk/haskell), [PHP](https://secretspec.dev/sdk/php), [C#
+(0.16+)](https://secretspec.dev/sdk/csharp), and [Swift (0.18+)](https://secretspec.dev/sdk/swift).
 
 Every builder also takes a [scope (0.17+)](https://secretspec.dev/concepts/scopes/), resolving
 only a named subset of the profile and returning the selected name on
@@ -82,7 +85,7 @@ idiomatic type and deserializer for any language, which you build from
 the SDK’s `fields()` map:
 
 ```
-secretspec schema | quicktype -s schema --top-level SecretSpec --lang <language>
+$ secretspec schema | quicktype -s schema --top-level SecretSpec --lang <language>
 ```
 
 Terminal window
@@ -108,6 +111,9 @@ install and no runtime library path to set:
   one NuGet package and loads the matching asset through P/Invoke. The
   managed client supports trimming and NativeAOT; glibc/musl Linux,
   Intel/Arm macOS, and x64/Arm64 Windows assets are included.
+- **Swift (0.18+)** ships Intel and Apple-silicon macOS cdylibs in one
+  checksummed XCFramework binary target. SwiftPM selects and embeds the
+  matching architecture.
 - **Go** embeds the `cdylib` in the module and loads it at runtime via
   purego (no cgo); an opt-in `-tags static` build links it statically
   instead.
@@ -136,6 +142,7 @@ SecretSpec 0.17.
 | Go | ✓ | ✓ | — | ✓ | ✓ | — |
 | Ruby | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | C# | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Swift (0.18+) | — | — | ✓ | ✓ | — | — |
 | PHP | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | Haskell (source) | ✓ | — | — | — | ✓ (0.17+) | — |
 

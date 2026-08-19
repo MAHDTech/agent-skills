@@ -50,9 +50,9 @@ you. Read it with any tool, or use the new `secretspec audit` command
 for filtering and a readable summary:
 
 ```
-# Last 20 entries, formattedsecretspec audit -n 20
-# Only `run` events for one projectsecretspec audit --project my-app --action run
-# Raw JSON Lines, piped to jqsecretspec audit --json | jq 'select(.outcome == "missing")'
+# Last 20 entries, formatted$ secretspec audit -n 20
+# Only `run` events for one project$ secretspec audit --project my-app --action run
+# Raw JSON Lines, piped to jq$ secretspec audit --json | jq 'select(.outcome == "missing")'
 ```
 
 Terminal window
@@ -84,11 +84,13 @@ next:
 $ secretspec run -- npm testError: Accessing secrets requires a reason. Provide one with --reason"<why you are accessing these secrets>", the SECRETSPEC_REASON environmentvariable, or Secrets::with_reason() in the SDK. (Policy: require_reason in[project] of secretspec.toml — defaults to "agents"; set it to false todisable.)
 ```
 
+Terminal window
+
 Claude Code reads that message, states why it needs the secret, and
 retries:
 
 ```
-secretspec run --reason "run the test suite before opening a PR" -- npm test
+$ secretspec run --reason "run the test suite before opening a PR" -- npm test
 ```
 
 Terminal window
@@ -103,7 +105,7 @@ reason is tied to the access. There are three ways to supply a reason:
 | `SECRETSPEC_REASON`      | CLI + SDK + derive | lowest        |
 
 ```
-# CLI: the most explicit option, overrides the otherssecretspec run --reason "deploying release 0.12" -- ./deploy.sh
+# CLI: the most explicit option, overrides the others$ secretspec run --reason "deploying release 0.12" -- ./deploy.sh
 ```
 
 Terminal window
@@ -113,7 +115,7 @@ Terminal window
 ```
 
 ```
-# Env: lowest precedence, but honored everywhereexport SECRETSPEC_REASON="nightly backup job"
+# Env: lowest precedence, but honored everywhere$ export SECRETSPEC_REASON="nightly backup job"
 ```
 
 Terminal window
@@ -152,7 +154,7 @@ crate (Claude Code, Cursor, Codex, Gemini CLI, Copilot, and more); set
 ## Upgrading
 
 ```
-cargo install secretspec
+$ cargo install secretspec
 ```
 
 Terminal window

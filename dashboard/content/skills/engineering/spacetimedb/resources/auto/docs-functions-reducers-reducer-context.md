@@ -133,7 +133,7 @@ Every reducer invocation has an associated caller identity.
 - C++
 
 ``` codeBlockStandalone_LlrK
-import { schema, table, t, type Identity } from 'spacetimedb/server';
+import { schema, table, t } from 'spacetimedb/server';
 
 const player = table(
   { name: 'player', public: true },
@@ -250,9 +250,10 @@ per-connection state.
 
 note
 
-The connection ID may be `None`/`null`/`undefined` for reducers invoked
-by the system (such as scheduled reducers or lifecycle reducers) or when
-called via the CLI without specifying a connection.
+The connection ID may be absent for reducers invoked by the system (such
+as scheduled reducers or lifecycle reducers) or when called via the CLI
+without specifying a connection. In TypeScript modules,
+`ctx.connectionId` is `ConnectionId | null`.
 
 ### Timestamp
 
@@ -271,6 +272,37 @@ warning
 Never use external random number generators (like `Random` in C# without
 using the context). These are non-deterministic and will cause different
 nodes to produce different results, breaking consensus.
+
+Use the context-provided random API for any reducer logic that needs
+random values:
+
+- TypeScript
+- C#
+- Rust
+- C++
+
+``` codeBlockStandalone_LlrK
+const fraction = ctx.random();                         // [0.0, 1.0)
+const roll = ctx.random.integerInRange(1, 6);          // inclusive
+const bytes = ctx.random.fill(new Uint8Array(16));
+```
+
+``` codeBlockStandalone_LlrK
+double fraction = ctx.Rng.NextDouble();  // [0.0, 1.0)
+int roll = ctx.Rng.Next(1, 7);           // [1, 7)
+```
+
+``` codeBlockStandalone_LlrK
+use spacetimedb::rand::Rng;
+
+let value: u32 = ctx.random();
+let roll: u32 = ctx.rng().gen_range(1..=6);
+```
+
+``` codeBlockStandalone_LlrK
+auto& rng = ctx.rng();
+int32_t roll = rng.gen_range(1, 6);  // inclusive
+```
 
 ## Module Identity
 
@@ -293,7 +325,7 @@ wraps the shared logic.
 import { schema, table, t } from 'spacetimedb/server';
 
 const scheduledTask = table(
-  { name: 'scheduled_task', scheduled: (): any => send_reminder },
+  { name: 'scheduled_task' },
   {
     taskId: t.u64().primaryKey().autoInc(),
     scheduledAt: t.scheduleAt(),
@@ -304,9 +336,13 @@ const scheduledTask = table(
 const spacetimedb = schema({ scheduledTask });
 export default spacetimedb;
 
-export const send_reminder = spacetimedb.reducer({ arg: scheduledTask.rowType }, (_ctx, { arg }) => {
-  console.log(`Reminder: ${arg.message}`);
-});
+export const sendReminder = spacetimedb.reducer(
+  { onSchedule: scheduledTask },
+  { arg: scheduledTask.rowType },
+  (_ctx, { arg }) => {
+    console.log(`Reminder: ${arg.message}`);
+  }
+);
 ```
 
 ``` codeBlockStandalone_LlrK
@@ -314,20 +350,20 @@ using SpacetimeDB;
 
 public static partial class Module
 {
-    [SpacetimeDB.Table(Accessor = "ScheduledTask", Scheduled = nameof(SendReminder))]
+    [SpacetimeDB.Table(Accessor = "ScheduledTask", Scheduled = nameof(SendReminder), ScheduledAt = nameof(ScheduledAt))]
     public partial struct ScheduledTask
     {
         [SpacetimeDB.PrimaryKey]
         [SpacetimeDB.AutoInc]
-        public ulong taskId;
-        public ScheduleAt scheduledAt;
-        public string message;
+        public ulong TaskId;
+        public ScheduleAt ScheduledAt;
+        public string Message;
     }
 
     [SpacetimeDB.Reducer]
     public static void SendReminder(ReducerContext _ctx, ScheduledTask task)
     {
-        Log.Info($"Reminder: {task.message}");
+        Log.Info($"Reminder: {task.Message}");
     }
 }
 ```
@@ -384,7 +420,7 @@ SPACETIMEDB_REDUCER(send_reminder, ReducerContext _ctx, ScheduledTask task) {
 | `db` | `DbView` | Access to the module's database tables |
 | `sender` | `Identity` | Identity of the caller |
 | `senderAuth` | `AuthCtx` | Authorization context for the caller (includes JWT claims and internal call detection) |
-| `connectionId` | `ConnectionId | undefined` | Connection ID of the caller, if available |
+| `connectionId` | `ConnectionId | null` | Connection ID of the caller, if available |
 | `timestamp` | `Timestamp` | Time when the reducer was invoked |
 | `random` | `Random` | Random number generator (deterministic, seeded by SpacetimeDB) |
 
@@ -396,7 +432,7 @@ SPACETIMEDB_REDUCER(send_reminder, ReducerContext _ctx, ScheduledTask task) {
 | `ConnectionId` | `ConnectionId?` | Connection ID of the caller, if available |
 | `Timestamp` | `Timestamp` | Time when the reducer was invoked |
 | `Rng` | `Random` | Random number generator |
-| `Identity` | `Identity` | The module's identity |
+| `DatabaseIdentity` | `Identity` | The module's identity |
 
 | Property | Type | Description |
 |----|----|----|
@@ -407,7 +443,7 @@ SPACETIMEDB_REDUCER(send_reminder, ReducerContext _ctx, ScheduledTask task) {
 
 **Methods:**
 
-- `identity() -> Identity` - Get the module's identity
+- `database_identity() -> Identity` - Get the module's identity
 - `rng() -> &StdbRng` - Get the random number generator
 - `random\<T\>() -> T` - Generate a single random value
 - `sender_auth() -> &AuthCtx` - Get authorization context for the caller
@@ -422,7 +458,7 @@ SPACETIMEDB_REDUCER(send_reminder, ReducerContext _ctx, ScheduledTask task) {
 
 **Methods:**
 
-- `identity() -> Identity` - Get the module's identity
+- `database_identity() -> Identity` - Get the module's identity
 - `rng() -> StdbRng&` - Get the random number generator (deterministic
   and reproducible)
 - `sender_auth() -> const AuthCtx&` - Get authorization context for the

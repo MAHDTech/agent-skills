@@ -28,7 +28,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": "Explain the Riemann hypothesis in one paragraph.",
     "service_tier": "priority"
   }'
@@ -43,7 +43,7 @@ from xai_sdk.chat import user
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     service_tier="priority",
 )
 chat.append(user("Explain the Riemann hypothesis in one paragraph."))
@@ -64,7 +64,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input="Explain the Riemann hypothesis in one paragraph.",
     service_tier="priority",
 )
@@ -82,7 +82,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: "Explain the Riemann hypothesis in one paragraph.",
   service_tier: "priority",
 });
@@ -96,7 +96,7 @@ The response includes `"service_tier": "priority"` when the request was served a
 ```json customLanguage="json"
 {
   "id": "resp_abc123",
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "service_tier": "priority",
   "usage": {
     "input_tokens": 42,

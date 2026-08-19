@@ -1,11 +1,12 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Using AGY CLI
+Markdownkeyboard_arrow_down
 
-# Using AGY CLI[link](#using-agy-cli)
+content_copyCopy Markdown
 
-### Settings[link](#settings)
+open_in_newView Markdown
+
+# Using AGY CLI
+
+### Settings
 
 Antigravity CLI provides a flexible configuration system to customize
 workspace behavior, safety restrictions, editor preferences, visual
@@ -26,7 +27,7 @@ style, and performance.
   - You can still edit the persistent setting on disk, but the current
     session will enforce the command-line override until restarted.
 
-### Quick Tips[link](#quick-tips)
+### Quick Tips
 
 | Action/Feature | Tip/Command |
 |:---|:---|
@@ -42,7 +43,7 @@ style, and performance.
 | **Resume Conversation** | Use `/resume` to list and resume previous conversation logs |
 | **Auto-Save Resume** | When you close the CLI, it automatically prints the exact command needed to resume that specific session |
 
-### Keybindings[link](#keybindings)
+### Keybindings
 
 AGY CLI allows for custom keybindings. You can edit them by typing
 `/keybindings` or modifying the JSON file directly.
@@ -82,9 +83,3 @@ You can map a single action to many keybindings in the JSON file. To
 disable keybindings, set the list to empty (e.g., `[]`). If the file is
 malformed, the CLI will use the valid parts and fall back to defaults
 for the broken actions.
-
-warning
-
-Important: Keybindings cli.exit and cli.enter cannot be disabled.
-
-On this Page

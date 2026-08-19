@@ -264,7 +264,7 @@ class Invoice(BaseModel):
     currency: Currency = Field(description="Currency of the invoice")
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 
 chat.append(system("Given a raw invoice, carefully analyze the text and extract the invoice data into JSON format."))
 chat.append(
@@ -338,7 +338,7 @@ client = OpenAI(
 )
 
 completion = client.beta.chat.completions.parse(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[
     {"role": "system", "content": "Given a raw invoice, carefully analyze the text and extract the invoice data into JSON format."},
     {"role": "user", "content": """
@@ -395,7 +395,7 @@ const client = new OpenAI({
 });
 
 const completion = await client.chat.completions.parse({
-    model: "grok-4.5",
+    model: "grok-4.6",
     messages: [
     { role: "system", content: "Given a raw invoice, carefully analyze the text and extract the invoice data into JSON format." },
     { role: "user", content: \`
@@ -449,7 +449,7 @@ const InvoiceSchema = z.object({
 });
 
 const result = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   output: Output.object({ schema: InvoiceSchema }),
   system:
     'Given a raw invoice, carefully analyze the text and extract the invoice data into JSON format.',
@@ -542,7 +542,7 @@ from xai_sdk.tools import web_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[web_search()],
 )
 
@@ -569,7 +569,7 @@ client = OpenAI(
 )
 
 response = client.responses.parse(
-    model="grok-4.5",
+    model="grok-4.6",
     input="Find the latest machine-checked proof of the four color theorem.",
     tools=[
         {"type": "web_search"}
@@ -600,7 +600,7 @@ const client = new OpenAI({
 const format = zodResponseFormat(ProofInfoSchema, "proof_info");
 
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: "Find the latest machine-checked proof of the four color theorem.",
     tools: [
         { type: "web_search" }
@@ -684,7 +684,7 @@ collatz_tool = tool(
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[collatz_tool],
 )
 
@@ -755,7 +755,7 @@ messages = [
 # Handle tool calls until we get a final response
 while True:
     completion = client.chat.completions.create(
-        model="grok-4.5",
+        model="grok-4.6",
         messages=messages,
         tools=tools,
     )
@@ -777,7 +777,7 @@ while True:
 
 # Final call with structured output
 completion = client.beta.chat.completions.parse(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=messages,
     response_format=CollatzResult,
 )
@@ -830,7 +830,7 @@ let messages = [
 // Handle tool calls until we get a final response
 while (true) {
     const completion = await client.chat.completions.create({
-        model: "grok-4.5",
+        model: "grok-4.6",
         messages,
         tools,
     });
@@ -855,7 +855,7 @@ while (true) {
 
 // Final call with structured output
 const completion = await client.chat.completions.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     messages,
     response_format: {
         type: "json_schema",
@@ -947,7 +947,7 @@ client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 # Pass the Pydantic model to response_format instead of using parse()
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     response_format=Invoice,  # Pass the Pydantic model here
 )
 
@@ -1000,7 +1000,7 @@ class Summary(BaseModel):
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     response_format=Summary,  # Pass the Pydantic model here
 )
 

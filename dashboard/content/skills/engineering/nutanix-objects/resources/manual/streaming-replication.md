@@ -68,7 +68,7 @@ This section covers the replication guarantees, how replication works, and suppo
 
 ### Replication GuaranteesThe following object attributes are replicated:
 
-- Object operations—Object PUT, Object Copy, Updates (PutTags, PutObjectLock), and Delete• Object metadata—ETag, create and modification time, and lock property• Version numbers, User metadata, and Tags
+- Object operations - Object PUT, Object Copy, Updates (PutTags, PutObjectLock), and Delete• Object metadata - ETag, create and modification time, and lock property• Version numbers, User metadata, and Tags
 
 ### Note:
 
@@ -698,7 +698,7 @@ policy on a role in Prism Central for the non-admin user. The specific role must
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -729,12 +729,12 @@ assigned object store.
 
 If the bucket has both inbound and outbound traffic, you can select either of the traffic types from the Traffic Type list and then select the corresponding source or destination bucket.
 
-| • | Outbound from this bucket—Shows the statistics for replication of objects from the selected |
+| • | Outbound from this bucket - Shows the statistics for replication of objects from the selected |
 | --- | --- |
 
 bucket (source) to the destination bucket.
 
-| • | Inbound to this bucket—The selected bucket can be a destination to many source buckets. |
+| • | Inbound to this bucket - The selected bucket can be a destination to many source buckets. |
 | --- | --- |
 
 Inbound statistics show the data for the replication of objects to the selected bucket. You can select the source bucket and view the inbound statistics from that bucket.
@@ -743,21 +743,21 @@ Inbound statistics show the data for the replication of objects to the selected 
 
 destination bucket statistics display.
 
-| • | Destination Bucket—The destination bucket for replication. |
+| • | Destination Bucket - The destination bucket for replication. |
 | --- | --- |
-| • | Destination Bucket Object Store—The name of the object store that contains the destination |
+| • | Destination Bucket Object Store - The name of the object store that contains the destination |
 
 bucket.
 
-| • | Last replication point—Point-in-time up to which all the objects created on the source bucket have |
+| • | Last replication point - Point-in-time up to which all the objects created on the source bucket have |
 | --- | --- |
 
 been replicated.
 
-| • | Number of objects pending replication—Object count pending replication. |
+| • | Number of objects pending replication - Object count pending replication. |
 | --- | --- |
-| • | Objects size pending replication—Total amount of data pending replication. |
-| • | Average bandwidth—The rate of the amount of data transferred from the source to the destination. |
+| • | Objects size pending replication - Total amount of data pending replication. |
+| • | Average bandwidth - The rate of the amount of data transferred from the source to the destination. |
 
 For inbound relationships, the average bandwidth is the cumulative value of all the incoming data from the source buckets. The bandwidth graph helps you to visualize the progress of the replication. What to do nextYou can create more replication rules for buckets. For more information, see Creating Replication Relation for Buckets on page 151.
 

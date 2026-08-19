@@ -22,15 +22,19 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Obsidian](https://obsidian.md)
   * through the [Agent Client](https://github.com/RAIT-09/obsidian-agent-client) plugin
   * through the [Agent Console](https://github.com/donivatamazondotcom/obsidian-agent-console) plugin — a tabbed multi-session workspace: run several ACP agents in parallel with restorable, searchable sessions and quick prompts
+  * through the [Obsidian Harness](https://github.com/vlln/obsidian-harness) plugin — Obsidian as a cockpit for ACP agents (Claude Code, Codex, Gemini CLI, Pi); every agent session is a first-class `.session` vault file with Codex-style Session and Turn navigators
 * [Pulsar](https://pulsar-edit.dev) — through the [pulsar-acp-agent](https://github.com/hovancik/pulsar-acp-agent) package
 * [Qt Creator](https://www.qt.io/development/tools/qt-creator-ide) — through the [ACP Client Plugin](https://doc.qt.io/qtcreator/creator-how-to-use-acp-client.html)
 * [Unity ACP Client](https://github.com/3DLabInstruments/UnityACPClient)(Unity plugin)
 * [Unity Agent Client](https://github.com/nuskey8/UnityAgentClient) (Unity editor)
+* Visual Studio — through the [Poolside Assistant](https://marketplace.visualstudio.com/items?itemName=poolside-ai.vs-acp-assistant)
 * Visual Studio Code
   * [ACP Client](https://github.com/formulahendry/vscode-acp) extension
   * [ACP Patchbay](https://github.com/solutionsunity/acp-patchbay) extension
   * [ACP Pro Extension](https://marketplace.visualstudio.com/items?itemName=duclvz.acp-pro)
     * VS Code–compatible IDEs (Cursor, Windsurf, Trae,..): [ACP Pro Extension](https://open-vsx.org/extension/duclvz/acp-pro)
+  * [Multicoder](https://marketplace.visualstudio.com/items?itemName=multicoder.multicoder) extension
+  * [Poolside Assistant](https://marketplace.visualstudio.com/items?itemName=poolside-ai.acp-assistant)
 * [Zed](https://zed.dev/docs/ai/external-agents)
 
 ## CLI and TUI
@@ -52,18 +56,24 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Braide](https://braide.dev) - Parallel sessions, worktrees, personas and interactive agent responses (supports macOS, Windows, Linux)
 * [Casper](https://github.com/joeyshi12/casper) - A web client for kiro-cli that talks to it over the Agent Client Protocol (ACP), giving you a browser-based chat UI with live streaming, session history, and rich per-tool-call rendering.
 * [Codeg](https://github.com/xintaofei/codeg) — collaborative multi-agent coding workbench that unifies ACP agents (Claude Code, Codex, Gemini CLI, OpenCode, and more) with session aggregation; desktop app, self-hosted server, or Docker (macOS, Windows, Linux, Web)
+* [CompozyOS](https://github.com/compozy/compozy) — open-source agent OS: runs ACP agents as a team on loops and schedules, with shared memory and approvals (Web, CLI)
 * [DeepChat](https://github.com/ThinkInAIXYZ/deepchat)
 * [Devin Desktop](https://devin.ai/desktop)
 * [fabriqa.ai](https://fabriqa.ai)
 * [gemini-cli-desktop](https://github.com/Piebald-AI/gemini-cli-desktop)
+* [Gold Band](https://github.com/diodeme/Gold-Band) — open-source, local-first ACP desktop client supporting direct agent conversations, DSL-based workflow orchestration, AI-generated dynamic workflows, and unified context management (Windows, macOS, Linux)
 * [Harnss](https://github.com/OpenSource03/harnss)
 * [Jockey](https://github.com/recailai/jockey) — open-source multi-agent orchestrator (Tauri + Rust + SolidJS) that coordinates Claude Code, Gemini CLI, and Codex CLI via ACP
+* [Kepler](https://www.gitkraken.com/kepler) — GitKraken’s agentic development environment (ADE) giving you full clarity and control to run parallel agents at scale
 * [Lody](https://lody.ai)
 * [Minion Mind](https://minion-mind.nebulame.com/) — through the [Agent Client](https://github.com/RAIT-09/obsidian-agent-client) plugin
 * [Mitto](https://github.com/inercia/mitto)
 * [Ngent](https://github.com/beyond5959/ngent)
+* [Poolside Desktop Assistant](https://poolside.ai/get-started) - An agent agnostic worktree native macOS desktop app.
+* [qwen-audio-agent](https://github.com/QwenAudio/qwen-audio-agent) — realtime full-duplex voice client for ACP agents, with wake word and barge-in (macOS desktop, TUI, Web)
 * [RayClaw](https://github.com/rayclaw/rayclaw?tab=readme-ov-file#acp-agent-client-protocol)
 * [RLM Code](https://github.com/SuperagenticAI/rlm-code)
+* [Shellular](https://shellular.dev) ([GitHub](https://github.com/shellular-org))
 * [Sidequery *(coming soon)*](https://sidequery.dev)
 * [Tidewave](https://tidewave.ai/)
 * [Web Browser with AI SDK](https://github.com/mcpc-tech/ai-elements-remix-template) (powered by [@mcpc/acp-ai-provider](https://github.com/mcpc-tech/mcpc/tree/main/packages/acp-ai-provider))
@@ -86,6 +96,8 @@ These mobile-first tools bring ACP and related coding-agent workflows to phones 
 * [Ferngeist](https://github.com/arafatamim/Ferngeist) (Android)
 * [Happy](https://happy.engineering/) ([GitHub](https://github.com/slopus/happy)) (iOS, Android, Web)
 * [Mobvibe](https://github.com/Eric-Song-Nop/mobvibe) (iOS, Android, Web)
+* [Shellular](https://shellular.dev) ([GitHub](https://github.com/shellular-org)) (iOS, Android, [Web](https://app.shellular.dev))
+* [VACP](https://play.google.com/store/apps/details?id=com.intellexie.vacp) (Android) — voice control for AI coding agents (OpenCode, KiloCode, and any ACP-compatible agent over TCP)
 
 ## Messaging
 
@@ -120,6 +132,7 @@ These frameworks add ACP support through dedicated integrations or adapters:
 
 These connectors bridge ACP into other environments and transport layers:
 
+* [acp\_rpc\_bridge](https://github.com/Intellexie/acp_rpc_bridge) — terminal binary that bridges stdio-based agents to HTTP, giving non-network agents network capability; supports ACP and Pi RPC protocols with ACP Streamable HTTP and OpenCode REST API endpoints
 * [ACP to AG-UI](https://github.com/namanrajpal/acp-to-agui) — bridges any ACP agent to web frontends via [AG-UI](https://docs.ag-ui.com) events over SSE; works with CopilotKit, AG-UI HttpAgent, or custom UIs (Web)
 * [AgentRQ](https://github.com/agentrq/acp-gateway) — bridges stdio-based ACP agents to the AgentRQ - Human-in-the-loop task collaboration service using MCP server.
 * [Aptove Bridge](https://github.com/aptove/bridge) — bridges stdio-based ACP agents to the Aptove mobile client over WebSocket

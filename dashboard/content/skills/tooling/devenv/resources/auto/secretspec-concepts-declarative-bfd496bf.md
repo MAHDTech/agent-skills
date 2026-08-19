@@ -42,6 +42,9 @@ SECRET_NAME = {  description = "Human-readable explanation",  # Required: shown 
   `uuid`, `command`)
 - `generate`: Enable auto-generation when the secret is missing (`true`
   or a table with options)
+- `prompt` (0.19+): Securely ask for a missing value during
+  `secretspec run` and let the selected provider decide whether to save
+  the answer
 
 ## Related Concepts
 
@@ -49,6 +52,10 @@ SECRET_NAME = {  description = "Human-readable explanation",  # Required: shown 
   share common secret definitions via the `extends` field
 - [Secret Generation](https://secretspec.dev/concepts/generation/) auto-creates passwords,
   tokens, and keys when secrets are missing
+- [Run prompts
+  (0.19+)](https://secretspec.dev/reference/configuration/#prompt-on-missing-during-run-019)
+  provision stored secrets on first use, or remain invocation-only with
+  `null`
 - [Composed Secrets (0.16+)](https://secretspec.dev/concepts/composed-secrets/) derive values
   from other declared secrets without dotenv or shell expansion
 

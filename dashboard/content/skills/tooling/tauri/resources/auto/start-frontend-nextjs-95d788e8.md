@@ -23,10 +23,10 @@ Next.js is a meta framework for React. Learn more about Next.js at
 
 1.  ##### Update Tauri configuration
 
-    - [npm](#tab-panel-6956)
-    - [yarn](#tab-panel-6957)
-    - [pnpm](#tab-panel-6958)
-    - [deno](#tab-panel-6959)
+    - [npm](#tab-panel-6575)
+    - [yarn](#tab-panel-6576)
+    - [pnpm](#tab-panel-6577)
+    - [deno](#tab-panel-6578)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run build",    "devUrl": "http://localhost:3000",    "frontendDist": "../out"  }}

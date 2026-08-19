@@ -1,6 +1,6 @@
 +++
 title = "git-update-branch"
-description = "Bring a feature branch up to date with its base branch safely — fetch first, detect the base, choose rebase vs merge deliberately, use --force-with-lease, and hand conflicts off cleanly. Use when a branch has fallen behind its base, when the user wants to rebase or merge in the latest from the base/default branch, when a PR reports merge conflicts or an out-of-date branch, or when deciding between rebase and merge for an update."
+description = "Bring a feature branch up to date with its base branch safely - fetch first, detect the base, choose rebase vs merge deliberately, use --force-with-lease, and hand conflicts off cleanly. Use when a branch has fallen behind its base, when the user wants to rebase or merge in the latest from the base/default branch, when a PR reports merge conflicts or an out-of-date branch, or when deciding between rebase and merge for an update."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -24,7 +24,7 @@ Always fetch first so you integrate against the true remote tip, not a stale loc
 git fetch origin --prune
 ```
 
-Detect the base branch — do **not** assume `main` or `master`. If the user named one, use it. Otherwise try in order until one succeeds:
+Detect the base branch - do **not** assume `main` or `master`. If the user named one, use it. Otherwise try in order until one succeeds:
 
 ```bash
 BASE=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
@@ -48,8 +48,8 @@ If there are uncommitted changes, commit them or `git stash push` first, and res
 
 | Factor               | Rebase                                           | Merge                                         |
 | -------------------- | ------------------------------------------------ | --------------------------------------------- |
-| History              | Linear — replays your commits on top of the base | Preserves both histories, adds a merge commit |
-| Shared-branch safety | Unsafe — rewrites your commit SHAs               | Safe — never rewrites existing commits        |
+| History              | Linear - replays your commits on top of the base | Preserves both histories, adds a merge commit |
+| Shared-branch safety | Unsafe - rewrites your commit SHAs               | Safe - never rewrites existing commits        |
 | Conflicts            | May resurface per replayed commit                | Resolved once, in the merge commit            |
 | Push after           | Needs `--force-with-lease`                       | Plain `git push`                              |
 
@@ -85,7 +85,7 @@ After a **merge**, push normally:
 git push
 ```
 
-After a **rebase**, the remote branch and your rewritten local branch have diverged, so push with a lease — never a bare `--force`:
+After a **rebase**, the remote branch and your rewritten local branch have diverged, so push with a lease - never a bare `--force`:
 
 ```bash
 git push --force-with-lease

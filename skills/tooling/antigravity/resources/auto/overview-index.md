@@ -15,49 +15,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- deployed_code
+- folder
 
 - commit
 
-- code_blocks
-
-- plus_code
-
-- keyboard_tab
-
-- keyboard_command_key
-
-- search_spark
-
-- developer_mode_tv
-
-- folder
-
-- keyboard_return
-
-- data_object
-
-- code
-
-- device_hub
-
-- spark
-
-- refresh
-
-- pen_spark
+- terminal
 
 - dashboard_customize
 
+- pen_spark
+
+- device_hub
+
 - merge
 
-- terminal
+- keyboard_command_key
+
+- keyboard_tab
 
 - check_circle
 
 - file_copy
 
+- data_object
+
+- keyboard_return
+
+- deployed_code
+
 - spark
+
+- plus_code
+
+- search_spark
+
+- developer_mode_tv
+
+- refresh
+
+- spark
+
+- code
+
+- code_blocks
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -189,6 +189,28 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/gemini-3-7-flash-in-google-antigravity)
+
+![Gemini 3.7 Flash in Google
+Antigravity](https://antigravity.google/assets/image/blog/3.7-Flash---Square.jpg)
+
+Gemini 3.7 Flash in Google Antigravity
+
+Aug 13, 2026Model
+
+Read blog
+
+[](https://antigravity.google/blog/introducing-custom-agents)
+
+![Introducing Custom
+Agents](https://antigravity.google/assets/image/blog/Custom_Agents_Blog_1x1.png)
+
+Introducing Custom Agents
+
+Aug 12, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/gemini-3-6-flash-in-google-antigravity)
 
 ![Gemini 3.6 Flash in Google
@@ -196,7 +218,7 @@ Antigravity](https://antigravity.google/assets/image/blog/3.6-Flash---Square.png
 
 Gemini 3.6 Flash in Google Antigravity
 
-Jul 21, 2026Product
+Jul 21, 2026Model
 
 Read blog
 
@@ -261,29 +283,6 @@ Enterprise](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square
 Google Antigravity in Gemini Enterprise
 
 May 19, 2026Enterprise
-
-Read blog
-
-[](https://antigravity.google/blog/gemini-3-5-flash-in-google-antigravity)
-
-![Gemini 3.5 Flash in Google
-Antigravity](https://antigravity.google/assets/image/blog/3.5-Flash---Square.png)
-
-Gemini 3.5 Flash in Google Antigravity
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-io-2026-feature-deep-dive)
-
-![Subagents, Hooks, Scheduled Tasks, Agent Management, Voice, and Much
-More](https://antigravity.google/assets/image/blog/features-square.png)
-
-Subagents, Hooks, Scheduled Tasks, Agent Management, Voice, and Much
-More
-
-May 19, 2026Product
 
 Read blog
 
@@ -314,49 +313,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- deployed_code
+- folder
 
 - commit
 
-- code_blocks
-
-- plus_code
-
-- keyboard_tab
-
-- keyboard_command_key
-
-- search_spark
-
-- developer_mode_tv
-
-- folder
-
-- keyboard_return
-
-- data_object
-
-- code
-
-- device_hub
-
-- spark
-
-- refresh
-
-- pen_spark
+- terminal
 
 - dashboard_customize
 
+- pen_spark
+
+- device_hub
+
 - merge
 
-- terminal
+- keyboard_command_key
+
+- keyboard_tab
 
 - check_circle
 
 - file_copy
 
+- data_object
+
+- keyboard_return
+
+- deployed_code
+
 - spark
+
+- plus_code
+
+- search_spark
+
+- developer_mode_tv
+
+- refresh
+
+- spark
+
+- code
+
+- code_blocks
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -488,6 +487,28 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/gemini-3-7-flash-in-google-antigravity)
+
+![Gemini 3.7 Flash in Google
+Antigravity](https://antigravity.google/assets/image/blog/3.7-Flash---Square.jpg)
+
+Gemini 3.7 Flash in Google Antigravity
+
+Aug 13, 2026Model
+
+Read blog
+
+[](https://antigravity.google/blog/introducing-custom-agents)
+
+![Introducing Custom
+Agents](https://antigravity.google/assets/image/blog/Custom_Agents_Blog_1x1.png)
+
+Introducing Custom Agents
+
+Aug 12, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/gemini-3-6-flash-in-google-antigravity)
 
 ![Gemini 3.6 Flash in Google
@@ -495,7 +516,7 @@ Antigravity](https://antigravity.google/assets/image/blog/3.6-Flash---Square.png
 
 Gemini 3.6 Flash in Google Antigravity
 
-Jul 21, 2026Product
+Jul 21, 2026Model
 
 Read blog
 
@@ -560,29 +581,6 @@ Enterprise](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square
 Google Antigravity in Gemini Enterprise
 
 May 19, 2026Enterprise
-
-Read blog
-
-[](https://antigravity.google/blog/gemini-3-5-flash-in-google-antigravity)
-
-![Gemini 3.5 Flash in Google
-Antigravity](https://antigravity.google/assets/image/blog/3.5-Flash---Square.png)
-
-Gemini 3.5 Flash in Google Antigravity
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-io-2026-feature-deep-dive)
-
-![Subagents, Hooks, Scheduled Tasks, Agent Management, Voice, and Much
-More](https://antigravity.google/assets/image/blog/features-square.png)
-
-Subagents, Hooks, Scheduled Tasks, Agent Management, Voice, and Much
-More
-
-May 19, 2026Product
 
 Read blog
 

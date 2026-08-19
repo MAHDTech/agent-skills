@@ -154,12 +154,12 @@ src-tauri/tauri.conf.json
 
 To build the RPM package, you can use the following command:
 
-- [npm](#tab-panel-4710)
-- [yarn](#tab-panel-4711)
-- [pnpm](#tab-panel-4712)
-- [deno](#tab-panel-4713)
-- [bun](#tab-panel-4714)
-- [cargo](#tab-panel-4715)
+- [npm](#tab-panel-4595)
+- [yarn](#tab-panel-4596)
+- [pnpm](#tab-panel-4597)
+- [deno](#tab-panel-4598)
+- [bun](#tab-panel-4599)
+- [cargo](#tab-panel-4600)
 
 ```
 npm run tauri build
@@ -227,12 +227,12 @@ Terminal window
 
 Now you can build the package with the following command:
 
-- [npm](#tab-panel-4716)
-- [yarn](#tab-panel-4717)
-- [pnpm](#tab-panel-4718)
-- [deno](#tab-panel-4719)
-- [bun](#tab-panel-4720)
-- [cargo](#tab-panel-4721)
+- [npm](#tab-panel-4601)
+- [yarn](#tab-panel-4602)
+- [pnpm](#tab-panel-4603)
+- [deno](#tab-panel-4604)
+- [bun](#tab-panel-4605)
+- [cargo](#tab-panel-4606)
 
 ```
 npm run tauri build

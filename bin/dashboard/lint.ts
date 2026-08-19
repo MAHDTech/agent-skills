@@ -3,7 +3,7 @@ import {execFileSync} from "node:child_process"
 import {run} from "./lib.ts"
 
 // Generated files a full sync rewrites. Restored after the check so lint never
-// mutates the working tree — it only reports.
+// mutates the working tree - it only reports.
 const GENERATED_PATHS = [
     "README.md",
     "agents/AGENTS.md",
@@ -18,7 +18,7 @@ function git(args: string[]): string {
 /**
  * Verify the committed dashboard content matches what a fresh build produces.
  * Regenerates content without staging, then fails if that leaves any
- * un-committed change under dashboard/content — i.e. someone edited a skill but
+ * un-committed change under dashboard/content - i.e. someone edited a skill but
  * did not run `dashboard --action build` and commit the result.
  */
 export async function lintAction() {
@@ -41,7 +41,7 @@ export async function lintAction() {
         .filter(Boolean)
         .filter((line) => line.startsWith("??") || line[1] !== " ")
 
-    // Restore everything the regeneration touched — lint is read-only.
+    // Restore everything the regeneration touched - lint is read-only.
     try {
         git(["checkout", "--", ...GENERATED_PATHS])
         git(["clean", "-fdq", "dashboard/content"])

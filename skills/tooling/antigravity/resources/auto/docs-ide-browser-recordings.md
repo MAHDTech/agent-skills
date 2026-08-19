@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity IDE
-  \>
-- Artifacts
-  \>
-- Browser Recordings
+Markdownkeyboard_arrow_down
 
-# Browser Recordings[link](#browser-recordings)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Browser Recordings
 
 Every time the browser subagent actuates on the Browser, it may choose
 to generate a recording of the agent’s actions for your review. You can
@@ -20,5 +19,3 @@ review. This view loops through the browser agent’s actions.
 
 ![Browser Recording
 Artifact](https://antigravity.google/assets/image/docs/artifacts/browser-recording-artifact.png)
-
-On this Page

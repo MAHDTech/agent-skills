@@ -8,14 +8,15 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Features
+Markdownkeyboard_arrow_down
 
-# Antigravity CLI Features[link](#antigravity-cli-features)
+content_copyCopy Markdown
 
-### Plugins[link](#plugins)
+open_in_newView Markdown
+
+# Antigravity CLI Features
+
+### Plugins
 
 **How Plugins Work**  
 Plugins are namespaced bundles that can contain skills, agents, rules,
@@ -26,9 +27,7 @@ directory under `~/.gemini/antigravity-cli/plugins/\<plugin_name\>/`. The
 Antigravity Agent automatically discovers and loads these staged
 customizations.
 
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/
 ├── plugins/
 │   └── <plugin_name>/
@@ -45,7 +44,7 @@ content_copy
 Once staged and loaded, you can interact with the plugin components
 inside the CLI using slash commands.
 
-### Terminal Sandbox[link](#terminal-sandbox)
+### Terminal Sandbox
 
 The Terminal Sandbox is a lightweight security isolation mechanism that
 protects your host system from potentially destructive file
@@ -61,13 +60,9 @@ strict containment boundaries with zero startup overhead.
 You can configure the sandbox behavior in your `settings.json` file
 (located at `~/.gemini/antigravity-cli/settings.json`):
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "enableTerminalSandbox": true
+    "enableTerminalSandbox": true
 }
 ```
 
@@ -86,13 +81,13 @@ confirmation, the CLI prompt adapts dynamically based on your settings:
   **Yes, and run in sandbox** if you want to force a specific,
   potentially risky command to execute within the safety boundary.
 
-### CLI Slash Commands Reference[link](#cli-slash-commands-reference)
+### CLI Slash Commands Reference
 
 The Antigravity CLI supports a variety of slash commands typed directly
 into the prompt box to manage conversations, configure settings, and
 inspect agent capabilities.
 
-### Core Slash Commands[link](#core-slash-commands)
+### Core Slash Commands
 
 | Command | Category | Purpose |
 |:---|:---|:---|
@@ -111,28 +106,27 @@ inspect agent capabilities.
 | **`/usage`** | Utility | Open the inline interactive help manual inside the terminal. |
 | **`/logout`** | Account | Log out of your Google session and clear cached credentials. |
 
-### Advanced Customization via `settings.json`[link](#advanced-customization-via-settingsjson)
+### Advanced Customization via `settings.json`
 
 For power users, several slash commands support deep customization via
 your `~/.gemini/antigravity-cli/settings.json` configuration:
 
 - **Fine-Grained Permissions**: Instead of global levels, define
   specific allowed/denied commands:
-  json
 
-  content_copy
-  ```
+  ``` astro-code
   "permissions": {
     "allow": ["command(git)", "command(npm test)"],
     "deny": ["command(rm -rf)"]
   }
   ```
+
 - **Custom Status Line & Window Titles**: You can pipe live agent
   metadata (JSON format containing CWD, active model, token usage,
   state, etc.) directly into your own custom shell scripts to generate
   dynamic status bars or terminal window titles.
 
-### Subagents in Antigravity CLI[link](#subagents-in-antigravity-cli)
+### Subagents in Antigravity CLI
 
 Antigravity CLI features an asynchronous subagents framework that allows
 the main agent to delegate parallel work, perform background research,
@@ -152,7 +146,7 @@ specific background tasks in parallel with the main conversation.
     including whether they can use MCP tools and if they can write
     files.
 
-### Managing Agents: The `/agents` Panel[link](#managing-agents-the-agents-panel)
+### Managing Agents: The `/agents` Panel
 
 Antigravity CLI provides an interactive terminal UI to view, manage, and
 approve actions for running subagents.
@@ -161,12 +155,6 @@ approve actions for running subagents.
 - **Overview**: The panel shows a list of active and completed
   subagents, including surface-level details such as their status
   (running, done, killed, etc.) and the current step they are executing.
-
-info
-
-Selecting a subagent from the panel opens a full-screen detail view.
-This view shows the entirety of the subagent’s conversation, including
-its steps, thoughts, and tool execution logs.
 
 **Tool Confirmations & Approvals**  
 When a subagent wants to execute a tool that requires user permissions
@@ -178,22 +166,10 @@ request. You can manage approvals in two ways:
     all pending approvals, where you can selectively approve or deny
     requests.
 
-    lightbulb
-
-    Tip: Use the keyboard shortcut ctrl+j to “teleport” from the main
-    conversation directly to the detailed view of the next subagent
-    waiting for your approval.
+ 
 
 2.  **Fast Path Alerts**  
     To keep you in your flow, Antigravity CLI displays a Fast Path Alert
     directly above your prompt box when a subagent requests permission.
-
-    lightbulb
-
-    Tip: You can approve a pending subagent permission instantly using
-    ctrl+k without ever having to switch away from the main
-    conversation.
-
-On this Page
 
 {% endraw %}

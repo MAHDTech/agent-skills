@@ -1,11 +1,12 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Feature Overview
+Markdownkeyboard_arrow_down
 
-# Antigravity 2.0 Features[link](#antigravity-20-features)
+content_copyCopy Markdown
 
-### Projects[link](#projects)
+open_in_newView Markdown
+
+# Antigravity 2.0 Features
+
+### Projects
 
 In Antigravity 2.0, agents work in **Projects** (previously in Agent
 Manager, agents were strictly mapped to a single workspace folder).
@@ -26,14 +27,14 @@ Manager, agents were strictly mapped to a single workspace folder).
   multiple folders, allowing agents to operate across different
   codebases within the same conversation.
 
-### Conversations outside of projects[link](#conversations-outside-of-projects)
+### Conversations outside of projects
 
 Start quick, one-off conversations outside of any Project. These
 sessions run in an isolated local scratch folder. They have their own
 settings, and they also have their own permissions in addition to
 inheriting from global permissions.
 
-### Scheduled Tasks[link](#scheduled-tasks)
+### Scheduled Tasks
 
 We’re introducing scheduled tasks, allowing users to plan ahead with
 their projects. Utilizing the newest Gemini 3.5 Flash model, users can
@@ -43,7 +44,7 @@ schedule messages to be sent to their agents while they’re away.
   periodically.
 - Tasks will be set to repeat on the minute you’ve set them.
 
-### Secure by Default[link](#secure-by-default)
+### Secure by Default
 
 We put you in the driver’s seat with robust security controls:
 
@@ -54,7 +55,7 @@ We put you in the driver’s seat with robust security controls:
   preset to “Full Machine” or “Unrestricted”, the agent will have read
   and write access over your full machine.
 
-### Voice transcription[link](#voice-transcription)
+### Voice transcription
 
 Antigravity features a built-in live voice transcription, allowing you
 to prompt agents and leave feedback using natural speech.
@@ -65,8 +66,8 @@ to prompt agents and leave feedback using natural speech.
   start recording, click it again to stop.
 - **Live View**: As you speak, your words are transcribed in real-time
   directly into the input field.
-- **Shortcut**: You can start recording by pressing `Ctrl + M`. Once
-  you’re done, press `Ctrl + M` to stop recording.
+- **Shortcut**: You can start recording by pressing Ctrl + M. Once
+  you’re done, press Ctrl + M to stop recording.
 
 **Key Features**
 
@@ -86,7 +87,7 @@ Voice input is available across all primary interaction surfaces:
 - **Artifact Comments**: For leaving precise, inline feedback on plans,
   code diffs, and deliverables.
 
-### JSON Hooks[link](#json-hooks)
+### JSON Hooks
 
 JSON Hooks allow you to execute custom local shell scripts at critical
 stages of an Antigravity agent’s execution cycle. You can intercept and
@@ -96,7 +97,7 @@ simple JSON files.
 
 [Explore the JSON Hooks & Rules Documentation](https://antigravity.google/docs/hooks)
 
-### Browser[link](#browser)
+### Browser
 
 We reworked the browser subagent in Antigravity 2.0.
 
@@ -104,5 +105,3 @@ We reworked the browser subagent in Antigravity 2.0.
 - **Chrome DevTools integration**: The browser subagent also integrates
   natively with Chrome DevTools MCP.
 - **Video recording**: Now supports recordings as webm videos.
-
-On this Page

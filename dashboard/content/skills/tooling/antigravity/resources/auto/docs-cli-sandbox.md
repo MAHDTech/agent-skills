@@ -8,19 +8,18 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Agent Capabilities
-  \>
-- Sandbox
+Markdownkeyboard_arrow_down
 
-# Sandbox[link](#sandbox)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Sandbox
 
 Enforce native operating system process isolation, manage execution
 containment boundaries, and protect your local workstation.
 
-## The security model[link](#the-security-model)
+## The security model
 
 Because autonomous development agents run local terminal commands, edit
 source codes, and execute tests directly in your workspace, maintaining
@@ -28,7 +27,7 @@ a secure workstation environment is critical. Antigravity CLI integrates
 a native **Terminal Sandbox** to restrict destructive shell operations
 or unauthorized remote network calls.
 
-### Native OS containment[link](#native-os-containment)
+### Native OS containment
 
 Unlike heavy virtual containers or isolated virtual machines that slow
 down execution speeds, Antigravity uses lightweight, native operating
@@ -41,46 +40,36 @@ execution overhead:
 | **macOS** | `sandbox-exec` | Native system tool enforcing policy profiles that restrict absolute filesystem access and raw TCP queries. |
 | **Windows** | `AppContainer` | Desktop security containment ring isolating filesystem permissions and registry visibility. |
 
-## Activating the sandbox[link](#activating-the-sandbox)
+## Activating the sandbox
 
 You configure the sandbox directly inside your global preferences:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/settings.json
 ```
 
-### Sandbox configurations[link](#sandbox-configurations)
+### Sandbox configurations
 
 Add the sandboxing toggle to your settings profile:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "enableTerminalSandbox": true
+    "enableTerminalSandbox": true
 }
 ```
 
 - **`enableTerminalSandbox`** (boolean, default: `false`): Restricts all
   local execution commands launched by agents to OS containment rings.
 
-## Interactive approvals with sandbox[link](#interactive-approvals-with-sandbox)
+## Interactive approvals with sandbox
 
 When the agent attempts to run a terminal tool or shell command, the TUI
 prompt block adapts dynamically based on your sandboxing state:
 
 - **When Sandbox is Enabled**: The prompt panel offers a temporary
   escape option:
-  text
 
-  content_copy
-  ```
+  ``` astro-code
   Do you want to proceed?
   1. Yes
   2. Yes, and run without sandbox restrictions
@@ -89,19 +78,18 @@ prompt block adapts dynamically based on your sandboxing state:
 
   Choosing Option 2 bypasses the containment barrier exclusively for
   that single execution run.
+
 - **When Sandbox is Disabled**: The prompt lets you force containment
   for a risky command:
-  text
 
-  content_copy
-  ```
+  ``` astro-code
   Do you want to proceed?
   1. Yes
   2. Yes, and run in sandbox
   3. No
   ```
 
-## See also[link](#see-also)
+## See also
 
 - **[Permissions Engine](https://antigravity.google/docs/cli/permissions)**: Configure
   fine-grained allow/deny policy rules.
@@ -109,7 +97,5 @@ prompt block adapts dynamically based on your sandboxing state:
   skills slash commands.
 - **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Customize
   keyboard hotkeys and buffers.
-
-On this Page
 
 {% endraw %}

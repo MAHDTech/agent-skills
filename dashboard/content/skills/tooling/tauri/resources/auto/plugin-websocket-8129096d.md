@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/websocket)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-websocket)[crates.io](https://crates.io/crates/tauri-plugin-websocket)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/websocket/)[](https://docs.rs/tauri-plugin-websocket)
+Reference:[](https://v2.tauri.app/reference/javascript/websocket/)[](https://docs.rs/tauri-plugin-websocket)
 
 Open a WebSocket connection using a Rust client in JavaScript.
 
@@ -27,17 +27,17 @@ Open a WebSocket connection using a Rust client in JavaScript.
 
 Install the websocket plugin to get started.
 
-- [Automatic](#tab-panel-6655)
-- [Manual](#tab-panel-6656)
+- [Automatic](#tab-panel-6274)
+- [Manual](#tab-panel-6275)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6644)
-- [yarn](#tab-panel-6645)
-- [pnpm](#tab-panel-6646)
-- [deno](#tab-panel-6647)
-- [bun](#tab-panel-6648)
-- [cargo](#tab-panel-6649)
+- [npm](#tab-panel-6263)
+- [yarn](#tab-panel-6264)
+- [pnpm](#tab-panel-6265)
+- [deno](#tab-panel-6266)
+- [bun](#tab-panel-6267)
+- [cargo](#tab-panel-6268)
 
 ```
 npm run tauri add websocket
@@ -81,11 +81,11 @@ cargo tauri add websocket
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6650)
-    - [yarn](#tab-panel-6651)
-    - [pnpm](#tab-panel-6652)
-    - [deno](#tab-panel-6653)
-    - [bun](#tab-panel-6654)
+    - [npm](#tab-panel-6269)
+    - [yarn](#tab-panel-6270)
+    - [pnpm](#tab-panel-6271)
+    - [deno](#tab-panel-6272)
+    - [bun](#tab-panel-6273)
 
     ```
     npm install @tauri-apps/plugin-websocket

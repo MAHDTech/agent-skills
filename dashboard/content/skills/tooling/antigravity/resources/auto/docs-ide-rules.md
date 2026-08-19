@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Customizations
-  \>
-- Rules
+Markdownkeyboard_arrow_down
 
-# Rules[link](#rules)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Rules
 
 Rules are manually defined constraints for the Agent to follow, at both
 the local and global levels. Rules allow users to guide the agent to
@@ -34,12 +33,12 @@ constraints to guide the Agent to your tasks, stack, and style.
 
 Rules files are limited to 12,000 characters each.
 
-## Global Rules[link](#global-rules)
+## Global Rules
 
 Global rules live in ~/.gemini/GEMINI.md and are applied across all
 workspaces.
 
-## Workspace Rules[link](#workspace-rules)
+## Workspace Rules
 
 Workspace rules live in the .agents/rules folder of your workspace or
 git root.
@@ -58,7 +57,7 @@ At the rule level you can define how a rule should be activated:
 Note: Antigravity now defaults to .agents/rules, but still maintains
 backward support for .agent/rules.
 
-## @ Mentions[link](#-mentions)
+## @ Mentions
 
 You can reference other files using @filename in a Rules file. If
 filename is a relative path, it will be interpreted relative to the
@@ -67,7 +66,5 @@ resolved as a true absolute path, otherwise it will be resolved relative
 to the repository. For example, @/path/to/file.md will first attempt to
 be resolved to /path/to/file.md, and if that file does not exist, it
 will be resolved to workspace/path/to/file.md.
-
-On this Page
 
 {% endraw %}

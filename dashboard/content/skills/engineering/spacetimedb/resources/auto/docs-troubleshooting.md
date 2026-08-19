@@ -26,8 +26,8 @@ also possible your server's signing keys have changed, most likely due
 to the server having been reset.
 
 Log out to remove the invalid token, then log in again. Logging in with
-GitHub will prevent this happening again, as those identities are
-portable and valid with any SpacetimeDB server, including Maincloud.
+GitHub or Google will prevent this happening again, as those identities
+are portable and valid with any SpacetimeDB server, including Maincloud.
 
 ``` codeBlockStandalone_LlrK
 spacetime logout
@@ -104,7 +104,8 @@ methods:
 | Rust (browser only) | `conn.run_background_task()` | Spawn a task to continuously advance the connection. |
 | Rust | `conn.run_async()` | A `Future` which you can `await` or poll to advance the connection. |
 | Rust | `conn.frame_tick()` | In single-threaded games, call this every frame to advance the connection. |
-| C# | `Conn.FrameTick()` | Call this from your game or application update loop. If you use a separate loop, keep `Conn.Db` access on that same thread or synchronize access. |
+| C# | `Conn.FrameTick()` | In native C# clients, call this from your game or application update loop. If you use a separate loop, keep `Conn.Db` access on that same thread or synchronize access. |
+| Unity | `SpacetimeDBNetworkManager` or `Conn.FrameTick()` | The Unity package can advance connections automatically when a single `SpacetimeDBNetworkManager` component is present in the scene. If you manage the loop yourself, call `FrameTick()` every frame. |
 | Unreal | `Conn->FrameTick()` or `Conn->SetAutoTicking(true)` | Call `FrameTick()` every frame, or enable auto-ticking once after building the connection. |
 | TypeScript | N/a | The TypeScript client SDK advances connections automatically. |
 

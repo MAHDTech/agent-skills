@@ -29,7 +29,8 @@ conventions.
 ## Quick start
 
 ```
-$ export BAO_TOKEN=hvs.your-token-here$ secretspec set DATABASE_URL --provider openbao://bao.example.com:8200Enter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to openbao (profile: default)
+$ export BAO_TOKEN=hvs.your-token-here
+$ secretspec set DATABASE_URL --provider openbao://bao.example.com:8200Enter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to openbao (profile: default)
 ```
 
 Terminal window
@@ -72,10 +73,12 @@ Terminal window
 
 ### AppRole authentication
 
-Select AppRole with `?auth=approle`:
+Select AppRole with `?auth=approle`. OpenBao roles bind a SecretID by
+default, so the usual configuration provides both inputs:
 
 ```
-$ export BAO_ROLE_ID=your-role-id$ export BAO_SECRET_ID=your-secret-id
+$ export BAO_ROLE_ID=your-role-id
+$ export BAO_SECRET_ID=your-secret-id
 ```
 
 Terminal window
@@ -91,16 +94,51 @@ Prefer semantic provider credentials when configuring an alias:
 
 secretspec.toml
 
+Disabling SecretID binding removes AppRole’s usual second credential.
+Keep the server default unless the workload deliberately relies on
+another trust boundary, such as a tightly controlled Agent host and
+network constraints.
+
+### Custom authentication mounts (0.18+)
+
+AppRole and JWT methods mounted somewhere other than their defaults can
+be selected with `?auth_mount=`. The value is relative to `/v1/auth`:
+
+```
+openbao://bao.example.com:8200/secret?auth=approle&auth_mount=platform-approleopenbao://bao.example.com:8200/secret?auth=jwt&auth_mount=ci-jwt&role=ci
+```
+
+The provider logs in at `/v1/auth/platform-approle/login` and
+`/v1/auth/ci-jwt/login`, respectively. The KV mount remains the provider
+URI path (`secret` in these examples).
+
 ### JWT / OIDC authentication
 
-Select JWT with `?auth=jwt` and a `role`. The provider performs the
-`auth/jwt/login` exchange itself. The JWT comes from SecretSpec’s
-`BAO_JWT` input, then the `VAULT_JWT` compatibility fallback. Otherwise,
-in a GitHub Actions or Forgejo job with `id-token: write`, the provider
-mints one from the runner’s OIDC identity.
+Select JWT with `?auth=jwt`. The provider performs the `auth/jwt/login`
+exchange itself. The JWT comes from SecretSpec’s `BAO_JWT` input, then
+the `VAULT_JWT` compatibility fallback. Otherwise, in a GitHub Actions
+or Forgejo job with `id-token: write`, the provider mints one from the
+runner’s OIDC identity.
 
-- `?role=`, `BAO_JWT_ROLE`, or `VAULT_JWT_ROLE` (required)
+Starting with SecretSpec 0.18, the role may be omitted when the JWT auth
+mount has a `default_role`; OpenBao then selects that role during login.
+An explicit SecretSpec role still takes precedence.
+
+- `?role=`, `BAO_JWT_ROLE`, or `VAULT_JWT_ROLE`; optional with a
+  server-configured `default_role` (0.18+)
 - `?audience=`, `BAO_JWT_AUDIENCE`, or `VAULT_JWT_AUDIENCE`
+
+## Provider credentials
+
+| Credential  | Environment fallback                | Available since |
+|-------------|-------------------------------------|-----------------|
+| `role_id`   | `BAO_ROLE_ID` → `VAULT_ROLE_ID`     | 0.17+           |
+| `secret_id` | `BAO_SECRET_ID` → `VAULT_SECRET_ID` | 0.17+           |
+| `token`     | `BAO_TOKEN` → `VAULT_TOKEN`         | 0.17+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -116,7 +154,10 @@ openbao://[namespace@]host[:port][/mount][?key=value&...]
 - `namespace@`: Optional namespace (falls back through `BAO_NAMESPACE`,
   `VAULT_NAMESPACE`)
 - `?auth=approle`: Use AppRole authentication (default: `token`)
-- `?auth=jwt`: Use JWT/OIDC authentication (requires a role)
+- `?auth=jwt`: Use JWT/OIDC authentication; a server-configured
+  `default_role` can supply the role when using SecretSpec 0.18+
+- `?auth_mount=` (0.18+): Non-default AppRole or JWT mount beneath
+  `/v1/auth`
 - `?role=`: OpenBao role for JWT auth
 - `?audience=`: Audience requested from the CI OIDC issuer
 - `?kv=1`: Use KV v1 (default: v2)
@@ -133,7 +174,7 @@ openbao://[namespace@]host[:port][/mount][?key=value&...]
 ### URI examples
 
 ```
-openbao://bao.example.com:8200/secretopenbao://team-a@bao.example.com:8200/secretopenbao://bao.example.com:8200/secret?auth=approleopenbao://bao.example.com:8200/secret?auth=jwt&role=ci
+openbao://bao.example.com:8200/secretopenbao://team-a@bao.example.com:8200/secretopenbao://bao.example.com:8200/secret?auth=approle# SecretSpec 0.18+openbao://bao.example.com:8200/secret?auth=approle&auth_mount=platform-approleopenbao://bao.example.com:8200/secret?auth=jwt&role=ci# SecretSpec 0.18+, with default_role configured on the JWT auth mountopenbao://bao.example.com:8200/secret?auth=jwt
 ```
 
 ### Project configuration
@@ -185,7 +226,9 @@ single-field write cannot overwrite the entry’s other fields.
 AppRole avoids placing a user token in the CI environment:
 
 ```
-$ export BAO_ROLE_ID="$CI_ROLE_ID"$ export BAO_SECRET_ID="$CI_SECRET_ID"$ secretspec export --format gha --provider "openbao://bao.example.com:8200/secret?auth=approle"
+$ export BAO_ROLE_ID="$CI_ROLE_ID"
+$ export BAO_SECRET_ID="$CI_SECRET_ID"
+$ secretspec export --format gha --provider "openbao://bao.example.com:8200/secret?auth=approle"
 ```
 
 Terminal window
@@ -213,7 +256,8 @@ Terminal window
 
 ```
 $ secretspec check --provider openbao://team-a@bao.example.com:8200/secret
-$ export BAO_NAMESPACE=team-a$ secretspec check --provider openbao://bao.example.com:8200/secret
+$ export BAO_NAMESPACE=team-a
+$ secretspec check --provider openbao://bao.example.com:8200/secret
 ```
 
 Terminal window
@@ -221,7 +265,9 @@ Terminal window
 ### Development mode
 
 ```
-$ bao server -dev -dev-root-token-id="dev-only-token"$ export BAO_TOKEN="dev-only-token"$ secretspec check --provider "openbao://127.0.0.1:8200/secret?tls=false"
+$ bao server -dev -dev-root-token-id="dev-only-token"
+$ export BAO_TOKEN="dev-only-token"
+$ secretspec check --provider "openbao://127.0.0.1:8200/secret?tls=false"
 ```
 
 Terminal window

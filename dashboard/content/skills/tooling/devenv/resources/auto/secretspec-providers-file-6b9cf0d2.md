@@ -1,0 +1,192 @@
++++
+title = "secretspec-providers-file-6b9cf0d2"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+{% raw %}
+# File Provider
+
+The file provider reads and writes one plaintext UTF-8 file per secret.
+
+## At a glance
+
+|                |                                                     |
+|----------------|-----------------------------------------------------|
+| Provider       | `file` (0.19+)                                      |
+| URI            | `file:ROOT`                                         |
+| Access         | Read, write, and delete                             |
+| Best for       | Local fixtures and file-mounted secrets             |
+| Authentication | Filesystem permissions                              |
+| Availability   | Built in (0.19+)                                    |
+| Storage root   | Required; relative to `secretspec.toml` or absolute |
+
+## Quick start
+
+Choose a directory, exclude it from version control, and route a
+declaration to it:
+
+```
+/.secrets/
+```
+
+.gitignore
+
+```
+[providers]local_files = "file:./.secrets"
+[profiles.development]API_TOKEN = { description = "Local API token", providers = ["local_files"] }
+```
+
+secretspec.toml
+
+```
+$ secretspec set API_TOKEN --profile development
+$ secretspec get API_TOKEN --profile development
+$ secretspec run --profile development -- npm start
+```
+
+Terminal window
+
+The stored value is `.secrets/\<project\>/development/API_TOKEN`, where
+`<project>` is `[project].name` from the manifest.
+
+## Setup
+
+The provider has no external dependency or credential. The SecretSpec
+process needs read access to the configured directory and write access
+for `set`, generated values, imports, cache writes, and deletes.
+
+Relative roots resolve from the directory containing `secretspec.toml`,
+not from the shell’s current directory. Every `file` provider URI must
+include a root; the bare `file` provider name is rejected.
+
+## Configuration
+
+### URI format
+
+```
+file:ROOT
+```
+
+`ROOT` is required and names the directory that contains the
+project/profile tree. It can be relative, absolute, or home-relative.
+The URI accepts no query options or user information.
+
+### URI examples
+
+```
+file:./.secrets            # .secrets beside secretspec.tomlfile:///var/lib/app/secrets # Absolute directoryfile:~/.local/share/myapp  # Home-relative directory
+```
+
+Use `file:./...` for relative paths containing spaces. SecretSpec
+percent- encodes the path when reporting the provider URI.
+
+### Project configuration
+
+Check in the provider alias, but never the directory’s plaintext
+contents:
+
+```
+[providers]local_files = "file:./.secrets"
+[profiles.default]DATABASE_URL = { description = "Database connection string", providers = ["local_files"] }
+```
+
+secretspec.toml
+
+The alias is shared configuration. Each machine supplies its own
+directory contents.
+
+## Storage model
+
+Convention addresses use this path beneath `ROOT`:
+
+```
+{project}/{profile}/{key}
+```
+
+Project and profile are therefore isolated even when one user-global
+file provider serves several projects. Each component must be one safe
+filename; slashes, backslashes, `.` and `..` are rejected in convention
+components.
+
+Values are read and written exactly as UTF-8 text. Leading and trailing
+whitespace, newlines, CRLF line endings, and multiline content are
+preserved. Binary files are rejected by the provider’s text interface;
+use a SecretSpec 0.19+ `encoding` when the stored file should contain a
+textual encoding of binary data.
+
+Writes use a temporary file in the destination directory and atomically
+replace the entry after flushing it. On Unix, SecretSpec creates new
+directories with mode `0700` and new entry files with mode `0600`.
+Existing directory permissions are not changed.
+
+## Use existing files
+
+A native `ref.item` is a relative path beneath `ROOT`. It replaces the
+entire `{project}/{profile}/{key}` convention path:
+
+```
+[providers]runtime_files = "file:///run/secrets"
+[profiles.production]DATABASE_PASSWORD = {  description = "Database password mounted by the runtime",  providers = ["runtime_files"],  ref = { item = "database/password" }}
+```
+
+secretspec.toml
+
+This reads `/run/secrets/database/password`. `item` may contain nested
+relative components, but absolute paths, empty components, `.`, `..`,
+backslashes, and symbolic links inside the configured root are rejected.
+`field`, `vault`, `section`, and `version` do not have file equivalents
+and are rejected.
+
+Referenced files are writable when filesystem permissions allow it.
+Treat runtime-managed mounts as read-only unless their owner explicitly
+permits SecretSpec to replace or delete entries.
+
+## Extract from JSON (0.19+)
+
+Several declarations can select values from one JSON file without making
+JSON part of the provider itself:
+
+```
+[providers]runtime_files = "file:///run/secrets"
+[profiles.production]# extract is available in SecretSpec 0.19+DATABASE_USER = {  description = "Database user",  providers = ["runtime_files"],  ref = { item = "application.json" },  extract = { format = "json", pointer = "/database/user" }}DATABASE_PASSWORD = {  description = "Database password",  providers = ["runtime_files"],  ref = { item = "application.json" },  extract = { format = "json", pointer = "/database/password" }}
+```
+
+secretspec.toml
+
+The file provider returns the complete UTF-8 document; SecretSpec then
+applies the RFC 6901 pointer as a provider-independent stored-value
+transform. Extracted declarations are read-only in 0.19 so `set`,
+`delete`, generation, prompting, and import cannot overwrite or remove
+the containing file. See [Structured
+Extraction](https://secretspec.dev/reference/configuration/#structured-extraction-019) for
+value rendering, error behavior, and composition with `encoding`.
+
+## CI/CD and containers
+
+Use a read-only mounted directory with explicit refs when the runtime
+already publishes one file per secret. For example, mount the source at
+`/run/secrets` and use `file:///run/secrets` as the provider alias.
+SecretSpec reads only the files declared by the active profile; it does
+not enumerate or inject every file in the mount.
+
+The ordinary convention is useful when SecretSpec owns the directory.
+Give each job a private root and let `{project}/{profile}/{key}` keep
+jobs and environments separate.
+
+## Security considerations
+
+SecretSpec rejects symbolic links within the configured store so an
+entry cannot deliberately redirect reads or writes outside its root. It
+also rejects lexical traversal through `ref.item`. The configured root
+itself remains the operator’s trust boundary: protect it with filesystem
+ownership and mount permissions, and do not let untrusted processes
+modify it while SecretSpec is running.
+
+Deleting an entry removes only its file. Empty project and profile
+directories remain in place.
+
+{% endraw %}

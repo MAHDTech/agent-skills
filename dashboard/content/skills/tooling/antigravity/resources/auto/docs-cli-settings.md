@@ -8,32 +8,27 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Settings
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Settings, rendering & keybindings[link](#settings-rendering--keybindings)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Settings, rendering & keybindings
 
 Configure persistent preferences, customize keyboard shortcuts, toggle
 terminal display buffers, and manage runtime CLI parameter overrides.
 
-## Setting up preferences[link](#setting-up-preferences)
+## Setting up preferences
 
 Antigravity CLI stores user preferences in a minimal, forward-compatible
 JSON configuration profile.
 
-### Configuration file location[link](#configuration-file-location)
+### Configuration file location
 
 The persistent settings are saved in a plain JSON format:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/settings.json
 ```
 
@@ -41,7 +36,7 @@ The CLI leverages **sparse persistence** by writing only values to disk
 that differ from their system defaults. This keeps your configuration
 file clean, minimal, and fully forward-compatible with future updates.
 
-### The interactive settings panel[link](#the-interactive-settings-panel)
+### The interactive settings panel
 
 To edit settings directly inside your active terminal session without
 opening raw JSON files:
@@ -57,27 +52,19 @@ opening raw JSON files:
 ![The interactive settings
 panel](https://antigravity.google/assets/image/docs/cli/settings-interactive-panel.png)
 
-## Command-line overrides[link](#command-line-overrides)
+## Command-line overrides
 
 You can temporarily override persistent preferences for individual
 terminal sessions using CLI command flags:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy --sandbox --model="Gemini 3.5 Flash"
 ```
 
 When an override flag is active, the interactive `/config` menu displays
 a warning indicator alongside the modified setting:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ! Tool Permission: strict (overridden by command flag)
 ```
 
@@ -85,12 +72,12 @@ You can still edit the persistent value on disk during these sessions,
 but the CLI enforces the active runtime flag override until you close
 the session.
 
-## Visual rendering modes[link](#visual-rendering-modes)
+## Visual rendering modes
 
 The TUI operates in one of two visual rendering modes depending on your
 terminal capability and connection latency.
 
-### Alt-screen mode (`always`)[link](#alt-screen-mode-always)
+### Alt-screen mode (`always`)
 
 This mode opens a dedicated display screen using the terminal’s
 alternate buffer, creating an immersive, standalone app interface.
@@ -101,7 +88,7 @@ alternate buffer, creating an immersive, standalone app interface.
 - **Best used for**: Standard local development sessions in advanced
   terminal emulators (such as iTerm2, Ghostty, or WezTerm).
 
-### Inline mode (`never`)[link](#inline-mode-never)
+### Inline mode (`never`)
 
 This mode renders output sequentially directly within your terminal’s
 standard stdout pipeline.
@@ -112,19 +99,12 @@ standard stdout pipeline.
 - **Best used for**: Remote SSH terminals, terminal multiplexers like
   `tmux` or `screen`, and low-bandwidth remote sessions.
 
-info
-
-Adaptive Rendering: Setting Alt-Screen mode to default allows the TUI to
-automatically detect your environment. It defaults to Alt-Screen on
-advanced local shells and degrades to Inline mode when running over SSH
-or in non-interactive sessions.
-
-## Configuration options reference[link](#configuration-options-reference)
+## Configuration options reference
 
 The interactive settings panel (`/config`) and `settings.json` allow you
 to customize the CLI’s behavior across several categories.
 
-### Safety & permissions[link](#safety--permissions)
+### Safety & permissions
 
 Manage how the agent interacts with your system and codebase:
 
@@ -153,7 +133,7 @@ Manage how the agent interacts with your system and codebase:
   the agent can read or write files outside your active project
   directories. Set to `off` by default for safety.
 
-### Display & rendering[link](#display--rendering)
+### Display & rendering
 
 Customize the visual experience of the TUI:
 
@@ -176,18 +156,23 @@ Customize the visual experience of the TUI:
   agent thoughts and tool steps; `low` shows only minimal progress
   indicators.
 
-### Editor & notifications[link](#editor--notifications)
+### Editor & notifications
 
 Configure integrations with your host environment:
 
 - **Editor (`editor`)**: The text editor used to view artifacts or
   compose prompts (via `Ctrl+G`). Defaults to `auto` (respects
   `$EDITOR`), but can be set to `vim`, `emacs`, or others.
+- **Editor Mode (`editorMode`)**: The editing model used inside the CLI
+  prompt itself. Defaults to `default` (flat text editing); set it to
+  `vim` for modal editing. See [Vim Editor
+  Mode](https://antigravity.google/docs/cli/vim-editor-mode). This is independent of the `editor`
+  setting above, which only selects an external program.
 - **Notifications (`notifications`)**: When enabled (`on`), triggers a
   system desktop notification and a terminal bell chime when a
   long-running task completes or requires your attention.
 
-### AI Credits & Feedback[link](#ai-credits--feedback)
+### AI Credits & Feedback
 
 Manage usage, tips, and telemetry:
 
@@ -201,7 +186,7 @@ Manage usage, tips, and telemetry:
 - **Show Feedback Survey (`showFeedbackSurvey`)**: Enables periodic
   brief surveys after task completions to help improve the experience.
 
-## Custom status lines & terminal titles[link](#custom-status-lines--terminal-titles)
+## Custom status lines & terminal titles
 
 For advanced TUI environment integrations, you can toggle active metrics
 or deploy custom scripts to generate dynamic status bars and modify your
@@ -214,44 +199,29 @@ terminal window titles:
   how to toggle window title outputs and pipe live agent states into
   your window headers.
 
-## Keybindings configuration[link](#keybindings-configuration)
+## Keybindings configuration
 
 You can customize almost all keyboard shortcuts in the TUI by mapping
 keys to specific workspace commands.
 
-### Keybindings file location[link](#keybindings-file-location)
+### Keybindings file location
 
 Custom maps are stored alongside your primary settings profile:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/keybindings.json
 ```
 
-### Format and customization[link](#format-and-customization)
+### Format and customization
 
 The JSON structure maps a single TUI command action to an array of
 hotkey sequences:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "cli.clear_screen": [
-    "ctrl+l"
-  ],
-  "prompt.insert_newline": [
-    "shift+enter",
-    "ctrl+j"
-  ],
-  "edit.open_editor": [
-    "ctrl+g"
-  ]
+    "cli.clear_screen": ["ctrl+l"],
+    "prompt.insert_newline": ["shift+enter", "ctrl+j"],
+    "edit.open_editor": ["ctrl+g"]
 }
 ```
 
@@ -260,26 +230,16 @@ To completely disable a default hotkey, map its action to an empty array
 system defaults for those specific actions and loads the remaining valid
 mappings.
 
-warning
-
-Protected Keys: Crucial navigation shortcuts like cli.exit (Ctrl+D /
-Ctrl+C) and cli.enter (Enter) are protected by the system and cannot be
-disabled.
-
-### Restoring defaults[link](#restoring-defaults)
+### Restoring defaults
 
 To revert all keys back to system defaults, delete the keybindings
 profile:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 rm ~/.gemini/antigravity-cli/keybindings.json
 ```
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Now that you have configured your environment, review security controls
 and extensibility options:
@@ -291,7 +251,5 @@ and extensibility options:
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Access quick reference
   sheets listing all configuration options, commands, and default key
   maps.
-
-On this Page
 
 {% endraw %}
