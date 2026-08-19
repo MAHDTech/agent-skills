@@ -19,7 +19,7 @@ This skill operates in a Hub-and-Spoke topology using sub-agents to analyze code
 ## Targets and Paths
 
 - All issue tickets are stored locally relative to the project root in `.tars/issues/todo/`
-- Standard ticket folders also include `.tars/issues/done/` and `.tars/issues/failed/`
+- Standard ticket folders also include `.tars/issues/done/`, `.tars/issues/failed/`, and `.tars/issues/wont-do/` (retired or superseded tickets)
 - Ticket files are saved only to disk. Since `.tars/` must be gitignored, do **NOT** stage, commit, or force-add ticket files to git.
 
 ## Topic Branch Workflow (Hub Only)
@@ -50,7 +50,7 @@ Equip each subagent with:
 
   Deeply analyze it for:
   1. Bugs & Issues: Edge cases, unhandled errors, TOCTOU/race conditions, and security vulnerabilities.
-  2. Maintainability, Naming & Style: Code smells, duplicate logic, or formatting/naming style violations *only if they violate repository formatting/naming standards* (e.g. eslint rules, prek check configs, or guidelines in AGENTS.md). Avoid logging subjective preferences that are not backed by repository standard configurations.
+  2. Maintainability, Naming & Style: Code smells, duplicate logic, or formatting/naming style violations *only if they violate repository formatting/naming standards* (e.g. linter rules, hook configs, or the repository's own documented contributor/agent guidelines, whatever file it keeps them in). Avoid logging subjective preferences that are not backed by repository standard configurations.
   3. Automated Testing: Test coverage gaps, missing integration suites, and fragile mock patterns.
   4. Features & Enhancements: Programmatic tools or utility endpoints that would improve user/agent experience.
 
@@ -62,12 +62,19 @@ Equip each subagent with:
   - Otherwise, for each finding, you must verify the existence of the issue in the codebase and output it using this Markdown template:
     ### Finding: <Short Title>
     - **File**: <FilePath> (relative to project root)
-    - **Lines**: <LineRange> (e.g. 42-55)
+    - **Symbol**: <REQUIRED - the enclosing function, method, constant, type, or exported name,
+      e.g. verifyBashPermission or ALLOWED_KEYS_BY_KIND. If the finding is genuinely file-level
+      (a missing config key, an absent test file), say so explicitly instead of inventing one.>
     - **Snippet**:
       ```<language>
-      <exact code snippet from the file>
+      <exact code snippet from the file - copy it verbatim, do not paraphrase>
       ```
-    - **Description**: <Detailed explanation of the issue, what standard/spec it violates, and how to fix it.>
+    - **Lines**: <OPTIONAL hint, e.g. 42-55. PERISHABLE - any landed change reorders the file and
+      invalidates it. Never make it the only way to locate the finding.>
+    - **Description**: <Detailed explanation of the issue, what standard/spec it violates, and how to fix it. Refer to the symbol by name in this prose, not to a line number.>
+
+  The symbol and the snippet are the durable anchors: they survive the file moving. The line
+  range does not, so it is a convenience only.
   ````
 
 ### 3. Synthesis & Ticket Generation (Hub Only)
@@ -75,21 +82,26 @@ Equip each subagent with:
 Once the subagents report back, collect all findings:
 
 1. **Verify Findings (CRITICAL ANTI-HALLUCINATION CHECK)**:
-   - For each reported finding, the Hub must verify the existence of the file and inspect the referenced line range in the codebase.
+   - For each reported finding, the Hub must verify the existence of the file, then locate the reported **symbol** inside it by searching for the name - not by jumping to the reported line range.
    - Confirm that the actual code in the parent repository matches the provided snippet and contains the reported issue.
-   - Discard any findings that fail this check, contain fabricated files/lines, or represent subjective styling preferences not violating repository standard files.
+   - A `**Lines**` hint that has drifted is **not** grounds to discard the finding. Re-locate by symbol and snippet; if both hold, the finding stands and the stale hint is simply dropped. Only a finding whose symbol and snippet cannot be found is fabricated.
+   - Discard any findings that fail this check, contain fabricated files or symbols, or represent subjective styling preferences not violating repository standard files.
 2. **Deduplicate**: Combine overlapping findings.
-3. **Filter**: Check against existing tickets in `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` to avoid duplicates.
+3. **Filter**: Check against existing tickets in `.tars/issues/todo/`, `.tars/issues/done/`, `.tars/issues/failed/`, and `.tars/issues/wont-do/` to avoid duplicates. A finding already parked in `wont-do/` was retired deliberately - do not re-raise it without saying why the decision changed.
 4. **Determine ID (CRITICAL FOR COLLISION PREVENTION)**:
-   - Scan all three folders: `.tars/issues/todo/`, `.tars/issues/done/`, and `.tars/issues/failed/` (if any folders do not exist, treat them as empty).
+   - Scan every ticket folder: `.tars/issues/todo/`, `.tars/issues/done/`, `.tars/issues/failed/`, and `.tars/issues/wont-do/` (if any folders do not exist, treat them as empty). A retired ticket still owns its ID; reusing it makes two different tickets answer to the same dependency edge.
    - Find all files in these directories that match the 3-digit pattern `XXX.md` (where `XXX` is a number like `001`, `042`, etc.).
    - Extract the numeric ID from each file name (e.g., `042.md` corresponds to `42`).
-   - Find the absolute maximum ID used across all three folders.
+   - Find the absolute maximum ID used across every ticket folder.
    - The ID for the first new issue must be `max_id + 1` (e.g., if the highest is `042.md`, the next must be `043.md`).
-   - **CRITICAL**: Never assume the backlog starts at `001` or overwrite existing issue files. Only start at `001` if all three folders are completely empty or do not exist.
+   - **CRITICAL**: Never assume the backlog starts at `001` or overwrite existing issue files. Only start at `001` if every ticket folder is completely empty or does not exist.
    - Allocate subsequent new tickets sequentially (e.g., `043.md`, `044.md`, `045.md`).
 5. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` following the guidelines and structure defined in the [tars-backlog-create-issue](@/skills/planning/tars-backlog-create-issue/_index.md) skill.
    - **Filename**: `XXX.md` (3-digit ID, padded with leading zeros, e.g., `043.md`)
+   - **Cite the symbol, not the line.** Carry the finding's `**Symbol**` and `**Snippet**` into the ticket's `## Description`. Drop the `**Lines**` hint rather than writing it into ticket prose - by the time the ticket is implemented, other tickets will have landed and moved the file. Line-grain coordinates belong only in `owns:`, as `path#Symbol`.
+   - **Never write a batch number into ticket prose**, and set `batch: null` at creation - batches are allocated at dispatch time, not at audit time.
+   - **Frontmatter shapes are load-bearing**: `dependencies:` must be an inline array on one line, `files:` a two-space-indented block list. See **Frontmatter field rules** in [tars-backlog-create-issue](@/skills/planning/tars-backlog-create-issue/_index.md); getting these wrong is not a formatting nit, it silently drops the data.
+   - The batching rules that consume `files:`, `owns:`, and `dependencies:` are stated canonically in [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md). Do not restate them in a ticket.
 6. **No Findings Output**: If no findings were reported or all were discarded during verification, output a clear status message to the user: "Audit complete. The codebase is clean, stable, and conforms to all standards. No new issues were logged."
 7. **CRITICAL CLEANLINESS ASSERTION**: Audit agents read the parent working tree in place, so the Hub must confirm they left it untouched - run this after every batch, whether the agents succeeded, failed, or timed out:
 

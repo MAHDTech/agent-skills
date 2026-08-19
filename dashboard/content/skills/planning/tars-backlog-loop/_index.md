@@ -56,24 +56,28 @@ Two rules hold across every phase below. Both are established in full by [tars-b
 ### Step 2. Triage Phase (`tars-backlog-triage`)
 
 1. Execute [tars-backlog-triage](@/skills/planning/tars-backlog-triage/_index.md) inline to verify the backlog.
-2. Sub-agents will check the tickets in parallel batches to ensure accuracy, verify file and line coordinates, eliminate hallucinations, check platform constraints, and append a detailed review section to each ticket.
-3. Wait for the triage phase to run to completion.
+2. Sub-agents will check the tickets in parallel batches to ensure accuracy, verify that each cited **symbol** exists and the claim about it still holds, eliminate hallucinations, and check platform constraints.
+3. The Hub **repairs** the defects the sub-agents report - editing the offending line in the section it lives in, correcting the binding section rather than annotating around it - then writes a `## Review` section stamped `RESOLVED` or `UNRESOLVED`. Annotating a defect is not repairing it.
+4. Wait for the triage phase to run to completion. Report any ticket left `UNRESOLVED`: it is waiting on a human decision and is not ready to implement.
 
 ### Step 3. Implementation & Review Phase (`tars-backlog-implement` & `tars-backlog-review`)
 
 1. Execute [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md) inline (it lives in the engineering category) to execute the tickets.
-2. The Hub groups tickets into batches that are conflict-free by `files:` **and** `owns:`, free of hard dependency edges onto unmerged tickets, and free of soft-ownership collisions, then dispatches parallel spokes in isolated clones (minimal spoke contract; checkpoint protocol when `complexity: high` or rework).
-3. As each spoke reports, the Hub force-updates topic refs, fetches the spoke branch into the parent for durability, runs **`tars-gate`** inside the clone (flake classify → isolate → one re-gate when appropriate), commits hook autofixes if the gate dirtied the tree, then reviews.
-4. On a green clean tree, the Hub uses a **risk-tiered** review: lightweight checklist by default; full [tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) when high-risk / post-conflict / rework. Approved branches merge sequentially with the prepare-frozen land commit subject; tickets move to `.tars/issues/done/`. Every terminal path dismisses the spoke.
-5. For rejected tickets, the Hub updates `rework`, appends review comments, and preserves the implementation branch for the next attempt.
-6. After the batch merges, the Hub runs **`tars-gate`** again on the topic branch for cross-ticket interactions.
-7. If `TARS_CI_CHECK=1` in `run.env`, the Hub confirms CI on the batch head before the next batch (blocks on red when `TARS_CI_BLOCK_ON_RED=1`). Local green is not CI green.
-8. Wait for the implementation and review phase to run to completion. Final reports must banner any weakened gate reason.
+2. The Hub groups tickets into batches that are conflict-free across `files:` **and** `owns:` together, free of hard dependency edges onto unmerged tickets, and free of soft-ownership collisions.
+3. **Before any spoke is dispatched**, the Hub runs the pre-dispatch ticket check: if `TARS_TICKET_LINT_COMMAND` is set in `run.env`, it runs against the batch just written to disk and a non-zero exit blocks dispatch; if it is empty, the Hub **logs that the check was skipped** and continues. A silent skip is not permitted - a quiet run must never read as a passing check.
+4. The Hub then dispatches parallel spokes in isolated clones (minimal spoke contract; checkpoint protocol when `complexity: high` or rework).
+5. As each spoke reports, the Hub force-updates topic refs, fetches the spoke branch into the parent for durability, runs **`tars-gate`** inside the clone (flake classify → isolate → one re-gate when appropriate), commits hook autofixes if the gate dirtied the tree, then reviews.
+6. On a green clean tree, the Hub uses a **risk-tiered** review: lightweight checklist by default; full [tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) when high-risk / post-conflict / rework. Approved branches merge sequentially with the prepare-frozen land commit subject; tickets move to `.tars/issues/done/`. Every terminal path dismisses the spoke.
+7. For rejected tickets, the Hub updates `rework`, appends review comments, and preserves the implementation branch for the next attempt.
+8. After the batch merges, the Hub runs **`tars-gate`** again on the topic branch for cross-ticket interactions.
+9. If `TARS_CI_CHECK=1` in `run.env`, the Hub confirms CI on the batch head before the next batch (blocks on red when `TARS_CI_BLOCK_ON_RED=1`). Local green is not CI green.
+10. Wait for the implementation and review phase to run to completion. Final reports must banner any weakened gate reason.
 
 ## Convergence
 
 - If any tickets fail implementation (exceeding 5 attempts), they will reside in `.tars/issues/failed/`.
-- The loop continues until all tickets in `.tars/issues/todo/` are resolved (moved to `done/` or `failed/`), and the audit phase reports no further issues.
+- Retired or superseded tickets are moved to `.tars/issues/wont-do/`. That is a terminal resting place, not a failure - but a dependency pointing into it can never be satisfied.
+- The loop continues until all tickets in `.tars/issues/todo/` are resolved (moved to `done/`, `failed/`, or `wont-do/`), and the audit phase reports no further issues.
 
-**Guard against a non-terminating loop.** The convergence condition is an empty `todo/`, so any ticket that can never be scheduled would spin forever. Two cases do this, and both are swept in step 6 of `tars-backlog-implement`'s batching: a ticket whose `dependencies` name a ticket now in `failed/`, and a dependency cycle where no member can ever go first. If a full pass over `todo/` schedules nothing and resolves nothing, stop and report rather than looping - that is the signature of a blocked backlog, not a slow one.
+**Guard against a non-terminating loop.** The convergence condition is an empty `todo/`, so any ticket that can never be scheduled would spin forever. Two cases do this, and both are swept by the unschedulable-dependency resolution in `tars-backlog-implement`'s batching bookkeeping: a ticket whose `dependencies` name a ticket now in `failed/` or `wont-do/`, and a dependency cycle where no member can ever go first. If a full pass over `todo/` schedules nothing and resolves nothing, stop and report rather than looping - that is the signature of a blocked backlog, not a slow one.
 

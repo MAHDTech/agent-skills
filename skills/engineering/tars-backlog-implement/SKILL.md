@@ -12,7 +12,7 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 
 ## Targets and Paths
 
-- Target Folders: `.tars/issues/{todo,done,failed}/` relative to project root.
+- Target Folders: `.tars/issues/{todo,done,failed,wont-do}/` relative to project root. `wont-do/` holds retired and superseded tickets; nothing is ever dispatched from it, and a dependency pointing into it can never be satisfied.
 - Ticket status updates are written to disk only. Ticket files are never staged, committed, or force-added in git.
 - This skill requires `tars-backlog-prepare` to have run first. Read **only** `.tars/run.env` for run facts (paths, opaque commands, land template, CI flags, weaken banner). Do **not** re-open `.tars/config.yaml` for gate/land/CI - prepare already froze policy into `run.env`. Re-read `run.env` rather than remembering values so a compacted Hub context cannot drift mid-run.
 - **If `.tars/run.env` does not exist, do not proceed and do not improvise.** Read [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) and execute its steps inline, then continue. See **Invoking Sibling Skills** below for why you cannot simply call it.
@@ -151,18 +151,40 @@ Semantic merges of the same function are easy to get wrong; the full gate is a l
 
 ### 1. Backlog Scan & Conflict-Free Batching
 
+> This section is the **canonical** statement of the batching rules for the whole pipeline. `tars-backlog-audit`, `tars-backlog-triage`, and `tars-backlog-create-issue` cite it rather than restating it, and tickets must not restate it either - a duplicated rule set disagrees with the original the first time either changes.
+
 1. Scan the `.tars/issues/todo/` directory for ticket markdown files.
 2. Analyze `files:`, optional `owns:`, `dependencies:`, and soft-ownership signals in the ticket body.
-3. Dynamically group tickets into batches of at most 5. A batch is admissible only if **all** rules hold:
-   - **File rule**: no two tickets modify overlapping paths in `files:`.
-   - **Owns rule**: no two tickets share an overlapping `owns:` entry (string equality on `path` or `path#symbol`). Treat overlap like a file collision - serialise.
-   - **Dependency rule**: no ticket names, in `dependencies`, another ticket that is in the same batch or still unmerged (`todo/` or `failed/`).
+3. Dynamically group tickets into batches. A batch is admissible only if **all four** rules hold:
+   1. **Path rule.** Within one batch, no two `status: todo` tickets share **any** path, across `files:` **or** `owns:`. The comparison is over the union of both lists, on the **normalised path**, so all of these collide:
 
-   **A ticket with no `files:` list fails the File rule - it does not pass it.** When `files:` is missing or empty, either derive it first or schedule that ticket **alone**.
+      | Ticket A             | Ticket B             | Collide?                                  |
+      | -------------------- | -------------------- | ----------------------------------------- |
+      | `files: src/a.ts`    | `files: ./src/a.ts`  | yes - normalise the path before comparing |
+      | `owns: src/a.ts`     | `owns: src/a.ts#Foo` | yes - a symbol lives inside its file      |
+      | `files: src/a.ts`    | `owns: src/a.ts#Foo` | yes - `files:` × `owns:` cross-check      |
+      | `owns: src/a.ts#Foo` | `owns: src/a.ts#Bar` | yes - same file, two writers              |
 
-   **Soft dependencies:** if two tickets clearly add or own the same export/shared constant (from body, `owns:`, or triage notes) but lack a hard `dependencies:` edge, **do not batch them together** - land the natural owner first (or the lower id if unclear), then the other. Prefer adding an explicit `dependencies:` entry when editing frontmatter.
+      Strip the `#Symbol` suffix before comparing, and compare paths after normalising them (resolve `./`, collapse duplicate separators, use one consistent separator). Two tickets editing the same file in the same batch is the collision this whole design exists to prevent; a `#Symbol` suffix narrows _intent_, not the file the writes land in.
+
+   2. **Dependency rule.** Every dependency of a ticket must sit in a **strictly earlier** batch. It may not be in the same batch, and it may not be unmerged (`todo/`, `failed/`, or `wont-do/`).
+
+   3. **Size rule.** At most **5** `status: todo` tickets per batch. Count only tickets that will actually dispatch a spoke: a parked ticket that spawns nothing occupies no slot. (`status: rework` **does** dispatch a spoke here by design - see the rework spawn path in step 2 - so it does occupy a slot.)
+
+   4. **Empty-footprint rule.** A ticket with a missing or empty `files:` list **fails** the path rule; it does not pass it. Either derive its `files:` list first, or schedule it **alone**.
+
+   **Soft dependencies:** if two tickets clearly add or own the same export/shared constant (from body, `owns:`, or triage notes) but lack a hard `dependencies:` edge, **do not batch them together** - land the natural owner first (or the lower id if unclear), then the other. Prefer adding an explicit `dependencies:` entry when editing frontmatter. Write it as an inline array on one line (`dependencies: [12, 19]`); a multi-line YAML list parses as **empty** and the edge disappears without any error.
 
    > `component:` is not a substitute for `files:` or `owns:`. Use it to suspect collisions, never to clear them.
+
+#### `batch:` is the plan; the dependency check is the re-verification
+
+These two statements are the **same invariant observed at two different times**, not a contradiction to be reconciled by deleting one of them:
+
+- **`batch:` is the static plan.** A dependency must land in a strictly earlier batch number.
+- **The dependency rule is the runtime check.** At dispatch time, a dependency must already be **merged**.
+
+Batches execute in ascending order with merges in between, so when batch N dispatches, batches 1…N-1 are already merged and both statements hold at once. If they ever disagree, the plan is stale - re-batch; do not relax either rule.
 
 #### Shared append-only files
 
@@ -172,14 +194,28 @@ For a file on that list, a merge conflict is **expected and not a rework trigger
 
 Then continue batch bookkeeping:
 
-1. Update ticket frontmatter with `batch: X` and write to disk.
-2. Before executing a batch, re-verify all rules.
-3. **Resolve tickets the dependency rule can never admit:**
-   - Dependency in `failed/` → move dependent to `failed/` with a note.
-   - Dependency cycle → fail every member of the cycle.
-   - Dependency on a missing ID → treat edge as satisfied and warn.
+1. Update ticket frontmatter with `batch: X` (bare integer, never quoted) and write to disk.
 
-> Conflict-free by file/`owns` is not the same as behaviourally independent. The batch-final gate catches cross-ticket behavioural breaks.
+   When a ticket's `batch:` changes, **re-verify anything that referenced the old value**: the `` `batch: N` - rationale `` bullet in that ticket's `## Review`, and any `dependencies:` edge pointing at it. Never write a batch number into ticket prose outside that one Review bullet - `batch:` is reallocated every run and reset to `null` on rework, so prose batch numbers ("this lands in batch 4", "#660 is batch 3") are stale almost immediately. Express the relationship as a `dependencies:` edge, which is machine-checkable and cannot drift.
+
+2. **Resolve tickets the dependency rule can never admit** before dispatching anything:
+   - Dependency in `failed/` or `wont-do/` → move the dependent to `failed/` with a note naming the blocking ticket. `wont-do/` holds retired and superseded tickets; an edge into it can never be satisfied, so a dependent left in `todo/` would spin the loop forever.
+   - Dependency cycle → fail every member of the cycle, and say so in the report. **Never proceed silently** by breaking the cycle arbitrarily or dropping one of its edges: a cycle is a metadata defect that needs a human, and quietly picking a winner ships the tickets in an order nobody chose.
+   - **Dependency on an ID that appears to be missing → normalise before concluding it is missing.** IDs are written unpadded in frontmatter (`9`) and padded in filenames (`009.md`), so a naive string comparison reports a real dependency as absent and the edge silently disappears - a fail-open in exactly the place that must fail closed. Compare numerically: parse both sides as integers and match on the number. Only after that normalisation fails is the ID genuinely missing; treat that as a defect to report, not an edge to wave through.
+
+3. **Pre-dispatch verification (before spawning any spoke).**
+
+   Self-verification by the same agent that did the allocation catches little - it re-runs the reasoning that produced the error. When the run provides a ticket-lint command, use it.
+
+   Read `TARS_TICKET_LINT_COMMAND` from `.tars/run.env` (frozen there by `tars-backlog-prepare`; implement never reads `.tars/config.yaml` directly).
+   - **Set** → run it with the batch number, from the repository root, against the working tree. A non-zero exit means the batch has errors: **do not proceed to §2 "Spawn Spokes"**. Repair the reported tickets and re-run until it is green, or park the offending tickets and re-batch.
+   - **Empty or absent** → **skip the check and log that you skipped it**, naming the reason ("no `TARS_TICKET_LINT_COMMAND` in run.env"). Most repositories will not provide one; the pipeline must stay usable there. A silent skip is forbidden - a quiet run must never read as a passing check.
+
+   The command must run **after** `batch: X` is written to disk (step 1), because that is the field it reads.
+
+   Whether or not a linter ran, re-verify the four batching rules by hand before dispatch.
+
+> Conflict-free by path is not the same as behaviourally independent. The batch-final gate catches cross-ticket behavioural breaks.
 
 ### 2. Spawn Spokes in Isolated Clones
 
@@ -232,6 +268,17 @@ happened again - because the fault is a script falling through, not an agent dis
 The Hub does **not** use `tars-git`; it legitimately fetches, merges and commits in the repo
 root. `tars-gate` and `tars-spoke` carry the weaker form of the same check: they refuse any
 target that is neither the run's repo root nor a spoke clone.
+
+**The Hub must therefore disable commit signing itself, on every commit it makes.** `tars-git`
+does this for spokes; nothing does it for the Hub. With `commit.gpgsign=true` and a signer that
+prompts for approval (for example `gpg.ssh.program=op-ssh-sign`), a Hub merge opens a window a
+human has to click, and a headless run hangs there - while holding the heavy-command mutex, so
+every spoke waiting to test hangs behind it too. Pass `--no-gpg-sign` (or
+`git -c commit.gpgsign=false …` where the subcommand has no such flag) on the land merge, on any
+revert, and on any other Hub-side commit.
+
+Never confuse this with `--no-verify`. Signing is skipped; **hooks always run**. `--no-verify` is
+prohibited everywhere in this pipeline.
 
 #### 2b. Transfer gitignored files
 
@@ -292,8 +339,13 @@ Spawn each spoke with:
   5. Never install git hooks. Never merge into topic/default. You may `git merge` topic INTO your branch to sync.
   6. Conventional commits; never --no-verify; never stage anything under .tars/.
   7. Update Tasks/AC checkboxes and ## Evidence on the ticket file.
-  8. Report completion and STAY AVAILABLE until Hub says the ticket is resolved.
-  9. Tool args: never wrap paths in nested escaped quotes.
+  8. NEVER copy a 4-or-more-digit line number out of the ticket into a source or test file -
+     not in a name, a comment, or fixture data. Repositories commonly scan test sources for
+     bare long digit runs (mock IDs, fixture keys) and cannot tell a line reference from a
+     real identifier, so a pasted coordinate reds the gate from an unrelated file. Refer to
+     the symbol by name instead.
+  9. Report completion and STAY AVAILABLE until Hub says the ticket is resolved.
+  10. Tool args: never wrap paths in nested escaped quotes.
   ```
 
 - **Add checkpoint protocol** when `complexity: high` or `status: rework`:
@@ -371,7 +423,7 @@ For each completed spoke:
      - Land commit subject from `TARS_LAND_SUBJECT_TEMPLATE` with `{{id}}` / `{{title}}` filled - e.g. `chore(backlog): land ticket 551`. **Never** use a subject that starts with `merge(` or default `Merge branch 'subagent-…'` if the repo rejects it; set `merge.ff` / message explicitly:
 
        ```bash
-       git merge --no-ff -m "<filled land template>" "subagent-<TICKET_ID>"
+       git merge --no-ff --no-gpg-sign -m "<filled land template>" "subagent-<TICKET_ID>"
        ```
 
      - Move ticket to `.tars/issues/done/`.
@@ -381,6 +433,7 @@ For each completed spoke:
      - Do not merge. Increment `attempts`. Dismiss spoke.
      - If `attempts >= 5` → `failed/`, delete branch and clone.
      - Else `status: rework`, `batch: null`, keep `branch:`, append `## Implementation Review`, delete clone, **keep branch**.
+     - Because `batch:` just changed, re-verify what referenced it: drop or correct this ticket's `` `batch: N` - rationale `` bullet in `## Review`, and check any `dependencies:` edge pointing at this ticket - the dependent can no longer be in a batch that was "later" than a batch this ticket no longer has.
 
 > Every terminal path must dismiss the spoke.
 
@@ -393,7 +446,7 @@ PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "$REPO_ROOT"
 ```
 
-Same frozen commands as per-spoke gates. Apply flake policy on red. If still red, identify the offending merge, revert it, return that ticket to rework.
+Same frozen commands as per-spoke gates. Apply flake policy on red. If still red, identify the offending merge, revert it (`git revert --no-gpg-sign -m 1 <merge-sha>` - Hub commits are unsigned, never `--no-verify`), and return that ticket to rework.
 
 If `TARS_GATE_WEAKENED=1`, banner the reason again in the batch report.
 

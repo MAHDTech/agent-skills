@@ -3,7 +3,13 @@
 # tars-lock -- run a command under a portable, single-holder mutex.
 #
 # Usage:  tars-lock <lock-path> <command> [args...]
-# Example: tars-lock "$HOME/.cache/tars/locks/myrepo.heavy" devenv --no-tui test
+# Example: tars-lock "$HOME/.cache/tars/locks/myrepo.heavy" \
+#            env CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_REASON="backlog gate: tests" \
+#            devenv --no-tui test
+#
+# Note the secrets context in that example. A devenv command without a reason
+# fails before it runs anything ("Accessing secrets requires a reason"), and it
+# fails while holding this lock, so every waiter pays for it.
 #
 # Backlog spokes run in parallel, but starvation-sensitive commands (test
 # suites, nix/devenv builds, whole-repo hook runs) produce false failures when

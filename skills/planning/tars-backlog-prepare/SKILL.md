@@ -48,6 +48,10 @@ commands:
   install: null
   hooks: null
   test: null
+  # Optional pre-dispatch ticket linter. See "Ticket lint contract" in step 4c.
+  # Receives the batch number, runs against the working tree, exits non-zero on
+  # a batch with errors. Null (the default) means no pre-dispatch check exists.
+  ticket_lint: null
 
 land:
   # {{id}} and {{title}} are substituted by the Hub at merge time.
@@ -246,6 +250,24 @@ sh "$TARS_LOCK" /tmp/tars-preflight-probe true
 
 Confirm gate and spoke scripts exist and are readable. Do **not** document platform-specific lock backends to the user - one consistent `sh tars-gate` / `sh tars-spoke` surface everywhere.
 
+##### Ticket lint contract (optional)
+
+The implementation phase can run a **pre-dispatch check** over a batch before it spawns any spoke. This pipeline does not ship such a checker and does not require one; it defines the contract and resolves the command from configuration, so any project may supply its own.
+
+Resolve `commands.ticket_lint` from `.tars/config.yaml`, or `$TARS_TICKET_LINT_COMMAND` from the environment if set. **Never hardcode a particular project's tool here.** The command a repository supplies is its own business; the pipeline only knows the contract:
+
+| Aspect      | Contract                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------ |
+| Invocation  | Called with the batch number as its argument                                                                 |
+| Working dir | Repository root                                                                                              |
+| Reads       | The **working tree** - ticket files under `.tars/issues/`, as they are on disk right now                     |
+| Not a hook  | It must **not** be wired as a pre-commit hook: `.tars/` is gitignored, so a hook would never see the tickets |
+| Exit status | `0` when the batch is clean; non-zero when the batch has errors                                              |
+
+Freeze the resolved string into `run.env` as `TARS_TICKET_LINT_COMMAND`. When nothing is configured, freeze it as the **empty string** - implement then skips the check and logs that it skipped, which is the expected case for most repositories.
+
+If a value **is** configured, smoke it once here (invoke it with a batch number, or with whatever no-op argument it accepts) so a broken or missing command is found now rather than at dispatch time. A linter that is configured but does not run is an error: fix it or clear the config key. Do not silently freeze a command that does not run.
+
 #### 4d. Resolve the repository's own commands (opaque strings)
 
 Determine, once, the three commands every spoke and gate will need. Detect them from what the repository contains - **never assume a specific toolchain** in implement prose later. Prefer `commands.*` overrides from `.tars/config.yaml` when set.
@@ -265,6 +287,26 @@ Determine, once, the three commands every spoke and gate will need. Detect them 
   An empty hook command is a legitimate answer. The gate substitutes `:` for empty steps.
 
 **Devenv projects:** if `devenv.nix`, `devenv.yaml`, or `devenv/default.nix` is present, **do not invent enter flags here.** Read and follow the [devenv](../../tooling/devenv/SKILL.md) skill, then bake its non-interactive enter recipe into the **opaque** install/hooks/test strings (or a single outer wrapper that those strings already include). Other skills only point at devenv; prepare is the only backlog phase that expands it.
+
+> [!IMPORTANT]
+> **A devenv command with no secrets reason dies before it starts anything.** SecretSpec's `require_reason` policy defaults to `"agents"` **even when the key is absent from `secretspec.toml`**, so any command entering a devenv shell without `SECRETSPEC_REASON` fails with _"Accessing secrets requires a reason"_. `tars-gate` `eval`s these frozen strings blind and cannot add the missing variable, so the omission surfaces as a red gate that never ran a test - and it is discovered at gate time, several minutes into a batch, not here.
+>
+> Every frozen string that enters a devenv shell (`TARS_INSTALL_COMMAND`, `TARS_HOOK_COMMAND`, `TARS_TEST_COMMAND`, and `TARS_CI_COMMAND` if it enters one) **must** carry, per the [devenv](../../tooling/devenv/SKILL.md) skill's non-interactive shape:
+>
+> ```bash
+> CI=true SECRETSPEC_PROVIDER=env SECRETSPEC_ENV=<ci-if-defined-else-default> \
+>   SECRETSPEC_REASON="<why you are running this>" \
+>   devenv --no-tui shell --quiet -- <command>
+> ```
+>
+> - `SECRETSPEC_REASON` - **mandatory**; a short human-readable purpose, e.g. `"backlog gate: full test suite"`. There is no default and no way to omit it.
+> - `SECRETSPEC_PROVIDER=env` - no interactive authorization prompt.
+> - `SECRETSPEC_ENV` - `ci` when `[profiles.ci]` exists in `secretspec.toml`, else `default`, else the first defined profile. Omit only when there is no `secretspec.toml`.
+> - `CI=true` - match CI's install/auto-dependency behaviour.
+>
+> Freeze the same values into `run.env` (`TARS_SECRETSPEC_REASON`, `TARS_SECRETSPEC_PROVIDER`, `TARS_SECRETSPEC_ENV`) so a later reader can see what the opaque strings carry without parsing them. The variables inside the frozen command strings are what actually take effect; the `run.env` keys are the record.
+>
+> Before writing any command string, **read it back and confirm the reason is present**. This is the single most common way a devenv repository produces a gate that is red for a reason unrelated to the code.
 
 **Then check for overlap, and subtract it.** Hook runners frequently include a hook that already runs the test suite - so a naive gate of `<hooks> && <tests>` runs the whole suite twice. Inspect the hook config: if a hook already covers typecheck, lint, build, or test, set the test command to only what the hooks do **not** cover. A common residue is a coverage-threshold run, which a plain test invocation does not enforce.
 
@@ -299,23 +341,24 @@ When off, implement still documents that local green ≠ CI green, but does not 
 Before freezing commands, **run the real gate once** on the clean topic branch in the parent workspace - the same path hub will use:
 
 1. Write a **draft** `.tars/run.env` with the paths and candidate commands (weaken flags off).
-2. Export `PRE_COMMIT_HOME` to `$TARS_SPOKE_ROOT/hook-cache` when the hook runner uses it.
-3. Run:
+2. **On a devenv project, check the candidate strings before running anything.** Every command that enters a devenv shell must already carry `SECRETSPEC_REASON` (plus `SECRETSPEC_PROVIDER=env`, `SECRETSPEC_ENV` where a `secretspec.toml` exists, and `CI=true`) - see step 4d. A missing reason is **red: fix it before proceeding**, not something to discover when the gate runs. It costs one read now and a full failed gate cycle later.
+3. Export `PRE_COMMIT_HOME` to `$TARS_SPOKE_ROOT/hook-cache` when the hook runner uses it.
+4. Run:
 
    ```bash
    sh "$TARS_GATE" "$REPO_ROOT"
    ```
 
-4. Classify the result:
+5. Classify the result:
 
-   | Outcome                                                                                                     | Action                                                                                                                                                                                                                                                                                                                                       |
-   | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | **Green**                                                                                                   | Freeze commands. `TARS_GATE_WEAKENED=0`.                                                                                                                                                                                                                                                                                                     |
-   | **Red - environment / tooling** (secrets prompt, missing toolchain, install failure, quoting, devenv enter) | **Fix or abort.** Do not weaken the suite to hide this. Re-read the [devenv](../../tooling/devenv/SKILL.md) skill if the project uses devenv.                                                                                                                                                                                                |
-   | **Red - pre-existing product / coverage / known baseline**                                                  | Prefer narrowing `TARS_TEST_COMMAND` to the green subset the repo can honestly run. Only if `gate.allow_weaken` is true and no useful subset exists, set `TARS_TEST_COMMAND` to `:` (or the narrowed command), `TARS_GATE_WEAKENED=1`, and a precise `TARS_GATE_WEAKENED_REASON`. Never write a no-op test command without both weaken keys. |
-   | **Red - ambiguous / flaky**                                                                                 | Re-run the full gate **once**. Still red → report output and **ask the user** rather than auto-weaken.                                                                                                                                                                                                                                       |
+   | Outcome                                                                                                                             | Action                                                                                                                                                                                                                                                                                                                                       |
+   | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | **Green**                                                                                                                           | Freeze commands. `TARS_GATE_WEAKENED=0`.                                                                                                                                                                                                                                                                                                     |
+   | **Red - environment / tooling** (missing secrets reason, secrets prompt, missing toolchain, install failure, quoting, devenv enter) | **Fix or abort.** Do not weaken the suite to hide this. A failure naming a missing reason (_"Accessing secrets requires a reason"_) means a frozen string lost its `SECRETSPEC_REASON` - repair the string, do not work around it. Re-read the [devenv](../../tooling/devenv/SKILL.md) skill if the project uses devenv.                     |
+   | **Red - pre-existing product / coverage / known baseline**                                                                          | Prefer narrowing `TARS_TEST_COMMAND` to the green subset the repo can honestly run. Only if `gate.allow_weaken` is true and no useful subset exists, set `TARS_TEST_COMMAND` to `:` (or the narrowed command), `TARS_GATE_WEAKENED=1`, and a precise `TARS_GATE_WEAKENED_REASON`. Never write a no-op test command without both weaken keys. |
+   | **Red - ambiguous / flaky**                                                                                                         | Re-run the full gate **once**. Still red → report output and **ask the user** rather than auto-weaken.                                                                                                                                                                                                                                       |
 
-5. Re-write the final `.tars/run.env` with the frozen values. If the smoke left the working tree dirty (hook autofix), restore cleanliness before finishing prepare: the tree must be clean at the end of prepare (`git status --porcelain` empty). Prefer restoring autofixes with `git checkout -- .` / `git clean` only for smoke dirt **you** caused; if unsure, abort and ask the user.
+6. Re-write the final `.tars/run.env` with the frozen values. If the smoke left the working tree dirty (hook autofix), restore cleanliness before finishing prepare: the tree must be clean at the end of prepare (`git status --porcelain` empty). Prefer restoring autofixes with `git checkout -- .` / `git clean` only for smoke dirt **you** caused; if unsure, abort and ask the user.
 
 Report the smoke outcome and any weaken banner prominently in the prepare summary.
 
@@ -335,6 +378,17 @@ TARS_PRE_COMMIT_HOME="…/hook-cache"   # may be empty if unused
 TARS_INSTALL_COMMAND="…"   # opaque; may be :
 TARS_HOOK_COMMAND="…"      # opaque; may be :
 TARS_TEST_COMMAND="…"      # opaque; may be : only if weakened
+# Secrets context baked INTO the three opaque strings above on a devenv project.
+# Recorded here so a reader can see what they carry without parsing them; the
+# copies inside the command strings are what actually take effect.
+# A devenv command with no reason fails before it runs anything - see step 4d.
+TARS_SECRETSPEC_REASON="backlog gate: …"   # mandatory on devenv; never empty
+TARS_SECRETSPEC_PROVIDER="env"             # non-interactive; no authorization prompt
+TARS_SECRETSPEC_ENV="ci"                   # or "default"/first profile; empty if no secretspec.toml
+# Optional pre-dispatch ticket check. Empty = none configured; implement then
+# skips the check and LOGS that it skipped. Invoked with the batch number,
+# run against the working tree, non-zero exit = batch has errors.
+TARS_TICKET_LINT_COMMAND=""
 TARS_GATE_WEAKENED=0       # or 1
 TARS_GATE_WEAKENED_REASON=""  # required when weakened
 TARS_LAND_SUBJECT_TEMPLATE="chore(backlog): land ticket {{id}}"
