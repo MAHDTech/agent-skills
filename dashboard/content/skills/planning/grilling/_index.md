@@ -16,7 +16,7 @@ Interview the user relentlessly about every aspect of a plan, feature, or archit
 
 ## The Interview Rules
 
-1. **One decision at a time.** Ask questions strictly one at a time. Never dump multiple questions in a single turn—asking several questions at once creates cognitive overload and tangles branching decisions.
+1. **One decision at a time.** Ask questions strictly one at a time. Never dump multiple questions in a single turn - asking several questions at once creates cognitive overload and tangles branching decisions.
 2. **Always give a recommended answer.** Never ask open-ended questions without guidance. State the options, explain the trade-offs, and state your clear recommendation (e.g. `(Recommended)`).
 3. **Lookup facts yourself; ask the user for decisions.**
    - **Facts belong to the agent.** If a detail can be determined by reading the codebase, configuration, git history, or documentation, search for it autonomously. Never ask the user questions you could answer yourself.

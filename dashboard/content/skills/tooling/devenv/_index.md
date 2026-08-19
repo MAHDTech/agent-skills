@@ -46,14 +46,14 @@ devenv --no-tui shell --quiet -- \
 | Variable / flag | Why |
 | --------------- | --- |
 | `CI=true` | Many `devenv.nix` setups change install/auto-deps behaviour under CI; agents should match CI. |
-| `SECRETSPEC_PROVIDER=env` | Resolve secrets from the environment only — **no interactive provider prompt**. |
+| `SECRETSPEC_PROVIDER=env` | Resolve secrets from the environment only - **no interactive provider prompt**. |
 | `SECRETSPEC_REASON=…` | Required for SecretSpec agent audit logging. |
 | `--no-tui` | Never open the interactive TUI (hangs agents). |
 | `--quiet` | Prefer under CI/agents to reduce noise; still always use `--no-tui`. |
 
 **Profile selection** when `secretspec.toml` exists (same rules as hook runs below): set `SECRETSPEC_ENV` to `ci` if `[profiles.ci]` exists, else `default`, else the first defined profile.
 
-**Never** run bare `devenv shell` without `--no-tui` in an agent context. **Never** dismiss or ignore a secretspec authorization prompt — fix the env (`SECRETSPEC_PROVIDER=env` + required vars) instead.
+**Never** run bare `devenv shell` without `--no-tui` in an agent context. **Never** dismiss or ignore a secretspec authorization prompt - fix the env (`SECRETSPEC_PROVIDER=env` + required vars) instead.
 
 Other skills (for example the tars-backlog pipeline) must **not** restate these flags. If a project has `devenv.nix` or `devenv.yaml`, follow **this** skill when building any command that enters the devenv shell. Backlog prepare freezes the resulting opaque command strings into `.tars/run.env`; implementers only execute those strings.
 

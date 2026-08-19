@@ -825,7 +825,7 @@ export async function downloadAction(
         url: string
         error: string
     }> = []
-    // Dead links discovered from upstream llms.txt indexes — reported as
+    // Dead links discovered from upstream llms.txt indexes - reported as
     // warnings, never fatal.
     const staleLinks: Array<{
         skillName: string
@@ -957,7 +957,7 @@ export async function downloadAction(
                     `  Filename collision detected for path: ${path.basename(destFile)}. Colliding URLs:`
                 )
                 for (const job of jobs) {
-                    log.warn(`    - ${job.url}`)
+                    log.warn(`   - ${job.url}`)
                 }
 
                 for (const job of jobs) {
@@ -1233,7 +1233,7 @@ export async function downloadAction(
         for (const [skill, items] of Object.entries(groupedStale)) {
             log.warn(`  ● Skill: ${skill}`)
             for (const item of items) {
-                log.warn(`    - ${item.url}`)
+                log.warn(`   - ${item.url}`)
             }
         }
     }
@@ -1252,7 +1252,7 @@ export async function downloadAction(
         for (const [skill, items] of Object.entries(grouped)) {
             log.error(`  ● Skill: ${skill}`)
             for (const item of items) {
-                log.error(`    - URL: ${item.url}`)
+                log.error(`   - URL: ${item.url}`)
                 log.error(`      Error: ${item.error}`)
             }
         }

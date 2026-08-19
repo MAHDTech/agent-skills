@@ -3,7 +3,7 @@ name: plan-before-coding
 description: Intercepts requests to ensure the AI agent and human work back and forth to create an implementation plan before diving into code. Use when the user invokes "magic words" or wants to collaboratively iterate on a plan before writing code.
 ---
 
-> **Deprecated — use `/grilling` instead.** Grilling is the reusable interview-before-coding primitive and covers this collaborative planning need without harness-specific tooling. Kept here for reference only.
+> **Deprecated - use `/grilling` instead.** Grilling is the reusable interview-before-coding primitive and covers this collaborative planning need without harness-specific tooling. Kept here for reference only.
 
 # Magic Words (Iterative Planning)
 

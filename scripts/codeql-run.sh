@@ -42,7 +42,7 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # ==========================================
-# Global lock — serializes codeql-run across repos
+# Global lock - serializes codeql-run across repos
 # ==========================================
 # ~/.codeql/packages is a shared global directory; concurrent runs from
 # multiple repos race to install the same query packs and leave partial writes
@@ -86,7 +86,7 @@ acquire_lock() {
 	truncate -s 0 "${CODEQL_LOCK_FILE}"
 	echo "pid=$$, repo=${PROJECT_ROOT}, started=$(date -Iseconds)" >&9
 
-	# Release lock on exit, Ctrl-C, or failure — clear identity and close fd.
+	# Release lock on exit, Ctrl-C, or failure - clear identity and close fd.
 	release_lock() {
 		local sig="${1:-EXIT}"
 		trap - EXIT INT TERM
@@ -170,7 +170,7 @@ cmd_analyze() {
 		local csv_file="${RESULTS_DIR}/${lang}.csv"
 
 		if [[ ! -d ${db_path} ]]; then
-			log_warn "No database for ${lang} — run 'codeql-run db' first. Skipping."
+			log_warn "No database for ${lang} - run 'codeql-run db' first. Skipping."
 			continue
 		fi
 

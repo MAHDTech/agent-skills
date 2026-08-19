@@ -92,7 +92,7 @@ of NFS on Nutanix Objects. See Use Cases and Recommendations for Network File Sy
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -254,7 +254,7 @@ A non-admin user can create lifecycle policies only after the administrator crea
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -423,7 +423,7 @@ Cloud tiering enables you to move objects to another S3-compatible object store 
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide. Cloud tiering is managed through lifecycle policies. You can configure multiple lifecycle rules for different objects within a bucket.Cloud tiering configuration consists of the following steps:
 
@@ -682,7 +682,7 @@ You can create a lifecycle rule for a bucket where you define the scope (all obj
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide. About this taskWhen creating a bucket, you can enable versioning, set a rule to delete past versions, and add a lifecycle policy to expire the current objects after the specified time. Once the bucket gets created, you can go to the bucket page and configure object-tiering lifecycle rules.To create a lifecycle rule to tier out objects, do the following:
 
@@ -835,7 +835,7 @@ Write-once-read-many (WORM) buckets protect your data and metadata. You can conf
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -927,7 +927,7 @@ Objects | Bucket Creation, Operations, and Bucket Policy Configuration |
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -1035,7 +1035,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -1114,7 +1114,7 @@ The buckets view allows you to view the list of buckets in the object store and 
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -1145,7 +1145,7 @@ buckets that are part of the federation. To view all the buckets in a federation
 
 displayed:
 
-- Enabled—If a replication rule is enabled.• Disabled—If all the replication rules are disabled.• None—If no replication rule is created on the bucket.
+- Enabled - If a replication rule is enabled.• Disabled - If all the replication rules are disabled.• None - If no replication rule is created on the bucket.
 
 | • | Multiprotocol Access: Displays if multiprotocol access is enabled or disabled for the bucket. |
 | --- | --- |
@@ -1181,7 +1181,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -1216,7 +1216,7 @@ You can share a bucket with multiple users that have access keys. Before you beg
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide.
 
@@ -1368,7 +1368,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide. Objects | Bucket Creation, Operations, and Bucket Policy Configuration |
 
@@ -1401,7 +1401,7 @@ You can modify user access to grant different permissions, including read-only a
 
 - Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in
 
 the Security Guide. Objects | Bucket Creation, Operations, and Bucket Policy Configuration |
 
@@ -1461,7 +1461,7 @@ on a role in Prism Central for the non-admin user. The specific role must have t
 
 - Edit Buckets• View Buckets• View Object StoreAdministrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in the Security
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see Built-in Role Management in the Security
 
 Guide.
 

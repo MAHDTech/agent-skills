@@ -1,6 +1,6 @@
 +++
 title = "to-spec"
-description = "Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker — no interview, just synthesis of what you have already discussed."
+description = "Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker - no interview, just synthesis of what you have already discussed."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -12,7 +12,7 @@ mermaid = false
 
 # To Spec
 
-Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
+Take the current conversation context and codebase understanding and produce a spec (you may know this document as a PRD). Do NOT interview the user - just synthesize what you already know.
 
 Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear, or local files), triage label vocabulary, domain glossary, and any ADRs in the area you are touching. If those conventions have not been established, ask the user before publishing.
 
@@ -20,11 +20,11 @@ Work from your project's conventions: its issue tracker (GitHub via `gh`, Linear
 
 1. Explore the repo to understand the current state of the codebase, if you have not already. Use the project's domain glossary throughout the spec, and respect any ADRs in the area you are touching.
 
-2. Sketch out the seams at which you will test the feature. Prefer existing seams to new ones, and use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better — the ideal number is one.
+2. Sketch out the seams at which you will test the feature. Prefer existing seams to new ones, and use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
    Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to your project's issue tracker. Apply the project's ready-for-agent triage label (or its equivalent) — no need for additional triage.
+3. Write the spec using the template below, then publish it to your project's issue tracker. Apply the project's ready-for-agent triage label (or its equivalent) - no need for additional triage.
 
 Once the spec is approved, slice it into tracer-bullet tickets with `/to-tickets`.
 
@@ -63,12 +63,12 @@ A list of the implementation decisions that were made. This can include:
 - API contracts
 - Specific interactions
 
-Do NOT include specific file paths or code snippets — they go stale quickly.
+Do NOT include specific file paths or code snippets - they go stale quickly.
 
 Exception: if exploratory prototyping produced a snippet that encodes a
 decision more precisely than prose can (a state machine, reducer, schema, or
 type shape), inline it within the relevant decision and note briefly that it
-came from a prototype. Trim to the decision-rich parts — not a working demo,
+came from a prototype. Trim to the decision-rich parts - not a working demo,
 just the important bits.
 
 ## Testing Decisions

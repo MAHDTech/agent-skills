@@ -1,6 +1,6 @@
 +++
 title = "self-review"
-description = "Self-review after implementation — surface missed work, simplification opportunities, and idiomatic improvements"
+description = "Self-review after implementation - surface missed work, simplification opportunities, and idiomatic improvements"
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -16,12 +16,12 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 
 ## Instructions
 
-1. **Determine scope** — use the current branch diff unless the user specifies otherwise:
+1. **Determine scope** - use the current branch diff unless the user specifies otherwise:
    - `git diff <base-branch>...HEAD --name-only` (the branch your work targets)
    - Fall back to staged changes if no branch diff exists
 2. **Read all changed files in full** before reviewing.
 3. **Answer each question below.** For every finding, cite `file_path:line_number` and fix it directly.
-4. **If everything looks good**, say so briefly — don't invent busywork.
+4. **If everything looks good**, say so briefly - don't invent busywork.
 
 ## Questions
 
@@ -31,7 +31,7 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 - Did you skip something the user asked for?
 - Are there commented-out code blocks or placeholder values that shouldn't ship?
 - Are there missing error cases, edge cases, or validations at system boundaries?
-- Are there fallback/legacy code paths? If so, **ask the user explicitly** whether to keep, remove, or flag them — don't assume backward compatibility is wanted.
+- Are there fallback/legacy code paths? If so, **ask the user explicitly** whether to keep, remove, or flag them - don't assume backward compatibility is wanted.
 
 ### 2. More idiomatic?
 
@@ -42,7 +42,7 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 
 ### 3. More modular?
 
-> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup — untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt — reach for `/sculpt-code` instead.
+> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup - untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt - reach for `/sculpt-code` instead.
 
 - Are there functions doing more than one thing that should be split?
 - Is there duplicated logic across the diff that should be extracted?
@@ -64,5 +64,5 @@ For each question where you find something actionable:
 - Apply the fix directly
 - One-line explanation of what changed and why
 
-If nothing actionable is found, say: "Clean — nothing to follow up on."
+If nothing actionable is found, say: "Clean - nothing to follow up on."
 

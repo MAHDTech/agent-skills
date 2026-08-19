@@ -11,7 +11,7 @@
 # the spoke chooses the targeted test command; this wrapper only makes lock +
 # cwd mechanical.
 #
-# Hub must NOT use this for the full gate — use tars-gate instead.
+# Hub must NOT use this for the full gate - use tars-gate instead.
 #
 # Environment:
 #   TARS_RUN_ENV   absolute path to run.env

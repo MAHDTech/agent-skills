@@ -62,8 +62,40 @@ async function checkNoIndexFiles(dirAbs: string): Promise<string[]> {
     return errors
 }
 
+export function checkNoEmDashes(content: string, fileLabel: string): string[] {
+    const errors: string[] = []
+    if (content.includes("\u2014")) {
+        errors.push(
+            `${fileLabel}: contains em-dash (Unicode U+2014). CRITICAL STYLE RULE violation: Never use em-dashes. Use hyphens ('-'), colons, commas, parentheses, or restructure sentences instead.`
+        )
+    }
+    return errors
+}
+
+async function checkManualResourcesNoEmDashes(
+    dirAbs: string,
+    relBase: string
+): Promise<string[]> {
+    const errors: string[] = []
+    if (!(await fs.pathExists(dirAbs))) return errors
+    const entries = await fs.readdir(dirAbs, {withFileTypes: true})
+    for (const entry of entries) {
+        const fullPath = path.join(dirAbs, entry.name)
+        const relPath = path.posix.join(relBase, entry.name)
+        if (entry.isDirectory()) {
+            errors.push(
+                ...(await checkManualResourcesNoEmDashes(fullPath, relPath))
+            )
+        } else if (entry.isFile()) {
+            const raw = await fs.readFile(fullPath, "utf-8")
+            errors.push(...checkNoEmDashes(raw, relPath))
+        }
+    }
+    return errors
+}
+
 // resources/ may contain only auto/ (downloader-owned) and manual/
-// (hand-authored) subdirectories — no bare files, no other subdirectories.
+// (hand-authored) subdirectories - no bare files, no other subdirectories.
 export async function checkResourcesLayout(
     resourcesDirAbs: string
 ): Promise<string[]> {
@@ -82,6 +114,14 @@ export async function checkResourcesLayout(
                         path.join(resourcesDirAbs, entry.name)
                     ))
                 )
+                if (entry.name === "manual") {
+                    errors.push(
+                        ...(await checkManualResourcesNoEmDashes(
+                            path.join(resourcesDirAbs, "manual"),
+                            "resources/manual"
+                        ))
+                    )
+                }
             }
         } else {
             errors.push(
@@ -203,6 +243,11 @@ export async function lint() {
         )
         for (const msg of await checkResourcesLayout(resourcesDirAbs)) {
             log.error(`❌ ${file}: ${msg}`)
+            errors++
+        }
+
+        for (const msg of checkNoEmDashes(skill.raw, file)) {
+            log.error(`❌ ${msg}`)
             errors++
         }
     }

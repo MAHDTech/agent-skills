@@ -8,7 +8,7 @@ skill_name = "software-factory"
 +++
 
 {% raw %}
-# Gate 1 — Product
+# Gate 1 - Product
 
 Saved as `docs/plans/<feature-slug>/01-product.md`. Written in the end user's language throughout; anything technical belongs to Gate 2.
 
@@ -17,12 +17,12 @@ Saved as `docs/plans/<feature-slug>/01-product.md`. Written in the end user's la
 
 ## Problem
 
-<the problem the user has today, in the user's words — what they cannot do, or what
+<the problem the user has today, in the user's words - what they cannot do, or what
 costs them time, and what they do instead right now>
 
 ## Success metric
 
-<one real number tied to the business — conversion, latency, support tickets, revenue —
+<one real number tied to the business - conversion, latency, support tickets, revenue  - 
 and how it will be measured after this ships>
 
 ## Announcement
@@ -32,7 +32,7 @@ write this is the signal that the wrong thing is being built.>
 
 ## Screens
 
-<one line per mockup file in ./mockups/, saying what the screen is for — or "no UI">
+<one line per mockup file in ./mockups/, saying what the screen is for - or "no UI">
 
 ## Out of scope
 
@@ -41,6 +41,6 @@ write this is the signal that the wrong thing is being built.>
 
 ## Mockups
 
-One plain HTML file per screen in `mockups/`, no framework and no build step. They exist to make the user point at something and say "yes, that" — they are thrown away once the real screens exist, so hardcode the content and skip the polish.
+One plain HTML file per screen in `mockups/`, no framework and no build step. They exist to make the user point at something and say "yes, that" - they are thrown away once the real screens exist, so hardcode the content and skip the polish.
 
 {% endraw %}

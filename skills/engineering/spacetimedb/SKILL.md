@@ -46,7 +46,7 @@ Data in SpacetimeDB is stored in tables. You declare tables using macros/decorat
 
 ### Table Configurations & Attributes
 
-- **Public vs. Private**: Tables are private by default — queryable only by server-side code (reducers and views). Add the `public` attribute (`#[table(accessor = <name>, public)]` in Rust) to make a table readable by any connected client.
+- **Public vs. Private**: Tables are private by default - queryable only by server-side code (reducers and views). Add the `public` attribute (`#[table(accessor = <name>, public)]` in Rust) to make a table readable by any connected client.
 - **Primary Keys**: Used to uniquely identify rows (`#[primary_key]`).
 - **Unique Constraints**: Prevent duplicate values in specified columns (`#[unique]`).
 - **Auto-Increment**: Automatically generates unique integer sequences for new rows (`#[auto_inc]`).

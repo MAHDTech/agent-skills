@@ -1,6 +1,6 @@
 +++
 title = "productionize-app"
-description = "Transform an application into a production-ready deployment through systematic analysis, hardening, and framework-specific optimization. Use when preparing an app to ship — auditing readiness, tightening config, and getting it deployable to a target platform."
+description = "Transform an application into a production-ready deployment through systematic analysis, hardening, and framework-specific optimization. Use when preparing an app to ship - auditing readiness, tightening config, and getting it deployable to a target platform."
 sort_by = "title"
 template = "skill.html"
 [extra]

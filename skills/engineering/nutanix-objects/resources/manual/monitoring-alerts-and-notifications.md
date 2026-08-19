@@ -126,7 +126,7 @@ Before you beginA non-admin user can assign quota policy to a user only after th
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -527,12 +527,12 @@ For more information on Nutanix Objects specific alerts, see Nutanix Objects Spe
 
 Notifications for Nutanix Objects enables you to send the completed events logs to the configured endpoints in your Nutanix Objects instance. This helps you with centralized events log management, thus enabling you to monitor and analyze the logs and identify performance or configuration issues. TCP is the supported protocol for Nutanix Objects notifications.The following endpoints are supported for logging the notification events:
 
-| • | Syslog—System Logging Protocol is a standard protocol for sending events logs to the Syslog server. |
+| • | Syslog - System Logging Protocol is a standard protocol for sending events logs to the Syslog server. |
 | --- | --- |
 
 Enter the hostname or host IP address and port number of your Syslog server when configuring the endpoints. The Syslog server should be up and running when performing the endpoint configuration in your Nutanix Objects instance.
 
-| • | Nats-streaming—A lightweight, reliable streaming platform built on top of the core NATS platform |
+| • | Nats-streaming - A lightweight, reliable streaming platform built on top of the core NATS platform |
 | --- | --- |
 
 that provides persistent logs. Enter the hostname or host IP address and port number of your NATS streaming server when configuring the endpoints. NATS streaming server should be up and running when performing the endpoint configuration in your Nutanix Objects instance.
@@ -541,7 +541,7 @@ that provides persistent logs. Enter the hostname or host IP address and port nu
 
 while using the NATS client to connect to the NATS streaming server.
 
-| • | Apache Kafka—Kafka is a distributed system consisting of servers and clients that communicate |
+| • | Apache Kafka - Kafka is a distributed system consisting of servers and clients that communicate |
 | --- | --- |
 
 through a high-performance TCP network protocol. It can be deployed on bare-metal hardware, virtual machines, and containers in on-premise as well as cloud environments. Enter the hostname or host IP address and port number of your Kafka server when configuring the endpoints. The Kafka server should be up and running when performing the endpoint configuration in your Nutanix Objects instance.
@@ -550,7 +550,7 @@ through a high-performance TCP network protocol. It can be deployed on bare-meta
 
 There are two types of notifications for Nutanix Objects that can be enabled for either successful, or failed, or both successful and failed instance-level and data events.
 
-| • | Instance-level events—All operations performed on a bucket. For example, create a bucket, update |
+| • | Instance-level events - All operations performed on a bucket. For example, create a bucket, update |
 | --- | --- |
 
 a bucket, delete a bucket, enable versioning, and so on. The following instance-level events are supported for successful, or failed, or both successful and failed events: Note: All the instance-level events notifications are enabled by default once you configure the endpoints. You cannot enable or disable the notifications for a single instance-level event.
@@ -634,7 +634,7 @@ Objects | Nutanix Objects Notifications |
 
 endpoints. {"EventType":"s3:BucketCreated:Put","Key":"first","Records": [{"eventError":"","eventVersion":"2.0","eventSource":"aws:s3","awsRegion":"us- east-1","eventTime":"2022-02-09T07:40:13Z","eventName":"s3:BucketCreated:Put","userIdentity": {"principalId":"upgrade@ntnx.com"},"requestParameters": {"sourceIPAddress":"10.44.91.64"},"responseElements": {"x-amz-id-2":"110000+1229+2129+240","x-amz-request- id":"110000+1229+2129+240","x-ntnx-origin-endpoint":"0.0.0.0"},"s3": {"s3SchemaVersion":"1.0","configurationId":"SuccessfulWriteManagementEvent","OSSDomain":"rc4.eng.nutanix.com","bucket": {"name":"frst","ownerIdentity": {"principalId":"upgrade@ntnx.com"},"arn":"arn:aws:s3:::frst"}}}],"level":"info","msg":"","time":"2022-02-09T07:40:13Z"}
 
-| • | Data events—Data events are specific to data operations. These events can be enabled for each |
+| • | Data events - Data events are specific to data operations. These events can be enabled for each |
 | --- | --- |
 
 bucket. To enable notifications for successful, or failed, or both data events for a bucket, you need to

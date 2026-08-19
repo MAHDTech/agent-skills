@@ -52,7 +52,7 @@ If you are working on the skills in this repository, install them from your loca
 - `~/.agents/skills/` for OpenCode, Goose, and Antigravity (registered via `~/.gemini/config/skills.json`)
 - `~/.claude/skills/` for Claude Code
 
-It auto-detects which tools are installed and only wires those. It is idempotent: re-run it any time you add, rename, or remove a skill — it cleans up its own stale links (from renames or deletions) while leaving any skills you hand-copied for testing untouched. Because everything is symlinked, edits to a `SKILL.md` in your clone take effect immediately in every agent, with no reinstall needed.
+It auto-detects which tools are installed and only wires those. It is idempotent: re-run it any time you add, rename, or remove a skill - it cleans up its own stale links (from renames or deletions) while leaving any skills you hand-copied for testing untouched. Because everything is symlinked, edits to a `SKILL.md` in your clone take effect immediately in every agent, with no reinstall needed.
 
 The three commands you will use:
 
@@ -60,4 +60,4 @@ The three commands you will use:
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `skills --action install`   | Wire the skills into your machine's agent tools (idempotent)                                                                                    |
 | `skills --action uninstall` | Remove every symlink this repo owns                                                                                                             |
-| `skills --action sync`      | Do both of the above **and** regenerate the README, `agents/AGENTS.md`, `skills.sh.json`, and dashboard — the "make everything current" command |
+| `skills --action sync`      | Do both of the above **and** regenerate the README, `agents/AGENTS.md`, `skills.sh.json`, and dashboard - the "make everything current" command |

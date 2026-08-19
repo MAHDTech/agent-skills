@@ -8,7 +8,7 @@ Nutanix Files consolidates file storage onto hyperconverged infrastructure (HCI)
 
 ### Key Architectural Characteristics
 
-- **Software-Defined & Scale-Out**: Runs as virtual machines—File Server Virtual Machines (FSVMs)—across Nutanix cluster nodes. Compute and capacity scale independently or together.
+- **Software-Defined & Scale-Out**: Runs as virtual machines - File Server Virtual Machines (FSVMs) - across Nutanix cluster nodes. Compute and capacity scale independently or together.
 - **Acropolis DSF Integration**: Leverages Nutanix DSF features including data tiering, inline/post-process compression, erasure coding (EC-X), data-at-rest encryption, and snapshot protection.
 - **Multiprotocol Storage**: Simultaneous support for SMB 2.1, SMB 3.0, NFS v3, and NFS v4.1 protocols on a single file server instance.
 - **High Availability & Self-Healing**: Automated FSVM failure detection, virtual IP failover, and non-disruptive Volume Group reattachment.

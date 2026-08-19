@@ -30,7 +30,7 @@ This skill is invoked by the Hub for each branch implemented by a subagent. It c
 
 ## Where This Runs
 
-The Hub runs this review **after** the verification gate has passed, and before the merge — see [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md).
+The Hub runs this review **after** the verification gate has passed, and before the merge - see [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md).
 
 Implement uses **risk-tiered** review. Run this full dual-axis skill only when the Hub selects the full tier (any of: `risk: high`; diff touches high-risk path patterns such as hooks/auth/secrets; post-conflict resolve on this ticket; rework with `attempts >= 2`; Hub marks security/shared-core). Otherwise the Hub uses a lightweight checklist and does **not** invoke this skill.
 
@@ -39,7 +39,7 @@ Two consequences when this skill does run:
 - **Do not re-run the test suite or the whole-repo hook run.** They are already green for this branch via `tars-gate`. They are starvation-sensitive; re-running them here occupies the mutex for no new information.
 - **No workspace needs creating.** The spoke's clone is still alive with the branch checked out. The branch also exists in the parent (fetched for durability before gating), so diff extraction can run in the parent without checkout.
 
-## Lightweight checklist (Hub default — not this skill)
+## Lightweight checklist (Hub default - not this skill)
 
 When full review is not required, the Hub still records a short pass under `## Implementation Review` covering:
 
@@ -71,7 +71,7 @@ git diff <merge-base>..<implementation-branch>
 
 ### 2. Run the Dual-Axis Review
 
-The general Spec-and-Standards review is not backlog-specific, so **delegate it to the [code-review](@/skills/review/code-review/_index.md) skill** rather than restating it here. Run that review — either inline, or in a subagent working in the spoke's existing clone — and pass it:
+The general Spec-and-Standards review is not backlog-specific, so **delegate it to the [code-review](@/skills/review/code-review/_index.md) skill** rather than restating it here. Run that review - either inline, or in a subagent working in the spoke's existing clone - and pass it:
 
 - the **ticket as the originating spec/issue** (its `## Description`, `## Tasks`, and `## Acceptance Criteria`), and
 - the **diff** (or the implementation branch and its merge-base) as the range to review.
@@ -80,7 +80,7 @@ The general Spec-and-Standards review is not backlog-specific, so **delegate it 
 
 #### Reviewer prompt template
 
-When running the review in a subagent, the constraints above are **not** inherited — the subagent never sees this document. Carry them explicitly:
+When running the review in a subagent, the constraints above are **not** inherited - the subagent never sees this document. Carry them explicitly:
 
 ```text
 You are reviewing one backlog ticket's implementation. Work in the spoke's clone at <SPOKE_DIR>,
@@ -90,7 +90,7 @@ Ticket (the originating spec):
 <TICKET_CONTENT>
 
 DO NOT RUN THE TEST SUITE, AND DO NOT RUN THE REPOSITORY'S HOOKS ACROSS ALL FILES.
-Both have already passed for this exact branch — the Hub gated it before calling you.
+Both have already passed for this exact branch - the Hub gated it before calling you.
 They are also serialised behind a shared mutex, so re-running them blocks every other
 spoke in the batch to re-prove a result that is already known. Read the diff and the
 code; do not re-execute the gate.
@@ -98,11 +98,11 @@ code; do not re-execute the gate.
 You may run cheap, read-only commands (git log/diff/show, typecheck, reading files).
 
 Report:
-1. Spec — does the change do what the ticket asked?
-2. Standards — does it follow the repo's documented conventions and avoid common code smells?
-3. Task & Criteria Coverage — is every '## Tasks' and '## Acceptance Criteria' checkbox genuinely
+1. Spec - does the change do what the ticket asked?
+2. Standards - does it follow the repo's documented conventions and avoid common code smells?
+3. Task & Criteria Coverage - is every '## Tasks' and '## Acceptance Criteria' checkbox genuinely
    satisfied by the diff, not merely ticked?
-4. Evidence Authenticity — do the '## Evidence' command logs correspond to the implemented code,
+4. Evidence Authenticity - do the '## Evidence' command logs correspond to the implemented code,
    rather than being fabricated, stale, or copied from an unrelated run?
 
 End with exactly one verdict line: APPROVED or REQUEST REWORK, followed by bulleted,
@@ -116,8 +116,8 @@ On top of that, apply the backlog-specific checks the general review does not co
 
 Combine both into a single verdict:
 
-- **APPROVED** — the general review is clean and every task, acceptance criterion, and piece of evidence checks out.
-- **REQUEST REWORK** — any missing task, failed criterion, incorrect logic, standards issue, or fabricated/insufficient evidence. Follow it with bulleted, actionable feedback detailing what needs correction.
+- **APPROVED** - the general review is clean and every task, acceptance criterion, and piece of evidence checks out.
+- **REQUEST REWORK** - any missing task, failed criterion, incorrect logic, standards issue, or fabricated/insufficient evidence. Follow it with bulleted, actionable feedback detailing what needs correction.
 
 ### 3. Parse Verdict & Output (Hub Only)
 
@@ -140,8 +140,8 @@ Combine both into a single verdict:
 
 ## Related Skills
 
-- [code-review](@/skills/review/code-review/_index.md) — the general dual-axis (Spec and Standards) review that this skill delegates to.
-- [tars-backlog-create-issue](@/skills/planning/tars-backlog-create-issue/_index.md) — canonical format and standards for backlog issues.
-- [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md) — implementation phase that dispatches tasks to spokes.
-- [tars-backlog-loop](@/skills/planning/tars-backlog-loop/_index.md) — orchestration of the full backlog pipeline.
+- [code-review](@/skills/review/code-review/_index.md) - the general dual-axis (Spec and Standards) review that this skill delegates to.
+- [tars-backlog-create-issue](@/skills/planning/tars-backlog-create-issue/_index.md) - canonical format and standards for backlog issues.
+- [tars-backlog-implement](@/skills/engineering/tars-backlog-implement/_index.md) - implementation phase that dispatches tasks to spokes.
+- [tars-backlog-loop](@/skills/planning/tars-backlog-loop/_index.md) - orchestration of the full backlog pipeline.
 

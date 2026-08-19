@@ -58,11 +58,11 @@ description: Concisely describes what the skill does and when to use it.
 
 Optional frontmatter fields, when needed:
 
-- `disable-model-invocation` — prevent the model from auto-invoking the skill
-- `argument-hint` — hint shown for expected arguments
-- `context` — additional context to load with the skill
-- `agent` — restrict the skill to a specific agent
-- `metadata` — arbitrary key/value metadata
+- `disable-model-invocation` - prevent the model from auto-invoking the skill
+- `argument-hint` - hint shown for expected arguments
+- `context` - additional context to load with the skill
+- `agent` - restrict the skill to a specific agent
+- `metadata` - arbitrary key/value metadata
 
 Do NOT use the legacy `custom:`, `triggers:`, `category:`, or `type:` fields. Category comes from the folder path, not frontmatter.
 

@@ -39,7 +39,7 @@ Problem / Idea
 
 As terms, boundaries, and concepts are clarified during the interview, record them immediately in `CONTEXT.md`. Do not wait until the end of the session.
 
-- **Check against existing terms:** Call out conflicting or overloaded words ("You said 'account'—do you mean Customer or User?").
+- **Check against existing terms:** Call out conflicting or overloaded words ("You said 'account' - do you mean Customer or User?").
 - **Keep it free of implementation details:** `CONTEXT.md` is a ubiquitous language glossary, not a technical spec.
 - Follow the format defined in [CONTEXT-FORMAT.md](../../engineering/domain-modeling/resources/manual/CONTEXT-FORMAT.md).
 
@@ -47,9 +47,9 @@ As terms, boundaries, and concepts are clarified during the interview, record th
 
 Only create an ADR when a settled decision meets all three criteria:
 
-1. **Hard to reverse** — High cost to change later (e.g. database choice, communication protocol, core boundary).
-2. **Surprising without context** — Future engineers would ask "why did they build it this way?".
-3. **Real trade-off** — Chosen among genuine alternatives with distinct advantages and disadvantages.
+1. **Hard to reverse** - High cost to change later (e.g. database choice, communication protocol, core boundary).
+2. **Surprising without context** - Future engineers would ask "why did they build it this way?".
+3. **Real trade-off** - Chosen among genuine alternatives with distinct advantages and disadvantages.
 
 When all three are met, create `docs/adr/000X-slug.md` using the format in [ADR-FORMAT.md](../../engineering/domain-modeling/resources/manual/ADR-FORMAT.md).
 

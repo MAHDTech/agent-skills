@@ -43,7 +43,7 @@ runs:
           echo "## $TITLE"
           echo ""
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "> **PR #${PR_NUMBER}** — ${PR_TITLE}"
+            echo "> **PR #${PR_NUMBER}** - ${PR_TITLE}"
             echo "> _${PR_HEAD} → ${PR_BASE}_"
             echo ""
           fi

@@ -56,9 +56,9 @@ A list summarizing key decisions from the conversation:
 
 High-level summary of phases or work items:
 
-- 🟢 **Phase 1**: `module.py` — What this phase does. **Priority**: P0
-- 🟡 **Phase 2**: `client/js/` — What this phase does. **Priority**: P1
-- ⚪ **Future**: TBD — Deferred work. **Priority**: P2
+- 🟢 **Phase 1**: `module.py` - What this phase does. **Priority**: P0
+- 🟡 **Phase 2**: `client/js/` - What this phase does. **Priority**: P1
+- ⚪ **Future**: TBD - Deferred work. **Priority**: P2
 
 > 🟢 Ready to start · 🟡 Needs more detail · 🔴 Blocked · ⚪ Deferred
 
@@ -68,17 +68,17 @@ Priority labels: **P0** (do first), **P1** (do next), **P2** (backlog)
 
 Checkboxed list grouped by priority. Each item should be concrete and actionable:
 
-**P0 — Do first:**
+**P0 - Do first:**
 
 - [ ] Action item with `file_path` reference if applicable
 - [ ] Another action item
 
-**P1 — Do next:**
+**P1 - Do next:**
 
 - [ ] Action item
 - [ ] Action item
 
-**P2 — Backlog:**
+**P2 - Backlog:**
 
 - [ ] Action item
 
@@ -95,8 +95,8 @@ _One-line italicized summary of what this phase achieves._
 
 **Steps:**
 
-- [ ] Step 1 — description
-- [ ] Step 2 — description
+- [ ] Step 1 - description
+- [ ] Step 2 - description
 
 **Verify:** How to confirm this phase is done (e.g., `cd server && uv run pytest`)
 
@@ -119,8 +119,8 @@ Only include phases that were actually discussed. Don't invent phases.
 
 Bullet list of links, prior plans, or external resources mentioned:
 
-- `docs/plans/prior_plan.md` — what it covers
-- URL or resource — what it covers
+- `docs/plans/prior_plan.md` - what it covers
+- URL or resource - what it covers
 
 ## Formatting Rules
 
@@ -180,27 +180,27 @@ _tl;dr Replace time-based QC cache with fingerprint-based invalidation to elimin
 
 - 🟢 **Decision**: Use content fingerprint, not timestamps. **Rationale**: Timestamps miss in-place edits to migration JSON.
 - 🟢 **Decision**: Hash migration file + source data. **Rationale**: Captures both data changes and rule changes.
-- 🟡 **Decision**: Consider background pre-warming. **Rationale**: Deferred — evaluate after P0 lands.
+- 🟡 **Decision**: Consider background pre-warming. **Rationale**: Deferred - evaluate after P0 lands.
 - 🔴 **Decision**: Rejected per-field granular caching. **Rationale**: Too complex for current data volume.
 
 > 🟢 Approved · 🟡 Tentative · 🔴 Rejected · ⚪ Deferred
 
 ## Plan Overview
 
-- 🟢 **Phase 1**: `server/core/qc_engine.py` — Fingerprint-based cache invalidation. **Priority**: P0
-- 🟡 **Phase 2**: `server/core/qc_engine.py` — Background refresh on migration save. **Priority**: P1
+- 🟢 **Phase 1**: `server/core/qc_engine.py` - Fingerprint-based cache invalidation. **Priority**: P0
+- 🟡 **Phase 2**: `server/core/qc_engine.py` - Background refresh on migration save. **Priority**: P1
 
 > 🟢 Ready to start · 🟡 Needs more detail · 🔴 Blocked · ⚪ Deferred
 
 ## Action Items
 
-**P0 — Do first:**
+**P0 - Do first:**
 
 - [ ] Add `_compute_fingerprint()` to `server/core/qc_engine.py`
 - [ ] Replace TTL check with fingerprint comparison in `run_qc_analysis()`
 - [ ] Update tests in `server/tests/test_qc_cache.py`
 
-**P1 — Do next:**
+**P1 - Do next:**
 
 - [ ] Add background pre-warm after migration save in `server/core/migration_crud.py`
 
@@ -234,7 +234,7 @@ _Pre-warm QC cache after migration saves so the QC tab loads instantly._
 - [ ] Fire async QC job after successful migration save
 - [ ] Reuse existing `qc-start` job infrastructure
 
-**Verify:** Save a migration, switch to QC tab — results should appear without "Running QC..."
+**Verify:** Save a migration, switch to QC tab - results should appear without "Running QC..."
 
 ## Risks Open Questions
 

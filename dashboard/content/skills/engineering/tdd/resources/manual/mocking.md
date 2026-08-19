@@ -13,7 +13,7 @@ skill_name = "tdd"
 Mock at **system boundaries** only:
 
 - External APIs (payment, email, etc.)
-- Databases (sometimes — prefer a test DB)
+- Databases (sometimes - prefer a test DB)
 - Time/randomness
 - File system (sometimes)
 

@@ -14,7 +14,7 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 
 - Target Folders: `.tars/issues/{todo,done,failed}/` relative to project root.
 - Ticket status updates are written to disk only. Ticket files are never staged, committed, or force-added in git.
-- This skill requires `tars-backlog-prepare` to have run first. Read **only** `.tars/run.env` for run facts (paths, opaque commands, land template, CI flags, weaken banner). Do **not** re-open `.tars/config.yaml` for gate/land/CI — prepare already froze policy into `run.env`. Re-read `run.env` rather than remembering values so a compacted Hub context cannot drift mid-run.
+- This skill requires `tars-backlog-prepare` to have run first. Read **only** `.tars/run.env` for run facts (paths, opaque commands, land template, CI flags, weaken banner). Do **not** re-open `.tars/config.yaml` for gate/land/CI - prepare already froze policy into `run.env`. Re-read `run.env` rather than remembering values so a compacted Hub context cannot drift mid-run.
 - **If `.tars/run.env` does not exist, do not proceed and do not improvise.** Read [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) and execute its steps inline, then continue. See **Invoking Sibling Skills** below for why you cannot simply call it.
 - Runners ship beside this skill (always invoke as `sh <path>`):
 
@@ -26,7 +26,7 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 
 ## Invoking Sibling Skills
 
-These skills are marked **user-invoked** — in Claude Code that is `disable-model-invocation: true`; other runtimes spell it differently. Wherever that marking is honoured, the effect is the same: only the user typing the skill's name can invoke it, and **no skill can invoke another**. So a "call `tars-backlog-<phase>`" instruction will simply be refused.
+These skills are marked **user-invoked** - in Claude Code that is `disable-model-invocation: true`; other runtimes spell it differently. Wherever that marking is honoured, the effect is the same: only the user typing the skill's name can invoke it, and **no skill can invoke another**. So a "call `tars-backlog-<phase>`" instruction will simply be refused.
 
 **When it is refused, read that skill's `SKILL.md` and execute its steps inline.** Each call site gives the path. If your runtime does permit skill-to-skill invocation, calling it directly is equivalent and fine.
 
@@ -53,7 +53,7 @@ Everything below follows from two facts about running several agents against one
 
 ## Heavy commands: mechanical runners, not hand-rolled locks
 
-**Hub full verification** — always:
+**Hub full verification** - always:
 
 ```bash
 # Optional when the hook runner uses a shared cache:
@@ -61,7 +61,7 @@ PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "<spoke-dir-or-repo-root>"
 ```
 
-**Spoke targeted tests** — always:
+**Spoke targeted tests** - always:
 
 ```bash
 PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
@@ -80,7 +80,7 @@ Test runners spawn worker processes, and a worker that outlives its parent is **
 
 1. **`tars-lock` (inside the runners) contains and reaps** process groups on exit.
 2. **Spokes must not background heavy commands.** Run them in the foreground and let them exit.
-3. **The Hub sweeps between batches** (prose + examples — no separate helper this version). Before starting a new batch, look for processes matching heavy substrings that belong to no live spoke, and stop them (`SIGTERM`, then `SIGKILL` if needed).
+3. **The Hub sweeps between batches** (prose + examples - no separate helper this version). Before starting a new batch, look for processes matching heavy substrings that belong to no live spoke, and stop them (`SIGTERM`, then `SIGKILL` if needed).
 
 Example sweep shape (adapt patterns to the repo; never kill the hub or unrelated user jobs):
 
@@ -95,18 +95,18 @@ pgrep -af 'bun test|pytest|cargo test|prek run' || true
 
 ## The Verification Gate
 
-The Hub runs the gate twice — once per spoke inside its clone, once on the topic branch after the batch — **only** via `tars-gate` and the commands prepare recorded. Do not re-derive or shorten those commands.
+The Hub runs the gate twice - once per spoke inside its clone, once on the topic branch after the batch - **only** via `tars-gate` and the commands prepare recorded. Do not re-derive or shorten those commands.
 
 ```bash
 PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "<spoke-dir>"
 ```
 
-**Gate always installs first** (when `TARS_INSTALL_COMMAND` is not `:`) so lockfile moves cannot leave stale dependency trees — see _Installed dependencies go stale_ below.
+**Gate always installs first** (when `TARS_INSTALL_COMMAND` is not `:`) so lockfile moves cannot leave stale dependency trees - see _Installed dependencies go stale_ below.
 
 **Weakened gates:** if `TARS_GATE_WEAKENED=1`, every green result is "gate command green (weakened: …)", never "full suite green". Surface `TARS_GATE_WEAKENED_REASON` in batch and final reports.
 
-**Devenv:** if the project has `devenv.nix` / `devenv.yaml`, prepare already followed the [devenv](../../tooling/devenv/SKILL.md) skill when freezing commands. Implement does not restate secrets or CI env vars — it only runs `tars-gate` / `tars-spoke`.
+**Devenv:** if the project has `devenv.nix` / `devenv.yaml`, prepare already followed the [devenv](../../tooling/devenv/SKILL.md) skill when freezing commands. Implement does not restate secrets or CI env vars - it only runs `tars-gate` / `tars-spoke`.
 
 ### Dirty gate (hook autofix)
 
@@ -155,12 +155,12 @@ Semantic merges of the same function are easy to get wrong; the full gate is a l
 2. Analyze `files:`, optional `owns:`, `dependencies:`, and soft-ownership signals in the ticket body.
 3. Dynamically group tickets into batches of at most 5. A batch is admissible only if **all** rules hold:
    - **File rule**: no two tickets modify overlapping paths in `files:`.
-   - **Owns rule**: no two tickets share an overlapping `owns:` entry (string equality on `path` or `path#symbol`). Treat overlap like a file collision — serialise.
+   - **Owns rule**: no two tickets share an overlapping `owns:` entry (string equality on `path` or `path#symbol`). Treat overlap like a file collision - serialise.
    - **Dependency rule**: no ticket names, in `dependencies`, another ticket that is in the same batch or still unmerged (`todo/` or `failed/`).
 
-   **A ticket with no `files:` list fails the File rule — it does not pass it.** When `files:` is missing or empty, either derive it first or schedule that ticket **alone**.
+   **A ticket with no `files:` list fails the File rule - it does not pass it.** When `files:` is missing or empty, either derive it first or schedule that ticket **alone**.
 
-   **Soft dependencies:** if two tickets clearly add or own the same export/shared constant (from body, `owns:`, or triage notes) but lack a hard `dependencies:` edge, **do not batch them together** — land the natural owner first (or the lower id if unclear), then the other. Prefer adding an explicit `dependencies:` entry when editing frontmatter.
+   **Soft dependencies:** if two tickets clearly add or own the same export/shared constant (from body, `owns:`, or triage notes) but lack a hard `dependencies:` edge, **do not batch them together** - land the natural owner first (or the lower id if unclear), then the other. Prefer adding an explicit `dependencies:` entry when editing frontmatter.
 
    > `component:` is not a substitute for `files:` or `owns:`. Use it to suspect collisions, never to clear them.
 
@@ -206,7 +206,7 @@ Branch inside the clone:
 - **New ticket**: `git checkout -b subagent-<TICKET_ID>`
 - **Rework ticket** (`branch:` set): checkout that branch, then sync topic (see ref hygiene below).
 
-A fresh clone has no hooks installed. Spoke commits are unhooked by design — never `--no-verify`, never install hooks.
+A fresh clone has no hooks installed. Spoke commits are unhooked by design - never `--no-verify`, never install hooks.
 
 #### 2a-i. Spokes run git through `tars-git`
 
@@ -223,11 +223,11 @@ signing prompt (e.g. 1Password `op-ssh-sign`) needs a human click and will hang 
 spoke while it holds the heavy-command mutex.
 
 This is structural, not advisory, and it exists because advice failed. On 2026-08-11 three
-spokes created branches — and one committed — in the developer's live repository. Each time a
+spokes created branches - and one committed - in the developer's live repository. Each time a
 `cd "$SPOKE_DIR"` had failed while `set -e` was suppressed by a pipeline or a redirect, so the
 next bare `git` ran against whatever tree the shell was already in. The spoke brief was
 tightened twice, including an explicit "never run git against the main repo" rule, and it
-happened again — because the fault is a script falling through, not an agent disobeying.
+happened again - because the fault is a script falling through, not an agent disobeying.
 
 The Hub does **not** use `tars-git`; it legitimately fetches, merges and commits in the repo
 root. `tars-gate` and `tars-spoke` carry the weaker form of the same check: they refuse any
@@ -274,7 +274,7 @@ PRE_COMMIT_HOME="$TARS_PRE_COMMIT_HOME"
 Spawn each spoke with:
 
 - **Role**: `Implement-<TICKET_ID>`
-- **Prompt** (default — do **not** paste the full ticket body):
+- **Prompt** (default - do **not** paste the full ticket body):
 
   ```text
   You implement one backlog ticket in an isolated clone.
@@ -288,7 +288,7 @@ Spawn each spoke with:
   2. Bootstrap with TARS_INSTALL_COMMAND from run.env before verifying.
   3. Cheap checks only on YOUR changed files (typecheck/format/lint/hooks scoped to those paths). Never whole-repo hooks.
   4. Heavy tests ONLY via: sh "<TARS_SPOKE>" -- <targeted test command>
-     Never bare test runners. Never full-suite / whole-repo prek — Hub runs tars-gate.
+     Never bare test runners. Never full-suite / whole-repo prek - Hub runs tars-gate.
   5. Never install git hooks. Never merge into topic/default. You may `git merge` topic INTO your branch to sync.
   6. Conventional commits; never --no-verify; never stage anything under .tars/.
   7. Update Tasks/AC checkboxes and ## Evidence on the ticket file.
@@ -300,7 +300,7 @@ Spawn each spoke with:
 
   ```text
   Checkpoint: commit incremental work on your branch. If stuck after repeated failed approaches,
-  stop, leave commits + Evidence notes, and report BLOCKED with what you tried — do not burn a
+  stop, leave commits + Evidence notes, and report BLOCKED with what you tried - do not burn a
   long unproductive loop. Hub may resume or rework.
   ```
 
@@ -308,7 +308,7 @@ Spawn each spoke with:
 
 Do **NOT** wait passively for the whole batch.
 
-- Periodically check spoke liveness via the runtime's subagent status — never infer completion from log keywords (`error`/`fail`/`done` appear in passing suites).
+- Periodically check spoke liveness via the runtime's subagent status - never infer completion from log keywords (`error`/`fail`/`done` appear in passing suites).
 - Approval-blocked spokes: warn the user explicitly.
 - A spoke waiting on the mutex is not stuck.
 - Prefer `SIGTERM` over `SIGKILL` when stopping a spoke.
@@ -338,7 +338,7 @@ For each completed spoke:
    git -C "$SPOKE_DIR" fetch origin "+refs/heads/<topic>:refs/remotes/origin/<topic>"
    ```
 
-   If still failing, surface to the user — do not mass-edit packed-refs.
+   If still failing, surface to the user - do not mass-edit packed-refs.
 
    After sync, re-run install (or rely on the upcoming gate's install step). Spoke resolves its own conflicts when possible. After any **non-append** conflict resolve → **post-conflict smoke**, then gate.
 
@@ -368,7 +368,7 @@ For each completed spoke:
 7. **Verdict**:
    - **Approved**:
      - Merge **sequentially** into the topic branch (never parallel merges).
-     - Land commit subject from `TARS_LAND_SUBJECT_TEMPLATE` with `{{id}}` / `{{title}}` filled — e.g. `chore(backlog): land ticket 551`. **Never** use a subject that starts with `merge(` or default `Merge branch 'subagent-…'` if the repo rejects it; set `merge.ff` / message explicitly:
+     - Land commit subject from `TARS_LAND_SUBJECT_TEMPLATE` with `{{id}}` / `{{title}}` filled - e.g. `chore(backlog): land ticket 551`. **Never** use a subject that starts with `merge(` or default `Merge branch 'subagent-…'` if the repo rejects it; set `merge.ff` / message explicitly:
 
        ```bash
        git merge --no-ff -m "<filled land template>" "subagent-<TICKET_ID>"
@@ -419,7 +419,7 @@ Never claim "full suite green" when `TARS_GATE_WEAKENED=1`.
 
 ## Related Skills
 
-- [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) — integrity, spoke root, command freeze, baseline smoke, `run.env`.
-- [tars-backlog-review](../../review/tars-backlog-review/SKILL.md) — full dual-axis review when risk-tiered rules require it.
-- [tars-backlog-create-issue](../../planning/tars-backlog-create-issue/SKILL.md) — ticket format including `files:` / `owns:`.
-- [devenv](../../tooling/devenv/SKILL.md) — only if you must understand how prepare built commands; implement does not re-enter devenv by hand when `run.env` is present.
+- [tars-backlog-prepare](../../planning/tars-backlog-prepare/SKILL.md) - integrity, spoke root, command freeze, baseline smoke, `run.env`.
+- [tars-backlog-review](../../review/tars-backlog-review/SKILL.md) - full dual-axis review when risk-tiered rules require it.
+- [tars-backlog-create-issue](../../planning/tars-backlog-create-issue/SKILL.md) - ticket format including `files:` / `owns:`.
+- [devenv](../../tooling/devenv/SKILL.md) - only if you must understand how prepare built commands; implement does not re-enter devenv by hand when `run.env` is present.

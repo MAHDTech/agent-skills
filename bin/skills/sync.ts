@@ -159,7 +159,7 @@ export async function sync(options?: {category?: string; skill?: string}) {
         return true
     }
 
-    // 1. agents/AGENTS.md — regenerate the skill index, preserve frontmatter.
+    // 1. agents/AGENTS.md - regenerate the skill index, preserve frontmatter.
     if (!hasFilter && (await fs.pathExists(AGENTS_FILE))) {
         const agentsContent = (await fs.readFile(AGENTS_FILE, "utf-8")).replace(
             /\r\n/g,
@@ -179,7 +179,7 @@ export async function sync(options?: {category?: string; skill?: string}) {
         logTask("Updated agents/AGENTS.md index.")
     }
 
-    // 2. README.md — badge, install, and a categorised catalog.
+    // 2. README.md - badge, install, and a categorised catalog.
     if (!hasFilter) {
         const docsList = (await fs.pathExists(DOCS_DIR))
             ? (await glob("*.md", {cwd: DOCS_DIR})).sort()
@@ -195,7 +195,7 @@ export async function sync(options?: {category?: string; skill?: string}) {
                 const skillsList = list
                     .map((s) => {
                         const desc = (s.metadata.description || "").trim()
-                        return `- **[${s.dirName}](${s.path})** — ${desc}`
+                        return `- **[${s.dirName}](${s.path})** - ${desc}`
                     })
                     .join("\n")
                 return `### ${title}\n\n${description}\n\n${skillsList}`
@@ -231,7 +231,7 @@ ${catalogContent}
         logTask("Updated README.md catalog.")
     }
 
-    // 3. skills.sh.json — display groupings for the skills.sh repo page.
+    // 3. skills.sh.json - display groupings for the skills.sh repo page.
     if (!hasFilter) {
         const skillsSh = {
             $schema: "https://skills.sh/schemas/skills.sh.schema.json",
@@ -246,7 +246,7 @@ ${catalogContent}
         logTask("Updated skills.sh.json groupings.")
     }
 
-    // 4. Zola dashboard content — mirror the category tree so the theme groups
+    // 4. Zola dashboard content - mirror the category tree so the theme groups
     //    skills into collapsible sections automatically. Skipped when
     //    SKILLS_SKIP_DASHBOARD is set: dashboard content is owned by the
     //    dashboard build/lint, not the skills-sync hook.

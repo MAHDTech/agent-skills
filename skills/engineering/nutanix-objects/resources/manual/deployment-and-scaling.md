@@ -335,7 +335,7 @@ on a role in the Prism Central user interface for the non-admin user. The specif
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -473,7 +473,7 @@ You can delete both successful and failed object store deployments. However, for
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -645,7 +645,7 @@ policy on a role in Prism Central for the non-admin user. The specific role must
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide.
 
@@ -700,7 +700,7 @@ You can add multiple fully qualified domain names (FQDNs), download the Certific
 
 ### Note: Administrators and non-admin users are Prism Central users with the following roles:
 
-- Administrator—A Super Admin or a Prism Admin in Prism Central.• Non-admin user—A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
+- Administrator - A Super Admin or a Prism Admin in Prism Central.• Non-admin user - A Prism Central user without any administrator privileges.For more information on the built-in roles in Prism Central, see
 
 Built-in Role Management in the Security Guide. Objects | Nutanix Objects Deployment |
 

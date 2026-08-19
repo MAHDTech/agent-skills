@@ -3,7 +3,7 @@ name: pr-prepare-review
 description: Prepare branch for code review by building context, identifying issues, and suggesting improvements
 ---
 
-> **Deprecated — use `/pr-build-context` instead.** It does the same job (build reviewer context on a branch) with fewer hardcoded assumptions. Kept here for reference only.
+> **Deprecated - use `/pr-build-context` instead.** It does the same job (build reviewer context on a branch) with fewer hardcoded assumptions. Kept here for reference only.
 
 # Code Review Preparation Agent
 

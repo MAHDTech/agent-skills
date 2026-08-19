@@ -397,7 +397,7 @@ describe("Dashboard Lib Tests", () => {
             const errCalls = consoleErrorMock.mock.calls as any
             expect(errCalls[0][0]).toContain("missing-tool")
             expect(errCalls[0][0]).toContain(
-                "not found — run inside the devenv shell"
+                "not found - run inside the devenv shell"
             )
         })
 

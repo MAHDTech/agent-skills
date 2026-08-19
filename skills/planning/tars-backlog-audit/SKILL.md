@@ -18,7 +18,7 @@ This skill operates in a Hub-and-Spoke topology using sub-agents to analyze code
 
 ## Topic Branch Workflow (Hub Only)
 
-All backlog operations must run from a topic branch, never the default branch. Audit subagents are read-only and take no branch of their own — they read the topic branch's working tree as the Hub has it checked out. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../tars-backlog-prepare/SKILL.md) for the full policy and commands.
+All backlog operations must run from a topic branch, never the default branch. Audit subagents are read-only and take no branch of their own - they read the topic branch's working tree as the Hub has it checked out. See the canonical **Topic Branch Verification** section in [tars-backlog-prepare](../tars-backlog-prepare/SKILL.md) for the full policy and commands.
 
 ## Audit Workflow
 
@@ -28,11 +28,11 @@ Analyze the project's directory structure (by listing directories or inspecting 
 
 ### 2. Spawn Spokes
 
-Spawn read-only research subagents (up to a maximum of 5 in parallel) to audit each identified module. They read the **parent working tree directly** — no clone, no worktree, no workspace setup or teardown.
+Spawn read-only research subagents (up to a maximum of 5 in parallel) to audit each identified module. They read the **parent working tree directly** - no clone, no worktree, no workspace setup or teardown.
 
 Audit agents analyse and report back by message; they never commit. An isolated workspace would buy nothing and cost real setup on every batch, while giving each agent its own view of a repository that nobody is modifying. Reading the parent in place also means gitignored files such as `.tars/` are simply present, with no transfer step.
 
-The safety this gives up is enforced by checking rather than by construction — see the cleanliness assertion in step 3.
+The safety this gives up is enforced by checking rather than by construction - see the cleanliness assertion in step 3.
 
 Equip each subagent with:
 
@@ -48,7 +48,7 @@ Equip each subagent with:
   3. Automated Testing: Test coverage gaps, missing integration suites, and fragile mock patterns.
   4. Features & Enhancements: Programmatic tools or utility endpoints that would improve user/agent experience.
 
-  STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository — in particular never run a formatter, a hook runner, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
+  STRICT READ-ONLY CONSTRAINT: You are reading the user's live working tree, which is shared with other agents. You must NEVER modify, create, or delete any file, and never run a command that writes to the repository - in particular never run a formatter, a hook runner, or any test that generates artefacts. Never check out, commit to, or merge any branch. Read and report only.
 
   Verification & Output Format:
   - If the module is clean, stable, and conforms fully to the above criteria, reply with exactly:
@@ -85,7 +85,7 @@ Once the subagents report back, collect all findings:
 5. **Generate Tickets**: For each verified finding, write a new ticket file to `.tars/issues/todo/` following the guidelines and structure defined in the [tars-backlog-create-issue](../tars-backlog-create-issue/SKILL.md) skill.
    - **Filename**: `XXX.md` (3-digit ID, padded with leading zeros, e.g., `043.md`)
 6. **No Findings Output**: If no findings were reported or all were discarded during verification, output a clear status message to the user: "Audit complete. The codebase is clean, stable, and conforms to all standards. No new issues were logged."
-7. **CRITICAL CLEANLINESS ASSERTION**: Audit agents read the parent working tree in place, so the Hub must confirm they left it untouched — run this after every batch, whether the agents succeeded, failed, or timed out:
+7. **CRITICAL CLEANLINESS ASSERTION**: Audit agents read the parent working tree in place, so the Hub must confirm they left it untouched - run this after every batch, whether the agents succeeded, failed, or timed out:
 
    ```bash
    git status --porcelain

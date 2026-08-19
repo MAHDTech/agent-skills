@@ -1,6 +1,6 @@
 +++
 title = "agent-guidelines"
-description = "Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use before and while implementing to avoid common LLM coding pitfalls — over-engineering, unrequested refactors, silent assumptions, and unverified changes."
+description = "Behavioural guidelines for AI agents to reduce common LLM coding mistakes. Use before and while implementing to avoid common LLM coding pitfalls - over-engineering, unrequested refactors, silent assumptions, and unverified changes."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -76,4 +76,12 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## 5. Style and Punctuation: No Em-Dashes
+
+**Never use em-dashes (Unicode U+2014).**
+
+- Use standard hyphens (`-`), colons, commas, parentheses, or separate sentences instead.
+- Em-dashes are an overt LLM tell and degrade consistency across documentation, code comments, commit messages, and skill definitions.
+- Always use standard ASCII punctuation.
 

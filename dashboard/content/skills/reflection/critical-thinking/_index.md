@@ -1,6 +1,6 @@
 +++
 title = "critical-thinking"
-description = "Analyze your own immediately preceding response with rigorous, skeptical critical thinking — surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it."
+description = "Analyze your own immediately preceding response with rigorous, skeptical critical thinking - surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it."
 sort_by = "title"
 template = "skill.html"
 [extra]

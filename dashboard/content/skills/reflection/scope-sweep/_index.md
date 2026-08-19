@@ -1,6 +1,6 @@
 +++
 title = "scope-sweep"
-description = "Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done — to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed."
+description = "Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done - to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -14,7 +14,7 @@ mermaid = false
 
 Now that we've completed the core work and reviewed it, do a final pass to identify anything we missed or should address before considering this scope "done".
 
-This is the **breadth pass** — it makes sure nothing was dropped. For a deep dive on a single axis, reach for the focused skill instead: `/pr-edge-cases` for logic and failure-mode analysis of a diff, `/self-review` for simplification and idiomatic cleanup, `/critical-thinking` to stress-test your own reasoning.
+This is the **breadth pass** - it makes sure nothing was dropped. For a deep dive on a single axis, reach for the focused skill instead: `/pr-edge-cases` for logic and failure-mode analysis of a diff, `/self-review` for simplification and idiomatic cleanup, `/critical-thinking` to stress-test your own reasoning.
 
 _Note: Prefer your agent's built-in file-search and file-reading tools (instead of ad-hoc bash `find`/`grep`) to quickly sweep the codebase for incomplete items, FIXME comments, or test gaps._
 

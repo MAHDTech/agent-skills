@@ -1,6 +1,6 @@
 +++
 title = "opencode-acp"
-description = "Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates. Use when driving OpenCode headless or programmatically over ACP — starting a session, sending prompts, resuming a prior session, or checking and triggering OpenCode updates."
+description = "Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates. Use when driving OpenCode headless or programmatically over ACP - starting a session, sending prompts, resuming a prior session, or checking and triggering OpenCode updates."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -14,7 +14,7 @@ mermaid = false
 
 Control OpenCode directly via the Agent Client Protocol (ACP).
 
-**See also:** `/opencode` — for driving the OpenCode CLI interactively (commands, agents, tools, MCP, config) rather than over ACP.
+**See also:** `/opencode` - for driving the OpenCode CLI interactively (commands, agents, tools, MCP, config) rather than over ACP.
 
 ## Metadata
 
@@ -369,7 +369,7 @@ function updateOpenCode():
 
 ### Important Notes
 
-- **Sessions persist**: `opencodeSessionId` survives restarts — use `session/load` to recover
+- **Sessions persist**: `opencodeSessionId` survives restarts - use `session/load` to recover
 - **Auto-update**: OpenCode downloads new binary automatically on restart
 - **No data loss**: Conversation history is preserved server-side
 

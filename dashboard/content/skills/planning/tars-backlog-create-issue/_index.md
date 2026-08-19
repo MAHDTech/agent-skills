@@ -47,7 +47,7 @@ owns: [] # optional; path or path#symbol this ticket uniquely owns
 ---
 
 > [!IMPORTANT]
-> **`files:` is mandatory and must not be empty.** It is an input to the File rule that decides which tickets may be implemented in parallel — see [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md). A ticket without it cannot be batched with anything and must run alone, so an omitted list silently serialises the backlog at best, and at worst gets treated as "no conflicts" and batched into a collision.
+> **`files:` is mandatory and must not be empty.** It is an input to the File rule that decides which tickets may be implemented in parallel - see [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md). A ticket without it cannot be batched with anything and must run alone, so an omitted list silently serialises the backlog at best, and at worst gets treated as "no conflicts" and batched into a collision.
 >
 > List every file the work will touch, including ones changed only incidentally: test files, fixtures, barrel/index re-exports, lockfiles, and shared append-only files such as a spellcheck dictionary. Under-declaring is the failure that matters; over-declaring only costs a little parallelism.
 >
@@ -55,9 +55,9 @@ owns: [] # optional; path or path#symbol this ticket uniquely owns
 >
 > **Soft dependencies:** if ticket B needs an export or behaviour ticket A will introduce, put A in B's `dependencies:` even when the files do not overlap. "Must already be merged" is not the same as "must not collide on disk."
 >
-> **`risk: high`** (security, hooks, auth, shared core) and **`complexity: high`** (large multi-file work) steer review depth and spoke checkpointing during implement — set them honestly.
+> **`risk: high`** (security, hooks, auth, shared core) and **`complexity: high`** (large multi-file work) steer review depth and spoke checkpointing during implement - set them honestly.
 
-# XXX — Issue Name
+# XXX - Issue Name
 
 ## Description
 
