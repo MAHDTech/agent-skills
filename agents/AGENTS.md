@@ -75,6 +75,7 @@ description: Single source of truth for agent instructions
 - **critical-thinking**: Analyze your own immediately preceding response with rigorous, skeptical critical thinking - surfacing flaws, hidden assumptions, logical gaps, and overlooked risks. Use when you want your last answer stress-tested for weaknesses before the user acts on it.
 - **scope-sweep**: Final pass to identify missed items, edge cases, and risks before considering a scope done. Use as a final breadth pass before calling a scope or task done - to catch missed items, overlooked requirements, edge cases, and risks after the core work is complete and reviewed.
 - **self-review**: Self-review after implementation - surface missed work, simplification opportunities, and idiomatic improvements
+- **total-recall**: Record a human-reviewable decision trail for long-running, autonomous, or high-risk tasks. Writes an append-only TSV decision log (ts, phase, decision, why, evidence, result) and audits it against runtime transcripts. Use when running multi-phase migrations, autonomous loops, risky refactors, or when requested via /total-recall.
 - **wtf**: Re-pitch your own last message in plain language when it did not land. Use when the user reacts to your previous response with confusion - "wtf", "what?", "huh", "in English?", "that made no sense", "I don't understand", "say that again properly". Not for "wtf is this error/output/regex", where the confusion is about a thing rather than about your message - that is debugging.
 
 ## Writing
