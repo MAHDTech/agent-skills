@@ -58,7 +58,7 @@ from xai_sdk.tools import code_execution
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[code_execution()],
     include=["verbose_streaming"],
 )
@@ -99,7 +99,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -126,7 +126,7 @@ headers = {
     "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}"
 }
 payload = {
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "user",
@@ -148,7 +148,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -168,7 +168,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'Calculate the compound interest for $10,000 at 5% annually for 10 years',
   tools: {
     code_execution: xai.tools.codeExecution(),
@@ -190,7 +190,7 @@ client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 # Multi-turn conversation with data analysis
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[code_execution()],
     include=["verbose_streaming"],
 )
@@ -260,7 +260,7 @@ import { generateText } from 'ai';
 
 // Step 1: Load and analyze data
 const step1 = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: \`I have sales data for Q1-Q4: [120000, 135000, 98000, 156000].
 Please analyze this data and create a visualization showing:
 1. Quarterly trends
@@ -276,7 +276,7 @@ console.log(step1.text);
 
 // Step 2: Follow-up analysis using previousResponseId
 const step2 = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'Now predict Q1 next year using linear regression',
   tools: {
     code_execution: xai.tools.codeExecution(),
@@ -322,7 +322,7 @@ Data: [['2024-01', 50000, 35000], ['2024-02', 55000, 38000], ...]
 ### 3. **Use Appropriate Model Settings**
 
 * **Temperature**: Use lower values (0.0-0.3) for mathematical calculations
-* **Model**: Use reasoning models like `grok-4.5` for better code generation
+* **Model**: Use reasoning models like `grok-4.6` for better code generation
 
 ## Common Use Cases
 

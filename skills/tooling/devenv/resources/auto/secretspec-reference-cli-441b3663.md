@@ -11,6 +11,10 @@ These options are available on every command:
 |----|----|
 | `-f, --file <FILE>` | Path to `secretspec.toml` (default: auto-detect). Env: `SECRETSPEC_FILE` |
 | `--reason <REASON>` | Reason for accessing secrets, recorded by providers that support audit logging (e.g. Proton Pass agent sessions). Takes precedence over `PROTON_PASS_AGENT_REASON`. Env: `SECRETSPEC_REASON` |
+| `--caller <NAME>` | Software integration invoking SecretSpec; recorded separately from the user reason (0.20+) |
+| `--caller-version <VERSION>` | Version of `--caller`; requires `--caller` (0.20+) |
+| `--caller-operation <OPERATION>` | Integration operation; requires `--caller` (0.20+) |
+| `--caller-resource <RESOURCE>` | Non-secret resource being accessed; requires `--caller` (0.20+) |
 
 ```
 $ secretspec run --reason "Deploying web frontend" -- ./deploy.sh
@@ -18,27 +22,56 @@ $ secretspec run --reason "Deploying web frontend" -- ./deploy.sh
 
 Terminal window
 
+SecretSpec 0.20+ lets a Git integration identify itself without
+replacing the user-supplied reason:
+
+```
+$ secretspec get GITHUB_TOKEN \    --caller git \    --caller-version 2.51.0 \    --caller-operation credential_get \    --caller-resource github.com \    --reason "push the release tag"
+```
+
+Terminal window
+
+Caller context is caller-asserted audit metadata, not an authenticated
+identity, and never satisfies `require_reason`. Do not put credentials
+or secret values in these fields.
+
 ## Commands
 
 ### init
 
-Initialize a new `secretspec.toml` configuration file from an existing
-.env file.
+Initialize a new `secretspec.toml` from declarations discovered in a
+provider. Dotenv files are supported in every current release.
+SecretSpec 0.18+ accepts any provider that implements reflection,
+including age files, AWS Parameter Store, and Bitwarden Password Manager
+vaults.
 
 ```
-secretspec init [OPTIONS]
+$ secretspec init [--from <PROVIDER>] [--project <PROJECT>] [--profile <PROFILE>]
 ```
 
 Terminal window
 
 **Options:**
 
-- `--from <PATH>` - Path to .env file to import from (default: `.env`)
+- `--from <PROVIDER>` - Provider URI to discover (default:
+  `dotenv://.env`); use a `dotenv://` URI for dotenv files
+- `--project <PROJECT>` - Project used to render the provider namespace
+  (SecretSpec 0.18+; default: current directory name)
+- `-P, --profile <PROFILE>` - Profile used to render the provider
+  namespace and written to the manifest (SecretSpec 0.18+; default:
+  `default`)
 
-**Example:**
+Reflection creates declarations only: values are never written to the
+manifest. Configure the discovered provider as the profile’s source to
+keep using it, or run `secretspec import` afterward to copy the declared
+values to a different destination.
+
+**Examples:**
 
 ```
-$ secretspec init --from .env.example✓ Created secretspec.toml with 5 secrets
+$ secretspec init --from dotenv://.env.example✓ Created secretspec.toml with 5 secrets
+# SecretSpec 0.18+: discover one rendered Parameter Store hierarchy$ secretspec init \    --from 'awsps://us-east-1?template=/{profile}/{project}/{key}' \    --project payments \    --profile production✓ Created secretspec.toml with 12 secrets
+# SecretSpec 0.18+: discover items in one Bitwarden collection$ secretspec init --from 'bw://dev-secrets?type=login'✓ Created secretspec.toml with 8 secrets
 ```
 
 Terminal window
@@ -50,7 +83,7 @@ available in SecretSpec 0.17+; without options, the command prompts for
 the provider and profile.
 
 ```
-secretspec config global init [--provider <PROVIDER>] [--profile <PROFILE>] # 0.17+
+$ secretspec config global init [--provider <PROVIDER>] [--profile <PROFILE>] # 0.17+
 ```
 
 Terminal window
@@ -85,7 +118,7 @@ available in SecretSpec 0.17+; `secretspec config show` remains a hidden
 alias.
 
 ```
-secretspec config global show # 0.17+
+$ secretspec config global show # 0.17+
 ```
 
 Terminal window
@@ -108,7 +141,7 @@ To share aliases with your team, declare them in a top-level
 over user-level aliases on name conflict.
 
 ```
-secretspec config global provider add <ALIAS> <URI> [--credential NAME=PROVIDER]... # 0.17+
+$ secretspec config global provider add <ALIAS> <URI> [--credential NAME=PROVIDER]... # 0.17+
 ```
 
 Terminal window
@@ -121,8 +154,8 @@ Terminal window
 **Options:**
 
 - `--credential <NAME=PROVIDER>` - Declare a [provider
-  credential](https://secretspec.dev/concepts/providers/#provider-credentials) and its source.
-  `NAME` is semantic and provider-specific, such as `access_token` or
+  credential](https://secretspec.dev/reference/provider-credentials/) and its source. `NAME`
+  is semantic and provider-specific, such as `access_token` or
   `role_id`. Repeatable. Only the bare-string source form is expressible
   on the command line; add a `ref` by editing the config.
 
@@ -141,7 +174,7 @@ List all configured user-level provider aliases. Project-level aliases
 declared in `secretspec.toml` are not shown by this command.
 
 ```
-secretspec config global provider list # 0.17+
+$ secretspec config global provider list # 0.17+
 ```
 
 Terminal window
@@ -161,7 +194,7 @@ project-level alias, edit the `[providers]` table in `secretspec.toml`
 directly.
 
 ```
-secretspec config global provider remove <ALIAS> # 0.17+
+$ secretspec config global provider remove <ALIAS> # 0.17+
 ```
 
 Terminal window
@@ -180,13 +213,13 @@ Terminal window
 
 ### config provider login
 
-Store the [credentials](https://secretspec.dev/concepts/providers/#provider-credentials) a
-provider alias declares. Prompts (hidden input) for each credential and
-writes it to its source provider at the exact location resolution reads
-it back from. Runs in a project, like `set` and `check`.
+Store the [credentials](https://secretspec.dev/reference/provider-credentials/) a provider
+alias declares. Prompts (hidden input) for each credential and writes it
+to its source provider at the exact location resolution reads it back
+from. Runs in a project, like `set` and `check`.
 
 ```
-secretspec config provider login <ALIAS>
+$ secretspec config provider login <ALIAS>
 ```
 
 Terminal window
@@ -213,7 +246,7 @@ Check if all required secrets are available, with interactive prompting
 for missing secrets.
 
 ```
-secretspec check [OPTIONS]
+$ secretspec check [OPTIONS]
 ```
 
 Terminal window
@@ -234,7 +267,7 @@ Terminal window
 **Example:**
 
 ```
-$ secretspec check --profile production✓ DATABASE_URL - Database connection string✗ API_KEY - API key for external service (required)Enter value for API_KEY (profile: production): ****✓ Secret 'API_KEY' saved to keyring (profile: production)
+$ secretspec check --profile production✓ DATABASE_URL - Database connection string✗ API_KEY - API key for external service (required)# SecretSpec 0.19+: the exact write destination is shown before prompting.Writing secret 'API_KEY' to keyring (profile: production)  target: item=secretspec/my-app/production/API_KEY[1/1] Enter value for API_KEY: ****✓ Secret 'API_KEY' saved to keyring (profile: production)
 ```
 
 Terminal window
@@ -273,7 +306,7 @@ Terminal window
 Get a secret value.
 
 ```
-secretspec get [OPTIONS] <NAME>
+$ secretspec get [OPTIONS] <NAME>
 ```
 
 Terminal window
@@ -302,7 +335,7 @@ that profile’s exact fields. Value-free: reads only the manifest, never
 a provider.
 
 ```
-secretspec schema [OPTIONS]
+$ secretspec schema [OPTIONS]
 ```
 
 Terminal window
@@ -335,12 +368,47 @@ The same pattern works in every SDK: Go
 `Convert.toSecretSpec(resolved.fieldsJson())`, Ruby
 `SecretSpec.from_dynamic!(resolved.fields)`.
 
+### add (0.18+)
+
+Add a secret declaration to an existing `secretspec.toml`. This edits
+only the selected profile and preserves the manifest’s comments,
+formatting, and unrelated tables. The new declaration follows the
+profile’s defaults; without a `required` profile default, it is required
+like any other declaration.
+
+```
+$ secretspec add <NAME> [--description <DESCRIPTION>] [--profile <PROFILE>] # 0.18+
+```
+
+Terminal window
+
+**Arguments and options:**
+
+- `<NAME>` - Secret name. It must be a valid identifier: letters,
+  numbers, and underscores, without a leading number.
+- `-d, --description <DESCRIPTION>` - Human-readable description. When
+  omitted, SecretSpec prompts for it.
+- `-P, --profile <PROFILE>` - Profile to edit. When omitted, SecretSpec
+  uses the normal active-profile resolution, including
+  `SECRETSPEC_PROFILE` and the user-global default.
+
+```
+$ secretspec add API_KEY --description "API access token" # 0.18+✓ Added secret 'API_KEY' to profile 'development' in secretspec.tomlSet its value with: secretspec set API_KEY --profile development
+```
+
+Terminal window
+
+`add` changes only the declaration; it never asks for or stores the
+secret value. Use `secretspec set` afterward to store the value. It
+rejects names that are already available in the selected profile,
+including declarations inherited from `default` or an extended manifest.
+
 ### set
 
 Set a secret value.
 
 ```
-secretspec set [OPTIONS] <NAME> [VALUE]
+$ secretspec set [OPTIONS] <NAME> [VALUE]
 ```
 
 Terminal window
@@ -353,20 +421,70 @@ Terminal window
 **Example:**
 
 ```
-$ secretspec set API_KEY sk-1234567890✓ Secret 'API_KEY' saved to keyring (profile: development)
+$ secretspec set API_KEY sk-1234567890 --profile production --provider sops://secrets.enc.yaml# SecretSpec 0.19+:Writing secret 'API_KEY' to sops://secrets.enc.yaml?format=yaml (profile: production)  target: /work/my-app/secrets.enc.yaml ["my-app"]["production"]["API_KEY"]✓ Secret 'API_KEY' saved to sops (profile: production)
 ```
 
 Terminal window
 
+In SecretSpec 0.19+, `set` shows the resolved provider, profile, and
+native write target before reading a piped value or opening the password
+prompt. For SOPS this includes the exact encrypted file and `sops set`
+selector, making a missing `--profile` visible before the write.
+
 `set` rejects composed secrets because their values are derived and
 read-only. Available since SecretSpec 0.16.
+
+### delete (0.18+)
+
+Delete stored provider values without changing their declarations in
+`secretspec.toml`.
+
+```
+$ secretspec delete <NAME>... [--provider <PROVIDER>] [--profile <PROFILE>]
+$ secretspec delete --all [--yes] [--provider <PROVIDER>] [--profile <PROFILE>]
+```
+
+Terminal window
+
+**Arguments and options:**
+
+- `<NAME>...` - One or more declared secrets to delete.
+- `--all` - Delete every provider-backed secret declared in the active
+  profile. It cannot be combined with a name.
+- `-y, --yes` - Skip the interactive confirmation for `--all`.
+  Non-interactive use of `--all` requires this option.
+- `-p, --provider <PROVIDER>` - Delete from this provider instead of the
+  manifest’s primary write provider.
+- `-P, --profile <PROFILE>` - Profile whose values are addressed.
+
+```
+# Delete one value from its primary write provider$ secretspec delete API_KEYDeleted 'API_KEY'Deleted 1 secret value; 0 already absent
+# Delete selected values from an old dotenv provider$ secretspec delete API_KEY DATABASE_URL --provider dotenv://.env.old
+# Explicitly delete every stored value in production$ secretspec delete --all --profile production --yes
+```
+
+Terminal window
+
+Deletion is idempotent: an already-absent value is reported as such and
+does not fail the command. Without `--provider`, routing mirrors `set`:
+only the primary write provider is changed, never every provider in a
+fallback chain. Any cache entry declared for the secret is invalidated
+so it cannot continue to serve the deleted value.
+
+The providers that support deletion in 0.18 are keyring, dotenv, pass,
+gopass, Vault, OpenBao, and Keeper Secrets Manager; age supports it
+starting with 0.20. Other providers return an explicit
+unsupported-operation error. Vault, OpenBao, and Keeper refuse to delete
+native `ref` entries because their backends would have to destroy a
+whole externally managed path or record rather than only the referenced
+field.
 
 ### run
 
 Run a command with secrets injected as environment variables.
 
 ```
-secretspec run [OPTIONS] -- <COMMAND>
+$ secretspec run [OPTIONS] -- <COMMAND>
 ```
 
 Terminal window
@@ -388,6 +506,30 @@ Terminal window
 
 Terminal window
 
+SecretSpec 0.19+ can securely request a declared missing value before
+the child starts. The selected provider normally saves the answer;
+choose `null` when it must be ephemeral:
+
+```
+[profiles.default]DEPLOY_PASSWORD = { description = "One-time deployment password", required = true, prompt = true, providers = ["null"] }
+```
+
+secretspec.toml
+
+```
+$ secretspec run -- ./deploy? Enter value for DEPLOY_PASSWORD (profile: default):
+```
+
+Terminal window
+
+The hidden prompt reads from the controlling terminal, leaving the
+child’s stdin unchanged even when it is piped or redirected. The answer
+is injected only for that invocation when the provider is `null`;
+writable providers save it and make the prompt a first-use provisioning
+step. If no controlling terminal exists, `run` fails before starting the
+child. Only declarations with `prompt = true` opt into this behavior;
+ordinary missing secrets still fail without a prompt.
+
 The `--provider` override applies to every secret, including those with
 a [`ref`](https://secretspec.dev/reference/configuration/#secret-references) field: refs are
 redirected to the overriding provider just like convention secrets. This
@@ -408,7 +550,7 @@ and exits non-zero when a required secret is missing, so CI can gate on
 it.
 
 ```
-secretspec export [OPTIONS]
+$ secretspec export [OPTIONS]
 ```
 
 Terminal window
@@ -426,7 +568,7 @@ existing environment.
 | Format | Output |
 |----|----|
 | `shell` | `export KEY='value'` lines, ready for `eval "$(secretspec export)"` |
-| `dotenv` | `KEY="value"` lines in dotenv syntax (double-quoted, with `\`, `"`, `$`, and newline escaped) |
+| `dotenv` | `KEY=value` lines in dotenv syntax. In 0.20+, values are unquoted when they already round-trip and otherwise double-quoted and escaped; `$` remains literal. |
 | `json` | a single compact JSON object mapping each secret name to its value |
 | `gha` | appends `KEY=value` to the file named by `$GITHUB_ENV` and prints an `::add-mask::` command per value to stdout, so later workflow steps and third-party actions see the secrets |
 
@@ -446,7 +588,7 @@ persists them to the job environment for the steps that follow.
 Import secrets from one provider to another.
 
 ```
-secretspec import <FROM_PROVIDER>
+$ secretspec import <FROM_PROVIDER> [--delete-source]
 ```
 
 Terminal window
@@ -455,10 +597,28 @@ The destination provider and profile are determined from your
 configuration. Secrets that already exist in the destination provider
 will not be overwritten.
 
+In SecretSpec 0.19+, the source and destination resolve their addresses
+independently. A source alias can use its own [provider `ref` template
+or per-secret scoped
+ref](https://secretspec.dev/concepts/references/#different-coordinates-per-provider-019),
+while the destination uses its selected alias’s mapping.
+
+Also in SecretSpec 0.19+, a literal source remains convention-addressed,
+but `import` warns when it shares a storage container with a defined
+alias whose template or active scoped refs resolve any imported secret
+to a different entry. The warning is informational: keep the literal to
+migrate convention-named entries, or select the alias when its
+alias-specific coordinates describe the intended source. Import output
+retains the selected alias name alongside its resolved, credential-free
+provider URI.
+
 **Arguments:**
 
 - `<FROM_PROVIDER>` - Provider to import from (e.g., `env`,
   `dotenv:/path/to/.env`)
+- `--delete-source` - After copying, delete a source value only when the
+  destination is verified to contain the same value. Available in
+  SecretSpec 0.18+.
 
 **Example:**
 
@@ -467,20 +627,32 @@ will not be overwritten.
 ✓ DATABASE_URL - Database connection string○ API_KEY - API key for external service (already exists in target)✗ REDIS_URL - Redis connection URL (not found in source)
 Summary: 1 imported, 1 already exists, 1 not found in source
 # Import from a specific .env file$ secretspec import dotenv:/home/user/old-project/.env
+# Move values out of an old provider (SecretSpec 0.18+)$ secretspec import dotenv:/home/user/old-project/.env --delete-source
 ```
 
 Terminal window
 
 **Use Cases:**
 
-- Migrate from .env files to a secure provider like keyring or
-  OnePassword
+- Migrate from .env files to a secure provider like keyring or 1Password
 - Copy secrets between different profiles or projects
 - Import existing environment variables into SecretSpec management
 
 `import` skips composed secrets because they have no stored value to
 copy; their component secrets are imported normally. Available since
 SecretSpec 0.16.
+
+With `--delete-source`, source and destination must resolve to different
+physical entries. In SecretSpec 0.19+, distinct scoped refs in the same
+store are allowed. SecretSpec preflights every source and destination,
+performs all writes, reads back and validates every copied value, and
+only then begins source cleanup. If a destination already contains an
+identical value, the source is also safe to delete; if it differs,
+SecretSpec retains the source and reports the conflict. A source
+provider that does not support deletion fails explicitly instead of
+pretending the migration completed. Source deletion was introduced in
+SecretSpec 0.18; independent endpoint refs and operation-wide preflight
+are available in 0.19+.
 
 ### cache clear (0.17+)
 
@@ -489,7 +661,7 @@ in the active profile. Authoritative fallback providers are not
 modified.
 
 ```
-secretspec cache clear [NAME] [--profile <PROFILE>]
+$ secretspec cache clear [NAME] [--profile <PROFILE>]
 ```
 
 Terminal window
@@ -523,7 +695,7 @@ and resolution behavior.
 Show the local [audit log](https://secretspec.dev/concepts/audit/) of secret access.
 
 ```
-secretspec audit [--project <NAME>] [--action <ACTION>] [-n <N>] [--json]
+$ secretspec audit [--project <NAME>] [--action <ACTION>] [-n <N>] [--json]
 ```
 
 Terminal window
@@ -532,8 +704,8 @@ Terminal window
 
 - `--project <NAME>` - Only show entries for this project
 - `--action <ACTION>` - Only show entries for this action (`get`, `set`,
-  `check`, `run`, `import`, `export`, or `cache_clear` and
-  `cache_refresh` in 0.17+)
+  `check`, `run`, `import`, `export`, `cache_clear` and `cache_refresh`
+  in 0.17+, or `delete` in 0.18+)
 - `-n, --tail <N>` - Show only the last N entries
 - `--json` - Output raw JSON Lines instead of the formatted summary
 
@@ -544,11 +716,59 @@ directory.
 **Example:**
 
 ```
-$ secretspec audit --action run -n 52026-06-04T18:06:29Z  run    found  ./deploy.sh  API_KEY,DATABASE_URL  (my-app/production)  reason: deploy  [claude-code]
+$ secretspec audit --action get -n 52026-06-04T18:06:29Z  get    found  GITHUB_TOKEN  (my-app/production)  reason: push release tag  caller: git@2.51.0/credential_get github.com
 # Pipe raw entries to jq$ secretspec audit --json | jq 'select(.outcome == "missing")'
 ```
 
 Terminal window
+
+### completions (0.20+)
+
+Generate a completion script that asks the same command definition used
+by `secretspec --help` for suggestions. Completion results include every
+command, option, possible value, and description supported by the target
+shell. They also provide contextual suggestions for profile, scope,
+secret, provider, and provider-alias names. File arguments complete
+paths, while `secretspec run` completes executables and command-argument
+paths.
+
+When you press Tab, the completion script invokes `secretspec` to
+calculate the current suggestions. SecretSpec reads the nearest
+`secretspec.toml` (or the manifest selected by `--file` or
+`SECRETSPEC_FILE`) and user configuration to discover names and
+descriptions. It does not contact providers or read secret values.
+
+```
+$ secretspec completions <SHELL>
+```
+
+Terminal window
+
+Supported shells are `bash`, `elvish`, `fish`, `nushell`, `powershell`,
+and `zsh`. Load completions for the current session with the command for
+your shell:
+
+- Bash: `source <(secretspec completions bash)`
+- Elvish: `eval (secretspec completions elvish | slurp)`
+- Fish: `secretspec completions fish | source`
+- PowerShell:
+  `secretspec completions powershell | Out-String | Invoke-Expression`
+- Zsh:
+  `autoload -U compinit && compinit && source <(secretspec completions zsh)`
+
+For persistent Bash, Elvish, Fish, PowerShell, or Zsh completions, put
+the corresponding command in your shell’s startup file. Generating the
+script at startup keeps it synchronized after a SecretSpec upgrade.
+
+Nushell loads completion modules from a file:
+
+```
+secretspec completions nushell | save -f ~/.config/nushell/completions-secretspec.nuuse ~/.config/nushell/completions-secretspec.nu *
+```
+
+Terminal window
+
+Regenerate that file after upgrading SecretSpec.
 
 ## Environment Variables
 

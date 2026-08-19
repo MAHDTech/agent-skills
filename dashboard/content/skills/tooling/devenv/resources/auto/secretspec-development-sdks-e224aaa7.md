@@ -11,11 +11,11 @@ skill_name = "devenv"
 # SDK Development
 
 SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript,
-Haskell, PHP, and C#. This page is for contributors: how the SDKs are
-put together, how each one is packaged and released, which platforms
-each artifact covers, and what to update when adding a platform or a new
-SDK. For the user-facing architecture and API, see the [SDK
-overview](https://secretspec.dev/sdk/overview).
+Haskell, PHP, C#, and Swift (0.18+). This page is for contributors: how
+the SDKs are put together, how each one is packaged and released, which
+platforms each artifact covers, and what to update when adding a
+platform or a new SDK. For the user-facing architecture and API, see the
+[SDK overview](https://secretspec.dev/sdk/overview).
 
 ## One resolver, many packages
 
@@ -27,8 +27,8 @@ reach it two ways:
   statically links the archive), Go (purego `dlopen` of the cdylib, or
   cgo against the archive with `-tags static`), Haskell (GHC FFI against
   the archive), C# (P/Invoke against per-runtime cdylibs in the NuGet
-  package), and PHP’s `ext-ffi` fallback (runtime `dlopen` of the
-  cdylib).
+  package), Swift (0.18+; Clang C import from an XCFramework), and PHP’s
+  `ext-ffi` fallback (runtime `dlopen` of the cdylib).
 - **As an embedded extension**: Python ([pyo3](https://pyo3.rs/)),
   Node.js ([napi-rs](https://napi.rs/)), and PHP’s preferred backend
   ([ext-php-rs](https://github.com/davidcole1340/ext-php-rs)) compile
@@ -56,6 +56,7 @@ platform and publishes on a version tag:
 | Go | Go module (source) + `secretspec-ffi` release assets | `go-embed.yml`, `go-static.yml`, `ffi-build.yml` |
 | Ruby | `secretspec` platform gems on RubyGems | `ruby-gems.yml` |
 | C# | `Cachix.SecretSpec` on NuGet | `dotnet-package.yml` |
+| Swift (0.18+) | SwiftPM source package + XCFramework release asset | `swift-package.yml` |
 | PHP | Composer package (source) + prebuilt extension binaries and `secretspec-ffi` release assets | `php-ext.yml`, `ffi-build.yml` |
 | Haskell | `secretspec` on Hackage (source) | `haskell-build.yml` |
 
@@ -73,6 +74,7 @@ SecretSpec 0.17.
 | Go | ✓ | ✓ | — | ✓ | ✓ | — |
 | Ruby | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | C# | ✓ (glibc and musl) | ✓ (glibc and musl) | ✓ | ✓ | ✓ | ✓ |
+| Swift (0.18+) | — | — | ✓ | ✓ | — | — |
 | PHP | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | Haskell (source) | ✓ (CI-covered) | — | — | — | ✓ (CI-covered, 0.17+) | — |
 
@@ -81,13 +83,40 @@ Notes:
 - Most Linux binary artifacts build inside manylinux_2_28 containers so
   they run on any distro with glibc \>= 2.28 (the Ruby Linux gem still
   links the build runner’s glibc; a baseline toolchain there is a
-  tracked follow-up). On Linux the keyring provider’s libdbus is either
-  compiled in (`vendored-dbus`) or required at runtime, per artifact —
-  each workflow’s header comment states which.
+  tracked follow-up). The keyring provider uses a Rust-native D-Bus
+  transport on Linux and does not require system libdbus.
 - Hackage distributes source only; the Haskell column records which
   platforms CI builds and tests, since users link `secretspec-ffi`
   themselves.
+- The Swift package targets macOS 12+ only. Its XCFramework contains
+  native Intel and Apple-silicon slices; mobile Apple platforms are
+  intentionally out of scope for a development-workflow resolver that
+  launches provider CLIs and reads desktop files and credential stores.
 - The fully-static Go binary (`-tags static`, musl) is Linux x64 only.
+
+## Why Swift uses the C ABI
+
+Swift interoperates with C directly through Clang modules, and SwiftPM
+distributes native Apple binaries as XCFramework binary targets. That
+fits the existing `secretspec-ffi` boundary exactly: three
+ownership-audited C functions carry one already-versioned JSON contract.
+
+[UniFFI](https://mozilla.github.io/uniffi-rs/latest/) is a good default
+for a new object-rich Rust API that needs generated Swift and Kotlin
+bindings. It would be the wrong layer here: SecretSpec already has a
+deliberately narrow ABI shared by several SDKs, and introducing UniFFI
+would create a second exported ABI, generated Rust scaffolding, and
+another schema to version. The hand-written Swift layer is limited to
+`Codable` request/response models and idiomatic errors; resolution
+remains entirely in Rust.
+
+`scripts/build-swift-xcframework.sh` changes Cargo’s target-local dylib
+install name to `@rpath`, merges the native slices into a universal
+dylib, adds the C header and module map, and invokes
+`xcodebuild -create-xcframework`. `swift-package.yml` builds each
+architecture natively, tests the final universal artifact, computes
+SwiftPM’s SHA-256 checksum, and attaches the ZIP to the GitHub release.
+See `RELEASE.md` for the required pre-tag checksum step.
 
 ## Windows toolchains
 
@@ -120,6 +149,16 @@ list names import libraries that ship inside cargo registry crates
 next to the archive — the Ruby gem bundles them in `vendor/`, the
 Haskell job points GHC’s linker at them.
 
+## Linking through pkg-config (0.19+)
+
+`secretspec-ffi/scripts/cinstall.sh PREFIX static|shared` uses
+[cargo-c](https://github.com/lu-zero/cargo-c) to install one library
+type, the header, and a `secretspec_ffi.pc` carrying its full link line.
+This lets pkg-config consumers skip the `native-static-libs` capture
+above. Use separate prefixes for the two modes: both metadata files use
+`-lsecretspec_ffi`, and the linker prefers a shared library when both
+forms are present.
+
 ## Adding a platform to an SDK
 
 1.  Add the platform to the SDK’s distribution workflow matrix, and make
@@ -128,8 +167,8 @@ Haskell job points GHC’s linker at them.
     workflows deliberately avoid cross-compiling because the crate links
     system libraries.
 3.  Keep the artifact self-contained: vendor or statically link anything
-    an end user’s machine will not have (see the manylinux/dbus and
-    MinGW import library notes above).
+    an end user’s machine will not have (see the manylinux and MinGW
+    import library notes above).
 4.  Smoke test in the same workflow: install or load the built artifact
     and call one function through it.
 5.  Update the platform table above, the [SDK overview](https://secretspec.dev/sdk/overview)

@@ -2,9 +2,7 @@
 
 # Reference-to-Video
 
-Provide one or more reference images to incorporate specific people, objects, clothing, or other visual elements into the generated video. The model uses the reference images as a visual guide, producing a video that features the content from those images. This is useful for virtual try-on, product placement, and character-consistent storytelling.
-
-Unlike [image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video), where the source image becomes the starting frame, reference images influence what appears in the video without locking in the first frame.
+Provide reference images, a preset voice, or both to guide the generated video. Images incorporate specific people, objects, clothing, or other visual elements without locking the first frame (unlike [image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video)). This is useful for virtual try-on, product placement, character-consistent storytelling, and voice identity. On `grok-imagine-video-1.5`, you can also pick the voice your subject speaks in (see [Reference audio](#reference-audio)).
 
 Each reference image can be provided as a public HTTPS URL, a base64-encoded data URI, or a `file_id` from the [Files API](https://docs.x.ai/developers/files) — and you can mix kinds within a single request. See [Imagine → Files API Integration](https://docs.x.ai/developers/model-capabilities/imagine/files/inputs) for `file_id` details and examples.
 
@@ -20,7 +18,7 @@ client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
 
 response = client.video.generate(
     prompt="slow zoom in on the white fashion runway stage. then, the model from <IMAGE_1> walks in from the back of the shot from the white opening, and gracefully walk out onto the front of the white stage platform. they wear the shirt from <IMAGE_2> and black flared jeans. they look dramatically at the camera. high quality slow motion shot. fun, playful. skin pores. highly detailed faces. perfect shot. they reach the end of the runway and look at the camera as the camera slowly zooms. subtle smile.",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     reference_image_urls=[
         "<IMAGE_URL_1>",
         "<IMAGE_URL_2>",
@@ -48,7 +46,7 @@ response = requests.post(
     "https://api.x.ai/v1/videos/generations",
     headers=headers,
     json={
-        "model": "grok-imagine-video",
+        "model": "grok-imagine-video-1.5",
         "prompt": "slow zoom in on the white fashion runway stage. then, the model from <IMAGE_1> walks in from the back of the shot from the white opening, and gracefully walk out onto the front of the white stage platform. they wear the shirt from <IMAGE_2> and black flared jeans. they look dramatically at the camera. high quality slow motion shot. fun, playful. skin pores. highly detailed faces. perfect shot. they reach the end of the runway and look at the camera as the camera slowly zooms. subtle smile.",
         "reference_images": [
             {"url": "<IMAGE_URL_1>"},
@@ -83,7 +81,7 @@ import { xai } from "@ai-sdk/xai";
 import { experimental_generateVideo as generateVideo } from "ai";
 
 const result = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "slow zoom in on the white fashion runway stage. then, the model from <IMAGE_1> walks in from the back of the shot from the white opening, and gracefully walk out onto the front of the white stage platform. they wear the shirt from <IMAGE_2> and black flared jeans. they look dramatically at the camera. high quality slow motion shot. fun, playful. skin pores. highly detailed faces. perfect shot. they reach the end of the runway and look at the camera as the camera slowly zooms. subtle smile.",
     duration: 10,
     aspectRatio: "16:9",
@@ -111,7 +109,7 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "slow zoom in on the white fashion runway stage. then, the model from <IMAGE_1> walks in from the back of the shot from the white opening, and gracefully walk out onto the front of the white stage platform. they wear the shirt from <IMAGE_2> and black flared jeans. they look dramatically at the camera. high quality slow motion shot. fun, playful. skin pores. highly detailed faces. perfect shot. they reach the end of the runway and look at the camera as the camera slowly zooms. subtle smile.",
     "reference_images": [
       {"url": "<IMAGE_URL_1>"},
@@ -124,6 +122,86 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   }' | jq -r '.request_id')
 
 # Poll until the video is ready
+while true; do
+  RESULT=$(curl -s https://api.x.ai/v1/videos/$REQUEST_ID \
+    -H "Authorization: Bearer $XAI_API_KEY")
+  STATUS=$(echo "$RESULT" | jq -r '.status')
+  if [ "$STATUS" = "done" ]; then
+    echo "$RESULT" | jq -r '.video.url'
+    break
+  elif [ "$STATUS" = "failed" ] || [ "$STATUS" = "expired" ]; then
+    echo "Request $STATUS"; echo "$RESULT" | jq .
+    break
+  fi
+  sleep 5
+done
+```
+
+## Reference audio
+
+> [!WARNING]
+>
+> Preset voices are generally available. Voice references with your own audio files are available to trusted partners, on request. .
+
+On `grok-imagine-video-1.5`, give your subject a voice by passing up to **3** preset voices with `reference_audios`. Each entry names a voice by `voice_id`, drawn from the same built-in roster as [Text to Speech](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech#voices), so `{"voice_id": "eve"}` speaks in Eve's voice. Identifiers are case-insensitive; an unknown one returns `400` with the list of available voices. You can hear every voice in the [flagship voices announcement](https://x.ai/news/new-flagship-voices).
+
+`reference_audios` accepts preset voices; voice references with your own audio files are available to trusted partners [on request](https://x.ai/contact-sales?interest=imagine). Use a voice alongside reference images or on its own, and tag voices in the prompt as `<AUDIO_0>`, `<AUDIO_1>`, and `<AUDIO_2>` (with `<IMAGE_0>`… when you also pass images).
+
+```python customLanguage="pythonRequests"
+import os
+import time
+import requests
+
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {os.environ['XAI_API_KEY']}",
+}
+
+response = requests.post(
+    "https://api.x.ai/v1/videos/generations",
+    headers=headers,
+    json={
+        "model": "grok-imagine-video-1.5",
+        "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
+        "reference_images": [{"url": "<IMAGE_URL_1>"}],
+        "reference_audios": [{"voice_id": "eve"}],
+        "duration": 8,
+        "aspect_ratio": "9:16",
+        "resolution": "720p",
+    },
+)
+
+request_id = response.json()["request_id"]
+
+while True:
+    result = requests.get(
+        f"https://api.x.ai/v1/videos/{request_id}",
+        headers={"Authorization": headers["Authorization"]},
+    )
+    data = result.json()
+    if data["status"] == "done":
+        print(data["video"]["url"])
+        break
+    elif data["status"] == "expired":
+        print("Request expired")
+        break
+    time.sleep(5)
+```
+
+```bash
+REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -d '{
+    "model": "grok-imagine-video-1.5",
+    "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
+    "reference_images": [{"url": "<IMAGE_URL_1>"}],
+    "reference_audios": [{"voice_id": "eve"}],
+    "duration": 8,
+    "aspect_ratio": "9:16",
+    "resolution": "720p"
+  }' | jq -r '.request_id')
+
 while true; do
   RESULT=$(curl -s https://api.x.ai/v1/videos/$REQUEST_ID \
     -H "Authorization: Bearer $XAI_API_KEY")

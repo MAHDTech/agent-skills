@@ -530,7 +530,7 @@ asyncio.run(realtime_with_custom_voice("nlbqfwie"))
 
 The default limit is 30 custom voices per team. If you need more, contact us to discuss higher limits.
 
-[Request more custom voices](https://x.ai/api/voice/contact-us?category=voice-api)
+[Request more custom voices](https://x.ai/contact-sales)
 
 ## Error Handling
 
@@ -538,8 +538,8 @@ The default limit is 30 custom voices per team. If you need more, contact us to 
 |--------|---------|--------|
 | `201` | Voice created | Save `voice_id` and start using it. |
 | `200` | Successful read / update / delete | - |
-| `400` | Bad request | Check: audio under 120 s; label values are within the allowed enums; PATCH does not contain empty strings. Also returned when the team's 30-voice limit is reached — delete an existing voice or [request more](https://x.ai/api/voice/contact-us?category=voice-api). |
+| `400` | Bad request | Check: audio under 120 s; label values are within the allowed enums; PATCH does not contain empty strings. Also returned when the team's 30-voice limit is reached — delete an existing voice or [request more](https://x.ai/contact-sales). |
 | `401` | Unauthorized | API key is missing or invalid. |
-| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), or [contact sales](https://x.ai/api/voice/contact-us?category=voice-api) to enable the create API. |
+| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), or [contact sales](https://x.ai/contact-sales) to enable the create API. |
 | `404` | Voice not found | The id does not exist or is owned by another team. |
 | `500` | Server error | Retry with exponential backoff. |

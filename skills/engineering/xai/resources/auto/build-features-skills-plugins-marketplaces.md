@@ -15,6 +15,22 @@ Grok discovers skills from:
 
 User-invocable skills also appear as slash commands, for example `/<skill-name>`.
 
+`SKILL.md` starts with YAML frontmatter. Extra keys are ignored.
+
+| Field | Description |
+| ----- | ----------- |
+| `name` | Identifier. Directory name if omitted. |
+| `description` | What it does and when to use it. First body paragraph if omitted. |
+| `when-to-use` | Extra trigger phrases. Alias: `when_to_use`. |
+| `paths` | Gitignore globs. Hidden until a matching file is touched. |
+| `allowed-tools` | Does not grant or restrict tools. Accepts a YAML list or a comma/space-separated string. |
+| `argument-hint` | Slash-command autocomplete hint. |
+| `user-invocable` | Show as a slash command. Default `true`. `false` hides it from you and from the model. Only the literal `true` counts; `yes` is false. |
+| `disable-model-invocation` | Slash command only; no automatic invoke. Default `false`. |
+| `metadata` | String map. `author` and `short-description` are shown in the UI. |
+
+Grok accepts `model`, `effort`, `license`, and `compatibility` and does not apply them.
+
 ## Plugins
 
 Plugins extend Grok with additional skills, agents, hooks, MCP servers, and LSP servers.

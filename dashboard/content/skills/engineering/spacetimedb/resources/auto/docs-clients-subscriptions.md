@@ -24,6 +24,8 @@ changes:
 - TypeScript
 - C#
 - Rust
+- Unreal C++
+- Unreal Blueprint
 
 ``` codeBlockStandalone_LlrK
 import { DbConnection, tables } from './module_bindings';
@@ -142,14 +144,68 @@ conn.db().user().on_update(|ctx, old_user, new_user| {
 });
 ```
 
+``` codeBlockStandalone_LlrK
+// Connect to the database
+FOnConnectDelegate ConnectDelegate;
+BIND_DELEGATE_SAFE(ConnectDelegate, this, AMyActor, OnConnected);
+
+Conn = UDbConnection::Builder()
+    ->WithUri(TEXT("wss://maincloud.spacetimedb.com"))
+    ->WithDatabaseName(TEXT("my_module"))
+    ->OnConnect(ConnectDelegate)
+    ->Build();
+
+// React to new rows being inserted
+Conn->Db->User->OnInsert.AddDynamic(this, &AMyActor::OnUserInsert);
+
+// React to rows being deleted
+Conn->Db->User->OnDelete.AddDynamic(this, &AMyActor::OnUserDelete);
+
+// React to rows being updated
+Conn->Db->User->OnUpdate.AddDynamic(this, &AMyActor::OnUserUpdate);
+
+void AMyActor::OnConnected(UDbConnection* Connection, FSpacetimeDBIdentity Identity, const FString& Token)
+{
+    FOnSubscriptionApplied SubscriptionAppliedDelegate;
+    BIND_DELEGATE_SAFE(SubscriptionAppliedDelegate, this, AMyActor, OnSubscriptionApplied);
+
+    Connection->SubscriptionBuilder()
+        ->OnApplied(SubscriptionAppliedDelegate)
+        ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+        {
+            return Q.From.User();
+        })
+        ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+        {
+            return Q.From.Message();
+        })
+        ->Subscribe();
+}
+
+void AMyActor::OnSubscriptionApplied(const FSubscriptionEventContext& Context)
+{
+    UE_LOG(LogTemp, Log, TEXT("Subscription ready!"));
+
+    // Initial data is now in the client cache
+    for (const FUserType& User : Context.Db->User->Iter())
+    {
+        UE_LOG(LogTemp, Log, TEXT("User: %s"), *User.Name);
+    }
+}
+```
+
+![Unreal Blueprint quick start subscription
+graph](https://spacetimedb.com/docs/assets/images/ue-blueprint-quick-start-33f615a08f30798e345442526365dada.png)
+
 Typed Query Builders
 
-Type-safe query builders are available in TypeScript, C#, and Rust and
-are the recommended default. They provide auto-completion and
+Type-safe query builders are available in TypeScript, C#, Rust, and
+Unreal and are the recommended default. They provide auto-completion and
 compile-time type checking. For complete API details, see
 [TypeScript](https://spacetimedb.com/docs/clients/typescript#query-builder-api),
-[C#](https://spacetimedb.com/docs/clients/c-sharp#query-builder-api), and
-[Rust](https://spacetimedb.com/docs/clients/rust#query-builder-api) references.
+[C#](https://spacetimedb.com/docs/clients/c-sharp#query-builder-api),
+[Rust](https://spacetimedb.com/docs/clients/rust#query-builder-api), and
+[Unreal](https://spacetimedb.com/docs/clients/unreal#query-builder-api) references.
 
 ## How Subscriptions Work
 
@@ -183,17 +239,25 @@ All SDKs expose a builder API for creating subscriptions:
   a subscription later terminates with an error.
 - Subscribe with one or more queries.
 
+In Unreal, inspect the initial subscribed data set in `OnApplied`. Use
+table callbacks like `OnInsert`, `OnDelete`, and `OnUpdate` for later
+live changes.
+
 ### Query Forms
 
-All SDKs support subscriptions. TypeScript, C#, and Rust support query
-builders (recommended), while Unreal uses query strings:
+All SDKs support subscriptions. Query builders are the recommended
+default across SDKs, with raw SQL available where needed:
 
 | SDK | Typed Query Builder Support | Entry Point |
 |----|----|----|
 | TypeScript | Yes | `tables.<table>.where(...)` passed to `subscribe(...)` |
 | C# | Yes | `SubscriptionBuilder.AddQuery(...).Subscribe()` |
 | Rust | Yes | `subscription_builder().add_query(...).subscribe()` |
-| Unreal | No | Query strings passed to `Subscribe(...)` |
+| Unreal | Yes | `SubscriptionBuilder.AddQuery(...).Subscribe()` |
+
+Unreal also supports raw SQL subscriptions through
+`Subscribe(const TArray\<FString\>& SQL)` when you need direct SQL
+control.
 
 ### Subscription Handles
 
@@ -221,6 +285,7 @@ lifecycle.
 - [Rust subscription API](https://spacetimedb.com/docs/clients/rust#subscribe-to-queries)
 - [Rust query builder API](https://spacetimedb.com/docs/clients/rust#query-builder-api)
 - [Unreal subscription API](https://spacetimedb.com/docs/clients/unreal#subscriptions)
+- [Unreal query builder API](https://spacetimedb.com/docs/clients/unreal#query-builder-api)
 
 ## Best Practices for Optimizing Server Compute and Reducing Serialization Overhead
 
@@ -250,6 +315,8 @@ from the database to your application.
 - TypeScript
 - C#
 - Rust
+- Unreal C++
+- Unreal Blueprint
 
 ``` codeBlockStandalone_LlrK
 import { DbConnection, tables } from './module_bindings';
@@ -290,7 +357,7 @@ var globalSubscriptions = conn
 // May unsubscribe to shop_items as player advances
 var shopSubscription = conn
     .SubscriptionBuilder()
-    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(5U)))
+    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(5)))
     .Subscribe();
 ```
 
@@ -307,9 +374,39 @@ let global_subscriptions = conn
 // May unsubscribe to shop_items as player advances
 let shop_subscription = conn
     .subscription_builder()
-    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(5u32)))
+    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(5)))
     .subscribe();
 ```
+
+``` codeBlockStandalone_LlrK
+UDbConnection* Conn = ConnectToDB();
+
+// Never need to unsubscribe from global subscriptions
+USubscriptionHandle* GlobalSubscriptions = Conn->SubscriptionBuilder()
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.Announcements();
+    })
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.Badges();
+    })
+    ->Subscribe();
+
+// May unsubscribe from ShopItems as player advances
+USubscriptionHandle* ShopSubscription = Conn->SubscriptionBuilder()
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.ShopItems().Where([](https://spacetimedb.com/docs/clients/const%20FShopItemsCols&%20Row)
+        {
+            return Row.RequiredLevel.Lte(5);
+        });
+    })
+    ->Subscribe();
+```
+
+![Unreal Blueprint grouped subscriptions
+graph](https://spacetimedb.com/docs/assets/images/ue-blueprint-group-subscriptions-591a45aa81b8fc129c951aaa79dee401.png)
 
 ### 3. Subscribe Before Unsubscribing
 
@@ -328,6 +425,8 @@ data serializtion.
 - TypeScript
 - C#
 - Rust
+- Unreal C++
+- Unreal Blueprint
 
 ``` codeBlockStandalone_LlrK
 import { DbConnection, tables } from './module_bindings';
@@ -368,14 +467,14 @@ var conn = ConnectToDB();
 var shopSubscription = conn
     .SubscriptionBuilder()
     .AddQuery(q => q.From.ExchangeRates())
-    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(5U)))
+    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(5)))
     .Subscribe();
 
 // New subscription: player now at level 6, which overlaps with the previous query.
 var newShopSubscription = conn
     .SubscriptionBuilder()
     .AddQuery(q => q.From.ExchangeRates())
-    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(6U)))
+    .AddQuery(q => q.From.ShopItems().Where(r => r.RequiredLevel.Lte(6)))
     .Subscribe();
 
 // Unsubscribe from the old subscription once the new one is in place.
@@ -392,14 +491,14 @@ let conn: DbConnection = connect_to_db();
 let shop_subscription = conn
     .subscription_builder()
     .add_query(|q| q.from.exchange_rates())
-    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(5u32)))
+    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(5)))
     .subscribe();
 
 // New subscription: player now at level 6, which overlaps with the previous query.
 let new_shop_subscription = conn
     .subscription_builder()
     .add_query(|q| q.from.exchange_rates())
-    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(6u32)))
+    .add_query(|q| q.from.shop_items().r#where(|r| r.required_level.lte(6)))
     .subscribe();
 
 // Unsubscribe from the old subscription once the new one is active.
@@ -407,6 +506,52 @@ if shop_subscription.is_active() {
     shop_subscription.unsubscribe();
 }
 ```
+
+``` codeBlockStandalone_LlrK
+UDbConnection* Conn = ConnectToDB();
+
+// Initial subscription: player at level 5.
+USubscriptionHandle* ShopSubscription = Conn->SubscriptionBuilder()
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.ExchangeRates();
+    })
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.ShopItems().Where([](https://spacetimedb.com/docs/clients/const%20FShopItemsCols&%20Row)
+        {
+            return Row.RequiredLevel.Lte(5);
+        });
+    })
+    ->Subscribe();
+
+// New subscription: player now at level 6, which overlaps with the previous query.
+USubscriptionHandle* NewShopSubscription = Conn->SubscriptionBuilder()
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.ExchangeRates();
+    })
+    ->AddQuery([](https://spacetimedb.com/docs/clients/const%20FQueryBuilder&%20Q)
+    {
+        return Q.From.ShopItems().Where([](https://spacetimedb.com/docs/clients/const%20FShopItemsCols&%20Row)
+        {
+            return Row.RequiredLevel.Lte(6);
+        });
+    })
+    ->Subscribe();
+
+// Unsubscribe from the old subscription once the new one is in place.
+if (ShopSubscription->IsActive())
+{
+    ShopSubscription->Unsubscribe();
+}
+```
+
+![Unreal Blueprint new overlapping subscription
+graph](https://spacetimedb.com/docs/assets/images/ue-blueprint-unsubscription-1-424fa930bd505e84a70029a0c21854bb.png)
+
+![Unreal Blueprint unsubscribe old subscription
+graph](https://spacetimedb.com/docs/assets/images/ue-blueprint-unsubscription-2-639f2fc54d2b79c7564d2b9e2a5fd552.png)
 
 ### 4. Avoid Overlapping Queries
 

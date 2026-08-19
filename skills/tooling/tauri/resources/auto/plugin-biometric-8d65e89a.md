@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/biometric)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-biometric)[crates.io](https://crates.io/crates/tauri-plugin-biometric)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/biometric/)[](https://docs.rs/tauri-plugin-biometric)
+Reference:[](https://v2.tauri.app/reference/javascript/biometric/)[](https://docs.rs/tauri-plugin-biometric)
 
 Prompt the user for biometric authentication on Android and iOS.
 
@@ -17,17 +17,17 @@ Prompt the user for biometric authentication on Android and iOS.
 
 Install the biometric plugin to get started.
 
-- [Automatic](#tab-panel-6274)
-- [Manual](#tab-panel-6275)
+- [Automatic](#tab-panel-5893)
+- [Manual](#tab-panel-5894)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6263)
-- [yarn](#tab-panel-6264)
-- [pnpm](#tab-panel-6265)
-- [deno](#tab-panel-6266)
-- [bun](#tab-panel-6267)
-- [cargo](#tab-panel-6268)
+- [npm](#tab-panel-5882)
+- [yarn](#tab-panel-5883)
+- [pnpm](#tab-panel-5884)
+- [deno](#tab-panel-5885)
+- [bun](#tab-panel-5886)
+- [cargo](#tab-panel-5887)
 
 ```
 npm run tauri add biometric
@@ -71,11 +71,11 @@ cargo tauri add biometric
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6269)
-    - [yarn](#tab-panel-6270)
-    - [pnpm](#tab-panel-6271)
-    - [deno](#tab-panel-6272)
-    - [bun](#tab-panel-6273)
+    - [npm](#tab-panel-5888)
+    - [yarn](#tab-panel-5889)
+    - [pnpm](#tab-panel-5890)
+    - [deno](#tab-panel-5891)
+    - [bun](#tab-panel-5892)
 
     ```
     npm install @tauri-apps/plugin-biometric
@@ -124,8 +124,8 @@ You can check the status of Biometric Authentication, including its
 availability and the types of biometric authentication methods
 supported.
 
-- [JavaScript](#tab-panel-6259)
-- [Rust](#tab-panel-6260)
+- [JavaScript](#tab-panel-5878)
+- [Rust](#tab-panel-5879)
 
 ```
 import { checkStatus } from '@tauri-apps/plugin-biometric';
@@ -142,8 +142,8 @@ fn check_biometric(app_handle: tauri::AppHandle) {    let status = app_handle.bi
 To prompt the user for Biometric Authentication, utilize the
 `authenticate()` method.
 
-- [JavaScript](#tab-panel-6261)
-- [Rust](#tab-panel-6262)
+- [JavaScript](#tab-panel-5880)
+- [Rust](#tab-panel-5881)
 
 ```
 import { authenticate } from '@tauri-apps/plugin-biometric';

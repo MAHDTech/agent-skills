@@ -32,7 +32,7 @@ way.
 ## Install
 
 ```
-composer require cachix/secretspec
+$ composer require cachix/secretspec
 ```
 
 Terminal window
@@ -87,7 +87,7 @@ Then fetch the native library for your platform (a one-time step;
 Composer does not run it automatically):
 
 ```
-vendor/bin/secretspec-install-lib
+$ vendor/bin/secretspec-install-lib
 ```
 
 Terminal window
@@ -100,12 +100,22 @@ local Cargo `target/` directory.
 
 ## Quick start
 
-```
+``` astro-code
 <?php
+
 use Secretspec\SecretSpec;
-$resolved = SecretSpec::builder()    ->withProvider('keyring://')    ->withProfile('production')    ->withReason('boot web app')    ->load();
+
+$resolved = SecretSpec::builder()
+    ->withProvider('keyring://')
+    ->withProfile('production')
+    ->withReason('boot web app')
+    ->load();
+
 echo $resolved->provider, ' ', $resolved->profile, PHP_EOL;
-$db = $resolved->secrets['DATABASE_URL'];echo $db->get();        // the value, or the file path for as_path secrets
+
+$db = $resolved->secrets['DATABASE_URL'];
+echo $db->get();        // the value, or the file path for as_path secrets
+
 $resolved->setAsEnv();  // export everything into getenv()/$_ENV/$_SERVER
 ```
 
@@ -115,9 +125,22 @@ A missing required secret throws `Secretspec\MissingRequiredException`
 
 There is also a one-shot form using named arguments:
 
-```
+``` astro-code
+<?php
+
 $resolved = SecretSpec::resolve(provider: 'keyring://', reason: 'boot');
 ```
+
+## Caller context (0.20+)
+
+```
+use Secretspec\CallerContext;use Secretspec\SecretSpec;
+$builder = SecretSpec::builder()->withCaller(new CallerContext(    name: 'git',    version: '2.51.0',    operation: 'credential_get',    resource: 'github.com',));
+```
+
+Caller context identifies the invoking integration in audit records but
+never satisfies `require_reason`. Do not put credentials or secret
+values in it.
 
 ## Scopes (0.17+)
 
@@ -125,7 +148,9 @@ Use `withScope('api')` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `$resolved->scope` and
 `$report->scope`:
 
-```
+``` astro-code
+<?php
+
 $resolved = SecretSpec::builder()->withScope('api')->load();
 ```
 
@@ -134,11 +159,25 @@ $resolved = SecretSpec::builder()->withScope('api')->load();
 Resolve your secrets early and export them so Laravel’s `env()` and
 config see them. A service provider is a natural home:
 
-```
+``` astro-code
 <?php
+
 namespace App\Providers;
-use Illuminate\Support\ServiceProvider;use Secretspec\SecretSpec;
-class SecretSpecServiceProvider extends ServiceProvider{    public function register(): void    {        SecretSpec::builder()            ->withProfile(app()->environment())   // "production", "local", ...            ->withReason('laravel boot')            ->load()            ->setAsEnv();    }}
+
+use Illuminate\Support\ServiceProvider;
+use Secretspec\SecretSpec;
+
+class SecretSpecServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        SecretSpec::builder()
+            ->withProfile(app()->environment())   // "production", "local", ...
+            ->withReason('laravel boot')
+            ->load()
+            ->setAsEnv();
+    }
+}
 ```
 
 Register it first in `bootstrap/providers.php` so the secrets are
@@ -156,10 +195,19 @@ also populates `$_ENV` and `$_SERVER`, the `env()` helper and any
 Export the secrets in the front controller and `bin/console`, before the
 kernel boots, so `%env(DATABASE_URL)%` in your config resolves:
 
-```
-// public/index.php (and bin/console)use Secretspec\SecretSpec;
+``` astro-code
+<?php
+
+// public/index.php (and bin/console)
+use Secretspec\SecretSpec;
+
 require_once dirname(__DIR__).'/vendor/autoload.php';
-SecretSpec::builder()    ->withProfile($_SERVER['APP_ENV'] ?? 'dev')    ->withReason('symfony boot')    ->load()    ->setAsEnv();
+
+SecretSpec::builder()
+    ->withProfile($_SERVER['APP_ENV'] ?? 'dev')
+    ->withReason('symfony boot')
+    ->load()
+    ->setAsEnv();
 ```
 
 `setAsEnv()` sets `$_ENV`, `$_SERVER`, and `putenv()`, all three of
@@ -171,10 +219,21 @@ configuration is needed.
 Point the builder at a specific manifest and provider and read the
 values back:
 
-```
+``` astro-code
+<?php
+
 use Secretspec\SecretSpec;
-$resolved = SecretSpec::builder()    ->withPath(__DIR__.'/secretspec.toml')    ->withProvider('dotenv://.env.production')    ->withReason('cron job')    ->load();
-foreach ($resolved->secrets as $name => $secret) {    // $secret->get() is the value, or a readable file path for as_path secrets.    printf("%s=%s\n", $name, $secret->get());}
+
+$resolved = SecretSpec::builder()
+    ->withPath(__DIR__.'/secretspec.toml')
+    ->withProvider('dotenv://.env.production')
+    ->withReason('cron job')
+    ->load();
+
+foreach ($resolved->secrets as $name => $secret) {
+    // $secret->get() is the value, or a readable file path for as_path secrets.
+    printf("%s=%s\n", $name, $secret->get());
+}
 ```
 
 ## Typed access (codegen)
@@ -184,13 +243,18 @@ Generate a typed class with `secretspec schema` plus
 `$resolved->fields()`:
 
 ```
-secretspec schema | quicktype -s schema --top-level SecretSpec --lang php -o SecretSpecTyped.php
+$ secretspec schema | quicktype -s schema --top-level SecretSpec --lang php -o SecretSpecTyped.php
 ```
 
 Terminal window
 
-```
-// $resolved->fields() is a [SECRET_NAME => value] map; quicktype's `from`// wants an object, so cast it.$typed = SecretSpec::from((object) $resolved->fields());echo $typed->getDatabaseURL();
+``` astro-code
+<?php
+
+// $resolved->fields() is a [SECRET_NAME => value] map; quicktype's `from`
+// wants an object, so cast it.
+$typed = SecretSpec::from((object) $resolved->fields());
+echo $typed->getDatabaseURL();
 ```
 
 ## Files (`as_path`)
@@ -201,8 +265,16 @@ persists the file (mode 0400) so the path stays valid after `load()`
 returns — you own its lifetime. Call `$resolved->close()` when done to
 remove those temp files:
 
-```
-$resolved = SecretSpec::builder()->withReason('tls')->load();try {    $certPath = $resolved->secrets['TLS_CERT']->get();    // ... use the file ...} finally {    $resolved->close();}
+``` astro-code
+<?php
+
+$resolved = SecretSpec::builder()->withReason('tls')->load();
+try {
+    $certPath = $resolved->secrets['TLS_CERT']->get();
+    // ... use the file ...
+} finally {
+    $resolved->close();
+}
 ```
 
 ## Native backends

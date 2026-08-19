@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Artifacts
-  \>
-- Walkthrough
+Markdownkeyboard_arrow_down
 
-# Walkthrough[link](#walkthrough)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Walkthrough
 
 Agent creates walkthrough artifacts when it has completed task
 implementation; this type of artifact includes a concise summary of the
@@ -31,7 +30,5 @@ recordings of what Agent has built or created in the browser!
 
 ![Walkthrough with
 Image](https://antigravity.google/assets/image/docs/artifacts/artifact-walkthrough-image.png)
-
-On this Page
 
 {% endraw %}

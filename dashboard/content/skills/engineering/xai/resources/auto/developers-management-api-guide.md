@@ -43,7 +43,7 @@ Or if you need to specify the particular endpoint available to the API:
 
 And to specify models the API key has access to:
 
-* `api-key:model:<model name such as grok-4.5>`
+* `api-key:model:<model name such as grok-4.6>`
 
 ### Create an API key
 

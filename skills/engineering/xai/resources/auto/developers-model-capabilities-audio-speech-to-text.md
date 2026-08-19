@@ -136,7 +136,7 @@ The response includes the full transcript, audio duration, and word-level timest
 ```json
 {
   "text": "The balance is $167,983.15.",
-  "language": "English",
+  "language": "en",
   "duration": 3.45,
   "words": [
     { "text": "The", "start": 0.24, "end": 0.48 },
@@ -150,7 +150,7 @@ The response includes the full transcript, audio duration, and word-level timest
 | Field | Type | Description |
 |-------|------|-------------|
 | `text` | string | Full transcript text. |
-| `language` | string | Detected language name (e.g. `"English"`, `"French"`). |
+| `language` | string | Detected language as a BCP-47 code (e.g. `en`, `es-mx`). |
 | `duration` | number | Audio duration in seconds (2 d.p.). |
 | `words` | array | Word-level segments with `text`, `start`, `end`, and `speaker` (integer, only when `diarize=true`). |
 | `channels` | array | Per-channel transcripts (only when `multichannel=true`). Each entry has `index`, `text`, and `words`. |

@@ -114,6 +114,11 @@ in the scene in order for it to facilitate the processing of messages.
 When you build a new connection to SpacetimeDB, that connection will be
 added to and managed by the `SpacetimeDBNetworkManager` automatically.
 
+The SDK also resets its own internal static Unity state when entering
+Play Mode, including projects that disable Domain Reloading in Unity's
+Enter Play Mode Options. Your own static fields and singleton references
+are still your responsibility.
+
 Click on the `GameManager` object in the scene and click **Add
 Component**. Search for and select the `SpacetimeDBNetworkManager` to
 add it to your `GameManager` object.

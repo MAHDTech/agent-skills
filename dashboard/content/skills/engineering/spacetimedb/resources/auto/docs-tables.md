@@ -288,7 +288,8 @@ match what your SQL queries expect.
 - Rust
 - C++
 
-The accessor name is converted from snake_case to camelCase:
+The accessor is the key passed to `schema({...})`, verbatim. By
+convention the key matches the table `name`:
 
 ``` codeBlockStandalone_LlrK
 // Table definition
@@ -297,15 +298,17 @@ const player_scores = table(
   { /* columns */ }
 );
 
-// Accessor uses camelCase
-ctx.db.playerScores.insert({ /* ... */ });
+const spacetimedb = schema({ player_scores });
+
+// Accessor is the schema key, verbatim
+ctx.db.player_scores.insert({ /* ... */ });
 ```
 
-| Table Name        | Accessor              |
-|-------------------|-----------------------|
-| `'user'`          | `ctx.db.user`         |
-| `'player_scores'` | `ctx.db.playerScores` |
-| `'game_session'`  | `ctx.db.gameSession`  |
+| Schema Key      | Accessor               |
+|-----------------|------------------------|
+| `user`          | `ctx.db.user`          |
+| `player_scores` | `ctx.db.player_scores` |
+| `game_session`  | `ctx.db.game_session`  |
 
 The accessor name **exactly matches** the `Accessor` attribute value:
 
@@ -379,7 +382,7 @@ Use idiomatic naming conventions for each language:
 
 | Language | Convention | Example Table | Example Accessor |
 |----|----|----|----|
-| **TypeScript** | snake_case | `'player_score'` | `ctx.db.playerScore` |
+| **TypeScript** | snake_case | `'player_score'` | `ctx.db.player_score` |
 | **C#** | PascalCase | `Accessor = "PlayerScore"` | `ctx.Db.PlayerScore` |
 | **Rust** | lower_snake_case | `name = player_score` | `ctx.db.player_score()` |
 | **C++** | lower_snake_case | `player_score` | `ctx.db[player_score]` |
@@ -473,8 +476,8 @@ const playerColumns = {
 };
 
 // Create two tables with the same schema
-const Player = table({ name: 'Player', public: true }, playerColumns);
-const LoggedOutPlayer = table({ name: 'LoggedOutPlayer' }, playerColumns);
+const player = table({ name: 'player', public: true }, playerColumns);
+const loggedOutPlayer = table({ name: 'logged_out_player' }, playerColumns);
 ```
 
 Apply multiple `[Table]` attributes to the same struct:

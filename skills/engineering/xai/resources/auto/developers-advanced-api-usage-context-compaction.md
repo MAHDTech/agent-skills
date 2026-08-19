@@ -35,7 +35,7 @@ curl -s https://api.x.ai/v1/responses/compact \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
       {"role": "system", "content": "You are a concise and knowledgeable science tutor."},
       {"role": "user", "content": "What is the Higgs boson and why is it important?"},
@@ -50,7 +50,7 @@ curl -s https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
       {
         "type": "compaction",
@@ -72,7 +72,7 @@ client = Client(api_key=os.environ["XAI_API_KEY"])
 # Build up a chat normally — system prompt plus a few user/assistant turns.
 # use_encrypted_content=True is recommended for reasoning models so the model's
 # reasoning content from prior turns is preserved through the compaction.
-chat = client.chat.create(model="grok-4.5", use_encrypted_content=True)
+chat = client.chat.create(model="grok-4.6", use_encrypted_content=True)
 chat.append(system("You are a concise and knowledgeable science tutor."))
 
 chat.append(user("What is the Higgs boson and why is it important?"))
@@ -86,7 +86,7 @@ chat.append(chat.sample())
 # Step 1 — compact the conversation. Pass the chat's accumulated messages
 # straight into compact_context.
 compact = client.chat.compact_context(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=chat.messages,
 )
 print(f"Compaction ID:    {compact.id}")
@@ -113,7 +113,7 @@ client = OpenAI(
 
 # Step 1 — compact the long conversation
 compacted = client.responses.compact(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are a concise and knowledgeable science tutor."},
         {"role": "user", "content": "What is the Higgs boson and why is it important?"},
@@ -129,7 +129,7 @@ print(f"Output tokens:    {compacted.usage.output_tokens}")
 
 # Step 2 — continue the conversation. Spread compacted.output into the next input.
 followup = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         *compacted.output,  # use the compaction item verbatim — do not modify
         {"role": "user", "content": "Based on our earlier conversation, what gives particles their mass?"},
@@ -149,7 +149,7 @@ const client = new OpenAI({
 
 // Step 1 — compact the long conversation
 const compacted = await client.responses.compact({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: [
     { role: "system", content: "You are a concise and knowledgeable science tutor." },
     { role: "user", content: "What is the Higgs boson and why is it important?" },
@@ -165,7 +165,7 @@ console.log(`Output tokens:    ${compacted.usage.output_tokens}`);
 
 // Step 2 — continue the conversation. Spread compacted.output into the next input.
 const followup = await client.responses.create({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: [
     ...compacted.output, // use the compaction item verbatim — do not modify
     { role: "user", content: "Based on our earlier conversation, what gives particles their mass?" },
@@ -186,7 +186,7 @@ The REST endpoint (`POST /v1/responses/compact`) returns an OpenAI-compatible co
   "id": "cmp_01HZ9P0V8M2YQK3F7C4G6N5R2A",
   "object": "response.compaction",
   "created_at": 1748895600,
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "output": [
     {
       "type": "compaction",
@@ -233,7 +233,7 @@ client = Client(api_key=os.environ["XAI_API_KEY"])
 
 # use_encrypted_content=True preserves the model's reasoning content across
 # turns, recommended when using reasoning models.
-chat = client.chat.create(model="grok-4.5", use_encrypted_content=True)
+chat = client.chat.create(model="grok-4.6", use_encrypted_content=True)
 chat.append(system("You are a helpful assistant. Keep answers brief."))
 
 compact_every = 5

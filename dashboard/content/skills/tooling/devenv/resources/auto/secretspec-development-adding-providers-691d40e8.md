@@ -23,8 +23,12 @@ pub trait Provider: Send + Sync {    fn name(&self) -> &'static str;    fn uri(&
     /// Compile SecretSpec's naming convention into the store's native    /// coordinates. The single owner of the provider's convention layout.    fn convention_address(&self, project: &str, profile: &str, key: &str)        -> Result<NativeAddress>;
     fn get(&self, addr: Address<'_>) -> Result<Option<SecretString>>;    fn set(&self, addr: Address<'_>, value: &SecretString) -> Result<()>;
     /// Optional, defaults to empty. The `ref` coordinates your store can    /// honor beyond `item`; every other coordinate is rejected for you.    fn supported_coords(&self) -> &'static [&'static str] { &[] }
-    /// Optional, defaults to writable. Read-only providers reject every    /// address; providers whose refs name externally managed secrets reject    /// native addresses only. State the reason: it is what the user sees.    fn check_writable(&self, addr: Address<'_>) -> Result<()> { Ok(()) }
-    /// Optional batch read. The default resolves each request's address and    /// fetches every unique address once, concurrently; override it when the    /// store has a real bulk surface (one listing, a batch API).    fn get_many(&self, requests: &[(&str, Address<'_>)])        -> Result<HashMap<String, SecretString>> { /* default */ }}
+    /// Optional, defaults to writable. Reject only the addresses the provider    /// cannot safely write: for example every address on a read-only provider,    /// or version-pinned and ARN refs on an otherwise writable provider. State    /// the reason: it is what the user sees.    fn check_writable(&self, addr: Address<'_>) -> Result<()> { Ok(()) }
+    /// SecretSpec 0.19+: optional, defaults to Persist. Return Ephemeral only    /// when generated values should be returned for one resolution without    /// calling `set`; ordinary writes remain governed by `check_writable`.    fn generated_value_persistence(&self) -> ProducedValuePersistence {        ProducedValuePersistence::Persist    }
+    /// SecretSpec 0.19+: optional, defaults to Persist. This is independent of    /// `prompt = true`, which selects operator input rather than storage policy.    fn prompted_value_persistence(&self) -> ProducedValuePersistence {        ProducedValuePersistence::Persist    }
+    /// SecretSpec 0.19+: optional pre-write description. The default renders    /// native coordinates; file-backed providers should include the resolved    /// file/container and selector. Never include credentials.    fn describe_write_target(&self, addr: Address<'_>) -> Result<String> {        /* default */    }
+    /// Optional batch read. The default resolves each request's address and    /// fetches every unique address once, concurrently; override it when the    /// store has a real bulk surface (one listing, a batch API).    fn get_many(&self, requests: &[(&str, Address<'_>)])        -> Result<HashMap<String, SecretString>> { /* default */ }
+    /// SecretSpec 0.18+: optional discovery hook used to build secret    /// declarations from a provider. Return definitions only; never put values    /// in descriptions or other manifest fields. Flat stores can ignore the    /// context; hierarchical stores use it to bound discovery.    fn reflect(&self, context: DiscoveryContext<'_>)        -> Result<HashMap<String, Secret>> { /* unsupported */ }}
 ```
 
 Inside `get`/`set`, call `self.resolve_coords(addr)` to obtain the
@@ -34,6 +38,77 @@ native coordinates for any address. It rejects any coordinate outside
 something else — you declare the set, you never write the check. Have
 `set` call `self.check_writable(addr)?` first, so the pre-check and the
 write agree on one refusal message.
+
+SecretSpec 0.19+ also exposes `generated_value_persistence` and
+`prompted_value_persistence`. Leave their default of `Persist` for
+storage providers. `Ephemeral` is an explicit automatic-value
+capability: after a healthy read miss, SecretSpec returns the generated
+or prompted logical value for the current materializing resolution
+without calling `set` or refreshing a cache. It does not make ordinary
+writes succeed, and each method must be a pure, I/O-free capability
+check. In particular, `prompt = true` selects how a missing value is
+acquired; `prompted_value_persistence` decides what the provider does
+with the answer.
+
+In SecretSpec 0.19+, override `describe_write_target` when the provider
+URI and native coordinates do not identify the physical destination
+clearly. The `secretspec set` and interactive `secretspec check`
+commands print this description before they read or prompt for a value;
+SDK and library writes do not print it. The method must be pure with
+respect to the backing store: resolving and formatting a path is fine,
+but it must not create the file or directory. Keep the description
+credential-free, just like `uri()`.
+
+### Convention templates
+
+When a provider lets users replace its complete convention layout, call
+that option `template` and support the `{project}`, `{profile}`, and
+`{key}` placeholders. Reserve `prefix` for an option that only prepends
+literal text to an otherwise fixed convention. For example, a
+hierarchical provider might use:
+
+```
+mybackend://account?template=/{profile}/{project}/{key}
+```
+
+Render the template only in `convention_address`, then validate the
+resulting native name before any provider I/O. This keeps `get`, `set`,
+batch reads, generation, and imports in the same address space. Document
+when a template omits a placeholder intentionally; in particular,
+omitting `{key}` can make several declarations target the same stored
+value.
+
+### Discovery and `init --from`
+
+SecretSpec 0.18+ passes a `DiscoveryContext` to the `reflect(context)`
+discovery hook. During `secretspec init --from PROVIDER`, the CLI
+constructs the provider, calls that hook, and turns the returned map
+into declarations in a new manifest. Flat stores such as dotenv and age
+ignore the context; hierarchical stores use it to bound discovery. A
+reflected `Secret` describes the discovered key; do not copy its value
+into the description, default, or any other committed field.
+
+`secretspec import PROVIDER` is different: it does **not** call
+`reflect(context)` or enumerate the source. It iterates the secrets
+already declared in the active and default profiles and copies their
+values into the configured destination. Implement the reflection hook
+for manifest discovery, not to change import semantics. SecretSpec 0.18+
+accepts any provider that implements the hook as an `init --from`
+source. Use `--project` and `--profile` when the provider’s convention
+needs context other than the current directory name and the `default`
+profile.
+
+For a hierarchical store, reflection must have a bounded namespace and a
+reversible mapping from native names to SecretSpec keys. A configured
+template such as `/{profile}/{project}/{key}` provides both: render it
+with `DiscoveryContext`, list the prefix before `{key}`, reject nested
+or otherwise ambiguous results, and return the remaining key names. Do
+not list an entire account or vault as a fallback.
+
+The reflection hook returns declarations, not values, so it is also not
+a runtime namespace-injection API. A Chamber-style “export everything
+under this path” feature would need a separate value-bearing contract or
+an intentional extension of the provider trait.
 
 ## Implementation Steps
 
@@ -114,10 +189,11 @@ When adding a provider for an upcoming release:
 
 Update every provider location; names otherwise drift out of sync:
 
-1.  `docs/src/content/docs/providers/\<provider\>.md`
+1.  `docs/src/content/docs/providers/\<provider\>.md` (or `.mdx` when it
+    renders the provider credential catalog)
 2.  `docs/astro.config.ts` — sidebar and `starlightLlmsTxt` provider
     summary
-3.  `docs/src/content/docs/concepts/providers.md` — available providers
+3.  `docs/src/content/docs/concepts/providers.mdx` — available providers
     table
 4.  `docs/src/content/docs/reference/providers.md` — provider details
     and security considerations
@@ -125,6 +201,29 @@ Update every provider location; names otherwise drift out of sync:
     selector examples
 6.  `docs/src/content/docs/quick-start.mdx` — provider selector example
 7.  `README.md` — provider lists and provider selector example
+
+If the provider accepts injected provider credentials, also update
+`docs/src/data/provider-credentials.json`. Record every semantic
+credential name in the Rust registration’s order, its ordered
+environment fallbacks, its minimum SecretSpec version, and the
+implementation files where those fallbacks are defined. Use an `.mdx`
+provider page with exactly one `## Provider credentials` section and
+render the shared component there:
+
+```
+import ProviderCredentials from '../../../components/ProviderCredentials.astro';
+## Provider credentials
+<ProviderCredentials provider="mybackend" />
+```
+
+The catalog also renders the complete [provider credentials
+reference](https://secretspec.dev/reference/provider-credentials/), and every
+provider-specific component links back to it.
+
+Run `npm --prefix docs run check:provider-credentials`. It rejects
+missing or stale catalog entries, environment fallbacks without
+implementation backlinks, and credential-aware provider pages that do
+not render their catalog entry.
 
 Use durable wording such as “Added in SecretSpec 0.16.” The `(0.16+)`
 labels may remain where knowing the minimum version is useful.

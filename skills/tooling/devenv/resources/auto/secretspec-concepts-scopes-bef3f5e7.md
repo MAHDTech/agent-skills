@@ -35,7 +35,9 @@ does not need to declare every member.
 `check`, `run`, and `export` accept `--scope`:
 
 ```
-secretspec check --profile production --scope apisecretspec run --profile production --scope api -- ./api-serversecretspec export --profile production --scope worker --format dotenv
+$ secretspec check --profile production --scope api
+$ secretspec run --profile production --scope api -- ./api-server
+$ secretspec export --profile production --scope worker --format dotenv
 ```
 
 Terminal window
@@ -43,7 +45,8 @@ Terminal window
 Set `SECRETSPEC_SCOPE` to select one without repeating the flag:
 
 ```
-export SECRETSPEC_SCOPE=workersecretspec run --profile production -- ./worker
+$ export SECRETSPEC_SCOPE=worker
+$ secretspec run --profile production -- ./worker
 ```
 
 Terminal window
@@ -128,6 +131,11 @@ rather than one consumer’s view.
 Scopes are orthogonal to profiles and reusable across them. They do not
 inherit from the `default` profile; instead, the selected scope is
 applied after normal profile inheritance produces the effective profile.
+
+In SecretSpec 0.19+, a profile with `defaults.inherit = false` does not
+include any default-profile secrets. A scope still intersects the
+effective profile, so it cannot bring an inherited secret into a
+standalone profile.
 
 When a project uses [`extends`](https://secretspec.dev/concepts/inheritance/), a child scope
 replaces a parent scope with the same name. The lists are not unioned,

@@ -1,28 +1,23 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Customizations
-  \>
-- Plugins
+Markdownkeyboard_arrow_down
 
-# Plugins[link](#plugins)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Plugins
 
 Plugins are namespaced bundles that allow you to extend Antigravity’s
 capabilities by grouping skills, rules, MCP servers, and hooks into a
 single package.
 
-## Directory Structure[link](#directory-structure)
+## Directory Structure
 
 If you want to create your own plugins or inspect existing ones, they
 follow a specific directory structure. A plugin is a directory
 containing a `plugin.json` file and optional subdirectories for
 different customization types:
 
-text
-
-content_copy
-
-```
+``` astro-code
 plugins/<plugin-name>/
 ├── plugin.json       # Required marker file
 ├── mcp_config.json   # Optional MCP server definitions
@@ -34,16 +29,12 @@ plugins/<plugin-name>/
     └── <rule-name>.md
 ```
 
-### Manifest File (`plugin.json`)[link](#manifest-file-pluginjson)
+### Manifest File (`plugin.json`)
 
 Every plugin must have a `plugin.json` file at its root. This file
 identifies the directory as a plugin.
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "name": "my-custom-plugin"
 }
@@ -52,7 +43,7 @@ content_copy
 The `name` field is optional and defaults to the directory name if
 omitted.
 
-## Supported Components[link](#supported-components)
+## Supported Components
 
 A plugin can contain the following components:
 
@@ -67,11 +58,11 @@ A plugin can contain the following components:
 4.  **Hooks**: Configured via `hooks.json` at the plugin root. These
     allow you to run scripts or commands when specific events occur.
 
-## How to Add Plugins[link](#how-to-add-plugins)
+## How to Add Plugins
 
 There are two ways to add plugins to Antigravity:
 
-### 1. Using Bundled Plugins (Build with Google)[link](#1-using-bundled-plugins-build-with-google)
+### 1. Using Bundled Plugins (Build with Google)
 
 Antigravity comes with a variety of bundled plugins created by Google.
 You can browse and add these plugins directly from the user interface:
@@ -80,7 +71,7 @@ You can browse and add these plugins directly from the user interface:
 - For more details about the available Google-built plugins, see the
   [Build with Google Page](https://antigravity.google/docs/build-with-google).
 
-### 2. Manually Adding Plugins[link](#2-manually-adding-plugins)
+### 2. Manually Adding Plugins
 
 You can also add custom plugins by placing your plugin folders in one of
 the designated plugin locations. Antigravity automatically scans these
@@ -93,5 +84,3 @@ directories to discover and load your customizations:
 - **Global Level**: Place your plugin folder inside
   `~/.gemini/config/plugins/` in your user home directory. This makes
   the plugin active across all workspaces.
-
-On this Page

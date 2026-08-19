@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/haptics)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-haptics)[crates.io](https://crates.io/crates/tauri-plugin-haptics)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/haptics/)[](https://docs.rs/tauri-plugin-haptics)
+Reference:[](https://v2.tauri.app/reference/javascript/haptics/)[](https://docs.rs/tauri-plugin-haptics)
 
 Haptic feedback and vibrations on Android and iOS.
 
@@ -31,17 +31,17 @@ including recently released ones.
 
 Install the haptics plugin to get started.
 
-- [Automatic](#tab-panel-6388)
-- [Manual](#tab-panel-6389)
+- [Automatic](#tab-panel-6007)
+- [Manual](#tab-panel-6008)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6377)
-- [yarn](#tab-panel-6378)
-- [pnpm](#tab-panel-6379)
-- [deno](#tab-panel-6380)
-- [bun](#tab-panel-6381)
-- [cargo](#tab-panel-6382)
+- [npm](#tab-panel-5996)
+- [yarn](#tab-panel-5997)
+- [pnpm](#tab-panel-5998)
+- [deno](#tab-panel-5999)
+- [bun](#tab-panel-6000)
+- [cargo](#tab-panel-6001)
 
 ```
 npm run tauri add haptics
@@ -85,11 +85,11 @@ cargo tauri add haptics
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6383)
-    - [yarn](#tab-panel-6384)
-    - [pnpm](#tab-panel-6385)
-    - [deno](#tab-panel-6386)
-    - [bun](#tab-panel-6387)
+    - [npm](#tab-panel-6002)
+    - [yarn](#tab-panel-6003)
+    - [pnpm](#tab-panel-6004)
+    - [deno](#tab-panel-6005)
+    - [bun](#tab-panel-6006)
 
     ```
     npm install @tauri-apps/plugin-haptics

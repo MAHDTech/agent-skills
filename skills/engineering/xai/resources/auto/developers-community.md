@@ -20,7 +20,7 @@ import os
 
 os.environ['XAI_API_KEY'] = ""
 response = completion(
-    model="xai/grok-4.5",
+    model="xai/grok-4.6",
     messages=[
         {
             "role": "user",
@@ -50,7 +50,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text } = await generateText({
-    model: xai.responses('grok-4.5'),
+    model: xai.responses('grok-4.6'),
     prompt: 'Write a vegetarian lasagna recipe for 4 people.',
 });
 ```
@@ -72,7 +72,7 @@ import { xai } from '@ai-sdk/xai';
 import { experimental_generateImage as generateImage } from 'ai';
 
 const { image } = await generateImage({
-    model: xai.image('grok-imagine-image-quality'),
+    model: xai.image('grok-imagine-image-2.0'),
     prompt: 'A cat in a tree',
 });
 ```

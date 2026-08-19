@@ -7,22 +7,67 @@ inherits every provider with no Go-side logic.
 
 ## Quick start
 
-```
-import secretspec "github.com/cachix/secretspec/secretspec-go"
-resolved, err := secretspec.New().    WithProvider("keyring://").    WithProfile("production").    WithReason("boot web app").    Load()if err != nil {    log.Fatal(err)}
-fmt.Println(resolved.Provider, resolved.Profile)db := resolved.Secrets["DATABASE_URL"]fmt.Println(db.Get()) // the value, or the file path for as_path secretsresolved.SetAsEnv()   // export everything into the process environment
+``` astro-code
+package main
+
+import (
+ "fmt"
+ "log"
+
+ secretspec "github.com/cachix/secretspec/secretspec-go"
+)
+
+func main() {
+ resolved, err := secretspec.New().
+     WithProvider("keyring://").
+     WithProfile("production").
+     WithReason("boot web app").
+     Load()
+ if err != nil {
+     log.Fatal(err)
+ }
+
+ fmt.Println(resolved.Provider, resolved.Profile)
+ db := resolved.Secrets["DATABASE_URL"]
+ fmt.Println(db.Get()) // the value, or the file path for as_path secrets
+ resolved.SetAsEnv()   // export everything into the process environment
+}
 ```
 
 A missing required secret returns `*MissingRequiredError`; any other
 failure returns `*Error` (with a stable `.Kind`).
+
+## Caller context (0.20+)
+
+```
+builder := secretspec.New().WithCaller(secretspec.CallerContext{    Name: "git",    Version: "2.51.0",    Operation: "credential_get",    Resource: "github.com",})
+```
+
+Caller context identifies the invoking integration in audit records but
+never satisfies `require_reason`. Do not put credentials or secret
+values in it.
 
 ## Scopes (0.17+)
 
 Use `WithScope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `Resolved.Scope` and `Report.Scope`:
 
-```
-resolved, err := secretspec.New().WithScope("api").Load()
+``` astro-code
+package main
+
+import (
+ "log"
+
+ secretspec "github.com/cachix/secretspec/secretspec-go"
+)
+
+func main() {
+ resolved, err := secretspec.New().WithScope("api").Load()
+ if err != nil {
+     log.Fatal(err)
+ }
+ defer resolved.Close()
+}
 ```
 
 ## Typed access (codegen)
@@ -32,13 +77,32 @@ Generate typed structs with `secretspec schema` plus
 `resolved.FieldsJSON()`:
 
 ```
-secretspec schema | quicktype -s schema --top-level SecretSpec --lang go -o secrets_gen.go
+$ secretspec schema | quicktype -s schema --top-level SecretSpec --lang go -o secrets_gen.go
 ```
 
 Terminal window
 
-```
-data, _ := resolved.FieldsJSON()typed, _ := UnmarshalSecretSpec(data) // typed, generatedfmt.Println(typed.DatabaseURL)
+``` astro-code
+package main
+
+import (
+ "fmt"
+ "log"
+
+ secretspec "github.com/cachix/secretspec/secretspec-go"
+)
+
+func main() {
+ resolved, err := secretspec.New().Load()
+ if err != nil {
+     log.Fatal(err)
+ }
+ defer resolved.Close()
+
+ data, _ := resolved.FieldsJSON()
+ typed, _ := UnmarshalSecretSpec(data) // typed, generated
+ fmt.Println(typed.DatabaseURL)
+}
 ```
 
 ## Library discovery
@@ -57,3 +121,40 @@ per-platform library into `lib/` and build with `-tags embed_lib` for a
 self-contained binary. The embedded library is extracted to a per-user,
 owner-only cache directory at first use, and is not distributed through
 the Go module proxy.
+
+## Static linking
+
+For a self-contained binary with no runtime library to locate, build
+with `-tags static` instead. This uses cgo and links
+`libsecretspec_ffi.a` directly into the Go binary. In a development
+checkout:
+
+```
+$ bash scripts/stage-staticlib.sh
+$ CGO_ENABLED=1 go build -tags static ./...
+```
+
+Terminal window
+
+## Linking with pkg-config (0.19+)
+
+Install one library type with
+[cargo-c](https://github.com/lu-zero/cargo-c):
+
+```
+# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash secretspec-ffi/scripts/cinstall.sh "$PREFIX" static
+```
+
+Terminal window
+
+Then use the same build command for either type:
+
+```
+$ PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" CGO_ENABLED=1 go build -tags pkgconfig ./...
+```
+
+Terminal window
+
+Unlike staging, this also works for a `go get` dependency. A shared
+install in a non-system prefix also requires `PREFIX/lib` in the
+platform’s runtime library search path.

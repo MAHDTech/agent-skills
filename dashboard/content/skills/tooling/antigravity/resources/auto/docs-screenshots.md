@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity 2.0
-  \>
-- Artifacts
-  \>
-- Screenshots
+Markdownkeyboard_arrow_down
 
-# Screenshots[link](#screenshots)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Screenshots
 
 The browser subagent can take screenshots of open pages or elements on
 pages when it would like your review of the state of the page. This is
@@ -30,7 +29,5 @@ give feedback to the agent.
 
 ![Browser Screenshot
 Artifact](https://antigravity.google/assets/image/docs/artifacts/browser-screenshot-artifact.png)
-
-On this Page
 
 {% endraw %}

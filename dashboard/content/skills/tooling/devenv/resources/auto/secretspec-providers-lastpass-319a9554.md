@@ -41,9 +41,9 @@ Terminal window
 Install LastPass CLI:
 
 ```
-# macOSbrew install lastpass-cli
-# Linux (apt)sudo apt install lastpass-cli
-# NixOSnix-env -iA nixpkgs.lastpass-cli
+# macOS$ brew install lastpass-cli
+# Linux (apt)$ sudo apt install lastpass-cli
+# NixOS$ nix-env -iA nixpkgs.lastpass-cli
 ```
 
 Terminal window
@@ -77,8 +77,6 @@ unless every SecretSpec key should resolve to the same LastPass item.
 # Keep SecretSpec items in a team folderlastpass://Work/SecretSpec/{project}/{profile}/{key}
 ```
 
-Terminal window
-
 ### Project configuration
 
 ```
@@ -109,7 +107,8 @@ in place.
 ## CI/CD
 
 ```
-# Disable interactive pinentry and authenticate with a CI-managed password$ export LPASS_DISABLE_PINENTRY=1$ echo "$LASTPASS_PASSWORD" | lpass login --trust your-email@example.com
+# Disable interactive pinentry and authenticate with a CI-managed password$ export LPASS_DISABLE_PINENTRY=1
+$ echo "$LASTPASS_PASSWORD" | lpass login --trust your-email@example.com
 $ secretspec run --provider lastpass -- deploy
 ```
 

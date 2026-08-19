@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/deep-link)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-deep-link)[crates.io](https://crates.io/crates/tauri-plugin-deep-link)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/deep-link/)[](https://docs.rs/tauri-plugin-deep-link)
+Reference:[](https://v2.tauri.app/reference/javascript/deep-link/)[](https://docs.rs/tauri-plugin-deep-link)
 
 Set your Tauri application as the default handler for an URL.
 
@@ -17,17 +17,17 @@ Set your Tauri application as the default handler for an URL.
 
 Install the deep-link plugin to get started.
 
-- [Automatic](#tab-panel-6319)
-- [Manual](#tab-panel-6320)
+- [Automatic](#tab-panel-5938)
+- [Manual](#tab-panel-5939)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6308)
-- [yarn](#tab-panel-6309)
-- [pnpm](#tab-panel-6310)
-- [deno](#tab-panel-6311)
-- [bun](#tab-panel-6312)
-- [cargo](#tab-panel-6313)
+- [npm](#tab-panel-5927)
+- [yarn](#tab-panel-5928)
+- [pnpm](#tab-panel-5929)
+- [deno](#tab-panel-5930)
+- [bun](#tab-panel-5931)
+- [cargo](#tab-panel-5932)
 
 ```
 npm run tauri add deep-link
@@ -71,11 +71,11 @@ cargo tauri add deep-link
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6314)
-    - [yarn](#tab-panel-6315)
-    - [pnpm](#tab-panel-6316)
-    - [deno](#tab-panel-6317)
-    - [bun](#tab-panel-6318)
+    - [npm](#tab-panel-5933)
+    - [yarn](#tab-panel-5934)
+    - [pnpm](#tab-panel-5935)
+    - [deno](#tab-panel-5936)
+    - [bun](#tab-panel-5937)
 
     ```
     npm install @tauri-apps/plugin-deep-link
@@ -233,8 +233,8 @@ The deep-link plugin is available in both JavaScript and Rust.
 
 ### Listening to Deep Links
 
-- [JavaScript](#tab-panel-6306)
-- [Rust](#tab-panel-6307)
+- [JavaScript](#tab-panel-5925)
+- [Rust](#tab-panel-5926)
 
 When a deep link triggers your app while it’s running, the `onOpenUrl`
 callback is called. To detect whether your app was opened via a deep

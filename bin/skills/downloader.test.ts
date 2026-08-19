@@ -17,6 +17,7 @@ fs.ensureDirSync(fakeRepo)
 process.env.AGENT_SKILLS_HOME = fakeRepo
 
 const {
+    extractMetaRefreshUrl,
     downloadAction,
     getDomainPrefix,
     smartSlugify,
@@ -709,6 +710,26 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
             expect(result).not.toContain("https://github.com/docs")
         })
 
+        it("should strip angle brackets and URL-encoded angle brackets from URLs", () => {
+            const content = `
+- [link1](<https://example.com/docs/page1>)
+- [link2](%3Chttps://example.com/docs/page2%3E)
+- [external-apple](%3Chttps://developer.apple.com/docs%3E)
+- [external-github](<https://github.com/yonaskolb/XcodeGen>)
+            `
+            const baseUrl = "https://example.com/docs/index"
+            const result = parseLlmsTxtLinks(content, baseUrl)
+            expect(result).toContain("https://example.com/docs/page1")
+            expect(result).toContain("https://example.com/docs/page2")
+            expect(result).not.toContain(
+                "https://example.com/docs/%3Chttps://developer.apple.com/docs%3E"
+            )
+            expect(result).not.toContain("https://developer.apple.com/docs")
+            expect(result).not.toContain(
+                "https://github.com/yonaskolb/XcodeGen"
+            )
+        })
+
         it("should exclude specified binary formats", () => {
             const content = `
 - [pdf](/docs/doc.pdf)
@@ -720,6 +741,29 @@ Check out [Prompt](./prompt.mdx#hash), [Proxy Chains](../proxy-chains.mdx), and 
             expect(result).toContain("https://example.com/docs/page")
             expect(result).not.toContain("https://example.com/docs/doc.pdf")
             expect(result).not.toContain("https://example.com/docs/archive.zip")
+        })
+    })
+
+    describe("extractMetaRefreshUrl unit tests", () => {
+        it("should extract URL from standard meta http-equiv refresh tags", () => {
+            const html =
+                '<html><head><meta http-equiv="refresh" content="0; url=https://example.com/target/"></head></html>'
+            expect(extractMetaRefreshUrl(html)).toBe(
+                "https://example.com/target/"
+            )
+        })
+
+        it("should extract URL when content attribute precedes http-equiv", () => {
+            const html =
+                '<html><head><meta content="0; url=https://example.com/dest/" http-equiv="refresh"></head></html>'
+            expect(extractMetaRefreshUrl(html)).toBe(
+                "https://example.com/dest/"
+            )
+        })
+
+        it("should return null when no meta refresh tag is present", () => {
+            const html = "<html><head><title>Normal page</title></head></html>"
+            expect(extractMetaRefreshUrl(html)).toBeNull()
         })
     })
 

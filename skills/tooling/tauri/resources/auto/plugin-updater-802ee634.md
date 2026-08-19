@@ -4,7 +4,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/updater)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-updater)[crates.io](https://crates.io/crates/tauri-plugin-updater)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/updater/)[](https://docs.rs/tauri-plugin-updater)
+Reference:[](https://v2.tauri.app/reference/javascript/updater/)[](https://docs.rs/tauri-plugin-updater)
 
 Automatically update your Tauri app with an update server or a static
 JSON.
@@ -19,17 +19,17 @@ JSON.
 
 Install the Tauri updater plugin to get started.
 
-- [Automatic](#tab-panel-6629)
-- [Manual](#tab-panel-6630)
+- [Automatic](#tab-panel-6248)
+- [Manual](#tab-panel-6249)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6612)
-- [yarn](#tab-panel-6613)
-- [pnpm](#tab-panel-6614)
-- [deno](#tab-panel-6615)
-- [bun](#tab-panel-6616)
-- [cargo](#tab-panel-6617)
+- [npm](#tab-panel-6231)
+- [yarn](#tab-panel-6232)
+- [pnpm](#tab-panel-6233)
+- [deno](#tab-panel-6234)
+- [bun](#tab-panel-6235)
+- [cargo](#tab-panel-6236)
 
 ```
 npm run tauri add updater
@@ -73,11 +73,11 @@ cargo tauri add updater
 3.  You can install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6618)
-    - [yarn](#tab-panel-6619)
-    - [pnpm](#tab-panel-6620)
-    - [deno](#tab-panel-6621)
-    - [bun](#tab-panel-6622)
+    - [npm](#tab-panel-6237)
+    - [yarn](#tab-panel-6238)
+    - [pnpm](#tab-panel-6239)
+    - [deno](#tab-panel-6240)
+    - [bun](#tab-panel-6241)
 
     ```
     npm install @tauri-apps/plugin-updater
@@ -118,12 +118,12 @@ To sign your updates you need two keys:
 To generate the keys the Tauri CLI provides the `signer generate`
 command. You can run this to create the keys in the home folder:
 
-- [npm](#tab-panel-6623)
-- [yarn](#tab-panel-6624)
-- [pnpm](#tab-panel-6625)
-- [deno](#tab-panel-6626)
-- [bun](#tab-panel-6627)
-- [cargo](#tab-panel-6628)
+- [npm](#tab-panel-6242)
+- [yarn](#tab-panel-6243)
+- [pnpm](#tab-panel-6244)
+- [deno](#tab-panel-6245)
+- [bun](#tab-panel-6246)
+- [cargo](#tab-panel-6247)
 
 ```
 npm run tauri signer generate -- -w ~/.tauri/myapp.key
@@ -155,8 +155,8 @@ While building your update artifacts, you need to have the private key
 you generated above in your environment variables. `.env` files do *not*
 work!
 
-- [Mac/Linux](#tab-panel-6602)
-- [Windows](#tab-panel-6603)
+- [Mac/Linux](#tab-panel-6221)
+- [Windows](#tab-panel-6222)
 
 ```
 export TAURI_SIGNING_PRIVATE_KEY="Path or content of your private key"# optionally also add a passwordexport TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
@@ -173,8 +173,8 @@ update bundles and their signatures. The generated files depend on the
 [`createUpdaterArtifacts`](https://v2.tauri.app/reference/config/#createupdaterartifacts)
 configuration value configured below.
 
-- [v2](#tab-panel-6606)
-- [v1 compatible](#tab-panel-6607)
+- [v2](#tab-panel-6225)
+- [v1 compatible](#tab-panel-6226)
 
 ```
 {  "bundle": {    "createUpdaterArtifacts": true  }}
@@ -356,8 +356,8 @@ The default API for checking updates and installing them leverages the
 configured endpoints and can be accessed by both JavaScript and Rust
 code.
 
-- [JavaScript](#tab-panel-6608)
-- [Rust](#tab-panel-6609)
+- [JavaScript](#tab-panel-6227)
+- [Rust](#tab-panel-6228)
 
 ```
 import { check } from '@tauri-apps/plugin-updater';import { relaunch } from '@tauri-apps/plugin-process';
@@ -390,8 +390,8 @@ select when to do so.
 When checking and downloading updates it is possible to define a custom
 request timeout, a proxy and request headers.
 
-- [JavaScript](#tab-panel-6604)
-- [Rust](#tab-panel-6605)
+- [JavaScript](#tab-panel-6223)
+- [Rust](#tab-panel-6224)
 
 ```
 import { check } from '@tauri-apps/plugin-updater';
@@ -441,8 +441,8 @@ more information on your updates (e.g. when distributing a Universal
 macOS binary option or having more build flavors) you can set a custom
 target.
 
-- [JavaScript](#tab-panel-6610)
-- [Rust](#tab-panel-6611)
+- [JavaScript](#tab-panel-6229)
+- [Rust](#tab-panel-6230)
 
 ```
 import { check } from '@tauri-apps/plugin-updater';

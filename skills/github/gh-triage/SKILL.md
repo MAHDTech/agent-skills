@@ -6,7 +6,7 @@ metadata:
   source: mattpocock/skills
   license: MIT
 resources:
-  - https://r.jina.ai/https://cli.github.com/manual/gh_issue
+  - https://cli.github.com/manual/gh_issue
 ---
 
 # GitHub Backlog Triage

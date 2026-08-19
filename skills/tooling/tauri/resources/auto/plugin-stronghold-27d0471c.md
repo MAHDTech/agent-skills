@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/stronghold)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-stronghold)[crates.io](https://crates.io/crates/tauri-plugin-stronghold)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/stronghold/)[](https://docs.rs/tauri-plugin-stronghold)
+Reference:[](https://v2.tauri.app/reference/javascript/stronghold/)[](https://docs.rs/tauri-plugin-stronghold)
 
 Store secrets and keys using the [IOTA
 Stronghold](https://github.com/iotaledger/stronghold.rs) secret
@@ -19,17 +19,17 @@ management engine.
 
 Install the stronghold plugin to get started.
 
-- [Automatic](#tab-panel-6600)
-- [Manual](#tab-panel-6601)
+- [Automatic](#tab-panel-6219)
+- [Manual](#tab-panel-6220)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6589)
-- [yarn](#tab-panel-6590)
-- [pnpm](#tab-panel-6591)
-- [deno](#tab-panel-6592)
-- [bun](#tab-panel-6593)
-- [cargo](#tab-panel-6594)
+- [npm](#tab-panel-6208)
+- [yarn](#tab-panel-6209)
+- [pnpm](#tab-panel-6210)
+- [deno](#tab-panel-6211)
+- [bun](#tab-panel-6212)
+- [cargo](#tab-panel-6213)
 
 ```
 npm run tauri add stronghold
@@ -73,11 +73,11 @@ cargo tauri add stronghold
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6595)
-    - [yarn](#tab-panel-6596)
-    - [pnpm](#tab-panel-6597)
-    - [deno](#tab-panel-6598)
-    - [bun](#tab-panel-6599)
+    - [npm](#tab-panel-6214)
+    - [yarn](#tab-panel-6215)
+    - [pnpm](#tab-panel-6216)
+    - [deno](#tab-panel-6217)
+    - [bun](#tab-panel-6218)
 
     ```
     npm install @tauri-apps/plugin-stronghold

@@ -27,12 +27,27 @@ List all models available to the authenticating API key, including model names (
   * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
   * `image_price` (integer | null) — Price per image in USD cents (image generation models).
+    The default tier: medium quality at the default (1k) resolution. See
+    \`pricing\` for the full quality/resolution matrix.
 
   * `long_context_threshold` (integer | null) — Token count at or above which the long context prices apply.
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
   * `owned_by` (string, required) — Owner of the model.
+
+  * `pricing` (array\\<object\>) — Per-image prices by (quality, resolution) tier (image generation
+    models). Omitted when the model prices all qualities identically
+    (see \`image\_price\`).
+
+    * `price_per_image` (integer, required) — Price per generated image, in 1/100,000,000ths of a USD cent.
+
+    * `quality` (string, required) — Quality tier this price applies to: \`"low"\`, \`"medium"\`, or \`"high"\`.
+      Medium is the default quality a request serves at when it leaves
+      \`quality\` unset.
+
+    * `resolution` (string, required) — Output resolution this price applies to: \`"1k"\` or \`"2k"\`. 1k is the
+      default when a request leaves \`resolution\` unset.
 
   * `prompt_image_token_price` (integer | null) — Price of the prompt image token in USD cents per 100 million tokens.
 
@@ -117,12 +132,27 @@ Get information about a model with its model\_id, including pricing.
 * `id` (string, required) — Model ID. Obtainable from \<https://console.x.ai/team/default/models> or \<https://docs.x.ai/docs/models>.
 
 * `image_price` (integer | null) — Price per image in USD cents (image generation models).
+  The default tier: medium quality at the default (1k) resolution. See
+  \`pricing\` for the full quality/resolution matrix.
 
 * `long_context_threshold` (integer | null) — Token count at or above which the long context prices apply.
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 
 * `owned_by` (string, required) — Owner of the model.
+
+* `pricing` (array\\<object\>) — Per-image prices by (quality, resolution) tier (image generation
+  models). Omitted when the model prices all qualities identically
+  (see \`image\_price\`).
+
+  * `price_per_image` (integer, required) — Price per generated image, in 1/100,000,000ths of a USD cent.
+
+  * `quality` (string, required) — Quality tier this price applies to: \`"low"\`, \`"medium"\`, or \`"high"\`.
+    Medium is the default quality a request serves at when it leaves
+    \`quality\` unset.
+
+  * `resolution` (string, required) — Output resolution this price applies to: \`"1k"\` or \`"2k"\`. 1k is the
+    default when a request leaves \`resolution\` unset.
 
 * `prompt_image_token_price` (integer | null) — Price of the prompt image token in USD cents per 100 million tokens.
 
@@ -224,8 +254,7 @@ List all chat and image understanding models available to the authenticating API
       "completion_text_token_price_long_context": 0,
       "long_context_threshold": 0,
       "aliases": [
-        "grok-4.3-latest",
-        "grok-latest"
+        "grok-4.3-latest"
       ]
     },
     {
@@ -354,6 +383,8 @@ List all image generation models available to the authenticating API key with fu
   * `id` (string, required) — Model ID.
 
   * `image_price` (integer, required) — Price of a single image in USD cents.
+    The default tier: medium quality at the default (1k) resolution. See
+    \`pricing\` for the full quality/resolution matrix.
 
   * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
@@ -364,6 +395,19 @@ List all image generation models available to the authenticating API key with fu
   * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
   * `owned_by` (string, required) — Owner of the model.
+
+  * `pricing` (array\\<object\>) — Per-image prices by (quality, resolution) tier. One entry per
+    combination the model serves; omitted when the model prices all
+    qualities identically (see \`image\_price\`).
+
+    * `price_per_image` (integer, required) — Price per generated image, in 1/100,000,000ths of a USD cent.
+
+    * `quality` (string, required) — Quality tier this price applies to: \`"low"\`, \`"medium"\`, or \`"high"\`.
+      Medium is the default quality a request serves at when it leaves
+      \`quality\` unset.
+
+    * `resolution` (string, required) — Output resolution this price applies to: \`"1k"\` or \`"2k"\`. 1k is the
+      default when a request leaves \`resolution\` unset.
 
   * `version` (string, required) — Version of the model.
 
@@ -410,6 +454,8 @@ Get full information about an image generation model with its model\_id.
 * `id` (string, required) — Model ID.
 
 * `image_price` (integer, required) — Price of a single image in USD cents.
+  The default tier: medium quality at the default (1k) resolution. See
+  \`pricing\` for the full quality/resolution matrix.
 
 * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model.
 
@@ -420,6 +466,19 @@ Get full information about an image generation model with its model\_id.
 * `output_modalities` (array\\<string\>, required) — The output modalities supported by the model.
 
 * `owned_by` (string, required) — Owner of the model.
+
+* `pricing` (array\\<object\>) — Per-image prices by (quality, resolution) tier. One entry per
+  combination the model serves; omitted when the model prices all
+  qualities identically (see \`image\_price\`).
+
+  * `price_per_image` (integer, required) — Price per generated image, in 1/100,000,000ths of a USD cent.
+
+  * `quality` (string, required) — Quality tier this price applies to: \`"low"\`, \`"medium"\`, or \`"high"\`.
+    Medium is the default quality a request serves at when it leaves
+    \`quality\` unset.
+
+  * `resolution` (string, required) — Output resolution this price applies to: \`"1k"\` or \`"2k"\`. 1k is the
+    default when a request leaves \`resolution\` unset.
 
 * `version` (string, required) — Version of the model.
 
@@ -459,7 +518,8 @@ List all video generation models available to the authenticating API key with fu
 
   * `id` (string, required) — Model ID.
 
-  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
+  * `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image";
+    "audio" for models accepting reference audio).
 
   * `object` (string, required) — The object type, which is always \`"model"\`.
 
@@ -514,7 +574,8 @@ Get full information about a video generation model with its model\_id.
 
 * `id` (string, required) — Model ID.
 
-* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image").
+* `input_modalities` (array\\<string\>, required) — The input modalities supported by the model (e.g. "text", "image";
+  "audio" for models accepting reference audio).
 
 * `object` (string, required) — The object type, which is always \`"model"\`.
 

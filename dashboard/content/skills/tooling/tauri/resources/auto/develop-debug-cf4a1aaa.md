@@ -95,12 +95,12 @@ builds unless you enable it with a Cargo feature.
 
 To create a debug build, run the `tauri build --debug` command.
 
-- [npm](#tab-panel-4572)
-- [yarn](#tab-panel-4573)
-- [pnpm](#tab-panel-4574)
-- [deno](#tab-panel-4575)
-- [bun](#tab-panel-4576)
-- [cargo](#tab-panel-4577)
+- [npm](#tab-panel-4449)
+- [yarn](#tab-panel-4450)
+- [pnpm](#tab-panel-4451)
+- [deno](#tab-panel-4452)
+- [bun](#tab-panel-4453)
+- [cargo](#tab-panel-4454)
 
 ```
 npm run tauri build -- --debug

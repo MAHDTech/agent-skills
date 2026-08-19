@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/notification)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-notification)[crates.io](https://crates.io/crates/tauri-plugin-notification)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/notification/)[](https://docs.rs/tauri-plugin-notification)
+Reference:[](https://v2.tauri.app/reference/javascript/notification/)[](https://docs.rs/tauri-plugin-notification)
 
 Send native notifications to your user using the notification plugin.
 
@@ -17,17 +17,17 @@ Send native notifications to your user using the notification plugin.
 
 Install the notifications plugin to get started.
 
-- [Automatic](#tab-panel-6459)
-- [Manual](#tab-panel-6460)
+- [Automatic](#tab-panel-6078)
+- [Manual](#tab-panel-6079)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6448)
-- [yarn](#tab-panel-6449)
-- [pnpm](#tab-panel-6450)
-- [deno](#tab-panel-6451)
-- [bun](#tab-panel-6452)
-- [cargo](#tab-panel-6453)
+- [npm](#tab-panel-6067)
+- [yarn](#tab-panel-6068)
+- [pnpm](#tab-panel-6069)
+- [deno](#tab-panel-6070)
+- [bun](#tab-panel-6071)
+- [cargo](#tab-panel-6072)
 
 ```
 npm run tauri add notification
@@ -71,11 +71,11 @@ cargo tauri add notification
 3.  If you’d like to use notifications in JavaScript then install the
     npm package as well:
 
-    - [npm](#tab-panel-6454)
-    - [yarn](#tab-panel-6455)
-    - [pnpm](#tab-panel-6456)
-    - [deno](#tab-panel-6457)
-    - [bun](#tab-panel-6458)
+    - [npm](#tab-panel-6073)
+    - [yarn](#tab-panel-6074)
+    - [pnpm](#tab-panel-6075)
+    - [deno](#tab-panel-6076)
+    - [bun](#tab-panel-6077)
 
     ```
     npm install @tauri-apps/plugin-notification
@@ -118,8 +118,8 @@ Follow these steps to send a notification:
 
 3.  Send the notification
 
-- [JavaScript](#tab-panel-6446)
-- [Rust](#tab-panel-6447)
+- [JavaScript](#tab-panel-6065)
+- [Rust](#tab-panel-6066)
 
 ```
 import {  isPermissionGranted,  requestPermission,  sendNotification,} from '@tauri-apps/plugin-notification';// when using `"withGlobalTauri": true`, you may use// const { isPermissionGranted, requestPermission, sendNotification, } = window.__TAURI__.notification;

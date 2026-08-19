@@ -8,12 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity SDK
-  \>
-- Overview + Quick Start
+Markdownkeyboard_arrow_down
 
-# Google Antigravity SDK[link](#google-antigravity-sdk)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Google Antigravity SDK
 
 The Antigravity SDK is a programmatic Python framework designed to
 build, test, and run autonomous AI agents. It extends the same core
@@ -24,28 +25,20 @@ your own applications and workflows.
 The SDK decouples your agent’s logic from where it runs, allowing you to
 focus on what the agent does; the SDK handles how and where it executes.
 
-## Quick Start[link](#quick-start)
+## Quick Start
 
 Install the SDK using pip:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 pip install google-antigravity
 ```
 
-### Hello World Example[link](#hello-world-example)
+### Hello World Example
 
 A functional agent that can interact with your local environment in
 under 15 lines of Python:
 
-python
-
-content_copy
-
-```
+``` astro-code
 import asyncio
 from google.antigravity import Agent, LocalAgentConfig
 
@@ -59,7 +52,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## Core Pillars[link](#core-pillars)
+## Core Pillars
 
 **1. Governed Extensibility (Tools)**  
 Every agent starts with a built-in toolset (file I/O, code editing,
@@ -77,11 +70,7 @@ of tools under a unified execution pipeline:
 Configure agent permissions using a declarative “deny by default” policy
 system to control when and how tools are executed:
 
-python
-
-content_copy
-
-```
+``` astro-code
 from google.antigravity.hooks.policy import deny, allow, ask_user
 
 policies = [
@@ -105,7 +94,7 @@ pre/post turn, pre/post tool call):
 
 ------------------------------------------------------------------------
 
-### Key Capabilities[link](#key-capabilities)
+### Key Capabilities
 
 - **Streaming:** Access live model reasoning and output chunks as they
   are generated.
@@ -124,7 +113,5 @@ To use the SDK more easily within Antigravity 2.0, use the Antigravity
 SDK Skill. To learn more about the Antigravity SDK and see more examples
 of how to use it, visit [**the GitHub
 repository**](https://github.com/google-antigravity/antigravity-sdk-python)
-
-On this Page
 
 {% endraw %}

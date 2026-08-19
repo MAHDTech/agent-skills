@@ -45,10 +45,27 @@ skill_name = "xai"
 | `GROK_MEMORY` | `0` | Enable cross-session memory (`1`/`0`). |
 | `GROK_SUBAGENTS` | `0` | Enable subagents / the task tool (`1`/`0`). |
 | `GROK_AGENT` | `grok-build` | Built-in agent name, profile, or absolute path to an agent definition. |
-| `GROK_SHOW_THINKING_BLOCKS` | `0` | Show reasoning/thinking blocks in the TUI (`1`/`0`). |
 | `GROK_WRITE_FILE` | `1` | Disable the `write` tool with `0` (read-only sessions). |
 | `GROK_TOOL_SEARCH` | `1` | On-demand MCP tool discovery for large toolsets (`1`/`0`). |
 | `GROK_LSP_TOOLS` | `0` | Enable the LSP code-intel tool (`1`/`0`). |
+
+### UI and appearance
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `GROK_THEME` | built-in | Color theme. |
+| `GROK_SHOW_THINKING_BLOCKS` | `1` | Show thinking/reasoning blocks in the TUI (`1`/`0`). |
+| `GROK_GROUP_TOOL_VERBS` | `1` | Fold consecutive read/search/list tool rows (`1`/`0`). |
+| `GROK_COLLAPSED_EDIT_BLOCKS` | `0` | Collapse edits to one-line `+N/-M` summaries (`1`/`0`). |
+| `GROK_PROMPT_SUGGESTIONS` | `1` | Next-prompt ghost text after each turn (`1`/`0`). |
+| `GROK_SCROLL_SPEED` | `50` | Mouse/trackpad scroll speed (`1`–`100`). |
+| `GROK_SCROLL_MODE` | `auto` | Scroll input: `auto`, `wheel`, or `trackpad`. |
+| `GROK_SCROLL_LINES` | use config if unset | Lines per scroll tick (`1`–`10`). |
+| `GROK_INVERT_SCROLL` | `0` | Reverse vertical scroll direction (`1`/`0`). |
+| `GROK_DEFAULT_SELECTED_PERMISSION` | `always_allow_all_sessions` | Preselected row on the first permission prompt. |
+| `GROK_REMEMBER_TOOL_APPROVALS` | `0` | Show per-tool "Always allow …" options (`1`/`0`). |
+| `GROK_MOUSE_REPORTING_TOGGLE` | `0` | `Ctrl+R` in scrollback toggles terminal mouse capture (`1`/`0`). |
+| `GROK_DISPLAY_REFRESH_AUTO_CADENCE` | `0` | Match stream/scroll cadence to display refresh rate (`1`/`0`). |
 
 ### MCP, logging, and proxy
 
@@ -155,6 +172,8 @@ String fields such as `url`, `command`, `args`, `env`, and `headers` support `${
 | Setting | Section | Values / default | Description |
 | --- | --- | --- | --- |
 | `respect_gitignore` | `[tools]` | `true` / `false` (default `false`) | When `true`, search and read tools skip gitignored files. |
+| `disable_zdr_incompatible_tools` | `[tools]` | `true` / `false` (default `false`) | Restrict tools needing xAI-hosted output (video) under ZDR; without a configured output bucket they return setup guidance instead of generating. |
+| `zdr_video_output_s3` | `[tools.zdr_video_output_s3]` | table | User-supplied S3 bucket for ZDR video output — see [Video Output Storage under ZDR](https://docs.x.ai/build/settings/zdr-video-storage). |
 | `file_toolset` | `[toolset]` | `standard` (default) | `hashline` | File edit tool scheme. |
 | `timeout_secs` | `[toolset.bash]` | seconds (default `120`) | Foreground bash command timeout. |
 | `output_byte_limit` | `[toolset.bash]` | bytes (default `20000`) | Max captured bash output. |
@@ -205,6 +224,52 @@ A non-empty `deny` list is enforced at the kernel level when the sandbox can be 
 | `show_tips` | `[cli]` | `true` / `false` | Startup tips. |
 | `new_session_worktree_mode` | `[hints]` | `ask` | `always` | `never` (default `never`) | Whether `/new` offers a [worktree](https://docs.x.ai/build/features/worktrees). |
 | `fork_worktree_mode` | `[hints]` | `ask` | `always` | `never` (default `ask`) | Whether `/fork` offers a worktree. |
+
+### `[ui]`, `[ui.display_refresh]`, and `[ui.contextual_hints]`
+
+| Setting | Section | Values / default | Description |
+| --- | --- | --- | --- |
+| `compact_mode` | `[ui]` | `true` / `false` (default `false`) | Denser message padding. Also `/compact-mode`. |
+| `screen_mode` | `[ui]` | `fullscreen` (default when unset) | `minimal` | Default render mode for plain `grok`. Restart required. |
+| `show_timestamps` | `[ui]` | `true` / `false` (default `true`) | Clock time next to messages. Also `/timestamps`. |
+| `show_timeline` | `[ui]` | `true` / `false` (default `false`) | Per-turn tick rail instead of the scrollbar. |
+| `page_flip_on_send` | `[ui]` | `true` / `false` (default `true`) | Snap the sent prompt to the top of the viewport. |
+| `max_thoughts_width` | `[ui]` | `40`–`500` (default `120`) | Column width for the thoughts panel. |
+| `combine_queued_prompts` | `[ui]` | `true` / `false` (default `false`) | Merge consecutive plain follow-ups into one turn. |
+| `theme` | `[ui]` | theme name or `auto` / `system` (default Grok Night) | Color theme. `auto` follows OS light/dark. Also `/theme`. |
+| `auto_dark_theme` | `[ui]` | theme name (default `groknight`) | Theme when `theme = "auto"` and the OS is dark. |
+| `auto_light_theme` | `[ui]` | theme name (default `grokday`) | Theme when `theme = "auto"` and the OS is light. |
+| `simple_mode` | `[ui]` | `true` / `false` (default `true`) | Readline prompt editing when `true`; experimental vim prompt keys when `false`. |
+| `vim_mode` | `[ui]` | `true` / `false` (default `false`) | Vim keys in the scrollback (not the prompt). Also `/vim-mode`. |
+| `prompt_suggestions` | `[ui]` | `true` / `false` (default `true`) | Next-prompt ghost text after each turn (Tab to accept). |
+| `mouse_reporting_toggle` | `[ui]` | `true` / `false` (default `false`) | `Ctrl+R` in scrollback toggles terminal mouse capture. |
+| `keep_text_selection` | `[ui]` | `flash` (default) | `hold` | `word_select` | In-app selection: brief flash, hold, or double-click word / triple-click paragraph select. |
+| `cursor_blink` | `[ui]` | `true` / `false` (unset inherits terminal) | Force blinking (`true`) or steady (`false`) block cursor. |
+| `show_thinking_blocks` | `[ui]` | `true` / `false` (default `true`) | Show thinking/reasoning blocks while streaming. |
+| `group_tool_verbs` | `[ui]` | `true` / `false` (default `true`) | Fold consecutive read/search/list tool rows into one summary. |
+| `collapsed_edit_blocks` | `[ui]` | `true` / `false` (default `false`) | Show edits as one-line `+N/-M` summaries. |
+| `render_mermaid` | `[ui]` | `auto` (default) | `on` | `off` | Mermaid diagrams: clickable open row (`auto`/`on`) or raw source (`off`). |
+| `scroll_speed` | `[ui]` | `1`–`100` (default `50`) | Mouse/trackpad scroll speed multiplier. |
+| `scroll_mode` | `[ui]` | `auto` (default) | `wheel` | `trackpad` | Force wheel vs trackpad when auto-detection is wrong. |
+| `scroll_lines` | `[ui]` | `1`–`10` (unset uses terminal profile) | Lines per scroll tick for wheel and trackpad. |
+| `invert_scroll` | `[ui]` | `true` / `false` (default `false`) | Reverse vertical scroll direction. |
+| `permission_mode` | `[ui]` | `default` | `ask` | `auto` | `always-approve` | Default tool-permission behavior. Enterprise locks use `requirements.toml`. |
+| `default_selected_permission` | `[ui]` | `always_allow_all_sessions` (default) | `allow_command_always` | `allow_once` | `reject` | Preselected approval row on the first prompt of a session. |
+| `remember_tool_approvals` | `[ui]` | `true` / `false` (default `false`) | Show per-tool "Always allow …" options. Restart required. |
+| `cancel_subagents_on_turn_cancel` | `[ui]` | `ask` (default when unset) | `always_stop` | `always_continue` | When cancelling a turn with running subagents. |
+| `hunk_tracker_mode` | `[ui]` | `agent_only` (default) | `all_dirty` | `off` | File-change hunk tracking. Restart required. |
+| `fork_secondary_model` | `[ui]` | model id (default: main default) | Model for the secondary agent when forking. |
+| `voice_keybind_enabled` | `[ui]` | `true` / `false` (default `true`) | Enable Ctrl+Space / F8 for voice dictation (`/voice` still works when off). |
+| `voice_capture_mode` | `[ui]` | `hold` (default) | `toggle` | Hold-to-talk or press-to-toggle voice capture. |
+| `voice_stt_language` | `[ui]` | language code or `auto` (default `en` / `[voice].language`) | Speech-to-text language for dictation. |
+| `auto_cadence_enabled` | `[ui.display_refresh]` | `true` / `false` (default `false`) | Match stream/scroll cadence to display refresh rate. Restart required. |
+| `undo` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | Ctrl+Z restores a wiped prompt draft. |
+| `plan_mode` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | Suggest plan mode (Shift+Tab) for planning-style prompts. |
+| `image_input` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | Clipboard image paste tip when the model accepts images. |
+| `send_now` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | After queuing a mid-turn follow-up, Enter on empty prompt sends now. |
+| `small_screen` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | Suggest `/compact-mode` on short terminals. |
+| `word_select` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | After double-click with fold/nav selection, point at Word select in settings. |
+| `ssh_wrap` | `[ui.contextual_hints]` | `true` / `false` (default `true`) | Recommend `grok wrap` when SSH lacks a clipboard sink. |
 
 ### `[permission]`
 

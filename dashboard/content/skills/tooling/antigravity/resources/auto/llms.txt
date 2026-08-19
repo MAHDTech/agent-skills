@@ -36,100 +36,101 @@
 ## Documentation
 
 ### Home
-- [Home](https://antigravity.google/docs/home): Learn about Home.
+- [home](https://antigravity.google/docs/home): Learn about home.
 
 ### Antigravity 2.0
-- [Overview](https://antigravity.google/docs/overview): Learn about Overview.
-- [Getting Started](https://antigravity.google/docs/getting-started): Learn about Getting Started.
-- [Build with Google](https://antigravity.google/docs/build-with-google): Learn about Build with Google.
-- [Feature Overview](https://antigravity.google/docs/features): Learn about Feature Overview.
-- [Models](https://antigravity.google/docs/models): Learn about Models.
-- [Projects](https://antigravity.google/docs/projects): Learn about Projects.
-- [Overview](https://antigravity.google/docs/settings): Learn about Overview.
-- [Agent Settings](https://antigravity.google/docs/agent-settings): Learn about Agent Settings.
-- [Artifact Review](https://antigravity.google/docs/artifact-review): Learn about Artifact Review.
-- [MCP](https://antigravity.google/docs/mcp): Learn about MCP.
-- [Skills](https://antigravity.google/docs/skills): Learn about Skills.
-- [Rules](https://antigravity.google/docs/rules-workflows): Learn about Rules.
-- [Plugins](https://antigravity.google/docs/plugins): Learn about Plugins.
-- [Hooks](https://antigravity.google/docs/hooks): Learn about Hooks.
-- [Sidecars](https://antigravity.google/docs/sidecars): Learn about Sidecars.
-- [Permissions](https://antigravity.google/docs/permissions): Learn about Permissions.
-- [Subagents](https://antigravity.google/docs/subagents): Learn about Subagents.
-- [Overview](https://antigravity.google/docs/artifacts): Learn about Overview.
-- [Plan](https://antigravity.google/docs/implementation-plan): Learn about Plan.
-- [Walkthrough](https://antigravity.google/docs/walkthrough): Learn about Walkthrough.
-- [Screenshots](https://antigravity.google/docs/screenshots): Learn about Screenshots.
+- [overview](https://antigravity.google/docs/overview): Learn about overview.
+- [getting-started](https://antigravity.google/docs/getting-started): Learn about getting-started.
+- [build-with-google](https://antigravity.google/docs/build-with-google): Learn about build-with-google.
+- [features](https://antigravity.google/docs/features): Learn about features.
+- [models](https://antigravity.google/docs/models): Learn about models.
+- [projects](https://antigravity.google/docs/projects): Learn about projects.
+- [settings](https://antigravity.google/docs/settings): Learn about settings.
+- [agent-settings](https://antigravity.google/docs/agent-settings): Learn about agent-settings.
+- [artifact-review](https://antigravity.google/docs/artifact-review): Learn about artifact-review.
+- [mcp](https://antigravity.google/docs/mcp): Learn about mcp.
+- [skills](https://antigravity.google/docs/skills): Learn about skills.
+- [rules-workflows](https://antigravity.google/docs/rules-workflows): Learn about rules-workflows.
+- [plugins](https://antigravity.google/docs/plugins): Learn about plugins.
+- [hooks](https://antigravity.google/docs/hooks): Learn about hooks.
+- [sidecars](https://antigravity.google/docs/sidecars): Learn about sidecars.
+- [permissions](https://antigravity.google/docs/permissions): Learn about permissions.
+- [subagents](https://antigravity.google/docs/subagents): Learn about subagents.
+- [artifacts](https://antigravity.google/docs/artifacts): Learn about artifacts.
+- [implementation-plan](https://antigravity.google/docs/implementation-plan): Learn about implementation-plan.
+- [walkthrough](https://antigravity.google/docs/walkthrough): Learn about walkthrough.
+- [screenshots](https://antigravity.google/docs/screenshots): Learn about screenshots.
 
 ### Antigravity CLI
-- [Overview](https://antigravity.google/docs/cli/overview): Learn about Overview.
-- [Getting Started](https://antigravity.google/docs/cli/getting-started): Learn about Getting Started.
-- [Installation & Auth](https://antigravity.google/docs/cli/install): Learn about Installation & Auth.
-- [Tutorial](https://antigravity.google/docs/cli/tutorial): Learn about Tutorial.
-- [Using AGY CLI](https://antigravity.google/docs/cli/using): Learn about Using AGY CLI.
-- [Features](https://antigravity.google/docs/cli/features): Learn about Features.
-- [Migration](https://antigravity.google/docs/cli/gcli-migration): Learn about Migration.
-- [Prompting & Interaction](https://antigravity.google/docs/cli/prompting): Learn about Prompting & Interaction.
-- [Headless mode](https://antigravity.google/docs/cli/headless): Learn about Headless mode.
-- [Reviewing Artifacts](https://antigravity.google/docs/cli/artifacts): Learn about Reviewing Artifacts.
-- [Managing Conversations](https://antigravity.google/docs/cli/conversations): Learn about Managing Conversations.
-- [Choose an execution mode](https://antigravity.google/docs/cli/modes): Learn about Choose an execution mode.
-- [Projects](https://antigravity.google/docs/cli/projects): Learn about Projects.
-- [Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents): Learn about Background Tasks & Subagents.
-- [Sandbox](https://antigravity.google/docs/cli/sandbox): Learn about Sandbox.
-- [Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings): Learn about Settings, Rendering & Keybindings.
-- [AI Credits](https://antigravity.google/docs/cli/credits): Learn about AI Credits.
-- [MCP](https://antigravity.google/docs/cli/mcp): Learn about MCP.
-- [Plugins & Skills](https://antigravity.google/docs/cli/plugins): Learn about Plugins & Skills.
-- [Permissions](https://antigravity.google/docs/cli/permissions): Learn about Permissions.
-- [Status Line Customization](https://antigravity.google/docs/cli/statusline): Learn about Status Line Customization.
-- [Terminal Title Customization](https://antigravity.google/docs/cli/title): Learn about Terminal Title Customization.
-- [Agents Command (/agents)](https://antigravity.google/docs/cli/commands/agents): Learn about Agents Command (/agents).
-- [Code Search Command (/codesearch)](https://antigravity.google/docs/cli/commands/codesearch): Learn about Code Search Command (/codesearch).
-- [AI Credits Command (/credits)](https://antigravity.google/docs/cli/commands/credits): Learn about AI Credits Command (/credits).
-- [Diff Command (/diff)](https://antigravity.google/docs/cli/commands/diff): Learn about Diff Command (/diff).
-- [Permissions Command (/permissions)](https://antigravity.google/docs/cli/commands/permissions): Learn about Permissions Command (/permissions).
-- [Resume Command (/resume)](https://antigravity.google/docs/cli/commands/resume): Learn about Resume Command (/resume).
-- [Status Line Command (/statusline)](https://antigravity.google/docs/cli/commands/statusline): Learn about Status Line Command (/statusline).
-- [Window Title Command (/title)](https://antigravity.google/docs/cli/commands/title): Learn about Window Title Command (/title).
-- [Model Quotas (/usage)](https://antigravity.google/docs/cli/commands/usage): Learn about Model Quotas (/usage).
-- [Best Practices](https://antigravity.google/docs/cli/best-practices): Learn about Best Practices.
-- [Troubleshooting](https://antigravity.google/docs/cli/troubleshooting): Learn about Troubleshooting.
-- [CLI Reference](https://antigravity.google/docs/cli/reference): Learn about CLI Reference.
+- [cli-overview](https://antigravity.google/docs/cli/overview): Learn about cli-overview.
+- [cli-getting-started](https://antigravity.google/docs/cli/getting-started): Learn about cli-getting-started.
+- [cli-install](https://antigravity.google/docs/cli/install): Learn about cli-install.
+- [cli-tutorial](https://antigravity.google/docs/cli/tutorial): Learn about cli-tutorial.
+- [cli-using](https://antigravity.google/docs/cli/using): Learn about cli-using.
+- [cli-features](https://antigravity.google/docs/cli/features): Learn about cli-features.
+- [gcli-migration](https://antigravity.google/docs/cli/gcli-migration): Learn about gcli-migration.
+- [cli-prompting](https://antigravity.google/docs/cli/prompting): Learn about cli-prompting.
+- [cli-headless](https://antigravity.google/docs/cli/headless): Learn about cli-headless.
+- [cli-artifacts](https://antigravity.google/docs/cli/artifacts): Learn about cli-artifacts.
+- [cli-conversations](https://antigravity.google/docs/cli/conversations): Learn about cli-conversations.
+- [cli-modes](https://antigravity.google/docs/cli/modes): Learn about cli-modes.
+- [cli-projects](https://antigravity.google/docs/cli/projects): Learn about cli-projects.
+- [cli-subagents](https://antigravity.google/docs/cli/subagents): Learn about cli-subagents.
+- [cli-sandbox](https://antigravity.google/docs/cli/sandbox): Learn about cli-sandbox.
+- [cli-settings](https://antigravity.google/docs/cli/settings): Learn about cli-settings.
+- [cli-vim-editor-mode](https://antigravity.google/docs/cli/vim-editor-mode): Learn about cli-vim-editor-mode.
+- [cli-credits](https://antigravity.google/docs/cli/credits): Learn about cli-credits.
+- [mcp](https://antigravity.google/docs/cli/mcp): Learn about mcp.
+- [cli-plugins](https://antigravity.google/docs/cli/plugins): Learn about cli-plugins.
+- [cli-permissions](https://antigravity.google/docs/cli/permissions): Learn about cli-permissions.
+- [cli-statusline](https://antigravity.google/docs/cli/statusline): Learn about cli-statusline.
+- [cli-title](https://antigravity.google/docs/cli/title): Learn about cli-title.
+- [agents](https://antigravity.google/docs/cli/commands/agents): Learn about agents.
+- [codesearch](https://antigravity.google/docs/cli/commands/codesearch): Learn about codesearch.
+- [credits](https://antigravity.google/docs/cli/commands/credits): Learn about credits.
+- [diff](https://antigravity.google/docs/cli/commands/diff): Learn about diff.
+- [permissions](https://antigravity.google/docs/cli/commands/permissions): Learn about permissions.
+- [resume](https://antigravity.google/docs/cli/commands/resume): Learn about resume.
+- [statusline](https://antigravity.google/docs/cli/commands/statusline): Learn about statusline.
+- [title](https://antigravity.google/docs/cli/commands/title): Learn about title.
+- [usage](https://antigravity.google/docs/cli/commands/usage): Learn about usage.
+- [cli-best-practices](https://antigravity.google/docs/cli/best-practices): Learn about cli-best-practices.
+- [cli-troubleshooting](https://antigravity.google/docs/cli/troubleshooting): Learn about cli-troubleshooting.
+- [cli-reference](https://antigravity.google/docs/cli/reference): Learn about cli-reference.
 
 ### Antigravity SDK
-- [Overview + Quick Start](https://antigravity.google/docs/sdk/overview): Learn about Overview + Quick Start.
-- [MCP](https://antigravity.google/docs/sdk/mcp): Learn about MCP.
+- [sdk-overview](https://antigravity.google/docs/sdk/overview): Learn about sdk-overview.
+- [mcp](https://antigravity.google/docs/sdk/mcp): Learn about mcp.
 
 ### Antigravity IDE
-- [Overview](https://antigravity.google/docs/ide/overview): Learn about Overview.
-- [Getting Started](https://antigravity.google/docs/ide/getting-started): Learn about Getting Started.
-- [Tab](https://antigravity.google/docs/ide/tab): Learn about Tab.
-- [Side Panel](https://antigravity.google/docs/ide/agent-side-panel): Learn about Side Panel.
-- [Review Changes](https://antigravity.google/docs/ide/review-changes-editor): Learn about Review Changes.
-- [Plan](https://antigravity.google/docs/ide/implementation-plan): Learn about Plan.
-- [Walkthrough](https://antigravity.google/docs/ide/walkthrough): Learn about Walkthrough.
-- [Screenshots](https://antigravity.google/docs/ide/screenshots): Learn about Screenshots.
-- [Browser Recordings](https://antigravity.google/docs/ide/browser-recordings): Learn about Browser Recordings.
-- [Overview](https://antigravity.google/docs/ide/browser): Learn about Overview.
-- [Allowlist / Denylist](https://antigravity.google/docs/ide/allowlist-denylist): Learn about Allowlist / Denylist.
-- [Separate Chrome Profile](https://antigravity.google/docs/ide/separate-chrome-profile): Learn about Separate Chrome Profile.
-- [MCP](https://antigravity.google/docs/ide/mcp): Learn about MCP.
-- [Skills](https://antigravity.google/docs/ide/skills): Learn about Skills.
-- [Rules](https://antigravity.google/docs/ide/rules): Learn about Rules.
-- [Workflows](https://antigravity.google/docs/ide/workflows): Learn about Workflows.
-- [Plugins](https://antigravity.google/docs/ide/plugins): Learn about Plugins.
-- [Hooks](https://antigravity.google/docs/ide/hooks): Learn about Hooks.
-- [Settings](https://antigravity.google/docs/ide/settings): Learn about Settings.
+- [ide-overview](https://antigravity.google/docs/ide/overview): Learn about ide-overview.
+- [ide-getting-started](https://antigravity.google/docs/ide/getting-started): Learn about ide-getting-started.
+- [tab](https://antigravity.google/docs/ide/tab): Learn about tab.
+- [agent-side-panel](https://antigravity.google/docs/ide/agent-side-panel): Learn about agent-side-panel.
+- [review-changes-editor](https://antigravity.google/docs/ide/review-changes-editor): Learn about review-changes-editor.
+- [ide-implementation-plan](https://antigravity.google/docs/ide/implementation-plan): Learn about ide-implementation-plan.
+- [ide-walkthrough](https://antigravity.google/docs/ide/walkthrough): Learn about ide-walkthrough.
+- [ide-screenshots](https://antigravity.google/docs/ide/screenshots): Learn about ide-screenshots.
+- [ide-browser-recordings](https://antigravity.google/docs/ide/browser-recordings): Learn about ide-browser-recordings.
+- [browser](https://antigravity.google/docs/ide/browser): Learn about browser.
+- [allowlist-denylist](https://antigravity.google/docs/ide/allowlist-denylist): Learn about allowlist-denylist.
+- [separate-chrome-profile](https://antigravity.google/docs/ide/separate-chrome-profile): Learn about separate-chrome-profile.
+- [mcp](https://antigravity.google/docs/ide/mcp): Learn about mcp.
+- [ide-skills](https://antigravity.google/docs/ide/skills): Learn about ide-skills.
+- [ide-rules](https://antigravity.google/docs/ide/rules): Learn about ide-rules.
+- [ide-workflows](https://antigravity.google/docs/ide/workflows): Learn about ide-workflows.
+- [ide-plugins](https://antigravity.google/docs/ide/plugins): Learn about ide-plugins.
+- [ide-hooks](https://antigravity.google/docs/ide/hooks): Learn about ide-hooks.
+- [ide-settings](https://antigravity.google/docs/ide/settings): Learn about ide-settings.
 
 ### Migration
-- [Firebase Studio Migration](https://antigravity.google/docs/firebase-studio-migration): Learn about Firebase Studio Migration.
+- [firebase-studio-migration](https://antigravity.google/docs/firebase-studio-migration): Learn about firebase-studio-migration.
 
 ### Enterprise
-- [Enterprise](https://antigravity.google/docs/enterprise): Learn about Enterprise.
+- [enterprise](https://antigravity.google/docs/enterprise): Learn about enterprise.
 
 ### Plans
-- [Plans](https://antigravity.google/docs/plans): Learn about Plans.
+- [plans](https://antigravity.google/docs/plans): Learn about plans.
 
 ### FAQ
-- [FAQ](https://antigravity.google/docs/faq): Learn about FAQ.
+- [faq](https://antigravity.google/docs/faq): Learn about faq.

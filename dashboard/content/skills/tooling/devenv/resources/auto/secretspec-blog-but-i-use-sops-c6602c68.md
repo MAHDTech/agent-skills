@@ -54,10 +54,11 @@ The same secret can come from a developer’s [system
 keyring](https://secretspec.dev/providers/keyring/) or CI [environment
 variables](https://secretspec.dev/providers/env/), while a more sensitive production
 environment resolves it from [Vault](https://secretspec.dev/providers/vault/). Applications
-use the same declaration through eight SDKs for [Rust](https://secretspec.dev/sdk/rust/),
+use the same declaration through nine SDKs for [Rust](https://secretspec.dev/sdk/rust/),
 [Python](https://secretspec.dev/sdk/python/), [Go](https://secretspec.dev/sdk/go/), [Ruby](https://secretspec.dev/sdk/ruby/),
 [Node.js/TypeScript](https://secretspec.dev/sdk/nodejs/), [Haskell](https://secretspec.dev/sdk/haskell/),
-[PHP](https://secretspec.dev/sdk/php/), and [C#](https://secretspec.dev/sdk/csharp/) without knowing the provider.
+[PHP](https://secretspec.dev/sdk/php/), [C#](https://secretspec.dev/sdk/csharp/), and [Swift (0.18+)](https://secretspec.dev/sdk/swift/)
+without knowing the provider.
 
 Encrypted files also make the key workflow a project-wide requirement.
 Adding a teammate means adding their key to `.sops.yaml` and

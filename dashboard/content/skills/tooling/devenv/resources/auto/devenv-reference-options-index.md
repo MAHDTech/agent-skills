@@ -880,6 +880,22 @@ true
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
+## claude.code.agent
+
+The agent to use as Claude Code’s primary agent.
+
+*Type:* null or string
+
+*Default:*
+
+```
+null
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
+
 ## claude.code.agents
 
 Custom Claude Code sub-agents to create in the project. Sub-agents are specialized AI assistants that handle specific tasks with their own context window and can be invoked automatically or explicitly.
@@ -899,8 +915,7 @@ For more details, see: https://docs.anthropic.com/en/docs/claude-code/sub-agents
 ```
 {
   code-reviewer = {
-    description = "Expert code review specialist that checks for quality, security, and best practices";
-    proactive = true;
+    description = "Expert code review specialist that checks for quality, security, and best practices. Use proactively after code changes.";
     model = "opus";
     tools = [ "Read" "Grep" "TodoWrite" ];
     permissionMode = "plan";
@@ -918,7 +933,6 @@ For more details, see: https://docs.anthropic.com/en/docs/claude-code/sub-agents
 
   test-writer = {
     description = "Specialized in writing comprehensive test suites";
-    proactive = false;
     tools = [ "Read" "Write" "Edit" "Bash" ];
     prompt = ''
       You are a test writing specialist. Create comprehensive test suites that:
@@ -945,16 +959,38 @@ What the sub-agent does
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
 
-## claude.code.agents.\<name\>.model
+## claude.code.agents.\<name\>.effort
 
-Override the model for this agent.
+Override the effort level for this agent.
 
-*Type:* null or one of “opus”, “sonnet”, “haiku”
+*Type:* null or one of “low”, “medium”, “high”, “xhigh”, “max”
 
 *Default:*
 
 ```
 null
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
+
+## claude.code.agents.\<name\>.model
+
+Override the model for this agent. Accepts an alias (`sonnet`, `opus`, `haiku`, `fable`), a full model ID (e.g. `claude-opus-5`), or `inherit`.
+
+*Type:* null or string
+
+*Default:*
+
+```
+null
+```
+
+*Example:*
+
+```
+"opus"
 ```
 
 *Declared by:*
@@ -963,30 +999,14 @@ null
 
 ## claude.code.agents.\<name\>.permissionMode
 
-Permission mode for this specific sub-agent.
+Permission mode for this specific sub-agent. `manual` is an alias for `default`.
 
-*Type:* null or one of “default”, “acceptEdits”, “plan”, “bypassPermissions”
+*Type:* null or one of “default”, “manual”, “acceptEdits”, “plan”, “auto”, “dontAsk”, “bypassPermissions”
 
 *Default:*
 
 ```
 null
-```
-
-*Declared by:*
-
-- <https://github.com/cachix/devenv/blob/main/src/modules/integrations/claude.nix>
-
-## claude.code.agents.\<name\>.proactive
-
-Whether Claude should use this sub-agent automatically
-
-*Type:* boolean
-
-*Default:*
-
-```
-false
 ```
 
 *Declared by:*
@@ -1128,14 +1148,24 @@ Custom environment variables for Claude Code sessions.
 
 ## claude.code.forceLoginMethod
 
-Restrict the login method to either browser or API key authentication.
+Restrict the login method.
 
-*Type:* null or one of “browser”, “api-key”
+- claudeai: only claude.ai accounts
+- console: only Claude Console (API key) accounts
+- gateway: only a cloud gateway
+
+*Type:* null or one of “claudeai”, “console”, “gateway”
 
 *Default:*
 
 ```
 null
+```
+
+*Example:*
+
+```
+"claudeai"
 ```
 
 *Declared by:*
@@ -1645,12 +1675,14 @@ Allow Claude Code to access directories outside the project root.
 
 Global permission mode for Claude Code.
 
-- default: Prompts on first use of each tool
+- default: Prompts on first use of each tool (`manual` is an alias)
 - acceptEdits: Auto-accepts file edits
 - plan: Read-only mode
+- auto: Auto-approves tool calls with background safety checks
+- dontAsk: Auto-denies unless pre-approved via permissions
 - bypassPermissions: Skips all permission prompts
 
-*Type:* null or one of “default”, “acceptEdits”, “plan”, “bypassPermissions”
+*Type:* null or one of “default”, “manual”, “acceptEdits”, “plan”, “auto”, “dontAsk”, “bypassPermissions”
 
 *Default:*
 
@@ -1670,7 +1702,7 @@ null
 
 ## claude.code.permissions.disableBypassPermissionsMode
 
-Security option to prevent the dangerous bypassPermissions mode.
+Security option to prevent the dangerous bypassPermissions mode. Written to `settings.json` as `"disableBypassPermissionsMode": "disable"`.
 
 *Type:* null or boolean
 
@@ -2459,7 +2491,7 @@ The latest version of devenv.
 *Default:*
 
 ```
-"2.2.0"
+"2.2.2"
 ```
 
 *Declared by:*
@@ -11295,6 +11327,12 @@ Whether to enable Cabal.
 true
 ```
 
+*Example:*
+
+```
+true
+```
+
 *Declared by:*
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/languages/haskell.nix>
@@ -11355,11 +11393,17 @@ pkgs.haskell-language-server
 
 ## languages.haskell.stack.enable
 
-Whether to enable the Haskell Stack
+Whether to enable Stack.
 
 *Type:* boolean
 
 *Default:*
+
+```
+true
+```
+
+*Example:*
 
 ```
 true
@@ -14678,6 +14722,8 @@ Use Clang as the Rust linker driver on Linux.
 
 This avoids GCC’s `collect2` wrapper, which can hit `Argument list too long` in large Nix development environments before the final linker receives Rust’s response file.
 
+On x86_64 Linux (glibc), Clang uses LLD unless another linker is enabled.
+
 *Type:* boolean
 
 *Default:*
@@ -16846,7 +16892,7 @@ Not used when `unixSocket.enable` is true.
 
 Top-level process-compose.yaml options
 
-Example: https://github.com/F1bonacc1/process-compose/blob/main/process-compose.yaml\`
+Example: https://github.com/F1bonacc1/process-compose/blob/main/process-compose.yaml
 
 *Type:* YAML 1.1 value
 
@@ -17269,7 +17315,7 @@ Resolved port value (allocated by devenv)
 
 process-compose.yaml specific process attributes.
 
-Example: https://github.com/F1bonacc1/process-compose/blob/main/process-compose.yaml\`
+Example: `https://github.com/F1bonacc1/process-compose/blob/main/process-compose.yaml`
 
 Only used when using `process.manager.implementation = "process-compose";`
 
@@ -19096,11 +19142,7 @@ config.env.DEVENV_STATE + "/couchdb"
 
 ## services.couchdb.settings
 
-CouchDB configuration. to know more about all settings, look at:
-
-<link
-xlink:href=“https://docs.couchdb.org/en/stable/config/couchdb.html”
-/>
+CouchDB configuration. https://docs.couchdb.org/en/stable/config/couchdb.html
 
 *Type:* open submodule of attribute set of section of an INI file (attrs of INI atom (null, bool, int, float or string))
 
@@ -25758,6 +25800,51 @@ Process-specific configuration. Only used when type = “process”.
 
 ```
 { }
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
+
+## tasks.\<name\>.process.linux
+
+Linux-specific process configuration.
+
+Requires devenv 2.0+.
+
+*Type:* submodule
+
+*Default:*
+
+```
+{ }
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
+
+## tasks.\<name\>.process.linux.capabilities
+
+Linux capabilities to add as ambient capabilities for this process (e.g., “cap_net_admin”, “cap_sys_admin”).
+
+Requires devenv 2.0+.
+
+*Type:* list of string
+
+*Default:*
+
+```
+[ ]
+```
+
+*Example:*
+
+```
+[
+  "cap_net_admin"
+  "cap_sys_admin"
+]
 ```
 
 *Declared by:*

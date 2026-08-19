@@ -14,15 +14,15 @@ and plugin specific permissions are used.
     Create your Tauri application. In our example we will facilitate
     [`create-tauri-app`](https://github.com/tauri-apps/create-tauri-app):
 
-    - [Bash](#tab-panel-6167)
-    - [PowerShell](#tab-panel-6168)
-    - [Fish](#tab-panel-6169)
-    - [npm](#tab-panel-6170)
-    - [Yarn](#tab-panel-6171)
-    - [pnpm](#tab-panel-6172)
-    - [deno](#tab-panel-6173)
-    - [bun](#tab-panel-6174)
-    - [Cargo](#tab-panel-6175)
+    - [Bash](#tab-panel-5786)
+    - [PowerShell](#tab-panel-5787)
+    - [Fish](#tab-panel-5788)
+    - [npm](#tab-panel-5789)
+    - [Yarn](#tab-panel-5790)
+    - [pnpm](#tab-panel-5791)
+    - [deno](#tab-panel-5792)
+    - [bun](#tab-panel-5793)
+    - [Cargo](#tab-panel-5794)
 
     ```
     sh <(curl https://create.tauri.app/sh)

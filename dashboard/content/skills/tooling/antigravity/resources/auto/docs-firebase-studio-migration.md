@@ -8,12 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Migration
-  \>
-- Firebase Studio Migration
+Markdownkeyboard_arrow_down
 
-# Firebase Studio Migration[link](#firebase-studio-migration)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Firebase Studio Migration
 
 Antigravity is Google’s next-generation, agent-first platform. It’s
 designed to be the primary home for high-velocity, autonomous
@@ -21,7 +22,7 @@ development workflows. Instead of relying on just a cloud-based web
 editor, Antigravity brings the power of AI right into your local
 development environment.
 
-## Why Antigravity?[link](#why-antigravity)
+## Why Antigravity?
 
 Antigravity offers significant enhancements over the web-based Code view
 in Firebase Studio:
@@ -37,53 +38,37 @@ in Firebase Studio:
   projects to Firebase, communicate with Firebase services via the
   Firebase CLI, and test your functions locally as you always have.
 
-## Learn how to navigate Antigravity[link](#learn-how-to-navigate-antigravity)
+## Learn how to navigate Antigravity
 
 To help you settle in, here is where you can find your favorite Firebase
 Studio features in Antigravity:
 
-[](https://antigravity.google/docs/ide/overview)
-
-code
-
-Cloud IDE Code viewkeyboard_arrow_right
+Cloud IDE Code view
 
 Enjoy the familiar interface of VS Code, but supercharged with AI and
 running locally on your hardware.
 
-[](https://antigravity.google/docs/agent)
-
-auto_awesome
-
-Agentic chatkeyboard_arrow_right
+Agentic chat
 
 The AI chat you used in Firebase Studio is now natively integrated into
 your IDE, capable of taking autonomous actions across your local files.
 
-[](https://antigravity.google/docs/tools)
-
-rocket_launch
-
-App Hosting deploymentskeyboard_arrow_right
+App Hosting deployments
 
 You can continue to deploy and manage your App Hosting URLs seamlessly
 using the Firebase CLI or built-in IDE integrations.
 
-[](https://antigravity.google/docs/ide/browser)
-
-important_devices
-
-Browser-based emulatorskeyboard_arrow_right
+Browser-based emulators
 
 Run the Firebase Local Emulator Suite directly on your machine for
 faster, offline testing.
 
-## Migrate your Firebase Studio project to Antigravity[link](#migrate-your-firebase-studio-project-to-antigravity)
+## Migrate your Firebase Studio project to Antigravity
 
 Antigravity is a local, agent-first IDE that brings the power of AI into
 your local development environment.
 
-### Prerequisites[link](#prerequisites)
+### Prerequisites
 
 Ensure you have the following installed locally and fully up-to-date:
 
@@ -92,7 +77,7 @@ Ensure you have the following installed locally and fully up-to-date:
 - [Firebase CLI](https://firebase.google.com/docs/cli) (version 15.10.0
   or higher)
 
-### Step 1: Export and initialize your app[link](#step-1-export-and-initialize-your-app)
+### Step 1: Export and initialize your app
 
 **Option 1: Automated migration**
 
@@ -112,9 +97,7 @@ transformation.
     the **Gemini Flash** model. It’s designed for speed and efficiency
     in high-volume transformation tasks like file conversion.
 
-content_copy
-
-```
+``` astro-code
 @fbs-to-agy-export
 ```
 
@@ -122,11 +105,6 @@ The Antigravity agent will then begin project migration, requesting your
 assistance along the way. Follow the agent’s guidance to complete the
 migration process. If you encounter any errors, prompt the agent to try
 again.
-
-info
-
-If the download window doesn’t appear, check your browser’s address bar
-for a pop-up blocker icon and ensure pop-ups are allowed.
 
 **Option 2: Manual export**
 
@@ -138,22 +116,11 @@ Open your terminal and run the following command, replacing `<path>`
 with the file path to your extracted project folder or the original
 `.zip` file:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 npx firebase-tools@latest studio:export <path>
 ```
 
-warning
-
-The studio:export command is currently optimized for Next.js, Flutter,
-and Angular workspaces. While you can use this command for other
-workspace types, the migration may not be fully successful. We’re
-actively working to improve the migration flow.
-
-### Step 2: Preview your app[link](#step-2-preview-your-app)
+### Step 2: Preview your app
 
 Once you have extracted your project and opened it within Antigravity,
 you can view your application locally:
@@ -163,13 +130,7 @@ you can view your application locally:
 2.  Click the play button to start your local development server.
 3.  Follow the instructions in the terminal to preview your app.
 
-lightbulb
-
-To refine your app or troubleshoot issues, simply chat with the agent
-using natural language. If the agent pane is hidden, click the Toggle
-Agent icon at the top of the window to reopen it.
-
-### Step 3: Publish your app[link](#step-3-publish-your-app)
+### Step 3: Publish your app
 
 Antigravity uses agent skills to publish your app using Firebase best
 practices.
@@ -177,9 +138,7 @@ practices.
 1.  In the chat panel, enter the following prompt: simply instruct the
     agent:
 
-content_copy
-
-```
+``` astro-code
 Publish my app
 ```
 
@@ -190,7 +149,7 @@ Publish my app
 3.  For future updates, simply instruct the agent to `publish my app` in
     the Antigravity chat panel.
 
-## Continue your work[link](#continue-your-work)
+## Continue your work
 
 There are several ways you can continue your development in Antigravity.
 
@@ -208,11 +167,9 @@ Thank you for being part of the Firebase Studio journey. Your prototypes
 and feedback have directly shaped Google’s AI tools, and we can’t wait
 to see what you build next in Antigravity!
 
-## Need help?[link](#need-help)
+## Need help?
 
 File any migration bugs in our [GitHub
 Issues](https://github.com/firebase/firebase-tools/issues).
-
-On this Page
 
 {% endraw %}

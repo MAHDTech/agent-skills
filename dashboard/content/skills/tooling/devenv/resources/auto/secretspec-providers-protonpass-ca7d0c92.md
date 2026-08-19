@@ -24,6 +24,7 @@ storage.
 | Best for | End-to-end encrypted cloud storage through Proton Pass |
 | Authentication | A `pass-cli` login or personal access token |
 | Default storage | Note item `{project}/{profile}/{key}` in the `secretspec` vault |
+| Requires | Official `pass-cli`, pinned to a version you have tested (see [compatibility](#pass-cli-compatibility)) |
 
 ## Quick start
 
@@ -43,6 +44,8 @@ Terminal window
   [proton.me/pass/download](https://proton.me/pass/download)
 - A Proton account, signed in via `pass-cli login`
 - A vault to store secrets in (e.g. `pass-cli vault create secretspec`)
+- A `pass-cli` version that works with your SecretSpec release, see
+  [`pass-cli` compatibility](#pass-cli-compatibility)
 
 ### Authentication
 
@@ -55,6 +58,55 @@ $ pass-cli login
 Terminal window
 
 For CI, use a personal access token as shown in [CI/CD](#cicd).
+
+## `pass-cli` compatibility
+
+Each of these `pass-cli` releases changed behaviour the provider relies
+on:
+
+| `pass-cli` | What changed | SecretSpec |
+|----|----|----|
+| 2.0.3 (2026-05-19) | `item list` output shape | Handled in 0.12.1+ |
+| 2.1.0 (2026-05-20) | Agent sessions reject audited item operations that carry no reason | Handled in 0.12.0+, see [Agent sessions](#agent-sessions) |
+| 2.2.4 (2026-07-31) | `pass-cli test` removed | Handled in 0.19+ ([\#279](https://github.com/cachix/secretspec/issues/279)) |
+
+SecretSpec probes the session once per run before any read or write.
+SecretSpec 0.18.0 and earlier probe with `pass-cli test`, so on
+`pass-cli` 2.2.4 and later every Proton Pass operation fails with:
+
+```
+Provider operation failed: error: unrecognized subcommand 'test'
+```
+
+SecretSpec 0.19+ tries `pass-cli info` and falls back to
+`pass-cli test`, so it works with every `pass-cli` release regardless of
+which check that release carries. `info` is preferred because it runs
+behind the CLI’s authentication gate and so reports whether a valid
+session is present, while `test` only proved that Proton’s servers were
+reachable. A `pass-cli` carrying neither is reported as incompatible
+with your SecretSpec release rather than surfacing the CLI’s usage text.
+
+On SecretSpec 0.18.0 and earlier, use `pass-cli` 2.2.3, the last release
+published before `pass-cli test` was removed.
+
+### Pinning a `pass-cli` version
+
+Install a specific release instead of tracking the latest build, and
+point SecretSpec at it with `SECRETSPEC_PROTONPASS_CLI_PATH`:
+
+```
+$ curl -Lo ~/.local/bin/pass-cli-2.2.3 \    https://github.com/protonpass/pass-cli/releases/download/2.2.3/pass-cli-linux-x86_64
+$ chmod +x ~/.local/bin/pass-cli-2.2.3
+$ export SECRETSPEC_PROTONPASS_CLI_PATH="$HOME/.local/bin/pass-cli-2.2.3"
+```
+
+Terminal window
+
+Every [release](https://github.com/protonpass/pass-cli/releases)
+publishes a `.sha256` file next to each binary; verify it before use.
+Pin the same version in CI rather than installing the latest `pass-cli`
+on each run, and treat a `pass-cli` upgrade as a change worth testing:
+run `secretspec check` against the new version before rolling it out.
 
 ## Configuration
 
@@ -75,8 +127,6 @@ protonpass://[vault_name[/title-template]]
 # Specific vaultprotonpass://Work
 # Specific vault and custom title templateprotonpass://Work/{project}/{profile}/{key}
 ```
-
-Terminal window
 
 ### Project configuration
 
@@ -108,7 +158,8 @@ item in place.
 
 ```
 # Create a token$ pass-cli personal-access-token create --name ci --expiration 1y
-# Authenticate in CI (store the token as a CI secret)$ pass-cli login --pat $PROTON_PASS_PAT$ secretspec run -- deploy
+# Authenticate in CI (store the token as a CI secret)$ pass-cli login --pat $PROTON_PASS_PAT
+$ secretspec run -- deploy
 ```
 
 Terminal window

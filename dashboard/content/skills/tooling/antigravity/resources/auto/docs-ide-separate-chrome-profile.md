@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Browser
-  \>
-- Separate Chrome Profile
+Markdownkeyboard_arrow_down
 
-# Separate Chrome Profile[link](#separate-chrome-profile)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Separate Chrome Profile
 
 To isolate the browser from your general browsing, it operates on a
 [separate Chrome
@@ -36,7 +35,5 @@ If you would like to change the location where your browser profile will
 be created, you can modify the following setting in the browser section.
 
 ![Browser Profile](https://antigravity.google/assets/image/docs/browser/browser-profile.png)
-
-On this Page
 
 {% endraw %}

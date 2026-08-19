@@ -1,13 +1,12 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Settings
-  \>
-- Agent Settings
+Markdownkeyboard_arrow_down
 
-# Agent Settings[link](#agent-settings)
+content_copyCopy Markdown
 
-### Terminal Command Auto Execution[link](#terminal-command-auto-execution)
+open_in_newView Markdown
+
+# Agent Settings
+
+### Terminal Command Auto Execution
 
 Controls how the agent executes generated shell commands:
 
@@ -18,7 +17,7 @@ Controls how the agent executes generated shell commands:
   without prompting (except those explicitly added to your configurable
   Deny list).
 
-### Agent Non-Workspace File Access[link](#agent-non-workspace-file-access)
+### Agent Non-Workspace File Access
 
 Allows the agent to view and edit files outside of the active project
 folders.
@@ -29,5 +28,3 @@ folders.
   etc.).
 - Enforcing this boundary protects your local sensitive data. Enable
   non-workspace access with caution.
-
-On this Page

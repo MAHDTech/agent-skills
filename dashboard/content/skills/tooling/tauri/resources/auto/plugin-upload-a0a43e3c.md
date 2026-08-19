@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/upload)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-upload)[crates.io](https://crates.io/crates/tauri-plugin-upload)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/upload/)[](https://docs.rs/tauri-plugin-upload)
+Reference:[](https://v2.tauri.app/reference/javascript/upload/)[](https://docs.rs/tauri-plugin-upload)
 
 Upload files from disk to a remote server over HTTP. Download files from
 a remote HTTP server to disk.
@@ -26,17 +26,17 @@ a remote HTTP server to disk.
 
 ## Setup
 
-- [Automatic](#tab-panel-6642)
-- [Manual](#tab-panel-6643)
+- [Automatic](#tab-panel-6261)
+- [Manual](#tab-panel-6262)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6631)
-- [yarn](#tab-panel-6632)
-- [pnpm](#tab-panel-6633)
-- [deno](#tab-panel-6634)
-- [bun](#tab-panel-6635)
-- [cargo](#tab-panel-6636)
+- [npm](#tab-panel-6250)
+- [yarn](#tab-panel-6251)
+- [pnpm](#tab-panel-6252)
+- [deno](#tab-panel-6253)
+- [bun](#tab-panel-6254)
+- [cargo](#tab-panel-6255)
 
 ```
 npm run tauri add upload
@@ -80,11 +80,11 @@ cargo tauri add upload
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6637)
-    - [yarn](#tab-panel-6638)
-    - [pnpm](#tab-panel-6639)
-    - [deno](#tab-panel-6640)
-    - [bun](#tab-panel-6641)
+    - [npm](#tab-panel-6256)
+    - [yarn](#tab-panel-6257)
+    - [pnpm](#tab-panel-6258)
+    - [deno](#tab-panel-6259)
+    - [bun](#tab-panel-6260)
 
     ```
     npm install @tauri-apps/plugin-upload

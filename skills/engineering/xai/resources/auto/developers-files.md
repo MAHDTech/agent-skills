@@ -78,7 +78,7 @@ uploaded_file = client.files.upload(
 )
 
 # 2. Chat with files
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 chat.append(user(
     "Summarize both documents",
     file(url=file_url),
@@ -117,7 +117,7 @@ const chatRes = await fetch("https://api.x.ai/v1/responses", {
     Authorization: \`Bearer \${process.env.XAI_API_KEY}\`,
   },
   body: JSON.stringify({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
       {
         role: "user",
@@ -162,7 +162,7 @@ Combine files with the [code execution tool](https://docs.x.ai/developers/model-
 
 * **File size**: Maximum 48 MB per file
 * **No batch requests**: File attachments with document search are agentic requests and do not support batch mode (`n > 1`)
-* **Agentic models only**: Requires models that support agentic tool calling (e.g., `grok-4.20`, `grok-4.5`)
+* **Agentic models only**: Requires models that support agentic tool calling (e.g., `grok-4.20`, `grok-4.5`, `grok-4.6`)
 * **Supported file formats**:
   * Plain text files (.txt)
   * Markdown files (.md)

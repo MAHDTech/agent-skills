@@ -69,7 +69,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {"role": "user", "content": "What is xAI?"}
   ],
@@ -86,7 +86,7 @@ from xai_sdk.tools import web_search, x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(),
         x_search(),
@@ -111,7 +111,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "user", "content": "What is xAI?"}
     ],
@@ -133,7 +133,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text, sources } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is xAI?',
   tools: {
     web_search: xai.tools.webSearch(), // inline citations are enabled by default
@@ -156,7 +156,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-  model: 'grok-4.5',
+  model: 'grok-4.6',
   input: [
     { role: 'user', content: 'What is xAI?' }
   ],
@@ -187,7 +187,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "user", "content": "What is xAI?"}
     ],
@@ -216,7 +216,7 @@ response = requests.post(
         "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}",
     },
     json={
-        "model": "grok-4.5",
+        "model": "grok-4.6",
         "include": ["no_inline_citations"],
         "input": [
             {"role": "user", "content": "What is xAI?"}
@@ -238,7 +238,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "include": ["no_inline_citations"],
   "input": [
     {"role": "user", "content": "What is xAI?"}
@@ -294,7 +294,7 @@ When inline citations are enabled, each `output_text` content block includes an 
   "completed_at": 1781829888,
   "id": "5808284d-ae14-9981-9289-73515f67ebda",
   "max_output_tokens": null,
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "object": "response",
   "output": [
     ...
@@ -394,7 +394,7 @@ import { xai } from '@ai-sdk/xai';
 import { streamText } from 'ai';
 
 const { fullStream } = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is xAI?',
   tools: {
     web_search: xai.tools.webSearch(),

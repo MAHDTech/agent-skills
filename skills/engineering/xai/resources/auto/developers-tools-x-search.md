@@ -25,7 +25,7 @@ from xai_sdk.tools import x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",  # reasoning model
+    model="grok-4.6",  # reasoning model
     tools=[x_search()],
     include=["verbose_streaming"],
 )
@@ -59,7 +59,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -81,7 +81,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text, sources } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What are people saying about xAI on X?',
   tools: {
     x_search: xai.tools.xSearch(),
@@ -97,7 +97,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -140,7 +140,7 @@ from xai_sdk.tools import x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         x_search(allowed_x_handles=["elonmusk"]),
     ],
@@ -152,7 +152,7 @@ chat.append(user("What is the current status of xAI?"))
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is the current status of xAI?"}],
     tools=[
         {
@@ -165,7 +165,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is the current status of xAI?',
   tools: {
     x_search: xai.tools.xSearch({
@@ -181,7 +181,7 @@ Use `excluded_x_handles` to prevent the model from including X posts from the sp
 
 ```pythonXAI
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         x_search(excluded_x_handles=["elonmusk"]),
     ],
@@ -190,7 +190,7 @@ chat = client.chat.create(
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is the current status of xAI?"}],
     tools=[
         {
@@ -203,7 +203,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is the current status of xAI?',
   tools: {
     x_search: xai.tools.xSearch({
@@ -229,7 +229,7 @@ from xai_sdk.tools import x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         x_search(
             from_date=datetime(2025, 10, 1),
@@ -244,7 +244,7 @@ chat.append(user("What is the current status of xAI?"))
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "What is the current status of xAI?"}],
     tools=[
         {
@@ -258,7 +258,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What is the current status of xAI?',
   tools: {
     x_search: xai.tools.xSearch({
@@ -275,7 +275,7 @@ Setting `enable_image_understanding` to true allows the agent to analyze images 
 
 ```pythonXAI
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         x_search(enable_image_understanding=True),
     ],
@@ -284,7 +284,7 @@ chat = client.chat.create(
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "Find X posts with images about AI"}],
     tools=[
         {
@@ -297,7 +297,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'Find X posts with images about AI',
   tools: {
     x_search: xai.tools.xSearch({
@@ -313,7 +313,7 @@ Setting `enable_video_understanding` to true allows the agent to analyze videos 
 
 ```pythonXAI
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         x_search(enable_video_understanding=True),
     ],
@@ -322,7 +322,7 @@ chat = client.chat.create(
 
 ```pythonOpenAISDK
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[{"role": "user", "content": "Find X posts with videos about AI"}],
     tools=[
         {
@@ -335,7 +335,7 @@ response = client.responses.create(
 
 ```javascriptAISDK
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'Find X posts with videos about AI',
   tools: {
     x_search: xai.tools.xSearch({

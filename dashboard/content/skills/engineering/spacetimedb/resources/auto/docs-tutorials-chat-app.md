@@ -101,21 +101,14 @@ SpacetimeDB](https://spacetimedb.com/install). This installs the
 No additional installation needed - Node.js/npm will handle
 dependencies.
 
-Next we need to [install .NET 8
-SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) so that we
+Next we need to [install .NET 10
+SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) so that we
 can build and publish our module.
 
-You may already have .NET 8 installed:
+You may already have .NET 10 installed:
 
 ``` codeBlockStandalone_LlrK
 dotnet --list-sdks
-```
-
-.NET 8.0 is the earliest to have the `wasi-experimental` workload that
-we rely on, but requires manual activation:
-
-``` codeBlockStandalone_LlrK
-dotnet workload install wasi-experimental
 ```
 
 Next we need to [install Rust](https://www.rust-lang.org/tools/install)
@@ -1449,6 +1442,15 @@ token if we refresh the page. The first time we connect, we won't have
 any credentials stored, so we pass `undefined` to the `withToken`
 method. This will cause SpacetimeDB to generate new credentials for us.
 
+warning
+
+With no token, SpacetimeDB issues a server-issued identity and a
+non-expiring token; persist it and pass it back on reconnect to keep the
+same identity. A lost token can't be recovered, so self-issued
+identities are for development. For production, authenticate with an
+OIDC provider such as SpacetimeAuth, which handles token lifecycle. See
+[Authentication](https://spacetimedb.com/docs/core-concepts/authentication).
+
 If you chose a different name for your database, replace
 `quickstart-chat` with that name, or republish your module as
 `quickstart-chat`.
@@ -1568,7 +1570,7 @@ reducer:
 const onSubmitNewName = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   setSettingName(false);
-  setName({ name: newName });
+  setName({ name: newName }).catch(console.error);
 };
 ```
 
@@ -1579,13 +1581,14 @@ Next, modify the `onSubmitMessage` callback by adding a call to the
 const onSubmitMessage = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   setNewMessage('');
-  sendMessage({ text: newMessage });
+  sendMessage({ text: newMessage }).catch(console.error);
 };
 ```
 
 SpacetimeDB generated these functions for us based on the type
 information provided by our module. Calling these functions will invoke
-our reducers in our module.
+our reducers in our module. They return a `Promise` that rejects if the
+reducer fails, so we log any error to the console.
 
 Let's try out our app to see the result of these changes.
 
@@ -2222,10 +2225,10 @@ void PrintMessage(RemoteTables tables, Message message)
 
 #### Warn if our name was rejected
 
-We can also register callbacks to run each time a reducer is invoked. We
-register these callbacks using the `OnReducerEvent` method of the
-`Reducer` namespace, which is automatically implemented for each reducer
-by `spacetime generate`.
+We can also register callbacks for reducer results. We register these
+callbacks using generated events on `conn.Reducers`, such as
+`conn.Reducers.OnSetName` and `conn.Reducers.OnSendMessage`, which are
+automatically implemented for each reducer by `spacetime generate`.
 
 Each reducer callback takes one fixed argument:
 
@@ -2242,21 +2245,17 @@ that contains several fields. The ones we care about are:
 It also takes a variable amount of additional arguments that match the
 reducer's arguments.
 
-These callbacks will be invoked in one of two cases:
+These callbacks are invoked for reducer calls made by this connection,
+whether the reducer commits successfully or fails.
 
-1.  If the reducer was successful and altered any of our subscribed
-    rows.
-2.  If we requested an invocation which failed.
-
-Note that a status of `Failed` or `OutOfEnergy` implies that the caller
-identity is our own identity.
+Note that the caller identity is our own identity for these callbacks.
 
 We already handle successful `SetName` invocations using our
 `User.OnUpdate` callback, but if the module rejects a user's chosen
 name, we'd like that user's client to let them know. We define a
-function `Reducer_OnSetNameEvent` as a `Reducer.OnSetNameEvent` callback
-which checks if the reducer failed, and if it did, prints an error
-message including the rejected name.
+function `Reducer_OnSetNameEvent` and register it with
+`conn.Reducers.OnSetName`; the callback checks if the reducer failed,
+and if it did, prints an error message including the rejected name.
 
 We'll test both that our identity matches the sender and that the status
 is `Failed`, even though the latter implies the former, for

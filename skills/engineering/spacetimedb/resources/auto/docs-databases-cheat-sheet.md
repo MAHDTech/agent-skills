@@ -65,7 +65,7 @@ const score = table(
   {
     name: 'score',
     indexes: [{
-      name: 'idx',
+      accessor: 'idx',
       algorithm: 'btree',
       columns: ['player_id', 'level'],
     }],
@@ -364,7 +364,7 @@ TypeScript: ScheduleAt import
 
 ``` codeBlockStandalone_LlrK
 const reminder = table(
-  { name: 'reminder', scheduled: (): any => send_reminder },
+  { name: 'reminder' },
   {
     id: t.u64().primaryKey().autoInc(),
     message: t.string(),
@@ -372,9 +372,14 @@ const reminder = table(
   }
 );
 
-export const send_reminder = spacetimedb.reducer({ arg: reminder.rowType }, (ctx, { arg }) => {
-  console.log(`Reminder: ${arg.message}`);
-});
+// `onSchedule` binds the reducer to the schedule table
+export const send_reminder = spacetimedb.reducer(
+  { onSchedule: reminder },
+  { arg: reminder.rowType },
+  (ctx, { arg }) => {
+    console.log(`Reminder: ${arg.message}`);
+  }
+);
 ```
 
 ``` codeBlockStandalone_LlrK
@@ -669,6 +674,12 @@ SPACETIMEDB_VIEW(std::vector<Player>, top_players, Public, ViewContext ctx) {
     return ctx.db[player_score].filter(range_from(int32_t(1000))).collect();
 }
 
+// Procedural view with update callbacks.
+SPACETIMEDB_VIEW(std::vector<Player>, top_players_with_updates, Public, ViewContext ctx) {
+    return ctx.db[player_score].filter(range_from(int32_t(1000))).collect();
+}
+VIEW_PrimaryKey(top_players_with_updates, id)
+
 // Perform a generic filter using the query builder.
 // Equivalent to `SELECT * FROM player WHERE score < 1000`.
 SPACETIMEDB_VIEW(Query<Player>, bottom_players, Public, ViewContext ctx) {
@@ -698,9 +709,9 @@ SPACETIMEDB_VIEW(std::optional<PlayerCount>, player_count, Public, AnonymousView
 ``` codeBlockStandalone_LlrK
 ctx.db                  // Database access
 ctx.sender              // Identity of caller
-ctx.connectionId        // ConnectionId | undefined
+ctx.connectionId        // ConnectionId | null
 ctx.timestamp           // Timestamp
-ctx.identity            // Module's identity
+ctx.databaseIdentity    // Module's identity
 ```
 
 ``` codeBlockStandalone_LlrK
@@ -708,7 +719,7 @@ ctx.Db                  // Database access
 ctx.Sender              // Identity of caller
 ctx.ConnectionId        // ConnectionId?
 ctx.Timestamp           // Timestamp
-ctx.Identity            // Module's identity
+ctx.DatabaseIdentity    // Module's identity
 ctx.Rng                 // Random number generator
 ```
 
@@ -717,7 +728,7 @@ ctx.db                  // Database access
 ctx.sender()            // Identity of caller
 ctx.connection_id()     // Option<ConnectionId>
 ctx.timestamp           // Timestamp
-ctx.identity()          // Module's identity
+ctx.database_identity() // Module's identity
 ctx.rng()               // Random number generator
 ```
 
@@ -726,7 +737,7 @@ ctx.db                  // Database access (Table accessor)
 ctx.sender()            // Identity of caller (Identity type)
 ctx.connection_id       // std::optional<ConnectionId>
 ctx.timestamp           // Timestamp of current transaction (Timestamp type)
-ctx.identity()          // Module's own identity (Identity type)
+ctx.database_identity() // Module's own identity (Identity type)
 ctx.rng()               // Random number generator (for seeded randomness)
 ```
 
@@ -791,6 +802,13 @@ LOG_DEBUG("Debug: " + msg);
     product types.
 9.  **`autoInc` not `autoIncrement`** — Use `.autoInc()` on column
     builders.
+10. **Row fields are camelCase** — Generated client row fields convert
+    snake_case column names: `trip_id` → `row.tripId`.
+11. **Await reducer calls** — Client reducer calls return
+    `Promise<void>` that rejects with `SenderError` on failure; `await`
+    or `.catch()` them.
+12. **Throw `SenderError` in reducers** — A plain `Error` surfaces as an
+    internal error, not a reducer error.
 
 *See Rust tab for module-specific tips.*
 
@@ -822,20 +840,20 @@ spacetime login                          # Authenticate
 # Module management
 spacetime build                          # Build module
 spacetime publish <NAME>                 # Publish module
-spacetime publish --delete-data <NAME>   # Reset database
+spacetime publish <NAME> --delete-data         # Reset database
 spacetime delete <NAME>                  # Delete database
 
 # Database operations
 spacetime logs <NAME>                    # View logs
 spacetime logs --follow <NAME>           # Stream logs
 spacetime sql <NAME> "SELECT * FROM t"   # Run SQL query
-spacetime describe <NAME>                # Show schema
+spacetime describe <NAME> --json         # Show schema
 spacetime call <NAME> reducer arg1 arg2  # Call reducer
 
 # Code generation
-spacetime generate --lang rust <NAME>    # Generate Rust client
-spacetime generate --lang csharp <NAME>  # Generate C# client
-spacetime generate --lang ts <NAME>      # Generate TypeScript client
+spacetime generate --lang rust --out-dir src/module_bindings --module-path spacetimedb
+spacetime generate --lang csharp --out-dir module_bindings --module-path spacetimedb
+spacetime generate --lang typescript --out-dir src/module_bindings --module-path spacetimedb
 ```
 
 ## Common Types

@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity IDE
-  \>
-- Features
-  \>
-- Side Panel
+Markdownkeyboard_arrow_down
 
-# Agent Side Panel[link](#agent-side-panel)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Agent Side Panel
 
 Use the panel on the right side of the editor to work directly with the
 agent. You can spin up new conversations, attach images, switch [agent
@@ -19,5 +18,3 @@ file changes, running terminal processes, and artifacts in the bottom
 toolbar above the input.
 
 ![Editor Agent Panel](https://antigravity.google/assets/image/docs/editor/agent_panel_toolbar.png)
-
-On this Page

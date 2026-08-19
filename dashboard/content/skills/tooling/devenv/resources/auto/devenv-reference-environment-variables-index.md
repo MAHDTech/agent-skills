@@ -50,7 +50,7 @@ Added in `1.0`
 
 Added in `0.5`
 
-**Read-only.** Points to the Nix store path that has the final profile of packages/scripts provided by devenv. Useful for teaching other programs about `/bin`, `/etc`, `/var` folders.
+**Read-only.** Points to the Nix store path that has the final profile of packages/scripts provided by devenv. Useful for teaching other programs about `/bin`, `/etc`, `/var` folders. See [Package outputs](https://devenv.sh/packages/#package-outputs) for which outputs of a package are linked into it.
 
 ### [`DEVENV_HOME`](#devenv_home)
 

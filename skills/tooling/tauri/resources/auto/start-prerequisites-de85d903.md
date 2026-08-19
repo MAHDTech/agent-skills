@@ -22,14 +22,14 @@ Tauri requires various system dependencies for development on Linux.
 These may be different depending on your distribution but we’ve included
 some popular distributions below to help you get setup.
 
-- [Debian](#tab-panel-7033)
-- [Arch](#tab-panel-7034)
-- [Fedora](#tab-panel-7035)
-- [Gentoo](#tab-panel-7036)
-- [OSTree](#tab-panel-7037)
-- [openSUSE](#tab-panel-7038)
-- [Alpine](#tab-panel-7039)
-- [NixOS](#tab-panel-7040)
+- [Debian](#tab-panel-6652)
+- [Arch](#tab-panel-6653)
+- [Fedora](#tab-panel-6654)
+- [Gentoo](#tab-panel-6655)
+- [OSTree](#tab-panel-6656)
+- [openSUSE](#tab-panel-6657)
+- [Alpine](#tab-panel-6658)
+- [NixOS](#tab-panel-6659)
 
 ```
 sudo apt updatesudo apt install libwebkit2gtk-4.1-dev \  build-essential \  curl \  wget \  file \  libxdo-dev \  libssl-dev \  libayatana-appindicator3-dev \  librsvg2-dev
@@ -169,8 +169,8 @@ for development. Install Rust using one of following methods. You can
 view more installation methods at
 <https://www.rust-lang.org/tools/install>.
 
-- [Linux and macOS](#tab-panel-7041)
-- [Windows](#tab-panel-7042)
+- [Linux and macOS](#tab-panel-6660)
+- [Windows](#tab-panel-6661)
 
 Install via [`rustup`](https://github.com/rust-lang/rustup) using the
 following command:
@@ -237,9 +237,9 @@ additional dependencies that you need to install:
     website](https://developer.android.com/studio)
 2.  Set the `JAVA_HOME` environment variable:
 
-- [Linux](#tab-panel-7030)
-- [macOS](#tab-panel-7031)
-- [Windows](#tab-panel-7032)
+- [Linux](#tab-panel-6649)
+- [macOS](#tab-panel-6650)
+- [Windows](#tab-panel-6651)
 
 ```
 export JAVA_HOME=/opt/android-studio/jbr
@@ -273,9 +273,9 @@ necessary, as they may introduce compatibility issues or security risks.
 
 4.  Set `ANDROID_HOME` and `NDK_HOME` environment variables.
 
-- [Linux](#tab-panel-7043)
-- [macOS](#tab-panel-7044)
-- [Windows](#tab-panel-7045)
+- [Linux](#tab-panel-6662)
+- [macOS](#tab-panel-6663)
+- [Windows](#tab-panel-6664)
 
 ```
 export ANDROID_HOME="$HOME/Android/Sdk"export NDK_HOME="$ANDROID_HOME/ndk/$(ls -1 $ANDROID_HOME/ndk)"

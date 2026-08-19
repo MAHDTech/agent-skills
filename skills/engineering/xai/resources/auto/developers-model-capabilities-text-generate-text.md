@@ -34,7 +34,7 @@ client = Client(
     timeout=3600,
 )
 
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 chat.append(system("You are Grok, an AI agent built to answer helpful questions."))
 chat.append(user("How big is the universe?"))
 response = chat.sample()
@@ -58,7 +58,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -82,7 +82,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         {
             role: "system",
@@ -106,7 +106,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text, response } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: "You are Grok, an AI agent built to answer helpful questions.",
   prompt: "How big is the universe?",
 });
@@ -123,7 +123,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "system",
@@ -152,7 +152,7 @@ client = Client(
     timeout=3600,
 )
 
-chat = client.chat.create(model="grok-4.5", store_messages=False)
+chat = client.chat.create(model="grok-4.6", store_messages=False)
 chat.append(system("You are Grok, an AI agent built to answer helpful questions."))
 chat.append(user("How big is the universe?"))
 response = chat.sample()
@@ -172,7 +172,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -193,7 +193,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         {
             role: "system",
@@ -216,7 +216,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "system",
@@ -242,13 +242,13 @@ If you want to return the encrypted thinking traces, you need to specify `use_en
 Modify the steps to create a chat client (xAI SDK) or change the request body as following:
 
 ```python customLanguage="pythonXAI"
-chat = client.chat.create(model="grok-4.5",
+chat = client.chat.create(model="grok-4.6",
         use_encrypted_content=True)
 ```
 
 ```python customLanguage="pythonOpenAISDK"
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -259,7 +259,7 @@ response = client.responses.create(
 
 ```javascript customLanguage="javascriptWithoutSDK"
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -276,7 +276,7 @@ import { generateText } from 'ai';
 // Encrypted reasoning content is included automatically by the AI SDK
 // as long as `store: false` is not set. No extra configuration is needed.
 const { text, reasoning } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: "You are Grok, an AI agent built to answer helpful questions.",
   prompt: "How big is the universe?",
 });
@@ -291,7 +291,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "system",
@@ -325,7 +325,7 @@ client = Client(
     timeout=3600,
 )
 
-chat = client.chat.create(model="grok-4.5", store_messages=True)
+chat = client.chat.create(model="grok-4.6", store_messages=True)
 chat.append(system("You are Grok, an AI agent built to answer helpful questions."))
 chat.append(user("How big is the universe?"))
 response = chat.sample()
@@ -339,7 +339,7 @@ print(response.id)
 # New steps
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     previous_response_id=response.id,
     store_messages=True,
 )
@@ -366,7 +366,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -382,7 +382,7 @@ print(response.id)
 # New steps
 
 second_response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     previous_response_id=response.id,
     input=[
         {"role": "user", "content": "How do stars form?"},
@@ -407,7 +407,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         {
             role: "system",
@@ -426,7 +426,7 @@ console.log(response);
 console.log(response.id);
 
 const secondResponse = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     previous_response_id: response.id,
     input: [
         {"role": "user", "content": "How do stars form?"},
@@ -445,7 +445,7 @@ import { generateText } from 'ai';
 
 // First request
 const result = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: "You are Grok, an AI agent built to answer helpful questions.",
   prompt: "How big is the universe?",
 });
@@ -457,7 +457,7 @@ const responseId = result.response.id;
 
 // Continue the conversation using previousResponseId
 const { text: secondResponse } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: "How do stars form?",
   providerOptions: {
     xai: {
@@ -475,7 +475,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "previous_response_id": "The previous response ID",
     "input": [
         {
@@ -505,7 +505,7 @@ client = Client(
     timeout=3600,
 )
 
-chat = client.chat.create(model="grok-4.5", store_messages=True, use_encrypted_content=True)
+chat = client.chat.create(model="grok-4.6", store_messages=True, use_encrypted_content=True)
 chat.append(system("You are Grok, an AI agent built to answer helpful questions."))
 chat.append(user("How big is the universe?"))
 response = chat.sample()
@@ -543,7 +543,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are Grok, an AI agent built to answer helpful questions."},
         {"role": "user", "content": "How big is the universe?"},
@@ -560,7 +560,7 @@ print(response.id)
 # New steps
 
 second_response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         *response.output,  # Use response.output instead of the stored response
         {"role": "user", "content": "How do stars form?"},
@@ -585,7 +585,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         {
             role: "system",
@@ -605,7 +605,7 @@ console.log(response);
 console.log(response.id);
 
 const secondResponse = await client.responses.create({
-    model: "grok-4.5",
+    model: "grok-4.6",
     input: [
         ...response.output,  // Use response.output instead of the stored response
         {"role": "user", "content": "How do stars form?"},
@@ -625,7 +625,7 @@ import { generateText } from 'ai';
 // First request. Encrypted reasoning content is included automatically
 // by the AI SDK as long as `store: false` is not set.
 const result = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   system: "You are Grok, an AI agent built to answer helpful questions.",
   prompt: "How big is the universe?",
 });
@@ -635,7 +635,7 @@ console.log(result.text);
 // Continue the conversation using previousResponseId
 // The encrypted content is automatically included when using previousResponseId
 const { text: secondResponse } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: "How do stars form?",
   providerOptions: {
     xai: {
@@ -653,7 +653,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600 \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "system",

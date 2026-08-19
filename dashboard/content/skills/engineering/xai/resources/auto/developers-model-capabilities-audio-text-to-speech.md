@@ -119,6 +119,7 @@ The response body contains raw audio bytes. Save directly to a file or pipe to a
 | `optimize_streaming_latency` | integer | | Latency optimization level for streaming synthesis. `0` (default): No optimization — best audio quality. `1`: Reduced first-chunk size for lower time-to-first-audio, with minor quality tradeoff at chunk boundaries. `2`: Further reduced first-chunk size for lowest time-to-first-audio, with more noticeable quality tradeoff at chunk boundaries. |
 | `text_normalization` | boolean | | Enable text normalization before synthesis. When `true`, the model normalizes written-form text (e.g. numbers, abbreviations, symbols) into spoken-form before generating audio. Defaults to `false`. |
 | `with_timestamps` | boolean | | Return character-level timing metadata alongside the audio. When `true`, the response is a JSON envelope containing base64-encoded audio plus per-character start/end times. Adds latency for the post-synthesis alignment pass. Defaults to `false`. See [Character-level timestamps](#character-level-timestamps). |
+| `replace` | object | | Map of phrases to spoken substitutions applied before synthesis. Values may be respellings (`{"Acme Mobile": "Acme Mobull"}`) or [IPA](#phonetic-pronunciations-with-ipa) phonetics (`{"nginx": "/ˈɛndʒɪn ˈɛks/"}`). See [Pronunciation Replacements](#pronunciation-replacements). |
 
 ### Example with all options
 
@@ -303,7 +304,7 @@ Wrap text to change delivery style. Use an opening tag and a matching closing ta
 |----------|------|
 | **Volume & intensity** |      |
 | **Pitch & speed** |     |
-| **Vocal style** |     |
+| **Vocal style** |    |
 
 ### Examples
 
@@ -684,6 +685,128 @@ start:  0.00  0.06  0.12  0.18  0.24  0.34  0.40  0.48  0.54  0.62  0.68  0.78
 
 This mostly happens with [`text_normalization`](#request-body) enabled, which expands symbols and numbers into words. With normalization on, `$5` is spoken as "five dollars" but is still only two characters: the `$` gets the full span for "five dollars", and the `5` gets an interpolated time inside it. So always step through `graph_chars` in order rather than slicing the input text by index.
 
+## Pronunciation Replacements
+
+Use `replace` to fix how specific words or phrases are pronounced. Each key is matched in your text and swapped for its replacement value **before** synthesis, so only the audio changes — you keep sending your original text, and you are billed on it.
+
+This is useful for brand names, acronyms, and domain terms. Mapping `"Acme Mobile"` to `"Acme Mobull"` makes the audio say it correctly while your request body still reads "Acme Mobile".
+
+```python customLanguage="pythonWithoutSDK"
+response = requests.post(
+    "https://api.x.ai/v1/tts",
+    headers={"Authorization": f"Bearer {XAI_API_KEY}"},
+    json={
+        "text": "Welcome to Acme Mobile.",
+        "voice_id": "eve",
+        "language": "en",
+        "replace": {"Acme Mobile": "Acme Mobull"},
+    },
+)
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+const response = await fetch("https://api.x.ai/v1/tts", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${XAI_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    text: "Welcome to Acme Mobile.",
+    voice_id: "eve",
+    language: "en",
+    replace: { "Acme Mobile": "Acme Mobull" }
+  })
+});
+```
+
+Matching behavior:
+
+* Matching is case-insensitive; the replacement is spoken using the casing you provide.
+* Whole-word boundaries are required, so `Acme, Mobile`, `Acme-Mobile`, and `Acme Mobiles` do **not** match. In scripts written without spaces — Chinese, Japanese, Thai, Lao, Khmer, Burmese — matching is per character, so a one-character key also matches inside a longer word.
+* When multiple keys share a prefix, the longest match wins.
+* Keys match the text exactly as you send it, so write them as they appear in your input.
+
+#### Map limits
+
+The map is validated before any audio is generated, so a broken rule fails the request rather than silently dropping an entry:
+
+| Constraint | Limit | Error (`400`) |
+|---|---|---|
+| Entries per map | 200 | `replace has too many entries` |
+| Key length | 100 characters | `replace key "…" is too long` |
+| Value length | 128 characters | `replace value for "…" is too long` |
+| Key characters | letters, digits, apostrophes, spaces | `replace key "C++" may not contain punctuation or symbols` |
+| Keys non-blank | — | `replace keys must not be blank` |
+| Keys distinct as phrases | compared case- and whitespace-insensitively | `replace keys "ACME" and "Acme" are the same phrase; keep one` |
+| Text after substitution | 60,000 characters | `` `replace` expands the text to … characters `` |
+
+The last row bounds the **rewritten** text — watch it when a short key maps to a long value across a large body of text. Your 15,000-character input cap and your billing still count what you sent.
+
+The same `replace` map is available on the [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#pronunciation-replacements) and on the [WebSocket endpoint](#session-configuration).
+
+> [!NOTE]
+>
+> Replacements change the text that is spoken. With `with_timestamps` enabled, `graph_chars` describes the **spoken** text, so it will contain the replacement characters rather than the characters you sent.
+
+### Phonetic pronunciations with IPA
+
+The model reads [IPA](https://www.internationalphoneticalphabet.org) directly in `text`:
+
+```json
+{"text": "Restart /ˈɛndʒɪn ˈɛks/ on the edge nodes."}
+```
+
+Put it in a `replace` value to keep phonetics out of the text you send — when the text is generated upstream, or when one entry should cover every occurrence in a document or a session.
+
+Phonetics earn their keep where pronunciation is a convention rather than something derivable from spelling: `nginx` is "engine X", `kubectl` is "kube cuttle", and `SQL` is "sequel" or "S-Q-L" by house style. Left alone the model spells these out, and not the same way twice; an entry makes the reading deterministic.
+
+```python customLanguage="pythonWithoutSDK"
+response = requests.post(
+    "https://api.x.ai/v1/tts",
+    headers={"Authorization": f"Bearer {XAI_API_KEY}"},
+    json={
+        "text": "nginx is returning errors on the Acme Mobile edge nodes.",
+        "voice_id": "eve",
+        "language": "en",
+        "replace": {
+            "nginx": "/ˈɛndʒɪn ˈɛks/",
+            "Acme Mobile": "Acme Mobull",
+        },
+    },
+)
+```
+
+```javascript customLanguage="javascriptWithoutSDK"
+const response = await fetch("https://api.x.ai/v1/tts", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${XAI_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    text: "nginx is returning errors on the Acme Mobile edge nodes.",
+    voice_id: "eve",
+    language: "en",
+    replace: {
+      nginx: "/ˈɛndʒɪn ˈɛks/",
+      "Acme Mobile": "Acme Mobull"
+    }
+  })
+});
+```
+
+Phonetic and respelled entries can share one map, as above.
+
+* Synthesize the word first. Well-known names are usually already right — `IEEE` comes out "I triple E" unprompted — and a redundant entry is upkeep with no benefit.
+* Slashes are convention, not a marker: `/ˈɛndʒɪn ˈɛks/` and `ˈɛndʒɪn ˈɛks` are spoken identically and never read aloud.
+* IPA belongs in the value. Keys stay the ordinary spelling you want to catch.
+* Phonetics are unaffected by [`text_normalization`](#request-body), and work in any supported language.
+
+> [!WARNING]
+>
+> IPA is interpreted per symbol, so a typo yields a confidently wrong pronunciation rather than an error. Check symbols against the [IPA sound chart](https://www.internationalphoneticalphabet.org/ipa-sounds/) and listen to each new entry once before shipping it.
+
 ## Best Practices
 
 Tips for getting the highest quality output from the TTS API.
@@ -900,6 +1023,8 @@ The unary/server-streamed endpoints and the bidirectional WebSocket endpoint hav
 | **Max text length** | 15,000 characters per request | No limit — individual `text.delta` messages capped at 15,000 characters each |
 | **Request timeout** | 15 minutes | No timeout (connection stays open) |
 | **Concurrent sessions** | — | 50 per team |
+| **[`replace`](#map-limits) map** | 200 entries; keys ≤ 100 and values ≤ 128 characters | Same, per `session.update` |
+| **Text after `replace`** | 60,000 characters | 60,000 characters per utterance |
 
 For content exceeding 15,000 characters, use the [bidirectional WebSocket endpoint](#streaming-tts-websocket) which has no text length limit.
 
@@ -925,7 +1050,7 @@ Authorization: Bearer $XAI_API_KEY
 
 | Parameter | Required | Default | Accepted values |
 |-----------|----------|---------|-----------------|
-| `voice` | | `eve` | `ara`, `eve`, `leo`, `rex`, `sal` |
+| `voice` | | | Any built-in voice ID (see [Voices](#voices)) or a [custom voice ID](https://docs.x.ai/developers/model-capabilities/audio/custom-voices) |
 | `language` | ✓ | | `auto` or BCP-47 codes (e.g. `en`, `zh`, `pt-BR`). See [Supported Languages](#supported-languages). |
 | `codec` | | `mp3` | `mp3`, `wav`, `pcm`, `mulaw` (or `ulaw`), `alaw` |
 | `sample_rate` | | `24000` | `8000`, `16000`, `22050`, `24000`, `44100`, `48000` |
@@ -952,6 +1077,7 @@ Send text to the server as JSON text frames. Split your text across multiple `te
 | `text.delta` | A chunk of text to synthesize. Individual deltas are capped at **15,000 characters**. |
 | `text.done` | Signals the end of the current utterance. The server will finish generating audio and send `audio.done`. |
 | `text.clear` | Cancel the current utterance. The server stops generating audio, discards any buffered data, and responds with `audio.clear`. |
+| `session.update` | Set or change the [`replace`](#session-configuration) map for the session. Accepted at any point; it takes effect on the next utterance to begin. |
 
 ### Server → Client Messages
 
@@ -969,7 +1095,30 @@ The server responds with base64-encoded audio chunks and a completion event:
 | `audio.delta` | A chunk of base64-encoded audio in the codec specified at connection time. Decode and enqueue for playback. When the connection was opened with `with_timestamps=true`, also carries `audio_timestamps` (`graph_chars` + `graph_times`) and `audio_duration` for the characters in that chunk. See [Character-level timestamps](#character-level-timestamps). |
 | `audio.done` | All audio for the current utterance has been sent. Includes a `trace_id` for debugging. |
 | `audio.clear` | Confirms that the current utterance was cancelled in response to `text.clear`. The connection is ready for the next utterance. |
+| `session.updated` | Acknowledges a `session.update` and echoes the `replace` map now in effect. |
 | `error` | An error occurred. The `message` field contains a human-readable description. |
+
+### Session Configuration
+
+[Pronunciation replacements](#pronunciation-replacements) are configured with a `session.update` message. Send it before the first `text.delta` to have it cover the whole connection:
+
+```json
+{"type": "session.update", "replace": {"Acme Mobile": "Acme Mobull"}}
+{"type": "text.delta", "delta": "Welcome to Acme Mobile."}
+{"type": "text.done"}
+```
+
+The server replies with `{"type": "session.updated", "replace": {...}}` echoing the map now in effect. Values may be respellings or [IPA](#phonetic-pronunciations-with-ipa), exactly as over HTTP.
+
+The map applies to **every utterance** for the life of the connection, including after `text.clear`. Send another `session.update` at any point to change it; no reconnect needed. Which utterance it reaches is decided by arrival:
+
+> An utterance is spoken with the map that was in effect when its **first text** arrived.
+
+An update landing mid-utterance therefore takes effect on the next one, so a phrase is never matched under two maps.
+
+Matching runs across `text.delta` boundaries, so a phrase split over two messages still matches.
+
+The [same map limits](#map-limits) apply. A map that fails validation is answered with an `error` frame, leaves the map in effect unchanged, and keeps the connection open — but a map that expands a turn past 60,000 characters ends the session, since by then the oversized text has already been accepted.
 
 ### Multi-Utterance Sessions
 
@@ -1300,6 +1449,7 @@ task.cancel(with: .normalClosure, reason: nil)
 | **Delta size** | Individual `text.delta` messages capped at 15,000 characters |
 | **Concurrent sessions** | 50 per team |
 | **Session permit TTL** | 600 seconds |
+| **[`replace`](#map-limits) expansion** | An utterance whose text exceeds 60,000 characters after substitution ends the session |
 | **Moderation** | Runs asynchronously on accumulated text after audio is sent (fail-open) |
 | **Billing** | Recorded per session based on total input characters |
 

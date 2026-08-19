@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Customizations
-  \>
-- Sidecars
+Markdownkeyboard_arrow_down
 
-# Sidecars[link](#sidecars)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Sidecars
 
 Sidecars are background processes that run alongside Antigravity.
 Antigravity manages the lifecycle of sidecars, automatically launching
@@ -13,7 +12,7 @@ them and restarting them if they crash or error.
 They are useful for persistent background scripts, scheduled recurring
 tasks, and reacting to events.
 
-## Configuration[link](#configuration)
+## Configuration
 
 Sidecars are discovered by searching for `sidecar.json` configuration
 files. They can be defined in two locations:
@@ -32,9 +31,7 @@ also acts as the current working directory for the sidecar’s command.
 
 Example directory structure
 
-content_copy
-
-```
+``` astro-code
 ~/.gemini/config/sidecars/
 ├── sidecar1/
 │   ├── sidecar.json
@@ -49,7 +46,7 @@ content_copy
                   └── sidecar.json
 ```
 
-### Config Schema (sidecar.json)[link](#config-schema-sidecarjson)
+### Config Schema (sidecar.json)
 
 - **`command`** (string): Command/executable (e.g., `python3` or
   `/bin/bash` ). Mutually exclusive with `builtin`.
@@ -69,26 +66,16 @@ One of `command` or `builtin` must be set.
 
 Examples:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "description": "Background worker",
   "command": "python3",
-  "args": [
-    "worker.py"
-  ],
+  "args": ["worker.py"],
   "restart_policy": "on-failure"
 }
 ```
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "description": "Hourly agent to triage review requests.",
   "builtin": "schedule",
@@ -101,7 +88,7 @@ content_copy
 }
 ```
 
-### User Configuration (config.json)[link](#user-configuration-configjson)
+### User Configuration (config.json)
 
 Sidecars are disabled unless explicitly enabled by the user in the
 global configuration file, located at `~/.gemini/config/config.json`.
@@ -112,11 +99,7 @@ global configuration file, located at `~/.gemini/config/config.json`.
 
 Example:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "sidecars": {
     "sidecar1": {
@@ -130,7 +113,7 @@ content_copy
 }
 ```
 
-### Runtime Data[link](#runtime-data)
+### Runtime Data
 
 Runtime data produced by sidecars are stored in
 `~/.gemini/antigravity/sidecar_data/\<sidecarId\>/`.
@@ -143,15 +126,11 @@ This includes:
 - **`logs/`**: Auto-generated timestamped logs from stdout and stderr.
 - **`events/`**: JSON files recorded for `agentapi` calls.
 
-### `schedule` builtin[link](#schedule-builtin)
+### `schedule` builtin
 
 `schedule` is a simple builtin scheduler for running recurring commands.
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "builtin": "schedule",
   "args": [
@@ -167,7 +146,7 @@ The first argument is a standard 5-field cron expression. The remaining
 arguments are the command and arguments to run on the specified
 schedule.
 
-### `agentapi`[link](#agentapi)
+### `agentapi`
 
 Sidecars can use the `agentapi` CLI to programmatically interact with
 Antigravity. The executable is automatically added to the sidecar’s path
@@ -176,5 +155,3 @@ and available as `agentapi`.
 - `agentapi new-conversation <prompt>`  
   Sidecars creating conversations must have a `projectId` set.
 - `agentapi send-message \<conversation_id\> <prompt>`
-
-On this Page

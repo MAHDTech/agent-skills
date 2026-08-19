@@ -69,7 +69,7 @@ import { xai } from "@ai-sdk/xai";
 import { experimental_generateVideo as generateVideo } from "ai";
 
 const source = await generateVideo({
-    model: xai.video("grok-imagine-video"),
+    model: xai.video("grok-imagine-video-1.5"),
     prompt: "A cat sitting on a sunlit windowsill, tail gently swishing.",
     duration: 5,
     aspectRatio: "16:9",

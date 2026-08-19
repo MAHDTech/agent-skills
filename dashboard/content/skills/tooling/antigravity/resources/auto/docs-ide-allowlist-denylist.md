@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Browser
-  \>
-- Allowlist / Denylist
+Markdownkeyboard_arrow_down
 
-# Allowlist / Denylist[link](#allowlist--denylist)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Allowlist / Denylist
 
 The browser uses a two-layer security system to control which URLs can
 be accessed:
@@ -23,9 +22,9 @@ be accessed:
 - **Denylist** - Deny dangerous/malicious URLs
 - **Allowlist** - Explicitly allow trusted URLs
 
-## How It Works[link](#how-it-works)
+## How It Works
 
-### Denylist[link](#denylist)
+### Denylist
 
 The denylist is maintained and enforced using the Google Superroots’s
 BadUrlsChecker service (See documentation). When the browser attempts to
@@ -34,7 +33,7 @@ denylist via RPC.
 
 **NOTE:** If the server is unavailable, access is denied by default.
 
-### Allowlist[link](#allowlist)
+### Allowlist
 
 The allowlist is a local text file that you can edit to explicitly trust
 specific URLs.
@@ -54,7 +53,5 @@ the web page. An example situation is shown below:
 You can also add/remove URLS from the allowlist manually. However, the
 denylist always takes precedence: you cannot allowlist a URL that
 appears on the denylist.
-
-On this Page
 
 {% endraw %}

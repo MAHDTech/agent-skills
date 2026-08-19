@@ -85,3 +85,20 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Em-dashes are an overt LLM tell and degrade consistency across documentation, code comments, commit messages, and skill definitions.
 - Always use standard ASCII punctuation.
 
+## 6. Minimal, High-Signal Code Comments
+
+**Code should speak for itself. Explain why, never what.**
+
+- Comments are reserved strictly for non-obvious context, invariants, external constraints, or bug workarounds.
+- Keep comments concise (1-2 lines maximum). Never write multi-paragraph essays for a single line of code.
+- Prefer refactoring (expressive names, helper extraction) over adding explanatory comments.
+- See the [code-comments](@/skills/engineering/code-comments/_index.md) skill for the full comment decision matrix and audit workflows.
+
+## 7. Markdown & Code Fence Compliance
+
+**All markdown must be strictly markdownlint-compliant.**
+
+- **Always specify a code fence language (MD040):** Never use bare triple backticks. Always supply a language tag (e.g. `bash`, `typescript`, `text`, `yaml`, `json`).
+- **Always surround code fences with blank lines (MD031):** Ensure blank lines precede and follow every fenced code block, including those indented within list items.
+- **Ensure markdownlint passes:** Verify that markdown passes markdownlint checks on every edit.
+

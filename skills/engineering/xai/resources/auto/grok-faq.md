@@ -176,6 +176,10 @@ Because our safety systems are updated continuously to prevent misuse, we don't 
 
 ## Products & Models
 
+### What is Grok Bot?
+
+[Grok Bot](https://docs.x.ai/grok-bot/overview) gives you durable AI teammates on a persistent cloud computer — messaging, approvals, connectors, and routines. It is not the same as Grok on [grok.com](https://grok.com) or the Grok mobile apps. See [Get started with Grok Bot](https://docs.x.ai/grok-bot/get-started).
+
 ### Where did Grok Studio go? / I can't access Grok Studio.
 
 **Grok Studio** is no longer supported. Use **Grok Build** instead. If you're reaching a "Studio" view through a third-party app that uses your Grok credentials, revoke and change those credentials for safety.

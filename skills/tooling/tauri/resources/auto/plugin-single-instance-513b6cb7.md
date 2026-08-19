@@ -2,7 +2,7 @@
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/single-instance)[crates.io](https://crates.io/crates/tauri-plugin-single-instance)
 
-API Reference[](https://docs.rs/tauri-plugin-single-instance)
+API Reference:[](https://docs.rs/tauri-plugin-single-instance)
 
 Ensure that a single instance of your tauri app is running at a time
 using the Single Instance Plugin.
@@ -17,17 +17,17 @@ using the Single Instance Plugin.
 
 Install the Single Instance plugin to get started.
 
-- [Automatic](#tab-panel-6548)
-- [Manual](#tab-panel-6549)
+- [Automatic](#tab-panel-6167)
+- [Manual](#tab-panel-6168)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6542)
-- [yarn](#tab-panel-6543)
-- [pnpm](#tab-panel-6544)
-- [deno](#tab-panel-6545)
-- [bun](#tab-panel-6546)
-- [cargo](#tab-panel-6547)
+- [npm](#tab-panel-6161)
+- [yarn](#tab-panel-6162)
+- [pnpm](#tab-panel-6163)
+- [deno](#tab-panel-6164)
+- [bun](#tab-panel-6165)
+- [cargo](#tab-panel-6166)
 
 ```
 npm run tauri add single-instance

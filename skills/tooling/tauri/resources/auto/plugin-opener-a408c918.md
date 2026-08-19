@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/opener)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-opener)[crates.io](https://crates.io/crates/tauri-plugin-opener)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/opener/)[](https://docs.rs/tauri-plugin-opener)
+Reference:[](https://v2.tauri.app/reference/javascript/opener/)[](https://docs.rs/tauri-plugin-opener)
 
 This plugin allows you to open files and URLs in a specified, or the
 default, application. It also supports “revealing” files in the system’s
@@ -19,17 +19,17 @@ file explorer.
 
 Install the opener plugin to get started.
 
-- [Automatic](#tab-panel-6474)
-- [Manual](#tab-panel-6475)
+- [Automatic](#tab-panel-6093)
+- [Manual](#tab-panel-6094)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6463)
-- [yarn](#tab-panel-6464)
-- [pnpm](#tab-panel-6465)
-- [deno](#tab-panel-6466)
-- [bun](#tab-panel-6467)
-- [cargo](#tab-panel-6468)
+- [npm](#tab-panel-6082)
+- [yarn](#tab-panel-6083)
+- [pnpm](#tab-panel-6084)
+- [deno](#tab-panel-6085)
+- [bun](#tab-panel-6086)
+- [cargo](#tab-panel-6087)
 
 ```
 npm run tauri add opener
@@ -73,11 +73,11 @@ cargo tauri add opener
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6469)
-    - [yarn](#tab-panel-6470)
-    - [pnpm](#tab-panel-6471)
-    - [deno](#tab-panel-6472)
-    - [bun](#tab-panel-6473)
+    - [npm](#tab-panel-6088)
+    - [yarn](#tab-panel-6089)
+    - [pnpm](#tab-panel-6090)
+    - [deno](#tab-panel-6091)
+    - [bun](#tab-panel-6092)
 
     ```
     npm install @tauri-apps/plugin-opener
@@ -103,8 +103,8 @@ cargo tauri add opener
 
 The opener plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6461)
-- [Rust](#tab-panel-6462)
+- [JavaScript](#tab-panel-6080)
+- [Rust](#tab-panel-6081)
 
 ```
 import { openPath, openUrl } from '@tauri-apps/plugin-opener';// when using `"withGlobalTauri": true`, you may use// const { openPath } = window.__TAURI__.opener;

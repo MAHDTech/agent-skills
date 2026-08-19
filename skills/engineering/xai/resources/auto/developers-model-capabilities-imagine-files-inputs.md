@@ -73,7 +73,7 @@ curl -s -X POST https://api.x.ai/v1/images/edits \
 ```python customLanguage="pythonXAI"
 response = client.video.generate(
     prompt="Pan across the scene as the sky darkens",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=5,
     image_file_id="file_7de029f4-eb66-42ee-87f8-b2a9d9e7466a",
 )
@@ -86,7 +86,7 @@ curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "Pan across the scene as the sky darkens",
     "duration": 5,
     "image": { "file_id": "file_7de029f4-eb66-42ee-87f8-b2a9d9e7466a" }
@@ -119,7 +119,7 @@ curl -s -X POST https://api.x.ai/v1/videos/edits \
 ```python customLanguage="pythonXAI"
 response = client.video.generate(
     prompt="A woman in this dress walks down a city street at night",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     duration=5,
     reference_image_file_ids=[
         "file_5be118c3-da55-31dd-76e7-a1b8c8d6355b",  # subject
@@ -134,7 +134,7 @@ curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-imagine-video",
+    "model": "grok-imagine-video-1.5",
     "prompt": "A woman in this dress walks down a city street at night",
     "duration": 5,
     "reference_images": [

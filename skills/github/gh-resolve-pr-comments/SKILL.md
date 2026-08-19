@@ -3,7 +3,7 @@ name: gh-resolve-pr-comments
 description: Triage and resolve GitHub PR review comments with categorized action plans and approval-gated execution
 disable-model-invocation: true
 resources:
-  - https://r.jina.ai/https://cli.github.com/manual/gh_pr
+  - https://cli.github.com/manual/gh_pr
 ---
 
 <!-- omit in toc -->

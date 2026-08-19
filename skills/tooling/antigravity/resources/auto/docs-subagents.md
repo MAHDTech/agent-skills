@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity 2.0
-  \>
-- Agent Capabilities
-  \>
-- Subagents
+Markdownkeyboard_arrow_down
 
-# Asynchronous Subagents[link](#asynchronous-subagents)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Asynchronous Subagents
 
 Subagents are an excellent way to parallelize complex tasks and preserve
 the context of your main agent. Instead of executing every step
@@ -20,7 +19,7 @@ details of a subagent’s work.
 > Command Reference](https://antigravity.google/docs/cli/commands/agents) for TUI controls and
 > keyboard shortcuts like `Alt+J` and `Ctrl+K`.
 
-## Invoking Subagents[link](#invoking-subagents)
+## Invoking Subagents
 
 The parent agent calls the `invoke_subagent` tool to spawn a new
 concurrent session with a dedicated role and initial prompt.
@@ -37,7 +36,7 @@ concurrent session with a dedicated role and initial prompt.
   by clicking into its conversation via the subagent panel or pressing
   `Alt+J` in the CLI.
 
-## Built-In Subagents[link](#built-in-subagents)
+## Built-In Subagents
 
 Antigravity comes pre-packaged with several specialized subagents out of
 the box:
@@ -50,13 +49,13 @@ the box:
 - **`self`**: A direct clone of the calling agent, sharing identical
   system instructions and toolsets.
 
-## Defining Custom Subagents (.md)[link](#defining-custom-subagents-md)
+## Defining Custom Subagents (.md)
 
 You can define reusable custom subagents in Markdown format (`.md`) with
 YAML frontmatter, or create transient subagents during a session using
 the `define_subagent` tool.
 
-### Agent Location and Discovery[link](#agent-location-and-discovery)
+### Agent Location and Discovery
 
 Antigravity automatically discovers custom subagent `.md` files in the
 following locations:
@@ -67,7 +66,7 @@ following locations:
 | **Global Customizations** | `~/.gemini/config/agents/\<name\>.md` or `.../agents/\<name\>/agent.md` | Machine-wide / All Projects |
 | **Plugins** | `plugins/\<plugin_name\>/agents/` | Bundled Plugin Package |
 
-### Frontmatter Configuration (YAML)[link](#frontmatter-configuration-yaml)
+### Frontmatter Configuration (YAML)
 
 Define agent metadata, capability limits, and execution policies using
 YAML frontmatter at the top of your `.md` file:
@@ -91,19 +90,15 @@ YAML frontmatter at the top of your `.md` file:
 > subagents. Enhanced schema validation and a fix for this behavior will
 > be released in an upcoming update.
 
-### System Prompt & Markdown Body[link](#system-prompt--markdown-body)
+### System Prompt & Markdown Body
 
 The content following the YAML `---` delimiter defines the subagent’s
 system prompt. You can organize instructions using standard Markdown H1
 headings (`# System Prompt`, `# Review Guidelines`).
 
-### Example Markdown Custom Agent (`code-auditor.md`)[link](#example-markdown-custom-agent-code-auditormd)
+### Example Markdown Custom Agent (`code-auditor.md`)
 
-markdown
-
-content_copy
-
-```
+``` astro-code
 ---
 name: code-auditor
 description: Specialized subagent for security audits, static analysis, and code quality reviews.
@@ -128,12 +123,12 @@ You are an expert security auditor and code reviewer. Your primary objective is 
 3. Provide concise, actionable remediation steps for each finding.
 ```
 
-## Subagent Lifecycle and States[link](#subagent-lifecycle-and-states)
+## Subagent Lifecycle and States
 
 Subagents run asynchronously in the background. At any point during a
 session, a subagent exists in one of three states:
 
-### 1. Running[link](#1-running)
+### 1. Running
 
 The subagent is actively executing its task, calling tools, and
 generating responses.
@@ -143,7 +138,7 @@ generating responses.
 - **Parent Control**: The parent agent can interrupt a subagent by
   sending a message or terminating it.
 
-### 2. Idle[link](#2-idle)
+### 2. Idle
 
 The subagent has completed its task, sent a result message to its parent
 agent, and paused execution.
@@ -153,7 +148,7 @@ agent, and paused execution.
 - **Context Retention**: When awoken, the agent retains all context from
   its prior execution turns.
 
-### 3. Killed[link](#3-killed)
+### 3. Killed
 
 The subagent is permanently terminated and cannot be re-awoken.
 
@@ -162,7 +157,7 @@ The subagent is permanently terminated and cannot be re-awoken.
 - **Visibility**: Historical conversation transcripts remain readable in
   JSONL logs.
 
-## Inter-Agent Communication & Nesting Limits[link](#inter-agent-communication--nesting-limits)
+## Inter-Agent Communication & Nesting Limits
 
 Agents communicate by sending messages to each other using unique agent
 conversation IDs.
@@ -174,13 +169,7 @@ conversation IDs.
 - **Shared Transcripts**: Agents can read each other’s conversation
   transcripts to audit multi-step workflows.
 
-warning
-
-Nesting Depth Limit: A maximum nesting depth of 10 levels (layers of
-subagents beneath the primary agent) is strictly enforced to prevent
-runaway recursion or resource exhaustion.
-
-## Permissions and Configuration Inheritance[link](#permissions-and-configuration-inheritance)
+## Permissions and Configuration Inheritance
 
 Subagents inherit safety configurations from their parent agent to
 maintain security boundaries:
@@ -194,19 +183,12 @@ maintain security boundaries:
   requiring user authorization, the request automatically bubbles up to
   the main UI/Subagent panel.
 
-## Multi-Agent Teamwork (Ultra Plan Only)[link](#multi-agent-teamwork-ultra-plan-only)
+## Multi-Agent Teamwork (Ultra Plan Only)
 
 Antigravity 2.0 introduces advanced multi-agent orchestration for
 complex high-level goals.
-
-star
-
-Ultra Plan Exclusive: The /teamwork-preview slash command is currently
-in preview and is exclusive to users on the Ultra (\$200/mo) plan.
 
 Using `/teamwork-preview` prompts the main agent to launch a
 collaborative multi-agent framework. This framework features built-in
 error recovery, automatic retries, and task coordination, allowing you
 to define the high-level goal while the platform manages the agent team.
-
-On this Page

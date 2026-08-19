@@ -990,7 +990,7 @@ times per second, to ensure that there is always 600 food on the map.
     any special characters other than internal hyphens (`-`).
 - Update the URL in the Unreal project to:
   `https://maincloud.spacetimedb.com`
-- Update the module name in the Unreal project to
+- Update the database name in the Unreal project to
   `<your database name>`.
 - Your `BP_GameManager` should look something like this:
 
@@ -1063,7 +1063,7 @@ Fortunately, we've done that for you! If you'd like to check out the
 completed tutorial game, with these additional features, you can
 download it on GitHub:
 
-[https://github.com/clockworklabs/SpacetimeDB/tree/v1.12.0/demo/Blackholio](https://github.com/clockworklabs/SpacetimeDB/tree/v1.12.0/demo/Blackholio)
+[https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio](https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio)
 
 If you have any suggestions or comments on the tutorial, either [open an
 issue](https://github.com/clockworklabs/SpacetimeDB/issues/new), or join

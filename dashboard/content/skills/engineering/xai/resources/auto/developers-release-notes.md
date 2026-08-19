@@ -12,7 +12,21 @@ skill_name = "xai"
 
 # Release Notes
 
+## August
+
+### Grok 4.6
+
+Grok 4.6, SpaceXAI's frontier model for coding, agentic tasks, and knowledge work, is now available on the xAI API. It has a 500k context window, text and image inputs with text-only output, and no text output limit. Pricing is $2 / $0.50 / $6 per 1M tokens (input / cached input / output) below 200k prompt tokens, and $4 / $1 / $12 above. Reasoning effort supports low, medium, high (default), and xhigh. See the [Grok 4.6 overview](https://docs.x.ai/developers/grok-4-6) and the [announcement](https://x.ai/news/grok-4-6).
+
+### Grok Bot
+
+Grok Bot is now available. Durable AI teammates that work on a persistent cloud computer, with messaging, approvals, connectors, and routines. See the [Grok Bot overview](https://docs.x.ai/grok-bot/overview) and [Get started](https://docs.x.ai/grok-bot/get-started).
+
 ## July
+
+### grok-imagine-video-1.5 modalities
+
+`grok-imagine-video-1.5` now supports text-to-video, image-to-video, and reference-to-video (including optional preset voices), with native 1080p for T2V and I2V. Text-to-video on this model runs as text-to-image then image-to-video under the hood. See [Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation), [Image-to-Video](https://docs.x.ai/developers/model-capabilities/video/image-to-video), and [Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video).
 
 ### Grok Voice Think Fast 2.0 is available
 

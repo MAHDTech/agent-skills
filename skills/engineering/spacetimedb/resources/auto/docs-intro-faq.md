@@ -266,8 +266,8 @@ complete walkthrough.
 ### Can I use SpacetimeDB with Unreal Engine?
 
 Yes. SpacetimeDB has a C++ client SDK for Unreal Engine with Blueprint
-support. See the [Unreal quickstart](https://spacetimedb.com/docs/quickstarts/c-plus-plus) for
-details.
+support. See the [Unreal tutorial](https://spacetimedb.com/docs/tutorials/unreal) and [Unreal
+SDK reference](https://spacetimedb.com/docs/clients/unreal) for details.
 
 ### Can I use SpacetimeDB with React / Vue / Angular / Svelte?
 

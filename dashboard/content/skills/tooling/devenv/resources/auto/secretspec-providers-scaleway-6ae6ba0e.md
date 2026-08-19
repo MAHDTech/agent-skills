@@ -29,7 +29,8 @@ Manager](https://www.scaleway.com/en/secret-manager/) through its
 ## Quick start
 
 ```
-$ export SCW_SECRET_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx$ export SCW_DEFAULT_PROJECT_ID=11111111-2222-3333-4444-555555555555
+$ export SCW_SECRET_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+$ export SCW_DEFAULT_PROJECT_ID=11111111-2222-3333-4444-555555555555
 # Set a secret$ secretspec set DATABASE_URL --provider scaleway://fr-parEnter value for DATABASE_URL: postgresql://localhost/mydb✓ Secret 'DATABASE_URL' saved to scaleway (profile: default)
 # Run with secrets$ secretspec run --provider scaleway://fr-par -- npm start
 ```
@@ -56,6 +57,16 @@ The target project is read from `?project_id=` in the URI, falling back
 to `SCW_DEFAULT_PROJECT_ID`. The region is the URI host, falling back to
 `SCW_DEFAULT_REGION`, and finally `fr-par`. Secret Manager is available
 in the `fr-par`, `nl-ams`, and `pl-waw` regions.
+
+## Provider credentials
+
+| Credential   | Environment fallback | Available since |
+|--------------|----------------------|-----------------|
+| `secret_key` | `SCW_SECRET_KEY`     | 0.17+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -126,7 +137,9 @@ are **read-only** in this provider.
 ## CI/CD
 
 ```
-$ export SCW_SECRET_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx$ export SCW_DEFAULT_PROJECT_ID=11111111-2222-3333-4444-555555555555$ export SCW_DEFAULT_REGION=fr-par
+$ export SCW_SECRET_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+$ export SCW_DEFAULT_PROJECT_ID=11111111-2222-3333-4444-555555555555
+$ export SCW_DEFAULT_REGION=fr-par
 $ secretspec run --provider scaleway://fr-par -- deploy
 ```
 

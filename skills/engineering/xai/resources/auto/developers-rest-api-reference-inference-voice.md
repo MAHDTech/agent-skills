@@ -393,7 +393,7 @@ Convert text into speech audio.
 
 ### Request Body
 
-* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\\<soft\>\`, \`\\<whisper\>\`, \`\\<loud\>\`, \`\\<build-intensity\>\`, \`\\<decrease-intensity\>\`, \`\\<higher-pitch\>\`, \`\\<lower-pitch\>\`, \`\\<slow\>\`, \`\\<fast\>\`, \`\\<sing-song\>\`, \`\\<singing\>\`, \`\\<laugh-speak\>\`, \`\\<emphasis\>\`.
+* `text` (string, required) — The text to convert to speech. Maximum 15,000 characters. Supports inline speech tags for expressive output: \`\[pause]\`, \`\[long-pause]\`, \`\[hum-tune]\`, \`\[laugh]\`, \`\[chuckle]\`, \`\[giggle]\`, \`\[cry]\`, \`\[tsk]\`, \`\[tongue-click]\`, \`\[lip-smack]\`, \`\[breath]\`, \`\[inhale]\`, \`\[exhale]\`, \`\[sigh]\`. Also supports wrapping tags for style control: \`\\<soft\>\`, \`\\<whisper\>\`, \`\\<loud\>\`, \`\\<build-intensity\>\`, \`\\<decrease-intensity\>\`, \`\\<higher-pitch\>\`, \`\\<lower-pitch\>\`, \`\\<slow\>\`, \`\\<fast\>\`, \`\\<sing-song\>\`, \`\\<singing\>\`, \`\\<emphasis\>\`.
 
 * `voice_id` (string) — Voice identifier. Use a built-in voice from \`GET /v1/tts/voices\` (e.g. \`eve\`, \`ara\`) or a custom voice ID. Defaults to \`eve\` when omitted.
 
@@ -414,6 +414,8 @@ Convert text into speech audio.
 * `with_timestamps` (boolean) — Return per-character timing metadata alongside the audio. When \`true\`, the response is \`application/json\` containing base64-encoded audio plus \`audio\_timestamps\`.
 
 * `speed` (number) — Speech speed multiplier. \`1.0\` is normal speed. Values below \`1.0\` slow down speech, values above \`1.0\` speed it up. Defaults to \`1.0\` when omitted.
+
+* `replace` (object) — Map of phrases to spoken substitutions applied before synthesis, e.g. \`\{"Acme Mobile": "Acme Mobull"}\`. Fixes pronunciation without changing the text you send or the characters you are billed for. A value may be a respelling or IPA phonetics written between forward slashes, e.g. \`\{"nginx": "/ˈɛndʒɪn ˈɛks/"}\` to have it spoken as "engine X"; the slashes are a readability convention and are never spoken. Matching is case-insensitive and requires whole-word boundaries; the longest match wins. Keys may contain only letters, digits, apostrophes and spaces. Up to 200 entries, keys up to 100 characters and values up to 128 characters.
 
 ### Response Body
 
@@ -719,6 +721,111 @@ print(json.dumps(response.json(), indent=2))
 {
   "voices": [
     {
+      "voice_id": "carina",
+      "name": "Carina",
+      "language": "en"
+    },
+    {
+      "voice_id": "zagan",
+      "name": "Zagan",
+      "language": "en"
+    },
+    {
+      "voice_id": "helix",
+      "name": "Helix",
+      "language": "en"
+    },
+    {
+      "voice_id": "orion",
+      "name": "Orion",
+      "language": "en"
+    },
+    {
+      "voice_id": "luna",
+      "name": "Luna",
+      "language": "en"
+    },
+    {
+      "voice_id": "iris",
+      "name": "Iris",
+      "language": "en"
+    },
+    {
+      "voice_id": "altair",
+      "name": "Altair",
+      "language": "en"
+    },
+    {
+      "voice_id": "zenith",
+      "name": "Zenith",
+      "language": "en"
+    },
+    {
+      "voice_id": "perseus",
+      "name": "Perseus",
+      "language": "en"
+    },
+    {
+      "voice_id": "helios",
+      "name": "Helios",
+      "language": "en"
+    },
+    {
+      "voice_id": "lux",
+      "name": "Lux",
+      "language": "en"
+    },
+    {
+      "voice_id": "kepler",
+      "name": "Kepler",
+      "language": "en"
+    },
+    {
+      "voice_id": "rigel",
+      "name": "Rigel",
+      "language": "en"
+    },
+    {
+      "voice_id": "cosmo",
+      "name": "Cosmo",
+      "language": "en"
+    },
+    {
+      "voice_id": "celeste",
+      "name": "Celeste",
+      "language": "en"
+    },
+    {
+      "voice_id": "ursa",
+      "name": "Ursa",
+      "language": "en"
+    },
+    {
+      "voice_id": "sirius",
+      "name": "Sirius",
+      "language": "en"
+    },
+    {
+      "voice_id": "lumen",
+      "name": "Lumen",
+      "language": "en"
+    },
+    {
+      "voice_id": "castor",
+      "name": "Castor",
+      "language": "en"
+    },
+    {
+      "voice_id": "naksh",
+      "name": "Naksh",
+      "language": "en"
+    },
+    {
+      "voice_id": "atlas",
+      "name": "Atlas",
+      "language": "en"
+    },
+    {
       "voice_id": "ara",
       "name": "Ara",
       "language": "en"
@@ -849,7 +956,7 @@ Transcribe an audio file to text.
 
 * `text` (string, required) — Full transcript text. For multichannel requests, this is a merged transcript across all channels (words interleaved by timestamp).
 
-* `language` (string, required) — Detected language code (ISO 639-1, e.g. \`en\`). Currently empty — language detection is not yet enabled.
+* `language` (string, required) — Detected language as a BCP-47 code (e.g. \`en\`, \`es-mx\`).
 
 * `duration` (number, required) — Audio duration in seconds (rounded to 2 decimal places).
 
@@ -869,7 +976,7 @@ Transcribe an audio file to text.
 
   * `index` (integer, required) — Zero-based channel index in the source audio.
 
-  * `language` (string) — Detected language code for this channel. Currently empty.
+  * `language` (string) — Detected language as a BCP-47 code for this channel (e.g. \`en\`, \`es-mx\`).
 
   * `text` (string, required) — Full transcript text for this channel.
 
@@ -890,7 +997,7 @@ Transcribe an audio file to text.
 ```json
 {
   "text": "The balance is $167,983.15. That is $23.4 kilograms.",
-  "language": "",
+  "language": "en",
   "duration": 8.4,
   "words": [
     {

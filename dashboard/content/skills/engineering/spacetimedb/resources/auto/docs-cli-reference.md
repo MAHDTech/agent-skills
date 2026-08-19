@@ -25,6 +25,7 @@ program.
 - [`spacetime describe`↴](#spacetime-describe)
 - [`spacetime dev`↴](#spacetime-dev)
 - [`spacetime sql`↴](#spacetime-sql)
+- [`spacetime mcp`↴](#spacetime-mcp)
 - [`spacetime rename`↴](#spacetime-rename)
 - [`spacetime generate`↴](#spacetime-generate)
 - [`spacetime list`↴](#spacetime-list)
@@ -44,6 +45,8 @@ program.
 - [`spacetime server clear`↴](#spacetime-server-clear)
 - [`spacetime subscribe`↴](#spacetime-subscribe)
 - [`spacetime start`↴](#spacetime-start)
+- [`spacetime lock`↴](#spacetime-lock)
+- [`spacetime unlock`↴](#spacetime-unlock)
 - [`spacetime version`↴](#spacetime-version)
 
 ## `spacetime`
@@ -63,6 +66,8 @@ program.
   bindings, auto-rebuild, and auto-publish on file changes.
 - `sql` — Runs a SQL query on the database. WARNING: This command is
   UNSTABLE and subject to breaking changes.
+- `mcp` — Serve SpacetimeDB to MCP-aware agents and editors over stdio.
+  WARNING: This command is UNSTABLE and subject to breaking changes.
 - `rename` — Rename a database
 - `generate` — Generate client files for a spacetime module.
 - `list` — Lists the databases attached to an identity. WARNING: This
@@ -76,6 +81,8 @@ program.
 - `subscribe` — Subscribe to SQL queries on the database. WARNING: This
   command is UNSTABLE and subject to breaking changes.
 - `start` — Start a local SpacetimeDB instance
+- `lock` — Lock a database to prevent accidental deletion
+- `unlock` — Unlock a database to allow deletion
 - `version` — Manage installed spacetime versions
 
 ###### **Options:**
@@ -177,6 +184,9 @@ Run `spacetime help publish` for more detailed information.
 
 - `--native-aot` — Use NativeAOT-LLVM compilation for C# modules
   (experimental, Windows only)
+
+- `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
+  projects (e.g. 8 or 10). Auto-detected when omitted.
 
 ## `spacetime delete`
 
@@ -350,6 +360,9 @@ auto-rebuild, and auto-publish on file changes.
 - `-t`, `--template <TEMPLATE>` — Template ID or GitHub repository
   (owner/repo or URL) for project initialization
 
+- `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
+  projects (e.g. 8 or 10). Auto-detected when omitted.
+
 - `--run <COMMAND>` — Command to run the client development server
   (overrides spacetime.json config)
 
@@ -391,12 +404,40 @@ subject to breaking changes.
 - `-s`, `--server <SERVER>` — The nickname, host name or URL of the
   server hosting the database
 
+- `--format <FORMAT>` — Output format for the SQL results
+
+  Default value: `text`
+
+  Possible values: `text`, `json`
+
 - `-y`, `--yes` — Run non-interactively wherever possible. This will
   answer "yes" to almost all prompts, but will sometimes answer "no" to
   preserve non-interactivity (e.g. when prompting whether to log in with
   spacetimedb.com).
 
 - `--no-config` — Ignore spacetime.json configuration
+
+## `spacetime mcp`
+
+Serve SpacetimeDB to MCP-aware agents and editors over stdio. WARNING:
+This command is UNSTABLE and subject to breaking changes.
+
+**Usage:** `spacetime mcp [OPTIONS] [database]`
+
+Run `spacetime help mcp` for more detailed information.
+
+###### **Arguments:**
+
+- `<DATABASE>` — The name or identity of a single database to serve.
+  Falls back to the SPACETIMEDB_DB_NAME environment variable. Omit it to
+  serve the whole server, where each tool takes a database argument
+  instead
+
+###### **Options:**
+
+- `-s`, `--server <SERVER>` — The nickname, host name or URL of the
+  server hosting the database
+- `--anonymous` — Perform this action with an anonymous identity
 
 ## `spacetime rename`
 
@@ -472,6 +513,9 @@ Run `spacetime help generate` for more detailed information.
   command, for example --build-options='--lint-dir='
 
   Default value: \`\`
+
+- `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
+  projects (e.g. 8 or 10). Auto-detected when omitted.
 
 - `--include-private` — Include private tables and functions in
   generated code (types are always included).
@@ -568,6 +612,9 @@ Initializes a new spacetime project.
 - `--non-interactive` — Run in non-interactive mode
 - `--native-aot` — Configure C# project for NativeAOT-LLVM compilation
   (experimental, Windows only)
+- `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
+  projects (e.g. 8 or 10). Defaults to 10 except on macOS or when only
+  .NET 8 is installed.
 
 ## `spacetime build`
 
@@ -588,6 +635,9 @@ Builds a spacetime module.
 
 - `-d`, `--debug` — Builds the module using debug instead of release
   (intended to speed up local iteration, not recommended for CI)
+
+- `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
+  projects (e.g. 8 or 10). Auto-detected when omitted.
 
 ## `spacetime server`
 
@@ -786,6 +836,49 @@ Run `spacetime start --help` to see all options.
   Default value: `standalone`
 
   Possible values: `standalone`, `cloud`
+
+## `spacetime lock`
+
+Lock a database to prevent it from being deleted.
+
+A locked database cannot be deleted until it is unlocked with
+`spacetime unlock`. This is a safety mechanism to protect production
+databases from accidental deletion.
+
+**Usage:** `spacetime lock [OPTIONS] [database]`
+
+Run `spacetime help lock` for more detailed information.
+
+###### **Arguments:**
+
+- `<DATABASE>` — The name or identity of the database to lock
+
+###### **Options:**
+
+- `-s`, `--server <SERVER>` — The nickname, host name or URL of the
+  server hosting the database
+- `--no-config` — Ignore spacetime.json configuration
+
+## `spacetime unlock`
+
+Unlock a database that was previously locked with `spacetime lock`.
+
+After unlocking, the database can be deleted normally with
+`spacetime delete`.
+
+**Usage:** `spacetime unlock [OPTIONS] [database]`
+
+Run `spacetime help unlock` for more detailed information.
+
+###### **Arguments:**
+
+- `<DATABASE>` — The name or identity of the database to unlock
+
+###### **Options:**
+
+- `-s`, `--server <SERVER>` — The nickname, host name or URL of the
+  server hosting the database
+- `--no-config` — Ignore spacetime.json configuration
 
 ## `spacetime version`
 

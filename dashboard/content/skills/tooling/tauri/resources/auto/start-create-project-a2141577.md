@@ -37,15 +37,15 @@ the folder you’d like to setup your project. If you’re not sure which
 command to use we recommend the Bash command on Linux and macOS and the
 PowerShell command on Windows.
 
-- [Bash](#tab-panel-6918)
-- [PowerShell](#tab-panel-6919)
-- [Fish](#tab-panel-6920)
-- [npm](#tab-panel-6921)
-- [Yarn](#tab-panel-6922)
-- [pnpm](#tab-panel-6923)
-- [deno](#tab-panel-6924)
-- [bun](#tab-panel-6925)
-- [Cargo](#tab-panel-6926)
+- [Bash](#tab-panel-6537)
+- [PowerShell](#tab-panel-6538)
+- [Fish](#tab-panel-6539)
+- [npm](#tab-panel-6540)
+- [Yarn](#tab-panel-6541)
+- [pnpm](#tab-panel-6542)
+- [deno](#tab-panel-6543)
+- [bun](#tab-panel-6544)
+- [Cargo](#tab-panel-6545)
 
 ```
 sh <(curl https://create.tauri.app/sh)
@@ -141,12 +141,12 @@ After `create-tauri-app` has completed, you can navigate into your
 project’s folder, install dependencies, and then use the [Tauri
 CLI](https://v2.tauri.app/reference/cli/) to start the development server:
 
-- [npm](#tab-panel-6927)
-- [yarn](#tab-panel-6928)
-- [pnpm](#tab-panel-6929)
-- [deno](#tab-panel-6930)
-- [bun](#tab-panel-6931)
-- [cargo](#tab-panel-6932)
+- [npm](#tab-panel-6546)
+- [yarn](#tab-panel-6547)
+- [pnpm](#tab-panel-6548)
+- [deno](#tab-panel-6549)
+- [bun](#tab-panel-6550)
+- [cargo](#tab-panel-6551)
 
 ```
 cd tauri-appnpm installnpm run tauri dev
@@ -188,11 +188,11 @@ project separately.
     a way of serving the app in your browser. Just as an example, this
     is how you would setup a simple Vite app:
 
-    - [npm](#tab-panel-6933)
-    - [yarn](#tab-panel-6934)
-    - [pnpm](#tab-panel-6935)
-    - [deno](#tab-panel-6936)
-    - [bun](#tab-panel-6937)
+    - [npm](#tab-panel-6552)
+    - [yarn](#tab-panel-6553)
+    - [pnpm](#tab-panel-6554)
+    - [deno](#tab-panel-6555)
+    - [bun](#tab-panel-6556)
 
     ```
     mkdir tauri-appcd tauri-appnpm create vite@latest .
@@ -218,12 +218,12 @@ project separately.
     If you are using `cargo` to install the Tauri CLI, you will have to
     install it globally.
 
-    - [npm](#tab-panel-6938)
-    - [yarn](#tab-panel-6939)
-    - [pnpm](#tab-panel-6940)
-    - [deno](#tab-panel-6941)
-    - [bun](#tab-panel-6942)
-    - [cargo](#tab-panel-6943)
+    - [npm](#tab-panel-6557)
+    - [yarn](#tab-panel-6558)
+    - [pnpm](#tab-panel-6559)
+    - [deno](#tab-panel-6560)
+    - [bun](#tab-panel-6561)
+    - [cargo](#tab-panel-6562)
 
     ```
     npm install -D @tauri-apps/cli@latest
@@ -255,12 +255,12 @@ project separately.
 
 4.  In your project directory, initialize Tauri:
 
-    - [npm](#tab-panel-6944)
-    - [yarn](#tab-panel-6945)
-    - [pnpm](#tab-panel-6946)
-    - [deno](#tab-panel-6947)
-    - [bun](#tab-panel-6948)
-    - [cargo](#tab-panel-6949)
+    - [npm](#tab-panel-6563)
+    - [yarn](#tab-panel-6564)
+    - [pnpm](#tab-panel-6565)
+    - [deno](#tab-panel-6566)
+    - [bun](#tab-panel-6567)
+    - [cargo](#tab-panel-6568)
 
     ```
     npx tauri init
@@ -308,12 +308,12 @@ project separately.
 
 6.  Verify your Tauri app is working by running the development server:
 
-    - [npm](#tab-panel-6950)
-    - [yarn](#tab-panel-6951)
-    - [pnpm](#tab-panel-6952)
-    - [deno](#tab-panel-6953)
-    - [bun](#tab-panel-6954)
-    - [cargo](#tab-panel-6955)
+    - [npm](#tab-panel-6569)
+    - [yarn](#tab-panel-6570)
+    - [pnpm](#tab-panel-6571)
+    - [deno](#tab-panel-6572)
+    - [bun](#tab-panel-6573)
+    - [cargo](#tab-panel-6574)
 
     ```
     npx tauri dev

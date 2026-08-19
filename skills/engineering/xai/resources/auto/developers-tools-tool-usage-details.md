@@ -122,7 +122,7 @@ from xai_sdk.tools import web_search, x_search
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(),
         x_search(),

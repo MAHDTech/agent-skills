@@ -46,7 +46,7 @@ from xai_sdk.tools import mcp
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         mcp(server_url="https://mcp.deepwiki.com/mcp"),
     ],
@@ -86,7 +86,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -115,7 +115,7 @@ headers = {
     "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}"
 }
 payload = {
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "user",
@@ -139,7 +139,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",
@@ -183,7 +183,7 @@ Enable multiple MCP servers simultaneously to create a rich ecosystem of special
 
 ```pythonXAI
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         mcp(server_url="https://mcp.deepwiki.com/mcp", server_label="deepwiki"),
         mcp(server_url="https://your-custom-tools.com/mcp", server_label="custom"),

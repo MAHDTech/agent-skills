@@ -93,6 +93,7 @@ Add missing TODOs for: known shortcuts, deferred work, temporary workarounds, an
 ### 8. Readability & Cognitive Load
 
 - Comments explain **why**, never **what** (delete `# increment counter` above `counter += 1`)
+- Prune noisy, bloated comments and keep comments minimal (see the [code-comments](../code-comments/SKILL.md) skill)
 - Add a brief comment above grouped code blocks (~5+ lines doing one thing)
 - Convert paragraph-style comments to bullet points when feasible
 - Strategic whitespace: blank lines between logical sections

@@ -102,7 +102,7 @@ async def main():
 
     # Step 3: Create a chat with collections search enabled
     chat = client.chat.create(
-        model="grok-4.5",  # Use a reasoning model for better analysis
+        model="grok-4.6",  # Use a reasoning model for better analysis
         tools=[
             collections_search(
                 collection_ids=[response.collection_id],
@@ -161,7 +161,7 @@ client = OpenAI(
 # Note: You must create the collection and upload documents first using either the xAI console (console.x.ai) or the xAI SDK
 # The collection_id below should be replaced with your actual collection ID
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {
             "role": "user",
@@ -191,7 +191,7 @@ const openai = createOpenAI({
 });
 
 const result = streamText({
-  model: openai('grok-4.5'),
+  model: openai('grok-4.6'),
   prompt: 'What documents do you have access to?',
   tools: {
     file_search: openai.tools.fileSearch({
@@ -213,7 +213,7 @@ headers = {
     "Authorization": f"Bearer {os.getenv('XAI_API_KEY')}"
 }
 payload = {
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
         {
             "role": "user",
@@ -239,7 +239,7 @@ curl https://api.x.ai/v1/responses \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $XAI_API_KEY" \\
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "input": [
     {
       "role": "user",

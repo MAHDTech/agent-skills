@@ -453,7 +453,7 @@ curl -s https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": "What is the meaning of life?"
   }'
 ```
@@ -463,7 +463,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateText } from "ai";
 
 const result = await generateText({
-  model: xai.responses("grok-4.5"),
+  model: xai.responses("grok-4.6"),
   prompt: "What is the meaning of life?",
 });
 
@@ -481,7 +481,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input="What is the meaning of life?",
 )
 
@@ -497,7 +497,7 @@ const client = new OpenAI({
 });
 
 const response = await client.responses.create({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: "What is the meaning of life?",
 });
 
@@ -611,7 +611,7 @@ curl -s https://api.x.ai/v1/responses/compact \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": [
       {"role": "system", "content": "You are a concise and knowledgeable science tutor."},
       {"role": "user", "content": "What is the Higgs boson and why is it important?"},
@@ -633,7 +633,7 @@ client = OpenAI(
 )
 
 compacted = client.responses.compact(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "system", "content": "You are a concise and knowledgeable science tutor."},
         {"role": "user", "content": "What is the Higgs boson and why is it important?"},
@@ -669,7 +669,7 @@ const client = new OpenAI({
 });
 
 const compacted = await client.responses.compact({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: [
     { role: "system", content: "You are a concise and knowledgeable science tutor." },
     { role: "user", content: "What is the Higgs boson and why is it important?" },

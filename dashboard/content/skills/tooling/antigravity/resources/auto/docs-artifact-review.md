@@ -8,14 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity 2.0
-  \>
-- Settings
-  \>
-- Artifact Review
+Markdownkeyboard_arrow_down
 
-# Artifact Review[link](#artifact-review)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Artifact Review
 
 When starting a new Agent conversation, you can choose between two
 primary execution modes that determine how changes are proposed and
@@ -35,12 +34,12 @@ When working in **Planning Mode**, the Artifact Review Policy controls
 how you interact with and approve these plans before changes are made to
 your codebase.
 
-## Artifact Review Policy[link](#artifact-review-policy)
+## Artifact Review Policy
 
 You can customize the review workflow in the **Agent** tab of the
 Settings pane. Choose between two policies:
 
-### 1. Request Review (Recommended)[link](#1-request-review-recommended)
+### 1. Request Review (Recommended)
 
 The agent always halts and requests your explicit approval before
 proceeding with proposed changes.
@@ -55,7 +54,7 @@ proceeding with proposed changes.
 ![Settings Review Policy
 Manual](https://antigravity.google/assets/image/docs/agent/settings-review-policy-manual.png)
 
-### 2. Always Proceed[link](#2-always-proceed)
+### 2. Always Proceed
 
 The agent never halts for manual review and immediately proceeds with
 executing its plans.
@@ -67,7 +66,5 @@ executing its plans.
 
 ![Settings Review Policy
 Proceed](https://antigravity.google/assets/image/docs/agent/settings-review-policy-proceed.png)
-
-On this Page
 
 {% endraw %}

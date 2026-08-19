@@ -29,7 +29,7 @@ client = xai_sdk.Client()
 
 response = client.image.sample(
     prompt="A collage of London landmarks in a stenciled street‑art style",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
 )
 
 print(response.url)
@@ -40,7 +40,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "A collage of London landmarks in a stenciled street‑art style"
   }'
 ```
@@ -54,7 +54,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A collage of London landmarks in a stenciled street‑art style",
 )
 
@@ -66,7 +66,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateImage } from "ai";
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "A collage of London landmarks in a stenciled street‑art style",
 });
 
@@ -89,7 +89,7 @@ with open("photo.png", "rb") as f:
 
 response = client.image.sample(
     prompt="Render this as a pencil sketch with detailed shading",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     image_url=f"data:image/png;base64,{image_data}",
 )
 
@@ -102,7 +102,7 @@ curl -X POST https://api.x.ai/v1/images/edits \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "Render this as a pencil sketch with detailed shading",
     "image": {
       "url": "https://docs.x.ai/assets/api-examples/images/style-realistic.png",
@@ -121,7 +121,7 @@ const imageBuffer = fs.readFileSync("photo.png");
 const base64Image = imageBuffer.toString("base64");
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: {
         text: "Render this as a pencil sketch with detailed shading",
         images: [`data:image/png;base64,${base64Image}`],
@@ -131,7 +131,7 @@ const { image } = await generateImage({
 console.log(image.base64);
 ```
 
-## Image-to-Video
+## Video Generation
 
 Animate a still image with a text prompt. The source image becomes the starting point for the generated video. Video requests are asynchronous: start a request, poll with the returned request ID, and use the completed video URL when ready. The xAI SDK and AI SDK handle polling for you.
 
@@ -203,7 +203,7 @@ Beyond the top use cases above, the Imagine API supports several additional work
 * **[Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)** — Combine up to 3 source images in a single edit for compositing subjects, transferring styles, and building scenes from multiple references.
 * **[Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation)** — Generate videos from text prompts with configurable duration (up to 15s), aspect ratio, and resolution.
 * **[Video Editing](https://docs.x.ai/developers/model-capabilities/video/editing)** — Modify an existing video with a text prompt while preserving the rest of the scene.
-* **[Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)** — Guide a generated video with one or more reference images that influence the output without forcing the first frame. Requires `grok-imagine-video` — `grok-imagine-video-1.5` does not support this mode.
+* **[Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)** — Guide a generated video with one or more reference images that influence the output without forcing the first frame.
 * **[Video Extension](https://docs.x.ai/developers/model-capabilities/video/extension)** — Continue an existing video from its last frame, combining the original and extension into one clip.
 * **[Files API Integration](https://docs.x.ai/developers/model-capabilities/imagine/files)** — Reference stored files as Imagine inputs by ID, persist generated assets to the Files API, and optionally create a permanent shareable public URL — all in a single request.
 

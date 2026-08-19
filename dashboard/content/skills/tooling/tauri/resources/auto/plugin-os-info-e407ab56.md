@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/os)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-os)[crates.io](https://crates.io/crates/tauri-plugin-os)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/os/)[](https://docs.rs/tauri-plugin-os)
+Reference:[](https://v2.tauri.app/reference/javascript/os/)[](https://docs.rs/tauri-plugin-os)
 
 Read information about the operating system using the OS Information
 plugin.
@@ -28,17 +28,17 @@ plugin.
 
 Install the OS Information plugin to get started.
 
-- [Automatic](#tab-panel-6489)
-- [Manual](#tab-panel-6490)
+- [Automatic](#tab-panel-6108)
+- [Manual](#tab-panel-6109)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6478)
-- [yarn](#tab-panel-6479)
-- [pnpm](#tab-panel-6480)
-- [deno](#tab-panel-6481)
-- [bun](#tab-panel-6482)
-- [cargo](#tab-panel-6483)
+- [npm](#tab-panel-6097)
+- [yarn](#tab-panel-6098)
+- [pnpm](#tab-panel-6099)
+- [deno](#tab-panel-6100)
+- [bun](#tab-panel-6101)
+- [cargo](#tab-panel-6102)
 
 ```
 npm run tauri add os
@@ -82,11 +82,11 @@ cargo tauri add os
 3.  If you’d like to use in JavaScript then install the npm package as
     well:
 
-    - [npm](#tab-panel-6484)
-    - [yarn](#tab-panel-6485)
-    - [pnpm](#tab-panel-6486)
-    - [deno](#tab-panel-6487)
-    - [bun](#tab-panel-6488)
+    - [npm](#tab-panel-6103)
+    - [yarn](#tab-panel-6104)
+    - [pnpm](#tab-panel-6105)
+    - [deno](#tab-panel-6106)
+    - [bun](#tab-panel-6107)
 
     ```
     npm install @tauri-apps/plugin-os
@@ -122,8 +122,8 @@ use. The value is set at compile time. Possible values are `linux`,
 `macos`, `ios`, `freebsd`, `dragonfly`, `netbsd`, `openbsd`, `solaris`,
 `android`, `windows`.
 
-- [JavaScript](#tab-panel-6476)
-- [Rust](#tab-panel-6477)
+- [JavaScript](#tab-panel-6095)
+- [Rust](#tab-panel-6096)
 
 ```
 import { platform } from '@tauri-apps/plugin-os';// when using `"withGlobalTauri": true`, you may use// const { platform } = window.__TAURI__.os;

@@ -1,15 +1,16 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Conversations
+Markdownkeyboard_arrow_down
 
-# Managing conversations[link](#managing-conversations)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Managing conversations
 
 Resume prior development threads, scope active histories to local
 workspaces, and fork conversations to experiment with alternate
 architectures.
 
-## Workspace scoping[link](#workspace-scoping)
+## Workspace scoping
 
 To maintain context hygiene, Antigravity CLI scopes conversation
 histories directly to your current working directory. When you launch
@@ -19,7 +20,7 @@ sessions associated with that specific local repository or subdirectory.
 This prevents context pollution, ensuring that the agent’s semantic
 memory and token limits remain focused solely on the relevant codebase.
 
-## Resuming sessions[link](#resuming-sessions)
+## Resuming sessions
 
 You can return to a prior conversation at any time to continue an
 implementation, refine a solution, or recover from an interrupted
@@ -33,17 +34,13 @@ For a complete walkthrough of the interactive picker, keyboard
 shortcuts, and details on how the directory-scoped session cache works,
 see the dedicated **[Resume Command Guide](https://antigravity.google/docs/cli/commands/resume)**.
 
-## Branching with `/fork`[link](#branching-with-fork)
+## Branching with `/fork`
 
 When engineering a complex feature, you may want to explore multiple
 design alternatives without losing your progress. The `/fork` command
 enables safe, parallel experimentation.
 
-text
-
-content_copy
-
-```
+``` astro-code
 /fork
 ```
 
@@ -52,7 +49,7 @@ content_copy
 The `/fork` command clones your entire conversation history up to the
 current turn into a new, independent session.
 
-### Forking workflow[link](#forking-workflow)
+### Forking workflow
 
 1.  Type `/fork` inside the prompt panel and press `Enter`.
 2.  The CLI allocates a new unique session ID and duplicates your
@@ -61,14 +58,7 @@ current turn into a new, independent session.
 4.  If the experiment fails, run `/resume` to restore your original,
     stable conversation branch.
 
-lightbulb
-
-Branching Filesystems: Forking clones the conversation thread, not your
-local git checkout. To fully isolate files during parallel forks, use
-git branches or stash local changes before testing contrasting
-approaches.
-
-## Next steps[link](#next-steps)
+## Next steps
 
 Explore how the agent handles complex, asynchronous operations and
 parallel tasks:
@@ -79,5 +69,3 @@ parallel tasks:
   rendering buffers and override JSON preferences.
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Manage security
   profiles and system command lists.
-
-On this Page

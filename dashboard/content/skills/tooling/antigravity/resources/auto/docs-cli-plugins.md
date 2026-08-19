@@ -8,20 +8,19 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Customizations
-  \>
-- Plugins & Skills
+Markdownkeyboard_arrow_down
 
-# Plugins & skills[link](#plugins--skills)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Plugins & skills
 
 Extend agent capabilities, install third-party extension bundles,
 package custom workflow skills, and interface with Model Context
 Protocol (MCP) servers.
 
-## The extensibility model[link](#the-extensibility-model)
+## The extensibility model
 
 Antigravity CLI is designed for limitless customization. You can augment
 the shared agent harness by installing structured package modules called
@@ -31,32 +30,24 @@ These customizations allow agents to access specialized proprietary
 commands, invoke domain-specific subagents, and consult customized style
 constraints.
 
-## Antigravity plugins[link](#antigravity-plugins)
+## Antigravity plugins
 
 Plugins are namespaced bundles that package custom skills, background
 subagents, linting rules, Model Context Protocol definitions, and event
 hooks into a single deployable asset.
 
-### Plugin filesystem structure[link](#plugin-filesystem-structure)
+### Plugin filesystem structure
 
 When you install or import a plugin, the CLI stages the bundle files
 within your global configuration path:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/plugins/<plugin_name>/
 ```
 
 A compliant plugin contains the following layout:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/plugins/<plugin_name>/
 ├── plugin.json                 # Required package marker file
 ├── mcp_config.json             # Optional Model Context Protocol servers
@@ -66,22 +57,18 @@ content_copy
 └── rules/                      # Optional custom codebase rules files
 ```
 
-### The plugin manifest (plugin.json)[link](#the-plugin-manifest-pluginjson)
+### The plugin manifest (plugin.json)
 
 The `plugin.json` file is a mandatory manifest located at the root of
 your plugin directory. It defines the plugin’s identity and metadata.
 
 **Manifest example**
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
-  "name": "my-plugin",
-  "description": "A brief description of what my plugin does."
+    "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+    "name": "my-plugin",
+    "description": "A brief description of what my plugin does."
 }
 ```
 
@@ -98,84 +85,69 @@ To enable automatic autocomplete and validation in editors like VS Code
 or WebStorm, include the `$schema` key pointing to the official schema
 URL:
 
-json
-
-content_copy
-
-```
+``` astro-code
 "$schema": "https://antigravity.google/schemas/v1/plugin.json"
 ```
 
 **Full JSON Schema**
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
-  "title": "Antigravity Plugin Manifest",
-  "description": "Schema for Antigravity CLI plugin manifest files (plugin.json)",
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string",
-      "description": "The unique, machine-readable name of the plugin. Must contain only alphanumeric characters, hyphens, and underscores.",
-      "pattern": "^[a-zA-Z0-9-_]+$"
+    "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+    "title": "Antigravity Plugin Manifest",
+    "description": "Schema for Antigravity CLI plugin manifest files (plugin.json)",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The unique, machine-readable name of the plugin. Must contain only alphanumeric characters, hyphens, and underscores.",
+            "pattern": "^[a-zA-Z0-9-_]+$"
+        },
+        "description": {
+            "type": "string",
+            "description": "A brief human-readable description of the plugin's purpose and capabilities."
+        }
     },
-    "description": {
-      "type": "string",
-      "description": "A brief human-readable description of the plugin's purpose and capabilities."
-    }
-  },
-  "required": [
-    "name"
-  ],
-  "additionalProperties": false
+    "required": ["name"],
+    "additionalProperties": false
 }
 ```
 
-### Managing plugins via CLI subcommands[link](#managing-plugins-via-cli-subcommands)
+### Managing plugins via CLI subcommands
 
 The CLI exposes a `plugin` (or plural `plugins`) subcommand pipeline to
 manage your extensions:
 
 - **List installed plugins**: Show active packages and their loaded
   components.
-  bash
 
-  content_copy
-  ```
+  ``` astro-code
   agy plugin list
   ```
+
 - **Install a local or remote plugin**: Stage a package directory into
   your local profile.
-  bash
 
-  content_copy
-  ```
+  ``` astro-code
   agy plugin install /path/to/local/plugin
   ```
+
 - **Disable/Enable a plugin**: Suspend a plugin’s tools without deleting
   its assets.
-  bash
 
-  content_copy
-  ```
+  ``` astro-code
   agy plugin disable <plugin_name>
   agy plugin enable <plugin_name>
   ```
+
 - **Uninstall a plugin**: Purge the package directory and clean up
   registries.
-  bash
 
-  content_copy
-  ```
+  ``` astro-code
   agy plugin uninstall <plugin_name>
   ```
 
-## Agent skills[link](#agent-skills)
+## Agent skills
 
 Skills are declarative, human-readable markdown files that outline
 explicit instruction protocols, scripts, and target resources for
@@ -185,7 +157,7 @@ Once registered, **Skills convert automatically into slash commands**
 inside the TUI, allowing you to invoke them manually (e.g., typing
 `/refactor-ui`).
 
-### Creating local workspace skills[link](#creating-local-workspace-skills)
+### Creating local workspace skills
 
 To deploy workspace-specific skills that stay with your git repository:
 
@@ -199,34 +171,26 @@ To deploy workspace-specific skills that stay with your git repository:
 
 **Frontmatter example:**
 
-yaml
-
-content_copy
-
-```
+``` astro-code
 ---
 name: format-tests
 description: Standardize and re-format Python unittest assertions
 ---
 ```
 
-### Sharing global skills[link](#sharing-global-skills)
+### Sharing global skills
 
 To share skills across all workspaces on your workstation, place the
 target markdown files inside your global configuration path:
 
-text
-
-content_copy
-
-```
+``` astro-code
 ~/.gemini/antigravity-cli/skills/
 ```
 
 Any markdown skill in this directory is automatically imported as a
 global slash command whenever you launch `agy` in any directory.
 
-## Managing hooks[link](#managing-hooks)
+## Managing hooks
 
 Hooks intercept agent actions right before or immediately after
 execution. They are useful for running automated pre-flight checks or
@@ -237,15 +201,11 @@ Hooks are defined inside a plugin’s `hooks.json` or configured inside
 your primary `settings.json` file. You can inspect all loaded and active
 hooks inside the TUI by typing:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /hooks
 ```
 
-## Model Context Protocol (MCP)[link](#model-context-protocol-mcp)
+## Model Context Protocol (MCP)
 
 Model Context Protocol is an open standard enabling foundation models to
 interface securely with local APIs, file parsers, and custom developer
@@ -256,7 +216,7 @@ servers in Antigravity CLI, accessing the interactive `/mcp` manager
 overlay, and understanding server schemas and authentication, see the
 dedicated [MCP Documentation](https://antigravity.google/docs/mcp).
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Learn how to migrate your existing configurations from Gemini CLI and
 troubleshoot connection anomalies:
@@ -267,7 +227,5 @@ troubleshoot connection anomalies:
   hook errors, lockouts, or network failures.
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Configure security
   containment rings around your custom plugins and MCP servers.
-
-On this Page
 
 {% endraw %}

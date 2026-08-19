@@ -21,8 +21,8 @@ To bundle the files of your choice, add the `resources` property to the
 
 To include a list of files:
 
-- [Syntax](#tab-panel-4596)
-- [Explanation](#tab-panel-4597)
+- [Syntax](#tab-panel-4473)
+- [Explanation](#tab-panel-4474)
 
 ```
 {  "bundle": {    "resources": [      "./path/to/some-file.txt",      "/absolute/path/to/textfile.txt",      "../relative/path/to/jsonfile.json",      "some-folder/",      "resources/**/*.md"    ]  }}
@@ -46,8 +46,8 @@ structure preserved, for example: `./path/to/some-file.txt` -\>
 
 To fine control where the files will get copied to, use a map instead:
 
-- [Syntax](#tab-panel-4598)
-- [Explanation](#tab-panel-4599)
+- [Syntax](#tab-panel-4475)
+- [Explanation](#tab-panel-4476)
 
 ```
 {  "bundle": {    "resources": {      "/absolute/path/to/textfile.txt": "resources/textfile.txt",      "relative/path/to/jsonfile.json": "resources/jsonfile.json",      "resources/": "",      "docs/**/*md": "website-docs/"    }  }}
@@ -94,8 +94,8 @@ original file paths in the array notation.
 To resolve the path for a resource file, instead of manually calculating
 the path, use the following APIs
 
-- [Rust](#tab-panel-4600)
-- [JavaScript](#tab-panel-4601)
+- [Rust](#tab-panel-4477)
+- [JavaScript](#tab-panel-4478)
 
 On the Rust side, you need an instance of the
 [`PathResolver`](https://docs.rs/tauri/latest/tauri/path/struct.PathResolver.html)

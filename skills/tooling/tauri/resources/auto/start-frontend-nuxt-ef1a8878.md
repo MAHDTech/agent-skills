@@ -16,10 +16,10 @@ Nuxt is a meta framework for Vue. Learn more about Nuxt at
 
 1.  ##### Update Tauri configuration
 
-    - [npm](#tab-panel-6960)
-    - [yarn](#tab-panel-6961)
-    - [pnpm](#tab-panel-6962)
-    - [deno](#tab-panel-6963)
+    - [npm](#tab-panel-6579)
+    - [yarn](#tab-panel-6580)
+    - [pnpm](#tab-panel-6581)
+    - [deno](#tab-panel-6582)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run generate",    "devUrl": "http://localhost:3000",    "frontendDist": "../dist"  }}

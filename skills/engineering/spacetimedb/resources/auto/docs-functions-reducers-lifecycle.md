@@ -352,4 +352,5 @@ Scheduled reducer calls originate from SpacetimeDB itself, not from a
 client. Therefore:
 
 - `ctx.sender()` will be the module's own identity
-- `ctx.connection_id()` will be `None`/`null`/`undefined`
+- The connection ID will be absent (`null` in TypeScript, `null` in C#,
+  `None` in Rust, and `std::nullopt` in C++)

@@ -32,7 +32,7 @@ is a set of provider-independent coordinates, each naming a level of
 structure that some stores have:
 
 ```
-vault                which container holds the item        (1Password only)└── item             the store's own name for the secret   (always required)    └── section      a named group of fields               (1Password only)        └── field    one component inside the item          (structured stores)            └── version   which revision to read            (GCSM only)
+vault                which container holds the item        (1Password only)└── item             the store's own name for the secret   (always required)    └── section      a named group of fields               (1Password only)        └── field    one component inside the item          (structured stores)            └── version   which revision to read            (supported stores only)
 ```
 
 Only `item` is universal, because every store names its secrets somehow.
@@ -79,6 +79,38 @@ $ secretspec run --provider dotenv:.env.fixtures -- cargo test
 
 Terminal window
 
+## Different coordinates per provider (0.19+)
+
+The original `ref` remains useful when every provider understands one
+address. When endpoints organize the same logical secret differently,
+attach a template to each leaf alias and use `refs` only for exceptions:
+
+```
+[providers]remote = { uri = "onepassword://Production", ref = { item = "{project}-{profile}", field = "{key}" } }local = { uri = "dotenv://.env", ref = { item = "{key}" } }legacy = "onepassword://Legacy"
+[profiles.production]API_KEY = { description = "API key", providers = ["remote", "local"], refs = { legacy = { item = "old-api-item", field = "token" } } }
+```
+
+SecretSpec resolves each endpoint independently: `refs.<selected-alias>`
+wins, then that alias’s template, then convention naming. This applies
+to primary and fallback reads, writes, and both sides of `import`; the
+`legacy` ref above can therefore describe an import source without
+adding it to the normal read route. Templates support `{project}`,
+`{profile}`, and `{key}` in every coordinate.
+
+Scoped refs deliberately key on aliases, not resolved URIs. Literal
+provider URIs and bare provider names use convention naming because they
+have no alias identity. Cached route aliases cannot own a template or
+scoped ref; configure their individual leaf aliases instead. `refs` and
+legacy route-wide `ref` are mutually exclusive.
+
+For profile inheritance, `ref` and `refs` (0.19+) are two forms of one
+address model. A profile that explicitly declares either form replaces
+the form inherited from `[profiles.default]`: `refs` can replace an
+inherited `ref`, and `ref` can replace inherited `refs`. A profile entry
+that declares neither keeps the inherited form. See [Profiles: Switching
+reference models](https://secretspec.dev/concepts/profiles/#switching-reference-models-019)
+for an example.
+
 ## How it works
 
 - `item` is required; `field`, `vault`, `section`, and `version` are
@@ -86,9 +118,9 @@ Terminal window
 - Reads and writes are symmetric: `secretspec set` and interactive
   `check` write through the coordinates in place wherever the store
   supports writes. Read-only stores fail with a clear error.
-- `ref` is always a table. String and URI forms
-  (`ref = "op://vault/item/field"`) are rejected, with an error that
-  spells out the equivalent table.
+- `ref` and every provider-scoped `refs.<alias>` value are tables.
+  String and URI forms (`ref = "op://vault/item/field"`) are rejected,
+  with an error that spells out the equivalent table.
 - Secrets sharing identical coordinates and store are fetched once, and
   [audit log](https://secretspec.dev/concepts/audit/) events carry the coordinates.
 
@@ -96,5 +128,12 @@ See the [configuration
 reference](https://secretspec.dev/reference/configuration/#secret-references) for the full
 specification: the coordinate table, how every provider interprets each
 coordinate, and the exact rules.
+
+Azure App Configuration (0.20+) native `ref.item` values name one App
+Configuration key and remain read-only. An App Configuration value can
+itself be a canonical Azure Key Vault reference; SecretSpec follows that
+stored URI, including its optional Key Vault version. This is separate
+from SecretSpec’s `ref.version` coordinate, which Azure Key Vault
+accepts directly starting in 0.20.
 
 {% endraw %}

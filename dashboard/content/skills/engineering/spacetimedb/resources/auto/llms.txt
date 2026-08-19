@@ -44,7 +44,8 @@ This section covers the fundamental concepts you need to understand to build app
 
 - [Core Concepts](https://spacetimedb.com/docs/core-concepts): This section covers the fundamental concepts you need to understand to build applications with SpacetimeDB.
 - [Authentication](https://spacetimedb.com/docs/core-concepts/authentication): SpacetimeDB modules are exposed to the open internet and anyone can connect to
-- [Auth0](https://spacetimedb.com/docs/core-concepts/authentication/Auth0): This guilde will walk you through integrating Auth0 authentication with your SpacetimeDB application.
+- [Auth0](https://spacetimedb.com/docs/core-concepts/authentication/Auth0): This guide will walk you through integrating Auth0 authentication with your SpacetimeDB application.
+- [Better Auth](https://spacetimedb.com/docs/core-concepts/authentication/BetterAuth): Better Auth is a TypeScript authentication
 - [Clerk](https://spacetimedb.com/docs/core-concepts/authentication/Clerk): This guide will walk you through integrating Clerk authentication with your SpacetimeDB React application. You will configure a Clerk application, obtain a JWT from Clerk, and pass it to your SpacetimeDB connection as the authentication token.
 - [Overview](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/): SpacetimeAuth is currently in beta, some features may not be available yet or
 - [Configuring your project](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project): SpacetimeAuth is currently in beta, some features may not be available yet or may change in the future. You might encounter bugs or issues while using the service. Please report any problems you encounter to help us improve SpacetimeAuth.
@@ -104,6 +105,12 @@ A module is a collection of functions and schema definitions, which can be writt
 - [What is SpacetimeDB?](https://spacetimedb.com/docs/intro/what-is-spacetimedb): SpacetimeDB is a database that is also a server.
 - [The Zen of SpacetimeDB](https://spacetimedb.com/docs/intro/zen): SpacetimeDB is built on 5 core principles. As you embrace these simple principles, you will find your troubles simply melt away. These principles guide both how we develop SpacetimeDB and how you should think about building applications with it.
 
+### migrating-from-convex
+
+This guide is for teams moving an application backend from Convex to a
+
+- [Migrating from Convex](https://spacetimedb.com/docs/migrating-from-convex): This guide is for teams moving an application backend from Convex to a
+
 ### quickstarts
 
 - [Angular Quickstart](https://spacetimedb.com/docs/quickstarts/angular): Get a SpacetimeDB Angular app running in under 5 minutes.
@@ -119,6 +126,7 @@ A module is a collection of functions and schema definitions, which can be writt
 - [React Quickstart](https://spacetimedb.com/docs/quickstarts/react): Get a SpacetimeDB React app running in under 5 minutes.
 - [Remix Quickstart](https://spacetimedb.com/docs/quickstarts/remix): Get a SpacetimeDB Remix app running in under 5 minutes.
 - [Rust Quickstart](https://spacetimedb.com/docs/quickstarts/rust): Get a SpacetimeDB Rust app running in under 5 minutes.
+- [SolidJS Quickstart](https://spacetimedb.com/docs/quickstarts/solid): Get a SpacetimeDB SolidJS app running in under 5 minutes.
 - [Svelte Quickstart](https://spacetimedb.com/docs/quickstarts/svelte): Get a SpacetimeDB Svelte app running in under 5 minutes.
 - [TanStack Start Quickstart](https://spacetimedb.com/docs/quickstarts/tanstack): Get a SpacetimeDB app with TanStack Start running in under 5 minutes.
 - [TypeScript Quickstart](https://spacetimedb.com/docs/quickstarts/typescript): Get a SpacetimeDB TypeScript app running in under 5 minutes.
@@ -140,6 +148,12 @@ Guides, references, and tools to help you build with SpacetimeDB.
 The Spacetime Algebraic Type System JSON format defines how Spacetime AlgebraicTypes and AlgebraicValues are encoded as JSON. Algebraic types and values are JSON-encoded for transport via the HTTP Databases API and the WebSocket text protocol. Note that SATS-JSON is not self-describing, and so a SATS value represented in JSON requires knowing the value's schema to meaningfully understand it - for example, it's not possible to tell whether a JSON object with a single field is a ProductValue with one element or a SumValue.
 
 - [SATS-JSON Data Format](https://spacetimedb.com/docs/sats-json): The Spacetime Algebraic Type System JSON format defines how Spacetime AlgebraicTypes and AlgebraicValues are encoded as JSON. Algebraic types and values are JSON-encoded for transport via the HTTP Databases API and the WebSocket text protocol. Note that SATS-JSON is not self-describing, and so a SATS value represented in JSON requires knowing the value's schema to meaningfully understand it - for example, it's not possible to tell whether a JSON object with a single field is a ProductValue with one element or a SumValue.
+
+### submodules
+
+A submodule is a SpacetimeDB module that can be included in another module's database. The submodule's tables and functions register under a namespace you choose, keeping them separate from the consumer's own tables and from other submodules.
+
+- [Submodules](https://spacetimedb.com/docs/submodules): A submodule is a SpacetimeDB module that can be included in another module's database. The submodule's tables and functions register under a namespace you choose, keeping them separate from the consumer's own tables and from other submodules.
 
 ### tables
 

@@ -8,60 +8,59 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Features
-  \>
-- Tab
+Markdownkeyboard_arrow_down
 
-# Antigravity IDE: Tab & Navigation[link](#antigravity-ide-tab--navigation)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Antigravity IDE: Tab & Navigation
 
 This guide covers the core navigation and completion tools:
 **Supercomplete**, **Tab-to-Jump**, and **Tab-to-Import**.
 
-## Supercomplete[link](#supercomplete)
+## Supercomplete
 
 Supercomplete provides code suggestions in a region near your current
 cursor position.
 
 ![Supercomplete](https://antigravity.google/assets/image/docs/editor/supercomplete.png)
 
-### How it Works[link](#how-it-works)
+### How it Works
 
 - **File-Wide Suggestions**: Suggestions can modify code throughout the
   document, handling tasks like changing variable names or updating
   separate function definitions simultaneously.
 - **Accepting**: Press `Tab` to accept the changes.
 
-## Tab-to-Jump[link](#tab-to-jump)
+## Tab-to-Jump
 
 Tab-to-Jump is a fluid navigation tool that suggests the next logical
 place in your document to move your cursor to.
 
 ![Tab-to-Jump](https://antigravity.google/assets/image/docs/editor/tab_to_jump.png)
 
-### How it Works[link](#how-it-works-1)
+### How it Works
 
 - A “Tab to jump” icon will appear offering to move your cursor to where
   your next logical edit will be. Pressing `Tab` instantly moves your
   cursor to that location.
 - **Accepting**: Press `Tab` to accept the jump.
 
-## Tab-to-Import[link](#tab-to-import)
+## Tab-to-Import
 
 Tab-to-Import handles missing dependencies without breaking your flow.
 
 ![Tab-to-Import](https://antigravity.google/assets/image/docs/editor/tab_to_import.png)
 
-### How it Works[link](#how-it-works-2)
+### How it Works
 
 - **Detection**: If you type a class or function that isn’t imported,
   Antigravity suggests the import.
 - **Action**: Press `Tab` to complete the word and instantly add the
   import statement to the top of the file.
 
-## Settings[link](#settings)
+## Settings
 
 In your settings, you can customize the behavior of these features:
 
@@ -78,7 +77,5 @@ In your settings, you can customize the behavior of these features:
 - **Allow Gitignored Files**: Enables Tab features (suggestions and
   jumping) within files listed in your `.gitignore` file. Tab will only
   ignore gitignored files if git is installed.
-
-On this Page
 
 {% endraw %}

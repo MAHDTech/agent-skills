@@ -8,20 +8,19 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Artifacts
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Reviewing artifacts[link](#reviewing-artifacts)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Reviewing artifacts
 
 Audit generated code, review implementation proposals, attach line-level
 feedback comments, and verify visual media assets before applying edits
 to your local filesystem.
 
-## Collaboration and co-steering[link](#collaboration-and-co-steering)
+## Collaboration and co-steering
 
 An **Artifact** is a structured deliverable created by the agent to
 accomplish its task and communicate its progress and thinking to you.
@@ -49,17 +48,13 @@ The TUI partitions these assets into two interactive layers:
   supporting inline commenting, syntax highlighting, and diagram
   scaling.
 
-## Overview of /artifact[link](#overview-of-artifact)
+## Overview of /artifact
 
 When the agent produces or modifies files, a notification updates in
 your TUI status bar (`/artifact to review`). Press `ctrl+r` inside the
 prompt box to open the full-screen **Artifact Picker Panel**.
 
-text
-
-content_copy
-
-```
+``` astro-code
                                                                                                     10 artifacts · /artifact to review
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 >
@@ -79,7 +74,7 @@ Action required (10 left)
 Keyboard: ↑/↓ Navigate  y/n Approve/reject  shift+a Approve all  p Preview  esc Done
 ```
 
-### Interaction keybindings[link](#interaction-keybindings)
+### Interaction keybindings
 
 Audit the file checklist using the following dedicated panel controls:
 
@@ -95,7 +90,7 @@ Audit the file checklist using the following dedicated panel controls:
 | **`Enter`** | `nav.confirm` | Executes the active focused button. If the `open` button is focused, it launches the full-screen Detail Viewer. |
 | **`Esc`** | `nav.escape` | Saves your active review state, submits approvals/rejections back to the agent thread, and returns focus to the prompt box. |
 
-### Code files vs visual media[link](#code-files-vs-visual-media)
+### Code files vs visual media
 
 To organize workspace assets, the picker separates files by format
 types:
@@ -112,17 +107,13 @@ types:
 
 ------------------------------------------------------------------------
 
-## Viewing an artifact[link](#viewing-an-artifact)
+## Viewing an artifact
 
 To launch a close audit of a file’s code structure or proposed logic,
 select `open` (or press `Enter` directly on a highlighted code row) to
 open the **Artifact Detail Viewer**.
 
-text
-
-content_copy
-
-```
+``` astro-code
 implementation_plan.md
 >   1      Implementation Plan: Alpha-Centauri Telemetry Scaling Engine
     2
@@ -187,7 +178,7 @@ implementation_plan.md
   l hide lines · esc close
 ```
 
-### Auditing & navigation[link](#auditing--navigation)
+### Auditing & navigation
 
 - **Scrolling**: Scroll page-by-page or line-by-line using `j`/`k` (or
   standard arrow keys).
@@ -196,7 +187,7 @@ implementation_plan.md
 - **Toggle Gutter**: Press `l` to toggle the line number gutter on and
   off for a cleaner presentation of the raw code.
 
-### Granular line commenting[link](#granular-line-commenting)
+### Granular line commenting
 
 If a specific block of code requires correction:
 
@@ -209,7 +200,7 @@ If a specific block of code requires correction:
 4.  To delete your active feedback, position your cursor on the
     commented line and press `d`.
 
-### Custom Mermaid diagram rendering[link](#custom-mermaid-diagram-rendering)
+### Custom Mermaid diagram rendering
 
 If the active document contains structured system flowcharts, database
 relationships, or architectural layouts:
@@ -227,7 +218,7 @@ relationships, or architectural layouts:
 Press `Esc` to close the Detail Viewer and return back to the primary
 picker checklist.
 
-## Next steps[link](#next-steps)
+## Next steps
 
 Configure settings preferences and review agent autonomy parameters:
 
@@ -237,7 +228,5 @@ Configure settings preferences and review agent autonomy parameters:
   keyboard hotkeys and visual buffers.
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Configure security
   parameters and containment lists.
-
-On this Page
 
 {% endraw %}

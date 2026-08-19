@@ -1,11 +1,10 @@
-- side_navigation
-- Antigravity IDE
-  \>
-- Customizations
-  \>
-- Workflows
+Markdownkeyboard_arrow_down
 
-# Workflows[link](#workflows)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Workflows
 
 Workflows enable you to define a series of steps to guide the Agent
 through a repetitive set of tasks, such as deploying a service or
@@ -40,10 +39,8 @@ Workflows are saved as markdown files and contain a title, a description
 and a series of steps with specific instructions for Agent to follow.
 Workflow files are limited to 12,000 characters each.
 
-## Agent-Generated Workflows[link](#agent-generated-workflows)
+## Agent-Generated Workflows
 
 You can also ask Agent to generate Workflows for you! This works
 particularly well after manually working with Agent through a series of
 steps since it can use the conversation history to create the Workflow.
-
-On this Page

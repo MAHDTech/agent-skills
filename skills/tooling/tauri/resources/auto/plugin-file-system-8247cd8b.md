@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/fs)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-fs)[crates.io](https://crates.io/crates/tauri-plugin-fs)
 
 API
-Reference[](https://tauri.app/reference/javascript/fs/)[](https://docs.rs/tauri-plugin-fs)
+Reference:[](https://tauri.app/reference/javascript/fs/)[](https://docs.rs/tauri-plugin-fs)
 
 Access the file system.
 
@@ -17,17 +17,17 @@ Access the file system.
 
 Install the fs plugin to get started.
 
-- [Automatic](#tab-panel-6347)
-- [Manual](#tab-panel-6348)
+- [Automatic](#tab-panel-5966)
+- [Manual](#tab-panel-5967)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6336)
-- [yarn](#tab-panel-6337)
-- [pnpm](#tab-panel-6338)
-- [deno](#tab-panel-6339)
-- [bun](#tab-panel-6340)
-- [cargo](#tab-panel-6341)
+- [npm](#tab-panel-5955)
+- [yarn](#tab-panel-5956)
+- [pnpm](#tab-panel-5957)
+- [deno](#tab-panel-5958)
+- [bun](#tab-panel-5959)
+- [cargo](#tab-panel-5960)
 
 ```
 npm run tauri add fs
@@ -71,11 +71,11 @@ cargo tauri add fs
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6342)
-    - [yarn](#tab-panel-6343)
-    - [pnpm](#tab-panel-6344)
-    - [deno](#tab-panel-6345)
-    - [bun](#tab-panel-6346)
+    - [npm](#tab-panel-5961)
+    - [yarn](#tab-panel-5962)
+    - [pnpm](#tab-panel-5963)
+    - [deno](#tab-panel-5964)
+    - [bun](#tab-panel-5965)
 
     ```
     npm install @tauri-apps/plugin-fs
@@ -131,8 +131,8 @@ recommended reason.
 
 The fs plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6334)
-- [Rust](#tab-panel-6335)
+- [JavaScript](#tab-panel-5953)
+- [Rust](#tab-panel-5954)
 
 ```
 import { exists, BaseDirectory } from '@tauri-apps/plugin-fs';// when using `"withGlobalTauri": true`, you may use// const { exists, BaseDirectory } = window.__TAURI__.fs;

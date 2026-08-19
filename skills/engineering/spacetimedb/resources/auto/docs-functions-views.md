@@ -49,7 +49,7 @@ const players = table(
 const playerLevels = table(
   { name: 'player_levels', public: true },
   {
-    player_id: t.u64().unique(),
+    playerId: t.u64().unique(),
     level: t.u64().index('btree'),
   }
 );
@@ -59,7 +59,7 @@ export default spacetimedb;
 
 // At-most-one row: return Option<row> via t.option(...)
 // Your function may return the row or null
-export const my_player = spacetimedb.view(
+export const myPlayer = spacetimedb.view(
     { name: 'my_player', public: true },
     t.option(players.rowType),
     (ctx) => {
@@ -76,13 +76,13 @@ const playerAndLevelRow = t.row('PlayerAndLevel', {
 });
 
 // Multiple rows: return an array of rows via t.array(...)
-export const players_for_level = spacetimedb.anonymousView(
+export const playersForLevel = spacetimedb.anonymousView(
     { name: 'players_for_level', public: true },
     t.array(playerAndLevelRow),
     (ctx) => {
         const out: Array<{ id: bigint; name: string; level: bigint }> = [];
         for (const playerLevel of ctx.db.playerLevels.level.filter(2n)) {
-            const p = ctx.db.players.id.find(playerLevel.player_id);
+            const p = ctx.db.players.id.find(playerLevel.playerId);
             if (p) out.push({ id: p.id, name: p.name, level: playerLevel.level });
         }
         return out;
@@ -170,8 +170,7 @@ be a table type or any product type.
 Use the `#[spacetimedb::view]` macro on a function:
 
 ``` codeBlockStandalone_LlrK
-use spacetimedb::{view, ViewContext, AnonymousViewContext, table, SpacetimeType};
-use spacetimedb_lib::Identity;
+use spacetimedb::{view, ViewContext, AnonymousViewContext, table, SpacetimeType, Identity};
 
 #[spacetimedb::table(accessor = player)]
 pub struct Player {
@@ -351,7 +350,7 @@ subscriber.
 
 ``` codeBlockStandalone_LlrK
 // Per-user: each client sees their own player
-export const my_player = spacetimedb.view(
+export const myPlayer = spacetimedb.view(
   { name: 'my_player', public: true },
   t.option(players.rowType),
   (ctx) => {
@@ -410,7 +409,7 @@ const spacetimedb = schema({ players });
 export default spacetimedb;
 
 // Shared: same high scorers for all clients
-export const high_scorers = spacetimedb.anonymousView(
+export const highScorers = spacetimedb.anonymousView(
   { name: 'high_scorers', public: true },
   t.array(players.rowType),
   (ctx) => {
@@ -512,7 +511,7 @@ const playerChunk = table(
 );
 
 // Shared: all players in chunk (0,0) share this view
-export const entities_in_origin_chunk = spacetimedb.anonymousView(
+export const entitiesInOriginChunk = spacetimedb.anonymousView(
   { name: 'entities_in_origin_chunk', public: true },
   t.array(entity.rowType),
   (ctx) => {
@@ -523,7 +522,7 @@ export const entities_in_origin_chunk = spacetimedb.anonymousView(
 );
 
 // Per-user: returns entities in the chunk the player is currently in
-export const entities_in_my_chunk = spacetimedb.view(
+export const entitiesInMyChunk = spacetimedb.view(
   { name: 'entities_in_my_chunk', public: true },
   t.array(entity.rowType),
   (ctx) => {
@@ -741,7 +740,7 @@ const playerCountRow = t.row('PlayerCountRow', {
     count: t.u64(),
 });
 
-export const player_count = spacetimedb.anonymousView(
+export const playerCount = spacetimedb.anonymousView(
     { name: 'player_count', public: true },
     t.array(playerCountRow),
     (ctx) => [{ count: ctx.db.players.count() }]
@@ -897,7 +896,7 @@ plan more efficiently.
 - C++
 
 ``` codeBlockStandalone_LlrK
-export const high_scorers = spacetimedb.anonymousView(
+export const highScorers = spacetimedb.anonymousView(
   { name: 'high_scorers', public: true },
   t.array(players.rowType),
   (ctx) => {
@@ -972,24 +971,24 @@ from `moderators` if it thinks that will be more efficient.
 
 ``` codeBlockStandalone_LlrK
 // Procedural: row-by-row join in module code.
-export const high_scoring_moderators_procedural = spacetimedb.anonymousView(
+export const highScoringModeratorsProcedural = spacetimedb.anonymousView(
   { name: 'high_scoring_moderators_procedural', public: true },
   t.array(players.rowType),
   (ctx) => {
     return Array.from(ctx.db.players.score.filter({ gte: 100n }))
-      .filter(p => ctx.db.moderators.player_id.find(p.id) != null);
+      .filter(p => ctx.db.moderators.playerId.find(p.id) != null);
   }
 );
 
 // Query builder: equivalent logic pushed to the query engine.
 // The engine can reorder this join if it decides the smaller side is a better starting point.
-export const high_scoring_moderators_declarative = spacetimedb.anonymousView(
+export const highScoringModeratorsDeclarative = spacetimedb.anonymousView(
   { name: 'high_scoring_moderators_declarative', public: true },
   t.array(players.rowType),
   (ctx) => {
     return ctx.from.players
       .where(p => p.score.gte(100n))
-      .leftSemijoin(ctx.from.moderators, (p, m) => p.id.eq(m.player_id));
+      .leftSemijoin(ctx.from.moderators, (p, m) => p.id.eq(m.playerId));
   }
 );
 ```
@@ -1098,7 +1097,7 @@ const players = table(
 const playerLevels = table(
   { name: 'player_levels', public: true },
   {
-    player_id: t.u64().unique(),
+    playerId: t.u64().unique(),
     level: t.u64().index('btree'),
   }
 );
@@ -1106,13 +1105,13 @@ const playerLevels = table(
 const spacetimedb = schema({ players, playerLevels });
 export default spacetimedb;
 
-export const all_players = spacetimedb.anonymousView(
+export const allPlayers = spacetimedb.anonymousView(
   { name: 'all_players', public: true },
   t.array(players.rowType),
   (ctx) => ctx.from.players
 );
 
-export const all_player_levels = spacetimedb.anonymousView(
+export const allPlayerLevels = spacetimedb.anonymousView(
   { name: 'all_player_levels', public: true },
   t.array(playerLevels.rowType),
   (ctx) => ctx.from.playerLevels
@@ -1158,7 +1157,7 @@ public partial class Module
 ``` codeBlockStandalone_LlrK
 use spacetimedb::{table, view, AnonymousViewContext, Query};
 
-#[spacetimedb::table(name = player, public)]
+#[spacetimedb::table(accessor = player, public)]
 pub struct Player {
     #[primary_key]
     #[auto_inc]
@@ -1168,7 +1167,7 @@ pub struct Player {
     score: u64,
 }
 
-#[spacetimedb::table(name = player_level, public)]
+#[spacetimedb::table(accessor = player_level, public)]
 pub struct PlayerLevel {
     #[unique]
     player_id: u64,
@@ -1240,7 +1239,7 @@ with logical `AND`.
 - C++
 
 ``` codeBlockStandalone_LlrK
-export const high_scorers = spacetimedb.anonymousView(
+export const highScorers = spacetimedb.anonymousView(
   { name: 'high_scorers', public: true },
   t.array(players.rowType),
   (ctx) => {
@@ -1343,22 +1342,22 @@ in the other table.
 - C++
 
 ``` codeBlockStandalone_LlrK
-export const players_with_levels = spacetimedb.anonymousView(
+export const playersWithLevels = spacetimedb.anonymousView(
   { name: 'players_with_levels', public: true },
   t.array(players.rowType),
   (ctx) => {
     return ctx.from.players
-      .leftSemijoin(ctx.from.playerLevels, (p, pl) => p.id.eq(pl.player_id));
+      .leftSemijoin(ctx.from.playerLevels, (p, pl) => p.id.eq(pl.playerId));
   }
 );
 
-export const levels_for_high_scorers = spacetimedb.anonymousView(
+export const levelsForHighScorers = spacetimedb.anonymousView(
   { name: 'levels_for_high_scorers', public: true },
   t.array(playerLevels.rowType),
   (ctx) => {
     return ctx.from.players
       .where(p => p.score.gte(1000n))
-      .rightSemijoin(ctx.from.playerLevels, (p, pl) => p.id.eq(pl.player_id))
+      .rightSemijoin(ctx.from.playerLevels, (p, pl) => p.id.eq(pl.playerId))
       .where(pl => pl.level.gte(10n));
   }
 );
@@ -1432,15 +1431,17 @@ for these view handles. Views without a known primary key fall back to
 insert/delete-only behavior.
 
 For procedural views, primary keys are declared in the view definition
-for Rust and C#. In TypeScript, you mark one of the columns in the
-returned row type with `.primaryKey()`. View primary keys refer to
-source/accessor names, not case-converted or canonical database column
-names. The examples below use a `Player` row with a primary-key `id` /
-`Id` column and an indexed `owner` / `Owner` column.
+for Rust and C#, and with a post-view declaration macro in C++. In
+TypeScript, you mark one of the columns in the returned row type with
+`.primaryKey()`. View primary keys refer to source/accessor names, not
+case-converted or canonical database column names. The examples below
+use a `Player` row with a primary-key `id` / `Id` column and an indexed
+`owner` / `Owner` column.
 
 - TypeScript
 - C#
 - Rust
+- C++
 
 ``` codeBlockStandalone_LlrK
 import { schema, table, t } from 'spacetimedb/server';
@@ -1457,7 +1458,7 @@ const players = table(
 const spacetimedb = schema({ players });
 export default spacetimedb;
 
-export const my_players = spacetimedb.view(
+export const myPlayers = spacetimedb.view(
   { name: 'my_players', public: true },
   t.array(players.rowType),
   (ctx) => Array.from(ctx.db.players.owner.filter(ctx.sender))
@@ -1477,6 +1478,13 @@ public static IEnumerable<Player> MyPlayers(ViewContext ctx)
 fn my_players(ctx: &ViewContext) -> Vec<Player> {
     ctx.db.player().owner().filter(ctx.sender()).collect()
 }
+```
+
+``` codeBlockStandalone_LlrK
+SPACETIMEDB_VIEW(std::vector<Player>, my_players, Public, ViewContext ctx) {
+    return ctx.db[player_owner].filter(ctx.sender()).collect();
+}
+VIEW_PrimaryKey(my_players, id)
 ```
 
 Query builder views may also carry primary-key semantics from their

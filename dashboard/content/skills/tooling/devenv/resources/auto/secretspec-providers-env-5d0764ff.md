@@ -29,7 +29,8 @@ CI/CD compatibility and containerized environments.
 ## Quick start
 
 ```
-# Set environment variablesexport DATABASE_URL="postgresql://localhost/mydb"export API_KEY="sk-1234567890"
+# Set environment variables$ export DATABASE_URL="postgresql://localhost/mydb"
+$ export API_KEY="sk-1234567890"
 # Check secrets are available$ secretspec check --provider env✓ All required secrets are configured
 # Run with environment variables$ secretspec run --provider env -- npm start
 ```
@@ -41,7 +42,9 @@ Terminal window
 The env provider accepts no configuration options:
 
 ```
-# All these are equivalent$ secretspec check --provider env$ secretspec check --provider env:$ secretspec check --provider env://
+# All these are equivalent$ secretspec check --provider env
+$ secretspec check --provider env:
+$ secretspec check --provider env://
 ```
 
 Terminal window

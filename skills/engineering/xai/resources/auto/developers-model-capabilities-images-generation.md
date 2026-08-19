@@ -2,7 +2,7 @@
 
 # Image Generation
 
-Generate images from text prompts with Grok Imagine models. The API supports batch generation of multiple images, and control over aspect ratio and resolution.
+Generate images from text prompts with Grok Imagine models. The API supports batch generation of multiple images, and control over aspect ratio, resolution, and quality.
 
 ## Quick Start
 
@@ -15,7 +15,7 @@ client = xai_sdk.Client()
 
 response = client.image.sample(
     prompt="A collage of London landmarks in a stenciled street‑art style",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
 )
 
 print(response.url)
@@ -26,7 +26,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "A collage of London landmarks in a stenciled street‑art style"
   }'
 ```
@@ -40,7 +40,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A collage of London landmarks in a stenciled street‑art style",
 )
 
@@ -56,7 +56,7 @@ const client = new OpenAI({
 });
 
 const response = await client.images.generate({
-    model: "grok-imagine-image-quality",
+    model: "grok-imagine-image-2.0",
     prompt: "A collage of London landmarks in a stenciled street‑art style",
 });
 
@@ -68,7 +68,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateImage } from "ai";
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "A collage of London landmarks in a stenciled street‑art style",
 });
 
@@ -90,7 +90,7 @@ client = xai_sdk.Client()
 
 responses = client.image.sample_batch(
     prompt="A futuristic city skyline at night",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     n=4,
 )
 
@@ -107,7 +107,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A futuristic city skyline at night",
     n=4,
 )
@@ -125,7 +125,7 @@ const client = new OpenAI({
 });
 
 const response = await client.images.generate({
-    model: "grok-imagine-image-quality",
+    model: "grok-imagine-image-2.0",
     prompt: "A futuristic city skyline at night",
     n: 4,
 });
@@ -141,7 +141,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateImage } from "ai";
 
 const { images } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "A futuristic city skyline at night",
     n: 4,
 });
@@ -157,7 +157,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "A futuristic city skyline at night",
     "n": 4
   }'
@@ -165,8 +165,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Aspect Ratio
 
-Control image dimensions with the `aspect_ratio` parameter. This works for image generation and image editing with multiple images.
-For image editing with a single image, the output aspect ratio respects the input image's aspect ratio.
+Control image dimensions with the `aspect_ratio` parameter.
 
 | Ratio | Use case |
 |-------|----------|
@@ -186,7 +185,7 @@ client = xai_sdk.Client()
 
 response = client.image.sample(
     prompt="Mountain landscape at sunrise",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     aspect_ratio="16:9",
 )
 
@@ -202,7 +201,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="Mountain landscape at sunrise",
     extra_body={"aspect_ratio": "16:9"},
 )
@@ -219,7 +218,7 @@ const client = new OpenAI({
 });
 
 const response = await client.images.generate({
-    model: "grok-imagine-image-quality",
+    model: "grok-imagine-image-2.0",
     prompt: "Mountain landscape at sunrise",
 
     aspect_ratio: "16:9",
@@ -233,7 +232,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateImage } from "ai";
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "Mountain landscape at sunrise",
     aspectRatio: "16:9",
 });
@@ -246,7 +245,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "Mountain landscape at sunrise",
     "aspect_ratio": "16:9"
   }'
@@ -266,7 +265,7 @@ client = xai_sdk.Client()
 
 response = client.image.sample(
     prompt="An astronaut performing EVA in LEO.",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     resolution="2k"
 )
 
@@ -282,7 +281,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="An astronaut performing EVA in LEO.",
     extra_body={"resolution": "2k"},
 )
@@ -299,7 +298,7 @@ const client = new OpenAI({
 });
 
 const response = await client.images.generate({
-    model: "grok-imagine-image-quality",
+    model: "grok-imagine-image-2.0",
     prompt: "An astronaut performing EVA in LEO.",
 
     resolution: "2k",
@@ -313,7 +312,7 @@ import { xai } from "@ai-sdk/xai";
 import { generateImage } from "ai";
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "An astronaut performing EVA in LEO.",
     providerOptions: {
         xai: { resolution: "2k" },
@@ -328,11 +327,15 @@ curl -X POST https://api.x.ai/v1/images/generations \
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer $XAI_API_KEY" \
 -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "An astronaut performing EVA in LEO.",
     "resolution": "2k"
 }'
 ```
+
+### Quality
+
+Control generation quality with the optional `quality` parameter. Allowed values are `low` and `medium`. When omitted, the default is `medium`. The parameter is only supported for `grok-imagine-image-2.0`.
 
 ### Base64 Output
 
@@ -345,7 +348,7 @@ client = xai_sdk.Client()
 
 response = client.image.sample(
     prompt="A serene Japanese garden",
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     image_format="base64",
 )
 
@@ -364,7 +367,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A serene Japanese garden",
     response_format="b64_json",
 )
@@ -385,7 +388,7 @@ const client = new OpenAI({
 });
 
 const response = await client.images.generate({
-    model: "grok-imagine-image-quality",
+    model: "grok-imagine-image-2.0",
     prompt: "A serene Japanese garden",
     response_format: "b64_json",
 });
@@ -401,7 +404,7 @@ import { generateImage } from "ai";
 import fs from "fs";
 
 const { image } = await generateImage({
-    model: xai.image("grok-imagine-image-quality"),
+    model: xai.image("grok-imagine-image-2.0"),
     prompt: "A serene Japanese garden",
 });
 
@@ -415,7 +418,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "A serene Japanese garden",
     "response_format": "b64_json"
   }'
@@ -467,7 +470,7 @@ async def generate_concurrently():
     tasks = [
         client.image.sample(
             prompt=prompt,
-            model="grok-imagine-image-quality",
+            model="grok-imagine-image-2.0",
         )
         for prompt in prompts
     ]
@@ -484,6 +487,7 @@ asyncio.run(generate_concurrently())
 
 * [Models](https://docs.x.ai/developers/models) — Available image models
 * [Image Editing](https://docs.x.ai/developers/model-capabilities/images/editing) — Edit images with natural language
+* [Image Generation Tool](https://docs.x.ai/developers/tools/image-generation) — Let Grok generate and edit images inside a conversation
 * [Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation) — Generate videos from text prompts
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action

@@ -32,7 +32,7 @@ from xai_sdk.chat import user
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[user("Say hello")],
 )
 response = chat.sample()
@@ -62,7 +62,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": "Say hello"
   }' | jq '.usage.cost_in_usd_ticks'
 ```
@@ -77,7 +77,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[{"role": "user", "content": "Say hello"}],
 )
 
@@ -96,7 +96,7 @@ const client = new OpenAI({
 });
 
 const completion = await client.chat.completions.create({
-  model: "grok-4.5",
+  model: "grok-4.6",
   messages: [{ role: "user", content: "Say hello" }],
 });
 
@@ -123,7 +123,7 @@ from xai_sdk.chat import user
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[user("Tell me a joke")],
 )
 
@@ -145,7 +145,7 @@ client = OpenAI(
 )
 
 stream = client.chat.completions.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[{"role": "user", "content": "Tell me a joke"}],
     stream=True,
     stream_options={"include_usage": True},
@@ -171,7 +171,7 @@ from xai_sdk.chat import system, user
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     messages=[system("You are a helpful assistant.")],
 )
 
@@ -211,7 +211,7 @@ while True:
 
     messages.append({"role": "user", "content": prompt})
     completion = client.chat.completions.create(
-        model="grok-4.5",
+        model="grok-4.6",
         messages=messages,
     )
 
@@ -240,7 +240,7 @@ from xai_sdk.tools import web_search, x_search
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[web_search(), x_search()],
 )
 chat.append(user("What are people saying about xAI's latest announcement?"))
@@ -264,7 +264,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input="What are people saying about xAI's latest announcement?",
     tools=[
         {"type": "web_search"},
@@ -284,7 +284,7 @@ curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "tools": [{"type": "web_search"}, {"type": "x_search"}],
     "input": "What are people saying about xAI'\''s latest announcement?"
   }' | jq '{tools_used: .usage.num_server_side_tools_used, cost_in_usd_ticks: .usage.cost_in_usd_ticks}'
@@ -300,7 +300,7 @@ curl https://api.x.ai/v1/images/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-imagine-image-quality",
+    "model": "grok-imagine-image-2.0",
     "prompt": "A cat on a rocket"
   }' | jq '.usage.cost_in_usd_ticks'
 # => 200000000 ($0.02)
@@ -314,14 +314,14 @@ client = Client(api_key=os.getenv("XAI_API_KEY"))
 
 # Image generation
 image = client.image.sample(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A cat on a rocket",
 )
 print(f"Image cost: ${image.cost_usd:.4f}")
 
 # Video generation
 video = client.video.generate(
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     prompt="A cat floating in space",
 )
 print(f"Video cost: ${video.cost_usd:.4f}")
@@ -337,7 +337,7 @@ client = OpenAI(
 )
 
 response = client.images.generate(
-    model="grok-imagine-image-quality",
+    model="grok-imagine-image-2.0",
     prompt="A cat on a rocket",
 )
 

@@ -3,7 +3,7 @@
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/positioner)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-positioner)[crates.io](https://crates.io/crates/tauri-plugin-positioner)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/positioner/)[](https://docs.rs/tauri-plugin-positioner)
+Reference:[](https://v2.tauri.app/reference/javascript/positioner/)[](https://docs.rs/tauri-plugin-positioner)
 
 Position your windows at well-known locations.
 
@@ -21,17 +21,17 @@ for Tauri.
 
 Install the positioner plugin to get started.
 
-- [Automatic](#tab-panel-6510)
-- [Manual](#tab-panel-6511)
+- [Automatic](#tab-panel-6129)
+- [Manual](#tab-panel-6130)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6499)
-- [yarn](#tab-panel-6500)
-- [pnpm](#tab-panel-6501)
-- [deno](#tab-panel-6502)
-- [bun](#tab-panel-6503)
-- [cargo](#tab-panel-6504)
+- [npm](#tab-panel-6118)
+- [yarn](#tab-panel-6119)
+- [pnpm](#tab-panel-6120)
+- [deno](#tab-panel-6121)
+- [bun](#tab-panel-6122)
+- [cargo](#tab-panel-6123)
 
 ```
 npm run tauri add positioner
@@ -75,11 +75,11 @@ cargo tauri add positioner
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6505)
-    - [yarn](#tab-panel-6506)
-    - [pnpm](#tab-panel-6507)
-    - [deno](#tab-panel-6508)
-    - [bun](#tab-panel-6509)
+    - [npm](#tab-panel-6124)
+    - [yarn](#tab-panel-6125)
+    - [pnpm](#tab-panel-6126)
+    - [deno](#tab-panel-6127)
+    - [bun](#tab-panel-6128)
 
     ```
     npm install @tauri-apps/plugin-positioner

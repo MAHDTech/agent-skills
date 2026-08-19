@@ -864,7 +864,7 @@ following.
 public class GameManager : MonoBehaviour
 {
     const string SERVER_URL = "http://127.0.0.1:3000";
-    const string MODULE_NAME = "blackholio";
+    const string DATABASE_NAME = "blackholio";
 
     public static event Action OnConnected;
     public static event Action OnSubscriptionApplied;
@@ -882,13 +882,13 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // In order to build a connection to SpacetimeDB we need to register
-        // our callbacks and specify a SpacetimeDB server URI and module name.
+        // our callbacks and specify a SpacetimeDB server URI and database name.
         var builder = DbConnection.Builder()
             .OnConnect(HandleConnect)
             .OnConnectError(HandleConnectError)
             .OnDisconnect(HandleDisconnect)
             .WithUri(SERVER_URL)
-            .WithDatabaseName(MODULE_NAME);
+            .WithDatabaseName(DATABASE_NAME);
 
         // If the user has a SpacetimeDB auth token stored in the Unity PlayerPrefs,
         // we can use it to authenticate the connection.
@@ -971,9 +971,9 @@ public class GameManager : MonoBehaviour
 > token instead of overwriting it during reconnect.
 
 Here we configure the connection to the database, by passing it some
-callbacks in addition to providing the `SERVER_URI` and `MODULE_NAME` to
-the connection. When the client connects, the SpacetimeDB SDK will call
-the `HandleConnect` method, allowing us to start up the game.
+callbacks in addition to providing the `SERVER_URL` and `DATABASE_NAME`
+to the connection. When the client connects, the SpacetimeDB SDK will
+call the `HandleConnect` method, allowing us to start up the game.
 
 In our `HandleConnect` callback we build a subscription and call
 `Subscribe`, subscribing to all data in the database. This causes

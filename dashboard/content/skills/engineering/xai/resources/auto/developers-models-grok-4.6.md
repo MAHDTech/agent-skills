@@ -1,5 +1,5 @@
 +++
-title = "developers-models-grok-4.5"
+title = "developers-models-grok-4.6"
 [extra]
 skill = false
 category = "engineering"
@@ -8,16 +8,15 @@ skill_name = "xai"
 +++
 
 {% raw %}
-# Grok 4.5
+# Grok 4.6
 
-SpaceXAI's intelligent coding model for agentic software, engineering, and workflow tasks. Trained in SpaceXAI's data centers in Memphis with new datasets spanning science, engineering, and math.
+SpaceXAI's frontier model for coding, agentic tasks, and knowledge work.
 
 ## At a glance
 
 - **Modalities:** text, image → text
 - **Context window:** 500,000 tokens
-- **Model name:** `grok-4.5`
-- **Aliases:** `grok-4.5-latest`, `grok-build-latest`
+- **Model name:** `grok-4.6`
 
 ## Capabilities
 
@@ -30,7 +29,7 @@ SpaceXAI's intelligent coding model for agentic software, engineering, and workf
 | Type | < 200k prompt tokens (per 1M tokens) | ≥ 200k prompt tokens (per 1M tokens) |
 | --- | --- | --- |
 | Input | $2.00 | $4.00 |
-| Cached input | $0.30 | $0.60 |
+| Cached input | $0.50 | $1.00 |
 | Output | $6.00 | $12.00 |
 
 Requests whose prompt reaches 200k tokens are billed at the higher rate for all tokens in the request.

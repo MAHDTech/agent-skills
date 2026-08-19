@@ -1,15 +1,14 @@
-- side_navigation
-- Antigravity CLI
-  \>
-- Commands
-  \>
-- Window Title (/title)
+Markdownkeyboard_arrow_down
 
-# Window Title Command (/title)[link](#window-title-command-title)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Window Title Command (/title)
 
 Configure dynamic terminal window titles interactively.
 
-## Overview[link](#overview)
+## Overview
 
 The `/title` command allows you to toggle the terminal window title
 feature on and off, or set its state explicitly. When enabled, the
@@ -20,42 +19,30 @@ For details on how to write custom scripts to format the window title,
 see the conceptual **[Terminal Title Customization
 Guide](https://antigravity.google/docs/cli/title)**.
 
-## Interactive Toggling[link](#interactive-toggling)
+## Interactive Toggling
 
 You can control the window title feature by running the `/title`
 command.
 
 To toggle the feature on and off:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /title
 ```
 
 To enable it explicitly:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /title on
 ```
 
 To disable it explicitly:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /title off
 ```
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - **[Terminal Title Guide](https://antigravity.google/docs/cli/title)**: Learn how to write custom
   scripts to format the window title.
@@ -63,5 +50,3 @@ content_copy
   your TUI status line.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands.
-
-On this Page

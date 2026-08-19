@@ -8,21 +8,20 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity 2.0
-  \>
-- Customizations
-  \>
-- Skills
+Markdownkeyboard_arrow_down
 
-# Agent Skills[link](#agent-skills)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Agent Skills
 
 Skills are an [open standard](https://agentskills.io/home) for extending
 agent capabilities. A skill is a folder containing a `SKILL.md` file
 with instructions that the agent can follow when working on specific
 tasks.
 
-## What are skills?[link](#what-are-skills)
+## What are skills?
 
 Skills are reusable packages of knowledge that extend what the agent can
 do. Each skill contains:
@@ -35,7 +34,7 @@ When you start a conversation, the agent sees a list of available skills
 with their names and descriptions. If a skill looks relevant to your
 task, the agent reads the full instructions and follows them.
 
-## Where skills live[link](#where-skills-live)
+## Where skills live
 
 Antigravity supports two types of skills:
 
@@ -53,16 +52,14 @@ utilities or general-purpose tools you want everywhere.
 Note: Antigravity now defaults to .agents/skills, but still maintains
 backward support for .agent/skills.
 
-## Creating a skill[link](#creating-a-skill)
+## Creating a skill
 
 To create a skill:
 
 1.  Create a folder for your skill in one of the skill directories
 2.  Add a `SKILL.md` file inside that folder
 
-content_copy
-
-```
+``` astro-code
 .agents/skills/
 └─── my-skill/
     └─── SKILL.md
@@ -70,9 +67,7 @@ content_copy
 
 Every skill needs a `SKILL.md` file with YAML frontmatter at the top:
 
-content_copy
-
-```
+``` astro-code
 ---
 name: my-skill
 description: Helps with a specific task. Use when you need to do X or Y.
@@ -92,7 +87,7 @@ Detailed instructions for the agent go here.
 Step-by-step guidance, conventions, and patterns the agent should follow.
 ```
 
-### Frontmatter fields[link](#frontmatter-fields)
+### Frontmatter fields
 
 | Field | Required | Description |
 |:---|:---|:---|
@@ -103,14 +98,12 @@ Tip: Write your description in third person and include keywords that
 help the agent recognize when the skill is relevant. For example:
 “Generates unit tests for Python code using pytest conventions.”
 
-## Skill folder structure[link](#skill-folder-structure)
+## Skill folder structure
 
 While `SKILL.md` is the only required file, you can include additional
 resources:
 
-content_copy
-
-```
+``` astro-code
 .agents/skills/my-skill/
 ├─── SKILL.md       # Main instructions (required)
 ├─── scripts/       # Helper scripts (optional)
@@ -120,7 +113,7 @@ content_copy
 
 The agent can read these files when following your skill’s instructions.
 
-## How the agent uses skills[link](#how-the-agent-uses-skills)
+## How the agent uses skills
 
 Skills follow a **progressive disclosure** pattern:
 
@@ -135,36 +128,34 @@ You don’t need to explicitly tell the agent to use a skill—it decides
 based on context. However, you can mention a skill by name if you want
 to ensure it’s used.
 
-## Best practices[link](#best-practices)
+## Best practices
 
-### Keep skills focused[link](#keep-skills-focused)
+### Keep skills focused
 
 Each skill should do one thing well. Instead of a “do everything” skill,
 create separate skills for distinct tasks.
 
-### Write clear descriptions[link](#write-clear-descriptions)
+### Write clear descriptions
 
 The description is how the agent decides whether to use your skill. Make
 it specific about what the skill does and when it’s useful.
 
-### Use scripts as black boxes[link](#use-scripts-as-black-boxes)
+### Use scripts as black boxes
 
 If your skill includes scripts, encourage the agent to run them with
 `--help` first rather than reading the entire source code. This keeps
 the agent’s context focused on the task.
 
-### Include decision trees[link](#include-decision-trees)
+### Include decision trees
 
 For complex skills, add a section that helps the agent choose the right
 approach based on the situation.
 
-## Example: A code review skill[link](#example-a-code-review-skill)
+## Example: A code review skill
 
 Here’s a simple skill that helps the agent review code:
 
-content_copy
-
-```
+``` astro-code
 ---
 name: code-review
 description: Reviews code changes for bugs, style issues, and best practices. Use when reviewing PRs or checking code quality.
@@ -187,7 +178,5 @@ When reviewing code, follow these steps:
 - Explain why, not just what
 - Suggest alternatives when possible
 ```
-
-On this Page
 
 {% endraw %}

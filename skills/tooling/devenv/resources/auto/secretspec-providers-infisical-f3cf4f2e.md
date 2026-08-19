@@ -43,7 +43,8 @@ Create a machine identity in Infisical, grant it access to the project,
 and set:
 
 ```
-$ export INFISICAL_CLIENT_ID=...$ export INFISICAL_CLIENT_SECRET=...
+$ export INFISICAL_CLIENT_ID=...
+$ export INFISICAL_CLIENT_SECRET=...
 ```
 
 Terminal window
@@ -68,7 +69,7 @@ machine identities.
 
 A machine identity’s credentials can live in another store rather than
 in the environment, declared as [provider
-credentials](https://secretspec.dev/concepts/providers/#provider-credentials):
+credentials](https://secretspec.dev/reference/provider-credentials/):
 
 ```
 [providers.infisical]uri = "infisical://app.infisical.com/7e2f1a4c-..."
@@ -82,6 +83,18 @@ Auth, and `token` for a ready-made access token. Each falls back to its
 corresponding environment variable when it is not declared. Use
 `secretspec config provider login infisical` to store declared
 credentials.
+
+## Provider credentials
+
+| Credential      | Environment fallback      | Available since |
+|-----------------|---------------------------|-----------------|
+| `client_id`     | `INFISICAL_CLIENT_ID`     | 0.16+           |
+| `client_secret` | `INFISICAL_CLIENT_SECRET` | 0.16+           |
+| `token`         | `INFISICAL_TOKEN`         | 0.16+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -133,7 +146,7 @@ A project whose environments do not correspond to profiles pins one with
 `?env=`:
 
 ```
-# Every profile reads Infisical's "dev" environmentsecretspec run --provider "infisical://app.infisical.com/7e2f1a4c-...?env=dev" -- npm start
+# Every profile reads Infisical's "dev" environment$ secretspec run --provider "infisical://app.infisical.com/7e2f1a4c-...?env=dev" -- npm start
 ```
 
 Terminal window
@@ -184,9 +197,29 @@ of SecretSpec’s layout:
 - `version`: an Infisical secret version. Version-pinned refs are
   read-only, since a past version cannot be rewritten
 
-A ref has no profile to name an environment with, so the provider URI
-must pin one with `?env=`. Infisical secrets are single values with no
-sub-components, so `field`, `section` and `vault` are rejected.
+A ref names a folder and key but never an environment. The environment
+comes from `?env=`, or from the profile the run resolves under (0.20+) —
+the same environment a convention secret reads in that run.
+
+With the profile supplying the environment, one alias serves every
+profile and secrets can be named flat, with no `{project}/{profile}`
+folders:
+
+```
+[providers]# `production` reads Infisical's production environment, `dev` reads devinfisical_flat = { uri = "infisical://app.infisical.com/7e2f1a4c-...", ref = { item = "/{key}" } }
+```
+
+See [Secret
+References](https://secretspec.dev/concepts/references/#different-coordinates-per-provider-019)
+for the alias-level `ref` template.
+
+A [provider credential](https://secretspec.dev/reference/provider-credentials/) is the
+exception: it belongs to its alias rather than to a profile, and is read
+the same way whichever profile runs, so a credential declared with a
+`ref` needs `?env=`.
+
+Infisical secrets are single values with no sub-components, so `field`,
+`section` and `vault` are rejected.
 
 ## CI/CD
 
@@ -194,7 +227,9 @@ Use Universal Auth credentials stored in the CI platform, or provide an
 access token minted by your deployment environment:
 
 ```
-$ export INFISICAL_CLIENT_ID="$CI_INFISICAL_CLIENT_ID"$ export INFISICAL_CLIENT_SECRET="$CI_INFISICAL_CLIENT_SECRET"$ secretspec run --provider "infisical://app.infisical.com/7e2f1a4c-...?env=prod" -- deploy
+$ export INFISICAL_CLIENT_ID="$CI_INFISICAL_CLIENT_ID"
+$ export INFISICAL_CLIENT_SECRET="$CI_INFISICAL_CLIENT_SECRET"
+$ secretspec run --provider "infisical://app.infisical.com/7e2f1a4c-...?env=prod" -- deploy
 ```
 
 Terminal window
@@ -219,7 +254,8 @@ resolved.
 Point the URI at the instance, or set `INFISICAL_DOMAIN`:
 
 ```
-export INFISICAL_DOMAIN=https://vault.example.comsecretspec run --provider "infisical:///7e2f1a4c-..." -- npm start
+$ export INFISICAL_DOMAIN=https://vault.example.com
+$ secretspec run --provider "infisical:///7e2f1a4c-..." -- npm start
 ```
 
 Terminal window
@@ -242,16 +278,20 @@ written once the request is approved.
 - A project or profile whose name is not spellable as an Infisical
   folder (letters, digits, dashes, underscores) is refused rather than
   rewritten
-- Refs need `?env=`, having no profile to name an environment with
+- A ref reads the environment the profile names unless `?env=` pins one.
+  Infisical answers a missing secret, folder, environment and project
+  with the same 404. Starting in SecretSpec 0.20, if every requested
+  secret gets that ambiguous response, SecretSpec checks the environment
+  root once. A missing environment or project then becomes an error
+  naming the selected environment and whether the profile or `?env=`
+  selected it; a missing secret or folder in an existing environment
+  remains unset so provider fallback still works
 - `secretspec import infisical://…` is not supported: the provider does
   not enumerate existing secrets, so import has nothing to discover
 - The domain variables name a host, not a path: an instance served under
   a sub-path (`https://example.com/infisical`) is not addressable. A
   trailing `/api` is the exception and is accepted, since Infisical’s
   own CLI takes the domain in that form
-- An environment or project that does not exist reads as an unset secret
-  rather than an error: Infisical answers a missing secret, folder,
-  environment and project with the same bare 404. Writing one reports
-  the environment by name. If a profile does not match an environment
-  slug — Infisical’s own default projects use `dev`, `staging` and
-  `prod` — pin the right one with `?env=`
+- If a profile does not match an environment slug — Infisical’s own
+  default projects use `dev`, `staging` and `prod` — pin the right one
+  with `?env=`

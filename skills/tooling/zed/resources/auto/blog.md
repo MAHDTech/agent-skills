@@ -2,6 +2,40 @@
 
 Keep up with news about Zed.
 
+[](https://zed.dev/blog/introducing-delta)
+
+![Introducing
+Delta](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/introducing-delta/thumbnail.webp)
+
+## Introducing Delta
+
+A multiplayer environment for coding with agents, from the creators of
+Zed.
+
+![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
+
+Nathan Sobo
+
+August 12th, 2026
+
+Newest
+
+[](https://zed.dev/blog/sandboxing)
+
+![Sandboxing](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/sandbox/sandbox.webp)
+
+## Sandboxing
+
+Zed supports sandboxing to restrict what agents can do while using the
+terminal and fetch tools.
+
+![Cameron
+Mcloughlin](https://avatars.githubusercontent.com/u/29902409?s=2048)
+
+Cameron Mcloughlin
+
+August 5th, 2026
+
 [](https://zed.dev/blog/hidden-gems-part-4)
 
 ![Hidden Gems: Part
@@ -18,39 +52,41 @@ Joseph Lyons
 
 June 23rd, 2026
 
-Newest
+[](https://zed.dev/blog/introducing-delta)
 
-[](https://zed.dev/blog/introducing-deltadb)
-
-![Software Is Made Between
-Commits](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/deltadb-early-access/thumbnail.webp)
-
-## Software Is Made Between Commits
-
-Agents turned the conversation into the real source of our software.
-DeltaDB is the version control built for it.
+## Introducing Delta
 
 ![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
 
-Nathan Sobo
+------------------------------------------------------------------------
 
-June 11th, 2026
+![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
 
-[](https://zed.dev/blog/community-champions)
+\|
 
-![The Community Champions
-Program](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/community-champions/thumbnail.webp)
+Featured
 
-## The Community Champions Program
+\|
 
-How we recognize our frequent contributors.
+Aug 12, 2026
 
-![Joseph
-Lyons](https://avatars.githubusercontent.com/u/19867440?v=4&s=2048)
+------------------------------------------------------------------------
 
-Joseph Lyons
+[](https://zed.dev/blog/sandboxing)
 
-June 2nd, 2026
+## Sandboxing
+
+![Cameron
+Mcloughlin](https://avatars.githubusercontent.com/u/29902409?s=2048)
+
+------------------------------------------------------------------------
+
+![Cameron
+Mcloughlin](https://avatars.githubusercontent.com/u/29902409?s=2048)
+
+Aug 05, 2026
+
+------------------------------------------------------------------------
 
 [](https://zed.dev/blog/hidden-gems-part-4)
 

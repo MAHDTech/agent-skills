@@ -100,7 +100,7 @@ Upgrade Notes](https://spacetimedb.com/docs/upgrade) first.
 To completely reset your database and delete all data:
 
 ``` codeBlockStandalone_LlrK
-spacetime publish --delete-data <DATABASE_NAME>
+spacetime publish <DATABASE_NAME> --delete-data
 ```
 
 ⚠️ **Warning:** This permanently deletes all data in your database!

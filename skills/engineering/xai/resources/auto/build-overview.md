@@ -70,16 +70,16 @@ grok -p "Hello" -m my-model
 
 You can also switch inside the TUI with `/model <name>`.
 
-## Use Grok 4.5 on the API
+## Use Grok 4.6 on the API
 
-The same model that powers Grok Build, [`grok-4.5`](https://docs.x.ai/developers/models/grok-4.5), is also available directly on the xAI API. Drop it into your own agent loop, IDE integration, or coding tool.
+The same model that powers Grok Build, [`grok-4.6`](https://docs.x.ai/developers/models/grok-4.6), is also available directly on the xAI API. Drop it into your own agent loop, IDE integration, or coding tool.
 
 ```bash customLanguage="bash"
 curl https://api.x.ai/v1/responses \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "grok-4.5",
+    "model": "grok-4.6",
     "input": "Fix this function and explain the bug: function median(a){a.sort();return a[a.length/2]}"
   }'
 ```
@@ -91,7 +91,7 @@ from xai_sdk.chat import user
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 
-chat = client.chat.create(model="grok-4.5")
+chat = client.chat.create(model="grok-4.6")
 chat.append(user("Fix this function and explain the bug: function median(a){a.sort();return a[a.length/2]}"))
 
 print(chat.sample().content)
@@ -106,7 +106,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input="Fix this function and explain the bug: function median(a){a.sort();return a[a.length/2]}",
 )
 
@@ -118,7 +118,7 @@ import { xai } from '@ai-sdk/xai';
 import { generateText } from 'ai';
 
 const { text } = await generateText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'Fix this function and explain the bug: function median(a){a.sort();return a[a.length/2]}',
 });
 
@@ -131,3 +131,4 @@ console.log(text);
 * [Modes and Commands](https://docs.x.ai/build/modes-and-commands)
 * [Headless & Scripting](https://docs.x.ai/build/cli/headless-scripting)
 * [Enterprise Deployments](https://docs.x.ai/build/enterprise)
+* [Grok Bot](https://docs.x.ai/grok-bot/overview) — AI teammates on a cloud computer

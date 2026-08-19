@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/log)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-log)[crates.io](https://crates.io/crates/tauri-plugin-log)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/log/)[](https://docs.rs/tauri-plugin-log)
+Reference:[](https://v2.tauri.app/reference/javascript/log/)[](https://docs.rs/tauri-plugin-log)
 
 Configurable logging for your Tauri app.
 
@@ -27,17 +27,17 @@ Configurable logging for your Tauri app.
 
 Install the log plugin to get started.
 
-- [Automatic](#tab-panel-6424)
-- [Manual](#tab-panel-6425)
+- [Automatic](#tab-panel-6043)
+- [Manual](#tab-panel-6044)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6413)
-- [yarn](#tab-panel-6414)
-- [pnpm](#tab-panel-6415)
-- [deno](#tab-panel-6416)
-- [bun](#tab-panel-6417)
-- [cargo](#tab-panel-6418)
+- [npm](#tab-panel-6032)
+- [yarn](#tab-panel-6033)
+- [pnpm](#tab-panel-6034)
+- [deno](#tab-panel-6035)
+- [bun](#tab-panel-6036)
+- [cargo](#tab-panel-6037)
 
 ```
 npm run tauri add log
@@ -81,11 +81,11 @@ cargo tauri add log
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6419)
-    - [yarn](#tab-panel-6420)
-    - [pnpm](#tab-panel-6421)
-    - [deno](#tab-panel-6422)
-    - [bun](#tab-panel-6423)
+    - [npm](#tab-panel-6038)
+    - [yarn](#tab-panel-6039)
+    - [pnpm](#tab-panel-6040)
+    - [deno](#tab-panel-6041)
+    - [bun](#tab-panel-6042)
 
     ```
     npm install @tauri-apps/plugin-log
@@ -127,8 +127,8 @@ cargo tauri add log
 
 ## Logging
 
-- [JavaScript](#tab-panel-6411)
-- [Rust](#tab-panel-6412)
+- [JavaScript](#tab-panel-6030)
+- [Rust](#tab-panel-6031)
 
 Use one of the plugin’s `warn`, `debug`, `trace`, `info` or `error` APIs
 to produce a log record from JavaScript code:

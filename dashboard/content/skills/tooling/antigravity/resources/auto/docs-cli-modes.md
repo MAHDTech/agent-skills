@@ -8,24 +8,23 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Agent Capabilities
-  \>
-- Choose an execution mode
+Markdownkeyboard_arrow_down
 
-# Choose an execution mode[link](#choose-an-execution-mode)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Choose an execution mode
 
 Control whether Antigravity CLI pauses to ask before modifying files or
 executing commands during a session.
 
-## Before you begin[link](#before-you-begin)
+## Before you begin
 
 - [Install Antigravity CLI](https://antigravity.google/docs/cli/install)
 - Have an active project repository with source code to edit
 
-## Available modes[link](#available-modes)
+## Available modes
 
 Each execution mode makes a different tradeoff between conversational
 autonomy and developer oversight. The table below shows how Antigravity
@@ -41,7 +40,7 @@ CLI handles file operations and planning in each mode.
 > `--dangerously-skip-permissions` continue to govern shell commands
 > (`run_command`) across all execution modes.
 
-## Cycle execution modes during a session[link](#cycle-execution-modes-during-a-session)
+## Cycle execution modes during a session
 
 You can switch execution modes mid-session without interrupting active
 tasks or restarting the terminal.
@@ -57,17 +56,13 @@ tasks or restarting the terminal.
 > switch to `accept-edits` mode and approve all pending file
 > modifications.
 
-## Review modifications in default mode[link](#review-modifications-in-default-mode)
+## Review modifications in default mode
 
 In `default` mode (`request-review`), Antigravity CLI pauses before
 applying any file writes to disk and renders an inline,
 syntax-highlighted diff preview.
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Launch in default interactive review mode
 agy
 ```
@@ -87,17 +82,13 @@ When prompted with a pending file modification:
 modifications and action
 choices](https://antigravity.google/assets/image/docs/cli/modes-edit-file-preview.png)
 
-### New file creation previews[link](#new-file-creation-previews)
+### New file creation previews
 
 When Antigravity CLI creates a brand-new file, the confirmation panel
 displays an addition-only diff preview with a dedicated `"Create file"`
 header and explicit allow/deny prompts:
 
-text
-
-content_copy
-
-```
+``` astro-code
 Create file: src/utils/formatter.ts
 Allow create this file? [y/n/f]
 ```
@@ -106,17 +97,13 @@ Allow create this file? [y/n/f]
 new file in default
 mode](https://antigravity.google/assets/image/docs/cli/modes-create-file-preview.png)
 
-## Auto-approve edits with accept-edits mode[link](#auto-approve-edits-with-accept-edits-mode)
+## Auto-approve edits with accept-edits mode
 
 Select `accept-edits` mode when you want Antigravity CLI to work in
 longer, uninterrupted stretches across your filesystem without pausing
 for each file modification.
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Launch directly in accept-edits mode
 agy --mode=accept-edits
 ```
@@ -131,16 +118,12 @@ background file writes from queueing for manual approval.
 automatic file
 modification](https://antigravity.google/assets/image/docs/cli/modes-accept-edits-status.png)
 
-## Analyze tasks before editing with plan mode[link](#analyze-tasks-before-editing-with-plan-mode)
+## Analyze tasks before editing with plan mode
 
 Use `plan` mode when taking on complex refactoring, multi-file
 architectural changes, or unfamiliar codebase investigations.
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Launch directly in planning mode
 agy --mode=plan
 ```
@@ -154,21 +137,17 @@ execution outline for your approval before writing code.
 ![The CLI running in plan mode analyzing code and structuring an
 execution outline](https://antigravity.google/assets/image/docs/cli/modes-plan-execution.png)
 
-## Persist or override your default mode[link](#persist-or-override-your-default-mode)
+## Persist or override your default mode
 
 You can set your preferred startup execution mode permanently across
 sessions or override it for specific invocations.
 
-### Using the interactive settings panel[link](#using-the-interactive-settings-panel)
+### Using the interactive settings panel
 
 Open the interactive settings panel mid-session to inspect or update
 your default configuration.
 
-bash
-
-content_copy
-
-```
+``` astro-code
 /settings
 ```
 
@@ -180,38 +159,30 @@ select your default (`default`, `accept-edits`, or `plan`), and press
 `Ctrl+S` to save. Modifying this option synchronizes your runtime
 `CycleMode` immediately.
 
-### Setting `agentMode` in `settings.json`[link](#setting-agentmode-in-settingsjson)
+### Setting `agentMode` in `settings.json`
 
 Set `agentMode` directly inside your user or project configuration file:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "agentMode": "accept-edits"
+    "agentMode": "accept-edits"
 }
 ```
 
 The CLI loads this file from `~/.gemini/antigravity-cli/settings.json`
 at startup and applies your chosen baseline execution mode.
 
-### Command-line flag overrides[link](#command-line-flag-overrides)
+### Command-line flag overrides
 
 Pass the `--mode` flag to temporarily override your persistent default
 mode for a single terminal run:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 # Override settings.json to run in planning mode
 agy --mode=plan
 ```
 
-## Common mistakes[link](#common-mistakes)
+## Common mistakes
 
 | Mistake | Why it fails | Fix |
 |:---|:---|:---|
@@ -219,7 +190,7 @@ agy --mode=plan
 | Using legacy `/planning` or `/fast` commands | These vestigial commands were removed in `1.1.0` | Press `Shift+Tab` to cycle modes or type `/plan` before your prompt |
 | Passing `--permission-mode` | `agy` uses `--mode` (`--mode=accept-edits` or `--mode=plan`) for execution overrides | Run `agy --mode=accept-edits` or check `agy --help` |
 
-## Next steps[link](#next-steps)
+## Next steps
 
 - [Permissions](https://antigravity.google/docs/cli/permissions): Configure fine-grained tool
   approval rules and wildcard matching
@@ -227,7 +198,5 @@ agy --mode=plan
   configuration overrides and interactive preferences
 - [Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents): Manage parallel
   subagent execution and asynchronous task queues
-
-On this Page
 
 {% endraw %}

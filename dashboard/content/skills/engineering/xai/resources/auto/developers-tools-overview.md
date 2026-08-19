@@ -20,7 +20,7 @@ The xAI API offers two categories of tools:
 
 | Type | Description | Examples |
 |------|-------------|----------|
-| **Built-in Tools** | Server-side tools managed by xAI that execute automatically | Web Search, X Search, Code Interpreter, Collections Search |
+| **Built-in Tools** | Server-side tools managed by xAI that execute automatically | Web Search, X Search, Code Interpreter, Image Generation, Collections Search |
 | **Function Calling** | Custom functions you define that the model can invoke | Database queries, API calls, custom business logic |
 
 Built-in tools run on xAI's servers—you provide the tool configuration, and the API handles execution and returns results. Function calling lets you define your own tools that the model can request, giving you full control over what happens when they're invoked.
@@ -48,7 +48,7 @@ curl https://api.x.ai/v1/responses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
-  "model": "grok-4.5",
+  "model": "grok-4.6",
   "stream": true,
   "input": [
     {
@@ -73,7 +73,7 @@ from xai_sdk.tools import web_search, x_search, code_execution
 
 client = Client(api_key=os.getenv("XAI_API_KEY"))
 chat = client.chat.create(
-    model="grok-4.5",
+    model="grok-4.6",
     tools=[
         web_search(),
         x_search(),
@@ -100,7 +100,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="grok-4.5",
+    model="grok-4.6",
     input=[
         {"role": "user", "content": "What are the latest updates from xAI?"}
     ],
@@ -122,7 +122,7 @@ import { xai } from '@ai-sdk/xai';
 import { streamText } from 'ai';
 
 const { fullStream } = streamText({
-  model: xai.responses('grok-4.5'),
+  model: xai.responses('grok-4.6'),
   prompt: 'What are the latest updates from xAI?',
   tools: {
     web_search: xai.tools.webSearch(),
@@ -149,7 +149,7 @@ const client = new OpenAI({
 });
 
 const stream = await client.responses.create({
-  model: "grok-4.5",
+  model: "grok-4.6",
   input: [
     { role: "user", content: "What are the latest updates from xAI?" }
   ],
@@ -178,6 +178,7 @@ The API automatically returns source URLs for information gathered via tools. Se
 * **[Web Search](https://docs.x.ai/developers/tools/web-search)** - Search the web and browse pages
 * **[X Search](https://docs.x.ai/developers/tools/x-search)** - Search X posts, users, and threads
 * **[Code Execution](https://docs.x.ai/developers/tools/code-execution)** - Execute Python code in a sandbox
+* **[Image Generation](https://docs.x.ai/developers/tools/image-generation)** - Generate and edit images in a conversation
 * **[Collections Search](https://docs.x.ai/developers/tools/collections-search)** - Query your uploaded documents
 * **[Citations](https://docs.x.ai/developers/tools/citations)** - Access source URLs and inline citations
 {% endraw %}

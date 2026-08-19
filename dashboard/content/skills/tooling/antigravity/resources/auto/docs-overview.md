@@ -8,21 +8,22 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity 2.0
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Antigravity 2.0[link](#antigravity-20)
+content_copyCopy Markdown
 
-## Overview[link](#overview)
+open_in_newView Markdown
+
+# Antigravity 2.0
+
+## Overview
 
 As we go deeper into the agent-first era, Antigravity is evolving to
 further empower developers. Introducing Antigravity 2.0, a standalone
 desktop application tailored for managing AI agents that execute complex
 knowledge and coding tasks.
 
-### What is Antigravity 2.0?[link](#what-is-antigravity-20)
+### What is Antigravity 2.0?
 
 Antigravity 2.0 serves as your AI agents’ central command center,
 providing a unified platform to launch, monitor, and orchestrate their
@@ -46,12 +47,10 @@ work.
 
 ![Antigravity 2.0 UI](https://antigravity.google/assets/image/docs/AGY2.0-Home.png)
 
-### Getting Started[link](#getting-started)
+### Getting Started
 
 Ready to dive in? Check out the **[Getting
 Started](https://antigravity.google/docs/getting-started)** guide to install Antigravity 2.0 and
 start your first project.
-
-On this Page
 
 {% endraw %}

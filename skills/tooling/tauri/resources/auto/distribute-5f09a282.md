@@ -8,12 +8,12 @@ either to the platform app stores or as platform-specific installers.
 Tauri builds your application directly from its CLI via the `build`,
 `android build` and `ios build` commands.
 
-- [npm](#tab-panel-4620)
-- [yarn](#tab-panel-4621)
-- [pnpm](#tab-panel-4622)
-- [deno](#tab-panel-4623)
-- [bun](#tab-panel-4624)
-- [cargo](#tab-panel-4625)
+- [npm](#tab-panel-4497)
+- [yarn](#tab-panel-4498)
+- [pnpm](#tab-panel-4499)
+- [deno](#tab-panel-4500)
+- [bun](#tab-panel-4501)
+- [cargo](#tab-panel-4502)
 
 ```
 npm run tauri build
@@ -51,12 +51,12 @@ for the configured formats.
 If you need further customization on how the platform bundles are
 generated, you can split the build and bundle steps:
 
-- [npm](#tab-panel-4626)
-- [yarn](#tab-panel-4627)
-- [pnpm](#tab-panel-4628)
-- [deno](#tab-panel-4629)
-- [bun](#tab-panel-4630)
-- [cargo](#tab-panel-4631)
+- [npm](#tab-panel-4503)
+- [yarn](#tab-panel-4504)
+- [pnpm](#tab-panel-4505)
+- [deno](#tab-panel-4506)
+- [bun](#tab-panel-4507)
+- [cargo](#tab-panel-4508)
 
 ```
 npm run tauri build -- --no-bundle# bundle for distribution outside the macOS App Storenpm run tauri bundle -- --bundles app,dmg# bundle for App Store distributionnpm run tauri bundle -- --bundles app --config src-tauri/tauri.appstore.conf.json

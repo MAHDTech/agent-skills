@@ -8,14 +8,15 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Getting Started
+Markdownkeyboard_arrow_down
 
-# Getting Started[link](#getting-started)
+content_copyCopy Markdown
 
-## Download[link](#download)
+open_in_newView Markdown
+
+# Getting Started
+
+## Download
 
 Please visit
 [antigravity.google/download](https://antigravity.google/download) to
@@ -33,7 +34,5 @@ download Antigravity IDE.
 The application will prompt when updates are available:
 
 ![Update Available](https://antigravity.google/assets/image/docs/restart-to-update.png)
-
-On this Page
 
 {% endraw %}

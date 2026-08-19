@@ -13,7 +13,7 @@ skill_name = "tauri"
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/window-state)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-window-state)[crates.io](https://crates.io/crates/tauri-plugin-window-state)
 
 API
-Reference[](https://v2.tauri.app/reference/javascript/window-state/)[](https://docs.rs/tauri-plugin-window-state)
+Reference:[](https://v2.tauri.app/reference/javascript/window-state/)[](https://docs.rs/tauri-plugin-window-state)
 
 Save window positions and sizes and restore them when the app is
 reopened.
@@ -28,17 +28,17 @@ reopened.
 
 Install the window-state plugin to get started.
 
-- [Automatic](#tab-panel-6668)
-- [Manual](#tab-panel-6669)
+- [Automatic](#tab-panel-6287)
+- [Manual](#tab-panel-6288)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6657)
-- [yarn](#tab-panel-6658)
-- [pnpm](#tab-panel-6659)
-- [deno](#tab-panel-6660)
-- [bun](#tab-panel-6661)
-- [cargo](#tab-panel-6662)
+- [npm](#tab-panel-6276)
+- [yarn](#tab-panel-6277)
+- [pnpm](#tab-panel-6278)
+- [deno](#tab-panel-6279)
+- [bun](#tab-panel-6280)
+- [cargo](#tab-panel-6281)
 
 ```
 npm run tauri add window-state
@@ -82,11 +82,11 @@ cargo tauri add window-state
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6663)
-    - [yarn](#tab-panel-6664)
-    - [pnpm](#tab-panel-6665)
-    - [deno](#tab-panel-6666)
-    - [bun](#tab-panel-6667)
+    - [npm](#tab-panel-6282)
+    - [yarn](#tab-panel-6283)
+    - [pnpm](#tab-panel-6284)
+    - [deno](#tab-panel-6285)
+    - [bun](#tab-panel-6286)
 
     ```
     npm install @tauri-apps/plugin-window-state

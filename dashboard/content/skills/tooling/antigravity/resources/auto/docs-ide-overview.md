@@ -8,20 +8,13 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Overview
+Markdownkeyboard_arrow_down
 
-# Antigravity IDE[link](#antigravity-ide)
+content_copyCopy Markdown
 
-warning
+open_in_newView Markdown
 
-Note: Antigravity IDE is not supported for enterprise customers. To use
-Antigravity with enterprise configurations, use Antigravity 2.0 or
-Antigravity CLI.
-
-[Enterprise Setup](https://antigravity.google/docs/enterprise)
+# Antigravity IDE
 
 Antigravity IDE is an agentic development environment, evolving anyone
 to build in the agent-first era. It integrates agents directly into your
@@ -33,67 +26,49 @@ end-to-end software tasks, elevating all aspects of development, from
 building features, UI iteration, and fixing bugs to research and
 generating reports.
 
-Main Features
-
-[](https://antigravity.google/)
-
-automatic_cluster
-
-AI-powered IDEkeyboard_arrow_right
+AI-powered IDE
 
 An AI-powered IDE with all of the AI features that developers have come
 to rely on such as Agent and Tab.
 
-[](https://antigravity.google/)
-
-automatic_cluster
-
-Asynchronous Agentskeyboard_arrow_right
+Asynchronous Agents
 
 Asynchronous, local agents that can work in parallel on all of your
 workspaces.
 
-[](https://antigravity.google/)
-
-automatic_cluster
-
-Browser Agentkeyboard_arrow_right
+Browser Agent
 
 Agent that can actuate the browser for you and to accomplish dev tasks
 like dashboard reads, SCM actions, UI testing, etc. in the Browser.
 
-## Core Surfaces[link](#core-surfaces)
+## Core Surfaces
 
-[](https://antigravity.google/)
-
-automatic_cluster
-
-Editorkeyboard_arrow_right
+Editor
 
 A fully-functional AI-powered IDE that maps to a single workspace.
 
-[](https://antigravity.google/)
-
-automatic_cluster
-
-Browserkeyboard_arrow_right
+Browser
 
 Browser-use agent capabilities to read & actuate on more surfaces beyond
 just the IDE.
 
-## Key Terms[link](#key-terms)
+## Key Concepts
 
-- **Agent**: The primary AI modality within Antigravity. While the user
-  can work tightly with an Agent within the Editor, they can also have
-  multiple agents working across multiple codebases.
-- **Tab**: The other AI modality within Antigravity, specifically within
-  the text editor part of the editor surface. Tab is a more powerful
-  autocomplete helper.
-- **Artifacts**: We define an artifact as anything that the agent
-  creates to allow it to get its work done or communicate its
-  accomplishments to the human user. These include rich markdown files,
-  diff views, architecture diagrams, images, browser recordings, etc.
+Agent & Parallel Subagents
 
-On this Page
+The primary AI modality within Antigravity. While developers work
+tightly with an Agent within the Editor, they can also spin up multiple
+parallel agents across multiple codebases.
+
+Editor Tab Autocomplete
+
+The real-time editing AI modality within the text editor surface,
+providing high-speed intelligent code completion and helper suggestions.
+
+Artifacts & Transparency
+
+Structured deliverables created by agents to communicate
+accomplishments, including rich markdown plans, code diff views,
+architecture diagrams, images, and browser recordings.
 
 {% endraw %}

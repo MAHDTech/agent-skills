@@ -814,9 +814,10 @@ in your module, but usable on the client.
 
 note
 
-`--uproject-dir` is straightforward as the path to the .uproject file.
-`--unreal-module-name` is the name of the Unreal module which in most
-projects is the name of the project, in this case `blackholio`.
+`--uproject-dir` is the path to the Unreal project directory that
+contains the `.uproject` file. `--unreal-module-name` is the name of the
+Unreal module, which in most projects is the name of the project, in
+this case `blackholio`.
 
 warning
 
@@ -1044,7 +1045,7 @@ void AGameManager::HandleSubscriptionApplied(FSubscriptionEventContext& Context)
 ```
 
 Here we configure the connection to the database, by passing it some
-callbacks in addition to providing the `SERVER_URI` and `MODULE_NAME` to
+callbacks in addition to providing the `ServerUri` and `DatabaseName` to
 the connection. When the client connects, the SpacetimeDB SDK will call
 the `HandleConnect` method, allowing us to start up the game.
 
@@ -1150,7 +1151,7 @@ Update the **OnConnect_Event**: ![Update
 OnConnect](https://spacetimedb.com/docs/assets/images/part-2-08-blueprint-onconnect-58c7a06e0b03f32ac42a2440387fd28f.png)
 
 Here we configure the connection to the database, by passing it some
-callbacks in addition to providing the `SERVER_URI` and `MODULE_NAME` to
+callbacks in addition to providing the `ServerUri` and `DatabaseName` to
 the connection. When the client connects, the SpacetimeDB SDK will call
 the `OnConnect_Event` method, allowing us to start up the game.
 

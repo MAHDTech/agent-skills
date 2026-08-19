@@ -8,35 +8,30 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity IDE
-  \>
-- Customizations
-  \>
-- Hooks
+Markdownkeyboard_arrow_down
 
-# Hooks[link](#hooks)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Hooks
 
 Hooks allow you to run custom scripts or shell commands at specific
 points during Antigravity’s execution loop. This is powerful for
 enforcing custom rules, running linters, or capturing diagnostics
 automatically.
 
-## Configuration[link](#configuration)
+## Configuration
 
 Hooks are configured in a `hooks.json` file located in your
 customization directory (e.g., `.agents/` in your workspace or
 `~/.gemini/config/`).
 
-## Schema and File Format[link](#schema-and-file-format)
+## Schema and File Format
 
 The `hooks.json` file maps hook names to their event configurations.
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "my-linter-hook": {
     "PostToolUse": [
@@ -76,7 +71,7 @@ content_copy
 }
 ```
 
-### Hook Definition Fields[link](#hook-definition-fields)
+### Hook Definition Fields
 
 | Field | Type | Description |
 |:---|:---|:---|
@@ -87,7 +82,7 @@ content_copy
 | `PostInvocation` | array | Handlers that run after tool calls finish. |
 | `Stop` | array | Handlers that run when the execution loop terminates. |
 
-## Supported Events[link](#supported-events)
+## Supported Events
 
 | Event | Description | Matcher Target |
 |:---|:---|:---|
@@ -97,7 +92,7 @@ content_copy
 | `PostInvocation` | Fires after tool calls finish. | N/A (matcher ignored) |
 | `Stop` | Fires when execution terminates. | N/A (matcher ignored) |
 
-### Matcher[link](#matcher)
+### Matcher
 
 For `PreToolUse` and `PostToolUse`, you can use a regular expression in
 the `matcher` field to specify which tools trigger the hook:
@@ -107,18 +102,12 @@ the `matcher` field to specify which tools trigger the hook:
 - `"run_command|view_file"`: Match either tool.
 - `"browser_.*"`: Match any tool starting with `browser_`.
 
-info
-
-Note: For PreInvocation, PostInvocation, and Stop, the structure is
-simpler (a list of handlers directly under the event key) and the
-matcher is ignored.
-
-## Supported Tools[link](#supported-tools)
+## Supported Tools
 
 For `PreToolUse` and `PostToolUse` matchers, you can match against the
 following tool names, grouped by category:
 
-### File and Directory Operations[link](#file-and-directory-operations)
+### File and Directory Operations
 
 - **`view_file`**: View the contents of a file.
   - Arguments: `AbsolutePath`, `StartLine` (optional), `EndLine`
@@ -144,7 +133,7 @@ following tool names, grouped by category:
     `Excludes` (optional), `Extensions` (optional), `FullPath`
     (optional), `MaxDepth` (optional)
 
-### Search and Research[link](#search-and-research)
+### Search and Research
 
 - **`grep_search`**: Fast text searches within specific paths.
   - Arguments: `SearchPath`, `Query`, `IsRegex` (optional),
@@ -155,7 +144,7 @@ following tool names, grouped by category:
 - **`read_url_content`**: Fetch text content of a public URL.
   - Arguments: `Url`
 
-### System and Execution[link](#system-and-execution)
+### System and Execution
 
 - **`run_command`**: Propose a bash command to run.
   - Arguments: `CommandLine`, `Cwd`, `WaitMsBeforeAsync`,
@@ -171,7 +160,7 @@ following tool names, grouped by category:
 - **`ask_permission`**: Request additional scoped permissions.
   - Arguments: `Action`, `Target`, `Reason`
 
-### Agent Collaboration[link](#agent-collaboration)
+### Agent Collaboration
 
 - **`invoke_subagent`**: Spawn specialized sub-agents.
   - Arguments: `Subagents` (array of specs with `Prompt`, `Role`,
@@ -186,7 +175,7 @@ following tool names, grouped by category:
   - Arguments: `Action` (`'list'`, `'kill'`, `'kill_all'`),
     `ConversationIds` (optional)
 
-### Interaction and Media[link](#interaction-and-media)
+### Interaction and Media
 
 - **`ask_question`**: Ask multiple-choice questions.
   - Arguments: `questions` (array of questions with `question`,
@@ -194,7 +183,7 @@ following tool names, grouped by category:
 - **`generate_image`**: Create or edit images.
   - Arguments: `Prompt`, `ImageName`, `ImagePaths` (optional)
 
-## Hook Handler Configuration[link](#hook-handler-configuration)
+## Hook Handler Configuration
 
 Each item in the `hooks` array supports:
 
@@ -204,12 +193,12 @@ Each item in the `hooks` array supports:
 | `command` | string | Required. The shell command to execute. |
 | `timeout` | integer | Optional. Timeout in seconds. Defaults to `30`. |
 
-## Input/Output Contract[link](#inputoutput-contract)
+## Input/Output Contract
 
 Hooks receive input via **stdin** as JSON and should return output via
 **stdout** as JSON. Field names use camelCase.
 
-### Common Input Fields[link](#common-input-fields)
+### Common Input Fields
 
 All hooks receive the following system metadata fields in their input
 payload on `stdin`:
@@ -218,7 +207,7 @@ payload on `stdin`:
 
 ------------------------------------------------------------------------
 
-### PreToolUse[link](#pretooluse)
+### PreToolUse
 
 Fires before a tool is executed.
 
@@ -242,11 +231,7 @@ Fires before a tool is executed.
 
 - **Input (stdin)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "toolCall": {
     "name": "run_command",
@@ -258,9 +243,7 @@ content_copy
   },
   "stepIdx": 19,
   "conversationId": "ec33ebf9-0cba-4100-8142-c61503f6c587",
-  "workspacePaths": [
-    "/workspace/project"
-  ],
+  "workspacePaths": ["/workspace/project"],
   "transcriptPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587/.system_generated/logs/transcript.jsonl",
   "artifactDirectoryPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587"
 }
@@ -268,23 +251,17 @@ content_copy
 
 - **Output (stdout)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "decision": "ask",
   "reason": "Requires confirmation for test execution.",
-  "permissionOverrides": [
-    "command(npm test)"
-  ]
+  "permissionOverrides": ["command(npm test)"]
 }
 ```
 
 ------------------------------------------------------------------------
 
-### PostToolUse[link](#posttooluse)
+### PostToolUse
 
 Fires after a tool completes.
 
@@ -304,18 +281,12 @@ Fires after a tool completes.
 
 - **Input (stdin)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "stepIdx": 5,
   "error": "exit status 1",
   "conversationId": "ec33ebf9-0cba-4100-8142-c61503f6c587",
-  "workspacePaths": [
-    "/workspace/project"
-  ],
+  "workspacePaths": ["/workspace/project"],
   "transcriptPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587/.system_generated/logs/transcript.jsonl",
   "artifactDirectoryPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587"
 }
@@ -325,7 +296,7 @@ content_copy
 
 ------------------------------------------------------------------------
 
-### PreInvocation[link](#preinvocation)
+### PreInvocation
 
 Fires before the model is called (starts at 0).
 
@@ -356,18 +327,12 @@ one of the following fields:
 
 - **Input (stdin)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "invocationNum": 3,
   "initialNumSteps": 10,
   "conversationId": "ec33ebf9-0cba-4100-8142-c61503f6c587",
-  "workspacePaths": [
-    "/workspace/project"
-  ],
+  "workspacePaths": ["/workspace/project"],
   "transcriptPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587/.system_generated/logs/transcript.jsonl",
   "artifactDirectoryPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587"
 }
@@ -375,23 +340,15 @@ content_copy
 
 - **Output (stdout)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
-  "injectSteps": [
-    {
-      "ephemeralMessage": "Remember to lint"
-    }
-  ]
+  "injectSteps": [{"ephemeralMessage": "Remember to lint"}]
 }
 ```
 
 ------------------------------------------------------------------------
 
-### PostInvocation[link](#postinvocation)
+### PostInvocation
 
 Fires after tool calls finish.
 
@@ -408,11 +365,7 @@ Fires after tool calls finish.
 - **Input (stdin)**: Same as `PreInvocation`
 - **Output (stdout)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "injectSteps": [],
   "terminationBehavior": ""
@@ -421,7 +374,7 @@ content_copy
 
 ------------------------------------------------------------------------
 
-### Stop[link](#stop)
+### Stop
 
 Fires when the execution loop terminates.
 
@@ -448,20 +401,14 @@ Fires when the execution loop terminates.
 
 - **Input (stdin)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "executionNum": 1,
   "terminationReason": "model_stop",
   "error": "",
   "fullyIdle": true,
   "conversationId": "ec33ebf9-0cba-4100-8142-c61503f6c587",
-  "workspacePaths": [
-    "/workspace/project"
-  ],
+  "workspacePaths": ["/workspace/project"],
   "transcriptPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587/.system_generated/logs/transcript.jsonl",
   "artifactDirectoryPath": "~/.gemini/antigravity-ide/brain/ec33ebf9-0cba-4100-8142-c61503f6c587"
 }
@@ -469,17 +416,11 @@ content_copy
 
 - **Output (stdout)**:
 
-json
-
-content_copy
-
-```
+``` astro-code
 {
   "decision": "continue",
   "reason": "Not done yet"
 }
 ```
-
-On this Page
 
 {% endraw %}

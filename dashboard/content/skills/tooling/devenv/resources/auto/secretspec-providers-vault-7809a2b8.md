@@ -55,11 +55,12 @@ Terminal window
 
 ### AppRole authentication
 
-Select AppRole with `?auth=approle` and provide both environment
-variables:
+Select AppRole with `?auth=approle`. Vault roles bind a SecretID by
+default, so the usual configuration provides both environment variables:
 
 ```
-$ export VAULT_ROLE_ID=your-role-id$ export VAULT_SECRET_ID=your-secret-id
+$ export VAULT_ROLE_ID=your-role-id
+$ export VAULT_SECRET_ID=your-secret-id
 ```
 
 Terminal window
@@ -76,20 +77,55 @@ secretspec.toml
 
 SecretSpec 0.14 supports only `VAULT_ROLE_ID` and `VAULT_SECRET_ID`.
 
+Disabling SecretID binding removes AppRole’s usual second credential.
+Keep the server default unless the workload deliberately relies on
+another trust boundary, such as a tightly controlled Agent host and
+network constraints.
+
+### Custom authentication mounts (0.18+)
+
+AppRole and JWT methods mounted somewhere other than their defaults can
+be selected with `?auth_mount=`. The value is relative to `/v1/auth`:
+
+```
+vault://vault.example.com:8200/secret?auth=approle&auth_mount=platform-approlevault://vault.example.com:8200/secret?auth=jwt&auth_mount=ci-jwt&role=ci
+```
+
+The provider logs in at `/v1/auth/platform-approle/login` and
+`/v1/auth/ci-jwt/login`, respectively. The KV mount remains the provider
+URI path (`secret` in these examples).
+
 ### JWT / OIDC authentication (0.17+)
 
-Select JWT with `?auth=jwt` and a `role`. The provider performs the
-`auth/jwt/login` exchange itself. The JWT comes from `VAULT_JWT` when
-set. Otherwise, in a GitHub Actions or Forgejo job with
-`id-token: write`, the provider mints one from the runner’s OIDC
-identity, so CI stores no static secret.
+Select JWT with `?auth=jwt`. The provider performs the `auth/jwt/login`
+exchange itself. The JWT comes from `VAULT_JWT` when set. Otherwise, in
+a GitHub Actions or Forgejo job with `id-token: write`, the provider
+mints one from the runner’s OIDC identity, so CI stores no static
+secret.
+
+Starting with SecretSpec 0.18, the role may be omitted when the JWT auth
+mount has a `default_role`; Vault then selects that role during login.
+An explicit SecretSpec role still takes precedence.
 
 Both `role` and `audience` accept a URI query parameter or an
 environment variable:
 
-- `?role=` or `VAULT_JWT_ROLE` (required)
+- `?role=` or `VAULT_JWT_ROLE`; optional with a server-configured
+  `default_role` (0.18+)
 - `?audience=` or `VAULT_JWT_AUDIENCE`, matched against the role’s
   `bound_audiences`
+
+## Provider credentials
+
+| Credential  | Environment fallback | Available since |
+|-------------|----------------------|-----------------|
+| `role_id`   | `VAULT_ROLE_ID`      | 0.15+           |
+| `secret_id` | `VAULT_SECRET_ID`    | 0.15+           |
+| `token`     | `VAULT_TOKEN`        | 0.15+           |
+
+See the complete [provider credential
+reference](https://secretspec.dev/reference/provider-credentials/) for all supported providers
+and environment fallbacks.
 
 ## Configuration
 
@@ -103,7 +139,10 @@ vault://[namespace@]host[:port][/mount][?key=value&...]
 - `mount`: KV engine mount path (default: `secret`)
 - `namespace@`: Optional Vault namespace (also reads `VAULT_NAMESPACE`)
 - `?auth=approle`: Use AppRole authentication (default: `token`)
-- `?auth=jwt` (0.17+): Use JWT/OIDC authentication (requires `?role=`)
+- `?auth=jwt` (0.17+): Use JWT/OIDC authentication; a server-configured
+  `default_role` can supply the role when using SecretSpec 0.18+
+- `?auth_mount=` (0.18+): Non-default AppRole or JWT mount beneath
+  `/v1/auth`
 - `?role=` (0.17+): Vault role for JWT auth (or `VAULT_JWT_ROLE`)
 - `?audience=` (0.17+): OIDC audience (or `VAULT_JWT_AUDIENCE`)
 - `?kv=1`: Use KV v1 (default: v2)
@@ -120,7 +159,7 @@ vault://[namespace@]host[:port][/mount][?key=value&...]
 ### URI examples
 
 ```
-vault://vault.example.com:8200/secretvault://team-a@vault.example.com:8200/secretvault://vault.example.com:8200/secret?auth=approle# SecretSpec 0.17+vault://vault.example.com:8200/secret?auth=jwt&role=ci
+vault://vault.example.com:8200/secretvault://team-a@vault.example.com:8200/secretvault://vault.example.com:8200/secret?auth=approle# SecretSpec 0.18+vault://vault.example.com:8200/secret?auth=approle&auth_mount=platform-approle# SecretSpec 0.17+vault://vault.example.com:8200/secret?auth=jwt&role=ci# SecretSpec 0.18+, with default_role configured on the JWT auth mountvault://vault.example.com:8200/secret?auth=jwt
 ```
 
 ### Project configuration
@@ -187,7 +226,9 @@ SecretSpec 0.16 can use AppRole to keep a user token out of the
 environment by logging in from `VAULT_ROLE_ID` and `VAULT_SECRET_ID`:
 
 ```
-$ export VAULT_ROLE_ID="$CI_VAULT_ROLE_ID"$ export VAULT_SECRET_ID="$CI_VAULT_SECRET_ID"$ secretspec export --format gha --provider "vault://vault.example.com:8200/secret?auth=approle"
+$ export VAULT_ROLE_ID="$CI_VAULT_ROLE_ID"
+$ export VAULT_SECRET_ID="$CI_VAULT_SECRET_ID"
+$ secretspec export --format gha --provider "vault://vault.example.com:8200/secret?auth=approle"
 ```
 
 Terminal window
@@ -216,7 +257,8 @@ Terminal window
 
 ```
 $ secretspec check --provider vault://team-a@vault.example.com:8200/secret
-$ export VAULT_NAMESPACE=team-a$ secretspec check --provider vault://vault.example.com:8200/secret
+$ export VAULT_NAMESPACE=team-a
+$ secretspec check --provider vault://vault.example.com:8200/secret
 ```
 
 Terminal window
@@ -224,7 +266,9 @@ Terminal window
 ### Development mode
 
 ```
-$ vault server -dev$ export VAULT_TOKEN=hvs.dev-root-token$ secretspec check --provider "vault://127.0.0.1:8200/secret?tls=false"
+$ vault server -dev
+$ export VAULT_TOKEN=hvs.dev-root-token
+$ secretspec check --provider "vault://127.0.0.1:8200/secret?tls=false"
 ```
 
 Terminal window

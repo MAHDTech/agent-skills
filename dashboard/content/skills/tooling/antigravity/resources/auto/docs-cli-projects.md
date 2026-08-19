@@ -8,80 +8,63 @@ skill_name = "antigravity"
 +++
 
 {% raw %}
-- side_navigation
-- Antigravity CLI
-  \>
-- Projects
+Markdownkeyboard_arrow_down
 
-# Projects[link](#projects)
+content_copyCopy Markdown
+
+open_in_newView Markdown
+
+# Projects
 
 Manage projects and organize conversation sessions in the Antigravity
 CLI.
 
-## Launching sessions with projects[link](#launching-sessions-with-projects)
+## Launching sessions with projects
 
-### 1. Default project execution[link](#1-default-project-execution)
+### 1. Default project execution
 
 When starting the CLI without any project flags, all conversations in
 the session will be in the `default-cli-project`:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy
 ```
 
-### 2. Opening a session in a specific project[link](#2-opening-a-session-in-a-specific-project)
+### 2. Opening a session in a specific project
 
 If you want to open a session attached to a specific existing project,
 pass the `--project` flag with the target project ID:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy --project=<project_id>
 ```
 
-### 3. Creating a new project on startup[link](#3-creating-a-new-project-on-startup)
+### 3. Creating a new project on startup
 
 If you want to create a brand new project and initialize your CLI
 session inside it, pass the `--new-project` flag:
 
-bash
-
-content_copy
-
-```
+``` astro-code
 agy --new-project
 ```
 
-### 4. Resuming an existing conversation[link](#4-resuming-an-existing-conversation)
+### 4. Resuming an existing conversation
 
 If you resume a conversation (whether on startup via
 `--conversation=<conv_id>` or during a session using `/resume`), the
 conversation’s associated project will automatically be used.
 
-## Moving conversations between projects (`/fork`)[link](#moving-conversations-between-projects-fork)
+## Moving conversations between projects (`/fork`)
 
 While interacting in an active session, you can copy and continue your
 current conversation to a different project using the `/fork` slash
 command:
 
-text
-
-content_copy
-
-```
+``` astro-code
 /fork <project_id>
 ```
 
 When executed, the CLI forks your current conversation and associates
 the newly created conversation with `<project_id>`.
-
-On this Page
 
 {% endraw %}
