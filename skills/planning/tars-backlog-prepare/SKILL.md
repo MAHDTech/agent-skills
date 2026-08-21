@@ -264,6 +264,15 @@ Resolve `commands.ticket_lint` from `.tars/config.yaml`, or `$TARS_TICKET_LINT_C
 | Not a hook  | It must **not** be wired as a pre-commit hook: `.tars/` is gitignored, so a hook would never see the tickets |
 | Exit status | `0` when the batch is clean; non-zero when the batch has errors                                              |
 
+**Suggested checks** for a repo-supplied linter - the batching invariants from the canonical rules in [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md) that are mechanically checkable and exactly what a pre-dispatch check exists to catch:
+
+- **Size**: no more than 5 dispatching tickets share one `batch:` number.
+- **Path collision**: within a batch, no two tickets share any normalised path across `files:` and `owns:` (strip `#Symbol` suffixes before comparing).
+- **Dependency placement**: every `dependencies:` edge points at a ticket in a strictly earlier batch or already merged - never the same batch, never `failed/`/`wont-do/` (compare IDs numerically; filenames pad, frontmatter does not).
+- **Empty footprint**: no dispatching ticket has a missing or empty `files:` list unless it is alone in its batch.
+
+A linter that checks none of these passes batches the pipeline will reject anyway; covering them moves the failure from mid-dispatch to pre-dispatch.
+
 Freeze the resolved string into `run.env` as `TARS_TICKET_LINT_COMMAND`. When nothing is configured, freeze it as the **empty string** - implement then skips the check and logs that it skipped, which is the expected case for most repositories.
 
 If a value **is** configured, smoke it once here (invoke it with a batch number, or with whatever no-op argument it accepts) so a broken or missing command is found now rather than at dispatch time. A linter that is configured but does not run is an error: fix it or clear the config key. Do not silently freeze a command that does not run.
@@ -349,6 +358,8 @@ Before freezing commands, **run the real gate once** on the clean topic branch i
    sh "$TARS_GATE" "$REPO_ROOT"
    ```
 
+   The runner's last stdout line is a machine-parseable verdict, `TARS_GATE_RESULT=<exit> step=<step> target=<dir> log=<path>`. Read the result from that line rather than from anything piped or tailed - green is exactly `TARS_GATE_RESULT=0` - and read the named log file for the full output when classifying a red.
+
 5. Classify the result:
 
    | Outcome                                                                                                                             | Action                                                                                                                                                                                                                                                                                                                                       |
@@ -357,6 +368,8 @@ Before freezing commands, **run the real gate once** on the clean topic branch i
    | **Red - environment / tooling** (missing secrets reason, secrets prompt, missing toolchain, install failure, quoting, devenv enter) | **Fix or abort.** Do not weaken the suite to hide this. A failure naming a missing reason (_"Accessing secrets requires a reason"_) means a frozen string lost its `SECRETSPEC_REASON` - repair the string, do not work around it. Re-read the [devenv](../../tooling/devenv/SKILL.md) skill if the project uses devenv.                     |
    | **Red - pre-existing product / coverage / known baseline**                                                                          | Prefer narrowing `TARS_TEST_COMMAND` to the green subset the repo can honestly run. Only if `gate.allow_weaken` is true and no useful subset exists, set `TARS_TEST_COMMAND` to `:` (or the narrowed command), `TARS_GATE_WEAKENED=1`, and a precise `TARS_GATE_WEAKENED_REASON`. Never write a no-op test command without both weaken keys. |
    | **Red - ambiguous / flaky**                                                                                                         | Re-run the full gate **once**. Still red → report output and **ask the user** rather than auto-weaken.                                                                                                                                                                                                                                       |
+
+   On an **ambiguous red**, apply the flake policy from [tars-backlog-implement](../../engineering/tars-backlog-implement/SKILL.md) (classify the failure shape → isolate the failing test → sole-failure acceptance) before falling back to asking the user. A flaky baseline should cost one classification pass, not a stalled prepare.
 
 6. Re-write the final `.tars/run.env` with the frozen values. If the smoke left the working tree dirty (hook autofix), restore cleanliness before finishing prepare: the tree must be clean at the end of prepare (`git status --porcelain` empty). Prefer restoring autofixes with `git checkout -- .` / `git clean` only for smoke dirt **you** caused; if unsure, abort and ask the user.
 
@@ -378,6 +391,17 @@ TARS_PRE_COMMIT_HOME="…/hook-cache"   # may be empty if unused
 TARS_INSTALL_COMMAND="…"   # opaque; may be :
 TARS_HOOK_COMMAND="…"      # opaque; may be :
 TARS_TEST_COMMAND="…"      # opaque; may be : only if weakened
+# The PATH the baseline smoke gate ran (and went green) under. tars-gate and
+# tars-spoke restore it before eval'ing the opaque commands, so the frozen
+# strings resolve the same binaries in every later session. Frozen commands
+# without their frozen environment are only half a freeze.
+TARS_PATH="$PATH"
+# Staleness stamp. Implement refuses to run when .tars/config.yaml no longer
+# matches the fingerprint it was frozen from - a run.env that predates a
+# config change is silently missing policy (existence is the wrong test).
+# Use `cksum` for the fingerprint: it is POSIX, unlike stat -c / stat -f.
+TARS_FROZEN_AT="…"            # date -u +%Y-%m-%dT%H:%M:%SZ at freeze time
+TARS_CONFIG_FINGERPRINT="…"   # `cksum .tars/config.yaml` output; empty when no config file
 # Secrets context baked INTO the three opaque strings above on a devenv project.
 # Recorded here so a reader can see what they carry without parsing them; the
 # copies inside the command strings are what actually take effect.
@@ -391,6 +415,12 @@ TARS_SECRETSPEC_ENV="ci"                   # or "default"/first profile; empty i
 TARS_TICKET_LINT_COMMAND=""
 TARS_GATE_WEAKENED=0       # or 1
 TARS_GATE_WEAKENED_REASON=""  # required when weakened
+# Tests the Hub has accepted as flaky THIS run (comma-separated). Prepare
+# always freezes this empty; the Hub appends on each sole-failure flake
+# acceptance - the one key it may update after prepare - so downstream
+# gates and spokes recognise the flake instead of re-diagnosing it. Rewritten
+# empty on every prepare, so a flake never outlives the run that observed it.
+TARS_KNOWN_FLAKES=""
 TARS_LAND_SUBJECT_TEMPLATE="chore(backlog): land ticket {{id}}"
 TARS_CI_CHECK=0            # or 1
 TARS_CI_CHECK_REASON="…"

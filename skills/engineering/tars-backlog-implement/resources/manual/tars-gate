@@ -19,6 +19,15 @@
 #
 # Exit: wrapped command status, or 64 on usage / missing run.env.
 #
+# The last line on stdout is always a machine-parseable verdict:
+#   TARS_GATE_RESULT=<exit> step=<install|hooks|tests|ok|setup> target=<dir> [log=<path>]
+# Callers should parse that line, not re-derive the result from pipes.
+#
+# Full output is also tee'd to $TARS_SPOKE_ROOT/logs/gate-<target>-<ts>.log
+# (when TARS_SPOKE_ROOT is set) so the diagnosis survives whatever pipe or
+# pager the caller wrapped this in. The exit code travels via a scratch file,
+# never through the tee pipe.
+#
 
 set -eu
 
@@ -54,6 +63,14 @@ set -a
 . "$RUN_ENV"
 set +a
 
+# Restore the PATH the frozen commands were smoked under, when prepare
+# recorded one. Frozen commands without their frozen environment are only
+# half a freeze: the same string resolves different binaries per session.
+if [ -n "${TARS_PATH:-}" ]; then
+	PATH="$TARS_PATH"
+	export PATH
+fi
+
 : "${TARS_LOCK:?tars-gate: TARS_LOCK missing from run.env}"
 : "${TARS_HEAVY_LOCK:?tars-gate: TARS_HEAVY_LOCK missing from run.env}"
 
@@ -81,13 +98,70 @@ if [ "${TARS_GATE_WEAKENED:-0}" = "1" ] || [ "${TARS_GATE_WEAKENED:-}" = "true" 
 	echo "tars-gate: WARNING gate is weakened: ${TARS_GATE_WEAKENED_REASON:-no reason recorded}" >&2
 fi
 
-# Single-quoted inner script: run.env values must not rely on further expansion
-# inside the locked shell beyond what prepare already baked in.
-# shellcheck disable=SC2086
-exec sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
-	sh -c 'cd "$1" && eval "$2" && eval "$3" && eval "$4"' \
-	gate \
-	"$TARS_CWD" \
-	"$install_cmd" \
-	"$hook_cmd" \
-	"$test_cmd"
+# The inner shell records the step in flight in a scratch file so the verdict
+# can name it. Single-quoted inner script: run.env values must not rely on
+# further expansion inside the locked shell beyond what prepare already baked in.
+step_file=$(mktemp "${TMPDIR:-/tmp}/tars-gate-step.XXXXXX" 2>/dev/null) || step_file=""
+
+run_gate() {
+	sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
+		sh -c '
+			sf=$5
+			[ -n "$sf" ] && printf setup > "$sf"
+			cd "$1" || exit 64
+			[ -n "$sf" ] && printf install > "$sf"
+			eval "$2" || exit $?
+			[ -n "$sf" ] && printf hooks > "$sf"
+			eval "$3" || exit $?
+			[ -n "$sf" ] && printf tests > "$sf"
+			eval "$4" || exit $?
+			[ -n "$sf" ] && printf ok > "$sf"
+		' \
+		gate \
+		"$TARS_CWD" \
+		"$install_cmd" \
+		"$hook_cmd" \
+		"$test_cmd" \
+		"$step_file"
+}
+
+# Durable log: tee everything so no caller can lose the diagnosis by piping
+# it away. Only when the log cannot be set up do we run untee'd.
+log_file=""
+rc_file=""
+if [ -n "${TARS_SPOKE_ROOT:-}" ] && mkdir -p "$TARS_SPOKE_ROOT/logs" 2>/dev/null; then
+	log_file="$TARS_SPOKE_ROOT/logs/gate-$(basename -- "$TARS_CWD")-$(date +%Y%m%d-%H%M%S)-$$.log"
+	rc_file=$(mktemp "${TMPDIR:-/tmp}/tars-gate-rc.XXXXXX" 2>/dev/null) || rc_file=""
+fi
+
+rc=0
+if [ -n "$log_file" ] && [ -n "$rc_file" ]; then
+	# The pipe reports tee's status; the gate's real status rides in rc_file.
+	{
+		st=0
+		run_gate || st=$?
+		echo "$st" > "$rc_file"
+	} 2>&1 | tee -a "$log_file"
+	rc=$(cat "$rc_file" 2>/dev/null)
+	[ -n "$rc" ] || rc=1   # empty file = the gate was killed before reporting
+	rm -f "$rc_file" 2>/dev/null || true
+else
+	run_gate || rc=$?
+fi
+
+step=unknown
+if [ -n "$step_file" ] && [ -s "$step_file" ]; then
+	step=$(cat "$step_file")
+fi
+rm -f "$step_file" 2>/dev/null || true
+
+if [ "$rc" -ne 0 ]; then
+	echo "tars-gate: FAILED at step=$step (exit $rc) in $TARS_CWD${log_file:+ (log: $log_file)}" >&2
+fi
+verdict="TARS_GATE_RESULT=$rc step=$step target=$TARS_CWD${log_file:+ log=$log_file}"
+if [ -n "$log_file" ]; then
+	echo "$verdict" | tee -a "$log_file"
+else
+	echo "$verdict"
+fi
+exit "$rc"
