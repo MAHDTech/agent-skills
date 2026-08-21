@@ -103,7 +103,9 @@ PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "<spoke-dir>"
 ```
 
-**Read the result from the verdict line, never from pipes.** Both runners end with a machine-parseable last line on stdout - `TARS_GATE_RESULT=<exit> step=<install|hooks|tests|ok> target=<dir>` from `tars-gate`, `TARS_SPOKE_RESULT=<exit> target=<dir>` from `tars-spoke` - and exit with the wrapped command's status. Parse that line. Piping runner output through `tail`, `grep`, or a pager and then reading `$?` reports the pipe's exit status, not the gate's, and has misreported a red gate as green.
+**Read the result from the verdict line, never from pipes.** Both runners end with a machine-parseable last line on stdout - `TARS_GATE_RESULT=<exit> step=<install|hooks|tests|ok> target=<dir> log=<path>` from `tars-gate`, `TARS_SPOKE_RESULT=<exit> target=<dir> log=<path>` from `tars-spoke` - and exit with the wrapped command's status. Parse that line. Piping runner output through `tail`, `grep`, or a pager and then reading `$?` reports the pipe's exit status, not the gate's, and has misreported a red gate as green.
+
+**The full output survives in the log.** Both runners tee everything they ran to `$TARS_SPOKE_ROOT/logs/` and name the file in the verdict line, so a diagnosis lost to a pipe or a truncated harness capture is always recoverable - read the log instead of re-running the gate to see the failure again. Cite the log path in ticket Evidence and rework notes; it is the durable record of what the gate actually saw.
 
 **Gate always installs first** (when `TARS_INSTALL_COMMAND` is not `:`) so lockfile moves cannot leave stale dependency trees - see _Installed dependencies go stale_ below.
 
@@ -138,7 +140,7 @@ On a **red** gate, do **not** immediately burn a spoke fix round:
 1. **Classify.** Only **transient-shaped** failures qualify for the flake path: timeouts, killed/runner infrastructure, single-hook flake with no assertion/compile/lint failure. Hard `expect` failures, type errors, and lint errors → real failure path (spoke fix).
 2. **Isolate.** Re-run the failing test or hook alone under the mutex (`tars-spoke` for a single test; or a narrowed command).
 3. **Isolation red** → real failure → spoke fix rounds.
-4. **Isolation green, sole failure** → accept **without** a second full gate when all three hold: (a) the flaky test was the **only** failure in the gate run, (b) it is green in isolation this run, and (c) the rest of that same gate run was green. Name the acceptance in the batch report ("accepted `<test>` as flake: sole failure, isolation green"). If the same test earns this acceptance more than once in a run, file a ticket for it - a recurring flake is product debt, not gate noise.
+4. **Isolation green, sole failure** → accept **without** a second full gate when all three hold: (a) the flaky test was the **only** failure in the gate run, (b) it is green in isolation this run, and (c) the rest of that same gate run was green. Name the acceptance in the batch report ("accepted `<test>` as flake: sole failure, isolation green"). If the same test earns this acceptance more than once in a run, file a ticket for it - a recurring flake is product debt, not gate noise. On each acceptance, append the test's name to `TARS_KNOWN_FLAKES` in `.tars/run.env` (comma-separated). This is the **one** key the Hub may update after prepare - run.env is otherwise read-only - and it exists so every later gate, spoke, and review in this run recognises the flake instead of re-diagnosing it independently. It resets naturally: prepare rewrites run.env, so a flake never outlives the run that observed it.
 5. **Isolation green, other failures present** → one full `tars-gate` re-run under the mutex. Green → accept. Red → real failure path.
 6. **Cap:** at most **one** full re-gate per gate attempt. No flake loops, and no silent acceptances - every flake path taken appears in the batch report.
 
@@ -248,6 +250,15 @@ Branch inside the clone:
 
 A fresh clone has no hooks installed. Spoke commits are unhooked by design - never `--no-verify`, never install hooks.
 
+**Verify the invariant rather than assuming it.** User-level git configuration can hook a clone at birth: a global `core.hooksPath` in `~/.gitconfig`, or an `init.templateDir` that seeds `.git/hooks/`, gives every fresh clone live hooks the pipeline never installed. After creating the clone, check:
+
+```bash
+git -C "$SPOKE_DIR" config --get core.hooksPath || true
+ls "$SPOKE_DIR/.git/hooks/" | grep -v '\.sample$' || true
+```
+
+Any live hook found here is environment damage, not spoke misbehaviour: remove the shims, warn the user that their global git config hooks fresh clones (the same class of hazard prepare's integrity check covers), and continue. A hooked spoke clone silently breaks the contract everywhere - commits run whole-repo suites that the design says only the Hub's gate runs, and half the "cheap scoped checks only" rule stops being true.
+
 #### 2a-i. Spokes run git through `tars-git`
 
 Give every spoke `resources/manual/tars-git` and require it for **all** git operations:
@@ -349,7 +360,14 @@ Spawn each spoke with:
      catches you, so catch it here in seconds. Never whole-repo hooks.
   4. Heavy tests ONLY via: sh "<TARS_SPOKE>" -- <targeted test command>
      Never bare test runners. Never full-suite / whole-repo prek - Hub runs tars-gate.
-  5. Never install git hooks. Never merge into topic/default. You may `git merge` topic INTO your branch to sync.
+     tars-spoke execs your argv, so VAR=x prefixes are not commands - use env VAR=x <cmd>.
+     Its last stdout line (TARS_SPOKE_RESULT=<exit> ... log=<path>) is the result: parse
+     that, never a piped $?, and cite the log path in Evidence.
+     Check TARS_KNOWN_FLAKES in run.env first: a failure ONLY in a listed test, green when
+     re-run in isolation, is a known flake - note it and move on, do not diagnose it as
+     your ticket's failure.
+  5. Never install git hooks. Never merge into topic/default. You may `git merge` topic INTO
+     your branch to sync - always with an explicit conventional -m subject, never git's default.
   6. Conventional commits; never --no-verify; never stage anything under .tars/.
   7. Update Tasks/AC checkboxes and ## Evidence on the ticket file.
   8. NEVER copy a 4-or-more-digit line number out of the ticket into a source or test file -
@@ -388,10 +406,13 @@ For each completed spoke:
 
    ```bash
    git -C "$SPOKE_DIR" fetch origin "+refs/heads/<topic>:refs/remotes/origin/<topic>"
-   git -C "$SPOKE_DIR" merge "origin/<topic>"
+   git -C "$SPOKE_DIR" merge --no-gpg-sign \
+     -m "chore(backlog): sync <topic> into subagent-<TICKET_ID>" "origin/<topic>"
    ```
 
    Prefer this force-refspec over a plain `git fetch` that can leave a stale/broken `origin/<topic>` after many hardlink-clone cycles.
+
+   Always pass `-m` with a conventional subject on sync merges (and any other merge this pipeline makes): git's default `Merge branch '…'` subject is exactly what a conventional-commit `commit-msg` policy rejects, and a rejected merge subject leaves the merge half-done at the worst possible moment. `--no-gpg-sign` for the same headless-signing reason as every other pipeline commit.
 
    **Repair (once) if fetch fails** with unable-to-lock-ref / dangling / corrupt remote-tracking ref:
 
@@ -414,6 +435,8 @@ For each completed spoke:
    ```
 
    Always, even if the gate will fail.
+
+   While here, re-check the unhooked-clone invariant: `ls "$SPOKE_DIR/.git/hooks/" | grep -v '\.sample$'`. Live hooks at capture time that were absent at clone creation mean the **spoke installed them** despite the contract - flag it in the ticket's review notes and treat the spoke's own verification claims with suspicion (its commits ran checks the design says they must not, or were shaped around them). Do not merge silently over the finding.
 
 3. **Run `tars-gate` on the clone** (with `PRE_COMMIT_HOME` if set). Never `--no-verify`.
 
