@@ -13,7 +13,7 @@
         "@types/fs-extra": "11.0.4",
         "@types/node": "26.2.0",
         "eslint": "10.8.1",
-        "globals": "17.7.0",
+        "globals": "17.11.0",
         "typescript": "6.0.3",
         "typescript-eslint": "8.67.0"
     },
