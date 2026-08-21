@@ -19,6 +19,10 @@
 #
 # Exit: wrapped command status, or 64 on usage / missing run.env.
 #
+# The last line on stdout is always a machine-parseable verdict:
+#   TARS_SPOKE_RESULT=<exit> target=<dir>
+# Callers should parse that line, not re-derive the result from pipes.
+#
 
 set -eu
 
@@ -64,6 +68,13 @@ set -a
 . "$RUN_ENV"
 set +a
 
+# Restore the PATH the frozen commands were smoked under, when prepare
+# recorded one (see tars-gate for rationale).
+if [ -n "${TARS_PATH:-}" ]; then
+	PATH="$TARS_PATH"
+	export PATH
+fi
+
 : "${TARS_LOCK:?tars-spoke: TARS_LOCK missing from run.env}"
 : "${TARS_HEAVY_LOCK:?tars-spoke: TARS_HEAVY_LOCK missing from run.env}"
 
@@ -82,8 +93,15 @@ else
 fi
 
 # Preserve the caller's argv exactly (no eval): spoke passes the real command.
-exec sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
+rc=0
+sh "$LOCK_HELPER" "$TARS_HEAVY_LOCK" \
 	sh -c 'cd "$1" && shift && exec "$@"' \
 	spoke \
 	"$TARS_CWD" \
-	"$@"
+	"$@" || rc=$?
+
+if [ "$rc" -ne 0 ]; then
+	echo "tars-spoke: FAILED (exit $rc) in $TARS_CWD" >&2
+fi
+echo "TARS_SPOKE_RESULT=$rc target=$TARS_CWD"
+exit "$rc"

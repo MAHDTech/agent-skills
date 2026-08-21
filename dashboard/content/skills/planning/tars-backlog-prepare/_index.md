@@ -355,6 +355,8 @@ Before freezing commands, **run the real gate once** on the clean topic branch i
    sh "$TARS_GATE" "$REPO_ROOT"
    ```
 
+   The runner's last stdout line is a machine-parseable verdict, `TARS_GATE_RESULT=<exit> step=<step> target=<dir>`. Read the result from that line rather than from anything piped or tailed - green is exactly `TARS_GATE_RESULT=0`.
+
 5. Classify the result:
 
    | Outcome                                                                                                                             | Action                                                                                                                                                                                                                                                                                                                                       |
@@ -384,6 +386,17 @@ TARS_PRE_COMMIT_HOME="…/hook-cache"   # may be empty if unused
 TARS_INSTALL_COMMAND="…"   # opaque; may be :
 TARS_HOOK_COMMAND="…"      # opaque; may be :
 TARS_TEST_COMMAND="…"      # opaque; may be : only if weakened
+# The PATH the baseline smoke gate ran (and went green) under. tars-gate and
+# tars-spoke restore it before eval'ing the opaque commands, so the frozen
+# strings resolve the same binaries in every later session. Frozen commands
+# without their frozen environment are only half a freeze.
+TARS_PATH="$PATH"
+# Staleness stamp. Implement refuses to run when .tars/config.yaml no longer
+# matches the fingerprint it was frozen from - a run.env that predates a
+# config change is silently missing policy (existence is the wrong test).
+# Use `cksum` for the fingerprint: it is POSIX, unlike stat -c / stat -f.
+TARS_FROZEN_AT="…"            # date -u +%Y-%m-%dT%H:%M:%SZ at freeze time
+TARS_CONFIG_FINGERPRINT="…"   # `cksum .tars/config.yaml` output; empty when no config file
 # Secrets context baked INTO the three opaque strings above on a devenv project.
 # Recorded here so a reader can see what they carry without parsing them; the
 # copies inside the command strings are what actually take effect.

@@ -22,6 +22,7 @@ This skill operates in a Hub-and-Spoke topology, spawning implementation subagen
 - Ticket status updates are written to disk only. Ticket files are never staged, committed, or force-added in git.
 - This skill requires `tars-backlog-prepare` to have run first. Read **only** `.tars/run.env` for run facts (paths, opaque commands, land template, CI flags, weaken banner). Do **not** re-open `.tars/config.yaml` for gate/land/CI - prepare already froze policy into `run.env`. Re-read `run.env` rather than remembering values so a compacted Hub context cannot drift mid-run.
 - **If `.tars/run.env` does not exist, do not proceed and do not improvise.** Read [tars-backlog-prepare](@/skills/planning/tars-backlog-prepare/_index.md) and execute its steps inline, then continue. See **Invoking Sibling Skills** below for why you cannot simply call it.
+- **If `.tars/run.env` exists but is stale, treat it as missing.** Existence is the wrong test: a run.env frozen before the last `.tars/config.yaml` change is silently missing policy. At run start, compare `TARS_CONFIG_FINGERPRINT` from `run.env` against `cksum .tars/config.yaml` (both empty when there is no config file is a match). On mismatch, do **not** hand-patch `run.env` - re-run prepare inline, exactly as if the file were absent, and say so in the run notes.
 - Runners ship beside this skill (always invoke as `sh <path>`):
 
   | Binary                        | Who         | Role                                                                              |
@@ -108,6 +109,8 @@ PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "<spoke-dir>"
 ```
 
+**Read the result from the verdict line, never from pipes.** Both runners end with a machine-parseable last line on stdout - `TARS_GATE_RESULT=<exit> step=<install|hooks|tests|ok> target=<dir>` from `tars-gate`, `TARS_SPOKE_RESULT=<exit> target=<dir>` from `tars-spoke` - and exit with the wrapped command's status. Parse that line. Piping runner output through `tail`, `grep`, or a pager and then reading `$?` reports the pipe's exit status, not the gate's, and has misreported a red gate as green.
+
 **Gate always installs first** (when `TARS_INSTALL_COMMAND` is not `:`) so lockfile moves cannot leave stale dependency trees - see _Installed dependencies go stale_ below.
 
 **Weakened gates:** if `TARS_GATE_WEAKENED=1`, every green result is "gate command green (weakened: …)", never "full suite green". Surface `TARS_GATE_WEAKENED_REASON` in batch and final reports.
@@ -141,8 +144,9 @@ On a **red** gate, do **not** immediately burn a spoke fix round:
 1. **Classify.** Only **transient-shaped** failures qualify for the flake path: timeouts, killed/runner infrastructure, single-hook flake with no assertion/compile/lint failure. Hard `expect` failures, type errors, and lint errors → real failure path (spoke fix).
 2. **Isolate.** Re-run the failing test or hook alone under the mutex (`tars-spoke` for a single test; or a narrowed command).
 3. **Isolation red** → real failure → spoke fix rounds.
-4. **Isolation green** → one full `tars-gate` re-run under the mutex. Green → accept. Red → real failure path.
-5. **Cap:** at most **one** full re-gate per gate attempt. No flake loops.
+4. **Isolation green, sole failure** → accept **without** a second full gate when all three hold: (a) the flaky test was the **only** failure in the gate run, (b) it is green in isolation this run, and (c) the rest of that same gate run was green. Name the acceptance in the batch report ("accepted `<test>` as flake: sole failure, isolation green"). If the same test earns this acceptance more than once in a run, file a ticket for it - a recurring flake is product debt, not gate noise.
+5. **Isolation green, other failures present** → one full `tars-gate` re-run under the mutex. Green → accept. Red → real failure path.
+6. **Cap:** at most **one** full re-gate per gate attempt. No flake loops, and no silent acceptances - every flake path taken appears in the batch report.
 
 ### Post-conflict smoke
 
@@ -283,8 +287,14 @@ every spoke waiting to test hangs behind it too. Pass `--no-gpg-sign` (or
 `git -c commit.gpgsign=false …` where the subcommand has no such flag) on the land merge, on any
 revert, and on any other Hub-side commit.
 
-Never confuse this with `--no-verify`. Signing is skipped; **hooks always run**. `--no-verify` is
-prohibited everywhere in this pipeline.
+Never confuse this with `--no-verify`. Signing is skipped deliberately; `--no-verify` is
+prohibited everywhere in this pipeline. But do not lean on hooks to police Hub commits
+either: **merge commits run no `pre-commit` hook.** Git fires only `commit-msg` (and
+`pre-merge-commit`, which hook managers do not install) on the landing path, so the Hub's
+`git merge --no-ff` lands content no hook ever saw - not because anything was bypassed, but
+because git never runs `pre-commit` there. Do not "fix" this by installing hooks (this
+pipeline forbids installing hooks everywhere); the **batch-final gate is the backstop** that
+re-checks the whole merged tree, which is why it is never skippable (see step 5).
 
 #### 2b. Transfer gitignored files
 
@@ -339,7 +349,10 @@ Spawn each spoke with:
   Rules:
   1. Read the ticket (Tasks, AC, Review, Implementation Review). Implement it; address rework feedback if any.
   2. Bootstrap with TARS_INSTALL_COMMAND from run.env before verifying.
-  3. Cheap checks only on YOUR changed files (typecheck/format/lint/hooks scoped to those paths). Never whole-repo hooks.
+  3. Cheap checks only on YOUR changed AND newly created files (typecheck/format/lint/hooks
+     scoped to those paths). Run the repo's own scoped hook command over them before
+     reporting - anything only the whole-repo gate checks costs a full gate cycle when it
+     catches you, so catch it here in seconds. Never whole-repo hooks.
   4. Heavy tests ONLY via: sh "<TARS_SPOKE>" -- <targeted test command>
      Never bare test runners. Never full-suite / whole-repo prek - Hub runs tars-gate.
   5. Never install git hooks. Never merge into topic/default. You may `git merge` topic INTO your branch to sync.
@@ -451,6 +464,8 @@ Repeat until the batch is done.
 PRE_COMMIT_HOME="<TARS_PRE_COMMIT_HOME>" \
   sh "<TARS_GATE>" "$REPO_ROOT"
 ```
+
+**This gate is never skippable**, even when the last per-spoke gate ran minutes ago on a fully synced clone and this run looks redundant. The Hub's land merges run no `pre-commit` hook (see the merge-hook note in step 2a-i), so the batch-final gate is the **only** check that sees the merged tree as it will actually ship. Skipping it reopens exactly the hole the unhooked landing path creates.
 
 Same frozen commands as per-spoke gates. Apply flake policy on red. If still red, identify the offending merge, revert it (`git revert --no-gpg-sign -m 1 <merge-sha>` - Hub commits are unsigned, never `--no-verify`), and return that ticket to rework.
 
