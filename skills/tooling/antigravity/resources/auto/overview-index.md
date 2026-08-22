@@ -15,49 +15,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- folder
-
-- commit
-
-- terminal
-
-- dashboard_customize
-
-- pen_spark
-
-- device_hub
-
-- merge
-
-- keyboard_command_key
-
-- keyboard_tab
-
-- check_circle
+- refresh
 
 - file_copy
 
-- data_object
-
-- keyboard_return
-
-- deployed_code
-
-- spark
+- developer_mode_tv
 
 - plus_code
 
+- code
+
+- deployed_code
+
 - search_spark
 
-- developer_mode_tv
+- device_hub
 
-- refresh
+- dashboard_customize
 
 - spark
 
-- code
+- data_object
+
+- terminal
 
 - code_blocks
+
+- keyboard_command_key
+
+- commit
+
+- folder
+
+- pen_spark
+
+- keyboard_return
+
+- keyboard_tab
+
+- merge
+
+- check_circle
+
+- spark
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -189,6 +189,40 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/remote-control-for-antigravity)
+
+![Antigravity Anywhere with Remote
+Control](https://antigravity.google/assets/image/blog/remote-control-square.png)
+
+Antigravity Anywhere with Remote Control
+
+Aug 21, 2026Product
+
+Read blog
+
+[](https://antigravity.google/blog/antigravity-enterprise)
+
+![Bringing Antigravity to Gemini Enterprise: Agentic workflows for every
+developer](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square.png)
+
+Bringing Antigravity to Gemini Enterprise: Agentic workflows for every
+developer
+
+Aug 20, 2026Enterprise
+
+Read blog
+
+[](https://antigravity.google/blog/antigravity-ide-extensions)
+
+![Introducing IDE
+Extensions](https://antigravity.google/assets/image/blog/IDE-Extensions-Square.png)
+
+Introducing IDE Extensions
+
+Aug 20, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/gemini-3-7-flash-in-google-antigravity)
 
 ![Gemini 3.7 Flash in Google
@@ -252,37 +286,6 @@ more)](https://antigravity.google/assets/image/blog/Agent-Teams-Square.jpg)
 Google Antigravity Built an OS (and more)
 
 May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-cli)
-
-![Google Antigravity CLI](https://antigravity.google/assets/image/blog/AGY-CLI-Blog---Square.png)
-
-Google Antigravity CLI
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-sdk)
-
-![Google Antigravity SDK](https://antigravity.google/assets/image/blog/AGY-SDK-Blog---Square.png)
-
-Google Antigravity SDK
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-antigravity-for-enterprises)
-
-![Google Antigravity in Gemini
-Enterprise](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square.png)
-
-Google Antigravity in Gemini Enterprise
-
-May 19, 2026Enterprise
 
 Read blog
 
@@ -313,49 +316,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- folder
-
-- commit
-
-- terminal
-
-- dashboard_customize
-
-- pen_spark
-
-- device_hub
-
-- merge
-
-- keyboard_command_key
-
-- keyboard_tab
-
-- check_circle
+- refresh
 
 - file_copy
 
-- data_object
-
-- keyboard_return
-
-- deployed_code
-
-- spark
+- developer_mode_tv
 
 - plus_code
 
+- code
+
+- deployed_code
+
 - search_spark
 
-- developer_mode_tv
+- device_hub
 
-- refresh
+- dashboard_customize
 
 - spark
 
-- code
+- data_object
+
+- terminal
 
 - code_blocks
+
+- keyboard_command_key
+
+- commit
+
+- folder
+
+- pen_spark
+
+- keyboard_return
+
+- keyboard_tab
+
+- merge
+
+- check_circle
+
+- spark
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -487,6 +490,40 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/remote-control-for-antigravity)
+
+![Antigravity Anywhere with Remote
+Control](https://antigravity.google/assets/image/blog/remote-control-square.png)
+
+Antigravity Anywhere with Remote Control
+
+Aug 21, 2026Product
+
+Read blog
+
+[](https://antigravity.google/blog/antigravity-enterprise)
+
+![Bringing Antigravity to Gemini Enterprise: Agentic workflows for every
+developer](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square.png)
+
+Bringing Antigravity to Gemini Enterprise: Agentic workflows for every
+developer
+
+Aug 20, 2026Enterprise
+
+Read blog
+
+[](https://antigravity.google/blog/antigravity-ide-extensions)
+
+![Introducing IDE
+Extensions](https://antigravity.google/assets/image/blog/IDE-Extensions-Square.png)
+
+Introducing IDE Extensions
+
+Aug 20, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/gemini-3-7-flash-in-google-antigravity)
 
 ![Gemini 3.7 Flash in Google
@@ -550,37 +587,6 @@ more)](https://antigravity.google/assets/image/blog/Agent-Teams-Square.jpg)
 Google Antigravity Built an OS (and more)
 
 May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-cli)
-
-![Google Antigravity CLI](https://antigravity.google/assets/image/blog/AGY-CLI-Blog---Square.png)
-
-Google Antigravity CLI
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-sdk)
-
-![Google Antigravity SDK](https://antigravity.google/assets/image/blog/AGY-SDK-Blog---Square.png)
-
-Google Antigravity SDK
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-antigravity-for-enterprises)
-
-![Google Antigravity in Gemini
-Enterprise](https://antigravity.google/assets/image/blog/AGY-Enterprise---Square.png)
-
-Google Antigravity in Gemini Enterprise
-
-May 19, 2026Enterprise
 
 Read blog
 

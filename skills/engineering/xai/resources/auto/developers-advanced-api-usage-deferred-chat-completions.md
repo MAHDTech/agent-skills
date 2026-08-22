@@ -10,7 +10,7 @@ Deferred Chat Completions allow you to create a chat completion, get a `response
 
 > [!TIP]
 >
-> Your deferred completion rate limit is the same as your chat completions rate limit. To view your rate limit, please visit [xAI Console](https://console.x.ai).
+> Your deferred completion rate limit is the same as your chat completions rate limit. To view your rate limit, please visit [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-advanced-api-usage-deferred-chat-completions\&utm_content=console-home).
 
 After sending the request to the xAI API, the chat completion result will be available at `https://api.x.ai/v1/chat/deferred-completion/{request_id}`. The response body will contain `{'request_id': 'f15c114e-f47d-40ca-8d5c-8c23d656eeb6'}`, and the `request_id` value can be inserted into the `deferred-completion` endpoint path. Then, we send this GET request to retrieve the deferred completion result.
 

@@ -1,7 +1,7 @@
 # Flathub
 
-- [Open Source](#tab-panel-4545)
-- [Closed Source](#tab-panel-4546)
+- [Open Source](#tab-panel-4569)
+- [Closed Source](#tab-panel-4570)
 
 1.  Get your required tools.
 
@@ -13,8 +13,8 @@ Terminal window
 
 2.  Generate your sources
 
-- [Yarn](#tab-panel-4539)
-- [NPM](#tab-panel-4540)
+- [Yarn](#tab-panel-4563)
+- [NPM](#tab-panel-4564)
 
 ```
 # Generate your Node Sourcesflatpak-node-generator --no-requests-cache -o node-sources.json yarn /path/to/your/lock/file/yarn.lock
@@ -114,10 +114,10 @@ helpful if you want to quickly share development builds.
 To build Flatpaks locally you need the `flatpak` and `flatpak-builder`
 tools. For example on Ubuntu you can run this command:
 
-- [Debian](#tab-panel-4541)
-- [Arch](#tab-panel-4542)
-- [Fedora](#tab-panel-4543)
-- [Gentoo](#tab-panel-4544)
+- [Debian](#tab-panel-4565)
+- [Arch](#tab-panel-4566)
+- [Fedora](#tab-panel-4567)
+- [Gentoo](#tab-panel-4568)
 
 ```
 sudo apt install flatpak flatpak-builder

@@ -220,7 +220,7 @@ The image generation model is available on API. Visit
 
 ### Audit Logs
 
-Team admins can now view audit logs on [console.x.ai](https://console.x.ai).
+Team admins can now view audit logs on [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home).
 
 ## January 2025
 
@@ -243,7 +243,7 @@ Check out the [announcement](https://x.com/Replit/status/1874211039258333643) fo
 ### Tokenizer Playground
 
 Understanding tokens can be hard. Check out
-[console.x.ai](https://console.x.ai) to get a better understanding of what counts as a token.
+[console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home) to get a better understanding of what counts as a token.
 
 ### Structured Outputs
 
@@ -300,5 +300,5 @@ What are you going to build?
 
 We are happy to announce the immediate availability of our API, which
 gives developers programmatic access to our Grok series of foundation models. To get started, head
-to [console.x.ai](https://console.x.ai/) and sign up to create an account. We are excited to see
+to [console.x.ai](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home) and sign up to create an account. We are excited to see
 what developers build using Grok.

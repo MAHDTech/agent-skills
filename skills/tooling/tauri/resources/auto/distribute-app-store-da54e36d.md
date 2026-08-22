@@ -22,12 +22,12 @@ Additionally, you must setup code signing for
 After running `tauri ios init` to setup the Xcode project, you can use
 the `tauri icon` command to update the app icons.
 
-- [npm](#tab-panel-4509)
-- [yarn](#tab-panel-4510)
-- [pnpm](#tab-panel-4511)
-- [deno](#tab-panel-4512)
-- [bun](#tab-panel-4513)
-- [cargo](#tab-panel-4514)
+- [npm](#tab-panel-4527)
+- [yarn](#tab-panel-4528)
+- [pnpm](#tab-panel-4529)
+- [deno](#tab-panel-4530)
+- [bun](#tab-panel-4531)
+- [cargo](#tab-panel-4532)
 
 ```
 npm run tauri icon /path/to/app-icon.png -- --ios-color '#fff'
@@ -85,12 +85,12 @@ Note that Tauri leverages Xcode for the iOS app so you can use Xcode to
 archive and distribute for iOS instead of the Tauri CLI. To open the iOS
 project in Xcode for building you must run the following command:
 
-- [npm](#tab-panel-4515)
-- [yarn](#tab-panel-4516)
-- [pnpm](#tab-panel-4517)
-- [deno](#tab-panel-4518)
-- [bun](#tab-panel-4519)
-- [cargo](#tab-panel-4520)
+- [npm](#tab-panel-4533)
+- [yarn](#tab-panel-4534)
+- [pnpm](#tab-panel-4535)
+- [deno](#tab-panel-4536)
+- [bun](#tab-panel-4537)
+- [cargo](#tab-panel-4538)
 
 ```
 npm run tauri ios build -- --open
@@ -220,8 +220,35 @@ You must upload your macOS application as a `.pkg` file to the App
 Store. Run the following command to package your app as a macOS App
 Bundle (`.app` extension):
 
+- [npm](#tab-panel-4545)
+- [yarn](#tab-panel-4546)
+- [pnpm](#tab-panel-4547)
+- [deno](#tab-panel-4548)
+- [bun](#tab-panel-4549)
+- [cargo](#tab-panel-4550)
+
 ```
-tauri build --bundles app --target universal-apple-darwin
+npm run tauri build -- --bundles app --target universal-apple-darwin
+```
+
+```
+yarn tauri build --bundles app --target universal-apple-darwin
+```
+
+```
+pnpm tauri build --bundles app --target universal-apple-darwin
+```
+
+```
+deno task tauri build --bundles app --target universal-apple-darwin
+```
+
+```
+bun tauri build --bundles app --target universal-apple-darwin
+```
+
+```
+cargo tauri build --bundles app --target universal-apple-darwin
 ```
 
 See the [App Bundle distribution
@@ -258,12 +285,12 @@ approved.
 
 To build your iOS app, run the `tauri ios build` command:
 
-- [npm](#tab-panel-4527)
-- [yarn](#tab-panel-4528)
-- [pnpm](#tab-panel-4529)
-- [deno](#tab-panel-4530)
-- [bun](#tab-panel-4531)
-- [cargo](#tab-panel-4532)
+- [npm](#tab-panel-4551)
+- [yarn](#tab-panel-4552)
+- [pnpm](#tab-panel-4553)
+- [deno](#tab-panel-4554)
+- [bun](#tab-panel-4555)
+- [cargo](#tab-panel-4556)
 
 ```
 npm run tauri ios build -- --export-method app-store-connect

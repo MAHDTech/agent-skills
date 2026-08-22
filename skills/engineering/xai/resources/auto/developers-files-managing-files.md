@@ -4,7 +4,7 @@
 
 The Files API provides a complete set of operations for managing your files. If your files are publicly accessible, you can reference them directly by URL in chat conversations — see [Attaching Files](https://docs.x.ai/developers/model-capabilities/files/chat-with-files#attaching-files). For files that aren't publicly accessible, upload them using one of the methods described below.
 
-You can also view and manage all of your uploaded files from the [Files page](https://console.x.ai/team/default/files) on the xAI Console.
+You can also view and manage all of your uploaded files from the [Files page](https://console.x.ai/team/default/files?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-files-managing-files\&utm_content=files) on the xAI Console.
 
 ## Uploading Files
 

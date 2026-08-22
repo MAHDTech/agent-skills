@@ -8,8 +8,8 @@ Set up Grok Bot, create your first Bot, and hand it a useful task.
 
 You need:
 
-* An eligible plan: SuperGrok Heavy, Cursor Ultra, Cursor Teams Premium
-  (sign in with your Cursor account)
+* An eligible plan: SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra,
+  or Cursor Teams Standard or Premium (sign in with your Cursor account)
 * The Grok Bot desktop app for macOS or Windows
 * An app or website where your first Bot can do useful work
 

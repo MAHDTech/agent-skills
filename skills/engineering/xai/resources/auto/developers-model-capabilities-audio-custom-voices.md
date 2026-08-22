@@ -10,7 +10,7 @@ Clone a voice from a short reference clip and use it anywhere a built-in voice w
 
 ## How to Use Custom Voices
 
-After creating a voice in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), click the three-dot menu on the voice card and select **Copy Voice ID**. If you created a custom voice via the API (Enterprise only), the `voice_id` is returned in the response.
+After creating a voice in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library), click the three-dot menu on the voice card and select **Copy Voice ID**. If you created a custom voice via the API (Enterprise only), the `voice_id` is returned in the response.
 
 Custom voices are interchangeable with built-in voices across all voice APIs. Pass your `voice_id` to any of:
 
@@ -52,7 +52,7 @@ A recording that reflects your intended use case will produce better results tha
 
 Get started in the console — create up to 30 custom voices for free and use them immediately across all voice APIs.
 
-[Clone Voice in Console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices)
+[Clone Voice in Console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library)
 
 ### API Quick Start
 
@@ -540,6 +540,6 @@ The default limit is 30 custom voices per team. If you need more, contact us to 
 | `200` | Successful read / update / delete | - |
 | `400` | Bad request | Check: audio under 120 s; label values are within the allowed enums; PATCH does not contain empty strings. Also returned when the team's 30-voice limit is reached — delete an existing voice or [request more](https://x.ai/contact-sales). |
 | `401` | Unauthorized | API key is missing or invalid. |
-| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), or [contact sales](https://x.ai/contact-sales) to enable the create API. |
+| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library), or [contact sales](https://x.ai/contact-sales) to enable the create API. |
 | `404` | Voice not found | The id does not exist or is owned by another team. |
 | `500` | Server error | Retry with exponential backoff. |

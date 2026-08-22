@@ -19,17 +19,17 @@ management engine.
 
 Install the stronghold plugin to get started.
 
-- [Automatic](#tab-panel-6219)
-- [Manual](#tab-panel-6220)
+- [Automatic](#tab-panel-6249)
+- [Manual](#tab-panel-6250)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6208)
-- [yarn](#tab-panel-6209)
-- [pnpm](#tab-panel-6210)
-- [deno](#tab-panel-6211)
-- [bun](#tab-panel-6212)
-- [cargo](#tab-panel-6213)
+- [npm](#tab-panel-6238)
+- [yarn](#tab-panel-6239)
+- [pnpm](#tab-panel-6240)
+- [deno](#tab-panel-6241)
+- [bun](#tab-panel-6242)
+- [cargo](#tab-panel-6243)
 
 ```
 npm run tauri add stronghold
@@ -73,11 +73,11 @@ cargo tauri add stronghold
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6214)
-    - [yarn](#tab-panel-6215)
-    - [pnpm](#tab-panel-6216)
-    - [deno](#tab-panel-6217)
-    - [bun](#tab-panel-6218)
+    - [npm](#tab-panel-6244)
+    - [yarn](#tab-panel-6245)
+    - [pnpm](#tab-panel-6246)
+    - [deno](#tab-panel-6247)
+    - [bun](#tab-panel-6248)
 
     ```
     npm install @tauri-apps/plugin-stronghold

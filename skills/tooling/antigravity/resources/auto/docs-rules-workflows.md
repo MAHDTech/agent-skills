@@ -12,7 +12,7 @@ follow behaviors particular to their own use cases and style.
 
 To get started with Rules:
 
-1.  Open the Customizations panel via the “…” dropdown at the top of the
+1.  Open the Customizations panel via the ”…” dropdown at the top of the
     editor’s agent panel.
 2.  Navigate to the Rules panel.
 3.  Click **+ Global** to create new Global Rules, or **+ Workspace** to
@@ -70,7 +70,7 @@ through a series of interconnected tasks or actions.
 
 To create a workflow:
 
-1.  Open the Customizations panel via the “…” dropdown at the top of the
+1.  Open the Customizations panel via the ”…” dropdown at the top of the
     editor’s agent panel.
 2.  Navigate to the Workflows panel.
 3.  Click the **+ Global** button to create a new global workflow that

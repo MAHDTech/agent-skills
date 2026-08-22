@@ -37,6 +37,10 @@ the Tauri Core.
 
 Events sent between the Core and the Webview.
 
+Under the hood, events still utilize Commands, and the access to the
+events API is controlled by the [Event
+permissions](https://v2.tauri.app/reference/acl/core-permissions/#event).
+
 ## Commands
 
 Tauri also provides a [foreign function

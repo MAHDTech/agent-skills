@@ -67,8 +67,8 @@ Development guide for more details on developing plugin configurations.
 
 The plugin instance on mobile has a getter for the plugin configuration:
 
-- [Android](#tab-panel-4461)
-- [iOS](#tab-panel-4462)
+- [Android](#tab-panel-4479)
+- [iOS](#tab-panel-4480)
 
 ```
 import android.app.Activityimport android.webkit.WebViewimport app.tauri.annotation.TauriPluginimport app.tauri.annotation.InvokeArg
@@ -100,8 +100,8 @@ guide.
 - **When**: When the plugin is loaded into the web view
 - **Why**: Execute plugin initialization code
 
-- [Android](#tab-panel-4463)
-- [iOS](#tab-panel-4464)
+- [Android](#tab-panel-4481)
+- [iOS](#tab-panel-4482)
 
 ```
 import android.app.Activityimport android.webkit.WebViewimport app.tauri.annotation.TauriPlugin
@@ -132,8 +132,8 @@ import android.app.Activityimport android.content.Intentimport app.tauri.annotat
 There is a plugin class inside the respective mobile projects where
 commands can be defined that can be called by the Rust code:
 
-- [Android](#tab-panel-4471)
-- [iOS](#tab-panel-4472)
+- [Android](#tab-panel-4489)
+- [iOS](#tab-panel-4490)
 
 ```
 import android.app.Activityimport app.tauri.annotation.Commandimport app.tauri.annotation.TauriPlugin
@@ -278,8 +278,8 @@ this to `rustc`:
 If a plugin requires permissions from the end user, Tauri simplifies the
 process of checking and requesting permissions.
 
-- [Android](#tab-panel-4465)
-- [iOS](#tab-panel-4466)
+- [Android](#tab-panel-4483)
+- [iOS](#tab-panel-4484)
 
 First define the list of permissions needed and an alias to identify
 each group in code. This is done inside the `TauriPlugin` annotation:
@@ -300,8 +300,8 @@ Tauri automatically implements two commands for the plugin:
 `checkPermissions` and `requestPermissions`. Those commands can be
 directly called from JavaScript or Rust:
 
-- [JavaScript](#tab-panel-4467)
-- [Rust](#tab-panel-4468)
+- [JavaScript](#tab-panel-4485)
+- [Rust](#tab-panel-4486)
 
 ```
 import { invoke, PermissionState } from '@tauri-apps/api/core'
@@ -324,8 +324,8 @@ impl<R: Runtime> Notification<R> {  pub fn request_post_notification_permission(
 Plugins can emit events at any point of time using the `trigger`
 function:
 
-- [Android](#tab-panel-4469)
-- [iOS](#tab-panel-4470)
+- [Android](#tab-panel-4487)
+- [iOS](#tab-panel-4488)
 
 ```
 @TauriPluginclass ExamplePlugin(private val activity: Activity): Plugin(activity) {    override fun load(webView: WebView) {      trigger("load", JSObject())    }

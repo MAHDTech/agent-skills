@@ -20,12 +20,12 @@ The Tauri CLI can generate all icons your app needs, including Microsoft
 Store icons. Use the `tauri icon` command to generate app icons from a
 single PNG or SVG source:
 
-- [npm](#tab-panel-4583)
-- [yarn](#tab-panel-4584)
-- [pnpm](#tab-panel-4585)
-- [deno](#tab-panel-4586)
-- [bun](#tab-panel-4587)
-- [cargo](#tab-panel-4588)
+- [npm](#tab-panel-4607)
+- [yarn](#tab-panel-4608)
+- [pnpm](#tab-panel-4609)
+- [deno](#tab-panel-4610)
+- [bun](#tab-panel-4611)
+- [cargo](#tab-panel-4612)
 
 ```
 npm run tauri icon /path/to/app-icon.png
@@ -91,12 +91,12 @@ Store, you can define a separate Tauri configuration file:
 Then merge that config file with the main one when bundling your Tauri
 app for Microsoft Store:
 
-- [npm](#tab-panel-4589)
-- [yarn](#tab-panel-4590)
-- [pnpm](#tab-panel-4591)
-- [deno](#tab-panel-4592)
-- [bun](#tab-panel-4593)
-- [cargo](#tab-panel-4594)
+- [npm](#tab-panel-4613)
+- [yarn](#tab-panel-4614)
+- [pnpm](#tab-panel-4615)
+- [deno](#tab-panel-4616)
+- [bun](#tab-panel-4617)
+- [cargo](#tab-panel-4618)
 
 ```
 npm run tauri build -- --no-bundlenpm run tauri bundle -- --config src-tauri/tauri.microsoftstore.conf.json

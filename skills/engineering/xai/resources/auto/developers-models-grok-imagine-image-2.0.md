@@ -4,6 +4,7 @@
 
 - **Modalities:** text, image → image
 - **Model name:** `grok-imagine-image-2.0`
+- **Batch API:** Supported
 
 ## Pricing
 

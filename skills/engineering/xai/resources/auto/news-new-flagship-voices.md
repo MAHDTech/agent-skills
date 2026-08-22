@@ -7,11 +7,11 @@ Jul 6, 2026
 New multilingual voices for Grok Voice, plus improved naturalness for
 the original five.
 
-[](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog)
+[](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog)
 
 Try It Free
 
-[](https://console.x.ai/team/default/voice/text-to-speech?campaign=new-voices-blog)
+[](https://console.x.ai/team/default/voice/text-to-speech?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog)
 
 Try in Playground
 
@@ -22,7 +22,7 @@ API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech?camp
 the [Text to Speech
 API](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech?campaign=new-voices-blog),
 and the new [**Grok Voice Agent
-Builder**](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog).
+Builder**](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog).
 Meet the newcomers in the lineup:
 
 Naksh
@@ -109,15 +109,15 @@ Warm and friendly.
 
 To build a custom voice agent with one of the new voices, use the **Grok
 Voice Agent Builder** in the [xAI
-console](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog).
+console](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog).
 You can also [clone your own
 voice](https://docs.x.ai/developers/model-capabilities/audio/custom-voices?campaign=new-voices-blog)
 from about a minute of audio.
 
-[](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog)
+[](https://console.x.ai/team/default/voice/agents?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog)
 
 Try It Free
 
-[](https://console.x.ai/team/default/voice/text-to-speech?campaign=new-voices-blog)
+[](https://console.x.ai/team/default/voice/text-to-speech?campaign=new-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=new-voices-blog)
 
 Try in Playground

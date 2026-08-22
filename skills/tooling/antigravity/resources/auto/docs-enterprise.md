@@ -6,22 +6,25 @@ open_in_newView Markdown
 
 # Antigravity in Gemini Enterprise
 
-Integration with **Gemini Enterprise and Gemini Enterprise Agent
-Platform** enables enterprise development teams to deploy Google
-Antigravity using models hosted directly within your organization’s
-Google Cloud infrastructure. Every session runs under Google Cloud’s
-enterprise security controls, data residency guarantees, and the Google
-Cloud Terms of Service.
+To deploy Google Antigravity using models hosted directly within your
+organization’s Google Cloud infrastructure, you can integrate with the
+Gemini Enterprise app and Gemini Enterprise Agent Platform. Every
+session runs under Google Cloud’s enterprise security controls, data
+residency guarantees, and the Google Cloud Terms of Service.
 
-Supported products: [Antigravity
-2.0](https://antigravity.google/product/antigravity-2)[Antigravity CLI](https://antigravity.google/product/antigravity-cli)
+Supported products: [Antigravity 2.0](https://antigravity.google/product/antigravity-2)
+[Antigravity CLI](https://antigravity.google/product/antigravity-cli) [Visual Studio
+Code](https://antigravity.google/docs/ide/extensions/vscode) [Visual Studio
+(Preview)](https://antigravity.google/docs/ide/extensions/visual-studio) [JetBrains
+(Preview)](https://antigravity.google/docs/ide/extensions/jetbrains) [Zed
+(Preview)](https://antigravity.google/docs/ide/extensions/zed)
 
 ## Overview & Key Benefits
 
 You can use Antigravity in two ways:
 
-- **Agent Platform** - Connect directly to Agent Platform to use
-  Antigravity with pay-as-you-go billing.
+- **Gemini Enterprise Agent Platform** - Connect directly to Agent
+  Platform API to use Antigravity with consumption-based billing.
 - **Gemini Enterprise license** - Connect with your Gemini Enterprise
   license to get access to included quotas, managed overages as well as
   advanced administrative controls.
@@ -32,7 +35,7 @@ organization gains:
 Enterprise Governance
 
 Operates under your existing Google Cloud Terms of Service with
-centralized administrative controls and role-based access.
+centralized administrative controls.
 
 Data Residency & Security
 
@@ -40,61 +43,17 @@ Satisfies private networking (VPC Service Controls) and regional data
 residency constraints. Enterprise prompts, responses, code, and
 telemetry are never stored outside your private environments.
 
-Consumption Billing
-
-Integrates directly with your Google Cloud Billing account for unified
-consumption invoicing at Agent Platform pricing.
-
-## Before You Begin
-
-Make sure your environment meets the following prerequisites:
-
-- A **Gemini Enterprise Standard**,**Gemini Enterprise Plus** or
-  **Gemini Enterprise Pay-as-you go** edition. *(Other editions, such as
-  Gemini Enterprise for Business, are planned for future releases but
-  are not currently supported).*
-
-- A Google Cloud project ID and a deployment location—`global`, `us`, or
-  `eu`—that carries your license.
-
-- For Bring Your Own Identity (BYOID), an administrator must configure
-  Cloud Identity or Workforce Identity Federation for your organization.
-
-- **Select a project**: Selecting a project doesn’t require a specific
-  IAM role—you can select any project that you’ve been granted a role
-  on.
-
- 
-
-- **Create a project**: To create a project, you need the **Project
-  Creator** role (`roles/resourcemanager.projectCreator`), which
-  contains the `resourcemanager.projects.create` permission. [Learn how
-  to grant
-  roles](https://cloud.google.com/iam/docs/granting-changing-revoking-access).
-
-## IAM Roles & Permissions Matrix
-
-Before configuring your environment, review the Identity and Access
-Management (IAM) roles required for initial project setup and model
-inference:
-
-| Setup Step | Required IAM Role | Permission ID |
-|:---|:---|:---|
-| **Create GCP Project** | Project Creator (`roles/resourcemanager.projectCreator`) | `resourcemanager.projects.create` |
-| **Enable Agent Platform API** | Service Usage Admin (`roles/serviceusage.serviceUsageAdmin`) | `serviceusage.services.enable` |
-| **Use Antigravity Models** | Agent Platform User (`roles/aiplatform.user`) | `aiplatform.user` |
-
 ## Administrator Setup Guide
 
-### Gemini Enterprise Setup
+### Gemini Enterprise App Setup
 
-To setup Gemini Enterprise subscriptions, follow the official Google
+To set up Gemini Enterprise subscriptions, follow the official Google
 Cloud onboarding guide.
 
-[Gemini Enterprise
+[Gemini Enterprise App
 Documentation](https://docs.cloud.google.com/gemini/enterprise/docs/ai-developer-tools-overview)
 
-### Google Cloud Environment Provisioning
+### Gemini Enterprise Agent Platform API Setup
 
 Complete the following three steps to provision your Google Cloud
 project and enable API access.
@@ -128,7 +87,8 @@ detected without requiring manual tier selection.
 
 ### Sign-In Workflow
 
-1.  Start **Antigravity 2.0** or the **Antigravity CLI**.
+1.  Start **Antigravity 2.0**, the **Antigravity CLI**, or your
+    supported **[IDE extension](https://antigravity.google/docs/ide/extensions)**.
 2.  Select **Sign in** to open the browser authentication flow.
 3.  Choose **Business account** *(subject to the Google Cloud Terms of
     Service)*.
@@ -136,8 +96,9 @@ detected without requiring manual tier selection.
     WIF).
 5.  Complete authentication in your browser.
 6.  Once authenticated, the **License Selector** displays your assigned
-    licenses. Confirm the project linked to your license and select it.
-7.  Alternatively, select **Other** to self-assign a license by entering
+    licenses.
+7.  Confirm the project linked to your license and select it.
+    Alternatively, select **Other** to self-assign a license by entering
     your project ID and selecting a location (`global`, `us`, or `eu`).
 
 ## Bring Your Own Identity (BYOID / WIF)
@@ -193,8 +154,9 @@ Application Default Credentials (ADC).
 
 ## Regional Endpoints & Capability Matrix
 
-Antigravity CLI and Antigravity 2.0 support multi-region deployment
-endpoints to satisfy regional data residency requirements:
+Antigravity CLI, Antigravity 2.0, and IDE Extensions support
+multi-region deployment endpoints to satisfy regional data residency
+requirements:
 
 | Endpoint Region | Base Endpoint URI | Supported Capabilities |
 |:---|:---|:---|
@@ -228,9 +190,10 @@ more](https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-lea
   empty, contact your administrator to ensure your account has been
   granted access to a Gemini Enterprise Standard or Plus license.
 - **Missing BYOID Sign-In Option**: Ensure you are running the latest
-  release of **[Antigravity 2.0](https://antigravity.google/download)** or the **[Antigravity
-  CLI](https://antigravity.google/docs/cli/install)**, as enterprise authentication and BYOID
-  support are included natively in all recent releases.
+  release of **[Antigravity 2.0](https://antigravity.google/download)**, the **[Antigravity
+  CLI](https://antigravity.google/docs/cli/install)**, or your **[IDE
+  Extension](https://antigravity.google/docs/ide/extensions)**, as enterprise authentication and
+  BYOID support are included natively in all recent releases.
 - **Browser URL Allowlist Advisory**: When a browser URL allowlist is
   configured in admin controls, allowlisted URLs may still be blocked in
   Antigravity. Admin URL allowlists are currently being integrated and

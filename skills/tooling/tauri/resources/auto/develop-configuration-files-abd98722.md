@@ -127,12 +127,12 @@ src-tauri/tauri.beta.conf.json
 And to distribute this separate *beta* app you provide this
 configuration file when building it:
 
-- [npm](#tab-panel-4443)
-- [yarn](#tab-panel-4444)
-- [pnpm](#tab-panel-4445)
-- [deno](#tab-panel-4446)
-- [bun](#tab-panel-4447)
-- [cargo](#tab-panel-4448)
+- [npm](#tab-panel-4461)
+- [yarn](#tab-panel-4462)
+- [pnpm](#tab-panel-4463)
+- [deno](#tab-panel-4464)
+- [bun](#tab-panel-4465)
+- [cargo](#tab-panel-4466)
 
 ```
 npm run tauri build -- --config src-tauri/tauri.beta.conf.json

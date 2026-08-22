@@ -60,7 +60,7 @@ SecretSpec 0.17.
 |----|----|----|----|----|----|----|
 | Rust (source crate) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Python | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
-| Node.js | ✓ | ✓ | — | ✓ | ✓ | — |
+| Node.js | ✓ (glibc and musl 0.20+) | ✓ (glibc and musl 0.20+) | — | ✓ | ✓ | — |
 | Go | ✓ | ✓ | — | ✓ | ✓ | — |
 | Ruby | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | C# | ✓ (glibc and musl) | ✓ (glibc and musl) | ✓ | ✓ | ✓ | ✓ |

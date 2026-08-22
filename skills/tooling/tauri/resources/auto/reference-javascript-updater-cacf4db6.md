@@ -82,7 +82,7 @@ any method on this object anymore and should drop any reference to it.**
 `Resource.close`
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L138>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L152>
 
 ##### download()
 
@@ -90,7 +90,8 @@ any method on this object anymore and should drop any reference to it.**
 download(onEvent?, options?): Promise<void>
 ```
 
-Download the updater package
+Download the updater package. Call
+[`install`](https://v2.tauri.app/reference/javascript/updater/#install) later to install it
 
 ###### Parameters
 
@@ -114,6 +115,13 @@ downloadAndInstall(onEvent?, options?): Promise<void>
 
 Downloads the updater package and installs it
 
+## Platform-specific:
+
+- **Windows:** This function exits the app after launching the updater
+  installer successfully
+- **macOS / Linux:** You need to relaunch the app to run the newly
+  install version
+
 ###### Parameters
 
 | Parameter | Type |
@@ -126,7 +134,7 @@ Downloads the updater package and installs it
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L122>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L136>
 
 ##### install()
 
@@ -134,7 +142,15 @@ Downloads the updater package and installs it
 install(options?): Promise<void>
 ```
 
-Install downloaded updater package
+Install downloaded updater package. Must be called after
+[`download`](https://v2.tauri.app/reference/javascript/updater/#download).
+
+## Platform-specific:
+
+- **Windows:** This function exits the app after launching the updater
+  installer successfully
+- **macOS / Linux:** You need to relaunch the app to run the newly
+  install version
 
 ###### Parameters
 
@@ -147,7 +163,7 @@ Install downloaded updater package
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L106>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L113>
 
 ## Interfaces
 
@@ -213,7 +229,7 @@ Check for updates, resolves to `null` if no updates are available
 \| `null`\>
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L145>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/updater/guest-js/index.ts#L159>
 
 ------------------------------------------------------------------------
 

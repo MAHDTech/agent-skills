@@ -87,7 +87,7 @@ ws.on("message", (data) => {
 
 ```
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-speech\&utm_content=api-keys)
 
 [API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
 

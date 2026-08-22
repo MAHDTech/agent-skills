@@ -19,17 +19,17 @@ file explorer.
 
 Install the opener plugin to get started.
 
-- [Automatic](#tab-panel-6093)
-- [Manual](#tab-panel-6094)
+- [Automatic](#tab-panel-6123)
+- [Manual](#tab-panel-6124)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6082)
-- [yarn](#tab-panel-6083)
-- [pnpm](#tab-panel-6084)
-- [deno](#tab-panel-6085)
-- [bun](#tab-panel-6086)
-- [cargo](#tab-panel-6087)
+- [npm](#tab-panel-6112)
+- [yarn](#tab-panel-6113)
+- [pnpm](#tab-panel-6114)
+- [deno](#tab-panel-6115)
+- [bun](#tab-panel-6116)
+- [cargo](#tab-panel-6117)
 
 ```
 npm run tauri add opener
@@ -73,11 +73,11 @@ cargo tauri add opener
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6088)
-    - [yarn](#tab-panel-6089)
-    - [pnpm](#tab-panel-6090)
-    - [deno](#tab-panel-6091)
-    - [bun](#tab-panel-6092)
+    - [npm](#tab-panel-6118)
+    - [yarn](#tab-panel-6119)
+    - [pnpm](#tab-panel-6120)
+    - [deno](#tab-panel-6121)
+    - [bun](#tab-panel-6122)
 
     ```
     npm install @tauri-apps/plugin-opener
@@ -103,8 +103,8 @@ cargo tauri add opener
 
 The opener plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6080)
-- [Rust](#tab-panel-6081)
+- [JavaScript](#tab-panel-6110)
+- [Rust](#tab-panel-6111)
 
 ```
 import { openPath, openUrl } from '@tauri-apps/plugin-opener';// when using `"withGlobalTauri": true`, you may use// const { openPath } = window.__TAURI__.opener;

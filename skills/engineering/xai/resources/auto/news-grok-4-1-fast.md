@@ -308,7 +308,7 @@ Tool calls
 
 From \$5 / 1000 successful invocations
 
-[](https://console.x.ai/team/default/api-keys)
+[](https://console.x.ai/team/default/api-keys?utm_source=website&utm_medium=referral&utm_campaign=grok-4-1-fast-blog&utm_content=api-links)
 
 ### Create an xAI API Key
 

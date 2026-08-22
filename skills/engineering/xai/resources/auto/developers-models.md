@@ -69,6 +69,8 @@ Voice: [Grok Voice API](https://docs.x.ai/developers/model-capabilities/audio/vo
   * Maximum number of images: No limit
   * Supported image file types: `jpg/jpeg` or `png`.
   * Any image/text input order is accepted (e.g. text prompt can precede image prompt)
+* **Batch API**
+  * Not every model accepts [Batch API](https://docs.x.ai/developers/advanced-api-usage/batch-api) requests. See Details on each model page.
 
 > [!NOTE]
 >

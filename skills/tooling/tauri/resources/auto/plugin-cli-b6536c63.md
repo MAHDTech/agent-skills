@@ -27,17 +27,17 @@ JavaScript and/or Rust.
 
 Install the CLI plugin to get started.
 
-- [Automatic](#tab-panel-5908)
-- [Manual](#tab-panel-5909)
+- [Automatic](#tab-panel-5938)
+- [Manual](#tab-panel-5939)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5897)
-- [yarn](#tab-panel-5898)
-- [pnpm](#tab-panel-5899)
-- [deno](#tab-panel-5900)
-- [bun](#tab-panel-5901)
-- [cargo](#tab-panel-5902)
+- [npm](#tab-panel-5927)
+- [yarn](#tab-panel-5928)
+- [pnpm](#tab-panel-5929)
+- [deno](#tab-panel-5930)
+- [bun](#tab-panel-5931)
+- [cargo](#tab-panel-5932)
 
 ```
 npm run tauri add cli
@@ -81,11 +81,11 @@ cargo tauri add cli
     3.  Install the JavaScript Guest bindings using your preferred
         JavaScript package manager:
 
-    - [npm](#tab-panel-5903)
-    - [yarn](#tab-panel-5904)
-    - [pnpm](#tab-panel-5905)
-    - [deno](#tab-panel-5906)
-    - [bun](#tab-panel-5907)
+    - [npm](#tab-panel-5933)
+    - [yarn](#tab-panel-5934)
+    - [pnpm](#tab-panel-5935)
+    - [deno](#tab-panel-5936)
+    - [bun](#tab-panel-5937)
 
     ```
     npm install @tauri-apps/plugin-cli
@@ -188,8 +188,8 @@ with the `description`, `longDescription`, `args`, etc.
 
 The CLI plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-5895)
-- [Rust](#tab-panel-5896)
+- [JavaScript](#tab-panel-5925)
+- [Rust](#tab-panel-5926)
 
 ```
 import { getMatches } from '@tauri-apps/plugin-cli';// when using `"withGlobalTauri": true`, you may use// const { getMatches } = window.__TAURI__.cli;

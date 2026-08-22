@@ -135,7 +135,7 @@ Referenced files are writable when filesystem permissions allow it.
 Treat runtime-managed mounts as read-only unless their owner explicitly
 permits SecretSpec to replace or delete entries.
 
-## Extract from JSON (0.19+)
+## Extract from a document (0.19+)
 
 Several declarations can select values from one JSON file without making
 JSON part of the provider itself:
@@ -147,11 +147,21 @@ JSON part of the provider itself:
 
 secretspec.toml
 
+An INI file is selected the same way with `format = "ini"` (0.20+),
+where `/key` reads an unsectioned key and `/section/key` reads a key in
+a named section:
+
+```
+[profiles.production]# format = "ini" requires SecretSpec 0.20+DATABASE_PASSWORD = {  description = "Database password",  providers = ["runtime_files"],  ref = { item = "application.ini" },  extract = { format = "ini", pointer = "/database/password" }}
+```
+
+secretspec.toml
+
 The file provider returns the complete UTF-8 document; SecretSpec then
-applies the RFC 6901 pointer as a provider-independent stored-value
-transform. Extracted declarations are read-only in 0.19 so `set`,
-`delete`, generation, prompting, and import cannot overwrite or remove
-the containing file. See [Structured
+applies the pointer as a provider-independent stored-value transform.
+Extracted declarations are read-only so `set`, `delete`, generation,
+prompting, and import cannot overwrite or remove the containing file.
+See [Structured
 Extraction](https://secretspec.dev/reference/configuration/#structured-extraction-019) for
 value rendering, error behavior, and composition with `encoding`.
 

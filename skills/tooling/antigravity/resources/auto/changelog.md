@@ -24,6 +24,95 @@ Description
 
 ------------------------------------------------------------------------
 
+[2.9.1](https://antigravity.google/releases?tab=hub&version=2.9.1 "View release 2.9.1")  
+August 20, 2026
+
+### Remote Control, faster project switching, and more
+
+This update introduces Remote Control to drive and monitor agent
+sessions on your local device from any browser, alongside core
+performance gains, improved sidebar navigation, and cleaner error
+recovery.
+
+Improvements (11)
+
+- Introduced Antigravity Remote Control, allowing you to securely
+  connect to and drive agent sessions on your local device from any
+  browser, with proactive push notifications when agents complete tasks
+  or require input.
+- Improved performance across the app: faster startup and project
+  switching, faster loading of conversations with long histories, less
+  lag during active sessions, and smoother opening and collapsing of the
+  sidebar and side panels.
+- Added the ability to collapse top-level sidebar sections. The
+  ungrouped list now shows up to 30 conversations, and conversation
+  actions appear instantly on hover.
+- Notification toasts now appear in the bottom-right corner and collapse
+  into a compact stack that expands on hover, so they no longer cover
+  the screen.
+- Hovering over a file's comment count pill now previews all comments on
+  that file alongside their line numbers, and clicking a comment opens
+  the referenced file, diff, or artifact with that comment focused.
+- Refreshed the Customizations settings screen with collapsible sections
+  and item counts for skills, rules, plugins, and custom agents,
+  consistent back navigation across sub-pages, and clearer card layouts
+  and status indicators for MCP server configurations.
+- Clicking Retry on an agent error card now resumes the task directly,
+  without adding an artificial "Continue" message to your conversation.
+- Custom agents can now reuse the skills, rules, and subagents you
+  already have, using a single `inheritCustomizations` setting in the
+  agent's frontmatter.
+- Added support for uploading and attaching WebP images in chat.
+- Added syntax highlighting for PowerShell (`.ps1`, `.psm1`, `.psd1`,
+  and `pwsh`/`ps1` code fences) and Zsh (`.zsh`, `zsh`) in chat and the
+  file viewer.
+- Refreshed the Google Docs, Sheets, Slides, and Drive icons to the 2026
+  Workspace logos, and URL artifact cards for those products now show
+  the product icon instead of a generic link glyph.
+
+Fixes (15)
+
+- Fixed an issue where Find (Ctrl+F / Cmd+F) in the Review pane missed
+  matches that were outside the visible area or hidden inside collapsed
+  files and folded line blocks. Search now scans all open files and
+  automatically expands and scrolls to each match.
+- Fixed an error that could stop you from rewinding a long conversation.
+- Fixed an issue where a conversation could get stuck showing as still
+  running and never return to idle, most often after pressing Stop.
+- Large binary attachments returned by connected MCP tools — images,
+  PDFs, and audio — are now saved to a file and referenced in the
+  conversation instead of being pasted inline, where they could
+  previously overflow the conversation and break the turn.
+- Fixed an issue where one invalid or unsupported MCP server
+  configuration would prevent all other configured MCP servers from
+  loading.
+- Fixed an issue on Windows where the Proceed button failed to appear on
+  artifact review cards and plan editor headers.
+- Fixed an issue where titles for long-running conversations could
+  unexpectedly change to an older message.
+- Fixed an issue where pinning, archiving, or restoring a conversation
+  that was no longer available on disk appeared to succeed. The action
+  is now reverted and an explanatory notification is shown.
+- Fixed an issue where newly created conversations in the sidebar
+  temporarily displayed raw link text instead of clean @-mention names.
+- Added visible error notifications when file attachments fail because
+  of file size limits, attachment counts, or unsupported formats.
+- Fixed an issue where confirmation dialogs (such as reverting actions
+  or deleting conversations) focused the close button by default, so
+  pressing Enter dismissed the dialog instead of confirming it.
+- Fixed an issue where updated images in chat could keep showing stale,
+  cached versions; they now refresh on reload.
+- Fixed an issue where comments added to markdown files or artifacts in
+  preview mode attached to the first line instead of the selected text.
+- Fixed an issue where images uploaded or pasted into the chat composer
+  alongside a comment on an artifact were left out of the message sent
+  to the model.
+- Fixed an issue in the Review pane where dragging file header pills
+  into the chat composer did not correctly reference files beyond the
+  first.
+
+Patches (0)
+
 [2.8.1](https://antigravity.google/releases?tab=hub&version=2.8.1 "View release 2.8.1")  
 August 13, 2026
 
@@ -653,6 +742,174 @@ Fixes (3)
   importing from Antigravity 1.0.
 - Resolved an issue where Google One credits were not being applied or
   utilized.
+
+Patches (0)
+
+[1.1.17](https://antigravity.google/download#antigravity-cli "View release 1.1.17")  
+August 20, 2026
+
+### Consolidated agent execution harness and media attachment fixes
+
+Consolidated agent execution harness for consistent tool, hook, and
+prompt behavior, alongside fixes for slash command visibility, Vim
+insert mode task navigation, and Ogg audio/video attachment MIME types.
+
+Improvements (1)
+
+- Improved the agent execution harness by consolidating onto a single
+  execution path, giving more consistent tool, hook, and prompt
+  behavior.
+
+Fixes (3)
+
+- Fixed `/teamwork-preview` and some other slash commands disappearing
+  for some users.
+- Fixed `Enter` not opening an active background task or subagent while
+  the prompt was in Vim insert mode.
+- Fixed attaching Ogg audio and video files such as `.ogg`, `.opus` and
+  `.ogv`, which the model rejected because they were sent as the generic
+  `application/ogg`.
+
+Patches (0)
+
+[1.1.16](https://antigravity.google/download#antigravity-cli "View release 1.1.16")  
+August 20, 2026
+
+### CLI mcp management commands, debounced @ path completion, and MCP resource handling fixes
+
+`mcp` management subcommands (`add`, `remove`, `list`, `enable`,
+`disable`) for `mcp_config.json`, debounced `@` file path completion
+powered by bundled `ripgrep`, Gemini API key reasoning effort adjustment
+for Gemini Flash models, and comprehensive fixes for binary MCP resource
+offloading, Workforce Identity Federation token refresh, `/mcp`
+configuration preservation, Kitty keyboard protocol handling, `/btw`
+with custom agents, and finished task status tracking.
+
+Improvements (3)
+
+- Added `mcp` subcommands (`add`, `remove`, `list`, `enable`, `disable`)
+  for managing MCP servers in your user-level `mcp_config.json` without
+  hand-editing it, covering both stdio and HTTP servers through
+  `--type`, `--env` and `--header`.
+- Improved `@` file path completion in large workspaces by running the
+  lookup through the bundled `ripgrep` and debouncing keystrokes, and by
+  ranking a file whose name matches your query above a directory or
+  generated artifact that merely contains it.
+- Improved `/effort` so it adjusts reasoning effort for Gemini 3.6 Flash
+  and Gemini 3.7 Flash when you sign in with a Gemini API key, a route
+  that previously reported those models as not adjustable even though
+  the same models were adjustable on every other sign-in path.
+
+Fixes (15)
+
+- Fixed links printing as raw escape sequences on terminals that do not
+  implement OSC 8 hyperlinks, such as Terminal.app, and extended the
+  same detection to command output and alert bodies, which still emitted
+  hyperlinks unconditionally.
+- Fixed a `=` character accumulating in the prompt every couple of
+  seconds on terminals that do not implement the Kitty keyboard
+  protocol, where the renderer's periodic re-arming of that protocol was
+  printed as literal text instead of being interpreted.
+- Fixed `@` file path completion showing files that were in your
+  `.antigravityignore`.
+- Fixed the artifact list showing a percent-escaped filename such as
+  `quarterly%20plan.md` for artifacts whose name contains a space, so
+  the list row, the inline preview and the detail header all spell the
+  name the same way.
+- Fixed the prompt editor's cursor becoming misaligned when text
+  wrapped.
+- Fixed the `/mcp` panel dropping `enabledTools`, `timeoutSeconds`,
+  `url` and `tools.eager` from `mcp_config.json` when you toggled a
+  server on or off; it now preserves any field it does not recognize, so
+  configuration written by a newer client survives an edit.
+- Fixed `read_resource` discarding non-image binary content returned by
+  an MCP server, which now offloads every blob to disk and inlines only
+  small text and image resources, so large PDFs, audio and other binary
+  resources are usable instead of silently dropped.
+- Fixed Workforce Identity Federation sign-in signing you out roughly
+  every hour, because the token refresh went to the standard sign-in
+  endpoint rather than the federated one.
+- Fixed skills that ship with the CLI being reported as not built-in, so
+  the `builtin` flag in the `/skills` listing under
+  `--output-format json` is accurate and the `/skills` panel groups them
+  correctly.
+- Fixed the reasoning-effort description under the timeline gauge in the
+  `/effort` and `/model` pickers overflowing on narrow terminals, where
+  it is now omitted so the gauge stays readable.
+- Fixed `/btw` failing with a planner configuration error in
+  conversations driven by a custom or SDK-defined agent, so side
+  questions work regardless of which agent you are running.
+- Fixed a failed `/btw` side question always reporting
+  `model returned an empty response`, which was a hardcoded guess rather
+  than the real failure; the card now shows the side question's own
+  error when there is one.
+- Fixed the status line, the active-items list and the `/tasks` panel
+  continuing to show background tasks that had already finished.
+- Fixed the CLI overwriting a `settings.json` it could not parse with
+  default settings, which silently reverted every setting the next time
+  anything was saved; a refused save now leaves the file byte-identical
+  so you can repair it by hand, and the status line names the file.
+- Fixed a subagent whose definition leaves `model` at `inherit` failing
+  to start when the parent agent has no model of its own, which now
+  falls back to the default fast tier.
+
+Patches (0)
+
+[1.1.15](https://antigravity.google/download#antigravity-cli "View release 1.1.15")  
+August 19, 2026
+
+### Stream-JSON input mode, markdown agent explicit rules, and startup credential fixes
+
+Stream-JSON print input mode for persistent session drivers, direct rule
+file configuration in markdown agent frontmatter, plugin rule support
+via `rules.json`, current tool call hints on the spinner, and fixes for
+allocator preloading on Cloud TPU VMs, keyring credential restoration,
+terminal scrolling and unicode display in the model picker, and artifact
+subdirectories.
+
+Improvements (4)
+
+- Added `--input-format stream-json` to print mode, which reads
+  newline-delimited JSON prompts from stdin and runs one turn per
+  message in a single conversation, so a driver can keep a session open.
+- Added a `rules:` key to markdown agent frontmatter, so an agent can
+  name rule files directly instead of inheriting your whole rule tree; a
+  rule named this way always applies.
+- Added plugin support for a top-level `rules.json`, so a plugin can
+  declare the rule files it ships the same way it already declares its
+  skills.
+- Added a more specific hint on the spinner line, which now names the
+  tool call the agent is currently running.
+
+Fixes (10)
+
+- Fixed the CLI aborting at startup on hosts that preload their own
+  allocator through `LD_PRELOAD`, such as Cloud TPU VM images, where it
+  died before the interface appeared.
+- Fixed personal accounts hitting a resource-exhausted error at startup
+  when saved credentials were restored from the system keyring, and cut
+  the repeated account checks that followed.
+- Fixed your billing project, and the license tier it selects, being
+  lost when the CLI restarted and restored saved credentials from the
+  system keyring.
+- Fixed a spurious "Out of credits" message for enterprise users signed
+  in through Application Default Credentials.
+- Fixed the `/model` picker cutting off models, and its own header, on
+  terminals too short to show every model; the list now scrolls.
+- Fixed the `/model` picker misaligning its columns for model names that
+  are not plain ASCII, by measuring column widths in display cells
+  rather than bytes.
+- Fixed the spinner line flickering to a generic label between quick
+  tool calls.
+- Fixed streamed text corrupting non-ASCII characters into replacement
+  characters, in both the interactive display and
+  `--output-format stream-json` text deltas.
+- Fixed artifacts written into a subdirectory of a conversation's
+  artifact directory, such as `scratch/`, never appearing in the
+  artifact list.
+- Fixed reading a `.wav` file failing as an unsupported media type, by
+  normalizing non-canonical MIME types such as `audio/wave` before they
+  reach the model.
 
 Patches (0)
 
@@ -2929,6 +3186,52 @@ Improvements (1)
 - Google Antigravity
 
 Fixes (0)
+
+Patches (0)
+
+[0.1.13](https://antigravity.google/download#antigravity-sdk "View release 0.1.13")  
+August 18, 2026
+
+### Pre-tool argument modification, synchronous lifecycle hooks, RunCommandConfig timeouts, and step correlation IDs
+
+The 0.1.13 release introduces pre-tool argument modification
+capabilities in lifecycle hooks, adds native support for synchronous
+hook functions, and establishes structured command execution
+configuration with configurable execution timeouts. It also improves
+tool execution observability with step correlation IDs and enhances
+connection resilience during client disconnects.
+
+Improvements (5)
+
+- **Pre-Tool Hook Argument Modification**: Pre-tool lifecycle hooks can
+  now sanitize, transform, or override tool input arguments before tool
+  execution begins.
+- **Synchronous Hook Function Support**: Lifecycle hook decorators now
+  accept standard synchronous functions alongside asynchronous
+  coroutines without raising runtime await errors.
+- **Structured Command Execution Configuration**: Command execution
+  settings are now consolidated under `RunCommandConfig`, introducing
+  configurable timeouts that default to 10 minutes (600 seconds)
+  alongside daemon execution controls.
+- **Tool Lifecycle Step Correlation**: `ToolResult` and
+  `ToolExecutionError` event payloads now include `step_id`, enabling
+  end-to-end tracking and correlation of tool invocations across
+  trajectory steps.
+- **VS Code Debugging Configuration**: Updated
+  `setup_vscode_debugging.sh` to target the canonical
+  `getting_started/hello_world` starter example and explicitly configure
+  Gemini Developer API defaults.
+
+Fixes (2)
+
+- **Synchronous Hook Decorator Execution**: Fixed a runtime `TypeError`
+  when decorating synchronous functions with `@pre_turn`,
+  `@post_tool_call`, and other lifecycle hooks by verifying awaitability
+  before awaiting hook responses.
+- **LiteRT Early Client Disconnects**: Suppressed unhandled
+  `ConnectionResetError`, `ConnectionAbortedError`, and
+  `BrokenPipeError` exceptions when clients disconnect early from local
+  LiteRT server connections.
 
 Patches (0)
 

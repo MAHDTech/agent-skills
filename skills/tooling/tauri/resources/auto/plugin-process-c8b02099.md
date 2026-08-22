@@ -18,17 +18,17 @@ processes, see the [shell](https://v2.tauri.app/plugin/shell/) plugin.
 
 Install the plugin-process to get started.
 
-- [Automatic](#tab-panel-6144)
-- [Manual](#tab-panel-6145)
+- [Automatic](#tab-panel-6174)
+- [Manual](#tab-panel-6175)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6133)
-- [yarn](#tab-panel-6134)
-- [pnpm](#tab-panel-6135)
-- [deno](#tab-panel-6136)
-- [bun](#tab-panel-6137)
-- [cargo](#tab-panel-6138)
+- [npm](#tab-panel-6163)
+- [yarn](#tab-panel-6164)
+- [pnpm](#tab-panel-6165)
+- [deno](#tab-panel-6166)
+- [bun](#tab-panel-6167)
+- [cargo](#tab-panel-6168)
 
 ```
 npm run tauri add process
@@ -72,11 +72,11 @@ cargo tauri add process
 3.  If you’d like to utilize the plugin in JavaScript then install the
     npm package as well:
 
-    - [npm](#tab-panel-6139)
-    - [yarn](#tab-panel-6140)
-    - [pnpm](#tab-panel-6141)
-    - [deno](#tab-panel-6142)
-    - [bun](#tab-panel-6143)
+    - [npm](#tab-panel-6169)
+    - [yarn](#tab-panel-6170)
+    - [pnpm](#tab-panel-6171)
+    - [deno](#tab-panel-6172)
+    - [bun](#tab-panel-6173)
 
     ```
     npm install @tauri-apps/plugin-process
@@ -102,8 +102,8 @@ cargo tauri add process
 
 The process plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6131)
-- [Rust](#tab-panel-6132)
+- [JavaScript](#tab-panel-6161)
+- [Rust](#tab-panel-6162)
 
 ```
 import { exit, relaunch } from '@tauri-apps/plugin-process';// when using `"withGlobalTauri": true`, you may use// const { exit, relaunch } = window.__TAURI__.process;

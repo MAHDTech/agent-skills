@@ -18,17 +18,17 @@ altitude, heading, and speed (if available).
 
 Install the geolocation plugin to get started.
 
-- [Automatic](#tab-panel-5979)
-- [Manual](#tab-panel-5980)
+- [Automatic](#tab-panel-6009)
+- [Manual](#tab-panel-6010)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5968)
-- [yarn](#tab-panel-5969)
-- [pnpm](#tab-panel-5970)
-- [deno](#tab-panel-5971)
-- [bun](#tab-panel-5972)
-- [cargo](#tab-panel-5973)
+- [npm](#tab-panel-5998)
+- [yarn](#tab-panel-5999)
+- [pnpm](#tab-panel-6000)
+- [deno](#tab-panel-6001)
+- [bun](#tab-panel-6002)
+- [cargo](#tab-panel-6003)
 
 ```
 npm run tauri add geolocation
@@ -72,11 +72,11 @@ cargo tauri add geolocation
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5974)
-    - [yarn](#tab-panel-5975)
-    - [pnpm](#tab-panel-5976)
-    - [deno](#tab-panel-5977)
-    - [bun](#tab-panel-5978)
+    - [npm](#tab-panel-6004)
+    - [yarn](#tab-panel-6005)
+    - [pnpm](#tab-panel-6006)
+    - [deno](#tab-panel-6007)
+    - [bun](#tab-panel-6008)
 
     ```
     npm install @tauri-apps/plugin-geolocation

@@ -69,7 +69,7 @@ for (const word of result.words ?? []) {
 
 Note: The `file` parameter must be provided after all other parameters in the multipart form.
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-text\&utm_content=api-keys)
 
 [Live Voice Demos](https://x.ai/api/voice)
 

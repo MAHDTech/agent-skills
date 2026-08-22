@@ -10,13 +10,14 @@ If you already have the exact prompt and want direct control over aspect ratio a
 
 | SDK/API | Tool Name |
 |---------|-----------|
+| xAI SDK | `image_generation` |
 | OpenAI Responses API | `image_generation` |
 
 This tool is also supported in all Responses API compatible SDKs. The Vercel AI SDK does not yet expose the image generation tool.
 
 ## Basic usage
 
-Add `image_generation` to `tools` and ask for an image. In the Responses API, each image arrives as an `image_generation_call` output item whose `result` field carries the base64-encoded image with no data-URL prefix, so you can decode it directly.
+Add `image_generation` to `tools` and ask for an image. In the xAI SDK, each generated image is exposed on `response.image_outputs` as decoded bytes you can write straight to a file. In the Responses API, each image arrives as an `image_generation_call` output item whose `result` field carries the base64-encoded image with no data-URL prefix, so you can decode it directly.
 
 ```bash customLanguage="bash"
 curl https://api.x.ai/v1/responses \
@@ -32,6 +33,27 @@ curl https://api.x.ai/v1/responses \
   ]
 }' | jq -r '.output[] | select(.type == "image_generation_call") | .result' \
   | base64 --decode > corgi_surfing.jpg
+```
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+)
+chat.append(user("Generate an image of a corgi surfing a big wave, in the style of a Japanese woodblock print"))
+response = chat.sample()
+
+print(response.content)
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
 ```
 
 ```python customLanguage="pythonOpenAISDK"
@@ -156,6 +178,15 @@ curl https://api.x.ai/v1/responses \
 }'
 ```
 
+```python customLanguage="pythonXAI"
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation(action="generate")],
+)
+chat.append(user("Generate an image of a hot air balloon over the desert"))
+response = chat.sample()
+```
+
 ```python customLanguage="pythonOpenAISDK"
 response = client.responses.create(
     model="grok-4.6",
@@ -196,6 +227,31 @@ curl https://api.x.ai/v1/responses \
     }
   ]
 }'
+```
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import image, user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation(action="edit")],
+)
+chat.append(
+    user(
+        "Edit this image so it looks like a watercolor painting.",
+        image("https://docs.x.ai/assets/api-examples/images/style-realistic.png"),
+    )
+)
+response = chat.sample()
+
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
 ```
 
 ```python customLanguage="pythonOpenAISDK"
@@ -242,7 +298,35 @@ if image_data:
 
 ## Multi-turn editing
 
-Images generated on a previous turn stay editable on follow-up turns. Continue the conversation with `previous_response_id`, and the model can refine its earlier images by reference:
+Images generated on a previous turn stay editable on follow-up turns. Continue the conversation — append the previous response to the chat in the xAI SDK, or pass `previous_response_id` in the Responses API — and the model can refine its earlier images by reference:
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+)
+
+# Turn 1: generate an image
+chat.append(user("Generate an image of a lighthouse on a rocky coast"))
+response = chat.sample()
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+
+# Turn 2: edit the image from the previous turn
+chat.append(response)
+chat.append(user("Make it night time with a full moon"))
+followup = chat.sample()
+with open("edited_image.jpeg", "wb") as f:
+    f.write(followup.image_outputs[0].image)
+```
 
 ```python customLanguage="pythonOpenAISDK"
 import base64
@@ -315,6 +399,35 @@ curl https://api.x.ai/v1/responses \
   | base64 --decode > champions_poster.jpg
 ```
 
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation, web_search
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[web_search(), image_generation()],
+)
+chat.append(
+    user(
+        "Find out which team won the most recent FIFA World Cup, then generate an "
+        "image of a celebratory poster for that team, in a vintage travel-poster style."
+    )
+)
+response = chat.sample()
+
+print(response.content)
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+
+# Per-tool invocation counts for the request
+print(response.server_side_tool_usage)
+```
+
 ```python customLanguage="pythonOpenAISDK"
 import base64
 import os
@@ -356,6 +469,36 @@ The same pattern works with [X search](https://docs.x.ai/developers/tools/x-sear
 ## Streaming
 
 When streaming, each image generation call emits progress events—`in_progress`, then `generating`, then `completed`—followed by a `response.output_item.done` event whose item carries the base64 result. Partial image previews are not emitted.
+
+In the xAI SDK, pass `include=["verbose_streaming"]` to watch tool calls as they happen; the decoded images are available on the accumulated response via `response.image_outputs` once the stream ends.
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import get_tool_call_type, image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+    include=["verbose_streaming"],
+)
+chat.append(user("Generate an image of an origami fox in a paper forest"))
+
+for response, chunk in chat.stream():
+    for tool_call in chunk.tool_calls:
+        if get_tool_call_type(tool_call) == "image_generation_tool":
+            print(f"\nGenerating image: {tool_call.function.arguments}")
+    if chunk.content:
+        print(chunk.content, end="", flush=True)
+
+# The accumulated response carries the decoded images once the stream ends
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+```
 
 ```python customLanguage="pythonOpenAISDK"
 import base64
