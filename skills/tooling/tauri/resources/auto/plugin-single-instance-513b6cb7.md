@@ -17,17 +17,17 @@ using the Single Instance Plugin.
 
 Install the Single Instance plugin to get started.
 
-- [Automatic](#tab-panel-6167)
-- [Manual](#tab-panel-6168)
+- [Automatic](#tab-panel-6197)
+- [Manual](#tab-panel-6198)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6161)
-- [yarn](#tab-panel-6162)
-- [pnpm](#tab-panel-6163)
-- [deno](#tab-panel-6164)
-- [bun](#tab-panel-6165)
-- [cargo](#tab-panel-6166)
+- [npm](#tab-panel-6191)
+- [yarn](#tab-panel-6192)
+- [pnpm](#tab-panel-6193)
+- [deno](#tab-panel-6194)
+- [bun](#tab-panel-6195)
+- [cargo](#tab-panel-6196)
 
 ```
 npm run tauri add single-instance

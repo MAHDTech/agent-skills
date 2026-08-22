@@ -17,17 +17,17 @@ reopened.
 
 Install the persisted-scope plugin to get started.
 
-- [Automatic](#tab-panel-6116)
-- [Manual](#tab-panel-6117)
+- [Automatic](#tab-panel-6146)
+- [Manual](#tab-panel-6147)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6110)
-- [yarn](#tab-panel-6111)
-- [pnpm](#tab-panel-6112)
-- [deno](#tab-panel-6113)
-- [bun](#tab-panel-6114)
-- [cargo](#tab-panel-6115)
+- [npm](#tab-panel-6140)
+- [yarn](#tab-panel-6141)
+- [pnpm](#tab-panel-6142)
+- [deno](#tab-panel-6143)
+- [bun](#tab-panel-6144)
+- [cargo](#tab-panel-6145)
 
 ```
 npm run tauri add persisted-scope

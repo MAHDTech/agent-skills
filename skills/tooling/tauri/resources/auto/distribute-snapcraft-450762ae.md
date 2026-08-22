@@ -4,9 +4,9 @@
 
 **1. Install `snap`**
 
-- [Debian](#tab-panel-4614)
-- [Arch](#tab-panel-4615)
-- [Fedora](#tab-panel-4616)
+- [Debian](#tab-panel-4638)
+- [Arch](#tab-panel-4639)
+- [Fedora](#tab-panel-4640)
 
 ```
 sudo apt install snapd

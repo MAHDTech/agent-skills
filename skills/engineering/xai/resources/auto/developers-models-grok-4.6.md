@@ -7,6 +7,7 @@ SpaceXAI's frontier model for coding, agentic tasks, and knowledge work.
 - **Modalities:** text, image → text
 - **Context window:** 500,000 tokens
 - **Model name:** `grok-4.6`
+- **Batch API:** Not supported
 
 ## Capabilities
 

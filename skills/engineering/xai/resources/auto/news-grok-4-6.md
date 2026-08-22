@@ -8,7 +8,7 @@ Grok 4.6 builds on Grok 4.5 with a particular focus on long-running
 agents and more ambitious interactive and visual work.
 
 [Try for free ](https://x.ai/build)[Start
-building](https://console.x.ai)
+building](https://console.x.ai?utm_source=website&utm_medium=referral&utm_campaign=news-intro&utm_content=build-cta)
 
 Today we are releasing **Grok 4.6**. Grok 4.6 builds on [Grok
 4.5](https://x.ai/news/grok-4-5) with a particular focus on long-running agents and

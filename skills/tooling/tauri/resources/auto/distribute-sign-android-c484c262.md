@@ -18,8 +18,8 @@ for more information.
 Android signing requires a Java Keystore file that can be generated
 using the official `keytool` CLI:
 
-- [macOS/Linux](#tab-panel-4607)
-- [Windows](#tab-panel-4608)
+- [macOS/Linux](#tab-panel-4631)
+- [Windows](#tab-panel-4632)
 
 ```
 keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload

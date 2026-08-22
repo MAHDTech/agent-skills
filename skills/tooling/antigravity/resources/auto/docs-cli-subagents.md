@@ -107,7 +107,7 @@ file or running a database migration), a status bar notification blinks.
 - Confirm or reject the action, and press Esc to teleport back to your
   primary thread.
 
-### “Fast-Path” confirmations (`Ctrl+K`)
+### ”Fast-Path” confirmations (`Ctrl+K`)
 
 To authorize an agent action instantly without leaving your active
 workspace:

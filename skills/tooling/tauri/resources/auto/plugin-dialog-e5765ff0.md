@@ -18,17 +18,17 @@ dialogs.
 
 Install the dialog plugin to get started.
 
-- [Automatic](#tab-panel-5951)
-- [Manual](#tab-panel-5952)
+- [Automatic](#tab-panel-5981)
+- [Manual](#tab-panel-5982)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5940)
-- [yarn](#tab-panel-5941)
-- [pnpm](#tab-panel-5942)
-- [deno](#tab-panel-5943)
-- [bun](#tab-panel-5944)
-- [cargo](#tab-panel-5945)
+- [npm](#tab-panel-5970)
+- [yarn](#tab-panel-5971)
+- [pnpm](#tab-panel-5972)
+- [deno](#tab-panel-5973)
+- [bun](#tab-panel-5974)
+- [cargo](#tab-panel-5975)
 
 ```
 npm run tauri add dialog
@@ -72,11 +72,11 @@ cargo tauri add dialog
 3.  If you’d like create dialogs in JavaScript, install the npm package
     as well:
 
-    - [npm](#tab-panel-5946)
-    - [yarn](#tab-panel-5947)
-    - [pnpm](#tab-panel-5948)
-    - [deno](#tab-panel-5949)
-    - [bun](#tab-panel-5950)
+    - [npm](#tab-panel-5976)
+    - [yarn](#tab-panel-5977)
+    - [pnpm](#tab-panel-5978)
+    - [deno](#tab-panel-5979)
+    - [bun](#tab-panel-5980)
 
     ```
     npm install @tauri-apps/plugin-dialog

@@ -18,17 +18,17 @@ reopened.
 
 Install the window-state plugin to get started.
 
-- [Automatic](#tab-panel-6287)
-- [Manual](#tab-panel-6288)
+- [Automatic](#tab-panel-6317)
+- [Manual](#tab-panel-6318)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6276)
-- [yarn](#tab-panel-6277)
-- [pnpm](#tab-panel-6278)
-- [deno](#tab-panel-6279)
-- [bun](#tab-panel-6280)
-- [cargo](#tab-panel-6281)
+- [npm](#tab-panel-6306)
+- [yarn](#tab-panel-6307)
+- [pnpm](#tab-panel-6308)
+- [deno](#tab-panel-6309)
+- [bun](#tab-panel-6310)
+- [cargo](#tab-panel-6311)
 
 ```
 npm run tauri add window-state
@@ -72,11 +72,11 @@ cargo tauri add window-state
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6282)
-    - [yarn](#tab-panel-6283)
-    - [pnpm](#tab-panel-6284)
-    - [deno](#tab-panel-6285)
-    - [bun](#tab-panel-6286)
+    - [npm](#tab-panel-6312)
+    - [yarn](#tab-panel-6313)
+    - [pnpm](#tab-panel-6314)
+    - [deno](#tab-panel-6315)
+    - [bun](#tab-panel-6316)
 
     ```
     npm install @tauri-apps/plugin-window-state

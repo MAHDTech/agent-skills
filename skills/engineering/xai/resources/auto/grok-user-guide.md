@@ -56,7 +56,7 @@ View all shared conversations in your history at [https://grok.com/history?tab=s
 
 To activate or manage your license:
 
-1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai).
+1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-user-guide\&utm_content=console-home).
 2. Press "Assign license" and select your license type.
 3. If you encounter access issues or lack permissions, contact your team admin for assistance.
 

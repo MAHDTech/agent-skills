@@ -8,6 +8,7 @@ SpaceXAI's intelligent coding model for agentic software, engineering, and workf
 - **Context window:** 256,000 tokens
 - **Model name:** `grok-build-0.1`
 - **Aliases:** `grok-code-fast-1`, `grok-code-fast`, `grok-code-fast-1-0825`
+- **Batch API:** Not supported
 
 ## Capabilities
 

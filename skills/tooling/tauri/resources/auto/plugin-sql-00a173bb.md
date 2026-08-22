@@ -20,17 +20,17 @@ feature.
 
 Install the SQL plugin to get started.
 
-- [Automatic](#tab-panel-6189)
-- [Manual](#tab-panel-6190)
+- [Automatic](#tab-panel-6219)
+- [Manual](#tab-panel-6220)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6178)
-- [yarn](#tab-panel-6179)
-- [pnpm](#tab-panel-6180)
-- [deno](#tab-panel-6181)
-- [bun](#tab-panel-6182)
-- [cargo](#tab-panel-6183)
+- [npm](#tab-panel-6208)
+- [yarn](#tab-panel-6209)
+- [pnpm](#tab-panel-6210)
+- [deno](#tab-panel-6211)
+- [bun](#tab-panel-6212)
+- [cargo](#tab-panel-6213)
 
 ```
 npm run tauri add sql
@@ -74,11 +74,11 @@ cargo tauri add sql
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6184)
-    - [yarn](#tab-panel-6185)
-    - [pnpm](#tab-panel-6186)
-    - [deno](#tab-panel-6187)
-    - [bun](#tab-panel-6188)
+    - [npm](#tab-panel-6214)
+    - [yarn](#tab-panel-6215)
+    - [pnpm](#tab-panel-6216)
+    - [deno](#tab-panel-6217)
+    - [bun](#tab-panel-6218)
 
     ```
     npm install @tauri-apps/plugin-sql
@@ -105,9 +105,9 @@ engine. The available engines are Sqlite, MySQL and PostgreSQL. Run the
 following command in the `src-tauri` folder to enable your preferred
 engine:
 
-- [SQLite](#tab-panel-6169)
-- [MySQL](#tab-panel-6170)
-- [PostgreSQL](#tab-panel-6171)
+- [SQLite](#tab-panel-6199)
+- [MySQL](#tab-panel-6200)
+- [PostgreSQL](#tab-panel-6201)
 
 ```
 cargo add tauri-plugin-sql --features sqlite
@@ -126,9 +126,9 @@ cargo add tauri-plugin-sql --features postgres
 All the plugin’s APIs are available through the JavaScript guest
 bindings:
 
-- [SQLite](#tab-panel-6172)
-- [MySQL](#tab-panel-6173)
-- [PostgreSQL](#tab-panel-6174)
+- [SQLite](#tab-panel-6202)
+- [MySQL](#tab-panel-6203)
+- [PostgreSQL](#tab-panel-6204)
 
 The path is relative to
 [`tauri::api::path::BaseDirectory::AppConfig`](https://docs.rs/tauri/2.0.0/tauri/path/enum.BaseDirectory.html#variant.AppConfig).
@@ -153,9 +153,9 @@ const db = await Database.load('postgres://user:password@host/test');await db.ex
 We use [sqlx](https://docs.rs/sqlx/latest/sqlx/) as the underlying
 library and adopt their query syntax.
 
-- [SQLite](#tab-panel-6175)
-- [MySQL](#tab-panel-6176)
-- [PostgreSQL](#tab-panel-6177)
+- [SQLite](#tab-panel-6205)
+- [MySQL](#tab-panel-6206)
+- [PostgreSQL](#tab-panel-6207)
 
 Use the “\$#” syntax when substituting query data
 

@@ -17,17 +17,17 @@ Set your Tauri application as the default handler for an URL.
 
 Install the deep-link plugin to get started.
 
-- [Automatic](#tab-panel-5938)
-- [Manual](#tab-panel-5939)
+- [Automatic](#tab-panel-5968)
+- [Manual](#tab-panel-5969)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5927)
-- [yarn](#tab-panel-5928)
-- [pnpm](#tab-panel-5929)
-- [deno](#tab-panel-5930)
-- [bun](#tab-panel-5931)
-- [cargo](#tab-panel-5932)
+- [npm](#tab-panel-5957)
+- [yarn](#tab-panel-5958)
+- [pnpm](#tab-panel-5959)
+- [deno](#tab-panel-5960)
+- [bun](#tab-panel-5961)
+- [cargo](#tab-panel-5962)
 
 ```
 npm run tauri add deep-link
@@ -71,11 +71,11 @@ cargo tauri add deep-link
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5933)
-    - [yarn](#tab-panel-5934)
-    - [pnpm](#tab-panel-5935)
-    - [deno](#tab-panel-5936)
-    - [bun](#tab-panel-5937)
+    - [npm](#tab-panel-5963)
+    - [yarn](#tab-panel-5964)
+    - [pnpm](#tab-panel-5965)
+    - [deno](#tab-panel-5966)
+    - [bun](#tab-panel-5967)
 
     ```
     npm install @tauri-apps/plugin-deep-link
@@ -233,8 +233,8 @@ The deep-link plugin is available in both JavaScript and Rust.
 
 ### Listening to Deep Links
 
-- [JavaScript](#tab-panel-5925)
-- [Rust](#tab-panel-5926)
+- [JavaScript](#tab-panel-5955)
+- [Rust](#tab-panel-5956)
 
 When a deep link triggers your app while it’s running, the `onOpenUrl`
 callback is called. To detect whether your app was opened via a deep

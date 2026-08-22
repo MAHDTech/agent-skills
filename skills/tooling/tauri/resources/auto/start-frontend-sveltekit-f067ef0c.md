@@ -19,10 +19,10 @@ Svelte 5.25.8.
 
 1.  ##### Install `@sveltejs/adapter-static`
 
-    - [npm](#tab-panel-6611)
-    - [yarn](#tab-panel-6612)
-    - [pnpm](#tab-panel-6613)
-    - [deno](#tab-panel-6614)
+    - [npm](#tab-panel-6641)
+    - [yarn](#tab-panel-6642)
+    - [pnpm](#tab-panel-6643)
+    - [deno](#tab-panel-6644)
 
     ```
     npm install --save-dev @sveltejs/adapter-static
@@ -42,10 +42,10 @@ Svelte 5.25.8.
 
 2.  ##### Update Tauri configuration
 
-    - [npm](#tab-panel-6607)
-    - [yarn](#tab-panel-6608)
-    - [pnpm](#tab-panel-6609)
-    - [deno](#tab-panel-6610)
+    - [npm](#tab-panel-6637)
+    - [yarn](#tab-panel-6638)
+    - [pnpm](#tab-panel-6639)
+    - [deno](#tab-panel-6640)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run build",    "devUrl": "http://localhost:5173",    "frontendDist": "../build"  }}

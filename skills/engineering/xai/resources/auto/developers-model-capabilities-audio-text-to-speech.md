@@ -91,11 +91,11 @@ print("Saved \(data.count) bytes to hello.mp3")
 
 The response body contains raw audio bytes. Save directly to a file or pipe to an audio player.
 
-[Try the Playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts)
+[Try the Playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech)
 
 [Live Voice Demos](https://x.ai/api/voice)
 
-[Get API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts)
+[Get API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=api-keys)
 
 ## Request Body
 
@@ -131,11 +131,11 @@ The response body contains raw audio bytes. Save directly to a file or pipe to a
 
 Each voice has a distinct personality. Listen to samples and choose the best fit for your use case (`eve` is the default):
 
-Voice IDs are **case-insensitive** - `eve`, `Eve`, and `EVE` all work. [Preview all voices in the playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts)
+Voice IDs are **case-insensitive** - `eve`, `Eve`, and `EVE` all work. [Preview all voices in the playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech)
 
 ### Custom voices
 
-Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices), or create one for free in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-tts). To find your custom voice ID in the console, click the three-dot menu on the voice card and select **Copy Voice ID**. Then pass it as `voice_id`:
+Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices), or create one for free in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=voice-library). To find your custom voice ID in the console, click the three-dot menu on the voice card and select **Copy Voice ID**. Then pass it as `voice_id`:
 
 ```bash
 # Replace YOUR_VOICE_ID with your custom voice ID from the console
@@ -810,7 +810,7 @@ Tips for getting the highest quality output from the TTS API.
 
 ### Integrating with AI coding assistants
 
-The [Cloud Console playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) includes ready-made **agent instructions** you can copy and paste into tools like Cursor, GitHub Copilot, or Windsurf. The instructions are pre-configured with your current voice and format settings - open the playground, tweak your settings, and copy the prompt to get a tailored integration guide for your coding agent.
+The [Cloud Console playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech) includes ready-made **agent instructions** you can copy and paste into tools like Cursor, GitHub Copilot, or Windsurf. The instructions are pre-configured with your current voice and format settings - open the playground, tweak your settings, and copy the prompt to get a tailored integration guide for your coding agent.
 
 ### Optimizing for production
 
@@ -1445,8 +1445,8 @@ task.cancel(with: .normalClosure, reason: nil)
 
 ## Related
 
-* [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) - Try voices and speech tags in your browser
-* [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts) - Get started with the API
+* [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech) - Try voices and speech tags in your browser
+* [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=api-keys) - Get started with the API
 * [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) - Overview of all xAI voice capabilities
 * [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) - Real-time voice conversations via WebSocket
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) - Full TTS endpoint specification

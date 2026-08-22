@@ -5,6 +5,7 @@
 - **Modalities:** text, image → video
 - **Model name:** `grok-imagine-video-1.5`
 - **Aliases:** `grok-imagine-video-1.5-preview`, `grok-imagine-video-1.5-2026-05-30`
+- **Batch API:** Supported
 
 ## Pricing
 

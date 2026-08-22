@@ -47,9 +47,9 @@ compiles and runs for you locally.
     run the `init` command of your preferred Node.js package manager
     inside the directory:
 
-    - [npm](#tab-panel-5806)
-    - [yarn](#tab-panel-5807)
-    - [pnpm](#tab-panel-5808)
+    - [npm](#tab-panel-5836)
+    - [yarn](#tab-panel-5837)
+    - [pnpm](#tab-panel-5838)
 
     ```
     npm init
@@ -68,9 +68,9 @@ compiles and runs for you locally.
     Let’s install it as a development dependency into the new
     `sidecar-app`:
 
-    - [npm](#tab-panel-5809)
-    - [yarn](#tab-panel-5810)
-    - [pnpm](#tab-panel-5811)
+    - [npm](#tab-panel-5839)
+    - [yarn](#tab-panel-5840)
+    - [pnpm](#tab-panel-5841)
 
     ```
     npm add @yao-pkg/pkg --save-dev
@@ -116,9 +116,9 @@ compiles and runs for you locally.
 
     sidecar-app/package.json
 
-    - [npm](#tab-panel-5812)
-    - [yarn](#tab-panel-5813)
-    - [pnpm](#tab-panel-5814)
+    - [npm](#tab-panel-5842)
+    - [yarn](#tab-panel-5843)
+    - [pnpm](#tab-panel-5844)
 
     ```
     npm run build
@@ -189,8 +189,8 @@ compiles and runs for you locally.
     We can run the sidecar binary either from Rust code or directly from
     JavaScript.
 
-    - [JavaScript](#tab-panel-5795)
-    - [Rust](#tab-panel-5796)
+    - [JavaScript](#tab-panel-5825)
+    - [Rust](#tab-panel-5826)
 
     Let’s execute the `hello` command in the Node.js sidecar directly:
 
@@ -218,12 +218,12 @@ compiles and runs for you locally.
 
     Lets test it
 
-    - [npm](#tab-panel-5815)
-    - [yarn](#tab-panel-5816)
-    - [pnpm](#tab-panel-5817)
-    - [deno](#tab-panel-5818)
-    - [bun](#tab-panel-5819)
-    - [cargo](#tab-panel-5820)
+    - [npm](#tab-panel-5845)
+    - [yarn](#tab-panel-5846)
+    - [pnpm](#tab-panel-5847)
+    - [deno](#tab-panel-5848)
+    - [bun](#tab-panel-5849)
+    - [cargo](#tab-panel-5850)
 
     ```
     npm run tauri dev

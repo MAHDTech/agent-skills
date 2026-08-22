@@ -18,12 +18,12 @@ for the installer.
 To build and bundle your app into a Windows installer you can use the
 Tauri CLI and run the `tauri build` command in a Windows computer:
 
-- [npm](#tab-panel-4621)
-- [yarn](#tab-panel-4622)
-- [pnpm](#tab-panel-4623)
-- [deno](#tab-panel-4624)
-- [bun](#tab-panel-4625)
-- [cargo](#tab-panel-4626)
+- [npm](#tab-panel-4645)
+- [yarn](#tab-panel-4646)
+- [pnpm](#tab-panel-4647)
+- [deno](#tab-panel-4648)
+- [bun](#tab-panel-4649)
+- [cargo](#tab-panel-4650)
 
 ```
 npm run tauri build
@@ -62,8 +62,8 @@ is a bit more involved.
 
 #### Install NSIS
 
-- [Linux](#tab-panel-4617)
-- [macOS](#tab-panel-4618)
+- [Linux](#tab-panel-4641)
+- [macOS](#tab-panel-4642)
 
 Some Linux distributions have NSIS available in their repositories, for
 example on Ubuntu you can install NSIS by running this command:
@@ -100,8 +100,8 @@ need to install a new linker. To compile the Windows Resource file which
 is used for setting the app icon among other things we will also need
 the `llvm-rc` binary which is part of the LLVM project.
 
-- [Linux](#tab-panel-4619)
-- [macOS](#tab-panel-4620)
+- [Linux](#tab-panel-4643)
+- [macOS](#tab-panel-4644)
 
 ```
 sudo apt install lld llvm
@@ -153,12 +153,12 @@ path to the preferred location.
 Now it should be as simple as adding the runner and target to the
 `tauri build` command:
 
-- [npm](#tab-panel-4627)
-- [yarn](#tab-panel-4628)
-- [pnpm](#tab-panel-4629)
-- [deno](#tab-panel-4630)
-- [bun](#tab-panel-4631)
-- [cargo](#tab-panel-4632)
+- [npm](#tab-panel-4651)
+- [yarn](#tab-panel-4652)
+- [pnpm](#tab-panel-4653)
+- [deno](#tab-panel-4654)
+- [bun](#tab-panel-4655)
+- [cargo](#tab-panel-4656)
 
 ```
 npm run tauri build -- --runner cargo-xwin --target x86_64-pc-windows-msvc
@@ -198,12 +198,12 @@ application with a **different** [Rust
 target](https://doc.rust-lang.org/nightly/rustc/platform-support.html)
 using the `--target` flag:
 
-- [npm](#tab-panel-4633)
-- [yarn](#tab-panel-4634)
-- [pnpm](#tab-panel-4635)
-- [deno](#tab-panel-4636)
-- [bun](#tab-panel-4637)
-- [cargo](#tab-panel-4638)
+- [npm](#tab-panel-4657)
+- [yarn](#tab-panel-4658)
+- [pnpm](#tab-panel-4659)
+- [deno](#tab-panel-4660)
+- [bun](#tab-panel-4661)
+- [cargo](#tab-panel-4662)
 
 ```
 npm run tauri build -- --target i686-pc-windows-msvc
@@ -241,12 +241,12 @@ build tools”. At the time of writing, the exact name in VS2022 is
 the rust target with `rustup target add aarch64-pc-windows-msvc` and
 then use the above-mentioned method to compile your app:
 
-- [npm](#tab-panel-4639)
-- [yarn](#tab-panel-4640)
-- [pnpm](#tab-panel-4641)
-- [deno](#tab-panel-4642)
-- [bun](#tab-panel-4643)
-- [cargo](#tab-panel-4644)
+- [npm](#tab-panel-4663)
+- [yarn](#tab-panel-4664)
+- [pnpm](#tab-panel-4665)
+- [deno](#tab-panel-4666)
+- [bun](#tab-panel-4667)
+- [cargo](#tab-panel-4668)
 
 ```
 npm run tauri build -- --target aarch64-pc-windows-msvc

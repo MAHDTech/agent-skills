@@ -8,6 +8,18 @@
 
 This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](https://agentclientprotocol.com/updates).
 
+<Update label="August 20, 2026" tags={["Completed"]}>
+  ## Terminal Authentication RFD moves to Completed
+
+  The Terminal Authentication RFD has been stabilized and is now part of the
+  protocol. Clients can advertise terminal authentication support, run an Agent's
+  configured interactive login flow, and reconnect after it succeeds. The v1 and
+  v2 wire shapes are now included in the stable schemas and SDK types. Please
+  review the [authentication documentation](https://agentclientprotocol.com/protocol/v1/authentication) and the
+  [RFD](https://agentclientprotocol.com/rfds/auth-methods) for the version-specific capability and lifecycle
+  semantics.
+</Update>
+
 <Update label="August 5, 2026" tags={["Draft"]}>
   ## Session Notices RFD moves to Draft stage
 

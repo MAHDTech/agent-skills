@@ -278,23 +278,35 @@ Shipped in 2026
 
 Shipped in 2025
 
+[](https://github.com/zed-industries/zed/pull/61220)
+
+Aagent_ui: Fix inline assistant when reasoning precedes tool use
+
+@aviatesk•\#61220•1d ago•View →
+
+[](https://github.com/zed-industries/zed/pull/61199)
+
+Vagent: OpenCode model updates (+6 Go, +7/-1 Zen, removed Free)
+
+@Vlaaaaaaad•\#61199•2d ago•View →
+
 [](https://github.com/zed-industries/zed/pull/62670)
 
 Agoogle_ai: Add Gemini 3.7 Flash
 
-@ArneshBanerjee•\#62670•2d ago•View →
+@ArneshBanerjee•\#62670•5d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61497)
 
 ERagent: Add ask_user tool using elicitation forms
 
-@e-r-w•\#61497•2d ago•View →
+@e-r-w•\#61497•5d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/51139)
 
 Aedit_prediction: Support self-hosted Sweep Next Edit models
 
-@avoidthekitchen•\#51139•2w ago•View →
+@avoidthekitchen•\#51139•3w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/59806)
 
@@ -306,26 +318,13 @@ Vai: Add Max reasoning effort
 
 JHandle SSE data fields without spaces
 
-@justjavac•\#60575•2w ago•View →
+@justjavac•\#60575•3w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61662)
 
 Magent: Improve error messaging for \`edit_file\` tool
 
 @mfeyg•\#61662•3w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/61621)
-
-Aagent_ui: Fix selection mentions from "Add to Agent Thread" not opening
-files
-
-@amtoaer•\#61621•3w ago•View →
-
-[](https://github.com/zed-industries/zed/pull/60893)
-
-NTTreat blank spawn_agent session IDs as absent
-
-@nevo-ts•\#60893•3w ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)

@@ -17,17 +17,17 @@ Automatically launch your application at system startup.
 
 Install the autostart plugin to get started.
 
-- [Automatic](#tab-panel-5863)
-- [Manual](#tab-panel-5864)
+- [Automatic](#tab-panel-5893)
+- [Manual](#tab-panel-5894)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5852)
-- [yarn](#tab-panel-5853)
-- [pnpm](#tab-panel-5854)
-- [deno](#tab-panel-5855)
-- [bun](#tab-panel-5856)
-- [cargo](#tab-panel-5857)
+- [npm](#tab-panel-5882)
+- [yarn](#tab-panel-5883)
+- [pnpm](#tab-panel-5884)
+- [deno](#tab-panel-5885)
+- [bun](#tab-panel-5886)
+- [cargo](#tab-panel-5887)
 
 ```
 npm run tauri add autostart
@@ -71,11 +71,11 @@ cargo tauri add autostart
 3.  You can install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5858)
-    - [yarn](#tab-panel-5859)
-    - [pnpm](#tab-panel-5860)
-    - [deno](#tab-panel-5861)
-    - [bun](#tab-panel-5862)
+    - [npm](#tab-panel-5888)
+    - [yarn](#tab-panel-5889)
+    - [pnpm](#tab-panel-5890)
+    - [deno](#tab-panel-5891)
+    - [bun](#tab-panel-5892)
 
     ```
     npm install @tauri-apps/plugin-autostart
@@ -101,8 +101,8 @@ cargo tauri add autostart
 
 The autostart plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-5850)
-- [Rust](#tab-panel-5851)
+- [JavaScript](#tab-panel-5880)
+- [Rust](#tab-panel-5881)
 
 ```
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';// when using `"withGlobalTauri": true`, you may use// const { enable, isEnabled, disable } = window.__TAURI__.autostart;

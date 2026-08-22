@@ -6,7 +6,7 @@ Grok 4.6 is SpaceXAI's frontier model built for coding, agentic tasks, and knowl
 
 ## Using the API
 
-If you already have an [API key](https://console.x.ai/team/default/api-keys), set the model name to `grok-4.6`:
+If you already have an [API key](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-grok-4-6\&utm_content=api-keys), set the model name to `grok-4.6`:
 
 ```python customLanguage="pythonXAI"
 import os
@@ -95,7 +95,7 @@ For benchmark results and demos, see the [announcement](https://x.ai/news/grok-4
 
 ## Where it runs
 
-* **xAI API**: get a key from the [console](https://console.x.ai/)
+* **xAI API**: get a key from the [console](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-grok-4-6\&utm_content=console-home)
 * **Grok Build**: the default model of the [coding agent](https://docs.x.ai/build/overview), on the API and CLI
 * **Cursor**: available on all plans
 * **Model gateways**: OpenRouter, Vercel, and Cloudflare

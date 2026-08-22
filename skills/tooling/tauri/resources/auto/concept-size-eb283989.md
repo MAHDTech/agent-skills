@@ -13,8 +13,8 @@ Dependent on whether you use the stable or nightly Rust toolchain the
 options available to you differ a bit. It’s recommended you stick to the
 stable toolchain unless you’re an advanced user.
 
-- [Stable](#tab-panel-4402)
-- [Nightly](#tab-panel-4403)
+- [Stable](#tab-panel-4420)
+- [Nightly](#tab-panel-4421)
 
 ```
 [profile.dev]incremental = true # Compile your binary in smaller steps.

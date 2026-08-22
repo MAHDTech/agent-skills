@@ -6,11 +6,11 @@ throughout the development lifecycle.
 You can add the Tauri CLI to your current project using your package
 manager of choice:
 
-- [npm](#tab-panel-6289)
-- [yarn](#tab-panel-6290)
-- [pnpm](#tab-panel-6291)
-- [deno](#tab-panel-6292)
-- [cargo](#tab-panel-6293)
+- [npm](#tab-panel-6319)
+- [yarn](#tab-panel-6320)
+- [pnpm](#tab-panel-6321)
+- [deno](#tab-panel-6322)
+- [cargo](#tab-panel-6323)
 
 ```
 npm install --save-dev @tauri-apps/cli@latest
@@ -78,12 +78,12 @@ cargo install tauri-cli --version "^2.0.0" --locked
 
 ### `init`
 
-- [npm](#tab-panel-6294)
-- [yarn](#tab-panel-6295)
-- [pnpm](#tab-panel-6296)
-- [deno](#tab-panel-6297)
-- [bun](#tab-panel-6298)
-- [cargo](#tab-panel-6299)
+- [npm](#tab-panel-6324)
+- [yarn](#tab-panel-6325)
+- [pnpm](#tab-panel-6326)
+- [deno](#tab-panel-6327)
+- [bun](#tab-panel-6328)
+- [cargo](#tab-panel-6329)
 
 ```
 npm run tauri init
@@ -117,12 +117,12 @@ Options:      --ci          Skip prompting for values [env: CI=true]  -v, --verb
 
 ### `dev`
 
-- [npm](#tab-panel-6300)
-- [yarn](#tab-panel-6301)
-- [pnpm](#tab-panel-6302)
-- [deno](#tab-panel-6303)
-- [bun](#tab-panel-6304)
-- [cargo](#tab-panel-6305)
+- [npm](#tab-panel-6330)
+- [yarn](#tab-panel-6331)
+- [pnpm](#tab-panel-6332)
+- [deno](#tab-panel-6333)
+- [bun](#tab-panel-6334)
+- [cargo](#tab-panel-6335)
 
 ```
 npm run tauri dev
@@ -174,12 +174,12 @@ Options:  -r, --runner <RUNNER>          Binary to use to run the application
 
 ### `build`
 
-- [npm](#tab-panel-6306)
-- [yarn](#tab-panel-6307)
-- [pnpm](#tab-panel-6308)
-- [deno](#tab-panel-6309)
-- [bun](#tab-panel-6310)
-- [cargo](#tab-panel-6311)
+- [npm](#tab-panel-6336)
+- [yarn](#tab-panel-6337)
+- [pnpm](#tab-panel-6338)
+- [deno](#tab-panel-6339)
+- [bun](#tab-panel-6340)
+- [cargo](#tab-panel-6341)
 
 ```
 npm run tauri build
@@ -236,12 +236,12 @@ Options:  -r, --runner <RUNNER>          Binary to use to build the application,
 
 ### `bundle`
 
-- [npm](#tab-panel-6312)
-- [yarn](#tab-panel-6313)
-- [pnpm](#tab-panel-6314)
-- [deno](#tab-panel-6315)
-- [bun](#tab-panel-6316)
-- [cargo](#tab-panel-6317)
+- [npm](#tab-panel-6342)
+- [yarn](#tab-panel-6343)
+- [pnpm](#tab-panel-6344)
+- [deno](#tab-panel-6345)
+- [bun](#tab-panel-6346)
+- [cargo](#tab-panel-6347)
 
 ```
 npm run tauri bundle
@@ -294,12 +294,12 @@ Options:  -d, --debug          Builds with the debug flag
 
 ### `android`
 
-- [npm](#tab-panel-6318)
-- [yarn](#tab-panel-6319)
-- [pnpm](#tab-panel-6320)
-- [deno](#tab-panel-6321)
-- [bun](#tab-panel-6322)
-- [cargo](#tab-panel-6323)
+- [npm](#tab-panel-6348)
+- [yarn](#tab-panel-6349)
+- [pnpm](#tab-panel-6350)
+- [deno](#tab-panel-6351)
+- [bun](#tab-panel-6352)
+- [cargo](#tab-panel-6353)
 
 ```
 npm run tauri android
@@ -334,12 +334,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `android init`
 
-- [npm](#tab-panel-6324)
-- [yarn](#tab-panel-6325)
-- [pnpm](#tab-panel-6326)
-- [deno](#tab-panel-6327)
-- [bun](#tab-panel-6328)
-- [cargo](#tab-panel-6329)
+- [npm](#tab-panel-6354)
+- [yarn](#tab-panel-6355)
+- [pnpm](#tab-panel-6356)
+- [deno](#tab-panel-6357)
+- [bun](#tab-panel-6358)
+- [cargo](#tab-panel-6359)
 
 ```
 npm run tauri android init
@@ -381,12 +381,12 @@ Options:      --ci          Skip prompting for values
 
 #### `android dev`
 
-- [npm](#tab-panel-6330)
-- [yarn](#tab-panel-6331)
-- [pnpm](#tab-panel-6332)
-- [deno](#tab-panel-6333)
-- [bun](#tab-panel-6334)
-- [cargo](#tab-panel-6335)
+- [npm](#tab-panel-6360)
+- [yarn](#tab-panel-6361)
+- [pnpm](#tab-panel-6362)
+- [deno](#tab-panel-6363)
+- [bun](#tab-panel-6364)
+- [cargo](#tab-panel-6365)
 
 ```
 npm run tauri android dev
@@ -447,12 +447,12 @@ Options:  -f, --features [<FEATURES>...]          List of cargo features to acti
 
 #### `android build`
 
-- [npm](#tab-panel-6336)
-- [yarn](#tab-panel-6337)
-- [pnpm](#tab-panel-6338)
-- [deno](#tab-panel-6339)
-- [bun](#tab-panel-6340)
-- [cargo](#tab-panel-6341)
+- [npm](#tab-panel-6366)
+- [yarn](#tab-panel-6367)
+- [pnpm](#tab-panel-6368)
+- [deno](#tab-panel-6369)
+- [bun](#tab-panel-6370)
+- [cargo](#tab-panel-6371)
 
 ```
 npm run tauri android build
@@ -504,12 +504,12 @@ Options:  -d, --debug          Builds with the debug flag
 
 #### `android run`
 
-- [npm](#tab-panel-6342)
-- [yarn](#tab-panel-6343)
-- [pnpm](#tab-panel-6344)
-- [deno](#tab-panel-6345)
-- [bun](#tab-panel-6346)
-- [cargo](#tab-panel-6347)
+- [npm](#tab-panel-6372)
+- [yarn](#tab-panel-6373)
+- [pnpm](#tab-panel-6374)
+- [deno](#tab-panel-6375)
+- [bun](#tab-panel-6376)
+- [cargo](#tab-panel-6377)
 
 ```
 npm run tauri android run
@@ -559,12 +559,12 @@ Options:  -r, --release          Run the app in release mode
 
 *All iOS commands are only available on macOS hosts.*
 
-- [npm](#tab-panel-6348)
-- [yarn](#tab-panel-6349)
-- [pnpm](#tab-panel-6350)
-- [deno](#tab-panel-6351)
-- [bun](#tab-panel-6352)
-- [cargo](#tab-panel-6353)
+- [npm](#tab-panel-6378)
+- [yarn](#tab-panel-6379)
+- [pnpm](#tab-panel-6380)
+- [deno](#tab-panel-6381)
+- [bun](#tab-panel-6382)
+- [cargo](#tab-panel-6383)
 
 ```
 npm run tauri ios
@@ -601,12 +601,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 *All iOS commands are only available on macOS hosts.*
 
-- [npm](#tab-panel-6354)
-- [yarn](#tab-panel-6355)
-- [pnpm](#tab-panel-6356)
-- [deno](#tab-panel-6357)
-- [bun](#tab-panel-6358)
-- [cargo](#tab-panel-6359)
+- [npm](#tab-panel-6384)
+- [yarn](#tab-panel-6385)
+- [pnpm](#tab-panel-6386)
+- [deno](#tab-panel-6387)
+- [bun](#tab-panel-6388)
+- [cargo](#tab-panel-6389)
 
 ```
 npm run tauri ios init
@@ -651,12 +651,12 @@ Options:      --ci          Skip prompting for values
 
 *All iOS commands are only available on macOS hosts.*
 
-- [npm](#tab-panel-6360)
-- [yarn](#tab-panel-6361)
-- [pnpm](#tab-panel-6362)
-- [deno](#tab-panel-6363)
-- [bun](#tab-panel-6364)
-- [cargo](#tab-panel-6365)
+- [npm](#tab-panel-6390)
+- [yarn](#tab-panel-6391)
+- [pnpm](#tab-panel-6392)
+- [deno](#tab-panel-6393)
+- [bun](#tab-panel-6394)
+- [cargo](#tab-panel-6395)
 
 ```
 npm run tauri ios dev
@@ -719,12 +719,12 @@ Options:  -f, --features [<FEATURES>...]          List of cargo features to acti
 
 *All iOS commands are only available on macOS hosts.*
 
-- [npm](#tab-panel-6366)
-- [yarn](#tab-panel-6367)
-- [pnpm](#tab-panel-6368)
-- [deno](#tab-panel-6369)
-- [bun](#tab-panel-6370)
-- [cargo](#tab-panel-6371)
+- [npm](#tab-panel-6396)
+- [yarn](#tab-panel-6397)
+- [pnpm](#tab-panel-6398)
+- [deno](#tab-panel-6399)
+- [bun](#tab-panel-6400)
+- [cargo](#tab-panel-6401)
 
 ```
 npm run tauri ios build
@@ -779,12 +779,12 @@ Options:  -d, --debug          Builds with the debug flag
 
 *All iOS commands are only available on macOS hosts.*
 
-- [npm](#tab-panel-6372)
-- [yarn](#tab-panel-6373)
-- [pnpm](#tab-panel-6374)
-- [deno](#tab-panel-6375)
-- [bun](#tab-panel-6376)
-- [cargo](#tab-panel-6377)
+- [npm](#tab-panel-6402)
+- [yarn](#tab-panel-6403)
+- [pnpm](#tab-panel-6404)
+- [deno](#tab-panel-6405)
+- [bun](#tab-panel-6406)
+- [cargo](#tab-panel-6407)
 
 ```
 npm run tauri ios run
@@ -832,12 +832,12 @@ Options:  -r, --release          Run the app in release mode
 
 ### `migrate`
 
-- [npm](#tab-panel-6378)
-- [yarn](#tab-panel-6379)
-- [pnpm](#tab-panel-6380)
-- [deno](#tab-panel-6381)
-- [bun](#tab-panel-6382)
-- [cargo](#tab-panel-6383)
+- [npm](#tab-panel-6408)
+- [yarn](#tab-panel-6409)
+- [pnpm](#tab-panel-6410)
+- [deno](#tab-panel-6411)
+- [bun](#tab-panel-6412)
+- [cargo](#tab-panel-6413)
 
 ```
 npm run tauri migrate
@@ -871,12 +871,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 ### `info`
 
-- [npm](#tab-panel-6384)
-- [yarn](#tab-panel-6385)
-- [pnpm](#tab-panel-6386)
-- [deno](#tab-panel-6387)
-- [bun](#tab-panel-6388)
-- [cargo](#tab-panel-6389)
+- [npm](#tab-panel-6414)
+- [yarn](#tab-panel-6415)
+- [pnpm](#tab-panel-6416)
+- [deno](#tab-panel-6417)
+- [bun](#tab-panel-6418)
+- [cargo](#tab-panel-6419)
 
 ```
 npm run tauri info
@@ -910,12 +910,12 @@ Options:      --interactive  Interactive mode to apply automatic fixes  -v, --ve
 
 ### `add`
 
-- [npm](#tab-panel-6390)
-- [yarn](#tab-panel-6391)
-- [pnpm](#tab-panel-6392)
-- [deno](#tab-panel-6393)
-- [bun](#tab-panel-6394)
-- [cargo](#tab-panel-6395)
+- [npm](#tab-panel-6420)
+- [yarn](#tab-panel-6421)
+- [pnpm](#tab-panel-6422)
+- [deno](#tab-panel-6423)
+- [bun](#tab-panel-6424)
+- [cargo](#tab-panel-6425)
 
 ```
 npm run tauri add
@@ -950,12 +950,12 @@ Options:  -t, --tag <TAG>        Git tag to use  -v, --verbose...       Enables 
 
 ### `remove`
 
-- [npm](#tab-panel-6396)
-- [yarn](#tab-panel-6397)
-- [pnpm](#tab-panel-6398)
-- [deno](#tab-panel-6399)
-- [bun](#tab-panel-6400)
-- [cargo](#tab-panel-6401)
+- [npm](#tab-panel-6426)
+- [yarn](#tab-panel-6427)
+- [pnpm](#tab-panel-6428)
+- [deno](#tab-panel-6429)
+- [bun](#tab-panel-6430)
+- [cargo](#tab-panel-6431)
 
 ```
 npm run tauri remove
@@ -990,12 +990,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 ### `plugin`
 
-- [npm](#tab-panel-6402)
-- [yarn](#tab-panel-6403)
-- [pnpm](#tab-panel-6404)
-- [deno](#tab-panel-6405)
-- [bun](#tab-panel-6406)
-- [cargo](#tab-panel-6407)
+- [npm](#tab-panel-6432)
+- [yarn](#tab-panel-6433)
+- [pnpm](#tab-panel-6434)
+- [deno](#tab-panel-6435)
+- [bun](#tab-panel-6436)
+- [cargo](#tab-panel-6437)
 
 ```
 npm run tauri plugin
@@ -1030,12 +1030,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `plugin new`
 
-- [npm](#tab-panel-6408)
-- [yarn](#tab-panel-6409)
-- [pnpm](#tab-panel-6410)
-- [deno](#tab-panel-6411)
-- [bun](#tab-panel-6412)
-- [cargo](#tab-panel-6413)
+- [npm](#tab-panel-6438)
+- [yarn](#tab-panel-6439)
+- [pnpm](#tab-panel-6440)
+- [deno](#tab-panel-6441)
+- [bun](#tab-panel-6442)
+- [cargo](#tab-panel-6443)
 
 ```
 npm run tauri plugin new
@@ -1084,12 +1084,12 @@ Options:      --no-api          Initializes a Tauri plugin without the TypeScrip
 
 #### `plugin init`
 
-- [npm](#tab-panel-6414)
-- [yarn](#tab-panel-6415)
-- [pnpm](#tab-panel-6416)
-- [deno](#tab-panel-6417)
-- [bun](#tab-panel-6418)
-- [cargo](#tab-panel-6419)
+- [npm](#tab-panel-6444)
+- [yarn](#tab-panel-6445)
+- [pnpm](#tab-panel-6446)
+- [deno](#tab-panel-6447)
+- [bun](#tab-panel-6448)
+- [cargo](#tab-panel-6449)
 
 ```
 npm run tauri plugin init
@@ -1139,12 +1139,12 @@ Options:      --no-api          Initializes a Tauri plugin without the TypeScrip
 
 #### `plugin android`
 
-- [npm](#tab-panel-6420)
-- [yarn](#tab-panel-6421)
-- [pnpm](#tab-panel-6422)
-- [deno](#tab-panel-6423)
-- [bun](#tab-panel-6424)
-- [cargo](#tab-panel-6425)
+- [npm](#tab-panel-6450)
+- [yarn](#tab-panel-6451)
+- [pnpm](#tab-panel-6452)
+- [deno](#tab-panel-6453)
+- [bun](#tab-panel-6454)
+- [cargo](#tab-panel-6455)
 
 ```
 npm run tauri plugin android
@@ -1179,12 +1179,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 ##### `plugin android init`
 
-- [npm](#tab-panel-6426)
-- [yarn](#tab-panel-6427)
-- [pnpm](#tab-panel-6428)
-- [deno](#tab-panel-6429)
-- [bun](#tab-panel-6430)
-- [cargo](#tab-panel-6431)
+- [npm](#tab-panel-6456)
+- [yarn](#tab-panel-6457)
+- [pnpm](#tab-panel-6458)
+- [deno](#tab-panel-6459)
+- [bun](#tab-panel-6460)
+- [cargo](#tab-panel-6461)
 
 ```
 npm run tauri plugin android init
@@ -1219,12 +1219,12 @@ Options:  -o, --out-dir <OUT_DIR>  The output directory [default: /opt/build/rep
 
 #### `plugin ios`
 
-- [npm](#tab-panel-6432)
-- [yarn](#tab-panel-6433)
-- [pnpm](#tab-panel-6434)
-- [deno](#tab-panel-6435)
-- [bun](#tab-panel-6436)
-- [cargo](#tab-panel-6437)
+- [npm](#tab-panel-6462)
+- [yarn](#tab-panel-6463)
+- [pnpm](#tab-panel-6464)
+- [deno](#tab-panel-6465)
+- [bun](#tab-panel-6466)
+- [cargo](#tab-panel-6467)
 
 ```
 npm run tauri plugin ios
@@ -1259,12 +1259,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 ##### `plugin ios init`
 
-- [npm](#tab-panel-6438)
-- [yarn](#tab-panel-6439)
-- [pnpm](#tab-panel-6440)
-- [deno](#tab-panel-6441)
-- [bun](#tab-panel-6442)
-- [cargo](#tab-panel-6443)
+- [npm](#tab-panel-6468)
+- [yarn](#tab-panel-6469)
+- [pnpm](#tab-panel-6470)
+- [deno](#tab-panel-6471)
+- [bun](#tab-panel-6472)
+- [cargo](#tab-panel-6473)
 
 ```
 npm run tauri plugin ios init
@@ -1306,12 +1306,12 @@ Options:  -o, --out-dir <OUT_DIR>          The output directory
 
 ### `icon`
 
-- [npm](#tab-panel-6444)
-- [yarn](#tab-panel-6445)
-- [pnpm](#tab-panel-6446)
-- [deno](#tab-panel-6447)
-- [bun](#tab-panel-6448)
-- [cargo](#tab-panel-6449)
+- [npm](#tab-panel-6474)
+- [yarn](#tab-panel-6475)
+- [pnpm](#tab-panel-6476)
+- [deno](#tab-panel-6477)
+- [bun](#tab-panel-6478)
+- [cargo](#tab-panel-6479)
 
 ```
 npm run tauri icon
@@ -1357,12 +1357,12 @@ Options:  -o, --output <OUTPUT>          Output directory. Default: 'icons' dire
 
 ### `signer`
 
-- [npm](#tab-panel-6450)
-- [yarn](#tab-panel-6451)
-- [pnpm](#tab-panel-6452)
-- [deno](#tab-panel-6453)
-- [bun](#tab-panel-6454)
-- [cargo](#tab-panel-6455)
+- [npm](#tab-panel-6480)
+- [yarn](#tab-panel-6481)
+- [pnpm](#tab-panel-6482)
+- [deno](#tab-panel-6483)
+- [bun](#tab-panel-6484)
+- [cargo](#tab-panel-6485)
 
 ```
 npm run tauri signer
@@ -1397,12 +1397,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `signer sign`
 
-- [npm](#tab-panel-6456)
-- [yarn](#tab-panel-6457)
-- [pnpm](#tab-panel-6458)
-- [deno](#tab-panel-6459)
-- [bun](#tab-panel-6460)
-- [cargo](#tab-panel-6461)
+- [npm](#tab-panel-6486)
+- [yarn](#tab-panel-6487)
+- [pnpm](#tab-panel-6488)
+- [deno](#tab-panel-6489)
+- [bun](#tab-panel-6490)
+- [cargo](#tab-panel-6491)
 
 ```
 npm run tauri signer sign
@@ -1437,12 +1437,12 @@ Options:  -k, --private-key <PRIVATE_KEY>          Load the private key from a s
 
 #### `signer generate`
 
-- [npm](#tab-panel-6462)
-- [yarn](#tab-panel-6463)
-- [pnpm](#tab-panel-6464)
-- [deno](#tab-panel-6465)
-- [bun](#tab-panel-6466)
-- [cargo](#tab-panel-6467)
+- [npm](#tab-panel-6492)
+- [yarn](#tab-panel-6493)
+- [pnpm](#tab-panel-6494)
+- [deno](#tab-panel-6495)
+- [bun](#tab-panel-6496)
+- [cargo](#tab-panel-6497)
 
 ```
 npm run tauri signer generate
@@ -1476,12 +1476,12 @@ Options:  -p, --password <PASSWORD>      Set private key password when signing  
 
 ### `completions`
 
-- [npm](#tab-panel-6468)
-- [yarn](#tab-panel-6469)
-- [pnpm](#tab-panel-6470)
-- [deno](#tab-panel-6471)
-- [bun](#tab-panel-6472)
-- [cargo](#tab-panel-6473)
+- [npm](#tab-panel-6498)
+- [yarn](#tab-panel-6499)
+- [pnpm](#tab-panel-6500)
+- [deno](#tab-panel-6501)
+- [bun](#tab-panel-6502)
+- [cargo](#tab-panel-6503)
 
 ```
 npm run tauri completions
@@ -1515,12 +1515,12 @@ Options:  -s, --shell <SHELL>    Shell to generate a completion script for. [pos
 
 ### `permission`
 
-- [npm](#tab-panel-6474)
-- [yarn](#tab-panel-6475)
-- [pnpm](#tab-panel-6476)
-- [deno](#tab-panel-6477)
-- [bun](#tab-panel-6478)
-- [cargo](#tab-panel-6479)
+- [npm](#tab-panel-6504)
+- [yarn](#tab-panel-6505)
+- [pnpm](#tab-panel-6506)
+- [deno](#tab-panel-6507)
+- [bun](#tab-panel-6508)
+- [cargo](#tab-panel-6509)
 
 ```
 npm run tauri permission
@@ -1555,12 +1555,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `permission new`
 
-- [npm](#tab-panel-6480)
-- [yarn](#tab-panel-6481)
-- [pnpm](#tab-panel-6482)
-- [deno](#tab-panel-6483)
-- [bun](#tab-panel-6484)
-- [cargo](#tab-panel-6485)
+- [npm](#tab-panel-6510)
+- [yarn](#tab-panel-6511)
+- [pnpm](#tab-panel-6512)
+- [deno](#tab-panel-6513)
+- [bun](#tab-panel-6514)
+- [cargo](#tab-panel-6515)
 
 ```
 npm run tauri permission new
@@ -1595,12 +1595,12 @@ Options:      --description <DESCRIPTION>  Permission description  -v, --verbose
 
 #### `permission add`
 
-- [npm](#tab-panel-6486)
-- [yarn](#tab-panel-6487)
-- [pnpm](#tab-panel-6488)
-- [deno](#tab-panel-6489)
-- [bun](#tab-panel-6490)
-- [cargo](#tab-panel-6491)
+- [npm](#tab-panel-6516)
+- [yarn](#tab-panel-6517)
+- [pnpm](#tab-panel-6518)
+- [deno](#tab-panel-6519)
+- [bun](#tab-panel-6520)
+- [cargo](#tab-panel-6521)
 
 ```
 npm run tauri permission add
@@ -1635,12 +1635,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `permission rm`
 
-- [npm](#tab-panel-6492)
-- [yarn](#tab-panel-6493)
-- [pnpm](#tab-panel-6494)
-- [deno](#tab-panel-6495)
-- [bun](#tab-panel-6496)
-- [cargo](#tab-panel-6497)
+- [npm](#tab-panel-6522)
+- [yarn](#tab-panel-6523)
+- [pnpm](#tab-panel-6524)
+- [deno](#tab-panel-6525)
+- [bun](#tab-panel-6526)
+- [cargo](#tab-panel-6527)
 
 ```
 npm run tauri permission rm
@@ -1678,12 +1678,12 @@ Options:  -v, --verbose...          Enables verbose logging
 
 #### `permission ls`
 
-- [npm](#tab-panel-6498)
-- [yarn](#tab-panel-6499)
-- [pnpm](#tab-panel-6500)
-- [deno](#tab-panel-6501)
-- [bun](#tab-panel-6502)
-- [cargo](#tab-panel-6503)
+- [npm](#tab-panel-6528)
+- [yarn](#tab-panel-6529)
+- [pnpm](#tab-panel-6530)
+- [deno](#tab-panel-6531)
+- [bun](#tab-panel-6532)
+- [cargo](#tab-panel-6533)
 
 ```
 npm run tauri permission ls
@@ -1718,12 +1718,12 @@ Options:  -f, --filter <FILTER>  Permission identifier filter  -v, --verbose... 
 
 ### `capability`
 
-- [npm](#tab-panel-6504)
-- [yarn](#tab-panel-6505)
-- [pnpm](#tab-panel-6506)
-- [deno](#tab-panel-6507)
-- [bun](#tab-panel-6508)
-- [cargo](#tab-panel-6509)
+- [npm](#tab-panel-6534)
+- [yarn](#tab-panel-6535)
+- [pnpm](#tab-panel-6536)
+- [deno](#tab-panel-6537)
+- [bun](#tab-panel-6538)
+- [cargo](#tab-panel-6539)
 
 ```
 npm run tauri capability
@@ -1758,12 +1758,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `capability new`
 
-- [npm](#tab-panel-6510)
-- [yarn](#tab-panel-6511)
-- [pnpm](#tab-panel-6512)
-- [deno](#tab-panel-6513)
-- [bun](#tab-panel-6514)
-- [cargo](#tab-panel-6515)
+- [npm](#tab-panel-6540)
+- [yarn](#tab-panel-6541)
+- [pnpm](#tab-panel-6542)
+- [deno](#tab-panel-6543)
+- [bun](#tab-panel-6544)
+- [cargo](#tab-panel-6545)
 
 ```
 npm run tauri capability new
@@ -1798,12 +1798,12 @@ Options:      --description <DESCRIPTION>  Capability description  -v, --verbose
 
 ### `inspect`
 
-- [npm](#tab-panel-6516)
-- [yarn](#tab-panel-6517)
-- [pnpm](#tab-panel-6518)
-- [deno](#tab-panel-6519)
-- [bun](#tab-panel-6520)
-- [cargo](#tab-panel-6521)
+- [npm](#tab-panel-6546)
+- [yarn](#tab-panel-6547)
+- [pnpm](#tab-panel-6548)
+- [deno](#tab-panel-6549)
+- [bun](#tab-panel-6550)
+- [cargo](#tab-panel-6551)
 
 ```
 npm run tauri inspect
@@ -1838,12 +1838,12 @@ Options:  -v, --verbose...  Enables verbose logging  -h, --help        Print hel
 
 #### `inspect wix-upgrade-code`
 
-- [npm](#tab-panel-6522)
-- [yarn](#tab-panel-6523)
-- [pnpm](#tab-panel-6524)
-- [deno](#tab-panel-6525)
-- [bun](#tab-panel-6526)
-- [cargo](#tab-panel-6527)
+- [npm](#tab-panel-6552)
+- [yarn](#tab-panel-6553)
+- [pnpm](#tab-panel-6554)
+- [deno](#tab-panel-6555)
+- [bun](#tab-panel-6556)
+- [cargo](#tab-panel-6557)
 
 ```
 npm run tauri inspect wix-upgrade-code

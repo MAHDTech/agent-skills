@@ -16,7 +16,7 @@ Default: 3;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L293>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L294>
 
 ##### High
 
@@ -25,7 +25,7 @@ High: 4;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L294>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L295>
 
 ##### Low
 
@@ -34,7 +34,7 @@ Low: 2;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L292>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L293>
 
 ##### Min
 
@@ -43,7 +43,7 @@ Min: 1;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L291>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L292>
 
 ##### None
 
@@ -52,7 +52,7 @@ None: 0;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L290>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L291>
 
 ------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ Day: "day";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L165>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L166>
 
 ##### Hour
 
@@ -76,7 +76,7 @@ Hour: "hour";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L166>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L167>
 
 ##### Minute
 
@@ -85,7 +85,7 @@ Minute: "minute";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L167>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L168>
 
 ##### Month
 
@@ -94,7 +94,7 @@ Month: "month";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L162>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L163>
 
 ##### Second
 
@@ -105,7 +105,7 @@ Second: "second";
 Not supported on iOS.
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L171>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L172>
 
 ##### TwoWeeks
 
@@ -114,7 +114,7 @@ TwoWeeks: "twoWeeks";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L163>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L164>
 
 ##### Week
 
@@ -123,7 +123,7 @@ Week: "week";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L164>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L165>
 
 ##### Year
 
@@ -132,7 +132,7 @@ Year: "year";
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L161>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L162>
 
 ------------------------------------------------------------------------
 
@@ -147,7 +147,7 @@ Private: 0;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L299>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L300>
 
 ##### Public
 
@@ -156,7 +156,7 @@ Public: 1;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L300>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L301>
 
 ##### Secret
 
@@ -165,7 +165,7 @@ Secret: -1;
 ```
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L298>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L299>
 
 ## Classes
 
@@ -187,9 +187,9 @@ new Schedule(): Schedule
 
 | Property | Type | Defined in |
 |----|----|----|
-|  `at` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L175> |
-|  `every` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L190> |
-|  `interval` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L183> |
+|  `at` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L176> |
+|  `every` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L191> |
+|  `interval` | `undefined` \| `object` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L184> |
 
 #### Methods
 
@@ -212,7 +212,7 @@ static at(   date,   repeating,   allowWhileIdle): Schedule
 [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule)
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L198>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L199>
 
 ##### every()
 
@@ -233,7 +233,7 @@ static every(   kind,   count,   allowWhileIdle): Schedule
 [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule)
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L217>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L218>
 
 ##### interval()
 
@@ -253,7 +253,7 @@ static interval(interval, allowWhileIdle): Schedule
 [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule)
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L206>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L207>
 
 ## Interfaces
 
@@ -263,14 +263,14 @@ static interval(interval, allowWhileIdle): Schedule
 
 | Property | Type | Defined in |
 |----|----|----|
-|  `destructive?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L245> |
-|  `foreground?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L244> |
-|  `id` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L241> |
-|  `input?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L246> |
-|  `inputButtonTitle?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L247> |
-|  `inputPlaceholder?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L248> |
-|  `requiresAuthentication?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L243> |
-|  `title` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L242> |
+|  `destructive?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L246> |
+|  `foreground?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L245> |
+|  `id` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L242> |
+|  `input?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L247> |
+|  `inputButtonTitle?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L248> |
+|  `inputPlaceholder?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L249> |
+|  `requiresAuthentication?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L244> |
+|  `title` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L243> |
 
 ------------------------------------------------------------------------
 
@@ -280,13 +280,13 @@ static interval(interval, allowWhileIdle): Schedule
 
 | Property | Type | Description | Defined in |
 |----|----|----|----|
-|  `actions` | [`Action`](https://v2.tauri.app/reference/javascript/notification/#action)\[\] | The list of associated actions | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L259> |
-|  `allowInCarPlay?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L262> |
-|  `customDismissAction?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L261> |
-|  `hiddenPreviewsBodyPlaceholder?` | `string` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L260> |
-|  `hiddenPreviewsShowSubtitle?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L264> |
-|  `hiddenPreviewsShowTitle?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L263> |
-|  `id` | `string` | The identifier of this action type | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L255> |
+|  `actions` | [`Action`](https://v2.tauri.app/reference/javascript/notification/#action)\[\] | The list of associated actions | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L260> |
+|  `allowInCarPlay?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L263> |
+|  `customDismissAction?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L262> |
+|  `hiddenPreviewsBodyPlaceholder?` | `string` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L261> |
+|  `hiddenPreviewsShowSubtitle?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L265> |
+|  `hiddenPreviewsShowTitle?` | `boolean` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L264> |
+|  `id` | `string` | The identifier of this action type | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L256> |
 
 ------------------------------------------------------------------------
 
@@ -296,18 +296,18 @@ static interval(interval, allowWhileIdle): Schedule
 
 | Property | Type | Defined in |
 |----|----|----|
-|  `actionTypeId?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L284> |
-|  `attachments` | [`Attachment`](https://v2.tauri.app/reference/javascript/notification/#attachment)\[\] | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L283> |
-|  `body?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L278> |
-|  `data` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L281> |
-|  `extra` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\> | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L282> |
-|  `group?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L279> |
-|  `groupSummary` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L280> |
-|  `id` | `number` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L275> |
-|  `schedule?` | [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L285> |
-|  `sound?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L286> |
-|  `tag?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L276> |
-|  `title?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L277> |
+|  `actionTypeId?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L285> |
+|  `attachments` | [`Attachment`](https://v2.tauri.app/reference/javascript/notification/#attachment)\[\] | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L284> |
+|  `body?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L279> |
+|  `data` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L282> |
+|  `extra` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\> | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L283> |
+|  `group?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L280> |
+|  `groupSummary` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L281> |
+|  `id` | `number` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L276> |
+|  `schedule?` | [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L286> |
+|  `sound?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L287> |
+|  `tag?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L277> |
+|  `title?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L278> |
 
 ------------------------------------------------------------------------
 
@@ -319,8 +319,8 @@ Attachment of a notification.
 
 | Property | Type | Description | Defined in |
 |----|----|----|----|
-|  `id` | `string` | Attachment identifier. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L235> |
-|  `url` | `string` | Attachment URL. Accepts the `asset` and `file` protocols. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L237> |
+|  `id` | `string` | Attachment identifier. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L236> |
+|  `url` | `string` | Attachment URL. Accepts the `asset` and `file` protocols. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L238> |
 
 ------------------------------------------------------------------------
 
@@ -330,15 +330,15 @@ Attachment of a notification.
 
 | Property | Type | Defined in |
 |----|----|----|
-|  `description?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L306> |
-|  `id` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L304> |
-|  `importance?` | [`Importance`](https://v2.tauri.app/reference/javascript/notification/#importance) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L311> |
-|  `lightColor?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L309> |
-|  `lights?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L308> |
-|  `name` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L305> |
-|  `sound?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L307> |
-|  `vibration?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L310> |
-|  `visibility?` | [`Visibility`](https://v2.tauri.app/reference/javascript/notification/#visibility) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L312> |
+|  `description?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L307> |
+|  `id` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L305> |
+|  `importance?` | [`Importance`](https://v2.tauri.app/reference/javascript/notification/#importance) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L312> |
+|  `lightColor?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L310> |
+|  `lights?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L309> |
+|  `name` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L306> |
+|  `sound?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L308> |
+|  `vibration?` | `boolean` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L311> |
+|  `visibility?` | [`Visibility`](https://v2.tauri.app/reference/javascript/notification/#visibility) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L313> |
 
 ------------------------------------------------------------------------
 
@@ -355,27 +355,27 @@ Options to send a notification.
 | Property | Type | Description | Defined in |
 |----|----|----|----|
 |  `actionTypeId?` | `string` | Defines an action type for this notification. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L62> |
-|  `attachments?` | [`Attachment`](https://v2.tauri.app/reference/javascript/notification/#attachment)\[\] | Notification attachments. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L110> |
-|  `autoCancel?` | `boolean` | Automatically cancel the notification when the user clicks on it. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L126> |
+|  `attachments?` | [`Attachment`](https://v2.tauri.app/reference/javascript/notification/#attachment)\[\] | Notification attachments. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L111> |
+|  `autoCancel?` | `boolean` | Automatically cancel the notification when the user clicks on it. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L127> |
 |  `body?` | `string` | Optional notification body. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L44> |
 |  `channelId?` | `string` | Identifier of the [Channel](https://v2.tauri.app/reference/javascript/notification/#channel) that deliveres this notification. If the channel does not exist, the notification won’t fire. Make sure the channel exists with listChannels and [createChannel](https://v2.tauri.app/reference/javascript/notification/#createchannel). | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L36> |
-|  `extra?` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\> | Extra payload to store in the notification. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L114> |
+|  `extra?` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `unknown`\> | Extra payload to store in the notification. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L115> |
 |  `group?` | `string` | Identifier used to group multiple notifications. <https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649872-threadidentifier> | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L68> |
 |  `groupSummary?` | `boolean` | Instructs the system that this notification is the summary of a group on Android. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L72> |
-|  `icon?` | `string` | Notification icon. On Android the icon must be placed in the app’s `res/drawable` folder. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L96> |
-|  `iconColor?` | `string` | Icon color on Android. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L106> |
+|  `icon?` | `string` | Notification icon. On Android the icon must be placed in the app’s `res/drawable` folder. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L97> |
+|  `iconColor?` | `string` | Icon color on Android. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L107> |
 |  `id?` | `number` | The notification identifier to reference this object later. Must be a 32-bit integer. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L29> |
-|  `inboxLines?` | `string`\[\] | List of lines to add to the notification. Changes the notification style to inbox. Cannot be used with `largeBody`. Only supports up to 5 lines. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L90> |
+|  `inboxLines?` | `string`\[\] | List of lines to add to the notification. Changes the notification style to inbox. Cannot be used with `largeBody`. Only supports up to 5 lines. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L91> |
 |  `largeBody?` | `string` | Multiline text. Changes the notification style to big text. Cannot be used with `inboxLines`. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L54> |
-|  `largeIcon?` | `string` | Notification large icon (Android). The icon must be placed in the app’s `res/drawable` folder. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L102> |
-|  `number?` | `number` | Sets the number of items this notification represents on Android. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L138> |
-|  `ongoing?` | `boolean` | If true, the notification cannot be dismissed by the user on Android. An application service must manage the dismissal of the notification. It is typically used to indicate a background task that is pending (e.g. a file download) or the user is engaged with (e.g. playing music). | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L122> |
+|  `largeIcon?` | `string` | Notification large icon (Android). The icon must be placed in the app’s `res/drawable` folder. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L103> |
+|  `number?` | `number` | Sets the number of items this notification represents on Android. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L139> |
+|  `ongoing?` | `boolean` | If true, the notification cannot be dismissed by the user on Android. An application service must manage the dismissal of the notification. It is typically used to indicate a background task that is pending (e.g. a file download) or the user is engaged with (e.g. playing music). | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L123> |
 |  `schedule?` | [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule) | Schedule this notification to fire on a later time or a fixed interval. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L48> |
-|  `silent?` | `boolean` | Changes the notification presentation to be silent on iOS (no badge, no sound, not listed). | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L130> |
-|  `sound?` | `string` | The sound resource name or file path for the notification. Platform specific behavior: - On macOS: use system sounds (e.g., “Ping”, “Blow”) or sound files in the app bundle - On Linux: use XDG theme sounds (e.g., “message-new-instant”) or file paths - On Windows: use file paths to sound files (.wav format) - On Mobile: use resource names | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L82> |
+|  `silent?` | `boolean` | Changes the notification presentation to be silent on iOS (no badge, no sound, not listed). | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L131> |
+|  `sound?` | `string` | The sound resource name or file path for the notification. \## Platform-specific behavior: - On macOS: use system sounds (e.g., “Ping”, “Blow”) or sound files in the app bundle - On Linux: use XDG theme sounds (e.g., “message-new-instant”) or file paths - On Windows: use file paths to sound files (.wav format) - On Mobile: use resource names | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L83> |
 |  `summary?` | `string` | Detail text for the notification with `largeBody`, `inboxLines` or `groupSummary`. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L58> |
 |  `title` | `string` | Notification title. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L40> |
-|  `visibility?` | [`Visibility`](https://v2.tauri.app/reference/javascript/notification/#visibility) | Notification visibility. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L134> |
+|  `visibility?` | [`Visibility`](https://v2.tauri.app/reference/javascript/notification/#visibility) | Notification visibility. | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L135> |
 
 ------------------------------------------------------------------------
 
@@ -385,10 +385,10 @@ Options to send a notification.
 
 | Property | Type | Defined in |
 |----|----|----|
-|  `body?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L270> |
-|  `id` | `number` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L268> |
-|  `schedule` | [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L271> |
-|  `title?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L269> |
+|  `body?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L271> |
+|  `id` | `number` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L269> |
+|  `schedule` | [`Schedule`](https://v2.tauri.app/reference/javascript/notification/#schedule) | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L272> |
+|  `title?` | `string` | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L270> |
 
 ------------------------------------------------------------------------
 
@@ -398,13 +398,13 @@ Options to send a notification.
 
 | Property | Type | Description | Defined in |
 |----|----|----|----|
-|  `day?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L144> |
-|  `hour?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L155> |
-|  `minute?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L156> |
-|  `month?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L143> |
-|  `second?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L157> |
-|  `weekday?` | `number` | 1 - Sunday 2 - Monday 3 - Tuesday 4 - Wednesday 5 - Thursday 6 - Friday 7 - Saturday | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L154> |
-|  `year?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L142> |
+|  `day?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L145> |
+|  `hour?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L156> |
+|  `minute?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L157> |
+|  `month?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L144> |
+|  `second?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L158> |
+|  `weekday?` | `number` | 1 - Sunday 2 - Monday 3 - Tuesday 4 - Wednesday 5 - Thursday 6 - Friday 7 - Saturday | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L155> |
+|  `year?` | `number` | \- | **Source**: <https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L143> |
 
 ## Type Aliases
 
@@ -443,7 +443,7 @@ import { active } from '@tauri-apps/plugin-notification';const activeNotificatio
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L465>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L466>
 
 ------------------------------------------------------------------------
 
@@ -478,7 +478,7 @@ import { cancel } from '@tauri-apps/plugin-notification';await cancel([-34234, 2
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L431>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L432>
 
 ------------------------------------------------------------------------
 
@@ -507,7 +507,7 @@ import { cancelAll } from '@tauri-apps/plugin-notification';await cancelAll();
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L448>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L449>
 
 ------------------------------------------------------------------------
 
@@ -536,7 +536,7 @@ import { channels } from '@tauri-apps/plugin-notification';const notificationCha
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L559>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L560>
 
 ------------------------------------------------------------------------
 
@@ -571,7 +571,7 @@ import { createChannel, Importance, Visibility } from '@tauri-apps/plugin-notifi
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L525>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L526>
 
 ------------------------------------------------------------------------
 
@@ -598,7 +598,7 @@ import { isPermissionGranted } from '@tauri-apps/plugin-notification';const perm
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L325>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L326>
 
 ------------------------------------------------------------------------
 
@@ -619,7 +619,7 @@ function onAction(cb): Promise<PluginListener>
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`PluginListener`\>
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L569>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L570>
 
 ------------------------------------------------------------------------
 
@@ -640,7 +640,7 @@ function onNotificationReceived(cb): Promise<PluginListener>
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`PluginListener`\>
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L563>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L564>
 
 ------------------------------------------------------------------------
 
@@ -669,7 +669,7 @@ import { pending } from '@tauri-apps/plugin-notification';const pendingNotificat
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L414>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L415>
 
 ------------------------------------------------------------------------
 
@@ -705,7 +705,7 @@ import { registerActionTypes } from '@tauri-apps/plugin-notification';await regi
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L397>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L398>
 
 ------------------------------------------------------------------------
 
@@ -740,7 +740,7 @@ import { cancel } from '@tauri-apps/plugin-notification';await cancel([-34234, 2
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L482>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L483>
 
 ------------------------------------------------------------------------
 
@@ -769,7 +769,7 @@ import { removeAllActive } from '@tauri-apps/plugin-notification';await removeAl
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L501>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L502>
 
 ------------------------------------------------------------------------
 
@@ -804,7 +804,7 @@ import { removeChannel } from '@tauri-apps/plugin-notification';await removeChan
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L542>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L543>
 
 ------------------------------------------------------------------------
 
@@ -833,7 +833,7 @@ import { isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notif
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L348>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L349>
 
 ------------------------------------------------------------------------
 
@@ -866,7 +866,7 @@ import { isPermissionGranted, requestPermission, sendNotification } from '@tauri
 2.0.0
 
 **Source**:
-<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L370>
+<https://github.com/tauri-apps/plugins-workspace/blob/v2/plugins/notification/guest-js/index.ts#L371>
 
 ------------------------------------------------------------------------
 

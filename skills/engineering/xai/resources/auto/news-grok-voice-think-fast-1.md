@@ -8,7 +8,7 @@ Our most capable voice agent is now available via API.
 
 Listen to this blog post
 
-[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog)
+[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog&utm_source=website&utm_medium=referral&utm_campaign=think-fast-blog)
 
 Try it out
 
@@ -20,7 +20,7 @@ Docs
 
 Get started
 
-[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog)
+[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog&utm_source=website&utm_medium=referral&utm_campaign=think-fast-blog)
 
 Try it out
 
@@ -193,7 +193,7 @@ support scenarios, and onboarding new customers via sales:
   model autonomously performs hardware troubleshooting workflows, issues
   hardware replacements, and grants service credits.
 
-[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog)
+[](https://console.x.ai/playground/voice/agent?campaign=think-fast-blog&utm_source=website&utm_medium=referral&utm_campaign=think-fast-blog)
 
 Open
 

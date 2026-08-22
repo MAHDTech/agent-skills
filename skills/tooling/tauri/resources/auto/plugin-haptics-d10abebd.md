@@ -21,17 +21,17 @@ including recently released ones.
 
 Install the haptics plugin to get started.
 
-- [Automatic](#tab-panel-6007)
-- [Manual](#tab-panel-6008)
+- [Automatic](#tab-panel-6037)
+- [Manual](#tab-panel-6038)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5996)
-- [yarn](#tab-panel-5997)
-- [pnpm](#tab-panel-5998)
-- [deno](#tab-panel-5999)
-- [bun](#tab-panel-6000)
-- [cargo](#tab-panel-6001)
+- [npm](#tab-panel-6026)
+- [yarn](#tab-panel-6027)
+- [pnpm](#tab-panel-6028)
+- [deno](#tab-panel-6029)
+- [bun](#tab-panel-6030)
+- [cargo](#tab-panel-6031)
 
 ```
 npm run tauri add haptics
@@ -75,11 +75,11 @@ cargo tauri add haptics
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6002)
-    - [yarn](#tab-panel-6003)
-    - [pnpm](#tab-panel-6004)
-    - [deno](#tab-panel-6005)
-    - [bun](#tab-panel-6006)
+    - [npm](#tab-panel-6032)
+    - [yarn](#tab-panel-6033)
+    - [pnpm](#tab-panel-6034)
+    - [deno](#tab-panel-6035)
+    - [bun](#tab-panel-6036)
 
     ```
     npm install @tauri-apps/plugin-haptics

@@ -30,8 +30,8 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 | Model | Cost |
 | --- | --- |
 | grok-imagine-image-2.0 | $0.04 / image |
-| grok-imagine-image | $0.02 / image |
 | grok-imagine-image-quality | $0.05 / image |
+| grok-imagine-image | $0.02 / image |
 | grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
 
@@ -103,7 +103,7 @@ The batch discount applies to all token types — input tokens, output tokens, c
 
 Models not listed above have no batch discount.
 
-To see a model's resulting batch prices, toggle **"Show batch API pricing"** on its detail page.
+To see a model's resulting batch prices, toggle **"Show batch API pricing"** on its detail page. Models that accept Batch with no discount show N/A.
 
 > [!NOTE]
 >
@@ -144,7 +144,7 @@ Downloading data from files and collections is charged at a flat rate based on t
 | File downloads | $0.20 / GiB downloaded |
 | Collection downloads | $0.20 / GiB downloaded |
 
-You can view and manage your [files](https://console.x.ai/team/default/files) and [collections](https://console.x.ai/team/default/collections) through the xAI console or the [xAI API](https://docs.x.ai/developers/files/managing-files).
+You can view and manage your [files](https://console.x.ai/team/default/files?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=files) and [collections](https://console.x.ai/team/default/collections?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=collections) through the xAI console or the [xAI API](https://docs.x.ai/developers/files/managing-files).
 
 ## Usage Guidelines Violation Fee
 
@@ -158,4 +158,4 @@ Your model access might vary depending on various factors such as geographical l
 
 For how the **bills are charged**, visit [Manage Billing](https://docs.x.ai/console/billing) for more information.
 
-For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models) on xAI Console.
+For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=models) on xAI Console.

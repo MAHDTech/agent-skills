@@ -2,11 +2,11 @@
 
 # Using Collections in Console
 
-This guide walks you through managing collections using the [xAI Console](https://console.x.ai) interface.
+This guide walks you through managing collections using the [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-collections\&utm_content=console-home) interface.
 
 ## Creating a new collection
 
-Navigate to the **Collections** tab in the [xAI Console](https://console.x.ai). Make sure you are in the correct team.
+Navigate to the **Collections** tab in the [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-collections\&utm_content=console-home). Make sure you are in the correct team.
 
 Click on "Create new collection" to create a new `collection`.
 

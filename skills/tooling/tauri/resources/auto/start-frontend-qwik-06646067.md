@@ -13,10 +13,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 1.  ##### Create a new Qwik app
 
-    - [npm](#tab-panel-6587)
-    - [yarn](#tab-panel-6588)
-    - [pnpm](#tab-panel-6589)
-    - [deno](#tab-panel-6590)
+    - [npm](#tab-panel-6617)
+    - [yarn](#tab-panel-6618)
+    - [pnpm](#tab-panel-6619)
+    - [deno](#tab-panel-6620)
 
     ```
     npm create qwik@latestcd <PROJECT>
@@ -36,10 +36,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 2.  ##### Install the `static adapter`
 
-    - [npm](#tab-panel-6591)
-    - [yarn](#tab-panel-6592)
-    - [pnpm](#tab-panel-6593)
-    - [deno](#tab-panel-6594)
+    - [npm](#tab-panel-6621)
+    - [yarn](#tab-panel-6622)
+    - [pnpm](#tab-panel-6623)
+    - [deno](#tab-panel-6624)
 
     ```
     npm run qwik add static
@@ -59,10 +59,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 3.  ##### Add the Tauri CLI to your project
 
-    - [npm](#tab-panel-6595)
-    - [yarn](#tab-panel-6596)
-    - [pnpm](#tab-panel-6597)
-    - [deno](#tab-panel-6598)
+    - [npm](#tab-panel-6625)
+    - [yarn](#tab-panel-6626)
+    - [pnpm](#tab-panel-6627)
+    - [deno](#tab-panel-6628)
 
     ```
     npm install -D @tauri-apps/cli@latest
@@ -82,10 +82,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 4.  ##### Initiate a new Tauri project
 
-    - [npm](#tab-panel-6599)
-    - [yarn](#tab-panel-6600)
-    - [pnpm](#tab-panel-6601)
-    - [deno](#tab-panel-6602)
+    - [npm](#tab-panel-6629)
+    - [yarn](#tab-panel-6630)
+    - [pnpm](#tab-panel-6631)
+    - [deno](#tab-panel-6632)
 
     ```
     npm run tauri init
@@ -105,10 +105,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 5.  ##### Tauri configuration
 
-    - [npm](#tab-panel-6583)
-    - [yarn](#tab-panel-6584)
-    - [pnpm](#tab-panel-6585)
-    - [deno](#tab-panel-6586)
+    - [npm](#tab-panel-6613)
+    - [yarn](#tab-panel-6614)
+    - [pnpm](#tab-panel-6615)
+    - [deno](#tab-panel-6616)
 
     ```
     {  "build": {    "devUrl": "http://localhost:5173"    "frontendDist": "../dist",    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run build"  }}
@@ -136,10 +136,10 @@ web framework. Learn more about Qwik at <https://qwik.dev>.
 
 6.  ##### Start your `tauri` app
 
-    - [npm](#tab-panel-6603)
-    - [yarn](#tab-panel-6604)
-    - [pnpm](#tab-panel-6605)
-    - [deno](#tab-panel-6606)
+    - [npm](#tab-panel-6633)
+    - [yarn](#tab-panel-6634)
+    - [pnpm](#tab-panel-6635)
+    - [deno](#tab-panel-6636)
 
     ```
     npm run tauri dev

@@ -154,6 +154,28 @@ devenv.nix
 }
 ```
 
+## Shutdown
+
+New in version 2.2.3
+
+Control how a process is stopped. `signal` is the Unix signal number sent for a graceful stop. `grace` is the number of seconds to wait before the process is killed with SIGKILL. The defaults are SIGTERM (15) and 5 seconds.
+
+devenv.nix
+
+```
+{
+  processes.postgres = {
+    exec = "postgres -D $PGDATA";
+    shutdown = {
+      signal = 2;  # SIGINT: fast shutdown
+      grace = 10;
+    };
+  };
+}
+```
+
+The same settings apply to restarts from file watching or the watchdog. If `devenv` or `devenv-tasks` is killed, a guardian performs the shutdown.
+
 ## Ready Probes
 
 New in devenv 2.0

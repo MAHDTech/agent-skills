@@ -8,7 +8,7 @@ Grok 4.5 is SpaceXAI's smartest model built for coding, agentic tasks,
 and knowledge work.
 
 [Try for free ](https://x.ai/build)[Start
-building](https://console.x.ai)
+building](https://console.x.ai?utm_source=website&utm_medium=referral&utm_campaign=news-intro&utm_content=build-cta)
 
 Today, we're launching **Grok 4.5**, SpaceXAI's smartest model built to
 excel at coding, agentic tasks, and knowledge work. It's our strongest
@@ -170,8 +170,9 @@ intelligence per unit of time and cost.
 ## [Getting started](#getting-started)
 
 Grok 4.5 is available today in Grok Build, in Cursor on all plans, and
-from the [SpaceXAI console](https://console.x.ai/). Simply grab an API
-key and get started in a few lines of code:
+from the [SpaceXAI
+console](https://console.x.ai/?utm_source=website&utm_medium=referral&utm_campaign=grok-4-5-blog).
+Simply grab an API key and get started in a few lines of code:
 
 Copy
 
@@ -191,7 +192,8 @@ bash
 
 Start building with Grok 4.5 today via the SpaceXAI API.
 
-[Start Building](https://console.x.ai/team/default/api-keys)
+[Start
+Building](https://console.x.ai/team/default/api-keys?utm_source=website&utm_medium=referral&utm_campaign=grok-4-5-blog&utm_content=api-links)
 
 ### API Docs
 

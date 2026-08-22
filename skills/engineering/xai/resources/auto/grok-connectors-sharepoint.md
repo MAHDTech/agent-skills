@@ -8,7 +8,7 @@ The SharePoint connector lets Grok access files and documents across your organi
 
 ## Prerequisites
 
-Before team members can use SharePoint in Grok, a **team admin** must add the connector through the [console](https://console.x.ai). This is a one-time setup that involves three steps:
+Before team members can use SharePoint in Grok, a **team admin** must add the connector through the [console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-connectors-sharepoint\&utm_content=console-home). This is a one-time setup that involves three steps:
 
 ### 1. Choose an access mode
 
