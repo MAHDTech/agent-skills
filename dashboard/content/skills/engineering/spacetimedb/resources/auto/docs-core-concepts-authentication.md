@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -117,4 +116,3 @@ views and procedures via the context.
 for more information on how to access and use authentication claims in
 your module:
 
-{% endraw %}

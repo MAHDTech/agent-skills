@@ -7,14 +7,13 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Key Information
 
 # Rate Limits
 
 Every xAI API team has per-model rate limits on two dimensions: **requests per second (RPS)** and **tokens per minute (TPM)**. Your per-second limit is derived from your per-minute request budget (RPM / 60): you cannot spend a full minute's requests in a single second, which protects the API from sudden bursts. These limits scale with your team's **tier**, which is determined by cumulative spend on the API.
 
-You can view your team's current tier and per-model limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits) page in the xAI Console.
+You can view your team's current tier and per-model limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) page in the xAI Console.
 
 ## Rate limit tiers
 
@@ -39,7 +38,7 @@ Qualification is based on total revenue received through prepaid credit purchase
 
 Each tier sets hard RPS and TPM caps per model. Limits scale exponentially with tier. Exceeding any limit returns a `429 Too Many Requests` error.
 
-The table below lists RPS and TPM limits at each tier for every model. You can also view your team's personalized limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits) page in the xAI Console.
+The table below lists RPS and TPM limits at each tier for every model. You can also view your team's personalized limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) page in the xAI Console.
 
 | Model | RPS | TPM |
 | --- | --- | --- |
@@ -50,9 +49,9 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
-| grok-imagine-image-quality | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
 | grok-imagine-image | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
 | grok-imagine-image-2.0 | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
+| grok-imagine-image-quality | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
 | grok-imagine-video-1.5 | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
 | grok-imagine-video | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
 
@@ -115,6 +114,5 @@ def request_with_backoff(prompt, max_retries=5):
 ## Increasing your limits
 
 * **Spend more.** Tiers upgrade automatically based on cumulative spend. No action required on your part.
-* **Request an increase.** Submit a request through the [xAI Console](https://console.x.ai/team/default/rate-limits) if you need higher limits without additional spend, or limits beyond Tier 4.
+* **Request an increase.** Submit a request through the [xAI Console](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) if you need higher limits without additional spend, or limits beyond Tier 4.
 * **Contact sales.** For enterprise-grade capacity, please email [sales@x.ai](mailto:sales@x.ai).
-{% endraw %}

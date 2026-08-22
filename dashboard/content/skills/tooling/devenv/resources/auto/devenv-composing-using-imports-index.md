@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Composing using imports
 
 You can compose environments either locally or by referencing [inputs](https://devenv.sh/inputs/index.md).
@@ -60,4 +59,3 @@ New in version 2.2
 Changes to files in local `path:` inputs are picked up automatically. Previously the evaluation cache held on to the old configuration until `.devenv` was deleted.
 
 See [devenv.yaml reference](https://devenv.sh/reference/yaml-options/#imports) for all supported import options.
-{% endraw %}

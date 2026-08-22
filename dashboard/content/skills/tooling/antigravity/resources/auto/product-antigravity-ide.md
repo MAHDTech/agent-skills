@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Antigravity IDE
 
 Google Antigravity's Editor view offers tab autocompletion, natural
@@ -76,4 +75,3 @@ Download Google AntigravityDownload Google Antigravity
 
 [Download for Apple Silicon](https://antigravity.google/download)[Download for Intel](https://antigravity.google/download)
 
-{% endraw %}

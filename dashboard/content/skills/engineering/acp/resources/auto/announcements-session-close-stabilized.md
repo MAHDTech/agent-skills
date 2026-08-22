@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Session Close RFD](https://agentclientprotocol.com/rfds/session-close) has 
 When advertised via `sessionCapabilities.close`, Clients can now ask Agents to cancel any ongoing work for a session and free the resources associated with it, without having to terminate the whole ACP process. This lets long-running Clients keep memory, threads, and subprocesses under control as users accumulate sessions over time.
 
 For the protocol documentation, see [Closing Active Sessions](https://agentclientprotocol.com/protocol/v1/session-setup#closing-active-sessions).
-{% endraw %}

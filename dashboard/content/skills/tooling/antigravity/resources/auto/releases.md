@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
 Google Antigravity  
@@ -27,4 +26,3 @@ Antigravity IDE
 
 Loading releases...
 
-{% endraw %}

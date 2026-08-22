@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # devenv.yaml
 
 ## backend
@@ -251,4 +250,3 @@ Supported values: `bash`, `zsh`, `fish`, `nu`. Any other value falls back to `ba
 Error if a port is already in use instead of auto-allocating the next available port. Can be overridden by `--strict-ports` or `--no-strict-ports` CLI flags.
 
 *Type:* `boolean` · *Default:* `false`
-{% endraw %}

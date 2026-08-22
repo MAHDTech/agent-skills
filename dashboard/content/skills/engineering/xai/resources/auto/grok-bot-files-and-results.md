@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Work with Grok Bot
 
 # Files and results
@@ -105,4 +104,3 @@ The shared workspace is useful for intermediate material, but the conversation
 should still contain the final result or a clear link to it. See
 [Use the computer and apps](https://docs.x.ai/grok-bot/computer-and-apps) for persistence and recovery
 details.
-{% endraw %}

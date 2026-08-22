@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -441,4 +440,3 @@ different times depending on the kind of function being called:
 - Explore [Procedures](https://spacetimedb.com/docs/functions/procedures) for scheduled
   execution patterns
 
-{% endraw %}

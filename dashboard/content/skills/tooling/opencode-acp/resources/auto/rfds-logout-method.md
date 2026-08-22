@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -222,4 +221,3 @@ The RFD intentionally does not mandate a specific behavior to allow flexibility.
 * 2026-05-21: RFD marked as Completed; `logout` is stabilized
 * 2026-05-17: Moved to Preview.
 * 2026-02-02: Initial draft
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Grok Business / Enterprise
 
 # Grok.com User Guide
@@ -66,7 +65,7 @@ View all shared conversations in your history at [https://grok.com/history?tab=s
 
 To activate or manage your license:
 
-1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai).
+1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-user-guide\&utm_content=console-home).
 2. Press "Assign license" and select your license type.
 3. If you encounter access issues or lack permissions, contact your team admin for assistance.
 
@@ -75,4 +74,3 @@ Once activated, your team workspace will become available on grok.com.
 > [!NOTE]
 >
 >  For white-glove support and Enterprise features, contact xAI sales at .
-{% endraw %}

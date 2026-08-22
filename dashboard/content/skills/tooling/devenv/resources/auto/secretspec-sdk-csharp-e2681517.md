@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # C# SDK
 
 > **Version compatibility:** Available since SecretSpec 0.16. The 0.15.0
@@ -189,4 +188,3 @@ development, `SECRETSPEC_FFI_LIB` can point to a particular
 also searches an ancestor Cargo `target/debug` or `target/release`
 directory.
 
-{% endraw %}

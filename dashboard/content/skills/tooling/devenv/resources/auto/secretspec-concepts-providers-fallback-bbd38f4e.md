@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Provider fallback
 
 Secrets may live in different stores across environments or during a
@@ -63,4 +62,3 @@ freshness rules.
   aliases](https://secretspec.dev/concepts/providers/#configure-provider-aliases).
 - Learn how [Profiles](https://secretspec.dev/concepts/profiles/) apply provider defaults.
 
-{% endraw %}

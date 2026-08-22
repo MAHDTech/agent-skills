@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Prompt Caching
 
 # Maximizing Cache Hits
@@ -185,4 +184,3 @@ print(f"Cached tokens: {response.usage.cached_prompt_text_tokens}")
 ## Next
 
 * [What Breaks Caching](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/multi-turn)
-{% endraw %}

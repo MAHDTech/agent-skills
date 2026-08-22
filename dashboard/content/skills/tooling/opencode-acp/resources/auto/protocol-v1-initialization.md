@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -127,6 +126,18 @@ Implementations can also [advertise custom capabilities](https://agentclientprot
 ### Client Capabilities
 
 The Client **SHOULD** specify whether it supports the following capabilities:
+
+#### Terminal Authentication
+
+<ParamField path="auth.terminal" type="boolean">
+  The Client can reproduce the configured Agent invocation in an interactive
+  terminal. When `true`, the Agent may advertise `type: "terminal"`
+  authentication methods.
+</ParamField>
+
+<Card icon="terminal" horizontal href="/protocol/v1/authentication">
+  Learn more about Terminal Authentication
+</Card>
 
 #### File System
 
@@ -286,4 +297,3 @@ Both Clients and Agents **SHOULD** provide information about their implementatio
 ***
 
 Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v1/session-setup) and begin the conversation with the Agent.
-{% endraw %}

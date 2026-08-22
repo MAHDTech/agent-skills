@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -392,4 +391,3 @@ pub struct Item {
 Auto-increment **cannot** be combined with default values, since both
 attempt to populate the column automatically.
 
-{% endraw %}

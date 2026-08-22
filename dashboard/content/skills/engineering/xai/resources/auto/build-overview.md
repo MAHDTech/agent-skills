@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Getting Started
 
 # Grok Build
@@ -142,4 +141,3 @@ console.log(text);
 * [Headless & Scripting](https://docs.x.ai/build/cli/headless-scripting)
 * [Enterprise Deployments](https://docs.x.ai/build/enterprise)
 * [Grok Bot](https://docs.x.ai/grok-bot/overview) — AI teammates on a cloud computer
-{% endraw %}

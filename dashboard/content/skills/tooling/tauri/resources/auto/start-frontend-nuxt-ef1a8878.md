@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Nuxt
 
 Nuxt is a meta framework for Vue. Learn more about Nuxt at
@@ -26,10 +25,10 @@ Nuxt is a meta framework for Vue. Learn more about Nuxt at
 
 1.  ##### Update Tauri configuration
 
-    - [npm](#tab-panel-6579)
-    - [yarn](#tab-panel-6580)
-    - [pnpm](#tab-panel-6581)
-    - [deno](#tab-panel-6582)
+    - [npm](#tab-panel-6609)
+    - [yarn](#tab-panel-6610)
+    - [pnpm](#tab-panel-6611)
+    - [deno](#tab-panel-6612)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run generate",    "devUrl": "http://localhost:3000",    "frontendDist": "../dist"  }}
@@ -68,4 +67,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

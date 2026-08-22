@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Nutanix Kubernetes Platform (NKP) v2.18 Release Notes
 
 Nutanix Kubernetes® Platform 2.18 Release Notes
@@ -1420,4 +1419,3 @@ these documented resources to either manually mitigate the issues or better
 understand why these cannot be mitigated. For more information, see Known
 Issues and Mitigations.
 
-{% endraw %}

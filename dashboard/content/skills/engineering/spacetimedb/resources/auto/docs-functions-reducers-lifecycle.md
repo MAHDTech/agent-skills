@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -365,4 +364,3 @@ client. Therefore:
 - The connection ID will be absent (`null` in TypeScript, `null` in C#,
   `None` in Rust, and `std::nullopt` in C++)
 
-{% endraw %}

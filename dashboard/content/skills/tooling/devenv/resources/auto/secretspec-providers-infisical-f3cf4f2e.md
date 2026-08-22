@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Infisical Provider
 
 The Infisical provider integrates with
@@ -306,4 +305,3 @@ written once the request is approved.
   default projects use `dev`, `staging` and `prod` — pin the right one
   with `?env=`
 
-{% endraw %}

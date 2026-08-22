@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Tools
 
 # Remote MCP Tools
@@ -200,4 +199,3 @@ Each server can provide different capabilities - documentation tools, API integr
 * **Filter tools appropriately**: Use `allowed_tools` to restrict access to only necessary tools, especially when servers have many tools since the model must keep all available tool definitions in context
 * **Use secure connections**: Always use HTTPS URLs and implement proper authentication mechanisms on your MCP server
 * **Provide Examples**: While the model can generally figure out what tools to use based on the tool descriptions and the user request it may help to provide examples in the prompt
-{% endraw %}

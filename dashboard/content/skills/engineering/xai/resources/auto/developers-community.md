@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Resources
 
 # Community Integrations
@@ -86,4 +85,3 @@ const { image } = await generateImage({
     prompt: 'A cat in a tree',
 });
 ```
-{% endraw %}

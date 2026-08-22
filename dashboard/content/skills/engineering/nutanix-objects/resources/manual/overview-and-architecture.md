@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Overview and Architecture
 
 ## NUTANIX OBJECTS OVERVIEW
@@ -773,4 +772,3 @@ to grant custom permissions for the user. When permission is granted to a role, 
 
 manage existing Nutanix Objects instances granted to him in the policy. Objects | Role-based Access Control for Nutanix Objects |
 
-{% endraw %}

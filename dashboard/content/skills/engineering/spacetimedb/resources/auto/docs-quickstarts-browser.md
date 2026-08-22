@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB app running in the browser with inline JavaScript.
@@ -129,4 +128,3 @@ conn.db.person.onDelete((ctx, person) => {
 - Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
   detailed API docs
 
-{% endraw %}

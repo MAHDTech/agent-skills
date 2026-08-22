@@ -7,16 +7,16 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Google Antigravity Additional Terms of Service
 
 If you are accessing the Service through [Gemini Enterprise (Google
 Cloud)](https://cloud.google.com/terms), [Gemini Enterprise for
 Business](https://cloud.google.com/terms/gemini-enterprise/business) or
 a Google Workspace subscription on the Google Cloud Pre-GA Offering
-Terms, then you are subject to the terms of use accepted or signed by
-your administrator applicable to the Service and the terms below do not
-apply to you.
+Terms, or with a Gemini Enterprise Agent Platform API Key, then you are
+subject to the terms of use accepted or signed by your administrator
+applicable to such service (including its applicable terms for
+downloadable software) and the terms below do not apply to you.
 
 BY DOWNLOADING, INSTALLING, OR OTHERWISE ACCESSING OR USING THE GOOGLE
 ANTIGRAVITY SERVICES (HEREIN REFERRED TO AS THE “SERVICE”), YOU AGREE
@@ -80,9 +80,10 @@ CONDITIONS:
 8.  If you select a third party or open source model as your main agent
     model, you will be subject to the terms of that model. For Anthropic
     specifically, you agree to be bound by its terms and conditions
-    found at <https://www.anthropic.com/legal/commercial-terms>.
+    found at
+    [https://www.anthropic.com/legal/commercial-terms](https://www.anthropic.com/legal/commercial-terms).
 
-Please reach out on <https://discuss.ai.google.dev/c/antigravity/64>
+Please reach out on
+[https://discuss.ai.google.dev/c/antigravity/64](https://discuss.ai.google.dev/c/antigravity/64)
 with any questions or suggestions.
 
-{% endraw %}

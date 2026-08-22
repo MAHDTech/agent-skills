@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-api-v4"
 +++
 
-{% raw %}
 # Nutanix v4 API Documentation Index
 
 This directory contains the complete reference documentation for the Nutanix v4 API family, converted into structured, AI-agent readable Markdown reference guides.
@@ -23,4 +22,3 @@ This directory contains the complete reference documentation for the Nutanix v4 
 4. **[troubleshooting-and-known-issues.md](@/skills/engineering/nutanix-api-v4/resources/manual/troubleshooting-and-known-issues.md)**
    - Resolved issues, known issues, error workarounds, OData parameter requirements (`$filter`, `$limit`, `$orderby`, `$page`, `$select`, `$statType`, `$samplingInterval`), response schema changes, RBAC VG restore owner permissions workaround, service account API key VM creation workaround, category value deletion orphaned key cleanup, and discontinued endpoints migration (Layer2 stretches replacement endpoints).
 
-{% endraw %}

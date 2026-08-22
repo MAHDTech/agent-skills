@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # DMG
 
 The DMG (Apple Disk Image) format is a common macOS installer file that
@@ -30,12 +29,12 @@ guide](https://v2.tauri.app/distribute/app-store/).
 To create an Apple Disk Image for your app you can use the Tauri CLI and
 run the `tauri build` command in a Mac computer:
 
-- [npm](#tab-panel-4533)
-- [yarn](#tab-panel-4534)
-- [pnpm](#tab-panel-4535)
-- [deno](#tab-panel-4536)
-- [bun](#tab-panel-4537)
-- [cargo](#tab-panel-4538)
+- [npm](#tab-panel-4557)
+- [yarn](#tab-panel-4558)
+- [pnpm](#tab-panel-4559)
+- [deno](#tab-panel-4560)
+- [bun](#tab-panel-4561)
+- [cargo](#tab-panel-4562)
 
 ```
 npm run tauri build -- --bundles dmg
@@ -121,4 +120,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

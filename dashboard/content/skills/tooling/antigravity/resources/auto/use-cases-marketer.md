@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Why Marketers choose Google Antigravity
 
 [Explore product](https://antigravity.google/product)
@@ -60,4 +59,3 @@ Idea to Prototype
 
 [Download](https://antigravity.google/download)
 
-{% endraw %}

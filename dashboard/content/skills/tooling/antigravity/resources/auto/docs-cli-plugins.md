@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -228,4 +227,3 @@ troubleshoot connection anomalies:
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Configure security
   containment rings around your custom plugins and MCP servers.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "software-factory"
 +++
 
-{% raw %}
 # Gate 2 - Architecture
 
 Saved as `docs/plans/<feature-slug>/02-architecture.md`. Written after reading the code this feature touches, so every line describes the real system.
@@ -43,4 +42,3 @@ hit them - enough to see whether the shape supports the access pattern>
 
 Where a decision here will outlive this feature, record it as an ADR with `/domain-modeling` rather than burying it in this doc.
 
-{% endraw %}

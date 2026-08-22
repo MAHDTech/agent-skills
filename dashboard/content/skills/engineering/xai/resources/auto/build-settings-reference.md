@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
-{% raw %}
 #### Settings
 
 # Reference
@@ -255,7 +253,7 @@ A non-empty `deny` list is enforced at the kernel level when the sandbox can be 
 | `invert_scroll` | `[ui]` | `true` / `false` (default `false`) | Reverse vertical scroll direction. |
 | `permission_mode` | `[ui]` | `default` | `ask` | `auto` | `always-approve` | Default tool-permission behavior. Enterprise locks use `requirements.toml`. |
 | `default_selected_permission` | `[ui]` | `always_allow_all_sessions` (default) | `allow_command_always` | `allow_once` | `reject` | Preselected approval row on the first prompt of a session. |
-| `remember_tool_approvals` | `[ui]` | `true` / `false` (default `false`) | Show per-tool "Always allow …" options. Restart required. |
+| `remember_tool_approvals` | `[ui]` | `true` / `false` (default `true`) | Show per-tool "Always allow …" options. Restart required. |
 | `cancel_subagents_on_turn_cancel` | `[ui]` | `ask` (default when unset) | `always_stop` | `always_continue` | When cancelling a turn with running subagents. |
 | `hunk_tracker_mode` | `[ui]` | `agent_only` (default) | `all_dirty` | `off` | File-change hunk tracking. Restart required. |
 | `fork_secondary_model` | `[ui]` | model id (default: main default) | Model for the secondary agent when forking. |
@@ -301,5 +299,4 @@ Project-scoped and user-scoped. Evaluation order: **deny > ask > allow**.
 | `disabled` | `[skills]` / `[plugins]` | name lists | Discover but do not activate. |
 | `enabled` | `[plugins]` | name lists | Explicitly enable plugins (project plugins may default off). |
 | `skills` / `rules` / `agents` / `mcps` / `hooks` | `[compat.cursor]` / `[compat.claude]` | `true` / `false` (default `true`) | Scan Cursor or Claude harness directories. |
-{% endraw %}{% raw %}
-{% endraw %}
+

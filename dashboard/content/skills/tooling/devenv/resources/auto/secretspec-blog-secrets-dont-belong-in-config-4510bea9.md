@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Secrets Don’t Belong in Config
 
 Jul 20, 2026
@@ -174,4 +173,3 @@ used to require infrastructure that only dedicated platform teams could
 build. A project of any size should be able to separate secrets from
 configuration without building its own secrets platform first.
 
-{% endraw %}

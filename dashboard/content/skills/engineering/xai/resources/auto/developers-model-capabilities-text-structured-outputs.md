@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Structured Outputs
@@ -1028,4 +1027,3 @@ summary = Summary.model_validate_json(response.content)
 print(f"Title: {summary.title}")
 print(f"Sentiment: {summary.sentiment}")
 ```
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -189,4 +188,3 @@ You're now set up to use SpacetimeAuth in your React application. When
 users access your app, they will be redirected to the SpacetimeAuth
 login page for authentication.
 
-{% endraw %}

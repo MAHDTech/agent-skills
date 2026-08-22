@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Services
 
 Services are a higher-level abstraction over [processes](https://devenv.sh/processes/index.md). While processes provide low-level control for running any command, services offer pre-configured interfaces for existing software like databases.
@@ -50,4 +49,3 @@ Services start in the foreground by default. If you want to start services up in
 ```
 $ devenv up -d
 ```
-{% endraw %}

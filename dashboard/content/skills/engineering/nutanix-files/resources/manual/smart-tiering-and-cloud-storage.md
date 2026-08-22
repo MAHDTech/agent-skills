@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Smart Tiering and Cloud Storage
 
 ## Smart Tiering Overview
@@ -37,4 +36,3 @@ Smart Tiering allows Nutanix Files to automatically offload cold or infrequently
 - **Automatic Recall**: When a client reads or writes a stub file, Nutanix Files streams data back from the cloud tier transparently.
 - **Manual Recall**: Admins can trigger bulk recall of tiered folders prior to offline migration.
 
-{% endraw %}

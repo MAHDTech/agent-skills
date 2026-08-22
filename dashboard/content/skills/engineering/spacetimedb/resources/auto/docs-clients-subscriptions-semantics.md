@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -143,4 +142,3 @@ from a transaction are fully applied. This ensures all callbacks see the
 fully consistent state of the cache, preventing callbacks from observing
 an inconsistent intermediate state.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -93,4 +92,3 @@ There is currently no support for:
   limits
 - Organizational tiers via contract
 
-{% endraw %}

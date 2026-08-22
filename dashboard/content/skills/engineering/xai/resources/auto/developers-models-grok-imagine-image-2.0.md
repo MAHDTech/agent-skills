@@ -7,13 +7,13 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # grok-imagine-image-2.0
 
 ## At a glance
 
 - **Modalities:** text, image → image
 - **Model name:** `grok-imagine-image-2.0`
+- **Batch API:** Supported
 
 ## Pricing
 
@@ -29,4 +29,3 @@ skill_name = "xai"
 ## Regions
 
 Available in: us-east-1, us-west-2
-{% endraw %}

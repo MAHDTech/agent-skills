@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Passbolt Provider
 
 The Passbolt provider reads and writes resources in a self-hosted
@@ -269,4 +268,3 @@ values.
   from that resource’s permissions, which may differ from the folder’s
   permissions.
 
-{% endraw %}

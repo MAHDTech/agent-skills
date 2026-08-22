@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Work with Grok Bot
 
 # Create and manage Bots
@@ -120,4 +119,3 @@ Start with the smallest useful roster:
 For example, a Website Launch group might include a launch coordinator, a
 content editor, and an analytics reviewer. The coordinator can assign work,
 while the group preserves the handoffs in one conversation.
-{% endraw %}

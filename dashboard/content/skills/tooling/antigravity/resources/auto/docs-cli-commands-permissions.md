@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -139,4 +138,3 @@ To remove a rule and revert to prompting for those actions:
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands and keybindings.
 
-{% endraw %}

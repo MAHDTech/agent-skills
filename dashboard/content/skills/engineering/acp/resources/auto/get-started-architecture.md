@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -45,4 +44,3 @@ Commonly the code editor will have user-configured MCP servers. When forwarding 
 The code editor may itself also wish to export MCP based tools. Instead of trying to run MCP and ACP on the same socket, the code editor can provide its own MCP server as configuration. As agents may only support MCP over stdio, the code editor can provide a small proxy that tunnels requests back to itself:
 
 <img src="https://mintcdn.com/zed-685ed6d6/ZwvtxaoaZwBJrK5s/images/mcp-proxy.svg?fit=max&auto=format&n=ZwvtxaoaZwBJrK5s&q=85&s=dd128411c4be5945e131596190b41cb8" alt="MCP connection to self" width="632" height="440" data-path="images/mcp-proxy.svg" />
-{% endraw %}

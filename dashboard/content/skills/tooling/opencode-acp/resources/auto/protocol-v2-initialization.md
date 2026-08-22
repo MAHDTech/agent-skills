@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -128,6 +127,18 @@ Implementations can also [advertise custom capabilities](https://agentclientprot
 Clients **MAY** include defined capability fields in `capabilities`.
 Omitted fields mean unsupported. Extension-specific capabilities belong in
 `_meta`.
+
+#### Terminal Authentication
+
+<ParamField path="auth.terminal" type="TerminalAuthCapabilities Object">
+  The Client can reproduce the configured Agent invocation in an interactive
+  terminal. Omitted or `null` means unsupported. Supplying `{}` means the Agent
+  may advertise `type: "terminal"` authentication methods.
+</ParamField>
+
+<Card icon="terminal" horizontal href="/protocol/v2/authentication">
+  Learn more about Terminal Authentication
+</Card>
 
 #### Elicitation
 
@@ -260,4 +271,3 @@ Both Clients and Agents **MUST** provide information about their implementation 
 ***
 
 Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v2/session-setup) and begin the conversation with the Agent.
-{% endraw %}

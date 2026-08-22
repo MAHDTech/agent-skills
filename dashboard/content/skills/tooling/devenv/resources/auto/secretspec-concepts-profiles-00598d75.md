@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Profiles
 
 ## What Are Profiles?
@@ -168,4 +167,3 @@ A web application with different requirements per environment:
 [profiles.production]# Inherits DATABASE_URL, REDIS_URL, JWT_SECRET from default# Only adds production-specific secretsSENTRY_DSN = { description = "Error tracking", required = true }SSL_CERT = { description = "SSL certificate path", required = true }
 ```
 
-{% endraw %}

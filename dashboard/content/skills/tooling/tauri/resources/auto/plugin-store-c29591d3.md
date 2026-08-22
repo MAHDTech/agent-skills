@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Store
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-store)[crates.io](https://crates.io/crates/tauri-plugin-store)
@@ -35,17 +34,17 @@ It can be used both in the webview or within Rust.
 
 Install the store plugin to get started.
 
-- [Automatic](#tab-panel-6206)
-- [Manual](#tab-panel-6207)
+- [Automatic](#tab-panel-6236)
+- [Manual](#tab-panel-6237)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6195)
-- [yarn](#tab-panel-6196)
-- [pnpm](#tab-panel-6197)
-- [deno](#tab-panel-6198)
-- [bun](#tab-panel-6199)
-- [cargo](#tab-panel-6200)
+- [npm](#tab-panel-6225)
+- [yarn](#tab-panel-6226)
+- [pnpm](#tab-panel-6227)
+- [deno](#tab-panel-6228)
+- [bun](#tab-panel-6229)
+- [cargo](#tab-panel-6230)
 
 ```
 npm run tauri add store
@@ -89,11 +88,11 @@ cargo tauri add store
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6201)
-    - [yarn](#tab-panel-6202)
-    - [pnpm](#tab-panel-6203)
-    - [deno](#tab-panel-6204)
-    - [bun](#tab-panel-6205)
+    - [npm](#tab-panel-6231)
+    - [yarn](#tab-panel-6232)
+    - [pnpm](#tab-panel-6233)
+    - [deno](#tab-panel-6234)
+    - [bun](#tab-panel-6235)
 
     ```
     npm install @tauri-apps/plugin-store
@@ -117,8 +116,8 @@ cargo tauri add store
 
 ## Usage
 
-- [JavaScript](#tab-panel-6191)
-- [Rust](#tab-panel-6192)
+- [JavaScript](#tab-panel-6221)
+- [Rust](#tab-panel-6222)
 
 ```
 import { load } from '@tauri-apps/plugin-store';// when using `"withGlobalTauri": true`, you may use// const { load } = window.__TAURI__.store;
@@ -152,8 +151,8 @@ const store = new LazyStore('settings.json');
 
 ## Migrating from v1 and v2 beta/rc
 
-- [JavaScript](#tab-panel-6193)
-- [Rust](#tab-panel-6194)
+- [JavaScript](#tab-panel-6223)
+- [Rust](#tab-panel-6224)
 
 ```
 import { Store } from '@tauri-apps/plugin-store';import { LazyStore } from '@tauri-apps/plugin-store';
@@ -246,4 +245,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

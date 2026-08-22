@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -28,4 +27,3 @@ Changes](https://antigravity.google/assets/image/docs/editor/review_changes_edit
 Just like with artifacts, you can comment on any of the file diffs to
 communicate with the agent.
 
-{% endraw %}

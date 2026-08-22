@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1070,4 +1069,3 @@ USubscriptionHandle* Handle = Conn->SubscriptionBuilder()
     ->SubscribeToAllTables();
 ```
 
-{% endraw %}

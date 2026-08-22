@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Generate Text
@@ -23,7 +22,7 @@ For Python, we also offer our [xAI SDK](https://github.com/xai-org/xai-sdk-pytho
 
 ## Prerequisites
 
-Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys). Set your API key in your environment:
+Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-text-generate-text\&utm_content=api-keys). Set your API key in your environment:
 
 ```bash
 export XAI_API_KEY="your_api_key"
@@ -851,4 +850,3 @@ curl -X DELETE https://api.x.ai/v1/responses/{response_id} \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -m 3600
 ```
-{% endraw %}

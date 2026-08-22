@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Sandbox
@@ -54,4 +53,3 @@ deny = ["/secrets", "**/.env", "**/*.pem"]
 Select with `--sandbox my-profile` or `[sandbox] profile`. Built-in names cannot be redefined for selection. Field details: [Settings Reference](https://docs.x.ai/build/settings/reference).
 
 For untrusted trees, pair a strict profile with narrow [permission](https://docs.x.ai/build/features/permissions) allows (or headless `dontAsk`).
-{% endraw %}

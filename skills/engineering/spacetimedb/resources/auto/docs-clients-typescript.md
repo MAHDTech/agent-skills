@@ -1,4 +1,3 @@
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1611,4 +1610,3 @@ const [onlineUsers] = useTable(
 {/if}
 ```
 
-{% endraw %}

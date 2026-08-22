@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -144,4 +143,3 @@ With the needed breaking changes, as much as possible I am targeting having a co
 * 2026-06-01: Recorded that model selection should remain represented by session config options instead of a dedicated selector API.
 * 2026-05-28: Recorded the v2 decision to remove session modes in favor of session config options
 * 2026-05-06: Initial draft
-{% endraw %}

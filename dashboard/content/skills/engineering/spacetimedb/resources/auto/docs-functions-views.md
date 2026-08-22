@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1512,4 +1511,3 @@ triggered the refresh.
 - Review [Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) for real-time
   client data access
 
-{% endraw %}

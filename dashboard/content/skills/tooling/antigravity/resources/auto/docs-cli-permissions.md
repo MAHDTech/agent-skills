@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -150,4 +149,3 @@ Add these rules to your `~/.gemini/antigravity-cli/settings.json` file:
 - **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Customize
   keyboard hotkeys and buffers.
 
-{% endraw %}

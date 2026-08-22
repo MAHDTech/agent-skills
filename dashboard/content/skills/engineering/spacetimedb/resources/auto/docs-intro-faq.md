@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -486,4 +485,3 @@ version of `spacetime generate` that produced your bindings. If you
 recently updated SpacetimeDB, re-run `spacetime generate` to regenerate
 your bindings, and update your client SDK to the matching version.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Start
 
 # Use cases
@@ -164,4 +163,3 @@ For any role:
 Continue with [Get started](https://docs.x.ai/grok-bot/get-started), then review
 [files and results](https://docs.x.ai/grok-bot/files-and-results) and
 [approval boundaries](https://docs.x.ai/grok-bot/approvals-security-and-privacy).
-{% endraw %}

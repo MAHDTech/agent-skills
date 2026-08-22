@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -119,4 +118,3 @@ that are not customizable:
   to populate a web page or application, generate system or architecture
   diagrams, or other generative image tasks.
 
-{% endraw %}

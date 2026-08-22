@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Files API Integration
@@ -66,4 +65,3 @@ print(vid.url)
 * [Persisting Generated Output](https://docs.x.ai/developers/model-capabilities/imagine/files/outputs) — Full reference + examples for the output direction.
 * [Files → Public URLs](https://docs.x.ai/developers/files/public-urls) — Public URL lifecycle for any file, regardless of how it was created.
 * [Managing Files](https://docs.x.ai/developers/files/managing-files) — Upload, list, retrieve, update, and delete files.
-{% endraw %}

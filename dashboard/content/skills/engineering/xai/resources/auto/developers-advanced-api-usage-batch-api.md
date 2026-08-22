@@ -7,17 +7,16 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Advanced API Usage
 
 # Batch API
 
 The Batch API lets you process large volumes of requests asynchronously with reduced pricing and higher rate limits. For pricing details, see [Batch API Pricing](https://docs.x.ai/developers/pricing#batch-api-pricing). If you need lower latency on real-time requests instead, see [Priority Processing](https://docs.x.ai/developers/advanced-api-usage/priority-processing).
 
-> [!WARNING]
+> [!NOTE]
 > Model support
 >
-> `grok-4.6` and `grok-4.5` are not currently supported for Batch API requests and will be rejected.
+> Not every model accepts Batch API requests. See Details on each [model page](https://docs.x.ai/developers/models). Unsupported models reject batch requests.
 
 ## What is the Batch API?
 
@@ -38,7 +37,7 @@ The Batch API takes a different approach. Instead of processing requests immedia
 
 > [!NOTE]
 >
-> You can also create, monitor, and manage batches through the [xAI Console](https://console.x.ai/team/default/batches). The Console provides a visual interface for tracking batch progress and viewing results.
+> You can also create, monitor, and manage batches through the [xAI Console](https://console.x.ai/team/default/batches?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-advanced-api-usage-batch-api\&utm_content=batches). The Console provides a visual interface for tracking batch progress and viewing results.
 
 ## When to use the Batch API
 
@@ -998,4 +997,3 @@ Both [server-side tools](https://docs.x.ai/developers/tools/overview) and client
 * [gRPC Reference: Batch management](https://docs.x.ai/developers/grpc-api-reference#batch-management)
 * [Pricing — Batch API Pricing](https://docs.x.ai/developers/pricing#batch-api-pricing)
 * [xAI Python SDK](https://github.com/xai-org/xai-sdk-python)
-{% endraw %}

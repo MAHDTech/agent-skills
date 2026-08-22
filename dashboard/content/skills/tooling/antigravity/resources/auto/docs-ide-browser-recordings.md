@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -30,4 +29,3 @@ review. This view loops through the browser agent’s actions.
 ![Browser Recording
 Artifact](https://antigravity.google/assets/image/docs/artifacts/browser-recording-artifact.png)
 
-{% endraw %}

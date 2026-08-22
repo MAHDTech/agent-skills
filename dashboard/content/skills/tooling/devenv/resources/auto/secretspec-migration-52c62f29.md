@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Migration
 
 SecretSpec can discover declarations from supported providers or copy
@@ -90,4 +89,3 @@ values that are already present there.
 - Use [provider references](https://secretspec.dev/concepts/references/) when existing values
   have provider-native names or addresses
 
-{% endraw %}

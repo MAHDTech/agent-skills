@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Global Shortcut
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/global-shortcut)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-global-shortcut)[crates.io](https://crates.io/crates/tauri-plugin-global-shortcut)
@@ -27,17 +26,17 @@ Register global shortcuts.
 
 Install the global-shortcut plugin to get started.
 
-- [Automatic](#tab-panel-5994)
-- [Manual](#tab-panel-5995)
+- [Automatic](#tab-panel-6024)
+- [Manual](#tab-panel-6025)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5983)
-- [yarn](#tab-panel-5984)
-- [pnpm](#tab-panel-5985)
-- [deno](#tab-panel-5986)
-- [bun](#tab-panel-5987)
-- [cargo](#tab-panel-5988)
+- [npm](#tab-panel-6013)
+- [yarn](#tab-panel-6014)
+- [pnpm](#tab-panel-6015)
+- [deno](#tab-panel-6016)
+- [bun](#tab-panel-6017)
+- [cargo](#tab-panel-6018)
 
 ```
 npm run tauri add global-shortcut
@@ -81,11 +80,11 @@ cargo tauri add global-shortcut
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5989)
-    - [yarn](#tab-panel-5990)
-    - [pnpm](#tab-panel-5991)
-    - [deno](#tab-panel-5992)
-    - [bun](#tab-panel-5993)
+    - [npm](#tab-panel-6019)
+    - [yarn](#tab-panel-6020)
+    - [pnpm](#tab-panel-6021)
+    - [deno](#tab-panel-6022)
+    - [bun](#tab-panel-6023)
 
     ```
     npm install @tauri-apps/plugin-global-shortcut
@@ -111,8 +110,8 @@ cargo tauri add global-shortcut
 
 The global-shortcut plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-5981)
-- [Rust](#tab-panel-5982)
+- [JavaScript](#tab-panel-6011)
+- [Rust](#tab-panel-6012)
 
 ```
 import { register } from '@tauri-apps/plugin-global-shortcut';// when using `"withGlobalTauri": true`, you may use// const { register } = window.__TAURI__.globalShortcut;
@@ -172,4 +171,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

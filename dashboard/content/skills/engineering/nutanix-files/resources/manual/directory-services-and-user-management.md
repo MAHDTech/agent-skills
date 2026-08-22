@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Directory Services and User Management
 
 ## Active Directory and LDAP Integration
@@ -45,4 +44,3 @@ Nutanix Files implements granular admin roles within Prism Central:
 | **Files Operator** | Monitoring rights to view alerts, tasks, performance metrics, and capacity usage. |
 | **REST API Limited User** | API key authenticated account restricted to specific REST endpoints (SMB share creation/querying). |
 
-{% endraw %}

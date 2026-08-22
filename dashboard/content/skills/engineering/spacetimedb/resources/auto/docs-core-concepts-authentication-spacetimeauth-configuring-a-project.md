@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -164,4 +163,3 @@ recommend verifying your setup with a quick test.
 - [React integration
   guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/react-integration)
 
-{% endraw %}

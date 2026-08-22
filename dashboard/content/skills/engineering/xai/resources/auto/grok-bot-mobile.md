@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Start
 
 # Grok Bot for iOS
@@ -22,8 +21,8 @@ the app is closed.
 ## Requirements
 
 * iPhone with iOS 18 or later
-* An eligible plan: SuperGrok Heavy, Cursor Ultra, or Cursor Teams Premium
-  (sign in with your Cursor account)
+* An eligible plan: SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra,
+  or Cursor Teams Standard or Premium (sign in with your Cursor account)
 * Internet connection
 
 Grok Bot is currently designed for iOS on iPhone, not iPad or Android.
@@ -108,4 +107,3 @@ available on iPhone. Use the desktop app when a flow requires them.
 
 See [Message and collaborate](https://docs.x.ai/grok-bot/chat-and-collaboration) for group behavior and
 [Troubleshooting](https://docs.x.ai/grok-bot/troubleshooting) for computer recovery.
-{% endraw %}

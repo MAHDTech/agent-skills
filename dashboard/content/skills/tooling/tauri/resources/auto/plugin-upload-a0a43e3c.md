@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Upload
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/upload)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-upload)[crates.io](https://crates.io/crates/tauri-plugin-upload)
@@ -26,17 +25,17 @@ a remote HTTP server to disk.
 
 ## Setup
 
-- [Automatic](#tab-panel-6261)
-- [Manual](#tab-panel-6262)
+- [Automatic](#tab-panel-6291)
+- [Manual](#tab-panel-6292)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6250)
-- [yarn](#tab-panel-6251)
-- [pnpm](#tab-panel-6252)
-- [deno](#tab-panel-6253)
-- [bun](#tab-panel-6254)
-- [cargo](#tab-panel-6255)
+- [npm](#tab-panel-6280)
+- [yarn](#tab-panel-6281)
+- [pnpm](#tab-panel-6282)
+- [deno](#tab-panel-6283)
+- [bun](#tab-panel-6284)
+- [cargo](#tab-panel-6285)
 
 ```
 npm run tauri add upload
@@ -80,11 +79,11 @@ cargo tauri add upload
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6256)
-    - [yarn](#tab-panel-6257)
-    - [pnpm](#tab-panel-6258)
-    - [deno](#tab-panel-6259)
-    - [bun](#tab-panel-6260)
+    - [npm](#tab-panel-6286)
+    - [yarn](#tab-panel-6287)
+    - [pnpm](#tab-panel-6288)
+    - [deno](#tab-panel-6289)
+    - [bun](#tab-panel-6290)
 
     ```
     npm install @tauri-apps/plugin-upload
@@ -171,4 +170,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

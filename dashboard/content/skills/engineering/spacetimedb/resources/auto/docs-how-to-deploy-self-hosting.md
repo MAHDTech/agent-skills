@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -317,4 +316,3 @@ If errors are found, check the logs:
 sudo journalctl -u nginx --no-pager | tail -20
 ```
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -257,4 +256,3 @@ To avoid locking in confusing semantics, the proposal currently keeps `auth/stat
 * 2026-03-10: Rename `getAuthState` to `auth/status`, nest capability under `agentCapabilities.auth`
 * 2026-03-07: Address review feedback on auth state structure
 * 2026-03-05: Initial draft — preliminary proposal to start discussion
-{% endraw %}

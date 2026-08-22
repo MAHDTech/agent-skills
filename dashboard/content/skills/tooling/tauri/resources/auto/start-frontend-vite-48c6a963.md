@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Vite
 
 Vite is a build tool that aims to provide a faster and leaner
@@ -35,10 +34,10 @@ as of Vite 5.4.8.
     and dist folder along with the hooks to automatically run the Vite
     scripts:
 
-    - [npm](#tab-panel-6615)
-    - [yarn](#tab-panel-6616)
-    - [pnpm](#tab-panel-6617)
-    - [deno](#tab-panel-6618)
+    - [npm](#tab-panel-6645)
+    - [yarn](#tab-panel-6646)
+    - [pnpm](#tab-panel-6647)
+    - [deno](#tab-panel-6648)
 
     ```
     {  "build": {    "beforeDevCommand": "npm run dev",    "beforeBuildCommand": "npm run build",    "devUrl": "http://localhost:5173",    "frontendDist": "../dist"  }}
@@ -82,4 +81,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

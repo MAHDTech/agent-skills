@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Tools
 
 # Advanced Usage
@@ -804,4 +803,3 @@ print(response.server_side_tool_usage)
 print("\\n\\nServer Side Tool Calls:")
 print(response.tool_calls)
 ```
-{% endraw %}

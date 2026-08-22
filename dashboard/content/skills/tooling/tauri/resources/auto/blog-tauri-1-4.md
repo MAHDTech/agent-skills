@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Announcing Tauri 1.4.0
 
 Jun 14, 2023
@@ -30,10 +29,10 @@ improvements.
 Make sure to update both NPM and Cargo dependencies to the 1.4.0
 release. You can update the dependencies with:
 
-- [npm](#tab-panel-4361)
-- [yarn](#tab-panel-4362)
-- [pnpm](#tab-panel-4363)
-- [cargo](#tab-panel-4364)
+- [npm](#tab-panel-4379)
+- [yarn](#tab-panel-4380)
+- [pnpm](#tab-panel-4381)
+- [cargo](#tab-panel-4382)
 
 ```
 npm install @tauri-apps/cli@latest @tauri-apps/api@latest
@@ -162,4 +161,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

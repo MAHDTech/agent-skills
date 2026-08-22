@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Dotenv Provider
 
 The Dotenv provider stores secrets in local `.env` files for development
@@ -99,4 +98,3 @@ name is ignored.
 
 ## Security considerations
 
-{% endraw %}

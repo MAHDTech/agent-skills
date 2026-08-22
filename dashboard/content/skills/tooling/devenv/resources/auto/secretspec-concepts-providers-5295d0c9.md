@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Providers
 
 A provider is a storage backend from which SecretSpec reads secrets and,
@@ -325,4 +324,3 @@ Provider credentials follow these rules:
 - Learn how [Secret references](https://secretspec.dev/concepts/references/) separate provider
   selection from provider-native addresses.
 
-{% endraw %}

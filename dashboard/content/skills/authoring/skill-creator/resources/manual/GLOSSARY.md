@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "skill-creator"
 +++
 
-{% raw %}
 # Glossary - Authoring a Skill
 
 The domain model for what makes a skill great in this repo. A skill exists to wrangle determinism out of a stochastic system; the root virtue is **Predictability**, and every term below is a lever on it. This is the disclosed reference for [`SKILL.md`](../SKILL.md).
@@ -230,4 +229,3 @@ _Failure mode._ An instruction that changes nothing because the model already do
 
 _Avoid:_ redundant instruction, restating the obvious, belaboring
 
-{% endraw %}

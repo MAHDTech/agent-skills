@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [Skip to main content](https://help.x.com/forms/x-refund-request#twtr-spa-main)
 
 [Help Center](https://help.x.com/en)
@@ -162,4 +161,3 @@ This form requires a X account. Before submitting a report, please log in to you
 
 *    Accept all cookies 
 *    Refuse non-essential cookies
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1041,4 +1040,3 @@ In the [next part](https://spacetimedb.com/docs/tutorials/Godot/part-3), we'll b
 functionality of the game and you'll learn how to access your table data
 and call reducers in Godot.
 
-{% endraw %}

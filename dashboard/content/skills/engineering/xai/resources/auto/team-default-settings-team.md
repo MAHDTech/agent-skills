@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [](https://console.x.ai/ "SpaceXAI account home link")
 
 You are signing into Cloud Console
@@ -70,4 +69,3 @@ Consent Leg.Interest
 Reject All Confirm My Choices
 
 [![Image 2: Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/products/cookie-consent/)
-{% endraw %}

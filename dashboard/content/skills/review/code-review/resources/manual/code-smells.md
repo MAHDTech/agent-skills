@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "code-review"
 +++
 
-{% raw %}
 <!-- cspell:ignore Fowler -->
 
 # Code-smell baseline
@@ -32,4 +31,3 @@ Each smell reads _what it is_ → _how to fix_. Match each against the diff unde
 - **Middle Man** - a class or function that mostly just delegates onward. → Cut it and call the real target directly.
 - **Refused Bequest** - a subclass or implementer that ignores or overrides most of what it inherits. → Drop the inheritance and use composition.
 
-{% endraw %}

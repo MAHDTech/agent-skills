@@ -1,4 +1,3 @@
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1372,4 +1371,3 @@ Checks:
 - Confirm publish step and log markers are emitted by the same runtime
   instance.
 
-{% endraw %}

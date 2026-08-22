@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [Back to news](https://x.ai/news)
 
 Jul 29, 2026
@@ -17,7 +16,7 @@ Jul 29, 2026
 Introducing our most capable speech-to-speech voice model.
 
 [Try It Free
-](https://console.x.ai/team/default/voice/agents?campaign=think-fast-2-blog)[View
+](https://console.x.ai/team/default/voice/agents?campaign=think-fast-2-blog&utm_source=website&utm_medium=referral&utm_campaign=think-fast-2-blog)[View
 Docs](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech?campaign=think-fast-2-blog)
 
 Today, we're announcing Grok Voice Think Fast 2.0, our next-generation
@@ -115,7 +114,7 @@ We believe pricing should be predictable and transparent. Grok Voice
 Think Fast 2.0 is priced at [\$0.08 / min of
 audio](https://docs.x.ai/developers/pricing?campaign=think-fast-2-blog#voice-api-pricing).
 
-[](https://console.x.ai/team/default/voice/agents?campaign=think-fast-2-blog)
+[](https://console.x.ai/team/default/voice/agents?campaign=think-fast-2-blog&utm_source=website&utm_medium=referral&utm_campaign=think-fast-2-blog)
 
 Try It Free
 
@@ -123,4 +122,3 @@ Try It Free
 
 View Docs
 
-{% endraw %}

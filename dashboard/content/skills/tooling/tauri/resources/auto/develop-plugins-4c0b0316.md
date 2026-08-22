@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Plugin Development
 
 Plugins are able to hook into the Tauri lifecycle, expose Rust code that
@@ -44,6 +43,41 @@ scope](https://docs.npmjs.com/about-scopes) if possible). The Tauri
 naming convention for NPM packages is
 `@scope-name/plugin-{plugin-name}`.
 
+### Identifier Rules
+
+The `{plugin-name}` portion of a plugin crate, and any permission
+identifier referenced within capabilities, must follow Tauri’s
+identifier syntax:
+
+- Lowercase ASCII letters (`a` through `z`), digits (`0` through `9`),
+  and hyphens (`-`).
+- Hyphens cannot appear as the first or last character.
+- A single colon (`:`) is permitted only when the identifier uses a
+  prefix (for example `<plugin-name>:<permission-name>`).
+- Underscores (`_`), uppercase letters, and other characters are not
+  allowed.
+- The base name is limited to 64 characters; with a prefix, the full
+  identifier is limited to 129 characters.
+
+Examples:
+
+| Identifier                |         Valid?          |
+|---------------------------|:-----------------------:|
+| `sqlite`                  |            ✓            |
+| `sqlite-store`            |            ✓            |
+| `sqlite-store:allow-read` |            ✓            |
+| `sqlite_store`            |     ✗ (underscore)      |
+| `SqliteStore`             |      ✗ (uppercase)      |
+| `-sqlite`                 |   ✗ (leading hyphen)    |
+| `sqlite-`                 |   ✗ (trailing hyphen)   |
+| `sqlite::store`           | ✗ (multiple separators) |
+
+If a plugin or permission identifier violates these rules, the build
+fails with the error
+`identifiers can only include lowercase ASCII, hyphens which are not leading or trailing, and a single colon if using a prefix`.
+The offending value is usually the plugin name in your plugin’s
+`Cargo.toml` or a permission identifier in a `permissions/*.toml` file.
+
 ## Initialize Plugin Project
 
 To bootstrap a new plugin project, run `plugin new`. If you do not need
@@ -53,7 +87,7 @@ the plugin with Android and/or iOS support, use the `--android` and/or
 
 After installing, you can run the following to create a plugin project:
 
-- [npm](#tab-panel-4460)
+- [npm](#tab-panel-4478)
 
 ```
 npx @tauri-apps/cli plugin new [name]
@@ -443,4 +477,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

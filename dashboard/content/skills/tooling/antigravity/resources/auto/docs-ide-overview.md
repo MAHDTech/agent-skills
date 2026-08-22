@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -71,4 +70,3 @@ Structured deliverables created by agents to communicate
 accomplishments, including rich markdown plans, code diff views,
 architecture diagrams, images, and browser recordings.
 
-{% endraw %}

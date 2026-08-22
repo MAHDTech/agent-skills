@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # OS Information
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/os)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-os)[crates.io](https://crates.io/crates/tauri-plugin-os)
@@ -28,17 +27,17 @@ plugin.
 
 Install the OS Information plugin to get started.
 
-- [Automatic](#tab-panel-6108)
-- [Manual](#tab-panel-6109)
+- [Automatic](#tab-panel-6138)
+- [Manual](#tab-panel-6139)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6097)
-- [yarn](#tab-panel-6098)
-- [pnpm](#tab-panel-6099)
-- [deno](#tab-panel-6100)
-- [bun](#tab-panel-6101)
-- [cargo](#tab-panel-6102)
+- [npm](#tab-panel-6127)
+- [yarn](#tab-panel-6128)
+- [pnpm](#tab-panel-6129)
+- [deno](#tab-panel-6130)
+- [bun](#tab-panel-6131)
+- [cargo](#tab-panel-6132)
 
 ```
 npm run tauri add os
@@ -82,11 +81,11 @@ cargo tauri add os
 3.  If you’d like to use in JavaScript then install the npm package as
     well:
 
-    - [npm](#tab-panel-6103)
-    - [yarn](#tab-panel-6104)
-    - [pnpm](#tab-panel-6105)
-    - [deno](#tab-panel-6106)
-    - [bun](#tab-panel-6107)
+    - [npm](#tab-panel-6133)
+    - [yarn](#tab-panel-6134)
+    - [pnpm](#tab-panel-6135)
+    - [deno](#tab-panel-6136)
+    - [bun](#tab-panel-6137)
 
     ```
     npm install @tauri-apps/plugin-os
@@ -122,8 +121,8 @@ use. The value is set at compile time. Possible values are `linux`,
 `macos`, `ios`, `freebsd`, `dragonfly`, `netbsd`, `openbsd`, `solaris`,
 `android`, `windows`.
 
-- [JavaScript](#tab-panel-6095)
-- [Rust](#tab-panel-6096)
+- [JavaScript](#tab-panel-6125)
+- [Rust](#tab-panel-6126)
 
 ```
 import { platform } from '@tauri-apps/plugin-os';// when using `"withGlobalTauri": true`, you may use// const { platform } = window.__TAURI__.os;
@@ -198,4 +197,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

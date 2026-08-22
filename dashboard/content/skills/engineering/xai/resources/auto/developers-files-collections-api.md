@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Files & Collections
 
 # Using Collections via API
@@ -18,7 +17,7 @@ This guide walks you through managing collections programmatically using the xAI
 
 To use the Collections API, you need to create a Management API Key with the `AddFileToCollection` permission. This permission is required for uploading documents to collections.
 
-1. Navigate to the **Management Keys** section in the [xAI Console](https://console.x.ai/team/default/settings/management-keys)
+1. Navigate to the **Management Keys** section in the [xAI Console](https://console.x.ai/team/default/settings/management-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-files-collections-api\&utm_content=management-keys)
 2. Click on **Create Management Key**
 3. Select the `AddFileToCollection` permission along with any other permissions you need
 4. If you need to perform operations other than uploading documents (such as creating, updating, or deleting collections), enable the corresponding permissions in the **Collections Endpoint** group
@@ -375,4 +374,3 @@ curl https://management-api.x.ai/v1/collections/collection_dbc087b1-6c99-493d-86
 ```
 
 ## Next Steps
-{% endraw %}

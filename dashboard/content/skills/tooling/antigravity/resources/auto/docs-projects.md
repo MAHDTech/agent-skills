@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -91,4 +90,3 @@ Settings and permissions are both scoped at the project level:
   operate inside the new worktrees and the existing non-git local
   folders simultaneously.
 
-{% endraw %}

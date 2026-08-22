@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -63,4 +62,3 @@ request review on its plans or code edits before executing them.
   the driver’s seat, allowing the agent to operate with high autonomy
   while maintaining strict human-in-the-loop validation.
 
-{% endraw %}

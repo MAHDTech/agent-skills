@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Manage and protect
 
 # Approvals, security, and privacy
@@ -160,4 +159,3 @@ Backend retention and account deletion follow the applicable Cursor terms.
 * Review installed connectors and active routines regularly.
 * Pause a routine when its source system or expected workflow changes.
 * Preserve source links and an action log for important decisions.
-{% endraw %}

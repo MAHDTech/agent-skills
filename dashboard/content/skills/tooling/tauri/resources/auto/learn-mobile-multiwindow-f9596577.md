@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Multi-Window on Mobile
 
 Tauri supports multiple windows on Android and iOS, allowing your app to
@@ -190,8 +189,8 @@ iOS options:
   foreground scene. When not set, it is automatically inherited from the
   manager.
 
-- [JavaScript](#tab-panel-5782)
-- [Rust](#tab-panel-5783)
+- [JavaScript](#tab-panel-5812)
+- [Rust](#tab-panel-5813)
 
 ```
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
@@ -210,8 +209,8 @@ let window = builder.build()?;
 Once a window has been created, you can retrieve its platform-specific
 identifier:
 
-- [JavaScript](#tab-panel-5784)
-- [Rust](#tab-panel-5785)
+- [JavaScript](#tab-panel-5814)
+- [Rust](#tab-panel-5815)
 
 ```
 const activityName = await window.activityName();const sceneId = await window.sceneIdentifier();
@@ -234,4 +233,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

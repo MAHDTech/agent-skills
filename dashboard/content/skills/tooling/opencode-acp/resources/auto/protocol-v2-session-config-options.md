@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -354,4 +353,3 @@ This notification also contains the complete configuration state. Common reasons
 * Switching modes after completing a planning phase
 * Falling back to a different model due to rate limits or errors
 * Adjusting available options based on context discovered during execution
-{% endraw %}

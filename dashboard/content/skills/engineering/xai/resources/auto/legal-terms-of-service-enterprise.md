@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 This xAI Enterprise Terms of Service (“**Agreement**”) is entered into by and between the business customer of xAI for xAI business services, including the xAI API and Grok Business, (“**Customer**”) and X.AI LLC (“**xAI**”) (Customer and xAI each, a “**party**” and collectively, the “**parties**”), and sets forth the terms and conditions under which Customer subscribes to and uses such xAI Services. This Agreement and is effective as of the date Customer makes the applicable purchase memorialized by an xAI online purchase confirmation (the “**Effective Date**”). The individual who signs, clicks through, or otherwise agrees to the applicable purchase terms referencing or incorporating this Agreement binds Customer to the terms and conditions of this Agreement and has been duly authorized by Customer to do so.
 
 ***Note: these terms are for enterprise (business) users of the xAI API and related xAI Services who are at least 18 years old. For consumer use of Grok, please see our [Consumer Terms of Service.](https://x.ai/legal/terms-of-service)**
@@ -129,4 +128,3 @@ BY ENTERING INTO THIS AGREEMENT, CUSTOMER AND XAI ARE EACH WAIVING THE RIGHT TO 
     11.   **Export Compliance**. Each party shall comply with all applicable export and re-export control and trade and economic sanctions laws, including the Export Administration Regulations, trade and economic sanctions, and the International Traffic in Arms Regulations. Neither party, nor any of its subsidiaries or any person acting on its behalf or owning 50% or more of its equity securities or other equivalent voting interests, is (a) a person on the List of Specially Designated Nationals and Blocked Persons or any other list of sanctioned persons administered by OFAC or any other governmental entity, or (b) a national or resident of, or a segment of the government of, any country or territory for which the United States has embargoed goods or imposed trade sanctions.
 
     12.   **Entire Agreement**. This Agreement is the complete and exclusive statement of the mutual understanding of the parties, and supersedes and cancels all previous written and oral agreements and communications, relating to the subject matter of this Agreement. Any pre-printed terms in a Customer purchase order or similar document are null and void.
-{% endraw %}

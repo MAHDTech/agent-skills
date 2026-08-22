@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -304,4 +303,3 @@ record:
 - See [Row-Level Security](https://spacetimedb.com/docs/tables/access-permissions) for
   controlling data visibility
 
-{% endraw %}

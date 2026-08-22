@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Languages
 
 What if you could have the tooling for any programming language by flipping a toggle?
@@ -37,4 +36,3 @@ Entering shell ...
 (devenv) $ python --version
 Python 3.11.3
 ```
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -267,4 +266,3 @@ After creating your database module:
   [Procedures](https://spacetimedb.com/docs/functions/procedures)
 - [Build and publish your module](https://spacetimedb.com/docs/databases/building-publishing)
 
-{% endraw %}

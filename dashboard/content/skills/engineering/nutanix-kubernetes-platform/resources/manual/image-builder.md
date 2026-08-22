@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Nutanix Image Builder
 
 You can add images in the following ways:
@@ -1388,4 +1387,3 @@ be rotated independently.
 
 Use RHSM_POOL_ID to attach a specific subscription pool
 
-{% endraw %}

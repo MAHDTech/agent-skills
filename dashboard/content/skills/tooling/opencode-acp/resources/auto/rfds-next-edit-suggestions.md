@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -683,4 +682,3 @@ Agents that perform server-side indexing (embedding-based retrieval, semantic se
 ## Revision history
 
 * 2026-02-22: Initial draft
-{% endraw %}

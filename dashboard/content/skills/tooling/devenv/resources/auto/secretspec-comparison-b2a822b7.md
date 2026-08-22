@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Comparison
 
 SecretSpec is the application-facing layer of a secrets system. It
@@ -67,4 +66,3 @@ also define an ordered fallback chain, which tries the next provider
 when an earlier provider does not return the value. SecretSpec keeps
 those storage decisions outside the application’s code.
 
-{% endraw %}

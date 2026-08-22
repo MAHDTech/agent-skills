@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Declarative Configuration
 
 SecretSpec uses `secretspec.toml` to declare what secrets your
@@ -77,4 +76,3 @@ SECRET_NAME = {  description = "Human-readable explanation",  # Required: shown 
 [profiles.default]# Inherits DATABASE_URL, INTERNAL_API_KEY from base# Inherits JWT_SECRET, SESSION_SECRET from auth# Service-specific additions:STRIPE_API_KEY = { description = "Stripe payment API", required = true }REDIS_URL = { description = "Redis cache connection", required = true }PORT = { description = "Server port", required = false, default = "3000" }
 ```
 
-{% endraw %}

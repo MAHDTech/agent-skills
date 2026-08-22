@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -487,4 +486,3 @@ and subscriptions your app depends on.
 - [Authentication](https://spacetimedb.com/docs/core-concepts/authentication)
 - [Schedule tables](https://spacetimedb.com/docs/tables/schedule-tables)
 
-{% endraw %}

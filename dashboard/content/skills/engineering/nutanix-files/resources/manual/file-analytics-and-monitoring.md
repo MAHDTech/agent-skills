@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: File Analytics and Monitoring
 
 ## File Analytics Overview
@@ -28,4 +27,3 @@ Nutanix File Analytics is a dedicated microservice that delivers real-time visib
 - **Syslog Forwarding**: Streams file audit logs to SIEM systems (Splunk, Elastic, QRadar).
 - **Event Streaming**: Integrates with Kafka or NATS message queues for custom event automation.
 
-{% endraw %}

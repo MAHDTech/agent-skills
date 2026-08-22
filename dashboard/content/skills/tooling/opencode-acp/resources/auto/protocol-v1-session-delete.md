@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -100,4 +99,3 @@ On success, the Agent returns an empty result:
 * Agents may implement soft delete or hard delete. ACP only specifies the user-facing session-list behavior.
 * Behavior for `session/load` on a deleted session is implementation-defined.
 * Behavior for deleting an active session is implementation-defined.
-{% endraw %}

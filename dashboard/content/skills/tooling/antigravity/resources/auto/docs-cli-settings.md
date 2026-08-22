@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -252,4 +251,3 @@ and extensibility options:
   sheets listing all configuration options, commands, and default key
   maps.
 
-{% endraw %}

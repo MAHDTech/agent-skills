@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Gopass Provider
 
 The Gopass provider integrates with [gopass](https://www.gopass.pw/), a
@@ -132,4 +131,3 @@ Only the first line of an entry is read back — if an entry was written
 outside of `secretspec` and contains multiple lines, everything after
 the first line is discarded on `get`.
 
-{% endraw %}

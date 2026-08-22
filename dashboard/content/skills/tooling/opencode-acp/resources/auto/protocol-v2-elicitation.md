@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -205,4 +204,3 @@ rules to ACP.
 
 See the [schema reference](https://agentclientprotocol.com/protocol/v2/schema#elicitation%2Fcreate) for the
 complete request and response types.
-{% endraw %}

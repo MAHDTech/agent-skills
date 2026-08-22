@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -30,4 +29,3 @@ give feedback to the agent.
 ![Browser Screenshot
 Artifact](https://antigravity.google/assets/image/docs/artifacts/browser-screenshot-artifact.png)
 
-{% endraw %}

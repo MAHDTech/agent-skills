@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Vault Provider
 
 The Vault provider integrates with HashiCorp Vault for centralized
@@ -273,4 +272,3 @@ $ secretspec check --provider "vault://127.0.0.1:8200/secret?tls=false"
 
 Terminal window
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Collections API
 
 # Collections REST API Overview
@@ -28,4 +27,3 @@ The base url for searching within `collections` is shared with [REST API](https:
 
 * [Collection Management](https://docs.x.ai/developers/rest-api-reference/collections/collection)
 * [Search in Collections](https://docs.x.ai/developers/rest-api-reference/collections/search)
-{% endraw %}

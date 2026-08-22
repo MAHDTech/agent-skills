@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -441,4 +440,3 @@ For language-specific details, see:
 - [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript)
 - [Unreal SDK Reference](https://spacetimedb.com/docs/clients/unreal)
 
-{% endraw %}

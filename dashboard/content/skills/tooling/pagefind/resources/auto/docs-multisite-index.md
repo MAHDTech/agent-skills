@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
-{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -177,4 +176,3 @@ Due to index merging happening in the browser, your additional search indexes mu
 ### Merging multiple languages
 
 Merged indexes will be searched using the WebAssembly module from your main instance. This means that merging an index from another language will use the language support from your main Pagefind instance.
-{% endraw %}

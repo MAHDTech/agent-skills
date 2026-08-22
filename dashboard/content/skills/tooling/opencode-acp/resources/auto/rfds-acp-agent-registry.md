@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -219,4 +218,3 @@ Authentication RFD](@/skills/tooling/opencode-acp/resources/auto/rfds-auth-metho
 * 2025-11-28: Initial draft.
 * 2025-12-16: Minors.
 * 2026-02-04: Updated to match latest schema — removed `schema_version`, `homepage`, `capabilities`, and `auth` fields; added `icon` field; restructured `distribution` into `binary`, `npx`, and `uvx` types.
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -107,4 +106,3 @@ the “Account” section. When toggled on, Antigravity collects
 interactions for use in evaluating, developing, and improving
 Antigravity and models that support Antigravity.
 
-{% endraw %}

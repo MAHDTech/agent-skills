@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Nutanix Kubernetes Platform Overview
 
 NUTANIX KUBERNETES® PLATFORM OVERVIEW
@@ -337,4 +336,3 @@ Yes - - - - - -
 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-{% endraw %}

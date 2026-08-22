@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -93,4 +92,3 @@ harness co-trained with Gemini models:
   - **AGY SDK**: Skills that optimize your agent’s ability to use the
     Antigravity SDK to build custom AI agents tailored to your workflow.
 
-{% endraw %}

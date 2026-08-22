@@ -7,14 +7,13 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Grok Business / Enterprise
 
 # Connector Management
 
 **On Grok Business and Enterprise plans, a team admin must add a connector in the cloud console before team members can connect and use it.** This gives your organization control over which external services Grok can access.
 
-Access the connectors page by logging into [console.x.ai](https://console.x.ai), selecting your team, and navigating to **Grok Business → Connectors**. Actions like adding or removing connectors require team management permissions—see the [Permissions](#permissions) section for details.
+Access the connectors page by logging into [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-connector-management\&utm_content=console-home), selecting your team, and navigating to **Grok Business → Connectors**. Actions like adding or removing connectors require team management permissions—see the [Permissions](#permissions) section for details.
 
 ## Adding connectors
 
@@ -63,4 +62,3 @@ If you lack permissions, contact your team admin to provision the connectors you
 >
 >  For white-glove support, Enterprise upgrades, or connector setup
 > assistance, contact xAI sales at .
-{% endraw %}

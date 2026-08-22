@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Prerequisites and Network Configuration
 
 ## NUTANIX OBJECTS PREREQUISITES AND
@@ -757,4 +756,3 @@ f. Select the VPC and enter Nutanix Objects public IP addresses required for the
 
 The floating IP addresses are assigned. What to do nextAfter creating all the networks and assignment of floating IP addresses, you can start the Nutanix Objects deployment. For more information, see Nutanix Objects Deployment on page 65. You can also configure VPC modes without NAT. For more information, see Configuring Virtual Private Cloud Modes for Nutanix Objects Without Network Address Translation on page 51. Objects | Configuring Virtual Private Cloud Modes for Nutanix Objects with Network Address Translation |
 
-{% endraw %}

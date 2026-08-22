@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
-{% raw %}
 # macOS Code Signing
 
 Code signing is required on macOS to allow your application to be listed
@@ -134,8 +132,8 @@ To notarize your application, you must provide credentials for Tauri to
 authenticate with Apple. This can be done via the App Store Connect API,
 or via your Apple ID.
 
-- [App Store Connect](#tab-panel-4612)
-- [Apple ID](#tab-panel-4613)
+- [App Store Connect](#tab-panel-4636)
+- [Apple ID](#tab-panel-4637)
 
 1.  Open the [App Store Connect’s Users and Access
     page](https://appstoreconnect.apple.com/access/users), select the
@@ -190,5 +188,4 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}{% raw %}
-{% endraw %}
+

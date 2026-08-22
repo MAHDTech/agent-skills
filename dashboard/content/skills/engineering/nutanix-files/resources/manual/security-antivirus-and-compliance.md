@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Security, Antivirus, and Compliance
 
 ## Security Architecture & Defense in Depth
@@ -44,4 +43,3 @@ Nutanix Files uses the Internet Content Adaptation Protocol (ICAP) to integrate 
 - **Data-at-Rest Encryption**: FIPS 140-2 validated encryption using AES-256. Managed at cluster level via Nutanix Native Key Manager or external KMS (KMIP).
 - **In-Flight Encryption**: SMB 3.0 AES-128-GCM / AES-128-CCMP wire encryption for all client-to-FSVM sessions.
 
-{% endraw %}

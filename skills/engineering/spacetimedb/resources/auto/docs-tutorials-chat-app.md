@@ -1,4 +1,3 @@
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -3093,4 +3092,3 @@ Congratulations! You've built a chat app with SpacetimeDB.
 - Learn about [Procedures](https://spacetimedb.com/docs/functions/procedures) for making
   external API calls
 
-{% endraw %}

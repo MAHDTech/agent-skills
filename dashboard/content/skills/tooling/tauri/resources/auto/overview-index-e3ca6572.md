@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Tauri 2.0
 
 Create small, fast, secure, cross-platform applications
@@ -16,15 +15,15 @@ Create small, fast, secure, cross-platform applications
 
 Create a Project
 
-- [Bash](#tab-panel-4908)
-- [PowerShell](#tab-panel-4909)
-- [Fish](#tab-panel-4910)
-- [npm](#tab-panel-4911)
-- [Yarn](#tab-panel-4912)
-- [pnpm](#tab-panel-4913)
-- [deno](#tab-panel-4914)
-- [bun](#tab-panel-4915)
-- [Cargo](#tab-panel-4916)
+- [Bash](#tab-panel-4932)
+- [PowerShell](#tab-panel-4933)
+- [Fish](#tab-panel-4934)
+- [npm](#tab-panel-4935)
+- [Yarn](#tab-panel-4936)
+- [pnpm](#tab-panel-4937)
+- [deno](#tab-panel-4938)
+- [bun](#tab-panel-4939)
+- [Cargo](#tab-panel-4940)
 
 ```
 sh <(curl https://create.tauri.app/sh)
@@ -424,4 +423,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -610,14 +610,6 @@ export function escapeOrphanTypeBrackets(content: string): string {
     return processedLines.join("\n")
 }
 
-// Wrap document content containing raw {{ or {% in Zola {% raw %} blocks to prevent Tera template build errors
-export function protectZolaDelimiters(content: string): string {
-    if (/\{\{|\{%/.test(content) && !content.includes("{% raw %}")) {
-        return `{% raw %}\n${content}\n{% endraw %}`
-    }
-    return content
-}
-
 // Strip non-printable control characters, null bytes (\x00), and replacement characters (\uFFFD)
 export function sanitizeControlCharacters(content: string): string {
     return (
@@ -1189,7 +1181,6 @@ export async function downloadAction(
                 finalContent = decodeHtmlEntities(finalContent)
                 finalContent = escapeOrphanTypeBrackets(finalContent)
                 finalContent = normalizeMarkdownFormatting(finalContent)
-                finalContent = protectZolaDelimiters(finalContent)
 
                 await fs.writeFile(job.destFile, finalContent, "utf-8")
                 savedFiles.add(path.basename(job.destFile))

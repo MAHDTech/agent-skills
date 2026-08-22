@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # NFC
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/nfc)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-nfc)[crates.io](https://crates.io/crates/tauri-plugin-nfc)
@@ -27,16 +26,16 @@ Read and write NFC tags on Android and iOS.
 
 Install the nfc plugin to get started.
 
-- [Automatic](#tab-panel-6063)
-- [Manual](#tab-panel-6064)
+- [Automatic](#tab-panel-6093)
+- [Manual](#tab-panel-6094)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6053)
-- [yarn](#tab-panel-6054)
-- [pnpm](#tab-panel-6055)
-- [bun](#tab-panel-6056)
-- [cargo](#tab-panel-6057)
+- [npm](#tab-panel-6083)
+- [yarn](#tab-panel-6084)
+- [pnpm](#tab-panel-6085)
+- [bun](#tab-panel-6086)
+- [cargo](#tab-panel-6087)
 
 ```
 npm run tauri add nfc
@@ -76,11 +75,11 @@ cargo tauri add nfc
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6058)
-    - [yarn](#tab-panel-6059)
-    - [pnpm](#tab-panel-6060)
-    - [deno](#tab-panel-6061)
-    - [bun](#tab-panel-6062)
+    - [npm](#tab-panel-6088)
+    - [yarn](#tab-panel-6089)
+    - [pnpm](#tab-panel-6090)
+    - [deno](#tab-panel-6091)
+    - [bun](#tab-panel-6092)
 
     ```
     npm install @tauri-apps/plugin-nfc
@@ -173,8 +172,8 @@ scan and write to NFC tags.
 Not every mobile device has the capability to scan NFC tags, so you
 should check for availability before using the scan and write APIs.
 
-- [JavaScript](#tab-panel-6045)
-- [Rust](#tab-panel-6046)
+- [JavaScript](#tab-panel-6075)
+- [Rust](#tab-panel-6076)
 
 ```
 import { isAvailable } from '@tauri-apps/plugin-nfc';
@@ -193,8 +192,8 @@ The plugin can scan either generic NFC tags or NFC tags with a NDEF (NFC
 Data Exchange Format) message, which is a standard format to encapsulate
 typed data in an NFC tag.
 
-- [JavaScript](#tab-panel-6047)
-- [Rust](#tab-panel-6048)
+- [JavaScript](#tab-panel-6077)
+- [Rust](#tab-panel-6078)
 
 ```
 import { scan } from '@tauri-apps/plugin-nfc';
@@ -215,8 +214,8 @@ The NFC scanner can also filter tags with a specific URI format, mime
 type or NFC tag technologies. In this case, the scan will only detect
 tags that matches the provided filters.
 
-- [JavaScript](#tab-panel-6049)
-- [Rust](#tab-panel-6050)
+- [JavaScript](#tab-panel-6079)
+- [Rust](#tab-panel-6080)
 
 ```
 import { scan, TechKind } from '@tauri-apps/plugin-nfc';
@@ -236,8 +235,8 @@ The `write` API can be used to write a payload to a NFC tag. If there’s
 no scanned tag with `keepSessionAlive: true`, the application will first
 scan an NFC tag.
 
-- [JavaScript](#tab-panel-6051)
-- [Rust](#tab-panel-6052)
+- [JavaScript](#tab-panel-6081)
+- [Rust](#tab-panel-6082)
 
 ```
 import { write, textRecord, uriRecord } from '@tauri-apps/plugin-nfc';
@@ -302,4 +301,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

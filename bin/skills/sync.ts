@@ -9,6 +9,8 @@ import {
     groupByCategory,
     CATEGORIES,
     rewriteSkillLinks,
+    stripLegacyRawWrapper,
+    escapeZolaShortcodes,
     logTask,
     printSummary,
     unlinkSkills,
@@ -90,15 +92,13 @@ async function syncResources(
                     /\r\n/g,
                     "\n"
                 )
-                const body = rewriteSkillLinks(raw, contentBase, linkSrcDir)
+                const body = rewriteSkillLinks(
+                    stripLegacyRawWrapper(raw),
+                    contentBase,
+                    linkSrcDir
+                )
                 const sibMermaid = body.includes("```mermaid")
-                let safeBody = body
-                if (safeBody.includes("{% endraw %}")) {
-                    safeBody = safeBody.replace(
-                        /\{% endraw %\}/g,
-                        "{% endraw %}{% raw %}"
-                    )
-                }
+                const safeBody = escapeZolaShortcodes(body)
 
                 await fs.writeFile(
                     finalDestPath,
@@ -111,9 +111,7 @@ mermaid = ${sibMermaid}
 skill_name = ${JSON.stringify(skillName)}
 +++
 
-{% raw %}
 ${safeBody}
-{% endraw %}
 `
                 )
             } else {
@@ -305,7 +303,7 @@ category = ${JSON.stringify(key)}
 mermaid = ${skillMermaid}
 +++
 
-${skillBody}
+${escapeZolaShortcodes(skillBody)}
 `
                 )
 
@@ -333,7 +331,7 @@ mermaid = ${sibMermaid}
 skill_name = ${JSON.stringify(s.dirName)}
 +++
 
-${body}
+${escapeZolaShortcodes(body)}
 `
                     )
                 }

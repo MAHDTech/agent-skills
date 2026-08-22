@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [Skip to main content](https://help.x.com/#twtr-main)
 
  Help Center 
@@ -227,4 +226,3 @@ Undo Post Posts
 
 *    Accept all cookies 
 *    Refuse non-essential cookies
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Provider caching
 
 ## The problem
@@ -337,4 +336,3 @@ If the same manifest is slower under WSL or in a container:
 | A warm run is much faster than the first | Provider CLI, token, DNS, or connection cache | Preserve the relevant cache and benchmark cold runs separately |
 | Only WSL or a container is slower | Filesystem, DNS, VPN, proxy, or executable interoperability | Compare the host/container probes and move hot files off mounted host paths |
 
-{% endraw %}

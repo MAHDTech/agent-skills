@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Nutanix Kubernetes Platform Requirements
 
 NUTANIX KUBERNETES PLATFORM REQUIREMENTS
@@ -255,4 +254,3 @@ page 1001.
 - Ensure that you add at least 40 GB of raw storage to each of your cluster
   worker nodes.
 
-{% endraw %}

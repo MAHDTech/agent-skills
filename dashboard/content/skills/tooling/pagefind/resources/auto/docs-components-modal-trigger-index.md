@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
-{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -71,4 +70,3 @@ Supported syntax:
 - **Case-insensitive:** Keys are normalized to lowercase
 
 The shortcut display auto-detects the platform to show the correct modifier key (⌘ on Mac, Ctrl on other platforms).
-{% endraw %}

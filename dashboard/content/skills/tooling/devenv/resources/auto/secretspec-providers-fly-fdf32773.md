@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
-{% raw %}
 # Fly.io secrets provider
 
 The Fly.io provider publishes declared values to an application’s
@@ -242,5 +240,4 @@ in the provider URI.
 - `secretspec delete` first lists names so it can report whether
   anything was removed. The listing never contains plaintext values.
 
-{% endraw %}{% raw %}
-{% endraw %}
+

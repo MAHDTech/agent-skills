@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 ## Brownfield
 
 Compatibility with any front-end framework means you don't have to
@@ -136,4 +135,3 @@ Send messages through a channel
 [![DigitalOcean](https://v1.tauri.app/img/index/partners/DigitalOcean_color_light.svg)](https://www.digitalocean.com)[![Netlify](https://v1.tauri.app/img/index/partners/Netlify_color_light.svg)](https://www.netlify.com)[![keygen](https://v1.tauri.app/img/index/partners/keygen_color_light.svg)](https://keygen.sh)[![ClickUp](https://v1.tauri.app/img/index/partners/ClickUp_color_light.svg)](https://clickup.com)[![Mintter](https://v1.tauri.app/img/index/partners/Mintter_color_light.svg)](https://mintter.com)[![Leniolabs\_](https://v1.tauri.app/img/index/partners/leniolabs_color_light.svg)](https://www.leniolabs.com)[![VPS
 Server](https://v1.tauri.app/img/index/partners/vps_server_color_light.svg)](https://www.vpsserver.com)[![Dimension](https://v1.tauri.app/img/index/partners/dimension_color_light.svg)](https://dimension.dev/)[![Lightfinder](https://v1.tauri.app/img/index/partners/lightfinder_color_light.svg)](https://lightfinder.com/)
 
-{% endraw %}

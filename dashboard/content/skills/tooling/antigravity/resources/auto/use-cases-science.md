@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Why choose Google Antigravity for science
 
 [Explore product](https://antigravity.google/product)
@@ -57,4 +56,3 @@ reagent generation—condensing hours of manual work into minutes.
 
 [Download](https://antigravity.google/download)
 
-{% endraw %}

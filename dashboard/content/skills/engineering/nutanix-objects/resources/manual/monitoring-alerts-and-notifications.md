@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Monitoring, Alerts, and Event Notifications
 
 ## MONITORING AND ALERTS IN NUTANIX
@@ -1038,4 +1037,3 @@ configured.
 
 Enabled. Objects | Nutanix Objects Notifications |
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -39,4 +38,3 @@ folders.
 - Enforcing this boundary protects your local sensitive data. Enable
   non-workspace access with caution.
 
-{% endraw %}

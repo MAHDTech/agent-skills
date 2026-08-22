@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Tests
 
 Tests are a way to ensure that your development environment is working as expected.
@@ -114,4 +113,3 @@ devenv.nix
 - `wait_for_port \<port\> <timeout>`: waits for a port to be open
 
 If you'd like more functions to be added, take a look at [NixOS tests](https://nixos.org/manual/nixos/stable/#sec-nixos-tests) and open an issue for what you need.
-{% endraw %}

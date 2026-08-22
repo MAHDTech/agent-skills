@@ -31,6 +31,8 @@ const {
     cleanStaleLinks,
     linkSkills,
     rewriteSkillLinks,
+    stripLegacyRawWrapper,
+    escapeZolaShortcodes,
     registerAntigravity,
     ANTIGRAVITY_LOCK_FILE,
     ANTIGRAVITY_CONFIG_DIR,
@@ -286,6 +288,69 @@ describe("Skills unit tests", () => {
             expect(await existsRaw(brokenSymlink)).toBe(false)
 
             await fs.remove(tempTestDir)
+        })
+    })
+
+    describe("stripLegacyRawWrapper", () => {
+        it("removes a whole-file {% raw %} wrapper", () => {
+            expect(
+                stripLegacyRawWrapper(
+                    "{% raw %}\nHello {{ name }}\n{% endraw %}\n"
+                )
+            ).toBe("Hello {{ name }}")
+        })
+
+        it("leaves unwrapped content and mid-document raw blocks alone", () => {
+            expect(stripLegacyRawWrapper("Plain text")).toBe("Plain text")
+            const midDoc = "Intro\n{% raw %}\nx\n{% endraw %}\nOutro"
+            expect(stripLegacyRawWrapper(midDoc)).toBe(midDoc)
+        })
+    })
+
+    describe("escapeZolaShortcodes", () => {
+        it("escapes inline shortcode-shaped calls", () => {
+            expect(
+                escapeZolaShortcodes(
+                    "<a href=\"{{ get_url(path='@/x.md') }}\">"
+                )
+            ).toBe("<a href=\"{{/* get_url(path='@/x.md') */}}\">")
+        })
+
+        it("leaves plain template variables and Jinja tags alone", () => {
+            const input =
+                "{{ page.title }} and {% if x %}{% endblock content %}{%- for i in y -%}"
+            expect(escapeZolaShortcodes(input)).toBe(input)
+        })
+
+        it("does not double-escape already escaped shortcodes", () => {
+            const input = "{{/* get_url(path='@/x.md') */}}"
+            expect(escapeZolaShortcodes(input)).toBe(input)
+        })
+
+        it("escapes balanced body shortcodes as a pair", () => {
+            expect(
+                escapeZolaShortcodes(
+                    '{% highlight(lang="rust") %} code {% end %}'
+                )
+            ).toBe('{%/* highlight(lang="rust") */%} code {%/* end */%}')
+        })
+
+        it("splits unbalanced body shortcode delimiters instead of escaping", () => {
+            const output = escapeZolaShortcodes(
+                'lone {% highlight(lang="rust") %} opener'
+            )
+            expect(output).toBe(
+                'lone {\u2060% highlight(lang="rust") %} opener'
+            )
+
+            const loneEnd = escapeZolaShortcodes("lone {% end %} tag")
+            expect(loneEnd).toBe("lone {\u2060% end %} tag")
+        })
+
+        it("handles multi-line inline shortcode calls", () => {
+            expect(escapeZolaShortcodes("{{foo(a=1,\nb=2)}}")).toBe(
+                "{{/*foo(a=1,\nb=2)*/}}"
+            )
         })
     })
 

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "software-factory"
 +++
 
-{% raw %}
 # Status file
 
 Lives at `docs/plans/<feature-slug>/00-status.md`. Created before Gate 1, updated at every approval. It holds gate state and nothing else - slice progress lives on the issue tracker, and this file points at it.
@@ -31,4 +30,3 @@ Lives at `docs/plans/<feature-slug>/00-status.md`. Created before Gate 1, update
 
 The Notes section is the compaction target: at every gate and slice boundary, move anything that exists only in the chat into it, or into the gate doc it belongs to.
 
-{% endraw %}

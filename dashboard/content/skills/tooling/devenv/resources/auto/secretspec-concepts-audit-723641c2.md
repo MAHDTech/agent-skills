@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Audit Logging
 
 secretspec records every secret access to a local audit log so you can
@@ -122,4 +121,3 @@ turn it off:
 
 ~/.config/secretspec/config.toml
 
-{% endraw %}

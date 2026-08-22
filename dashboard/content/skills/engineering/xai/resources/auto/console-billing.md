@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Key Information
 
 # Manage Billing
@@ -19,13 +18,13 @@ There are two billing options:
 * **Prepaid credits:** Pre-purchase credits for your team. API consumption will be deducted from this credit balance.
 * **Monthly invoiced billing:** Receive an invoice for your API consumption at the end of the month. If you don't have sufficient prepaid credits, your default payment method will be charged.
 
-**Monthly invoiced billing is disabled by default.** To request this, contact sales@x.ai, or use the contact link on the [Billing](https://console.x.ai/team/default/billing) page:
+**Monthly invoiced billing is disabled by default.** To request this, contact sales@x.ai, or use the contact link on the [Billing](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing) page:
 
 ## Prepaid credits
 
-This is the most common way to use the API, and allows you to control spending by purchasing credits in advance. Your usage can then be monitored on the [Usage explorer](https://console.x.ai/team/default/usage) page.
+This is the most common way to use the API, and allows you to control spending by purchasing credits in advance. Your usage can then be monitored on the [Usage explorer](https://console.x.ai/team/default/usage?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=usage) page.
 
-Purchase credits via [Billing -> API spend management](https://console.x.ai/team/default/billing).
+Purchase credits via [Billing -> API spend management](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing).
 
 From here you can also view your credit balance, and use a promo code if you have one.
 
@@ -65,19 +64,19 @@ Enterprise customers might find it beneficial to enroll in monthly invoiced bill
 
 When you have set a **$0 invoiced billing limit** (default), xAI will only use your available prepaid credits. **Your API requests will be automatically rejected once your prepaid credits are depleted.**
 
-If you want to use monthly billing, you can **increase your invoiced billing limit** on [Billing -> API Credits](https://console.x.ai/team/default/billing) page. xAI will attempt to use your prepaid credits first, and the remaining amount will be charged to your default payment method at the end of the month. This ensures you won't experience interruption while consuming the API.
+If you want to use monthly billing, you can **increase your invoiced billing limit** on [Billing -> API Credits](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing) page. xAI will attempt to use your prepaid credits first, and the remaining amount will be charged to your default payment method at the end of the month. This ensures you won't experience interruption while consuming the API.
 
 Once your monthly invoiced billing amount has reached the invoiced billing limit, you won't be able to get a response until you have raised the invoiced billing limit.
 
 ## Saving payment method
 
-When you make a purchase, we automatically keep it on file to make your next purchase easier. You can also manually add payment method on xAI Console [Billing -> Billing details -> Add Payment Information](https://console.x.ai/team/default/billing).
+When you make a purchase, we automatically keep it on file to make your next purchase easier. You can also manually add payment method on xAI Console [Billing -> Billing details -> Add Payment Information](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing).
 
 Currently we don't allow users to remove the last payment method on file. There might be changes in the future.
 
 ## Invoices
 
-You can view your invoices for prepaid credits and monthly invoices on [Billing -> Invoices](https://console.x.ai/team/default/billing/invoices).
+You can view your invoices for prepaid credits and monthly invoices on [Billing -> Invoices](https://console.x.ai/team/default/billing/invoices?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing-invoices).
 
 ## Billing address and tax information
 
@@ -86,5 +85,4 @@ You can view your invoices for prepaid credits and monthly invoices on [Billing 
 > Enter your billing information carefully, as it will appear on your invoices. We are not able to
 > regenerate the invoices at the moment.
 
-Your billing address and tax information will be displayed on the invoice. On [Billing -> Payment](https://console.x.ai/team/default/billing), you can also add/change your billing address. When you add/change billing address, you can optionally add your organization's tax information.
-{% endraw %}
+Your billing address and tax information will be displayed on the invoice. On [Billing -> Payment](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing), you can also add/change your billing address. When you add/change billing address, you can optionally add your organization's tax information.

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Speech to Speech API
 
 # SIP Phone Calls
@@ -190,4 +189,3 @@ Replace `{number}` with your Direct SIP phone number. If you configured `allowed
 
 1. In your carrier, contact center, or PBX, create an outbound route or SIP trunk.
 2. Set the destination to `sip:{number}@sip.voice.x.ai;transport=tls`.
-{% endraw %}

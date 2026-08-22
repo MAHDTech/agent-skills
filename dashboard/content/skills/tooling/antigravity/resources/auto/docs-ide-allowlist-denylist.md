@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -54,4 +53,3 @@ You can also add/remove URLS from the allowlist manually. However, the
 denylist always takes precedence: you cannot allowlist a URL that
 appears on the denylist.
 
-{% endraw %}

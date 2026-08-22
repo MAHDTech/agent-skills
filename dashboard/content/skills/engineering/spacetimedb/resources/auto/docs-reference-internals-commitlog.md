@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -390,4 +389,3 @@ The current format versions are:
 | 0       | Original format                       |
 | 1       | Adds the `epoch` field to each commit |
 
-{% endraw %}

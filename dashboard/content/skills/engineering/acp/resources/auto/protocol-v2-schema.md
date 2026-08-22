@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -1360,6 +1359,35 @@ Audio provided to or from an LLM.
   MIME type describing the encoded media payload.
 </ResponseField>
 
+## <span class="font-mono">AuthCapabilities</span>
+
+Authentication capabilities supported by the client.
+
+Advertised during initialization to inform the agent which authentication
+method types the client can handle. This governs opt-in types that require
+additional client-side support.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  The \_meta property is reserved by ACP to allow clients and agents to attach additional
+  metadata to their interactions. Implementations MUST NOT make assumptions about values at
+  these keys.
+
+  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+</ResponseField>
+
+<ResponseField name="terminal" type={<><span><a href="#terminalauthcapabilities">TerminalAuthCapabilities</a></span><span> | null</span></>}>
+  Whether the client supports `terminal` authentication methods.
+
+  Optional. Omitted or `null` both mean the client does not advertise support.
+  The client should supply `\{\}` only when it can reproduce the configured
+  agent invocation in an interactive terminal. Supplying `\{\}` means the
+  agent may include `terminal` entries in its authentication methods.
+</ResponseField>
+
 ## <span class="font-mono">AuthMethod</span>
 
 Describes an available authentication method.
@@ -1367,6 +1395,47 @@ Describes an available authentication method.
 The `type` field acts as the discriminator in the serialized JSON form.
 
 **Type:** Union
+
+<ResponseField name="terminal" type="object">
+  Client runs the configured agent program as a separate interactive
+  process, without passing this method to `auth/login`.
+
+  <Expandable title="Properties">
+    <ResponseField name="_meta" type={"object | null"}>
+      The \_meta property is reserved by ACP to allow clients and agents to attach additional
+      metadata to their interactions. Implementations MUST NOT make assumptions about values at
+      these keys.
+
+      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+    </ResponseField>
+
+    <ResponseField name="args" type={<><span>"string"</span><span>[]</span></>}>
+      Additional arguments to append to the configured agent invocation for terminal auth.
+    </ResponseField>
+
+    <ResponseField name="description" type={"string | null"}>
+      Optional description providing more details about this authentication method.
+    </ResponseField>
+
+    <ResponseField name="env" type={<a href="#envvariable">EnvVariable[]</a>}>
+      Additional environment variables to set on the configured agent invocation for terminal auth.
+      Names MUST be unique. These values override same-named variables in the
+      base launch configuration.
+    </ResponseField>
+
+    <ResponseField name="methodId" type={<a href="#authmethodid">AuthMethodId</a>} required>
+      Unique identifier for this authentication method.
+    </ResponseField>
+
+    <ResponseField name="name" type={"string"} required>
+      Human-readable name of the authentication method.
+    </ResponseField>
+
+    <ResponseField name="type" type={"string"} required>
+      The discriminator value. Must be `"terminal"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
 
 <ResponseField name="agent" type="object">
   Agent handles authentication itself through `auth/login`.
@@ -1477,6 +1546,50 @@ The `type` discriminator value is `agent`.
 Typed identifier used for auth method values on the wire.
 
 **Type:** `string`
+
+## <span class="font-mono">AuthMethodTerminal</span>
+
+Terminal-based authentication method.
+
+The client runs the configured agent program as a separate interactive
+process for the user to authenticate via a TUI. Agents MUST advertise this
+method only when the client enabled its terminal authentication capability.
+A zero exit status signals success; any other termination signals failure.
+The client MUST NOT pass this method to `auth/login`.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  The \_meta property is reserved by ACP to allow clients and agents to attach additional
+  metadata to their interactions. Implementations MUST NOT make assumptions about values at
+  these keys.
+
+  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+</ResponseField>
+
+<ResponseField name="args" type={<><span>"string"</span><span>[]</span></>}>
+  Additional arguments to append to the configured agent invocation for terminal auth.
+</ResponseField>
+
+<ResponseField name="description" type={"string | null"}>
+  Optional description providing more details about this authentication method.
+</ResponseField>
+
+<ResponseField name="env" type={<a href="#envvariable">EnvVariable[]</a>}>
+  Additional environment variables to set on the configured agent invocation for terminal auth.
+  Names MUST be unique. These values override same-named variables in the
+  base launch configuration.
+</ResponseField>
+
+<ResponseField name="methodId" type={<a href="#authmethodid">AuthMethodId</a>} required>
+  Unique identifier for this authentication method.
+</ResponseField>
+
+<ResponseField name="name" type={"string"} required>
+  Human-readable name of the authentication method.
+</ResponseField>
 
 ## <span class="font-mono">AvailableCommand</span>
 
@@ -1664,6 +1777,15 @@ See protocol docs: [Client Capabilities](https://agentclientprotocol.com/protoco
   these keys.
 
   See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+</ResponseField>
+
+<ResponseField name="auth" type={<><span><a href="#authcapabilities">AuthCapabilities</a></span><span> | null</span></>}>
+  Authentication capabilities supported by the client.
+  Determines which authentication method types the agent may include
+  in its `InitializeResponse`.
+
+  Optional. Omitted or `null` both mean the client does not advertise any
+  authentication-method extensions.
 </ResponseField>
 
 <ResponseField name="elicitation" type={<><span><a href="#elicitationcapabilities">ElicitationCapabilities</a></span><span> | null</span></>}>
@@ -5752,6 +5874,26 @@ Terminal state and output are delivered separately through
   The ID of the terminal to display.
 </ResponseField>
 
+## <span class="font-mono">TerminalAuthCapabilities</span>
+
+Capabilities for terminal authentication methods.
+
+Supplying `\{\}` means the client can reproduce the configured agent
+invocation in an interactive terminal and supports terminal authentication
+methods.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  The \_meta property is reserved by ACP to allow clients and agents to attach additional
+  metadata to their interactions. Implementations MUST NOT make assumptions about values at
+  these keys.
+
+  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+</ResponseField>
+
 ## <span class="font-mono">TerminalExitStatus</span>
 
 Exit information for an agent-owned terminal.
@@ -6393,4 +6535,3 @@ content.
 <ResponseField name="messageId" type={<a href="#messageid">MessageId</a>} required>
   A unique identifier for the message.
 </ResponseField>
-{% endraw %}

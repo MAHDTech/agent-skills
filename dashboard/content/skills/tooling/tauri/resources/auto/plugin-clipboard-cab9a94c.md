@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Clipboard
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/clipboard-manager)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-clipboard-manager)[crates.io](https://crates.io/crates/tauri-plugin-clipboard-manager)
@@ -27,17 +26,17 @@ Read and write to the system clipboard using the clipboard plugin.
 
 Install the clipboard plugin to get started.
 
-- [Automatic](#tab-panel-5923)
-- [Manual](#tab-panel-5924)
+- [Automatic](#tab-panel-5953)
+- [Manual](#tab-panel-5954)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5912)
-- [yarn](#tab-panel-5913)
-- [pnpm](#tab-panel-5914)
-- [deno](#tab-panel-5915)
-- [bun](#tab-panel-5916)
-- [cargo](#tab-panel-5917)
+- [npm](#tab-panel-5942)
+- [yarn](#tab-panel-5943)
+- [pnpm](#tab-panel-5944)
+- [deno](#tab-panel-5945)
+- [bun](#tab-panel-5946)
+- [cargo](#tab-panel-5947)
 
 ```
 npm run tauri add clipboard-manager
@@ -81,11 +80,11 @@ cargo tauri add clipboard-manager
 3.  If you’d like to manage the clipboard in JavaScript then install the
     npm package as well:
 
-    - [npm](#tab-panel-5918)
-    - [yarn](#tab-panel-5919)
-    - [pnpm](#tab-panel-5920)
-    - [deno](#tab-panel-5921)
-    - [bun](#tab-panel-5922)
+    - [npm](#tab-panel-5948)
+    - [yarn](#tab-panel-5949)
+    - [pnpm](#tab-panel-5950)
+    - [deno](#tab-panel-5951)
+    - [bun](#tab-panel-5952)
 
     ```
     npm install @tauri-apps/plugin-clipboard-manager
@@ -111,8 +110,8 @@ cargo tauri add clipboard-manager
 
 The clipboard plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-5910)
-- [Rust](#tab-panel-5911)
+- [JavaScript](#tab-panel-5940)
+- [Rust](#tab-panel-5941)
 
 ```
 import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager';// when using `"withGlobalTauri": true`, you may use// const { writeText, readText } = window.__TAURI__.clipboardManager;
@@ -158,4 +157,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

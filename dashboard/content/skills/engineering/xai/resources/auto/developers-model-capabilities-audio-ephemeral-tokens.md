@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Ephemeral Tokens
@@ -146,4 +145,3 @@ If you need to send the ephemeral token from the browser, you can add the epheme
 ```javascriptWithoutSDK
 new WebSocket("wss://api.x.ai/v1/realtime", [\`xai-client-secret.\${OBTAINED_EPHEMERAL_TOKEN}\`]);
 ```
-{% endraw %}

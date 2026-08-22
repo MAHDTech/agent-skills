@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Composed Secrets
 
 Composed secrets derive one exported value from other secrets in the
@@ -133,4 +132,3 @@ See the [`composed` configuration
 reference](https://secretspec.dev/reference/configuration/#composed-secrets) for the
 field-level constraints.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Additional Kommander and Konvoy Configurations
 
 ADDITIONAL KOMMANDER CONFIGURATION
@@ -3963,4 +3962,3 @@ This page will link you to all the necessary GPU pages.
 The remainder of GPU information is found in Cluster Management Operations
 section of the documentation.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -203,4 +202,3 @@ collaborative multi-agent framework. This framework features built-in
 error recovery, automatic retries, and task coordination, allowing you
 to define the high-level goal while the platform manages the agent team.
 
-{% endraw %}

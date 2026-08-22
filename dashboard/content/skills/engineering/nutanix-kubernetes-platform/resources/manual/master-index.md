@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Nutanix Kubernetes Platform (NKP) v2.18 Documentation Index
 
 This directory contains the complete documentation for Nutanix Kubernetes Platform (NKP) v2.18 and NKP Insights, converted to structured, AI-agent readable Markdown.
@@ -42,4 +41,3 @@ This directory contains the complete documentation for Nutanix Kubernetes Platfo
     - NKP Insights setup, architecture, uninstallation, Bring Your Own Storage (BYOS) configuration, and alert rules for customer workloads.
 
 
-{% endraw %}

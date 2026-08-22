@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -36,7 +35,7 @@ not install it now and would like to re-download it later, you can do so
 Agents work within Projects, which define the boundaries of the folders
 and repositories they can access.
 
-1.  Click the **folder with a “+” icon** in the **left sidebar**.
+1.  Click the **folder with a ”+” icon** in the **left sidebar**.
 2.  Click on **“New Project”**.
 3.  Click **Add Folder** to associate one or more local folders or Git
     repositories. Adding multiple folders provides your agent with full
@@ -78,4 +77,3 @@ tasks.
 | `/schedule` | Run an instruction as a one-time timer in the future or on a recurring schedule (via Scheduled Tasks). |
 | `/browser` | Explicit slash command controlling browser debugging behaviors in Google Chrome. |
 
-{% endraw %}

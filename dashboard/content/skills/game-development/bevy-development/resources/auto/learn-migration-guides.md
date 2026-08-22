@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "bevy-development"
 +++
 
-{% raw %}
 - [Introduction](https://bevy.org/learn/migration-guides/introduction/)
 
 - [0.18 to 0.19](https://bevy.org/learn/migration-guides/0-18-to-0-19/)
@@ -52,4 +51,3 @@ page](https://github.com/bevyengine/bevy-website/edit/main/content/learn/migrati
 [ Report
 issue](https://github.com/bevyengine/bevy-website/issues/new?template=docs.md&title=Issue%20on%20page%20Introduction)
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 ## Files
 
 ### devenv.nix
@@ -57,4 +56,3 @@ See [direnv integration](https://devenv.sh/integrations/direnv/index.md) to set 
 ## Environment Variables
 
 See the [environment variables reference](https://devenv.sh/reference/environment-variables/index.md).
-{% endraw %}

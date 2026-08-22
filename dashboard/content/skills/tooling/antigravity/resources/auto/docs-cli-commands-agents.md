@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -170,4 +169,3 @@ shortcuts apply:
 - [Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox): Configure security
   guardrails and approval rules for background subagents.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -170,4 +169,3 @@ becomes remarkably simple:
 
 This is the Zen of SpacetimeDB: a simpler way to build and live.
 
-{% endraw %}

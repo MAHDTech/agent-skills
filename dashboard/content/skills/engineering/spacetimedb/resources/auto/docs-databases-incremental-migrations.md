@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 SpacetimeDB does not provide built-in support for general
@@ -432,4 +431,3 @@ of outdated clients! The complete for this tutorial is on GitHub in the
 and
 [`v2`](https://github.com/clockworklabs/incr-migration-demo/tree/v2).
 
-{% endraw %}

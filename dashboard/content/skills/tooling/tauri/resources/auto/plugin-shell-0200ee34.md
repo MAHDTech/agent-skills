@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Shell
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/shell)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-shell)[crates.io](https://crates.io/crates/tauri-plugin-shell)
@@ -32,17 +31,17 @@ the new [Opener plugin](opener-766df9a3.md) instead.
 
 Install the shell plugin to get started.
 
-- [Automatic](#tab-panel-6159)
-- [Manual](#tab-panel-6160)
+- [Automatic](#tab-panel-6189)
+- [Manual](#tab-panel-6190)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6148)
-- [yarn](#tab-panel-6149)
-- [pnpm](#tab-panel-6150)
-- [deno](#tab-panel-6151)
-- [bun](#tab-panel-6152)
-- [cargo](#tab-panel-6153)
+- [npm](#tab-panel-6178)
+- [yarn](#tab-panel-6179)
+- [pnpm](#tab-panel-6180)
+- [deno](#tab-panel-6181)
+- [bun](#tab-panel-6182)
+- [cargo](#tab-panel-6183)
 
 ```
 npm run tauri add shell
@@ -86,11 +85,11 @@ cargo tauri add shell
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-6154)
-    - [yarn](#tab-panel-6155)
-    - [pnpm](#tab-panel-6156)
-    - [deno](#tab-panel-6157)
-    - [bun](#tab-panel-6158)
+    - [npm](#tab-panel-6184)
+    - [yarn](#tab-panel-6185)
+    - [pnpm](#tab-panel-6186)
+    - [deno](#tab-panel-6187)
+    - [bun](#tab-panel-6188)
 
     ```
     npm install @tauri-apps/plugin-shell
@@ -116,8 +115,8 @@ cargo tauri add shell
 
 The shell plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-6146)
-- [Rust](#tab-panel-6147)
+- [JavaScript](#tab-panel-6176)
+- [Rust](#tab-panel-6177)
 
 ```
 import { Command } from '@tauri-apps/plugin-shell';// when using `"withGlobalTauri": true`, you may use// const { Command } = window.__TAURI__.shell;
@@ -183,4 +182,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

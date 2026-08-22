@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -385,4 +384,3 @@ If your client doesn't see new tables or reducers, ensure you've
 regenerated the bindings after updating your module. Generated code is
 not automatically updated when the module changes.
 
-{% endraw %}

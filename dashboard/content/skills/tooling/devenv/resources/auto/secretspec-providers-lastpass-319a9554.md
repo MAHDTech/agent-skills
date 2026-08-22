@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # LastPass Provider
 
 The LastPass provider integrates with LastPass password manager for
@@ -114,4 +113,3 @@ $ secretspec run --provider lastpass -- deploy
 
 Terminal window
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Nutanix Objects Browser Guide
 
 ## NUTANIX OBJECTS BROWSER
@@ -1387,4 +1386,3 @@ Prism Central with an AD/LDAP account, you might be automatically signed in to O
 
 Note: A logged-in user can manage only the access keys created by that user. Objects | Nutanix Objects Browser |
 
-{% endraw %}

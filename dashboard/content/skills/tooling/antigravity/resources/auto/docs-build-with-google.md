@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -198,4 +197,3 @@ Web, Android, iOS, and Web Services.
 - **Learn more**: [Explore the Google Maps Platform Agent Skills
   Repository](https://github.com/googlemaps/agent-skills)
 
-{% endraw %}

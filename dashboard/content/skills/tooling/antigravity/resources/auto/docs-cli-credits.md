@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -71,4 +70,3 @@ settings in your `settings.json` file:
 - **[Model Quotas Command](https://antigravity.google/docs/cli/commands/usage)**: Monitor your
   model-specific API quotas.
 
-{% endraw %}

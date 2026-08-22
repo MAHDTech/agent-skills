@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
 EnterpriseEnterprise
@@ -60,4 +59,3 @@ agents with real-time, iterative feedback.
 
 [Explore use case](https://antigravity.google/use-cases/marketer)
 
-{% endraw %}

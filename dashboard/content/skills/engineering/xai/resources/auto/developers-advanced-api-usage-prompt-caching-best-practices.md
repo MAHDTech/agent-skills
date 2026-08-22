@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Prompt Caching
 
 # Best Practices & FAQ
@@ -51,4 +50,3 @@ Yes. Prompt caching works with both streaming and non-streaming requests. The fi
 ### Does caching work with tool calls and function calling?
 
 Yes. The cacheable prefix includes all messages up to and including tool call results. As long as the prefix remains unchanged, subsequent requests will benefit from caching.
-{% endraw %}

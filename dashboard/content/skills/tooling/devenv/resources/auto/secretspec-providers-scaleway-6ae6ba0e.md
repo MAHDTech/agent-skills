@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Scaleway Secret Manager Provider
 
 The Scaleway Secret Manager provider stores secrets in [Scaleway Secret
@@ -145,4 +144,3 @@ $ secretspec run --provider scaleway://fr-par -- deploy
 
 Terminal window
 
-{% endraw %}

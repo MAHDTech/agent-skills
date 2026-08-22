@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Google Cloud Secret Manager Provider
 
 The Google Cloud Secret Manager provider integrates with GCP for
@@ -173,4 +172,3 @@ supported). References are **read-only** in this provider.
 
 Terminal window
 
-{% endraw %}

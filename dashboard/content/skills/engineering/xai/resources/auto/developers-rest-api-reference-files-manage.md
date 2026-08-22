@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Files API
 
 # Manage
@@ -179,4 +178,3 @@ be referenced in chat attachments.
   "deleted": true
 }
 ```
-{% endraw %}

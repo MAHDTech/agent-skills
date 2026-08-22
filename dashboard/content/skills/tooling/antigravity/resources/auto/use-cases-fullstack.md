@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Why fullstack developers choose Google Antigravity
 
 Google Antigravity elevates your fullstack applications, ensuring
@@ -58,4 +57,3 @@ Reducing Context Switching
 
 [Download](https://antigravity.google/download)
 
-{% endraw %}

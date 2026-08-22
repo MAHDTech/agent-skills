@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Prompt Caching
 
 # Usage & Pricing
@@ -98,4 +97,3 @@ Cached tokens are billed at the **cached prompt token price**, which is substant
 ## Next
 
 * [Best Practices & FAQ](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/best-practices)
-{% endraw %}

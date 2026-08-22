@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 Grok Voice
 
 ∣
@@ -196,4 +195,3 @@ Enable zero data retention for your deployments.
 ## Ready to build with voice?
 
 Get an API key and start building in minutes, or talk to our team about enterprise deployment.
-{% endraw %}

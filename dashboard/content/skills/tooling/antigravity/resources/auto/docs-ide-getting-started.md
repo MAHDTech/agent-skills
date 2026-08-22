@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -35,4 +34,3 @@ The application will prompt when updates are available:
 
 ![Update Available](https://antigravity.google/assets/image/docs/restart-to-update.png)
 
-{% endraw %}

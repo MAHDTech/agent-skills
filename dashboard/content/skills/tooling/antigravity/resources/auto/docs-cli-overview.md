@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -85,4 +84,3 @@ with autonomous agents:
 - **[Best Practices](https://antigravity.google/docs/cli/best-practices)**: Master workflow
   pipelines, verification loops, and session course-corrections.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Bucket Management and Advanced Features
 
 ## BUCKET CREATION, OPERATIONS, AND
@@ -1487,4 +1486,3 @@ stores. They cannot delete buckets created by others.
 
 bucket that you want to delete. . Click Actions > Delete. While performing this action for a bucket on AWS S3, the cloud bucket is deleted from the federated global namespace. It continues to exist in AWS S3. 6. In the popup, click Confirm. A message appears to confirm the deletion of the bucket. What to do next(optional) After removing all the S3 bucket, you can remove the external endpoint from the Prism Central. For more information refer Removing External Object Store on page 61 Objects | Bucket Creation, Operations, and Bucket Policy Configuration |
 
-{% endraw %}

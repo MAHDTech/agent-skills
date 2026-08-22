@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Inference API
 
 # Chat
@@ -1069,4 +1068,3 @@ Tries to fetch a result for a previously-started deferred completion. Returns \`
   "system_fingerprint": "fp_156d35dcaa"
 }
 ```
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -998,4 +997,3 @@ our Discord
 ([https://discord.gg/SpacetimeDB](https://discord.gg/SpacetimeDB)) and
 chat with us!
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -32,7 +31,9 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Obsidian](https://obsidian.md)
   * through the [Agent Client](https://github.com/RAIT-09/obsidian-agent-client) plugin
   * through the [Agent Console](https://github.com/donivatamazondotcom/obsidian-agent-console) plugin — a tabbed multi-session workspace: run several ACP agents in parallel with restorable, searchable sessions and quick prompts
+  * through the [Copilot for Obsidian](https://github.com/logancyang/obsidian-copilot) plugin — runs OpenCode and Codex through ACP with vault context, projects, and shared skills
   * through the [Obsidian Harness](https://github.com/vlln/obsidian-harness) plugin — Obsidian as a cockpit for ACP agents (Claude Code, Codex, Gemini CLI, Pi); every agent session is a first-class `.session` vault file with Codex-style Session and Turn navigators
+* [Open Knowledge](https://openknowledge.ai) — local-first Markdown knowledge base with built-in ACP agent threads and one-click agent install from the ACP Registry
 * [Pulsar](https://pulsar-edit.dev) — through the [pulsar-acp-agent](https://github.com/hovancik/pulsar-acp-agent) package
 * [Qt Creator](https://www.qt.io/development/tools/qt-creator-ide) — through the [ACP Client Plugin](https://doc.qt.io/qtcreator/creator-how-to-use-acp-client.html)
 * [Unity ACP Client](https://github.com/3DLabInstruments/UnityACPClient)(Unity plugin)
@@ -75,6 +76,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Harnss](https://github.com/OpenSource03/harnss)
 * [Jockey](https://github.com/recailai/jockey) — open-source multi-agent orchestrator (Tauri + Rust + SolidJS) that coordinates Claude Code, Gemini CLI, and Codex CLI via ACP
 * [Kepler](https://www.gitkraken.com/kepler) — GitKraken’s agentic development environment (ADE) giving you full clarity and control to run parallel agents at scale
+* [Kronos](https://github.com/Reqeique/Kronos) — self-hosted scheduler and orchestration dashboard that runs ACP agent tasks on schedules via a bridge CLI, with Slack channel delivery and a real-time dashboard
 * [Lody](https://lody.ai)
 * [Minion Mind](https://minion-mind.nebulame.com/) — through the [Agent Client](https://github.com/RAIT-09/obsidian-agent-client) plugin
 * [Mitto](https://github.com/inercia/mitto)
@@ -150,4 +152,3 @@ These connectors bridge ACP into other environments and transport layers:
 * [OpenClaw](https://docs.openclaw.ai/cli/acp) — through the [`openclaw acp`](https://docs.openclaw.ai/cli/acp) bridge to an OpenClaw Gateway
 * [stdio Bus](https://stdiobus.com) – deterministic stdio-based kernel providing transport-level routing for ACP/MCP-style agent protocols.
 * [acpdbg](https://github.com/phimage/acpdbg) — bridges LLDB crashes (C/C++/Rust/Swift) to any ACP coding agent for root-cause analysis and live debugging
-{% endraw %}

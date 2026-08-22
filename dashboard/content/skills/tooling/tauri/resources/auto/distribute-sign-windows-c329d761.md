@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
-{% raw %}
 # Windows Code Signing
 
 Code signing is required on Windows to allow your application to be
@@ -332,5 +330,4 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}{% raw %}
-{% endraw %}
+

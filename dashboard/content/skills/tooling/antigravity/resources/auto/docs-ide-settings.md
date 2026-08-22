@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -140,4 +139,3 @@ a strict environment.
 ![Sandbox settings in strict
 mode](https://antigravity.google/assets/image/docs/sandbox-secure-mode-settings.png)
 
-{% endraw %}

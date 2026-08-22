@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -316,4 +315,3 @@ MCP-over-ACP has the same trust model as regular MCP: you're allowing a componen
 ## Revision history
 
 Split from proxy-chains RFD to enable independent use of MCP-over-ACP transport by any ACP component, not just proxies.
-{% endraw %}

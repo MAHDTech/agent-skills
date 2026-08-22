@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -98,4 +97,3 @@ This argues "session/resume" is the basic primitive which "session/load" builds 
 * 2026-04-22: RFD marked as Completed; `session/resume` is stabilized
 * 2026-04-14: Update capability shape to `sessionCapabilities.resume`
 * 2025-11-24: Update FAQ to mention session/resume vs session/load
-{% endraw %}

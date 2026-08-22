@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 ## Build with the most
 
 powerful AI models.
@@ -106,4 +105,3 @@ Custom rate limits and hands-on support for your team.
 *   Billing via monthly invoices
 *   Single sign-on and audit logging
 *   Data residency options
-{% endraw %}

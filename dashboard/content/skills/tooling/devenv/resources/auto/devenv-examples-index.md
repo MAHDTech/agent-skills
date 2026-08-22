@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 [The devenv project itself uses devenv, which serves as an example](https://github.com/cachix/devenv/blob/main/devenv.nix).
 
 If you're searching for an example but can't find it, [let us know](https://github.com/cachix/devenv/issues/12).
@@ -82,4 +81,3 @@ If you're searching for an example but can't find it, [let us know](https://gith
 - [wiremock](https://github.com/cachix/devenv/tree/main/examples/wiremock)
 
 See all examples [here](https://github.com/cachix/devenv/tree/main/examples).
-{% endraw %}

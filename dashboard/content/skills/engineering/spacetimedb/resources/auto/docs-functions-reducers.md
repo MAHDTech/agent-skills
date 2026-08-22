@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -683,4 +682,3 @@ options.
 - Review [Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) for real-time
   client updates
 
-{% endraw %}

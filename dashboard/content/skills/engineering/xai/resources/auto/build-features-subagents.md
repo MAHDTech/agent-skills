@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Subagents
@@ -23,4 +22,3 @@ Subagents are independent child sessions with their own context. They return a s
 | `plan` | Drafts an implementation plan (no shell, no edits) |
 
 Add or override types under `.grok/agents/` or `~/.grok/agents/`. Manage agents and personas with `/config-agents` (alias `/agents`) or `/personas`. Personas are behavioral overlays only (tone, focus, contracts); define them under `[subagents.personas]` or `.grok/personas/*.toml` / `~/.grok/personas/*.toml`.
-{% endraw %}

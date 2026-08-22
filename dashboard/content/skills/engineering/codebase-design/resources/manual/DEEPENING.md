@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "codebase-design"
 +++
 
-{% raw %}
 # Deepening
 
 How to deepen a cluster of shallow modules safely, given its dependencies. Assumes the vocabulary in [SKILL.md](../SKILL.md) - **module**, **interface**, **seam**, **adapter**.
@@ -48,4 +47,3 @@ Third-party services (payment, messaging, etc.) you do not control. The deepened
 
 For the loop that writes those interface-level tests, run `/tdd`.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -933,4 +932,3 @@ std::optional<T>, std::vector<T>
 Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt
 ```
 
-{% endraw %}

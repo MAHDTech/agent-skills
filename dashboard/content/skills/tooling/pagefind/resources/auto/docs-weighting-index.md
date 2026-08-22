@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
-{% raw %}
 \> \*\*Important: Pagefind 1.5.0 introduces the Component UI, which
 replaces the \> Default UI (pagefind-ui.js / PagefindUI). It includes a
 search modal, better \> accessibility and customization.\*\* Full
@@ -41,4 +40,3 @@ a normal word.
 \`2.0\` will have roughly 4 times the impact of standard text, and a
 weighting of \`10.0\` will have roughly 100 times the impact.
 
-{% endraw %}

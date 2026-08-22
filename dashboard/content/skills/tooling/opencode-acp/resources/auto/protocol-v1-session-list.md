@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -239,4 +238,3 @@ after the first meaningful exchange to auto-generate a title.
 1. Client calls `session/list` to discover available sessions
 2. User selects a session from the list
 3. Client calls [`session/load`](https://agentclientprotocol.com/protocol/v1/session-setup#loading-sessions) with the chosen `sessionId` to resume the conversation
-{% endraw %}

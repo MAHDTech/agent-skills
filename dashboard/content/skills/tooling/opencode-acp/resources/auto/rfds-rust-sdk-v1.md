@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -931,4 +930,3 @@ The Rust SDK has been stabilized as `agent-client-protocol` v1.0.0, so no RFD-bl
 * 2026-06-25: Moved to Completed after the Rust SDK and TypeScript SDK reached v1.0.0.
 * 2026-05-12: Moved to Preview after the initial crate import was upstreamed to agentclientprotocol/rust-sdk.
 * Initial draft based on working implementation in symposium-acp repository.
-{% endraw %}

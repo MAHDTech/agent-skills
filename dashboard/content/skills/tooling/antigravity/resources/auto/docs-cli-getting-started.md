@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -102,4 +101,3 @@ collaboration tools:
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Dense reference sheets
   cataloging all slash commands, shortcuts, and JSON keys.
 
-{% endraw %}

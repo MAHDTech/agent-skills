@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -423,4 +422,3 @@ Fires when the execution loop terminates.
 }
 ```
 
-{% endraw %}

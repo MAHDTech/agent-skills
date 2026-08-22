@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Ruby SDK
 
 The Ruby SDK (`secretspec`) is a thin client over the `secretspec-ffi` C
@@ -98,4 +97,3 @@ Terminal window
 A shared install in a non-system prefix also requires `PREFIX/lib` in
 the platform’s runtime library search path.
 
-{% endraw %}

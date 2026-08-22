@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -758,4 +757,3 @@ A standard remote transport (streamable HTTP with SSE streams, plus WebSocket) i
 ## Supporting v1 and v2 side by side
 
 Supporting both versions is the recommended path, not an edge case: v1 peers will remain in the wild well after v2 stabilizes, and dropping v1 support means losing them. Version negotiation gives you one protocol version per connection, so the cleanest approach is to keep two thin protocol surfaces behind shared application logic and select one after `initialize`.
-{% endraw %}

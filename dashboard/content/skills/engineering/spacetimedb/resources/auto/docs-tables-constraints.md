@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -365,4 +364,3 @@ different purposes:
 | Update behavior | Delete + Insert | In-place update  |
 | Required        | No              | No               |
 
-{% endraw %}

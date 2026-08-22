@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # KeePass KDBX Provider
 
 The KDBX provider reads and writes encrypted
@@ -200,4 +199,3 @@ KeePassXC.
 - Writing uses the `keepass` crate’s KDBX 4 writer. Back up important
   databases before first use with a new SecretSpec or `keepass` version.
 
-{% endraw %}

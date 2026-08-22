@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Press Assets
 
 ![Icon - Full
@@ -53,4 +52,3 @@ PNG](https://antigravity.google/assets/image/brand/antigravity_wordmark_horz__fu
 
 Wordmark - Full Color White Text
 
-{% endraw %}

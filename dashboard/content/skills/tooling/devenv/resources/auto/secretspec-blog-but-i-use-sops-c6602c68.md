@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # But I Use SOPS
 
 Jul 23, 2026
@@ -121,4 +120,3 @@ If encrypted files fit your workflow, keep using SOPS. Just recognize
 the boundary: encryption at rest is not an application secrets
 interface.
 
-{% endraw %}

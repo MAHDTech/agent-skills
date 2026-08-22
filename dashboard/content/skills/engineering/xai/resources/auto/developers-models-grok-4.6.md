@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # Grok 4.6
 
 SpaceXAI's frontier model for coding, agentic tasks, and knowledge work.
@@ -17,6 +16,7 @@ SpaceXAI's frontier model for coding, agentic tasks, and knowledge work.
 - **Modalities:** text, image → text
 - **Context window:** 500,000 tokens
 - **Model name:** `grok-4.6`
+- **Batch API:** Not supported
 
 ## Capabilities
 
@@ -44,4 +44,3 @@ Requests whose prompt reaches 200k tokens are billed at the higher rate for all 
 ## Regions
 
 Available in: us-east-1, us-west-2
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -53,4 +52,3 @@ Ready to dive in? Check out the **[Getting
 Started](https://antigravity.google/docs/getting-started)** guide to install Antigravity 2.0 and
 start your first project.
 
-{% endraw %}

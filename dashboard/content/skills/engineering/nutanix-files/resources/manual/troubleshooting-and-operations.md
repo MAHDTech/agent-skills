@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Troubleshooting and Operations
 
 ## Essential CLI Tools for Nutanix Files
@@ -54,4 +53,3 @@ Generate a support bundle using `logbay`:
 logbay collect --components=file_server --aggregate=true
 ```
 
-{% endraw %}

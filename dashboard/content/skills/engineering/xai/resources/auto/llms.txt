@@ -1,4 +1,3 @@
-{% raw %}
 ===/overview===
 # Get started
 
@@ -1849,7 +1848,7 @@ A non-empty `deny` list is enforced at the kernel level when the sandbox can be 
 | `invert_scroll` | `[ui]` | `true` / `false` (default `false`) | Reverse vertical scroll direction. |
 | `permission_mode` | `[ui]` | `default` | `ask` | `auto` | `always-approve` | Default tool-permission behavior. Enterprise locks use `requirements.toml`. |
 | `default_selected_permission` | `[ui]` | `always_allow_all_sessions` (default) | `allow_command_always` | `allow_once` | `reject` | Preselected approval row on the first prompt of a session. |
-| `remember_tool_approvals` | `[ui]` | `true` / `false` (default `false`) | Show per-tool "Always allow …" options. Restart required. |
+| `remember_tool_approvals` | `[ui]` | `true` / `false` (default `true`) | Show per-tool "Always allow …" options. Restart required. |
 | `cancel_subagents_on_turn_cancel` | `[ui]` | `ask` (default when unset) | `always_stop` | `always_continue` | When cancelling a turn with running subagents. |
 | `hunk_tracker_mode` | `[ui]` | `agent_only` (default) | `all_dirty` | `off` | File-change hunk tracking. Restart required. |
 | `fork_secondary_model` | `[ui]` | model id (default: main default) | Model for the secondary agent when forking. |
@@ -1948,13 +1947,13 @@ There are two billing options:
 * **Prepaid credits:** Pre-purchase credits for your team. API consumption will be deducted from this credit balance.
 * **Monthly invoiced billing:** Receive an invoice for your API consumption at the end of the month. If you don't have sufficient prepaid credits, your default payment method will be charged.
 
-**Monthly invoiced billing is disabled by default.** To request this, contact sales@x.ai, or use the contact link on the [Billing](https://console.x.ai/team/default/billing) page:
+**Monthly invoiced billing is disabled by default.** To request this, contact sales@x.ai, or use the contact link on the [Billing](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing) page:
 
 ## Prepaid credits
 
-This is the most common way to use the API, and allows you to control spending by purchasing credits in advance. Your usage can then be monitored on the [Usage explorer](https://console.x.ai/team/default/usage) page.
+This is the most common way to use the API, and allows you to control spending by purchasing credits in advance. Your usage can then be monitored on the [Usage explorer](https://console.x.ai/team/default/usage?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=usage) page.
 
-Purchase credits via [Billing -> API spend management](https://console.x.ai/team/default/billing).
+Purchase credits via [Billing -> API spend management](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing).
 
 From here you can also view your credit balance, and use a promo code if you have one.
 
@@ -1994,19 +1993,19 @@ Enterprise customers might find it beneficial to enroll in monthly invoiced bill
 
 When you have set a **$0 invoiced billing limit** (default), xAI will only use your available prepaid credits. **Your API requests will be automatically rejected once your prepaid credits are depleted.**
 
-If you want to use monthly billing, you can **increase your invoiced billing limit** on [Billing -> API Credits](https://console.x.ai/team/default/billing) page. xAI will attempt to use your prepaid credits first, and the remaining amount will be charged to your default payment method at the end of the month. This ensures you won't experience interruption while consuming the API.
+If you want to use monthly billing, you can **increase your invoiced billing limit** on [Billing -> API Credits](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing) page. xAI will attempt to use your prepaid credits first, and the remaining amount will be charged to your default payment method at the end of the month. This ensures you won't experience interruption while consuming the API.
 
 Once your monthly invoiced billing amount has reached the invoiced billing limit, you won't be able to get a response until you have raised the invoiced billing limit.
 
 ## Saving payment method
 
-When you make a purchase, we automatically keep it on file to make your next purchase easier. You can also manually add payment method on xAI Console [Billing -> Billing details -> Add Payment Information](https://console.x.ai/team/default/billing).
+When you make a purchase, we automatically keep it on file to make your next purchase easier. You can also manually add payment method on xAI Console [Billing -> Billing details -> Add Payment Information](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing).
 
 Currently we don't allow users to remove the last payment method on file. There might be changes in the future.
 
 ## Invoices
 
-You can view your invoices for prepaid credits and monthly invoices on [Billing -> Invoices](https://console.x.ai/team/default/billing/invoices).
+You can view your invoices for prepaid credits and monthly invoices on [Billing -> Invoices](https://console.x.ai/team/default/billing/invoices?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing-invoices).
 
 ## Billing address and tax information
 
@@ -2015,7 +2014,7 @@ You can view your invoices for prepaid credits and monthly invoices on [Billing 
 > Enter your billing information carefully, as it will appear on your invoices. We are not able to
 > regenerate the invoices at the moment.
 
-Your billing address and tax information will be displayed on the invoice. On [Billing -> Payment](https://console.x.ai/team/default/billing), you can also add/change your billing address. When you add/change billing address, you can optionally add your organization's tax information.
+Your billing address and tax information will be displayed on the invoice. On [Billing -> Payment](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=console-billing\&utm_content=billing), you can also add/change your billing address. When you add/change billing address, you can optionally add your organization's tax information.
 
 
 ===/console/collections===
@@ -2023,11 +2022,11 @@ Your billing address and tax information will be displayed on the invoice. On [B
 
 # Using Collections in Console
 
-This guide walks you through managing collections using the [xAI Console](https://console.x.ai) interface.
+This guide walks you through managing collections using the [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-collections\&utm_content=console-home) interface.
 
 ## Creating a new collection
 
-Navigate to the **Collections** tab in the [xAI Console](https://console.x.ai). Make sure you are in the correct team.
+Navigate to the **Collections** tab in the [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-collections\&utm_content=console-home). Make sure you are in the correct team.
 
 Click on "Create new collection" to create a new `collection`.
 
@@ -2059,7 +2058,7 @@ You can delete `documents` and `collections` by clicking on the more button on t
 
 ## How do I create an account for the API?
 
-You can create an account at https://accounts.x.ai, or https://console.x.ai. To link your X account automatically to
+You can create an account at [console.x.ai](https://console.x.ai/login?mode=sign-up\&utm_source=docs\&utm_medium=referral\&utm_campaign=faq-accounts). To link your X account automatically to
 your xAI account, choose to sign up with X account.
 
 > [!WARNING]
@@ -2090,7 +2089,7 @@ We can't remove or reset your MFA method unless you have recovery codes due to s
 
 Yes, the account is shared between Grok and xAI API. You can manage the sign-in details at https://accounts.x.ai.
 
-However, the billing is separate for Grok and xAI API. You can manage your billing for xAI API on [xAI Console](https://console.x.ai).
+However, the billing is separate for Grok and xAI API. You can manage your billing for xAI API on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-faq-accounts\&utm_content=console-home).
 To manage billing for Grok, visit https://grok.com -> Settings -> Billing, or directly with Apple/Google if you made the
 purchase via Apple App Store or Google Play.
 
@@ -2143,7 +2142,7 @@ Check out [Billing](https://docs.x.ai/console/billing) for more information.
 
 ## Can you retroactively generate an invoice with new billing information?
 
-We are unable to retroactively generate an invoice. Please ensure your billing information is correct on [xAI Console](https://console.x.ai) Billing -> Payment.
+We are unable to retroactively generate an invoice. Please ensure your billing information is correct on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=console-faq-billing\&utm_content=console-home) Billing -> Payment.
 
 ## Can prepaid API credits be refunded?
 
@@ -2178,7 +2177,7 @@ We are SOC 2 Type 2 compliant. Customers with a signed NDA can refer to our [Tru
 
 ## Do you have Audit Logs?
 
-Team admins are able to view an audit log of user interactions. This lists all of the user interactions with our API server. You can view it at [xAI Console -> Audit Log](https://console.x.ai/team/default/audit).
+Team admins are able to view an audit log of user interactions. This lists all of the user interactions with our API server. You can view it at [xAI Console -> Audit Log](https://console.x.ai/team/default/audit?utm_source=docs\&utm_medium=referral\&utm_campaign=console-faq-security\&utm_content=audit).
 
 The admin can also search by Event ID, Description, or User to filter the results shown. For example, this is to filter by description matching `ListApiKeys`:
 
@@ -2198,11 +2197,11 @@ xAI partners with GitHub's Secret Scanning program to detect leaked keys. If a l
 
 # Usage Explorer
 
-Sometimes as a team admin, you might want to monitor the API consumption, either to track spending, or to detect anomalies. xAI Console provides an easy-to-use [Usage Explorer](https://console.x.ai/team/default/usage) for team admins to track API usage across API keys, models, etc.
+Sometimes as a team admin, you might want to monitor the API consumption, either to track spending, or to detect anomalies. xAI Console provides an easy-to-use [Usage Explorer](https://console.x.ai/team/default/usage?utm_source=docs\&utm_medium=referral\&utm_campaign=console-usage\&utm_content=usage) for team admins to track API usage across API keys, models, etc.
 
 ## Basic usage
 
-[Usage Explorer](https://console.x.ai/team/default/usage) page provides intuitive dropdown menus for you to customize how you want to view the consumptions.
+[Usage Explorer](https://console.x.ai/team/default/usage?utm_source=docs\&utm_medium=referral\&utm_campaign=console-usage\&utm_content=usage) page provides intuitive dropdown menus for you to customize how you want to view the consumptions.
 
 For example, you can view your daily credit consumption with `Granularity: Daily`:
 
@@ -2345,10 +2344,10 @@ if __name__ == "__main__":
 
 The Batch API lets you process large volumes of requests asynchronously with reduced pricing and higher rate limits. For pricing details, see [Batch API Pricing](https://docs.x.ai/developers/pricing#batch-api-pricing). If you need lower latency on real-time requests instead, see [Priority Processing](https://docs.x.ai/developers/advanced-api-usage/priority-processing).
 
-> [!WARNING]
+> [!NOTE]
 > Model support
 >
-> `grok-4.6` and `grok-4.5` are not currently supported for Batch API requests and will be rejected.
+> Not every model accepts Batch API requests. See Details on each [model page](https://docs.x.ai/developers/models). Unsupported models reject batch requests.
 
 ## What is the Batch API?
 
@@ -2369,7 +2368,7 @@ The Batch API takes a different approach. Instead of processing requests immedia
 
 > [!NOTE]
 >
-> You can also create, monitor, and manage batches through the [xAI Console](https://console.x.ai/team/default/batches). The Console provides a visual interface for tracking batch progress and viewing results.
+> You can also create, monitor, and manage batches through the [xAI Console](https://console.x.ai/team/default/batches?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-advanced-api-usage-batch-api\&utm_content=batches). The Console provides a visual interface for tracking batch progress and viewing results.
 
 ## When to use the Batch API
 
@@ -3617,7 +3616,7 @@ Deferred Chat Completions allow you to create a chat completion, get a `response
 
 > [!TIP]
 >
-> Your deferred completion rate limit is the same as your chat completions rate limit. To view your rate limit, please visit [xAI Console](https://console.x.ai).
+> Your deferred completion rate limit is the same as your chat completions rate limit. To view your rate limit, please visit [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-advanced-api-usage-deferred-chat-completions\&utm_content=console-home).
 
 After sending the request to the xAI API, the chat completion result will be available at `https://api.x.ai/v1/chat/deferred-completion/{request_id}`. The response body will contain `{'request_id': 'f15c114e-f47d-40ca-8d5c-8c23d656eeb6'}`, and the `request_id` value can be inserted into the `deferred-completion` endpoint path. Then, we send this GET request to retrieve the deferred completion result.
 
@@ -3836,7 +3835,7 @@ Mutual TLS (mTLS) lets you lock down API access so that only machines presenting
 
 Contact [support@x.ai](mailto:support@x.ai) with:
 
-* Your team ID (found in the [xAI Console](https://console.x.ai))
+* Your team ID (found in the [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-advanced-api-usage-mtls\&utm_content=console-home))
 * Your CA certificate in PEM format
 * The Common Name (CN) from the client certificates your systems will use
 
@@ -5870,13 +5869,13 @@ Here is a list of potential errors and statuses arranged by status codes.
 | Status                                                                                  | Endpoints                   | Cause                                                                                                                                                                               | Solution                                                                                                                  |
 | --------------------------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | **400**Bad Request            | All endpoints               |  | Check your request body or request URL.                                                                                   |
-| **401**Unauthorized           | All endpoints               | No authorization header or an invalid authorization token was provided.                                                                                                             | Supply an `Authorization: Bearer <XAI_API_KEY>` header. You can get a new API key on [xAI Console](https://console.x.ai). |
+| **401**Unauthorized           | All endpoints               | No authorization header or an invalid authorization token was provided.                                                                                                             | Supply an `Authorization: Bearer <XAI_API_KEY>` header. You can get a new API key on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-debugging\&utm_content=console-home). |
 | **403**Forbidden              | All endpoints               |                                                       | Ask your team admin for permission.                                                                                       |
 | **404**Not Found              | All endpoints               |                                                    | Check your request body and endpoint URL against the [API Reference](https://docs.x.ai/developers/rest-api-reference).                     |
 | **405**Method Not Allowed     | All endpoints               | The request method is not allowed. For example, sending a `POST` to an endpoint that only supports `GET`.                                                                           | Check your request method against the [API Reference](https://docs.x.ai/developers/rest-api-reference).                                    |
 | **415**Unsupported Media Type | Endpoints supporting `POST` |                                                              |                       |
 | **422**Unprocessable Entity   | Endpoints supporting `POST` | A field in the `POST` request body has an invalid format.                                                                                                                           | Check your request body against the [API Reference](https://docs.x.ai/developers/rest-api-reference).                                      |
-| **429**Too Many Requests      | Inference endpoints         | You are sending requests too frequently and have reached the rate limit.                                                                                                            | Reduce your request rate or increase your rate limit on [xAI Console](https://console.x.ai).                              |
+| **429**Too Many Requests      | Inference endpoints         | You are sending requests too frequently and have reached the rate limit.                                                                                                            | Reduce your request rate or increase your rate limit on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-debugging\&utm_content=console-home).                              |
 
 ### 2XX Status Codes
 
@@ -6036,7 +6035,7 @@ curl -X POST https://docs.x.ai/api/mcp \
 
 ## How do I create an account for the API?
 
-You can create an account at https://accounts.x.ai, or https://console.x.ai. To link your X account automatically to
+You can create an account at [console.x.ai](https://console.x.ai/login?mode=sign-up\&utm_source=docs\&utm_medium=referral\&utm_campaign=faq-accounts). To link your X account automatically to
 your xAI account, choose to sign up with X account.
 
 > [!WARNING]
@@ -6067,7 +6066,7 @@ We can't remove or reset your MFA method unless you have recovery codes due to s
 
 Yes, the account is shared between Grok and xAI API. You can manage the sign-in details at https://accounts.x.ai.
 
-However, the billing is separate for Grok and xAI API. You can manage your billing for xAI API on [xAI Console](https://console.x.ai).
+However, the billing is separate for Grok and xAI API. You can manage your billing for xAI API on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-accounts\&utm_content=console-home).
 To manage billing for Grok, visit https://grok.com -> Settings -> Billing, or directly with Apple/Google if you made the
 purchase via Apple App Store or Google Play.
 
@@ -6120,7 +6119,7 @@ Check out [Billing](https://docs.x.ai/console/billing) for more information.
 
 ## Can you retroactively generate an invoice with new billing information?
 
-We are unable to retroactively generate an invoice. Please ensure your billing information is correct on [xAI Console](https://console.x.ai) Billing -> Payment.
+We are unable to retroactively generate an invoice. Please ensure your billing information is correct on [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-billing\&utm_content=console-home) Billing -> Payment.
 
 ## Can prepaid API credits be refunded?
 
@@ -6183,7 +6182,7 @@ For teams that require stricter data handling, see [Zero Data Retention (ZDR)](#
 
 * **No storage of prompts:** ZDR ensures that API request inputs (i.e., your prompt) and outputs (i.e., the tokens generated by the LLM) are never persisted to disk. The 30-day audit retention described above does not apply to ZDR-enabled teams.
 * **Applied at a team level:** If enabled, ZDR is team-wide. There is no ability to enable ZDR for specific API keys.
-* **Self-serve:** Where available, a team admin can turn it on or off directly from the [xAI Console](https://console.x.ai/team/default/settings/team). When enabled, it applies to every API key on the team.
+* **Self-serve:** Where available, a team admin can turn it on or off directly from the [xAI Console](https://console.x.ai/team/default/settings/team?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-security\&utm_content=team-settings). When enabled, it applies to every API key on the team.
 
 ### Features not supported with ZDR
 
@@ -6204,7 +6203,7 @@ Any capability that relies on xAI storing data is unavailable while ZDR is enabl
 
 Team admins can enable or disable ZDR from the Console:
 
-1. Sign in to the [xAI Console](https://console.x.ai/) as a team admin and select the team you want to change in the team picker.
+1. Sign in to the [xAI Console](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-security\&utm_content=console-home) as a team admin and select the team you want to change in the team picker.
 2. Delete any existing [Files](https://docs.x.ai/developers/files) and [Collections](https://docs.x.ai/developers/files/collections) for that team. The Console blocks Enable while stored files or collections remain.
 3. Open **Team Settings** and find the **Zero Data Retention (ZDR)** row, then click **Enable**.
 4. Review the acknowledgments in the confirmation dialog, including that deleted User Content cannot be recovered, and accept the Enterprise Terms and Privacy Policy. Click **Enable** to confirm.
@@ -6216,7 +6215,7 @@ If you do not see the ZDR option, you may not be a team admin, self-serve ZDR ma
 ### How to check that ZDR is enabled
 
 * **Team Settings:** the **Zero Data Retention (ZDR)** row shows an **Active** badge.
-* **Team picker:** the [xAI Console](https://console.x.ai/) team picker shows a **ZDR** badge next to your team name (tooltip: Zero Data Retention).
+* **Team picker:** the [xAI Console](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-security\&utm_content=console-home) team picker shows a **ZDR** badge next to your team name (tooltip: Zero Data Retention).
 * **Response header:** every API response includes an `x-zero-data-retention` header set to `"true"` or `"false"`, so your application can programmatically confirm whether ZDR is active.
 * **Audit logs:** administrative events (key creation, team changes, etc.) still appear in the Console audit log, but the content of API requests and responses does not.
 
@@ -6244,7 +6243,7 @@ We are SOC 2 Type 2 compliant. Customers with a signed NDA can refer to our [Tru
 
 ## Do you have Audit Logs?
 
-Team admins are able to view an audit log of user interactions. This lists all of the user interactions with our API server. You can view it at [xAI Console -> Audit Log](https://console.x.ai/team/default/audit).
+Team admins are able to view an audit log of user interactions. This lists all of the user interactions with our API server. You can view it at [xAI Console -> Audit Log](https://console.x.ai/team/default/audit?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-security\&utm_content=audit).
 
 The admin can also search by Event ID, Description, or User to filter the results shown. For example, this is to filter by description matching `ListApiKeys`:
 
@@ -6276,7 +6275,7 @@ Teams are the level at which xAI tracks API usage, processes billing, and issues
 
 ## Which team am I on?
 
-When you sign up for xAI, you’re automatically assigned to a **Personal Team**, which you can view the top bar of [xAI Console](https://console.x.ai).
+When you sign up for xAI, you’re automatically assigned to a **Personal Team**, which you can view the top bar of [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-team-management\&utm_content=console-home).
 
 ## How can I manage teams and team members?
 
@@ -6288,11 +6287,11 @@ When you sign up for xAI, you’re automatically assigned to a **Personal Team**
 
 ### Rename or Describe a Team
 
-Admins can update the team name and description on the [Settings page](https://console.x.ai/team/default/settings).
+Admins can update the team name and description on the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-team-management\&utm_content=settings).
 
 ### Manage Team Members
 
-Admins can add or remove members by email on the [Users page](https://console.x.ai/team/default/users).
+Admins can add or remove members by email on the [Users page](https://console.x.ai/team/default/users?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-team-management\&utm_content=users).
 
 * Assign members as **Admin** or **Member**.
 * If a user is removed, their API keys remain with the team.
@@ -6305,14 +6304,14 @@ Admins can add or remove members by email on the [Users page](https://console.x.
 
 To permanently delete a team:
 
-1. Go to the [Settings page](https://console.x.ai/team/default/settings).
+1. Go to the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-team-management\&utm_content=settings).
 2. Follow the instructions under **Delete Team**.
 
 ## How to automatically add users to team with my organization's email domain?
 
 Admins can enable automatic team joining for users with a shared email domain:
 
-1. Go to the [Settings page](https://console.x.ai/team/default/settings).
+1. Go to the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-faq-team-management\&utm_content=settings).
 2. Add the domain under **Verified Domains**.
 3. Add a `domain-verification` key to your domain’s DNS TXT record to verify ownership.
 
@@ -6330,7 +6329,7 @@ This guide walks you through managing collections programmatically using the xAI
 
 To use the Collections API, you need to create a Management API Key with the `AddFileToCollection` permission. This permission is required for uploading documents to collections.
 
-1. Navigate to the **Management Keys** section in the [xAI Console](https://console.x.ai/team/default/settings/management-keys)
+1. Navigate to the **Management Keys** section in the [xAI Console](https://console.x.ai/team/default/settings/management-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-files-collections-api\&utm_content=management-keys)
 2. Click on **Create Management Key**
 3. Select the `AddFileToCollection` permission along with any other permissions you need
 4. If you need to perform operations other than uploading documents (such as creating, updating, or deleting collections), enable the corresponding permissions in the **Collections Endpoint** group
@@ -7031,7 +7030,7 @@ The following would be a non-exhaustive list for the MIME types that we support:
 
 The Files API provides a complete set of operations for managing your files. If your files are publicly accessible, you can reference them directly by URL in chat conversations — see [Attaching Files](https://docs.x.ai/developers/model-capabilities/files/chat-with-files#attaching-files). For files that aren't publicly accessible, upload them using one of the methods described below.
 
-You can also view and manage all of your uploaded files from the [Files page](https://console.x.ai/team/default/files) on the xAI Console.
+You can also view and manage all of your uploaded files from the [Files page](https://console.x.ai/team/default/files?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-files-managing-files\&utm_content=files) on the xAI Console.
 
 ## Uploading Files
 
@@ -8226,7 +8225,7 @@ Grok 4.6 is SpaceXAI's frontier model built for coding, agentic tasks, and knowl
 
 ## Using the API
 
-If you already have an [API key](https://console.x.ai/team/default/api-keys), set the model name to `grok-4.6`:
+If you already have an [API key](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-grok-4-6\&utm_content=api-keys), set the model name to `grok-4.6`:
 
 ```python customLanguage="pythonXAI"
 import os
@@ -8315,7 +8314,7 @@ For benchmark results and demos, see the [announcement](https://x.ai/news/grok-4
 
 ## Where it runs
 
-* **xAI API**: get a key from the [console](https://console.x.ai/)
+* **xAI API**: get a key from the [console](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-grok-4-6\&utm_content=console-home)
 * **Grok Build**: the default model of the [coding agent](https://docs.x.ai/build/overview), on the API and CLI
 * **Cursor**: available on all plans
 * **Model gateways**: OpenRouter, Vercel, and Cloudflare
@@ -8362,7 +8361,7 @@ Some enterprise users may prefer to manage their account details programmaticall
 
 You can read the endpoint specifications and descriptions at [Management API Reference](https://docs.x.ai/developers/rest-api-reference/management).
 
-You need to get a management key, which is separate from your API key, to use the management API. The management key can be obtained at [xAI Console](https://console.x.ai) -> Settings -> Management Keys.
+You need to get a management key, which is separate from your API key, to use the management API. The management key can be obtained at [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-management-api-guide\&utm_content=console-home) -> Settings -> Management Keys.
 
 The base URL is at `https://management-api.x.ai`, which is also different from the inference API.
 
@@ -8632,7 +8631,7 @@ Clone a voice from a short reference clip and use it anywhere a built-in voice w
 
 ## How to Use Custom Voices
 
-After creating a voice in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), click the three-dot menu on the voice card and select **Copy Voice ID**. If you created a custom voice via the API (Enterprise only), the `voice_id` is returned in the response.
+After creating a voice in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library), click the three-dot menu on the voice card and select **Copy Voice ID**. If you created a custom voice via the API (Enterprise only), the `voice_id` is returned in the response.
 
 Custom voices are interchangeable with built-in voices across all voice APIs. Pass your `voice_id` to any of:
 
@@ -8674,7 +8673,7 @@ A recording that reflects your intended use case will produce better results tha
 
 Get started in the console — create up to 30 custom voices for free and use them immediately across all voice APIs.
 
-[Clone Voice in Console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices)
+[Clone Voice in Console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library)
 
 ### API Quick Start
 
@@ -9162,7 +9161,7 @@ The default limit is 30 custom voices per team. If you need more, contact us to 
 | `200` | Successful read / update / delete | - |
 | `400` | Bad request | Check: audio under 120 s; label values are within the allowed enums; PATCH does not contain empty strings. Also returned when the team's 30-voice limit is reached — delete an existing voice or [request more](https://x.ai/contact-sales). |
 | `401` | Unauthorized | API key is missing or invalid. |
-| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices), or [contact sales](https://x.ai/contact-sales) to enable the create API. |
+| `403` | Custom voices not enabled for this team, or `POST /v1/custom-voices` was called without an Enterprise contract | Create voices in the [console playground](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-custom-voices\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-custom-voices\&utm_content=voice-library), or [contact sales](https://x.ai/contact-sales) to enable the create API. |
 | `404` | Voice not found | The id does not exist or is owned by another team. |
 | `500` | Server error | Retry with exponential backoff. |
 
@@ -9398,7 +9397,7 @@ ws.on("message", (data) => {
 
 ```
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-speech\&utm_content=api-keys)
 
 [API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
 
@@ -11617,7 +11616,7 @@ for (const word of result.words ?? []) {
 
 Note: The `file` parameter must be provided after all other parameters in the multipart form.
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-text\&utm_content=api-keys)
 
 [Live Voice Demos](https://x.ai/api/voice)
 
@@ -12085,11 +12084,11 @@ print("Saved \(data.count) bytes to hello.mp3")
 
 The response body contains raw audio bytes. Save directly to a file or pipe to an audio player.
 
-[Try the Playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts)
+[Try the Playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech)
 
 [Live Voice Demos](https://x.ai/api/voice)
 
-[Get API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts)
+[Get API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=api-keys)
 
 ## Request Body
 
@@ -12125,11 +12124,11 @@ The response body contains raw audio bytes. Save directly to a file or pipe to a
 
 Each voice has a distinct personality. Listen to samples and choose the best fit for your use case (`eve` is the default):
 
-Voice IDs are **case-insensitive** - `eve`, `Eve`, and `EVE` all work. [Preview all voices in the playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts)
+Voice IDs are **case-insensitive** - `eve`, `Eve`, and `EVE` all work. [Preview all voices in the playground →](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech)
 
 ### Custom voices
 
-Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices), or create one for free in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-tts). To find your custom voice ID in the console, click the three-dot menu on the voice card and select **Copy Voice ID**. Then pass it as `voice_id`:
+Clone any voice from a short reference clip with the [Custom Voices API](https://docs.x.ai/developers/model-capabilities/audio/custom-voices), or create one for free in the [console](https://console.x.ai/team/default/voice/voice-library?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=voice-library). To find your custom voice ID in the console, click the three-dot menu on the voice card and select **Copy Voice ID**. Then pass it as `voice_id`:
 
 ```bash
 # Replace YOUR_VOICE_ID with your custom voice ID from the console
@@ -12804,7 +12803,7 @@ Tips for getting the highest quality output from the TTS API.
 
 ### Integrating with AI coding assistants
 
-The [Cloud Console playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) includes ready-made **agent instructions** you can copy and paste into tools like Cursor, GitHub Copilot, or Windsurf. The instructions are pre-configured with your current voice and format settings - open the playground, tweak your settings, and copy the prompt to get a tailored integration guide for your coding agent.
+The [Cloud Console playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech) includes ready-made **agent instructions** you can copy and paste into tools like Cursor, GitHub Copilot, or Windsurf. The instructions are pre-configured with your current voice and format settings - open the playground, tweak your settings, and copy the prompt to get a tailored integration guide for your coding agent.
 
 ### Optimizing for production
 
@@ -13439,8 +13438,8 @@ task.cancel(with: .normalClosure, reason: nil)
 
 ## Related
 
-* [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts) - Try voices and speech tags in your browser
-* [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts) - Get started with the API
+* [TTS Playground](https://console.x.ai/team/default/voice/text-to-speech?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=text-to-speech) - Try voices and speech tags in your browser
+* [Create an API Key](https://console.x.ai/team/default/api-keys?campaign=voice-docs-tts\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-text-to-speech\&utm_content=api-keys) - Get started with the API
 * [Voice Overview](https://docs.x.ai/developers/model-capabilities/audio/voice) - Overview of all xAI voice capabilities
 * [Speech to Speech API](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech) - Real-time voice conversations via WebSocket
 * [API Reference](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech---rest) - Full TTS endpoint specification
@@ -15981,7 +15980,7 @@ Text in, text out. Chat is the most popular feature on the xAI API, and can be u
 
 ## Prerequisites
 
-Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys). Set your API key in your environment:
+Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-legacy-chat-completions\&utm_content=api-keys). Set your API key in your environment:
 
 ```bash
 export XAI_API_KEY="your_api_key"
@@ -16540,7 +16539,7 @@ For Python, we also offer our [xAI SDK](https://github.com/xai-org/xai-sdk-pytho
 
 ## Prerequisites
 
-Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys). Set your API key in your environment:
+Create an API key on the [xAI Console API Keys Page](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-text-generate-text\&utm_content=api-keys). Set your API key in your environment:
 
 ```bash
 export XAI_API_KEY="your_api_key"
@@ -20692,6 +20691,8 @@ Voice: [Grok Voice API](https://docs.x.ai/developers/model-capabilities/audio/vo
   * Maximum number of images: No limit
   * Supported image file types: `jpg/jpeg` or `png`.
   * Any image/text input order is accepted (e.g. text prompt can precede image prompt)
+* **Batch API**
+  * Not every model accepts [Batch API](https://docs.x.ai/developers/advanced-api-usage/batch-api) requests. See Details on each model page.
 
 > [!NOTE]
 >
@@ -20976,7 +20977,7 @@ The batch discount applies to all token types — input tokens, output tokens, c
 
 Models not listed above have no batch discount.
 
-To see a model's resulting batch prices, toggle **"Show batch API pricing"** on its detail page.
+To see a model's resulting batch prices, toggle **"Show batch API pricing"** on its detail page. Models that accept Batch with no discount show N/A.
 
 > [!NOTE]
 >
@@ -21017,7 +21018,7 @@ Downloading data from files and collections is charged at a flat rate based on t
 | File downloads | $0.20 / GiB downloaded |
 | Collection downloads | $0.20 / GiB downloaded |
 
-You can view and manage your [files](https://console.x.ai/team/default/files) and [collections](https://console.x.ai/team/default/collections) through the xAI console or the [xAI API](https://docs.x.ai/developers/files/managing-files).
+You can view and manage your [files](https://console.x.ai/team/default/files?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=files) and [collections](https://console.x.ai/team/default/collections?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=collections) through the xAI console or the [xAI API](https://docs.x.ai/developers/files/managing-files).
 
 ## Usage Guidelines Violation Fee
 
@@ -21031,7 +21032,7 @@ Your model access might vary depending on various factors such as geographical l
 
 For how the **bills are charged**, visit [Manage Billing](https://docs.x.ai/console/billing) for more information.
 
-For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models) on xAI Console.
+For the most up-to-date information on **your team's model availability**, visit [Models Page](https://console.x.ai/team/default/models?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-pricing\&utm_content=models) on xAI Console.
 
 
 ===/developers/quickstart===
@@ -21043,11 +21044,11 @@ Welcome! In this guide, we'll walk you through the basics of using the xAI API, 
 
 ## Step 1: Create an xAI account
 
-Sign up for an account at [accounts.x.ai](https://accounts.x.ai/sign-up?redirect=cloud-console), then load it with credits to start using the API.
+Sign up for an account at [console.x.ai](https://console.x.ai/login?mode=sign-up\&utm_source=docs\&utm_medium=referral\&utm_campaign=quickstart), then load it with credits to start using the API.
 
 ## Step 2: Generate an API key
 
-Create an API key via the [API Keys page](https://console.x.ai/team/default/api-keys), then export it or add it as an environment variable.
+Create an API key via the [API Keys page](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-quickstart\&utm_content=api-keys), then export it or add it as an environment variable.
 
 ```bash
 export XAI_API_KEY="your_api_key"
@@ -21249,7 +21250,7 @@ Now that you've made your first request, explore what Grok can do:
 
 Every xAI API team has per-model rate limits on two dimensions: **requests per second (RPS)** and **tokens per minute (TPM)**. Your per-second limit is derived from your per-minute request budget (RPM / 60): you cannot spend a full minute's requests in a single second, which protects the API from sudden bursts. These limits scale with your team's **tier**, which is determined by cumulative spend on the API.
 
-You can view your team's current tier and per-model limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits) page in the xAI Console.
+You can view your team's current tier and per-model limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) page in the xAI Console.
 
 ## Rate limit tiers
 
@@ -21274,7 +21275,7 @@ Qualification is based on total revenue received through prepaid credit purchase
 
 Each tier sets hard RPS and TPM caps per model. Limits scale exponentially with tier. Exceeding any limit returns a `429 Too Many Requests` error.
 
-The table below lists RPS and TPM limits at each tier for every model. You can also view your team's personalized limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits) page in the xAI Console.
+The table below lists RPS and TPM limits at each tier for every model. You can also view your team's personalized limits on the [Rate Limits](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) page in the xAI Console.
 
 | Model | RPS | TPM |
 | --- | --- | --- |
@@ -21350,7 +21351,7 @@ def request_with_backoff(prompt, max_retries=5):
 ## Increasing your limits
 
 * **Spend more.** Tiers upgrade automatically based on cumulative spend. No action required on your part.
-* **Request an increase.** Submit a request through the [xAI Console](https://console.x.ai/team/default/rate-limits) if you need higher limits without additional spend, or limits beyond Tier 4.
+* **Request an increase.** Submit a request through the [xAI Console](https://console.x.ai/team/default/rate-limits?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rate-limits\&utm_content=rate-limits) if you need higher limits without additional spend, or limits beyond Tier 4.
 * **Contact sales.** For enterprise-grade capacity, please email [sales@x.ai](mailto:sales@x.ai).
 
 
@@ -21577,7 +21578,7 @@ The image generation model is available on API. Visit
 
 ### Audit Logs
 
-Team admins can now view audit logs on [console.x.ai](https://console.x.ai).
+Team admins can now view audit logs on [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home).
 
 ## January 2025
 
@@ -21600,7 +21601,7 @@ Check out the [announcement](https://x.com/Replit/status/1874211039258333643) fo
 ### Tokenizer Playground
 
 Understanding tokens can be hard. Check out
-[console.x.ai](https://console.x.ai) to get a better understanding of what counts as a token.
+[console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home) to get a better understanding of what counts as a token.
 
 ### Structured Outputs
 
@@ -21657,7 +21658,7 @@ What are you going to build?
 
 We are happy to announce the immediate availability of our API, which
 gives developers programmatic access to our Grok series of foundation models. To get started, head
-to [console.x.ai](https://console.x.ai/) and sign up to create an account. We are excited to see
+to [console.x.ai](https://console.x.ai/?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-release-notes\&utm_content=console-home) and sign up to create an account. We are excited to see
 what developers build using Grok.
 
 
@@ -24959,7 +24960,7 @@ Generate an image based on a prompt. This is the endpoint for making generation 
 
 ### Request Body
 
-* `aspect_ratio` ("1:1" | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "auto")
+* `aspect_ratio` ("1:1" | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "21:9" | "5:2" | "auto")
 
 * `model` (string | null) — Model to be used.
 
@@ -25118,7 +25119,7 @@ Edit an image based on a prompt. This is the endpoint for making edit requests t
 
 ### Request Body
 
-* `aspect_ratio` ("1:1" | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "auto")
+* `aspect_ratio` ("1:1" | "3:4" | "4:3" | "9:16" | "16:9" | "2:3" | "3:2" | "9:19.5" | "19.5:9" | "9:20" | "20:9" | "1:2" | "2:1" | "21:9" | "5:2" | "auto")
 
 * `image` (object)
 
@@ -31083,7 +31084,7 @@ Get historical usage of the API over a time period, aggregated by fields.
 # Management REST API Overview
 
 The Management API allows you to perform operations on your team programmatically. You
-need a [management key](https://console.x.ai/team/default/management-keys) in
+need a [management key](https://console.x.ai/team/default/management-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rest-api-reference-management\&utm_content=management-keys) in
 order to use this API. The base URL for all endpoints is `https://management-api.x.ai`.
 
 The Management API serves as a dedicated interface to the xAI platform, empowering developers and teams to
@@ -31094,7 +31095,7 @@ and perform team-level operations like creating, listing, updating, or deleting 
 (ACLs). This API also facilitates oversight of billing aspects, including monitoring prepaid credit balances and usage
 deductions, ensuring seamless scalability and cost transparency for Grok model integrations.
 
-To get started, go to [xAI Console](https://console.x.ai). On users page, make sure your xAI account has
+To get started, go to [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-rest-api-reference-management\&utm_content=console-home). On users page, make sure your xAI account has
 `Management Keys` Read + Write permission, and obtain your Management API key on the settings page. If you don't see
 any of these options, please ask your team administrator to enable the appropriate permissions.
 
@@ -33723,13 +33724,14 @@ If you already have the exact prompt and want direct control over aspect ratio a
 
 | SDK/API | Tool Name |
 |---------|-----------|
+| xAI SDK | `image_generation` |
 | OpenAI Responses API | `image_generation` |
 
 This tool is also supported in all Responses API compatible SDKs. The Vercel AI SDK does not yet expose the image generation tool.
 
 ## Basic usage
 
-Add `image_generation` to `tools` and ask for an image. In the Responses API, each image arrives as an `image_generation_call` output item whose `result` field carries the base64-encoded image with no data-URL prefix, so you can decode it directly.
+Add `image_generation` to `tools` and ask for an image. In the xAI SDK, each generated image is exposed on `response.image_outputs` as decoded bytes you can write straight to a file. In the Responses API, each image arrives as an `image_generation_call` output item whose `result` field carries the base64-encoded image with no data-URL prefix, so you can decode it directly.
 
 ```bash customLanguage="bash"
 curl https://api.x.ai/v1/responses \
@@ -33745,6 +33747,27 @@ curl https://api.x.ai/v1/responses \
   ]
 }' | jq -r '.output[] | select(.type == "image_generation_call") | .result' \
   | base64 --decode > corgi_surfing.jpg
+```
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+)
+chat.append(user("Generate an image of a corgi surfing a big wave, in the style of a Japanese woodblock print"))
+response = chat.sample()
+
+print(response.content)
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
 ```
 
 ```python customLanguage="pythonOpenAISDK"
@@ -33869,6 +33892,15 @@ curl https://api.x.ai/v1/responses \
 }'
 ```
 
+```python customLanguage="pythonXAI"
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation(action="generate")],
+)
+chat.append(user("Generate an image of a hot air balloon over the desert"))
+response = chat.sample()
+```
+
 ```python customLanguage="pythonOpenAISDK"
 response = client.responses.create(
     model="grok-4.6",
@@ -33909,6 +33941,31 @@ curl https://api.x.ai/v1/responses \
     }
   ]
 }'
+```
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import image, user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation(action="edit")],
+)
+chat.append(
+    user(
+        "Edit this image so it looks like a watercolor painting.",
+        image("https://docs.x.ai/assets/api-examples/images/style-realistic.png"),
+    )
+)
+response = chat.sample()
+
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
 ```
 
 ```python customLanguage="pythonOpenAISDK"
@@ -33955,7 +34012,35 @@ if image_data:
 
 ## Multi-turn editing
 
-Images generated on a previous turn stay editable on follow-up turns. Continue the conversation with `previous_response_id`, and the model can refine its earlier images by reference:
+Images generated on a previous turn stay editable on follow-up turns. Continue the conversation — append the previous response to the chat in the xAI SDK, or pass `previous_response_id` in the Responses API — and the model can refine its earlier images by reference:
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+)
+
+# Turn 1: generate an image
+chat.append(user("Generate an image of a lighthouse on a rocky coast"))
+response = chat.sample()
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+
+# Turn 2: edit the image from the previous turn
+chat.append(response)
+chat.append(user("Make it night time with a full moon"))
+followup = chat.sample()
+with open("edited_image.jpeg", "wb") as f:
+    f.write(followup.image_outputs[0].image)
+```
 
 ```python customLanguage="pythonOpenAISDK"
 import base64
@@ -34028,6 +34113,35 @@ curl https://api.x.ai/v1/responses \
   | base64 --decode > champions_poster.jpg
 ```
 
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import image_generation, web_search
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[web_search(), image_generation()],
+)
+chat.append(
+    user(
+        "Find out which team won the most recent FIFA World Cup, then generate an "
+        "image of a celebratory poster for that team, in a vintage travel-poster style."
+    )
+)
+response = chat.sample()
+
+print(response.content)
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+
+# Per-tool invocation counts for the request
+print(response.server_side_tool_usage)
+```
+
 ```python customLanguage="pythonOpenAISDK"
 import base64
 import os
@@ -34069,6 +34183,36 @@ The same pattern works with [X search](https://docs.x.ai/developers/tools/x-sear
 ## Streaming
 
 When streaming, each image generation call emits progress events—`in_progress`, then `generating`, then `completed`—followed by a `response.output_item.done` event whose item carries the base64 result. Partial image previews are not emitted.
+
+In the xAI SDK, pass `include=["verbose_streaming"]` to watch tool calls as they happen; the decoded images are available on the accumulated response via `response.image_outputs` once the stream ends.
+
+```python customLanguage="pythonXAI"
+import os
+
+from xai_sdk import Client
+from xai_sdk.chat import user
+from xai_sdk.tools import get_tool_call_type, image_generation
+
+client = Client(api_key=os.getenv("XAI_API_KEY"))
+
+chat = client.chat.create(
+    model="grok-4.6",
+    tools=[image_generation()],
+    include=["verbose_streaming"],
+)
+chat.append(user("Generate an image of an origami fox in a paper forest"))
+
+for response, chunk in chat.stream():
+    for tool_call in chunk.tool_calls:
+        if get_tool_call_type(tool_call) == "image_generation_tool":
+            print(f"\nGenerating image: {tool_call.function.arguments}")
+    if chunk.content:
+        print(chunk.content, end="", flush=True)
+
+# The accumulated response carries the decoded images once the stream ends
+with open("image.jpeg", "wb") as f:
+    f.write(response.image_outputs[0].image)
+```
 
 ```python customLanguage="pythonOpenAISDK"
 import base64
@@ -36251,17 +36395,20 @@ full boundary and links to current Cursor security information.
 ## How much does Grok Bot cost?
 
 Availability and billing depend on the account and plan. Eligible plans include
-SuperGrok Heavy, Cursor Ultra, and Cursor Teams Premium. Grok Bot subscriptions
-include weekly usage; eligible accounts can add on-demand usage billed from
-model and token cost. Review the current access page or
+SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra, and Cursor Teams
+Standard and Premium. Grok Bot subscriptions include weekly usage; eligible
+accounts can add on-demand usage billed from model and token cost. If you have
+both a Cursor and a SuperGrok subscription, Grok Bot uses whichever has more
+usage. Review the current access page or
 [Cursor pricing](https://cursor.com/pricing) for current terms. Enterprise
 customers should contact their Cursor account team.
 
 ## Is Grok Bot available to teams and enterprises?
 
-Team and enterprise access is rolling out. Availability and required plans can
-vary by organization. Contact your Cursor account team for current access and
-supported administrative controls.
+Self-serve Cursor Teams Standard and Premium seats include Grok Bot.
+Enterprise access is rolling out. Availability and administrative controls can
+vary by organization. Contact your Cursor account team for current enterprise
+access.
 
 ## Which platforms are supported?
 
@@ -36405,8 +36552,8 @@ Set up Grok Bot, create your first Bot, and hand it a useful task.
 
 You need:
 
-* An eligible plan: SuperGrok Heavy, Cursor Ultra, Cursor Teams Premium
-  (sign in with your Cursor account)
+* An eligible plan: SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra,
+  or Cursor Teams Standard or Premium (sign in with your Cursor account)
 * The Grok Bot desktop app for macOS or Windows
 * An app or website where your first Bot can do useful work
 
@@ -36559,8 +36706,8 @@ the app is closed.
 ## Requirements
 
 * iPhone with iOS 18 or later
-* An eligible plan: SuperGrok Heavy, Cursor Ultra, or Cursor Teams Premium
-  (sign in with your Cursor account)
+* An eligible plan: SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra,
+  or Cursor Teams Standard or Premium (sign in with your Cursor account)
 * Internet connection
 
 Grok Bot is currently designed for iOS on iPhone, not iPad or Android.
@@ -37038,8 +37185,8 @@ controls.
 
 | Plan | Access |
 | --- | --- |
-| Individuals | Available with SuperGrok Heavy, Cursor Ultra, or a one-time trial. |
-| Self-serve teams | Available. Premium seats include a weekly Grok Bot usage allowance. Standard seats can use the free trial or on-demand usage. |
+| Individuals | Available with SuperGrok Plus, SuperGrok Heavy, Cursor Pro+, Cursor Ultra, or a one-time trial. |
+| Self-serve teams | Available. Standard and Premium seats include a weekly Grok Bot usage allowance. |
 | Enterprise organizations | Rolling out. Contact your Cursor account team to join. |
 
 ## Before you roll out
@@ -37610,7 +37757,7 @@ Continue with [Get started](https://docs.x.ai/grok-bot/get-started), then review
 
 **On Grok Business and Enterprise plans, a team admin must add a connector in the cloud console before team members can connect and use it.** This gives your organization control over which external services Grok can access.
 
-Access the connectors page by logging into [console.x.ai](https://console.x.ai), selecting your team, and navigating to **Grok Business → Connectors**. Actions like adding or removing connectors require team management permissions—see the [Permissions](#permissions) section for details.
+Access the connectors page by logging into [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-connector-management\&utm_content=console-home), selecting your team, and navigating to **Grok Business → Connectors**. Actions like adding or removing connectors require team management permissions—see the [Permissions](#permissions) section for details.
 
 ## Adding connectors
 
@@ -37955,7 +38102,7 @@ The OneDrive connector gives Grok access to your personal Microsoft OneDrive sto
 
 ## Prerequisites
 
-Before team members can use OneDrive in Grok, a **team admin** must add the connector through the [console](https://console.x.ai). The setup requires:
+Before team members can use OneDrive in Grok, a **team admin** must add the connector through the [console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-connectors-onedrive\&utm_content=console-home). The setup requires:
 
 1. **Provide the Azure AD Tenant ID** -- The organization's Microsoft Entra (Azure AD) tenant identifier (e.g., `xai.onmicrosoft.com` or a GUID), found in the Azure portal under **Azure Active Directory > Overview**.
 2. **Grant admin consent** -- A Microsoft 365 administrator must approve Grok's access to OneDrive. This is a one-time authorization. The admin can approve directly, copy the consent link for their IT team, or skip and complete it later.
@@ -38187,7 +38334,7 @@ All actions are further restricted by your Salesforce profile, role, sharing rul
 
 Step 1: Company Admin Setup (xAI Console)
 
-1. Go to https://console.x.ai/
+1. Go to https://console.x.ai/?utm\_source=docs\&utm\_medium=referral\&utm\_campaign=grok-connectors-salesforce\&utm\_content=console-home
 2. Navigate to Grok Enterprise → Connectors
 3. Add the Salesforce connector and provide the OAuth credentials (Client ID, Client Secret) during the setup flow.
 
@@ -38241,7 +38388,7 @@ The SharePoint connector lets Grok access files and documents across your organi
 
 ## Prerequisites
 
-Before team members can use SharePoint in Grok, a **team admin** must add the connector through the [console](https://console.x.ai). This is a one-time setup that involves three steps:
+Before team members can use SharePoint in Grok, a **team admin** must add the connector through the [console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-connectors-sharepoint\&utm_content=console-home). This is a one-time setup that involves three steps:
 
 ### 1. Choose an access mode
 
@@ -38645,7 +38792,7 @@ Teams are the level at which xAI tracks API usage, processes billing, and issues
 
 ### Which team am I on?
 
-When you sign up for xAI, you’re automatically assigned to a **Personal Team**, which you can view in the top bar of [xAI Console](https://console.x.ai).
+When you sign up for xAI, you’re automatically assigned to a **Personal Team**, which you can view in the top bar of [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-faq\&utm_content=console-home).
 
 ### How can I manage teams and team members?
 
@@ -38657,11 +38804,11 @@ When you sign up for xAI, you’re automatically assigned to a **Personal Team**
 
 #### Rename or Describe a Team
 
-Admins can update the team name and description on the [Settings page](https://console.x.ai/team/default/settings).
+Admins can update the team name and description on the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-faq\&utm_content=settings).
 
 #### Manage Team Members
 
-Admins can add or remove members by email on the [Users page](https://console.x.ai/team/default/users).
+Admins can add or remove members by email on the [Users page](https://console.x.ai/team/default/users?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-faq\&utm_content=users).
 
 * Assign members as **Admin** or **Member**.
 * If a user is removed, their API keys remain with the team.
@@ -38674,14 +38821,14 @@ Admins can add or remove members by email on the [Users page](https://console.x.
 
 To permanently delete a team:
 
-1. Go to the [Settings page](https://console.x.ai/team/default/settings).
+1. Go to the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-faq\&utm_content=settings).
 2. Follow the instructions under **Delete Team**.
 
 ### How to automatically add users to team with my organization’s email domain?
 
 Admins can enable automatic team joining for users with a shared email domain:
 
-1. Go to the [Settings page](https://console.x.ai/team/default/settings).
+1. Go to the [Settings page](https://console.x.ai/team/default/settings?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-faq\&utm_content=settings).
 2. Add the domain under **Verified Domains**.
 3. Add a `domain-verification` key to your domain’s DNS TXT record to verify ownership.
 
@@ -38703,9 +38850,9 @@ While xAI provides the Grok in X service on X.com and X apps, it does not have o
 
 # License & User Management
 
-**The Grok Business overview page at [console.x.ai](https://console.x.ai) is your central hub for handling team licenses and user invitations.** As a team admin or user with appropriate permissions, you can buy licenses, invite new members, and manage access to ensure smooth collaboration.
+**The Grok Business overview page at [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-management\&utm_content=console-home) is your central hub for handling team licenses and user invitations.** As a team admin or user with appropriate permissions, you can buy licenses, invite new members, and manage access to ensure smooth collaboration.
 
-Access this page by logging into [console.x.ai](https://console.x.ai) and navigating to the overview section. Note that actions like purchasing or provisioning require specific permissions—see the [Permissions](#permissions-and-troubleshooting) section for details.
+Access this page by logging into [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-management\&utm_content=console-home) and navigating to the overview section. Note that actions like purchasing or provisioning require specific permissions—see the [Permissions](#permissions-and-troubleshooting) section for details.
 
 ## Purchasing Licenses
 
@@ -38727,7 +38874,7 @@ Purchased licenses become immediately available for provisioning to users.
 > [!NOTE]
 >
 >  Ensure your team's billing is set up correctly to avoid
-> interruptions. Visit [Billing Settings](https://console.x.ai/team/default/billing) for more
+> interruptions. Visit [Billing Settings](https://console.x.ai/team/default/billing?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-management\&utm_content=billing) for more
 > details.
 
 ## Inviting Users
@@ -38781,7 +38928,7 @@ Cancellations may take a few days to process, and eligible refunds will be issue
 
 Team admins decide how widely members can share Grok Business resources. A sharing policy sets the widest audience a member may pick for a given resource; members can always share more narrowly, never more broadly.
 
-Configure these policies in [console.x.ai](https://console.x.ai) under your team's **Sharing & Retention** settings, in the **Product Sharing** section. Each resource type carries its own policy: conversations, projects, and skills.
+Configure these policies in [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-management\&utm_content=console-home) under your team's **Sharing & Retention** settings, in the **Product Sharing** section. Each resource type carries its own policy: conversations, projects, and skills.
 
 The levels form a ladder from most to least restrictive:
 
@@ -38822,7 +38969,7 @@ If you encounter issues, such as invitations not provisioning due to insufficien
 
 **Organizations provide a higher-level governance structure for enterprise customers, encompassing multiple console teams under unified IT controls.** Available only to Enterprise tier subscribers, organizations enable centralized management of users, teams, and security features like SSO.
 
-Access the organization dashboard by visiting [console.x.ai/organization](https://console.x.ai/organization). This page is restricted to organization admins.
+Access the organization dashboard by visiting [console.x.ai/organization](https://console.x.ai/organization?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-organization\&utm_content=organization). This page is restricted to organization admins.
 
 > [!NOTE]
 >
@@ -38845,7 +38992,7 @@ This structure supports a multi-team architecture, allowing independent Grok Bus
 
 To view users:
 
-1. Navigate to [console.x.ai/organization](https://console.x.ai/organization).
+1. Navigate to [console.x.ai/organization](https://console.x.ai/organization?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-organization\&utm_content=organization).
 2. Scroll to the "Users" section for a list of all domain-associated users, including their team affiliations and access status.
 
 To view teams:
@@ -39043,7 +39190,7 @@ View all shared conversations in your history at [https://grok.com/history?tab=s
 
 To activate or manage your license:
 
-1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai).
+1. Visit your Grok Business overview at [console.x.ai](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=grok-user-guide\&utm_content=console-home).
 2. Press "Assign license" and select your license type.
 3. If you encounter access issues or lack permissions, contact your team admin for assistance.
 
@@ -39119,4 +39266,3 @@ Grok will pull live data and give contextual, AI-powered answers.
 ## Troubleshooting
 
 Need help? Contact [xAI support](mailto:support@x.ai) or visit the [xAI Developer Discord](https://discord.gg/x-ai).
-{% endraw %}

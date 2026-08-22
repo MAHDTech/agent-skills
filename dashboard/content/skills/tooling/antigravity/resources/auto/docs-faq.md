@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -345,4 +344,3 @@ Yes, you can use worktrees in Antigravity 2.0.
 If an agent is running, Antigravity will prevent your computer from
 sleeping.
 
-{% endraw %}

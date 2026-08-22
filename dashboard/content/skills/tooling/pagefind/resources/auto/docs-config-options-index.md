@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "pagefind"
 +++
 
-{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -159,4 +158,3 @@ Writes logs to the given logfile, in addition to the console. Replaces the file 
 | CLI Flag           | ENV Variable       | Config Key |
 |--------------------|--------------------|------------|
 | `--logfile <PATH>` | `PAGEFIND_LOGFILE` | `logfile`  |
-{% endraw %}

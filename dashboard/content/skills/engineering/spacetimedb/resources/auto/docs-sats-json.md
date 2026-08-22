@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -231,4 +230,3 @@ indices into a typespace, like the one returned by the
 [`GET /v1/database/:name_or_identity/schema` HTTP
 endpoint](https://spacetimedb.com/docs/http/database#get-v1databasename_or_identityschema).
 
-{% endraw %}

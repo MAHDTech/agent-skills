@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Request Cancellation RFD](https://agentclientprotocol.com/rfds/request-canc
 Either side can use the optional notification to request cancellation of an outstanding JSON-RPC request by ID. Implementations can return a valid partial result or the standard `-32800` Request Cancelled error, while feature-specific mechanisms such as `session/cancel` remain available for richer semantics.
 
 For the protocol documentation, see [Cancellation](https://agentclientprotocol.com/protocol/v1/cancellation).
-{% endraw %}

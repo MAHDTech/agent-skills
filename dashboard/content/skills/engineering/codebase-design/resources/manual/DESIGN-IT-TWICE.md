@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "codebase-design"
 +++
 
-{% raw %}
 # Design It Twice
 
 When the user wants to explore alternative interfaces for a chosen deepening candidate, use this parallel sub-agent pattern. Based on "Design It Twice" (Ousterhout) - your first idea is unlikely to be the best.
@@ -53,4 +52,3 @@ Present designs sequentially so the user can absorb each one, then compare them 
 
 After comparing, give your own recommendation: which design you think is strongest and why. If elements from different designs would combine well, propose a hybrid. Be opinionated - the user wants a strong read, not a menu.
 
-{% endraw %}

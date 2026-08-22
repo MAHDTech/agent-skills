@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Google Antigravity for Organizations
 
 ## Interest Form
@@ -38,4 +37,3 @@ Policy](https://www.google.com/intl/en/policies/privacy/).
 
 Submit
 
-{% endraw %}

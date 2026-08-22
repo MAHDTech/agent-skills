@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Distributing with CrabNebula Cloud
 
 [CrabNebula](https://crabnebula.dev) is an official Tauri partner
@@ -41,4 +40,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

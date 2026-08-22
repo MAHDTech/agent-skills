@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Adding a New Provider
 
 ## Provider Trait
@@ -252,4 +251,3 @@ impl Provider for MyBackendProvider {    fn name(&self) -> &'static str {       
     fn set(&self, addr: Address<'_>, value: &SecretString) -> Result<()> {        let coords = self.resolve_coords(addr)?;        // Write value at coords.item        Ok(())    }}
 ```
 
-{% endraw %}

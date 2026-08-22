@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -141,8 +140,8 @@ variable on its own has no effect.
 The CLI skips the sign-in screen and opens the main interface directly.
 The header shows **Gemini API key** instead of your account email:
 
-![Antigravity CLI authenticated with a Gemini API key, with “Gemini API
-key” shown in the header in place of an account
+![Antigravity CLI authenticated with a Gemini API key, with "Gemini API
+key" shown in the header in place of an account
 email](https://antigravity.google/assets/image/docs/cli/install-gemini-api-key.png)
 
 > **Note:** When you use the authentication with a `GEMINI_API_KEY`,
@@ -206,4 +205,3 @@ with your local agent:
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Configure secure
   filesystem directories and command limits.
 
-{% endraw %}

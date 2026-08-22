@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1839,4 +1838,3 @@ Remove `unstable::CallReducerFlags` from imports
 Note that confirmed reads are now enabled by default (no action needed
 unless you want to opt out with `.withConfirmedReads(false)`)
 
-{% endraw %}

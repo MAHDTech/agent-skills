@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -150,4 +149,3 @@ agent targeted, line-anchored instructions in a single flow.
 - **[Resume Command (/resume)](https://antigravity.google/docs/cli/commands/resume)**: Navigate
   and manage your past conversations.
 
-{% endraw %}

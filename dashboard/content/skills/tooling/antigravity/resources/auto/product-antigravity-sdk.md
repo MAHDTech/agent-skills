@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Antigravity SDK
 
 Build AI agents that autonomously read files, run commands, edit code,
@@ -54,4 +53,3 @@ can attach assets directly using content classes (perfect for in-memory
 bytes) or conveniently from a filesystem path (which automatically
 resolves types and guesses MIME formats).
 
-{% endraw %}

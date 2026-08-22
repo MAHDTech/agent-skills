@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Documentation Master Index
 
 This master index provides a complete structural map to the Nutanix Files (v5.0) reference guides located in `resources/manual/`.
@@ -29,4 +28,3 @@ This master index provides a complete structural map to the Nutanix Files (v5.0)
 | **11. REST APIs** | [`files-rest-apis.md`](@/skills/engineering/nutanix-files/resources/manual/files-rest-apis.md) | Files REST APIs v4, OData filtering, ETag concurrency, API Explorer, Python/Curl automation. |
 | **12. Operations & Debugging** | [`troubleshooting-and-operations.md`](@/skills/engineering/nutanix-files/resources/manual/troubleshooting-and-operations.md) | FSVM CLI tools (`ncli`, `afsi`, `minerva`, `allssh`), log paths, logbay support bundles, fixes. |
 
-{% endraw %}

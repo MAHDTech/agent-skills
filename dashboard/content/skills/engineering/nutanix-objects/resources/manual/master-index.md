@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects v5.3 Documentation Index
 
 This directory contains the complete reference documentation for Nutanix Objects v5.3, converted into structured, AI-agent readable Markdown reference guides.
@@ -37,4 +36,3 @@ This directory contains the complete reference documentation for Nutanix Objects
 11. **[troubleshooting-and-operations.md](@/skills/engineering/nutanix-objects/resources/manual/troubleshooting-and-operations.md)**
     - Orderly VM shutdown and startup procedures, slow connection detection, UI/Prism Element cluster discovery fixes, missing replication targets, and manual DNS server updates.
 
-{% endraw %}

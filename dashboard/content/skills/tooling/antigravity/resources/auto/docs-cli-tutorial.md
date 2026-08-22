@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -88,4 +87,3 @@ to configure the CLI and master core concepts:
 - **[Reviewing Artifacts](https://antigravity.google/docs/cli/artifacts)**: Deep dive into the
   “Trust through Transparency” architectural pattern.
 
-{% endraw %}

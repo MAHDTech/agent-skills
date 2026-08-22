@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Secret Generation
 
 Secrets can be declared with `type` and `generate` to be auto-generated
@@ -87,4 +86,3 @@ See the [configuration
 reference](https://secretspec.dev/reference/configuration/#secret-generation) for the full
 specification.
 
-{% endraw %}

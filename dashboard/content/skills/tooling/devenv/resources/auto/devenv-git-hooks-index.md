@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 `devenv` has first-class integration for [pre-commit](https://pre-commit.com/) via [git-hooks.nix](https://github.com/cachix/git-hooks.nix). This integration *requires* to have the `git-hooks` input the `devenv.yaml` file, as in [the inputs page](https://devenv.sh/inputs/index.md).
 
 If this is not already in the file, add it using `devenv inputs add git-hooks github:cachix/git-hooks.nix` or insert it manually:
@@ -118,4 +117,3 @@ devenv.nix
   };
 }
 ```
-{% endraw %}

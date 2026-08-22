@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -125,4 +124,3 @@ If the token is valid but does not match the identity, returns
 If the token is invalid, or no `Authorization` header is included in the
 request, returns `401 Unauthorized`.
 
-{% endraw %}

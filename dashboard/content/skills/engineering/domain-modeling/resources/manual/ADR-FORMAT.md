@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "domain-modeling"
 +++
 
-{% raw %}
 # ADR Format
 
 ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc. If your project already keeps decision records under a different path or naming scheme, follow that convention instead.
@@ -56,4 +55,3 @@ If a decision is easy to reverse, skip it - you'll just reverse it. If it's not 
 - **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
 - **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it - otherwise someone will suggest GraphQL again in six months.
 
-{% endraw %}
