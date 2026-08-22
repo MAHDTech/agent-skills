@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Keeper Secrets Manager Provider
 
 The Keeper provider reads and writes records available to a [Keeper
@@ -213,4 +212,3 @@ client keys and must be protected like any other secret; prefer
 `KSM_CONFIG` or a provider credential when persistent local files are
 undesirable.
 
-{% endraw %}

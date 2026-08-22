@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Deployment and Storage Scaling
 
 ## NUTANIX OBJECTS DEPLOYMENT
@@ -892,4 +891,3 @@ Upgrade Plan > Apply Updates. After the Objects Manager is upgraded to the lates
 
 Prism Central UI matches the version indicated in Step 4: nutanix@PCVM~$ mspctl controller version 16. From the Application Switcher, click Objects, then click Create Object Store to start the deployment. Objects | Nutanix Objects Deployment |
 
-{% endraw %}

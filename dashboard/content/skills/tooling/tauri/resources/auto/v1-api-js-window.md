@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 On this page
 
 # window
@@ -2666,4 +2665,3 @@ const monitor = primaryMonitor();
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Monitor`](https://tauri.app/v1/api/js/window#monitor)
 \| `null`\>
 
-{% endraw %}

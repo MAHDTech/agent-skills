@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -164,4 +163,3 @@ plugins:
   skills slash commands.
 - **[Installation & Auth](https://antigravity.google/docs/cli/install)**: Update your CLI install.
 
-{% endraw %}

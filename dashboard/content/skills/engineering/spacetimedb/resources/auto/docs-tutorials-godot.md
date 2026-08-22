@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -75,4 +74,3 @@ server, check out our completed tutorial project!
 
 [https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio](https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio)
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: File Server and Share Management
 
 ## Share and Export Architecture
@@ -75,4 +74,3 @@ Nutanix Files supports NFS v3 and NFS v4.1.
 - Block unwanted file extensions (e.g., `.exe`, `.mp3`, `.iso`, `.mp4`) at the file server or share level.
 - Rejects file creation or rename operations matching blocked extensions.
 
-{% endraw %}

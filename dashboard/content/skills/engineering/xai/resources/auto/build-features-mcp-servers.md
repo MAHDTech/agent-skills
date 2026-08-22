@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
-{% raw %}
 #### Features
 
 # MCP Servers
@@ -64,5 +62,4 @@ Grok also loads MCP configurations from `~/.claude.json`, `.cursor/mcp.json`, an
 ## Troubleshooting
 
 `grok mcp doctor` is the first stop. For stdio servers that start but fail to connect, Grok captures stderr to `~/.grok/logs/mcp/\<server\>.stderr.log`. Cold-start `npx` servers that download packages on first launch may need a higher `startup_timeout_sec`.
-{% endraw %}{% raw %}
-{% endraw %}
+

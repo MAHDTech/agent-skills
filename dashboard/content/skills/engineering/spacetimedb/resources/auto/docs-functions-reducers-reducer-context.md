@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -471,4 +470,3 @@ values that may not be present. The `rng()` method returns a
 deterministic random number generator that is seeded consistently across
 all nodes.
 
-{% endraw %}

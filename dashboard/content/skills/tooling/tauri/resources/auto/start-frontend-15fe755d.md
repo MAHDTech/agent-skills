@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Frontend Configuration
 
 Tauri is frontend agnostic and supports most frontend frameworks out of
@@ -70,4 +69,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Tauri 1.0 Release
 
 Jun 19, 2022
@@ -418,4 +417,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

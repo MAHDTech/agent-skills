@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Azure App Configuration Provider
 
 The Azure App Configuration provider reads and manages ordinary
@@ -438,4 +437,3 @@ which names the complete existing App Configuration key.
   requires bounded execution. After an indeterminate write or delete
   network error, read the current entry before retrying the mutation.
 
-{% endraw %}

@@ -7,15 +7,15 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Node.js SDK
 
 The Node.js / TypeScript SDK (`secretspec`) is a thin wrapper over a
 [napi-rs](https://napi.rs/) native addon that embeds the resolver.
 Resolution happens in the Rust core, so the SDK inherits every provider
-with no JS-side logic. The addon is built from the Rust core with
-`scripts/build-addon.sh`; prebuilt per-platform npm packages are a
-follow-up. TypeScript declarations ship in `index.d.ts`.
+with no JS-side logic. npm installs a prebuilt addon for the host
+platform: Linux x64 and arm64 (glibc, and musl for Alpine images in
+0.20+), macOS on Apple silicon, and Windows x64. TypeScript declarations
+ship in `index.d.ts`.
 
 ## Quick start
 
@@ -74,4 +74,3 @@ const typed = Convert.toSecretSpec(resolved.fieldsJson());
 console.log(typed.DATABASE_URL);
 ```
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Antigravity 2.0
 
 Google Antigravity 2.0 is your dedicated platform to work with agents.
@@ -80,4 +79,3 @@ Download Google AntigravityDownload Google Antigravity
 
 [Download for Apple Silicon](https://antigravity.google/download)[Download for Intel](https://antigravity.google/download)
 
-{% endraw %}

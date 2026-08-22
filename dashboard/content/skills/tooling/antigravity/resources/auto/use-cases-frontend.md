@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Why frontend developers choose Google Antigravity
 
 Google Antigravity takes browser integration to the next level, helping
@@ -54,4 +53,3 @@ Going from 90% to 100%
 
 [Download](https://antigravity.google/download)
 
-{% endraw %}

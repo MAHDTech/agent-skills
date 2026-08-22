@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Configuration Inheritance
 
 SecretSpec supports sharing common secrets across projects through the
@@ -69,4 +68,3 @@ precedence over earlier ones:
   Available from SecretSpec 0.17.
 - Paths are relative to the containing `secretspec.toml` file
 
-{% endraw %}

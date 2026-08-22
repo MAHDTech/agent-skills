@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Barcode Scanner
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/barcode-scanner)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-barcode-scanner)[crates.io](https://crates.io/crates/tauri-plugin-barcode-scanner)
@@ -28,17 +27,17 @@ EAN-13 and other kinds of barcodes.
 
 Install the barcode-scanner plugin to get started.
 
-- [Automatic](#tab-panel-5876)
-- [Manual](#tab-panel-5877)
+- [Automatic](#tab-panel-5906)
+- [Manual](#tab-panel-5907)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5865)
-- [yarn](#tab-panel-5866)
-- [pnpm](#tab-panel-5867)
-- [deno](#tab-panel-5868)
-- [bun](#tab-panel-5869)
-- [cargo](#tab-panel-5870)
+- [npm](#tab-panel-5895)
+- [yarn](#tab-panel-5896)
+- [pnpm](#tab-panel-5897)
+- [deno](#tab-panel-5898)
+- [bun](#tab-panel-5899)
+- [cargo](#tab-panel-5900)
 
 ```
 npm run tauri add barcode-scanner
@@ -82,11 +81,11 @@ cargo tauri add barcode-scanner
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5871)
-    - [yarn](#tab-panel-5872)
-    - [pnpm](#tab-panel-5873)
-    - [deno](#tab-panel-5874)
-    - [bun](#tab-panel-5875)
+    - [npm](#tab-panel-5901)
+    - [yarn](#tab-panel-5902)
+    - [pnpm](#tab-panel-5903)
+    - [deno](#tab-panel-5904)
+    - [bun](#tab-panel-5905)
 
     ```
     npm install @tauri-apps/plugin-barcode-scanner
@@ -190,4 +189,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Profiles
 
 Added in `1.9`
@@ -254,4 +253,3 @@ When you run `devenv --profile backend shell` on a machine named "ci-server" wit
 - `profiles.backend` (via `--profile`)
 - `profiles.hostname."ci-server"` (automatic hostname match)
 - `profiles.user."developer"` (automatic user match)
-{% endraw %}

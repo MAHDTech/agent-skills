@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Localhost
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/localhost)[crates.io](https://crates.io/crates/tauri-plugin-localhost)
@@ -27,17 +26,17 @@ default custom protocol.
 
 Install the localhost plugin to get started.
 
-- [Automatic](#tab-panel-6028)
-- [Manual](#tab-panel-6029)
+- [Automatic](#tab-panel-6058)
+- [Manual](#tab-panel-6059)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6022)
-- [yarn](#tab-panel-6023)
-- [pnpm](#tab-panel-6024)
-- [deno](#tab-panel-6025)
-- [bun](#tab-panel-6026)
-- [cargo](#tab-panel-6027)
+- [npm](#tab-panel-6052)
+- [yarn](#tab-panel-6053)
+- [pnpm](#tab-panel-6054)
+- [deno](#tab-panel-6055)
+- [bun](#tab-panel-6056)
+- [cargo](#tab-panel-6057)
 
 ```
 npm run tauri add localhost
@@ -97,4 +96,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -67,4 +66,3 @@ Use the following keyboard shortcuts to navigate the panel:
 - **[Settings & Rendering](https://antigravity.google/docs/cli/settings)**: Configure your default
   models and credit usage preferences.
 
-{% endraw %}

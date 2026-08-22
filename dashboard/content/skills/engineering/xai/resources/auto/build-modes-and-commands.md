@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # Modes and Commands
 
 The TUI has pager-local slash commands, plus a smaller set provided by `xai-grok-shell`. User-invocable skills also appear as slash commands.
@@ -130,4 +129,3 @@ Launch a saved workflow with `/workflow <name>` (optional JSON args) or `/<name>
 ```
 
 `/deep-research <query>` starts a built-in research workflow. Disable the feature with `[workflows] enabled = false` in `~/.grok/config.toml`, or `GROK_WORKFLOWS=0`.
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Data Protection and Disaster Recovery
 
 ## Data Protection & Replication Topologies
@@ -39,4 +38,3 @@ Self-Service Restore enables end users to recover accidentally deleted or overwr
 - **Snapshot Schedules**: Configure hourly, daily, weekly, or monthly snapshot retention schedules.
 - **Shadow Copy Integration**: SSR exposes snapshots seamlessly via standard VSS / Previous Versions tabs on Windows clients.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 **X Premium is our premium subscription service that elevates quality conversations on the platform.**
 
 X Premium is an opt-in, paid subscription that offers additional features* to improve your experience. X Premium has three tiers: Basic, Premium, and Premium+, with more features available in each higher tier.
@@ -397,4 +396,3 @@ Premium subscriptions are [non-refundable](https://help.x.com/using-x/x-premium#
 Prices may vary by location, applicable taxes, and your payment method fees.
 
 #### Share this article
-{% endraw %}

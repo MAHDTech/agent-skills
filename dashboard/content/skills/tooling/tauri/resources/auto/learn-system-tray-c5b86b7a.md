@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # System Tray
 
 Tauri allows you to create and customize a system tray for your
@@ -31,8 +30,8 @@ The tray API is available in both JavaScript and Rust.
 
 ### Create a Tray Icon
 
-- [JavaScript](#tab-panel-5830)
-- [Rust](#tab-panel-5831)
+- [JavaScript](#tab-panel-5860)
+- [Rust](#tab-panel-5861)
 
 Use the [`TrayIcon.new`](https://v2.tauri.app/reference/javascript/api/namespacetray/#new)
 static function to create a new tray icon:
@@ -61,8 +60,8 @@ for more information on customization options.
 When creating the tray you can use the application icon as the tray
 icon:
 
-- [JavaScript](#tab-panel-5832)
-- [Rust](#tab-panel-5833)
+- [JavaScript](#tab-panel-5862)
+- [Rust](#tab-panel-5863)
 
 ```
 import { TrayIcon } from '@tauri-apps/api/tray';import { defaultWindowIcon } from '@tauri-apps/api/app';
@@ -79,8 +78,8 @@ let tray = TrayIconBuilder::new()  .icon(app.default_window_icon().unwrap().clon
 To attach a menu that is displayed when the tray is clicked, you can use
 the `menu` option.
 
-- [JavaScript](#tab-panel-5834)
-- [Rust](#tab-panel-5835)
+- [JavaScript](#tab-panel-5864)
+- [Rust](#tab-panel-5865)
 
 ```
 import { TrayIcon } from '@tauri-apps/api/tray';import { Menu } from '@tauri-apps/api/menu';
@@ -97,8 +96,8 @@ let tray = TrayIconBuilder::new()  .menu(&menu)  .show_menu_on_left_click(true) 
 
 #### Listen to Menu Events
 
-- [JavaScript](#tab-panel-5836)
-- [Rust](#tab-panel-5837)
+- [JavaScript](#tab-panel-5866)
+- [Rust](#tab-panel-5867)
 
 On JavaScript you can attach a menu click event listener directly to the
 menu item:
@@ -140,8 +139,8 @@ The tray icon emits events for the following mouse events:
 - Move: triggered when the cursor moves around the tray icon area
 - Leave: triggered when the cursor leaves the tray icon area
 
-- [JavaScript](#tab-panel-5838)
-- [Rust](#tab-panel-5839)
+- [JavaScript](#tab-panel-5868)
+- [Rust](#tab-panel-5869)
 
 ```
 import { TrayIcon } from '@tauri-apps/api/tray';
@@ -173,4 +172,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

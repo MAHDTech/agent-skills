@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Announcing the Tauri Mobile Alpha Release
 
 Dec 9, 2022
@@ -28,10 +27,10 @@ published.
 Make sure to update both NPM and Cargo dependencies to the 2.0.0-alpha.0
 release. You can update the dependencies with:
 
-- [npm](#tab-panel-4398)
-- [yarn](#tab-panel-4399)
-- [pnpm](#tab-panel-4400)
-- [cargo](#tab-panel-4401)
+- [npm](#tab-panel-4416)
+- [yarn](#tab-panel-4417)
+- [pnpm](#tab-panel-4418)
+- [cargo](#tab-panel-4419)
 
 ```
 npm install @tauri-apps/cli@next @tauri-apps/api@next
@@ -78,4 +77,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

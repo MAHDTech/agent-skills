@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
-{% raw %}
 # GitHub
 
 This guide will show you how to use
@@ -160,5 +158,4 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}{% raw %}
-{% endraw %}
+

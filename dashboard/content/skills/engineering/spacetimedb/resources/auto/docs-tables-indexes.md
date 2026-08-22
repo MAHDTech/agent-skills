@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -630,4 +629,3 @@ benefit from fewer indexes.
 - See [Access Permissions](https://spacetimedb.com/docs/tables/access-permissions) for querying
   tables from reducers
 
-{% endraw %}

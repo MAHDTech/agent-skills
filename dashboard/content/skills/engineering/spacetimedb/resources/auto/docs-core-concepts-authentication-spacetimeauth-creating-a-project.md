@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -73,4 +72,3 @@ guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/c
 for more information on setting up identity providers, customizing
 templates, and managing users and roles.
 
-{% endraw %}

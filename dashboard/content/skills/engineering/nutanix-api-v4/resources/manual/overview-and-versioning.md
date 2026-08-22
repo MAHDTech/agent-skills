@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-api-v4"
 +++
 
-{% raw %}
 # Nutanix v4 API Overview and Versioning
 
 ### Nutanix v4 API Release Notes
@@ -42,4 +41,3 @@ Following are some key links to get you started with the v4 API:
 
 Nutanix v4 APIs were introduced with AOS 7.0 and pc.2024.3 versions. The Namespace and Versioning sectionlists the minimum supported product versions for the individual namespaces. For information on minimum supported product versions for individual APIs, see API Reference documentation. For information on compatibility and software interoperability of Nutanix products, see the Compatibility andInteroperability Matrix. For information about the upgrade paths available for AOS and Prism Central, see Upgrade Paths.
 
-{% endraw %}

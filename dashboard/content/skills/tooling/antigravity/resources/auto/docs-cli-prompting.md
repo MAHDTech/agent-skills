@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -96,4 +95,3 @@ actions and requests verification:
 - **[Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents)**: Monitor
   asynchronous background agents.
 
-{% endraw %}

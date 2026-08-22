@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Work with Grok Bot
 
 # Use the computer and apps
@@ -120,4 +119,3 @@ capability is enabled and you approve it under your local-computer policy.
 
 Review local-computer permissions in
 [Approvals, security, and privacy](https://docs.x.ai/grok-bot/approvals-security-and-privacy).
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Manage and protect
 
 # Settings and notifications
@@ -136,4 +135,3 @@ copy and share the complete ID.
 
 Clearing a notice removes the notification, not the underlying external action
 or Bot history.
-{% endraw %}

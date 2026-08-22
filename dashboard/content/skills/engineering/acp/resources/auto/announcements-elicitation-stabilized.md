@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -28,4 +27,3 @@ The protocol also defines explicit session, tool-call, and request
 scopes.
 
 For the protocol documentation, see [Elicitation](https://agentclientprotocol.com/protocol/v1/elicitation).
-{% endraw %}

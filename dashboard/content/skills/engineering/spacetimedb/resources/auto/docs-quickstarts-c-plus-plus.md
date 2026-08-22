@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 Get a SpacetimeDB C++ app running in under 5 minutes.
@@ -135,4 +134,3 @@ spacetime logs
 - If `emcc` is not found, re-run the appropriate `emsdk_env` script to
   populate environment variables.
 
-{% endraw %}

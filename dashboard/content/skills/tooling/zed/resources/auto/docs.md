@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "zed"
 +++
 
-{% raw %}
 > For the complete documentation index and Markdown links, see [llms.txt](https://zed.dev/docs/llms.txt).
 
 # Getting Started
@@ -101,4 +100,3 @@ Zed is open source. Join us on GitHub or in Discord to contribute code, report b
 - [Discord](https://discord.com/invite/zedindustries)
 - [GitHub Discussions](https://github.com/zed-industries/zed/discussions)
 - [Zed Reddit](https://www.reddit.com/r/ZedEditor)
-{% endraw %}

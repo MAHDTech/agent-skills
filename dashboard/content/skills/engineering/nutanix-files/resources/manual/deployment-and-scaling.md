@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Deployment and Scaling
 
 ## Deployment Workflows
@@ -68,4 +67,3 @@ Scale-out adds new FSVM nodes to an existing file server instance (e.g., expandi
 - In Prism Central, click **Expand Storage**, enter the target capacity (TB), and apply.
 - Underlying Volume Groups automatically expand in DSF.
 
-{% endraw %}

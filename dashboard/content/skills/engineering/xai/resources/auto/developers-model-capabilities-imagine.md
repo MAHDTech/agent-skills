@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Imagine Overview
@@ -222,4 +221,3 @@ The Imagine APIs are built for production workloads with strict security and com
 * **High Availability** — Multi-region infrastructure with custom SLAs for enterprise workloads
 
 * **SSO & RBAC** — SAML SSO, role-based access, and audit logging
-{% endraw %}

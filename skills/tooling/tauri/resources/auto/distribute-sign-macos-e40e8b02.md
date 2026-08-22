@@ -1,4 +1,3 @@
-{% raw %}
 # macOS Code Signing
 
 Code signing is required on macOS to allow your application to be listed
@@ -180,4 +179,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

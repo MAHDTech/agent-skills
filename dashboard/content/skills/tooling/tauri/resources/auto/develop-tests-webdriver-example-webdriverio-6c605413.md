@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # WebdriverIO
 
 This WebDriver testing example will use
@@ -54,8 +53,8 @@ and you need to set up the differences yourself.
 Let’s add the [WebdriverIO](https://webdriver.io/) CLI to this npm
 project.
 
-- [npm](#tab-panel-4485)
-- [yarn](#tab-panel-4486)
+- [npm](#tab-panel-4503)
+- [yarn](#tab-panel-4504)
 
 ```
 npm install @wdio/cli
@@ -68,8 +67,8 @@ yarn add @wdio/cli
 To then run the interactive config command to set up a
 [WebdriverIO](https://webdriver.io/) test suite, you can then run:
 
-- [npm](#tab-panel-4487)
-- [yarn](#tab-panel-4488)
+- [npm](#tab-panel-4505)
+- [yarn](#tab-panel-4506)
 
 ```
 npx wdio config
@@ -139,8 +138,8 @@ docs](https://webdriver.io/docs/api).
 
 Now that we are all set up with config and a spec let’s run it!
 
-- [npm](#tab-panel-4489)
-- [yarn](#tab-panel-4490)
+- [npm](#tab-panel-4507)
+- [yarn](#tab-panel-4508)
 
 ```
 npm test
@@ -178,4 +177,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

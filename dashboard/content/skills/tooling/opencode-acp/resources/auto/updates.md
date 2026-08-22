@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -217,4 +216,3 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   [Read the full announcement](https://agentclientprotocol.com/announcements/implementation-information).
 </Update>
-{% endraw %}

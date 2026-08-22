@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 On this page
 
 # shell
@@ -824,4 +823,3 @@ await open('/path/to/file');
 **Returns:**
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-{% endraw %}

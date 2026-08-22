@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tdd"
 +++
 
-{% raw %}
 # Good and Bad Tests
 
 ## Good tests
@@ -86,4 +85,3 @@ test("calculateTotal sums line items", () => {
 })
 ```
 
-{% endraw %}

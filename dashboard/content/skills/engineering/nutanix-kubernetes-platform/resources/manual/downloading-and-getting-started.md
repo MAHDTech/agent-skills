@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Downloading NKP and Getting Started
 
 ## Downloading NKP
@@ -1854,4 +1853,3 @@ Here are some links to the NKP installation-specific information:
   Providers.
 - For supported FIPS builds, see Deploying a Cluster in FIPS mode.
 
-{% endraw %}

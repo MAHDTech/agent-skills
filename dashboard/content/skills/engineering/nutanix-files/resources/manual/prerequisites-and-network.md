@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Prerequisites and Network
 
 ## Prerequisites and Environmental Requirements
@@ -63,4 +62,3 @@ Ensure the following network ports are open across firewalls:
 | **1344** | TCP | FSVMs | ICAP AV Servers | Antivirus scanning protocol |
 | **9440** | TCP | FSVM / PC | Prism Central | Minerva management & control plane |
 
-{% endraw %}

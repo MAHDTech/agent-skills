@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Tools
 
 # Streaming & Synchronous Requests
@@ -273,4 +272,3 @@ chat.append(user("What is the 100th Fibonacci number?"))
 | `"code_execution"` | `"code_interpreter"` | `"code_interpreter_call.outputs"` |
 | `"collections_search"` | `"file_search"` | `"file_search_call.results"` |
 | `"mcp"` | `"mcp"` | Always returned in Responses API |
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Tasks
 
 Added in `1.2`
@@ -342,13 +341,17 @@ devenv.nix
 When you run `devenv tasks run devenv:processes:web-server`, it will:
 
 1. First run any tasks that have `before = [ "devenv:processes:web-server" ]`
-1. Then execute the process itself
+1. Then start the process itself
 
 This is particularly useful for:
 
 - Running setup tasks before starting a process
 - Creating complex startup sequences
-- Testing individual processes without starting all of them
+- Checking that a single process reaches its ready state without starting all of them
+
+Processes only live for the duration of the run
+
+`devenv tasks run` stops every process it started once the task graph finishes, whether the process is a root or was pulled in as a dependency of another task. Use [`devenv up`](https://devenv.sh/processes/index.md) when you want a process to keep running.
 
 You can also run tasks after a process finishes by depending on its `@completed` state (see [Dependency states](#dependency-states)). The default suffix for a process dependency is `@ready`, which fires as soon as the process is healthy, so use `@completed` to wait for it to exit instead:
 
@@ -412,4 +415,3 @@ This allows tasks to reference paths relative to the repository root regardless 
 ## SDK using Task Server Protocol
 
 See [Task Server Protocol](https://github.com/cachix/devenv/issues/1457) for a proposal how defining tasks in your favorite language would look like.
-{% endraw %}

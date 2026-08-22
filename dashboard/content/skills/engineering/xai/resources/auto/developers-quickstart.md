@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Quickstart
 
 # Quickstart
@@ -16,11 +15,11 @@ Welcome! In this guide, we'll walk you through the basics of using the xAI API, 
 
 ## Step 1: Create an xAI account
 
-Sign up for an account at [accounts.x.ai](https://accounts.x.ai/sign-up?redirect=cloud-console), then load it with credits to start using the API.
+Sign up for an account at [console.x.ai](https://console.x.ai/login?mode=sign-up\&utm_source=docs\&utm_medium=referral\&utm_campaign=quickstart), then load it with credits to start using the API.
 
 ## Step 2: Generate an API key
 
-Create an API key via the [API Keys page](https://console.x.ai/team/default/api-keys), then export it or add it as an environment variable.
+Create an API key via the [API Keys page](https://console.x.ai/team/default/api-keys?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-quickstart\&utm_content=api-keys), then export it or add it as an environment variable.
 
 ```bash
 export XAI_API_KEY="your_api_key"
@@ -213,4 +212,3 @@ Now that you've made your first request, explore what Grok can do:
 * [Pricing](https://docs.x.ai/developers/pricing) - Tools, batch API, and other platform pricing
 * [Grok Bot](https://docs.x.ai/grok-bot/overview) - AI teammates on a persistent cloud computer
 * [Grok Build](https://docs.x.ai/build/overview) - Agentic coding CLI and API
-{% endraw %}

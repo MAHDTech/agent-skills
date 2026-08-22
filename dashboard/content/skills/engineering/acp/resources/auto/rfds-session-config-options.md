@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -275,4 +274,3 @@ This is a question we should discuss of how much complexity we want to introduce
 * 2025-10-29: Initial draft
 * 2026-01-09: Add option categories
 * 2026-01-15: Allow for category extensions
-{% endraw %}

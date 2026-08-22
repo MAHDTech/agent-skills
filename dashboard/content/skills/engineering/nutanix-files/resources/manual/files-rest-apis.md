@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Files REST APIs
 
 ## Overview and Endpoints
@@ -57,4 +56,3 @@ response = requests.get(url, headers=headers, verify=False)
 print(response.json())
 ```
 
-{% endraw %}

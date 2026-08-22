@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -68,4 +67,3 @@ Views can be subscribed to just like tables and will automatically
 update clients when underlying data changes, making them ideal for
 real-time computed data.
 
-{% endraw %}

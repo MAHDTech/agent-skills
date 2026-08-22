@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -172,4 +171,3 @@ to see what you build next in Antigravity!
 File any migration bugs in our [GitHub
 Issues](https://github.com/firebase/firebase-tools/issues).
 
-{% endraw %}

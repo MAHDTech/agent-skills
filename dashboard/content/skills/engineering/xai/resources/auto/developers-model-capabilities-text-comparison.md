@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Comparison with Chat Completions API
@@ -144,4 +143,3 @@ curl https://api.x.ai/v1/responses \
 ```
 
 This will work for most use cases. If you have a unique integration, refer to the [Responses API documentation](https://docs.x.ai/developers/model-capabilities/text/generate-text) for detailed guidance.
-{% endraw %}

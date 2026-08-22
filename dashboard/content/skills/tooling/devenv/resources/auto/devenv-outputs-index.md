@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Outputs
 
 Added in `1.1`
@@ -93,4 +92,3 @@ Here's an example:
 In this case, `myapp.package` is defined as an output option. When building, devenv will automatically include this output along with any others defined in the `outputs` attribute.
 
 If you don't want to specify the output option type, you can use `config.lib.types.output` instead.
-{% endraw %}

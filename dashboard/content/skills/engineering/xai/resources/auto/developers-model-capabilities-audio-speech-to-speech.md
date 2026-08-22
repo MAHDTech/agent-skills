@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Speech to Speech
@@ -97,7 +96,7 @@ ws.on("message", (data) => {
 
 ```
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-agent\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-speech\&utm_content=api-keys)
 
 [API documentation](https://docs.x.ai/developers/rest-api-reference/inference/voice#realtime)
 
@@ -1685,4 +1684,3 @@ These events and features are xAI-specific and not part of the OpenAI Realtime A
 | `force_message` | New `conversation.item.create` item type for TTS-synthesized scripted utterances. See [Force Message](#force-message). |
 | `resumption` | Field on `session.update` that caches conversation turns and replays them on reconnect. See [Session Resumption](#session-resumption). |
 | `replace` | Field on `session.update` that maps phrases to spoken substitutions applied before TTS to fix pronunciation without changing the transcript. See [Pronunciation Replacements](#pronunciation-replacements). |
-{% endraw %}

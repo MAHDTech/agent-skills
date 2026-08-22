@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "zed"
 +++
 
-{% raw %}
 # Edit Prediction
 
 Zed predicts your next edit based on your activity. Powered by Zeta2,
@@ -278,4 +277,3 @@ Code at the speed of thought.
 [Download nowD](https://zed.dev/download)[Clone
 sourceC](https://github.com/zed-industries/zed)
 
-{% endraw %}

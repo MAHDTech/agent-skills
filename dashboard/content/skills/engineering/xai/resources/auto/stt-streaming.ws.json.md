@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 {
   "title": "Streaming Speech to Text",
   "endpoint": "wss://api.x.ai/v1/stt",
@@ -367,4 +366,3 @@ skill_name = "xai"
     { "direction": "server", "type": "transcript.done" }
   ]
 }
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -67,4 +66,3 @@ executing its plans.
 ![Settings Review Policy
 Proceed](https://antigravity.google/assets/image/docs/agent/settings-review-policy-proceed.png)
 
-{% endraw %}

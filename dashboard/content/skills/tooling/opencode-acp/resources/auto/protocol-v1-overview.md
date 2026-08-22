@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -195,4 +194,3 @@ Learn about [protocol extensibility](https://agentclientprotocol.com/protocol/v1
 * Understand [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup) for creating and loading sessions
 * Review the [Prompt Turn](https://agentclientprotocol.com/protocol/v1/prompt-turn) lifecycle
 * Explore [Extensibility](https://agentclientprotocol.com/protocol/v1/extensibility) to add custom features
-{% endraw %}

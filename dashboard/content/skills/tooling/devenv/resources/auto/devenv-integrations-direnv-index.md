@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 devenv now supports native auto activation without direnv
 
 As of devenv 2.0, `devenv shell` supports **native shell reloading** and [`devenv hook`](https://devenv.sh/auto-activation/index.md) provides **automatic activation when switching directories** with no external dependencies.
@@ -144,4 +143,3 @@ source_url "https://raw.githubusercontent.com/cachix/devenv/VERSION/devenv/diren
 
 use devenv
 ```
-{% endraw %}

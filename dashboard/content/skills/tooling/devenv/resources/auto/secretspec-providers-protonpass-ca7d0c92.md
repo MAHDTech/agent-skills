@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Proton Pass Provider
 
 The Proton Pass provider integrates with [Proton
@@ -213,4 +212,3 @@ Detection is heuristic; set it to `true` to require a reason from every
 SecretSpec caller. secretspec then refuses operations through SecretSpec
 that do not supply an explicit reason.
 
-{% endraw %}

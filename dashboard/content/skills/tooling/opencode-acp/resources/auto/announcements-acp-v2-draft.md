@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -96,4 +95,3 @@ I firmly believe v2 provides a much better foundation for us to build on. It inc
 Overall, I am astounded by how many of you have been using ACP to build your agents, clients, and just about everything else you can imagine. It is a big tent, and every new use case or app that adopts it brings me joy. Your creativity keeps us going, and I am excited to see what you all can do with v2.
 
 <Author name="Ben Brandt" role="Zed Industries / ACP Lead Maintainer" github="https://github.com/benbrandt" />
-{% endraw %}

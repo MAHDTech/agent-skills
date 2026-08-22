@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # devenv.nix
 
 ## packages
@@ -450,7 +449,7 @@ If set to `null`, the system SDK can be used if the shell allows access to exter
 *Default:*
 
 ```
-if pkgs.stdenv.isDarwin then pkgs.apple-sdk else null
+if pkgs.stdenv.hostPlatform.isDarwin then pkgs.apple-sdk else null
 ```
 
 *Example:*
@@ -2532,7 +2531,7 @@ false
 
 ## dotenv.enable
 
-Whether to enable .env integration, doesn’t support comments or multiline values…
+Whether to enable .env integration.
 
 *Type:* boolean
 
@@ -2554,7 +2553,7 @@ true
 
 ## dotenv.disableHint
 
-Disable the hint that are printed when the dotenv module is not enabled, but .env is present.
+Disable the hint printed when a dotenv file is present but the integration is not enabled.
 
 *Type:* boolean
 
@@ -2570,7 +2569,7 @@ false
 
 ## dotenv.filename
 
-The name of the dotenv file to load, or a list of dotenv files to load in order of precedence.
+The path of the dotenv file to load, or a list of dotenv files to load in order of precedence.
 
 *Type:* string or list of string
 
@@ -2578,6 +2577,22 @@ The name of the dotenv file to load, or a list of dotenv files to load in order 
 
 ```
 ".env"
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/integrations/dotenv.nix>
+
+## dotenv.substitution
+
+Whether to expand variable references such as `$NAME`, `${NAME}`, and `${NAME:-default}` in dotenv values. Disabled by default so dollar signs in passwords, hashes, and tokens remain literal.
+
+*Type:* boolean
+
+*Default:*
+
+```
+false
 ```
 
 *Declared by:*
@@ -14729,7 +14744,7 @@ On x86_64 Linux (glibc), Clang uses LLD unless another linker is enabled.
 *Default:*
 
 ```
-pkgs.stdenv.isLinux
+pkgs.stdenv.hostPlatform.isLinux
 ```
 
 *Declared by:*
@@ -17657,6 +17672,54 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
 
+## processes.\<name\>.shutdown
+
+Graceful shutdown signal and timeout
+
+*Type:* submodule
+
+*Default:*
+
+```
+{ }
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
+
+## processes.\<name\>.shutdown.grace
+
+Seconds before shutdown escalates to SIGKILL
+
+*Type:* unsigned integer, meaning >=0
+
+*Default:*
+
+```
+5
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
+
+## processes.\<name\>.shutdown.signal
+
+Unix signal number used for graceful shutdown
+
+*Type:* integer between 1 and 31 (both inclusive)
+
+*Default:*
+
+```
+15
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/processes.nix>
+
 ## processes.\<name\>.start
 
 Auto-start configuration for this process.
@@ -18187,7 +18250,7 @@ null
 
 ## secretspec.provider
 
-The secretspec provider that was used to load secrets (read-only)
+The explicit secretspec provider override selected through devenv, if any (read-only)
 
 *Type:* null or string *(read only)*
 
@@ -26289,6 +26352,54 @@ null
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
 
+## tasks.\<name\>.process.shutdown
+
+Graceful shutdown signal and timeout.
+
+*Type:* submodule
+
+*Default:*
+
+```
+{ }
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
+
+## tasks.\<name\>.process.shutdown.grace
+
+Seconds before shutdown escalates to SIGKILL.
+
+*Type:* unsigned integer, meaning >=0
+
+*Default:*
+
+```
+5
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
+
+## tasks.\<name\>.process.shutdown.signal
+
+Unix signal number used for graceful shutdown.
+
+*Type:* integer between 1 and 31 (both inclusive)
+
+*Default:*
+
+```
+15
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/tasks.nix>
+
 ## tasks.\<name\>.process.start
 
 Auto-start configuration for this process.
@@ -33954,4 +34065,3 @@ A list of removed environment variables to make the shell/direnv more lean.
 *Declared by:*
 
 - <https://github.com/cachix/devenv/blob/main/src/modules/top-level.nix>
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -34,4 +33,3 @@ We have started work on a Draft RFD for how this could work both via WebSockets 
 A big thanks to both of you for starting this and I look forward to seeing what is next!
 
 <Author name="Ben Brandt" role="Zed Industries / ACP Lead Maintainer" github="https://github.com/benbrandt" />
-{% endraw %}

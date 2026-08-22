@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -256,4 +255,3 @@ above, send a request to
 `https://maincloud.spacetimedb.com`), and `$DATABASE` is the name or
 identity of the database.
 
-{% endraw %}

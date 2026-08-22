@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "gh-triage"
 +++
 
-{% raw %}
 # Out-of-Scope Knowledge Base
 
 The `.out-of-scope/` directory in a repo stores persistent records of rejected feature requests. It serves two purposes:
@@ -114,4 +113,3 @@ If the maintainer changes their mind about a previously rejected concept:
 - The skill does not need to reopen old issues - they're historical records
 - The new issue that triggered the reconsideration proceeds through normal triage
 
-{% endraw %}

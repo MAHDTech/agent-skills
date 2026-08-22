@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # grok-imagine-video-1.5
 
 ## At a glance
@@ -15,6 +14,7 @@ skill_name = "xai"
 - **Modalities:** text, image → video
 - **Model name:** `grok-imagine-video-1.5`
 - **Aliases:** `grok-imagine-video-1.5-preview`, `grok-imagine-video-1.5-2026-05-30`
+- **Batch API:** Supported
 
 ## Pricing
 
@@ -30,4 +30,3 @@ skill_name = "xai"
 ## Regions
 
 Available in: us-east-1, us-west-2
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -80,4 +79,3 @@ parallel tasks:
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Manage security
   profiles and system command lists.
 
-{% endraw %}

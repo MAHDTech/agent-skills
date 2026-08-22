@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -376,4 +375,3 @@ used. To expose a submodule's HTTP handlers, register them explicitly on
 the consumer's router using `ctx.as.<alias>` as shown in the [HTTP
 handler section](#from-an-http-handler).
 
-{% endraw %}

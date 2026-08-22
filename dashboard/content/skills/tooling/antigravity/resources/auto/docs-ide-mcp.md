@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -374,15 +373,17 @@ Databases & Storage (14 servers)
 - Spanner
 - Supabase
 
-Developer Tools & CI/CD (11 servers)
+Developer Tools & CI/CD (13 servers)
 
 - Apigee MCP
 - Atlassian
+- Cloud CLI Execution
 - GitHub
 - GitLab Orbit
 - GKE OneMCP
 - Harness
 - Heroku
+- Home Developer MCP
 - Linear
 - Netlify
 - Postman
@@ -413,4 +414,3 @@ Analytics, AI & Cloud (13 servers)
 - Stripe
 - Windsor AI
 
-{% endraw %}

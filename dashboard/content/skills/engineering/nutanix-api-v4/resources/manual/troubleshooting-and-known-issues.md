@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-api-v4"
 +++
 
-{% raw %}
 # Troubleshooting, Known Issues & Workarounds
 
 ## RELEASE NOTES
@@ -314,4 +313,3 @@ Namespace: Networking The following endpoint was provided to limited users with 
 | • | List remote VTEP gateways: GET api/networking/v4.0/config/clusters/{clusterExtId}/remote-vtep-gateways |
 | • | Get remote VTEP gateways: GET api/networking/v4.0/config/clusters/{clusterExtId}/remote-vtep-gateways/{extId} |
 
-{% endraw %}

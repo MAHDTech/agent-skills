@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # 1Password Provider
 
 The 1Password provider integrates with 1Password for team-based secret
@@ -203,4 +202,3 @@ secretspec.toml
 
 Terminal window
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-api-v4"
 +++
 
-{% raw %}
 # Release Features and API Enhancements
 
 ## RELEASE NOTES
@@ -364,4 +363,3 @@ Workaround: After upgrading the Prism v4 SDKs to use the pc.2024.3 version, beta
 | • | ENG-628634 The GetCategoryById endpoint GET api/prism/v4.0/config/categories/{extId}?$expand=detailedAssociations might fail with the 500 server error, if the category represented by theexternal ID is associated with more than 500 entities or policies. This applies only when the ODataparameter $expand is applied on detailedAssociations. |
 | --- | --- |
 
-{% endraw %}

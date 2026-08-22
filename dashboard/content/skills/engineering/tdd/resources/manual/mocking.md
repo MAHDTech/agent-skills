@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tdd"
 +++
 
-{% raw %}
 # When to Mock
 
 Mock at **system boundaries** only:
@@ -69,4 +68,3 @@ The SDK approach means:
 - Easier to see which endpoints a test exercises
 - Type safety per endpoint
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -192,4 +191,3 @@ Conn->Db->User->OnDelete.AddDynamic(this, &AMyActor::OnUserDelete);
 - [Unreal Reference](https://spacetimedb.com/docs/clients/unreal#subscriptions) - Unreal
   subscription APIs
 
-{% endraw %}

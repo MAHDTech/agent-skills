@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Plan Mode
@@ -47,4 +46,3 @@ An empty plan still opens this surface. Plan mode stays on until you approve or 
 * Only the session plan file may be edited until you approve. Other edit tools are rejected, including under auto or always-approve. Reads, bash, and MCP still follow [permission mode](https://docs.x.ai/build/features/permissions). Plan mode gates edit tools, not the shell — bash can still write via redirection.
 * [Subagents](https://docs.x.ai/build/features/subagents) are not edit-gated by the parent’s plan mode; they do inherit permission mode (including auto and always-approve).
 * Status shows `plan` while planning and `plan approval` on the review screen. The `auto` or always-approve flag returns when plan mode ends.
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -927,4 +926,3 @@ directly. See the [Subscriptions
 documentation](https://spacetimedb.com/docs/clients/subscriptions) for details on client-side
 table access.
 
-{% endraw %}

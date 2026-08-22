@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # Enterprise Deployments
 
 This page covers everything needed to deploy Grok Build in enterprise environments, including network requirements, configuration management, authentication options, security controls, and the data lifecycle.
@@ -235,4 +234,3 @@ A session moves data through six phases:
 ### Zero Data Retention
 
 ZDR is enforced at the team level. When enabled for a team or enterprise, zero data retention occurs when using Grok Build. Video tools under ZDR require user-supplied output storage — see [Video Output Storage under ZDR](https://docs.x.ai/build/settings/zdr-video-storage).
-{% endraw %}

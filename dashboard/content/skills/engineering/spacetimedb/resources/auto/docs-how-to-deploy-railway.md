@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -95,4 +94,3 @@ current client connection patterns across supported SDKs.
 - If you want full control over the host, reverse proxy, and operating
   system setup, see [Self-hosting](https://spacetimedb.com/docs/how-to/deploy/self-hosting).
 
-{% endraw %}

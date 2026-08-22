@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 SpacetimeDB provides a way to disconnect a client during a client
@@ -125,4 +124,3 @@ client will be disconnected and the server module's logs will contain an
 entry reading:
 `ERROR: : The client connection was rejected. With our current code logic, all clients will be rejected.`
 
-{% endraw %}

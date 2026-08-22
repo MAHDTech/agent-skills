@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Swift SDK
 
 > **Version compatibility:** The Swift SDK is available in SecretSpec
@@ -189,4 +188,3 @@ File-shaped secrets are materialized as mode-0400 temporary files. Call
 but explicit cleanup gives deterministic lifetime and reports filesystem
 errors.
 
-{% endraw %}

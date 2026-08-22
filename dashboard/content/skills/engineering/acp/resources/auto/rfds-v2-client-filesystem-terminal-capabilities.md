@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -109,4 +108,3 @@ No. It removes Client execution and control. The [Terminal Output](@/skills/engi
 
 * 2026-07-14: Linked the Agent-owned Terminal Output replacement and clarified the incompatible ownership models.
 * 2026-06-02: Initial draft
-{% endraw %}

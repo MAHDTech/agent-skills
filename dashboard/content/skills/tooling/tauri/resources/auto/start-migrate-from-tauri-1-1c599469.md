@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Upgrade from Tauri 1.0
 
 This guide walks you through upgrading your Tauri 1.0 application to
@@ -57,10 +56,10 @@ src-tauri/src/main.rs
 The Tauri v2 CLI includes a `migrate` command that automates most of the
 process and helps you finish the migration:
 
-- [npm](#tab-panel-6641)
-- [yarn](#tab-panel-6642)
-- [pnpm](#tab-panel-6643)
-- [cargo](#tab-panel-6644)
+- [npm](#tab-panel-6671)
+- [yarn](#tab-panel-6672)
+- [pnpm](#tab-panel-6673)
+- [cargo](#tab-panel-6674)
 
 ```
 npm install @tauri-apps/cli@latestnpm run tauri migrate
@@ -340,8 +339,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6619)
-- [Rust](#tab-panel-6620)
+- [JavaScript](#tab-panel-6649)
+- [Rust](#tab-panel-6650)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_cli::init())}
@@ -371,8 +370,8 @@ JavaScript `@tauri-apps/api/clipboard` APIs have been removed. Use the
 [dependencies]tauri-plugin-clipboard-manager = "2"
 ```
 
-- [JavaScript](#tab-panel-6621)
-- [Rust](#tab-panel-6622)
+- [JavaScript](#tab-panel-6651)
+- [Rust](#tab-panel-6652)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_clipboard_manager::init())}
@@ -407,8 +406,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6623)
-- [Rust](#tab-panel-6624)
+- [JavaScript](#tab-panel-6653)
+- [Rust](#tab-panel-6654)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_dialog::init())}
@@ -445,8 +444,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6625)
-- [Rust](#tab-panel-6626)
+- [JavaScript](#tab-panel-6655)
+- [Rust](#tab-panel-6656)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_fs::init())}
@@ -495,8 +494,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6627)
-- [Rust](#tab-panel-6628)
+- [JavaScript](#tab-panel-6657)
+- [Rust](#tab-panel-6658)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_global_shortcut::Builder::default().build())}
@@ -532,8 +531,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6629)
-- [Rust](#tab-panel-6630)
+- [JavaScript](#tab-panel-6659)
+- [Rust](#tab-panel-6660)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_http::init())}
@@ -574,8 +573,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6631)
-- [Rust](#tab-panel-6632)
+- [JavaScript](#tab-panel-6661)
+- [Rust](#tab-panel-6662)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_notification::init())}
@@ -677,8 +676,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6633)
-- [Rust](#tab-panel-6634)
+- [JavaScript](#tab-panel-6663)
+- [Rust](#tab-panel-6664)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_os::init())}
@@ -713,8 +712,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6635)
-- [Rust](#tab-panel-6636)
+- [JavaScript](#tab-panel-6665)
+- [Rust](#tab-panel-6666)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_process::init())}
@@ -749,8 +748,8 @@ Cargo.toml
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6637)
-- [Rust](#tab-panel-6638)
+- [JavaScript](#tab-panel-6667)
+- [Rust](#tab-panel-6668)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_shell::init())}
@@ -846,8 +845,8 @@ have been removed. To set a custom updater target with the
 
 2.  Use in JavaScript or Rust project:
 
-- [JavaScript](#tab-panel-6639)
-- [Rust](#tab-panel-6640)
+- [JavaScript](#tab-panel-6669)
+- [Rust](#tab-panel-6670)
 
 ```
 fn main() {    tauri::Builder::default()        .plugin(tauri_plugin_updater::Builder::new().build())}
@@ -959,4 +958,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

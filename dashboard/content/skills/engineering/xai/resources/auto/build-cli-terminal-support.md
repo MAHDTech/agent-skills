@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### CLI
 
 # Terminal Support
@@ -49,4 +48,3 @@ Grok intentionally runs inline under Zellij and tmux control mode (`tmux -CC`); 
 If your terminal's native scrollbar takes over, mouse reporting is off: Apple Terminal re-enables it under View → Allow Mouse Reporting (`Cmd+R`); iTerm2 under Settings → Profiles → Terminal → "Enable mouse reporting".
 
 Still stuck? Run `/feedback`.
-{% endraw %}

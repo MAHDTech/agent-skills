@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -135,4 +134,3 @@ We've now got the very basics set up. In [part
 create a SpacetimeDB server module and how to connect to it from your
 client.
 
-{% endraw %}

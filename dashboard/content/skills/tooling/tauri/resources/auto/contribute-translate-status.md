@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Tauri Docs Translation Status
 
 If you're interested in helping us translate
@@ -25,7 +24,7 @@ PRs in your language!
 ## [Translation progress by locale](#by-locale)
 
 **Français (fr)**  
-4 done, 8 outdated, 113 missing  
+3 done, 9 outdated, 113 missing  
 
 ### outdated
 
@@ -69,6 +68,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/fr/start/migrate/from-tauri-1.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/migrate/from-tauri-1.mdx?since=2025-08-04T15:22:23.000Z))
+- [start/prerequisites.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/prerequisites.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/fr/start/prerequisites.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/prerequisites.mdx?since=2026-03-30T20:35:58.000Z))
 
 ### missing
 
@@ -416,7 +420,7 @@ PRs in your language!
   file](https://github.com/tauri-apps/tauri-docs/new/v2?filename=src/content/docs/fr/start/project-structure.mdx)
 
 **Español (es)**  
-13 done, 9 outdated, 103 missing  
+12 done, 10 outdated, 103 missing  
 
 ### outdated
 
@@ -465,6 +469,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/es/start/migrate/from-tauri-1.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/migrate/from-tauri-1.mdx?since=2025-08-04T15:22:23.000Z))
+- [start/prerequisites.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/prerequisites.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/es/start/prerequisites.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/prerequisites.mdx?since=2026-03-30T20:35:58.000Z))
 
 ### missing
 
@@ -782,7 +791,7 @@ PRs in your language!
   file](https://github.com/tauri-apps/tauri-docs/new/v2?filename=src/content/docs/es/start/project-structure.mdx)
 
 **简体中文 (zh-cn)**  
-60 done, 43 outdated, 22 missing  
+57 done, 46 outdated, 22 missing  
 
 ### outdated
 
@@ -797,6 +806,12 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/concept/Inter-Process%20Communication/brownfield.md),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/brownfield.md?since=2025-02-28T01:45:56.000Z))
+- [concept/Inter-Process
+  Communication/index.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/concept/Inter-Process%20Communication/index.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx?since=2025-02-28T01:45:56.000Z))
 - [concept/index.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/index.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/concept/index.mdx),
@@ -922,6 +937,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/learn/system-tray.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/learn/system-tray.mdx?since=2025-09-06T10:09:58.000Z))
+- [learn/window-customization.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/learn/window-customization.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/learn/window-customization.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/learn/window-customization.mdx?since=2026-06-19T14:29:57.000Z))
 - [plugin/cli.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/plugin/cli.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/plugin/cli.mdx),
@@ -1002,6 +1022,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/start/migrate/from-tauri-1.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/migrate/from-tauri-1.mdx?since=2025-08-04T15:22:23.000Z))
+- [start/prerequisites.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/prerequisites.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/zh-cn/start/prerequisites.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/prerequisites.mdx?since=2026-03-30T20:35:58.000Z))
 
 ### missing
 
@@ -1073,7 +1098,7 @@ PRs in your language!
   file](https://github.com/tauri-apps/tauri-docs/new/v2?filename=src/content/docs/zh-cn/security/lifecycle.mdx)
 
 **日本語 (ja)**  
-81 done, 41 outdated, 3 missing  
+79 done, 43 outdated, 3 missing  
 
 ### outdated
 
@@ -1088,6 +1113,12 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/Inter-Process%20Communication/brownfield.md),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/brownfield.md?since=2025-03-29T18:57:42.000Z))
+- [concept/Inter-Process
+  Communication/index.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/Inter-Process%20Communication/index.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx?since=2025-03-29T18:57:42.000Z))
 - [concept/Inter-Process
   Communication/isolation.md](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/isolation.md)
   ([outdated
@@ -1174,11 +1205,6 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/distribute/Sign/windows.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/distribute/Sign/windows.mdx?since=2025-11-16T18:36:21.000Z))
-- [distribute/app-store.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/distribute/app-store.mdx)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/distribute/app-store.mdx),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/distribute/app-store.mdx?since=2025-08-16T21:55:00.000Z))
 - [distribute/appimage.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/distribute/appimage.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/distribute/appimage.mdx),
@@ -1234,6 +1260,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/learn/system-tray.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/learn/system-tray.mdx?since=2025-12-07T03:30:09.000Z))
+- [learn/window-customization.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/learn/window-customization.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/learn/window-customization.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/learn/window-customization.mdx?since=2026-06-19T14:29:57.000Z))
 - [plugin/deep-linking.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/plugin/deep-linking.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/plugin/deep-linking.mdx),
@@ -1284,6 +1315,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/start/migrate/from-tauri-1.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/migrate/from-tauri-1.mdx?since=2025-08-19T22:30:31.000Z))
+- [start/prerequisites.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/prerequisites.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/start/prerequisites.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/prerequisites.mdx?since=2026-03-30T20:35:58.000Z))
 
 ### missing
 
@@ -1303,4 +1339,3 @@ PRs in your language!
 
 File
 
-{% endraw %}

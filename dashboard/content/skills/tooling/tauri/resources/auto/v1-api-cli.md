@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 On this page
 
 ## `info`
@@ -560,4 +559,3 @@ This command will show the current version of Tauri.
 See more about the usage through this [complete
 guide](https://tauri.app/v1/guides/development/development-cycle).
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Window Menu
 
 Native application menus can be attached to both to a window or system
@@ -19,8 +18,8 @@ To create a base-level native window menu, and attach to a window. You
 can create various types of menu items including basic items, check
 items, and separators:
 
-- [JavaScript](#tab-panel-5840)
-- [Rust](#tab-panel-5841)
+- [JavaScript](#tab-panel-5870)
+- [Rust](#tab-panel-5871)
 
 Use the
 [`Menu.new`](https://v2.tauri.app/reference/javascript/api/namespacemenu/#new-2)
@@ -46,8 +45,8 @@ fn main() {    tauri::Builder::default()        .setup(|app| {            let me
 Each custom menu item triggers an event when clicked. Use the
 `on_menu_event` API to handle them.
 
-- [JavaScript](#tab-panel-5842)
-- [Rust](#tab-panel-5843)
+- [JavaScript](#tab-panel-5872)
+- [Rust](#tab-panel-5873)
 
 ```
 import { Menu } from '@tauri-apps/api/menu';
@@ -77,8 +76,8 @@ submenu will be placed under the application’s about menu by default,
 regardless of the `text` label. You should include a submenu as the
 first entry (say, an “About” submenu) to fill this space.
 
-- [JavaScript](#tab-panel-5844)
-- [Rust](#tab-panel-5845)
+- [JavaScript](#tab-panel-5874)
+- [Rust](#tab-panel-5875)
 
 ```
 import { Menu, MenuItem, Submenu } from '@tauri-apps/api/menu';
@@ -118,8 +117,8 @@ src-tauri/Cargo.toml
 To use built-in (native) menu items that has predefined behavior by the
 operating system or Tauri:
 
-- [JavaScript](#tab-panel-5848)
-- [Rust](#tab-panel-5849)
+- [JavaScript](#tab-panel-5878)
+- [Rust](#tab-panel-5879)
 
 ```
 import { Menu, PredefinedMenuItem } from '@tauri-apps/api/menu';
@@ -148,8 +147,8 @@ For more preset capabilities, please refer to the documentation
 If you want to change the status of the menu, such as text, icon, or
 check status, you can `set_menu` again:
 
-- [JavaScript](#tab-panel-5846)
-- [Rust](#tab-panel-5847)
+- [JavaScript](#tab-panel-5876)
+- [Rust](#tab-panel-5877)
 
 ```
 import {  Menu,  CheckMenuItem,  IconMenuItem,  MenuItem,} from '@tauri-apps/api/menu';import { Image } from '@tauri-apps/api/image';
@@ -183,4 +182,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

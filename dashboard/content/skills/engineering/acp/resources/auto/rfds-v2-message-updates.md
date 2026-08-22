@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -174,4 +173,3 @@ The Client appends those chunks to the message for that `messageId`. A later mes
 ## Revision history
 
 * 2026-06-09: Initial draft.
-{% endraw %}

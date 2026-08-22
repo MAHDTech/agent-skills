@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # systemd Credential Provider
 
 The systemd credential provider reads credentials that the service
@@ -122,4 +121,3 @@ Changing a source credential does not modify an already-running
 service’s immutable runtime credential. Restart the service to load the
 new value.
 
-{% endraw %}

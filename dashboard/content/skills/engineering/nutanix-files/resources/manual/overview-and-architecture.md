@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Overview and Architecture
 
 ## Nutanix Files Overview
@@ -55,4 +54,3 @@ Nutanix Files delivers high availability across compute, storage, and networking
 3. **Prism Central Monitoring**:
    - Monitors FSVM health, CPU/RAM utilization, storage growth, and network latency continuously.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Embedding Additional Files
 
 You may need to include additional files in your application bundle that
@@ -21,8 +20,8 @@ To bundle the files of your choice, add the `resources` property to the
 
 To include a list of files:
 
-- [Syntax](#tab-panel-4473)
-- [Explanation](#tab-panel-4474)
+- [Syntax](#tab-panel-4491)
+- [Explanation](#tab-panel-4492)
 
 ```
 {  "bundle": {    "resources": [      "./path/to/some-file.txt",      "/absolute/path/to/textfile.txt",      "../relative/path/to/jsonfile.json",      "some-folder/",      "resources/**/*.md"    ]  }}
@@ -46,8 +45,8 @@ structure preserved, for example: `./path/to/some-file.txt` -\>
 
 To fine control where the files will get copied to, use a map instead:
 
-- [Syntax](#tab-panel-4475)
-- [Explanation](#tab-panel-4476)
+- [Syntax](#tab-panel-4493)
+- [Explanation](#tab-panel-4494)
 
 ```
 {  "bundle": {    "resources": {      "/absolute/path/to/textfile.txt": "resources/textfile.txt",      "relative/path/to/jsonfile.json": "resources/jsonfile.json",      "resources/": "",      "docs/**/*md": "website-docs/"    }  }}
@@ -94,8 +93,8 @@ original file paths in the array notation.
 To resolve the path for a resource file, instead of manually calculating
 the path, use the following APIs
 
-- [Rust](#tab-panel-4477)
-- [JavaScript](#tab-panel-4478)
+- [Rust](#tab-panel-4495)
+- [JavaScript](#tab-panel-4496)
 
 On the Rust side, you need an instance of the
 [`PathResolver`](https://docs.rs/tauri/latest/tauri/path/struct.PathResolver.html)
@@ -264,4 +263,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

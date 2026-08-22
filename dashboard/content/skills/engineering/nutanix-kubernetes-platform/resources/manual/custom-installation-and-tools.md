@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Custom Installation and Infrastructure Tools
 
 CUSTOM INSTALLATION AND INFRASTRUCTURE TOOLS
@@ -19122,4 +19121,3 @@ Known Limitations
 The NKP version used to create the managed cluster must match the NKP version
 used to delete the managed cluster.
 
-{% endraw %}

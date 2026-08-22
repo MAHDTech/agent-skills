@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-files"
 +++
 
-{% raw %}
 # Nutanix Files Manual: Performance and Workload Optimization
 
 ## Workload Profiles
@@ -36,4 +35,3 @@ Nutanix Files continuously monitors CPU, Memory, and IOPS load across all FSVMs:
 - **Inline Compression**: Compresses data blocks in memory before writing to disk, reducing storage footprint without performance impact.
 - **Post-Process Compression**: Scans cold data blocks during background maintenance cycles to maximize space savings.
 
-{% endraw %}

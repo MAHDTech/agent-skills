@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Voice Overview
@@ -291,4 +290,3 @@ The xAI Voice APIs are built for production workloads with strict security and c
 * **High Availability** — Multi-region infrastructure with custom SLAs for enterprise workloads
 
 * **SSO & RBAC** — SAML SSO, role-based access, and audit logging
-{% endraw %}

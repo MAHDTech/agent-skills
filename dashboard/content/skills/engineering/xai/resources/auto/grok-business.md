@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [](https://x.ai/)
 
 *   [Products](https://x.ai/grok)
@@ -603,4 +602,3 @@ Social
 Copy black SVG
 
 Copy white SVG
-{% endraw %}

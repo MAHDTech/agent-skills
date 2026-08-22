@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "software-factory"
 +++
 
-{% raw %}
 # Gate 3 - Program Design
 
 Saved as `docs/plans/<feature-slug>/03-program-design.md`. This is the gate that catches the decisions an agent otherwise makes silently at implementation time.
@@ -41,4 +40,3 @@ Being unable to name any is a sign the design has not been thought through yet.>
 
 The last section is the point of the gate: put it in front of the user explicitly during the approval protocol, because it is the cheapest moment this feature will ever have to change its mind.
 
-{% endraw %}

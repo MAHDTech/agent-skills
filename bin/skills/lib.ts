@@ -160,6 +160,76 @@ export function rewriteSkillLinks(
     )
 }
 
+/**
+ * Strip the whole-file `{% raw %}` wrapper older downloader runs added.
+ * Zola (0.19+) does not honour raw blocks in content - the wrapper protected
+ * nothing and rendered literally on the page.
+ */
+export function stripLegacyRawWrapper(content: string): string {
+    const match = content.match(
+        /^\s*\{% raw %\}\n([\s\S]*)\n\{% endraw %\}\s*$/
+    )
+    return match ? match[1]! : content
+}
+
+// Word joiner (U+2060): invisible in rendered HTML, but splits the `{%`
+// delimiter so Zola's shortcode lexer never matches it.
+const WORD_JOINER = "\u2060"
+
+// `{{ name(args) }}` - Zola treats this as an inline shortcode call.
+const INLINE_CALL_RE =
+    /\{\{-?(\s*[A-Za-z_][A-Za-z0-9_]*\s*\((?:(?!\{\{)[\s\S])*?\)\s*)-?\}\}/g
+// `{% name(args) %}` / `{% end %}` - Zola treats these as a body shortcode.
+const BODY_OPEN_RE =
+    /\{%-?(\s*[A-Za-z_][A-Za-z0-9_]*\s*\((?:(?!\{%)[\s\S])*?\)\s*)-?%\}/g
+const BODY_END_RE = /\{%-?(\s*end\s*)-?%\}/g
+
+/**
+ * Neutralise shortcode-shaped text in downloaded/authored markdown so Zola
+ * renders it literally instead of failing the build on an unknown shortcode.
+ *
+ * Inline calls use Zola's escape syntax (`{{/* name() *\/}}`), which renders
+ * back as the original text. Body shortcodes only render correctly when the
+ * escaped open/end tokens pair up, so unbalanced or nested sequences fall
+ * back to splitting the `{%` delimiter with an invisible word joiner.
+ */
+export function escapeZolaShortcodes(content: string): string {
+    let result = content.replace(INLINE_CALL_RE, "{{/*$1*/}}")
+
+    const tokens: {index: number; kind: "open" | "end"}[] = []
+    for (const m of result.matchAll(BODY_OPEN_RE)) {
+        tokens.push({index: m.index!, kind: "open"})
+    }
+    for (const m of result.matchAll(BODY_END_RE)) {
+        tokens.push({index: m.index!, kind: "end"})
+    }
+    if (tokens.length === 0) return result
+
+    tokens.sort((a, b) => a.index - b.index)
+    let depth = 0
+    let balanced = true
+    for (const t of tokens) {
+        depth += t.kind === "open" ? 1 : -1
+        // depth > 1 means nested body shortcodes, which Zola's escape
+        // syntax does not reliably round-trip - treat like an imbalance.
+        if (depth < 0 || depth > 1) {
+            balanced = false
+            break
+        }
+    }
+    if (depth !== 0) balanced = false
+
+    if (balanced) {
+        result = result.replace(BODY_OPEN_RE, "{%/*$1*/%}")
+        result = result.replace(BODY_END_RE, "{%/*$1*/%}")
+    } else {
+        const split = (m: string) => `{${WORD_JOINER}${m.slice(1)}`
+        result = result.replace(BODY_OPEN_RE, split)
+        result = result.replace(BODY_END_RE, split)
+    }
+    return result
+}
+
 export async function getSkills(): Promise<Skill[]> {
     const skills: Skill[] = []
     if (!(await fs.pathExists(SKILLS_DIR))) return skills

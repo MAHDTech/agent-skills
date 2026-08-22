@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "software-factory"
 +++
 
-{% raw %}
 # Gate 1 - Product
 
 Saved as `docs/plans/<feature-slug>/01-product.md`. Written in the end user's language throughout; anything technical belongs to Gate 2.
@@ -43,4 +42,3 @@ write this is the signal that the wrong thing is being built.>
 
 One plain HTML file per screen in `mockups/`, no framework and no build step. They exist to make the user point at something and say "yes, that" - they are thrown away once the real screens exist, so hardcode the content and skip the polish.
 
-{% endraw %}

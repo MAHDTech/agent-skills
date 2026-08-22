@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -62,4 +61,3 @@ skill_name = "opencode-acp"
 ## Vala
 
 * [Agent Client Protocol Vala SDK](https://gitcode.com/ai-outputs/AgentClientProtocol)
-{% endraw %}

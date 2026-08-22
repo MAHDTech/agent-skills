@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 Given a hello world example, click on the end of each line to get an explanation:
 
 devenv.nix
@@ -73,4 +72,3 @@ $ devenv info
 
 # processes
 ```
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -204,4 +203,3 @@ This action cannot be undone.
 - **Monitor your usage**: Check your energy consumption and plan limits
   on the [pricing page](https://spacetimedb.com/pricing).
 
-{% endraw %}

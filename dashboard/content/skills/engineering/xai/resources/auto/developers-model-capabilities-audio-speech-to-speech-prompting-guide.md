@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Speech to Speech API
 
 # Prompting Guide
@@ -377,4 +376,3 @@ If the input is unclear or incomplete, ask a short clarification instead of gues
 ```
 
 This guide organizes the core techniques (persona and objective conditioning, language locking, variety, alphanumeric formatting, unclear-input policy, tool preambles and hygiene, escalation, and prompt-critique meta-prompts) into a single recommended structure: second-person voice and a fixed section order, so hand-written prompts stay close to the training distribution.
-{% endraw %}

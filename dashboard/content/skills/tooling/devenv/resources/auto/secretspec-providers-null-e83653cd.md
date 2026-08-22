@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Null Provider
 
 The null provider always reports that a value is missing. SecretSpec can
@@ -96,4 +95,3 @@ state. Use it on declarations with defaults, enabled generation, or
 prompted answer would be saved. Required declarations with none of those
 remain missing, and explicit writes are rejected.
 
-{% endraw %}

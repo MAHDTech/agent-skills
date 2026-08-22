@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Work with Grok Bot
 
 # Message and collaborate
@@ -120,4 +119,3 @@ See [Files and results](https://docs.x.ai/grok-bot/files-and-results) for attach
 [Skills and routines](https://docs.x.ai/grok-bot/skills-routines-and-automations) for repeatable work,
 and [Approvals, security, and privacy](https://docs.x.ai/grok-bot/approvals-security-and-privacy) before
 authorizing external actions.
-{% endraw %}

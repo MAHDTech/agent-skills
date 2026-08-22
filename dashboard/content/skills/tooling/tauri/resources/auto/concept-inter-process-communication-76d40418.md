@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Inter-Process Communication
 
 Inter-Process Communication (IPC) allows isolated processes to
@@ -47,6 +46,10 @@ the Tauri Core.
 
 Events sent between the Core and the Webview.
 
+Under the hood, events still utilize Commands, and the access to the
+events API is controlled by the [Event
+permissions](https://v2.tauri.app/reference/acl/core-permissions/#event).
+
 ## Commands
 
 Tauri also provides a [foreign function
@@ -77,4 +80,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

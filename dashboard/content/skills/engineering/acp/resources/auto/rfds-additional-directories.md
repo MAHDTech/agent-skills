@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -447,4 +446,3 @@ This proposal is preferred because it is additive, keeps `cwd` semantics stable,
 
 * 2026-05-21: Moved to Preview.
 * 2026-03-24: Initial draft.
-{% endraw %}

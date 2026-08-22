@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Cluster Operations Management
 
 ## Cluster Operations Management (2)
@@ -25679,4 +25678,3 @@ GPU NVIDIA GPU driver version, memory and capacity
 | Category | Description |
 | -------- | ----------- |
 
-{% endraw %}

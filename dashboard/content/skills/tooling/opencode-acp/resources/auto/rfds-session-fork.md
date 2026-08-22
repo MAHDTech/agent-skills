@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -110,4 +109,3 @@ None. This proposal is inspired by the abilities exposed in Claude Agent SDK. It
 * 2025-11-17: Mentioned capabilities format, updated FAQ.
 * 2025-11-20: Added request format and updated capabilities format.
 * 2025-12-10: Adjust fork options to align with `session/load`.
-{% endraw %}

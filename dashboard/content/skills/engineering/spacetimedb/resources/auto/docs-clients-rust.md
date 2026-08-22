@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1394,4 +1393,3 @@ An opaque identifier for a client connection to a database, intended to
 differentiate between connections from the same
 [`Identity`](#type-identity).
 
-{% endraw %}

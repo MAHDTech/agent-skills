@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -114,4 +113,3 @@ The v1 shape represents exactly one plan and has no plan ID. A stable synthetic 
 ## Revision history
 
 2026-06-02: Initial draft
-{% endraw %}

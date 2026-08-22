@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -50,4 +49,3 @@ Understand how the agent executes inside a completely separate Chrome
 profile to protect your personal data. [Read Isolated Profile
 Guide](https://antigravity.google/docs/ide/separate-chrome-profile)
 
-{% endraw %}

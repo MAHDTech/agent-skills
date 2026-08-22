@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -134,4 +133,3 @@ Tool-call updates need both operations. Omission means "I am not changing this f
 * 2026-07-02: Updated permission requests to carry tool-call updates through an optional `subject` tagged union and to use separate `title` and `description` fields for permission-specific prompt text.
 * 2026-06-09: Added `tool_call_content_chunk` for streaming tool-call content.
 * 2026-06-08: Initial draft
-{% endraw %}

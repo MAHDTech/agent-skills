@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [Back to news](https://x.ai/news)
 
 Apr 30, 2026
@@ -19,7 +18,7 @@ across Grok Text to Speech and Voice Agent APIs.
 
 Listen to this blog post
 
-[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog)
+[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=custom-voices-blog)
 
 Clone your voice
 
@@ -27,7 +26,7 @@ Clone your voice
 
 Read Docs
 
-[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog)
+[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=custom-voices-blog)
 
 Clone your voice
 
@@ -211,7 +210,7 @@ matches your brand identity, not a generic preset.
 **Clone your voice in under two minutes. Use it everywhere.**
 
 Record about a minute of natural speech in the [xAI
-console](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog).
+console](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=custom-voices-blog).
 Our pipeline verifies you're the voice owner, processes your recording,
 and delivers a production-ready voice model, all in under two minutes.
 Your custom voice inherits every TTS capability: [speech
@@ -273,7 +272,7 @@ RECORDING
 Speaker embeddings from the passphrase and the full recording are
 compared to confirm they belong to the same person.
 
-[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog)
+[](https://console.x.ai/team/default/voice/voice-library?campaign=custom-voices-blog&utm_source=website&utm_medium=referral&utm_campaign=custom-voices-blog)
 
 Clone your voice
 
@@ -285,4 +284,3 @@ Custom Voices Docs
 
 Voice Agent API
 
-{% endraw %}

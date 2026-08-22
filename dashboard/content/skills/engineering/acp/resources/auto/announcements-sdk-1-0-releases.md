@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Rust SDK based on SACP RFD](https://agentclientprotocol.com/rfds/rust-sdk-v
 The Rust SDK's component-based architecture provides explicit message ordering and composable handlers for clients, agents, and protocol adapters. The matching TypeScript milestone demonstrates that the SDK design goals apply across language ecosystems.
 
 The releases are available as [`agent-client-protocol` v1.0.0](https://crates.io/crates/agent-client-protocol/1.0.0) and [`@agentclientprotocol/sdk` v1.0.0](https://www.npmjs.com/package/@agentclientprotocol/sdk/v/1.0.0).
-{% endraw %}

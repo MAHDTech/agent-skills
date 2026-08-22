@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 Added in `0.6`
 
 Note
@@ -201,4 +200,3 @@ devenv.nix
 ```
 
 You can also conditionalize based on the particular container that is being built, for example, `config.containers."processes".isBuilding`.
-{% endraw %}

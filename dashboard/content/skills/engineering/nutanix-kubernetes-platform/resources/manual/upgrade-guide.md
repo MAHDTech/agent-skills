@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Upgrade Nutanix Kubernetes Platform
 
 UPGRADE NUTANIX KUBERNETES PLATFORM
@@ -2205,4 +2204,3 @@ Solution: Ensure that you disable Flux pruning before you upgrade the GitOps-man
 information, see Disabling Flux Pruning on page 1065.
 ```
 
-{% endraw %}

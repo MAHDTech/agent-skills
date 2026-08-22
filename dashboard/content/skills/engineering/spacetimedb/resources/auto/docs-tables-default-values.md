@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -158,4 +157,3 @@ const badTable = table(
 - **Feature flags**: Add boolean columns with `default(false)` to enable
   new functionality gradually
 
-{% endraw %}

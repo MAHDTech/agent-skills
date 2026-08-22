@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -36,4 +35,3 @@ bridges, and dual-agent/client demos under
 Browse the full documentation—including the quickstart, contrib helpers, and API
 reference—at
 [agentclientprotocol.github.io/python-sdk](https://agentclientprotocol.github.io/python-sdk/).
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -80,4 +79,3 @@ sequenceDiagram
     Note over Client,Agent: 6. Agent reports cancellation completion
     Agent->>Client: session/update (state_update: idle, stopReason: "cancelled")
 ```
-{% endraw %}

@@ -30,7 +30,6 @@ const {
     isNonTextContentType,
     decodeHtmlEntities,
     escapeOrphanTypeBrackets,
-    protectZolaDelimiters,
     sanitizeControlCharacters,
     normalizeMarkdownFormatting,
 } = await import("./downloader.ts")
@@ -80,16 +79,6 @@ describe("Markdown Post-Processing Helpers", () => {
         expect(output).toBe(
             "List of (array\\<string\\>, required)\n```\n<string>\n```"
         )
-    })
-
-    it("wraps raw Zola template tags in {% raw %} blocks", () => {
-        expect(protectZolaDelimiters("Hello {{ name }}")).toBe(
-            "{% raw %}\nHello {{ name }}\n{% endraw %}"
-        )
-        expect(
-            protectZolaDelimiters("{% raw %}Hello {{ name }}{% endraw %}")
-        ).toBe("{% raw %}Hello {{ name }}{% endraw %}")
-        expect(protectZolaDelimiters("Plain text")).toBe("Plain text")
     })
 
     it("strips null bytes, control characters, and U+FFFD", () => {

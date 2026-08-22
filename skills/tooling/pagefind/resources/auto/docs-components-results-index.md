@@ -1,4 +1,3 @@
-{% raw %}
 > **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
 > Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
 > accessibility and customization.** Full component guide:
@@ -160,4 +159,3 @@ By default, results display in a single column. You can change the layout of the
 ```
 
 See [CSS Variables](https://pagefind.app/docs/css-variables/) for all available layout variables.
-{% endraw %}

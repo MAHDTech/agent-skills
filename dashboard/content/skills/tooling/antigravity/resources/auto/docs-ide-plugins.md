@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -95,4 +94,3 @@ directories to discover and load your customizations:
   `~/.gemini/config/plugins/` in your user home directory. This makes
   the plugin active across all workspaces.
 
-{% endraw %}

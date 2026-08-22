@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -106,4 +105,3 @@ No. Implementations should preserve unknown values when practical and degrade gr
 ## Revision history
 
 2026-05-27: Initial draft
-{% endraw %}

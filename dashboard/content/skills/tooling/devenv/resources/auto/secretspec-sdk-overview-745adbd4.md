@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # SDK Overview
 
 SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript,
@@ -153,4 +152,3 @@ CI builds and tests. Contributors: the [SDK
 development](https://secretspec.dev/development/sdks) page documents how these artifacts are
 built and how to add a platform.
 
-{% endraw %}

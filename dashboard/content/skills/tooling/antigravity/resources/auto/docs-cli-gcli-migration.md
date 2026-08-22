@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -138,4 +137,3 @@ setup anomalies:
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Access standard parameters
   lists and slash command mappings.
 
-{% endraw %}

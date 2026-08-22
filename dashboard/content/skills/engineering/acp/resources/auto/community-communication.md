@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -97,4 +96,3 @@ When to use:
 
 1. Contact lead and/or core maintainers, or [hi@zed.dev](mailto:hi@zed.dev) directly.
 2. Follow responsible disclosure guidelines.
-{% endraw %}

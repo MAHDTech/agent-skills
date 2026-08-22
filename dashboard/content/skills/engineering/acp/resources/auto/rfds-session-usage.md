@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -258,4 +257,3 @@ For agents that only provide usage during active prompting, the client UI may no
 * 2026-06-02: Split end-turn token accounting into a separate draft RFD.
 * 2026-06-03: Moved to Preview.
 * 2026-06-05: Moved to Completed.
-{% endraw %}

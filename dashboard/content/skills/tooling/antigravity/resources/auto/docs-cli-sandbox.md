@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -98,4 +97,3 @@ prompt block adapts dynamically based on your sandboxing state:
 - **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Customize
   keyboard hotkeys and buffers.
 
-{% endraw %}

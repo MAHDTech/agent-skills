@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # OpenBao Provider
 
 The OpenBao provider integrates with OpenBao’s KV (Key-Value) secrets
@@ -272,4 +271,3 @@ $ secretspec check --provider "openbao://127.0.0.1:8200/secret?tls=false"
 
 Terminal window
 
-{% endraw %}

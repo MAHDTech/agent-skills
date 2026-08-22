@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "productionize-app"
 +++
 
-{% raw %}
 # Framework & Deployment Checklists
 
 Reference material for the productionize-app skill. Apply the block that matches the app's framework (during the Framework-Specific Optimizations phase) and the block that matches the deployment target (during the Deployment Preparation phase).
@@ -80,4 +79,3 @@ Reference material for the productionize-app skill. Apply the block that matches
 - Test scaling and load balancing
 - Configure logging and monitoring
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Model Config Option Category RFD](https://agentclientprotocol.com/rfds/mode
 Agents can use the category for model-related parameters such as context size or speed and quality trade-offs. Clients can then group those options near the primary model selector without depending on Agent-specific option IDs.
 
 For the protocol documentation, see [Option Categories](https://agentclientprotocol.com/protocol/v1/session-config-options#option-categories).
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 {
   "title": "Realtime Speech to Speech",
   "endpoint": "wss://api.x.ai/v1/realtime",
@@ -2725,4 +2724,3 @@ skill_name = "xai"
     }
   ]
 }
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Skills, Plugins & Marketplaces
@@ -89,4 +88,3 @@ Grok also reads the `AGENTS.md` instruction-file family (`AGENTS.md`, `Agents.md
 
 * `~/.agents/skills/`
 * `~/.agents/commands/`
-{% endraw %}

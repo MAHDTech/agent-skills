@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # SOPS Provider
 
 The `sops` provider reads and writes secrets in files encrypted with
@@ -398,4 +397,3 @@ the provider URI.
   write.
 - Use templated paths when profiles must not share the same dotenv key.
 
-{% endraw %}

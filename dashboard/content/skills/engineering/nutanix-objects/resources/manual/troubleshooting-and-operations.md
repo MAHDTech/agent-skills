@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Troubleshooting and VM Lifecycle Operations
 
 ## TROUBLESHOOTING NUTANIX OBJECTS
@@ -212,4 +211,3 @@ nutanix@pcvm$ mspctl cluster ssh cluster-name --all --cmd "sudo systemctl restar
 
 Copyright 2026 Nutanix, Inc. Nutanix, Inc. 1740 Technology Drive, Suite 150 San Jose, CA 95110 All rights reserved. This product is protected by U.S. and international copyright and intellectual property laws. Nutanix and the Nutanix logo are registered trademarks of Nutanix, Inc. in the United States and/or other jurisdictions. All other brand and product names mentioned herein are for identification purposes only and may be trademarks of their respective holders. Objects | Copyright |
 
-{% endraw %}

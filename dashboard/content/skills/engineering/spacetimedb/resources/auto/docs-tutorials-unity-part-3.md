@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1747,4 +1746,3 @@ there's a problem! We can't move yet. In the next part, we'll explore
 how to get your player moving and interacting with food and other
 objects.
 
-{% endraw %}

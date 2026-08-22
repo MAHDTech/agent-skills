@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Settings
 
 # Video Output Storage under ZDR
@@ -44,4 +43,3 @@ secret_access_key = ""
 Only the presigned URLs leave the machine — the credentials themselves are never sent to xAI. Restart Grok Build after changing the config for it to take effect.
 
 Note: Video tools will be enabled if the privacy setting is off (`/privacy`).
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -290,4 +289,3 @@ materialized entity.
 ## Revision history
 
 * 2026-07-22: Initial draft.
-{% endraw %}

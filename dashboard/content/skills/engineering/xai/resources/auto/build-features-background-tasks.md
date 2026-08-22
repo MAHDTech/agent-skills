@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Background Tasks
@@ -35,4 +34,3 @@ For real-time event streams rather than periodic checks, the agent can attach a 
 ## Prompt queue
 
 Prompts submitted while a turn is running are queued, not dropped. `Ctrl+;` toggles the queue panel and `/queue` lists it.
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Quick Start
 
 Tauri is compatible with **almost every frontend stack**. Select yours
@@ -126,4 +125,3 @@ looking for Getting Started guides! Read our
 [contributing](https://github.com/tauri-apps/tauri/blob/dev/.github/CONTRIBUTING.md)
 guidelines and help us out!
 
-{% endraw %}

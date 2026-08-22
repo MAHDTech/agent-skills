@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -183,4 +182,3 @@ Highlight any commit and press Enter to load and review its diff:
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Quick reference for all
   slash commands and default shortcuts.
 
-{% endraw %}

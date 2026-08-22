@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Keyring Provider
 
 The Keyring provider stores secrets in your system’s native credential
@@ -125,4 +124,3 @@ keyring entry:
 Both projects will resolve `ARTIFACTORY_USER` from keyring service
 `secretspec/shared/default/ARTIFACTORY_USER`.
 
-{% endraw %}

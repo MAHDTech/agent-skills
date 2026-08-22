@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: IAM and User Management
 
 ## TYPES OF NUTANIX OBJECTS USERS
@@ -386,4 +385,3 @@ To delete an API user, follow these steps:
 
 The user is deleted. Objects | Directory Configuration and Access Key Generation |
 
-{% endraw %}

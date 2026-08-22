@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-api-v4"
 +++
 
-{% raw %}
 # Nutanix v4 API Namespaces Reference
 
 ## NAMESPACE AND VERSIONING
@@ -53,4 +52,3 @@ The Nutanix v4 API blogs provides developers and technical professionals with re
 | Nested Pagination in Nutanix V4 APIs | Indicates methods to handle nested paginationin Nutanix v4 APIs, including examples and bestpractices. |
 | Pagination in Nutanix v4 APIs | Indicates a comprehensive guide to pagination inNutanix v4 APIs. |
 
-{% endraw %}

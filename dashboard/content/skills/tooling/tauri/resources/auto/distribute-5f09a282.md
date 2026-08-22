@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Distribute
 
 Tauri provides the tooling you need to distribute your application
@@ -18,12 +17,12 @@ either to the platform app stores or as platform-specific installers.
 Tauri builds your application directly from its CLI via the `build`,
 `android build` and `ios build` commands.
 
-- [npm](#tab-panel-4497)
-- [yarn](#tab-panel-4498)
-- [pnpm](#tab-panel-4499)
-- [deno](#tab-panel-4500)
-- [bun](#tab-panel-4501)
-- [cargo](#tab-panel-4502)
+- [npm](#tab-panel-4515)
+- [yarn](#tab-panel-4516)
+- [pnpm](#tab-panel-4517)
+- [deno](#tab-panel-4518)
+- [bun](#tab-panel-4519)
+- [cargo](#tab-panel-4520)
 
 ```
 npm run tauri build
@@ -61,12 +60,12 @@ for the configured formats.
 If you need further customization on how the platform bundles are
 generated, you can split the build and bundle steps:
 
-- [npm](#tab-panel-4503)
-- [yarn](#tab-panel-4504)
-- [pnpm](#tab-panel-4505)
-- [deno](#tab-panel-4506)
-- [bun](#tab-panel-4507)
-- [cargo](#tab-panel-4508)
+- [npm](#tab-panel-4521)
+- [yarn](#tab-panel-4522)
+- [pnpm](#tab-panel-4523)
+- [deno](#tab-panel-4524)
+- [bun](#tab-panel-4525)
+- [cargo](#tab-panel-4526)
 
 ```
 npm run tauri build -- --no-bundle# bundle for distribution outside the macOS App Storenpm run tauri bundle -- --bundles app,dmg# bundle for App Store distributionnpm run tauri bundle -- --bundles app --config src-tauri/tauri.appstore.conf.json
@@ -206,4 +205,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

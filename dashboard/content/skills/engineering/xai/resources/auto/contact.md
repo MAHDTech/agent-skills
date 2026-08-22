@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 Contact
 
 ## Get in touch
@@ -43,4 +42,3 @@ Follow us on X for the latest updates, or join our Discord community to connect 
 Quick links
 
 ## Find what you need
-{% endraw %}

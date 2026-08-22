@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -36,4 +35,3 @@ be created, you can modify the following setting in the browser section.
 
 ![Browser Profile](https://antigravity.google/assets/image/docs/browser/browser-profile.png)
 
-{% endraw %}

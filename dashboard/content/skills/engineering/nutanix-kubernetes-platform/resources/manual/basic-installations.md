@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Basic Installations by Infrastructure
 
 BASIC INSTALLATIONS BY INFRASTRUCTURE
@@ -14595,4 +14594,3 @@ Cluster to be centrally administrated by a Management Cluster, see Platform
 Expansion: Conversion of an NKP Pro Cluster to an NKP Ultimate Managed Cluster
 on page 519.
 
-{% endraw %}

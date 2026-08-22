@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Go SDK
 
 The Go SDK (`secretspec-go`) is a thin client over the `secretspec-ffi`
@@ -169,4 +168,3 @@ Unlike staging, this also works for a `go get` dependency. A shared
 install in a non-system prefix also requires `PREFIX/lib` in the
 platform’s runtime library search path.
 
-{% endraw %}

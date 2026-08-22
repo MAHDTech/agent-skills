@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Help
 
 # Troubleshooting
@@ -176,4 +175,3 @@ Collect:
 * Whether retry, app restart, or **Update Agent Computer** changed the result
 
 Do not include passwords, one-time codes, private keys, or secret values.
-{% endraw %}

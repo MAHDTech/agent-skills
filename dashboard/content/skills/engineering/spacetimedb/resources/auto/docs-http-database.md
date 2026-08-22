@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -531,4 +530,3 @@ The `rows` will be an array of [JSON-encoded
 Access routes defined by a database using [HTTP
 handlers](https://spacetimedb.com/docs/functions/http-handlers).
 
-{% endraw %}

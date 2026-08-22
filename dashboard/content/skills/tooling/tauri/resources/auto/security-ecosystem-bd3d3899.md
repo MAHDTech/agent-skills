@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Tauri Ecosystem Security
 
 Our Tauri organization ecosystem is hosted on GitHub and facilitates
@@ -63,4 +62,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

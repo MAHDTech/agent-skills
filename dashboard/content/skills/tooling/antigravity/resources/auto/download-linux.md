@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 ![Antigravity Logo](https://antigravity.google/assets/image/antigravity-logo.png)
 
 # Download for Linux
@@ -79,4 +78,3 @@ Using another distribution? You can download the source tarball
 
 Using MacOS or Windows? [View all download options](https://antigravity.google/download)
 
-{% endraw %}

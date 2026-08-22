@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -30,7 +29,7 @@ through a series of interconnected tasks or actions.
 
 To create a workflow:
 
-1.  Open the Customizations panel via the “…” dropdown at the top of the
+1.  Open the Customizations panel via the ”…” dropdown at the top of the
     editor’s agent panel.
 2.  Navigate to the Workflows panel.
 3.  Click the **+ Global** button to create a new global workflow that
@@ -55,4 +54,3 @@ You can also ask Agent to generate Workflows for you! This works
 particularly well after manually working with Agent through a series of
 steps since it can use the conversation history to create the Workflow.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # AI Navigator and MCP Server
 
 ## AI Navigator
@@ -468,4 +467,3 @@ kubectl delete secret ai-navigator-app-secrets -n kommander
 ```
 ````
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -235,4 +234,3 @@ Access our quick reference sheets or configure advanced permissions:
 - **[Plugins & Skills](https://antigravity.google/docs/cli/plugins)**: Create your own custom
   skills.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Worktrees
@@ -37,4 +36,3 @@ Worktrees persist until you remove them: ending or deleting a session leaves its
 | `grok worktree show <id>` | Show details for one worktree |
 | `grok worktree rm <ids...>` | Remove worktrees (`--dry-run` to preview) |
 | `grok worktree gc` | Remove entries whose directory is gone; `--max-age 7d` also expires idle worktrees not in use by a running process |
-{% endraw %}

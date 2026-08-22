@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # Sessions
@@ -62,4 +61,3 @@ Todos are separate from [background tasks](https://docs.x.ai/build/features/back
 | `grok sessions search <query>` | Search session titles and prompts |
 | `grok sessions delete <id>` | Permanently delete a session |
 | `grok export \<id\> [file]` | Export a transcript as Markdown (`--clipboard` to copy) |
-{% endraw %}

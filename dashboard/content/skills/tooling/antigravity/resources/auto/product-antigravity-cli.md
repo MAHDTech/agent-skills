@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Antigravity CLI
 
 The terminal-first surface to interact with Antigravity agents. Stay in
@@ -95,4 +94,3 @@ Install Google Antigravity CLIInstall Google Antigravity CLI
 
 [Install](https://antigravity.google/download#antigravity-cli)
 
-{% endraw %}

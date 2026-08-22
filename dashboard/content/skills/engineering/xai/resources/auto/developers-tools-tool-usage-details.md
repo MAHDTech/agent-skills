@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Tools
 
 # Tool Usage Details
@@ -193,4 +192,3 @@ Check the `type` field of output entries (`response.output[].type`):
 | `"code_interpreter_call"` | Code-execution tool - handled by xAI server |
 | `"file_search_call"` | Collections-search tool - handled by xAI server |
 | `"mcp_call"` | MCP tool - handled by xAI server |
-{% endraw %}

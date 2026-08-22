@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -199,4 +198,3 @@ agy --mode=plan
 - [Background Tasks & Subagents](https://antigravity.google/docs/cli/subagents): Manage parallel
   subagent execution and asynchronous task queues
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -588,4 +587,3 @@ By following these best practices, you can optimize your data
 replication strategy and ensure your application remains efficient and
 responsive.
 
-{% endraw %}

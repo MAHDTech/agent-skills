@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -123,4 +122,3 @@ Check out our [Creating a project
 guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/creating-a-project)
 to learn how to create and configure a SpacetimeAuth project.
 
-{% endraw %}

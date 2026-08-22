@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Pass Provider
 
 The Pass provider stores secrets using the Unix password manager `pass`
@@ -140,4 +139,3 @@ entry:
 Both projects will resolve `ARTIFACTORY_USER` from pass entry
 `secretspec/shared/default/ARTIFACTORY_USER`.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 # Why enterprise developers choose Google Antigravity
 
 Unite the cutting-edge agentic power of Google DeepMind with the
@@ -49,4 +48,3 @@ Building for Trust
 
 Going from 90% to 100%
 
-{% endraw %}

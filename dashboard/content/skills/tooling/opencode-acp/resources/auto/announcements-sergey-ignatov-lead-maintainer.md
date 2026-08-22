@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -32,4 +31,3 @@ This is in recognition of Sergey’s many contributions to the protocol. We woul
 I have enjoyed the chance to work with Sergey and the entire JetBrains team. There is still much work to be done, but with all of the agent and client teams working together, I am confident we can continue to make the ACP vision a reality: allowing you to collaborate with the agent or agents you love wherever you are already working.
 
 <Author name="Ben Brandt" role="Zed Industries / ACP Lead Maintainer" github="https://github.com/benbrandt" />
-{% endraw %}

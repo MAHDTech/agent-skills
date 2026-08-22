@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Boolean Config Option Type RFD](https://agentclientprotocol.com/rfds/boolea
 Agents can expose native on/off controls using `type: "boolean"`. In v1, Clients explicitly opt in through the `session.configOptions.boolean` capability, allowing Agents to preserve compatibility with Clients that only understand select options.
 
 For the protocol documentation, see [Boolean Config Options](https://agentclientprotocol.com/protocol/v1/session-config-options#boolean-config-options).
-{% endraw %}

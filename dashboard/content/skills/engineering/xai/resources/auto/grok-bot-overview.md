@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Grok Bot
 
 # Grok Bot
@@ -80,4 +79,3 @@ reusable skill or proactive routine.
 * Learn how to [use the computer and apps](https://docs.x.ai/grok-bot/computer-and-apps).
 * Review [approvals, security, and privacy](https://docs.x.ai/grok-bot/approvals-security-and-privacy)
   before granting access to sensitive systems.
-{% endraw %}

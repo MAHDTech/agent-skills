@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Rust SDK
 
 SecretSpec provides a Rust library with type-safe access to secrets
@@ -16,11 +15,18 @@ time and generates Rust types for its profiles and secrets.
 
 ## Quick start
 
-Add the runtime, derive macro, and the generated code’s direct
-dependencies to your `Cargo.toml`:
+Add the runtime and derive macro from the command line:
 
 ```
-[dependencies]secretspec = "0.18"secretspec-derive = "0.18"secrecy = { version = "0.10", features = ["serde"] }serde = { version = "1", features = ["derive"] }
+cargo add secretspec secretspec-derive
+```
+
+Terminal window
+
+Alternatively, add both dependencies to your `Cargo.toml`:
+
+```
+[dependencies]secretspec = "0.20"secretspec-derive = "0.20"
 ```
 
 The examples on this page are compiled as Cargo examples in
@@ -127,6 +133,16 @@ that file’s directory for relative provider paths. A Rust-built
 declaration resolves them from the current working directory by default;
 `Secrets::from_spec_at` selects another logical base directory.
 
+Use `schema_json(None)` to emit the value-free JSON Schema for the union
+shape, or pass a profile name for that profile’s effective fields:
+
+```
+let union_schema = spec.schema_json(None)?;let production_schema = spec.schema_json(Some("production"))?;
+```
+
+Schema generation reads declarations only. It does not resolve secret
+values or contact providers.
+
 `Spec` is immutable so its declarations and compiled view cannot drift
 apart. Use `to_builder()` to edit a copy, or `into_builder()` to consume
 the original, then rebuild to validate the result:
@@ -139,9 +155,17 @@ let edited = spec    .to_builder()    .remove_secret("default", "LEGACY_TOKEN") 
 override can reveal the declaration inherited from `default`; removing
 it from `default` also removes it from profiles that only inherited it.
 `build()` rejects dangling scope membership, invalid compositions, empty
-profiles, and other semantic errors introduced by an edit. These
-operations edit the in-memory specification; they do not rewrite or
-preserve the formatting of a TOML document.
+profiles, and other semantic errors introduced by an edit.
+
+For a spec loaded from TOML, `secret`, `add_secret`, `replace_secret`,
+and `remove_secret` preserve comments, ordering, quoting, and unrelated
+syntax in the root document. Read the edited document with
+`edited.preserved_text()`. Adding and then removing the same declaration
+restores the original bytes, and inherited declarations are never
+inlined into a child manifest. Other builder operations are semantic
+edits and clear the retained text; use `to_toml()` when freshly
+formatted output is acceptable. A spec constructed with
+`Spec::builder()` has no original document to preserve.
 
 The Rust-first API complements `declare_secrets!`: `Spec` describes and
 resolves names dynamically, while the macro continues to generate
@@ -273,6 +297,32 @@ context is caller-asserted audit metadata, not an authenticated
 identity, and never satisfies `require_reason`. Do not put credentials
 or secret values in it.
 
+## Interactive prompting (0.20+)
+
+`Secrets::ensure_secrets` prompts for and stores any missing required
+secret when stdin is a real terminal. Generated builders opt into the
+same behavior with `prompt_missing()`:
+
+``` astro-code
+secretspec_derive::declare_secrets!("secretspec.toml");
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let resolved = SecretSpec::builder()
+        .with_provider("keyring://")
+        .with_profile("development")
+        .with_reason("start application")
+        .prompt_missing(true)
+        .load()?;
+
+    println!("Database: {}", resolved.secrets.database_url);
+
+    Ok(())
+}
+```
+
+Left unset (the default), a missing required secret still fails fast
+with `RequiredSecretMissing`, exactly as without `prompt_missing()`.
+
 ## Secrets as file paths
 
 Secrets declared with `as_path = true` are generated as `PathBuf`
@@ -299,4 +349,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-{% endraw %}

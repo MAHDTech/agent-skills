@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Scopes
 
 A profile defines how secrets behave in an environment. A scope selects
@@ -167,4 +166,3 @@ reference](https://secretspec.dev/reference/configuration/#scopes-section) for v
 details, empty-selection behavior, audit semantics, and clearing an
 inherited scope selection.
 
-{% endraw %}

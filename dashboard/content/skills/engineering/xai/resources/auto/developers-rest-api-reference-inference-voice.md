@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Inference API
 
 # Voice
@@ -1667,4 +1666,3 @@ print(
     )
 )
 ```
-{% endraw %}

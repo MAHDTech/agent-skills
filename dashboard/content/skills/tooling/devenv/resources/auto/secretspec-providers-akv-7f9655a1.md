@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Azure Key Vault Provider
 
 The Azure Key Vault provider integrates with Azure for centralized
@@ -190,4 +189,3 @@ session.
 
 Terminal window
 
-{% endraw %}

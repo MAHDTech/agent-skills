@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Bitwarden Secrets Manager Provider
 
 The Bitwarden Secrets Manager (BWS) provider integrates with Bitwarden
@@ -157,4 +156,3 @@ or updated secret values as command-line arguments, however, so during
 tools available to the same user. This applies to the CLI-backed
 provider in SecretSpec 0.17 and later.
 
-{% endraw %}

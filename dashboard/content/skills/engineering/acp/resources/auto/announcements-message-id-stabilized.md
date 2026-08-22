@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The [Message ID RFD](https://agentclientprotocol.com/rfds/message-id) has moved 
 Agents can attach opaque, unique IDs to streamed message chunks. Chunks with the same ID belong to the same message, while a changed ID marks a new message, giving Clients a reliable boundary beyond changes in chunk type.
 
 For the protocol documentation, see [Message IDs](https://agentclientprotocol.com/protocol/v1/prompt-turn#message-ids).
-{% endraw %}

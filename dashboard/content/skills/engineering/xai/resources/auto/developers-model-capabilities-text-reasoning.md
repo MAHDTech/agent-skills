@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Reasoning
@@ -271,4 +270,3 @@ Yes, that makes sense. The final speed is sqrt(v0² + 2gh), independent of the l
 ```
 
 When you use a reasoning model, the reasoning tokens are billed as part of your total consumption.
-{% endraw %}

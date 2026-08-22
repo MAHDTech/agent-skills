@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Speech to Text
@@ -79,7 +78,7 @@ for (const word of result.words ?? []) {
 
 Note: The `file` parameter must be provided after all other parameters in the multipart form.
 
-[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt)
+[Get API Key →](https://console.x.ai/team/default/api-keys?campaign=voice-docs-stt\&utm_source=docs\&utm_medium=referral\&utm_campaign=developers-model-capabilities-audio-speech-to-text\&utm_content=api-keys)
 
 [Live Voice Demos](https://x.ai/api/voice)
 
@@ -451,4 +450,3 @@ ws.on("message", (data) => {
 * [Text to Speech](https://docs.x.ai/developers/model-capabilities/audio/text-to-speech) — Convert text to speech
 * [API Reference — Speech to text](https://docs.x.ai/developers/rest-api-reference/inference/voice#speech-to-text---rest) — Full REST endpoint specification
 * [API Reference — Streaming](https://docs.x.ai/developers/rest-api-reference/inference/voice#speech-to-text---streaming) — WebSocket streaming specification
-{% endraw %}

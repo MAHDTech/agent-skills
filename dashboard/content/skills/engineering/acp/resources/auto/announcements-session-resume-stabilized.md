@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -23,4 +22,3 @@ The Session Resume RFD has moved to Completed and the `session/resume` method is
 Unlike `session/load`, `session/resume` reconnects clients to an existing session without replaying the conversation history. This is a simpler primitive for agents that can restore context but don't implement full history replay, and it gives proxies and adapters a foundation they can build `session/load` semantics on top of.
 
 For the shipped protocol, see [Resuming Sessions](https://agentclientprotocol.com/protocol/v1/session-setup#resuming-sessions). For the design history, see the [Session Resume RFD](https://agentclientprotocol.com/rfds/session-resume).
-{% endraw %}

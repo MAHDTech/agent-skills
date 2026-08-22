@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Federated Namespace
 
 ## FEDERATION OVERVIEW
@@ -286,4 +285,3 @@ When an error occurs while creating a federated namespace, the description lists
 | Deletion Failure | Inability to delete an object store 1. Check the object store. as it is hosting buckets or objects. 2. Clear out all the objects and buckets stored in the selected object store. |
 | Transport error | When core members are 1. Check the object store. unreachable. 2. Get back the services to a healthy state. Objects | Federation Overview | |
 
-{% endraw %}

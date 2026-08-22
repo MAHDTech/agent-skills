@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: Streaming Replication and Multi-Site DR
 
 ## NUTANIX OBJECTS STREAMING
@@ -779,4 +778,3 @@ Objects | Nutanix Objects Streaming Replication |
 
 For example, in the preceding image, you have three PCs managing all your clusters that is PC1, PC2, and PC3. PC1 has four object stores (OSS 1, 2, 3 and 4) with IAM 1 residing only in the first object store OSS 1 (primary object store). All other secondary object stores on that PC (OSS 2, 3 and 4) relies on IAM 1 for authentication.Similarly, PC2 and PC3 have different object stores respectively (OSS 5, 6, 7, 8 and OSS 9, 10, 11, 12) with IAM 2 and IAM 3 residing only in the first object stores OSS 5 and OSS 9 (primary object stores) of PC2 and PC3.Now as recommended, you use PC2 and PC3 for replication of PC1. In this case, even if any object store in PC1 goes down, then replicated buckets will be available in PC2 and PC3 without any disruption. Objects | Nutanix Objects Streaming Replication |
 
-{% endraw %}

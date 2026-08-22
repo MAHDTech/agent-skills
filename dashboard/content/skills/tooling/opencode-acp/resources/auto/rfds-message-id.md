@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -301,4 +300,3 @@ Future RFDs may propose extending `messageId` to other update types if use cases
 * **2026-02-17**: Added "Message ID Acknowledgment" section to clarify that presence/absence of `userMessageId` in response indicates whether the Agent recorded the ID; clarified that UUID format is MUST (not SHOULD) since both sides generate IDs; renamed response field to `userMessageId` for clarity (request keeps `messageId`)
 * **2026-01-29**: Updated to allow both clients and agents to generate message IDs using UUID format
 * **2025-11-09**: Initial draft
-{% endraw %}

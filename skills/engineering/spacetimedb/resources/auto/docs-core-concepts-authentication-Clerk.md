@@ -1,4 +1,3 @@
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -286,4 +285,3 @@ await getToken({ template: '<YOUR_TEMPLATE_NAME>' });
 and ensure your SpacetimeDB authentication layer validates the
 corresponding issuer and signing keys.
 
-{% endraw %}

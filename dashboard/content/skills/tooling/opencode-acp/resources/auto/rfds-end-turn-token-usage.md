@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -175,4 +174,3 @@ Context size and cost have a clear session-level contract. Token usage still nee
 ## Revision history
 
 * 2026-06-02: Split from the original combined session usage and context RFD for separate draft discussion.
-{% endraw %}

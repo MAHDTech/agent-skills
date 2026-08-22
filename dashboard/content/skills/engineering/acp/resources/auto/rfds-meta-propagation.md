@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -77,4 +76,3 @@ Here are several MCP SDKs that propagate W3C trace-context in `_meta`:
 * 2026-06-03: Moved to Completed.
 * 2025-12-04: Implementation in extensibility docs
 * 2025-11-28: Initial draft
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -319,4 +318,3 @@ Tool calls can report file locations they're working with, enabling Clients to i
 <ParamField path="line" type="number">
   Optional line number within the file
 </ParamField>
-{% endraw %}

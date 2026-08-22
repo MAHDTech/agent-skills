@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # SecretSpec 0.12: Audit logs and coding agents
 
 Jun 8, 2026
@@ -165,4 +164,3 @@ Remember the new default: agents must pass a reason: set
 Questions or feedback? Join us on
 [Discord](https://discord.gg/naMgvexb6q).
 
-{% endraw %}

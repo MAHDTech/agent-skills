@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-kubernetes-platform"
 +++
 
-{% raw %}
 # Troubleshooting Guide
 
 ## Troubleshooting Guide (2)
@@ -1575,4 +1574,3 @@ kubectl wait CephObjectStore --for=jsonpath='{.status.phase}'=Connected dkp-obje
 store -n ${WORKSPACE_NAMESPACE} --timeout 10m
 ```
 
-{% endraw %}

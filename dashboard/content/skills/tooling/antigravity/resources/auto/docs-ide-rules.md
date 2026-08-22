@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -22,7 +21,7 @@ follow behaviors particular to their own use cases and style.
 
 To get started with Rules:
 
-1.  Open the Customizations panel via the “…” dropdown at the top of the
+1.  Open the Customizations panel via the ”…” dropdown at the top of the
     editor’s agent panel.
 2.  Navigate to the Rules panel.
 3.  Click **+ Global** to create new Global Rules, or **+ Workspace** to
@@ -67,4 +66,3 @@ to the repository. For example, @/path/to/file.md will first attempt to
 be resolved to /path/to/file.md, and if that file does not exist, it
 will be resolved to workspace/path/to/file.md.
 
-{% endraw %}

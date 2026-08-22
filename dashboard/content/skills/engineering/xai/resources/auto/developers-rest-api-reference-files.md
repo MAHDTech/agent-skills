@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Files API
 
 # Files REST API Overview
@@ -19,4 +18,3 @@ The base URL for all file operations is `https://api.x.ai`. You have to authenti
 * [Upload](https://docs.x.ai/developers/rest-api-reference/files/upload)
 * [Manage](https://docs.x.ai/developers/rest-api-reference/files/manage)
 * [Download](https://docs.x.ai/developers/rest-api-reference/files/download)
-{% endraw %}

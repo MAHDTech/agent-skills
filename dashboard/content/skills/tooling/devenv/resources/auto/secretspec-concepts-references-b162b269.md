@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Secret References
 
 By default, SecretSpec owns the naming: it stores each secret under its
@@ -136,4 +135,3 @@ stored URI, including its optional Key Vault version. This is separate
 from SecretSpec’s `ref.version` coordinate, which Azure Key Vault
 accepts directly starting in 0.20.
 
-{% endraw %}

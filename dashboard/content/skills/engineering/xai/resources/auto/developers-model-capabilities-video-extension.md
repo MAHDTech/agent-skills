@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Video Extension
@@ -146,4 +145,3 @@ Video editing uses the `/v1/videos/edits` endpoint and `client.video.generate(vi
 * [Image-to-Video](https://docs.x.ai/developers/model-capabilities/video/image-to-video) — Animate a still image
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
-{% endraw %}

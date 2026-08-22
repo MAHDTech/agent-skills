@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -67,4 +66,3 @@ command:
 When executed, the CLI forks your current conversation and associates
 the newly created conversation with `<project_id>`.
 
-{% endraw %}

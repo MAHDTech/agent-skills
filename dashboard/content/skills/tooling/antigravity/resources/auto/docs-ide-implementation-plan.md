@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -58,4 +57,3 @@ review or beginning with its work!
 ![Artifact Implementation Plan
 Proceeded](https://antigravity.google/assets/image/docs/artifacts/artifact-implementation-plan-proceeded.png)
 
-{% endraw %}

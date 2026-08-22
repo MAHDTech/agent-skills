@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 [](https://x.com/antigravity)
 
 X
@@ -32,4 +31,3 @@ Stay updated
 
 Visit
 
-{% endraw %}

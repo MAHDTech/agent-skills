@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Provider credentials
 
 Provider credentials let one provider load the authentication material
@@ -60,4 +59,3 @@ See [Provider credentials](https://secretspec.dev/concepts/providers/#provider-c
 for credential source addresses, storage commands, one-hop chaining, and
 runtime handling rules.
 
-{% endraw %}

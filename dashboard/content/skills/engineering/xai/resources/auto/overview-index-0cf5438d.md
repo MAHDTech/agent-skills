@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 ## Service Status
 
 ### No incidents declared
@@ -129,4 +128,3 @@ Last updated 30 seconds ago
 ## Services
 
 ## Models
-{% endraw %}

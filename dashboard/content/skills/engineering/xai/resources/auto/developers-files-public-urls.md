@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Files & Collections
 
 # Public URLs
@@ -255,4 +254,3 @@ curl -s "https://api.x.ai/v1/files?filter=public_url%20!%3D%20null" \\
 * [Managing Files](https://docs.x.ai/developers/files/managing-files) — Upload, list, retrieve, and delete files.
 * [Imagine → Files API Integration](https://docs.x.ai/developers/model-capabilities/imagine/files) — Reference stored files as Imagine inputs, persist generated assets, and create public URLs in a single request.
 * [Files API Reference](https://docs.x.ai/developers/rest-api-reference/files) — Full REST endpoint documentation.
-{% endraw %}

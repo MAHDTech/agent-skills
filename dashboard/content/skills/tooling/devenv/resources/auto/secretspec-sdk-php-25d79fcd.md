@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # PHP SDK
 
 The PHP SDK (`cachix/secretspec`) is a thin client over the same Rust
@@ -288,4 +287,3 @@ Cargo `target/` directory. Both backends call the identical Rust
 `resolve_json`, so the result is the same — a cross-language conformance
 suite asserts it.
 
-{% endraw %}

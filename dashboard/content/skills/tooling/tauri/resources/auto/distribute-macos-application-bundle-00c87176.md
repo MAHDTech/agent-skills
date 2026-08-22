@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # macOS Application Bundle
 
 An application bundle is the package format that is executed on macOS.
@@ -18,12 +17,12 @@ resources, the Info.plist file and other files such as macOS frameworks.
 To package your app as a macOS application bundle you can use the Tauri
 CLI and run the `tauri build` command in a Mac computer:
 
-- [npm](#tab-panel-4577)
-- [yarn](#tab-panel-4578)
-- [pnpm](#tab-panel-4579)
-- [deno](#tab-panel-4580)
-- [bun](#tab-panel-4581)
-- [cargo](#tab-panel-4582)
+- [npm](#tab-panel-4601)
+- [yarn](#tab-panel-4602)
+- [pnpm](#tab-panel-4603)
+- [deno](#tab-panel-4604)
+- [bun](#tab-panel-4605)
+- [cargo](#tab-panel-4606)
 
 ```
 npm run tauri build -- --bundles app
@@ -218,4 +217,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

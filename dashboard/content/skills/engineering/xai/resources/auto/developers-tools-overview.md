@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Tools
 
 # Overview
@@ -181,4 +180,3 @@ The API automatically returns source URLs for information gathered via tools. Se
 * **[Image Generation](https://docs.x.ai/developers/tools/image-generation)** - Generate and edit images in a conversation
 * **[Collections Search](https://docs.x.ai/developers/tools/collections-search)** - Query your uploaded documents
 * **[Citations](https://docs.x.ai/developers/tools/citations)** - Access source URLs and inline citations
-{% endraw %}

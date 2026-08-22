@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -331,4 +330,3 @@ You are now set up to use Better Auth authentication with SpacetimeDB.
 Your app signs users in through Better Auth, receives an OIDC-compatible
 JWT, and connects to SpacetimeDB using that token.
 
-{% endraw %}

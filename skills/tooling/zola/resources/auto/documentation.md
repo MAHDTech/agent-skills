@@ -1,4 +1,3 @@
-{% raw %}
 # Overview
 
 ## [🔗](#zola-at-a-glance)Zola at a Glance
@@ -322,4 +321,3 @@ link to our list of blog posts:
 This has been a quick overview of Zola. You can now dive into the rest
 of the documentation.
 
-{% endraw %}

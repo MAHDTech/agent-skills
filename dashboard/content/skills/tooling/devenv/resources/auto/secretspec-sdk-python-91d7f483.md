@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Python SDK
 
 The Python SDK (`secretspec`) is a thin client over a pyo3 extension
@@ -84,4 +83,3 @@ using pyo3’s `abi3-py39` feature, so the published `cp39-abi3` wheel is
 self-contained — there is no separate `cdylib` to locate and no runtime
 dlopen.
 
-{% endraw %}

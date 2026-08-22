@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -354,4 +353,3 @@ If an Agent provides both `configOptions` and `modes` in the session response:
 <Card icon="gears" horizontal href="/protocol/v1/session-modes">
   Learn about the Session Modes API
 </Card>
-{% endraw %}

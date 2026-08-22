@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "zed"
 +++
 
-{% raw %}
 # From The Blog
 
 Keep up with news about Zed.
@@ -2736,4 +2735,3 @@ Dec 01, 2022
 
 ------------------------------------------------------------------------
 
-{% endraw %}

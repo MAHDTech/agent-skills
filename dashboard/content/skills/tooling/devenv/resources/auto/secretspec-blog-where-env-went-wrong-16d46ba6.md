@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Where .env Went Wrong
 
 Jul 30, 2026
@@ -269,4 +268,3 @@ process environments.
 **SecretSpec aims to eliminate environment variables for secrets
 altogether.**
 
-{% endraw %}

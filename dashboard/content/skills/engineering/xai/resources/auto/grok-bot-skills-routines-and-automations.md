@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Work with Grok Bot
 
 # Skills and routines
@@ -158,4 +157,3 @@ routines when you return.
 See [Settings and notifications](https://docs.x.ai/grok-bot/settings-and-notifications) for time zone
 and usage controls, and [Approvals, security, and
 privacy](https://docs.x.ai/grok-bot/approvals-security-and-privacy) for automation boundaries.
-{% endraw %}

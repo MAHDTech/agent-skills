@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -82,7 +81,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Augment Code's powerful software agent, backed by industry-leading context engine
 
-    **0.35.0**, <a href="https://github.com/augmentcode/auggie"><Icon icon="github" /></a>
+    **0.36.0**, <a href="https://github.com/augmentcode/auggie"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -150,7 +149,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.55**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.56**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -166,7 +165,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Tencent Cloud's official intelligent coding tool
 
-    **2.106.7**
+    **2.137.1**
   </Card>
 
   <Card
@@ -180,7 +179,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP adapter for OpenAI's coding assistant
 
-    **1.4.0**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
+    **1.6.2**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -280,7 +279,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Devin CLI coding agent by Cognition
 
-    **3000.4.25**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
+    **3000.5.20**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -294,7 +293,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.3.16**
+    **0.3.18**
   </Card>
 
   <Card
@@ -323,7 +322,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.199.0**
+    **0.202.0**
   </Card>
 
   <Card
@@ -641,7 +640,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google's official CLI for Gemini
 
-    **0.55.1**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
+    **0.56.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -673,6 +672,20 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   </Card>
 
   <Card
+    title="Google Antigravity"
+    href="https://antigravity.google/docs/ide/extensions"
+    icon={
+  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M14.1452 14.6818C14.9937 15.3182 16.2664 14.894 15.0997 13.7273C11.5998 10.3333 12.3421 1 7.99366 1C3.64518 1 4.3876 10.3333 0.887603 13.7273C-0.385123 15 0.993664 15.3182 1.84215 14.6818C5.13002 12.4545 4.9179 8.5303 7.99366 8.5303C11.0694 8.5303 10.8573 12.4545 14.1452 14.6818Z" fill="currentColor"/>
+  </svg>
+}
+  >
+    Google’s AI coding agent
+
+    **1.0.0**
+  </Card>
+
+  <Card
     title="goose"
     href="https://block.github.io/goose/"
     icon={
@@ -683,7 +696,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A local, extensible, open source AI agent that automates engineering tasks
 
-    **1.46.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
+    **1.47.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -697,7 +710,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **1.0.6**
+    **1.0.8**
   </Card>
 
   <Card
@@ -711,7 +724,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.104**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.111**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -727,7 +740,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     AI Coding Agent by JetBrains
 
-    **2783.5.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
+    **2913.6.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -741,7 +754,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.4.22**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.4.23**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -829,7 +842,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Nova by Compass AI - a fully-fledged software engineer at your command
 
-    **1.1.35**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
+    **1.1.37**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -843,7 +856,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.18.18**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.21**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -898,7 +911,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.21.14**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.21.15**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -1060,4 +1073,3 @@ To add your agent to the registry:
 5. Submit a pull request
 
 See the [contributing guide](https://github.com/agentclientprotocol/registry/blob/main/CONTRIBUTING.md) for details.
-{% endraw %}

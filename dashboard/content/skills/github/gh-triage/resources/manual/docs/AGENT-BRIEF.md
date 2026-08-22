@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "gh-triage"
 +++
 
-{% raw %}
 # Writing Agent Briefs
 
 An agent brief is a structured comment posted on an issue or PR when it moves to `ready-for-agent`. It is the authoritative specification that an AFK agent will work from. The original body and discussion are context - the agent brief is the contract.
@@ -230,4 +229,3 @@ This is bad because:
 - No scope boundaries
 - No description of current vs desired behavior
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -24,6 +23,7 @@ The following agents can be used with an ACP Client:
 * [Blackbox AI](https://docs.blackbox.ai/features/blackbox-cli/introduction)
 * [Bub](https://github.com/bubbuild/bub) (via [bub-acp-server](https://github.com/bubbuild/bub-contrib/tree/main/packages/bub-acp-server))
 * [Claude Agent](https://platform.claude.com/docs/en/agent-sdk/overview) (via [Zed's SDK adapter](https://github.com/zed-industries/claude-agent-acp))
+* [Claw Orchestrator](https://github.com/Enderfga/claw-orchestrator/blob/main/skills/references/acp.md)
 * [Cline](https://cline.bot/)
 * [Codex CLI](https://developers.openai.com/codex/cli) (via [Zed's adapter](https://github.com/zed-industries/codex-acp))
 * [Code Assistant](https://github.com/stippi/code-assistant?tab=readme-ov-file#configuration)
@@ -57,4 +57,3 @@ The following agents can be used with an ACP Client:
 * [Stakpak](https://github.com/stakpak/agent?tab=readme-ov-file#agent-client-protocol-acp)
 * [stdio Bus](https://github.com/stdiobus/stdiobus)
 * [VT Code](https://github.com/vinhnx/vtcode/blob/main/README.md#zed-ide-integration-agent-client-protocol)
-{% endraw %}

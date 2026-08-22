@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Collections API
 
 # Collection Management
@@ -1177,4 +1176,3 @@ Get documents metadata in a batch request.
   ]
 }
 ```
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -29,4 +28,3 @@ toolbar above the input.
 
 ![Editor Agent Panel](https://antigravity.google/assets/image/docs/editor/agent_panel_toolbar.png)
 
-{% endraw %}

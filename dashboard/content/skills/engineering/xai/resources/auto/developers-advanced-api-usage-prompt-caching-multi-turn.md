@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Prompt Caching
 
 # What Breaks Caching
@@ -208,4 +207,3 @@ curl https://api.x.ai/v1/chat/completions \
 ## Next
 
 * [Usage & Pricing](https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing)
-{% endraw %}

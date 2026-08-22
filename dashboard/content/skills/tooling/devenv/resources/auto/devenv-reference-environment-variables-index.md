@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Environment variables
 
 devenv defines and respects the following environment variables:
@@ -162,7 +161,10 @@ Authentication token for pulling from and pushing to Cachix binary caches.
 
 Override the provider for the [secretspec integration](https://devenv.sh/integrations/secretspec/index.md). Mirrored by the `--secretspec-provider` flag.
 
+New in version 2.2.2
+
+devenv exports this variable into the development shell only when a provider override was explicitly configured. Otherwise, commands use the provider routes from `secretspec.toml`.
+
 ### [`SECRETSPEC_PROFILE`](#secretspec_profile)
 
 Override the profile for the [secretspec integration](https://devenv.sh/integrations/secretspec/index.md). Mirrored by the `--secretspec-profile` flag.
-{% endraw %}

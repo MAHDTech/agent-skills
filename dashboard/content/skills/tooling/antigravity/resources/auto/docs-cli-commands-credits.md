@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -58,4 +57,3 @@ Press `Esc` to close the panel and return to the main prompt.
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: See all available slash
   commands.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
 Agents that help you achieve liftoffAgents that help you achieve liftoff
@@ -127,4 +126,3 @@ keyboard_arrow_right
 
 [Download](https://antigravity.google/download)
 
-{% endraw %}

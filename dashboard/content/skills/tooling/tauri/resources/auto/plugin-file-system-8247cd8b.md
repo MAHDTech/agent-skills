@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # File System
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/fs)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-fs)[crates.io](https://crates.io/crates/tauri-plugin-fs)
@@ -27,17 +26,17 @@ Access the file system.
 
 Install the fs plugin to get started.
 
-- [Automatic](#tab-panel-5966)
-- [Manual](#tab-panel-5967)
+- [Automatic](#tab-panel-5996)
+- [Manual](#tab-panel-5997)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-5955)
-- [yarn](#tab-panel-5956)
-- [pnpm](#tab-panel-5957)
-- [deno](#tab-panel-5958)
-- [bun](#tab-panel-5959)
-- [cargo](#tab-panel-5960)
+- [npm](#tab-panel-5985)
+- [yarn](#tab-panel-5986)
+- [pnpm](#tab-panel-5987)
+- [deno](#tab-panel-5988)
+- [bun](#tab-panel-5989)
+- [cargo](#tab-panel-5990)
 
 ```
 npm run tauri add fs
@@ -81,11 +80,11 @@ cargo tauri add fs
 3.  Install the JavaScript Guest bindings using your preferred
     JavaScript package manager:
 
-    - [npm](#tab-panel-5961)
-    - [yarn](#tab-panel-5962)
-    - [pnpm](#tab-panel-5963)
-    - [deno](#tab-panel-5964)
-    - [bun](#tab-panel-5965)
+    - [npm](#tab-panel-5991)
+    - [yarn](#tab-panel-5992)
+    - [pnpm](#tab-panel-5993)
+    - [deno](#tab-panel-5994)
+    - [bun](#tab-panel-5995)
 
     ```
     npm install @tauri-apps/plugin-fs
@@ -141,8 +140,8 @@ recommended reason.
 
 The fs plugin is available in both JavaScript and Rust.
 
-- [JavaScript](#tab-panel-5953)
-- [Rust](#tab-panel-5954)
+- [JavaScript](#tab-panel-5983)
+- [Rust](#tab-panel-5984)
 
 ```
 import { exists, BaseDirectory } from '@tauri-apps/plugin-fs';// when using `"withGlobalTauri": true`, you may use// const { exists, BaseDirectory } = window.__TAURI__.fs;
@@ -512,8 +511,12 @@ Therefore, it is also allowed to create all of these folders via the
 #### Denied Permissions
 
 This default permission set prevents access to critical components of
-the Tauri application by default. On Windows the webview data folder
-access is denied.
+the Tauri application by default.
+
+- On Windows the access to webview data folder `$APPLOCALDATA/EBWebView`
+  is denied.
+- On Linux the access to webview data paths inside `$APPLOCALDATA` are
+  denied.
 
 #### This default permission set includes the following:
 
@@ -598,4 +601,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 On this page
 
 # Configuration
@@ -814,4 +813,3 @@ configuration object.
 
 Type: `object`
 
-{% endraw %}

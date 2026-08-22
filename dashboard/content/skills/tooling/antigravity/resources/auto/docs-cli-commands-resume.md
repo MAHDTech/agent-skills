@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -164,4 +163,3 @@ session using a local workspace-keyed cache.
 - **[Settings & Keybindings](https://antigravity.google/docs/cli/settings)**: Configure rendering
   modes and customize keyboard shortcuts.
 
-{% endraw %}

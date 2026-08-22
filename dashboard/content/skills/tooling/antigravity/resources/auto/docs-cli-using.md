@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -94,4 +93,3 @@ disable keybindings, set the list to empty (e.g., `[]`). If the file is
 malformed, the CLI will use the valid parts and fall back to defaults
 for the broken actions.
 
-{% endraw %}

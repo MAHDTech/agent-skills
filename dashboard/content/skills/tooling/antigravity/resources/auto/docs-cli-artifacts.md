@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -229,4 +228,3 @@ Configure settings preferences and review agent autonomy parameters:
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Configure security
   parameters and containment lists.
 
-{% endraw %}

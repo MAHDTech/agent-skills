@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -166,4 +165,3 @@ and available as `agentapi`.
   Sidecars creating conversations must have a `projectId` set.
 - `agentapi send-message \<conversation_id\> <prompt>`
 
-{% endraw %}

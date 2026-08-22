@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 [Back to news](https://x.ai/news)
 
 Nov 19, 2025
@@ -318,7 +317,7 @@ Tool calls
 
 From \$5 / 1000 successful invocations
 
-[](https://console.x.ai/team/default/api-keys)
+[](https://console.x.ai/team/default/api-keys?utm_source=website&utm_medium=referral&utm_campaign=grok-4-1-fast-blog&utm_content=api-links)
 
 ### Create an xAI API Key
 
@@ -333,4 +332,3 @@ See our documentation on how to use agent tools.
 We can’t wait to see what you build. Please share your creations and
 feedback with the community on X!
 
-{% endraw %}

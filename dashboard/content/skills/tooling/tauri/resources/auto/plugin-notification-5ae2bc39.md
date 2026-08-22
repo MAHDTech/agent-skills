@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Notifications
 
 [GitHub](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/notification)[npm](https://www.npmx.dev/package/@tauri-apps/plugin-notification)[crates.io](https://crates.io/crates/tauri-plugin-notification)
@@ -27,17 +26,17 @@ Send native notifications to your user using the notification plugin.
 
 Install the notifications plugin to get started.
 
-- [Automatic](#tab-panel-6078)
-- [Manual](#tab-panel-6079)
+- [Automatic](#tab-panel-6108)
+- [Manual](#tab-panel-6109)
 
 Use your project’s package manager to add the dependency:
 
-- [npm](#tab-panel-6067)
-- [yarn](#tab-panel-6068)
-- [pnpm](#tab-panel-6069)
-- [deno](#tab-panel-6070)
-- [bun](#tab-panel-6071)
-- [cargo](#tab-panel-6072)
+- [npm](#tab-panel-6097)
+- [yarn](#tab-panel-6098)
+- [pnpm](#tab-panel-6099)
+- [deno](#tab-panel-6100)
+- [bun](#tab-panel-6101)
+- [cargo](#tab-panel-6102)
 
 ```
 npm run tauri add notification
@@ -81,11 +80,11 @@ cargo tauri add notification
 3.  If you’d like to use notifications in JavaScript then install the
     npm package as well:
 
-    - [npm](#tab-panel-6073)
-    - [yarn](#tab-panel-6074)
-    - [pnpm](#tab-panel-6075)
-    - [deno](#tab-panel-6076)
-    - [bun](#tab-panel-6077)
+    - [npm](#tab-panel-6103)
+    - [yarn](#tab-panel-6104)
+    - [pnpm](#tab-panel-6105)
+    - [deno](#tab-panel-6106)
+    - [bun](#tab-panel-6107)
 
     ```
     npm install @tauri-apps/plugin-notification
@@ -128,8 +127,8 @@ Follow these steps to send a notification:
 
 3.  Send the notification
 
-- [JavaScript](#tab-panel-6065)
-- [Rust](#tab-panel-6066)
+- [JavaScript](#tab-panel-6095)
+- [Rust](#tab-panel-6096)
 
 ```
 import {  isPermissionGranted,  requestPermission,  sendNotification,} from '@tauri-apps/plugin-notification';// when using `"withGlobalTauri": true`, you may use// const { isPermissionGranted, requestPermission, sendNotification, } = window.__TAURI__.notification;
@@ -330,4 +329,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "nutanix-objects"
 +++
 
-{% raw %}
 # Nutanix Objects Manual: S3 APIs, Prometheus, and Integrations
 
 ## NUTANIX OBJECTS PROMETHEUS
@@ -478,4 +477,3 @@ Nutanix Objects is ideal for cost-effective, scale-out storage. It provides a fu
 
 backed up (For example, HYCU). The backup appliance configuration needs to be changed in order to take advantage of the larger size limit in Nutanix Objects. For more information on Commvault Integration, see Commvault with Nutanix guide on the Nutanix Support Portal. Objects | Nutanix Objects Integration with Backup Applications |
 
-{% endraw %}

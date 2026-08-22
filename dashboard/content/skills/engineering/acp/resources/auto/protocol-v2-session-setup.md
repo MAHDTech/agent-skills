@@ -7,7 +7,6 @@ mermaid = true
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -463,4 +462,3 @@ Supplying `{}` means the Agent supports the corresponding transport.
 Agents **SHOULD** connect to all MCP servers specified by the Client.
 
 Clients **MAY** use this ability to provide tools directly to the underlying language model by including their own MCP server.
-{% endraw %}

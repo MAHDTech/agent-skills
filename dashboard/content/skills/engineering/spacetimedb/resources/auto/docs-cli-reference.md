@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -897,4 +896,3 @@ Run `spacetime version --help` to see all options.
 This document was generated automatically by
 [`clap-markdown`](https://crates.io/crates/clap-markdown).
 
-{% endraw %}

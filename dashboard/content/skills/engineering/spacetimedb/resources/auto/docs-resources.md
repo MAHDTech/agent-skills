@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -62,4 +61,3 @@ Detailed technical references.
   - [SATS JSON](https://spacetimedb.com/docs/sats-json) - JSON serialization format
   - [BSATN](https://spacetimedb.com/docs/bsatn) - Binary serialization format
 
-{% endraw %}

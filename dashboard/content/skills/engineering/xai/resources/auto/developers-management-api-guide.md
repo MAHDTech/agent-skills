@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Key Information
 
 # Using Management API
@@ -16,7 +15,7 @@ Some enterprise users may prefer to manage their account details programmaticall
 
 You can read the endpoint specifications and descriptions at [Management API Reference](https://docs.x.ai/developers/rest-api-reference/management).
 
-You need to get a management key, which is separate from your API key, to use the management API. The management key can be obtained at [xAI Console](https://console.x.ai) -> Settings -> Management Keys.
+You need to get a management key, which is separate from your API key, to use the management API. The management key can be obtained at [xAI Console](https://console.x.ai?utm_source=docs\&utm_medium=referral\&utm_campaign=developers-management-api-guide\&utm_content=console-home) -> Settings -> Management Keys.
 
 The base URL is at `https://management-api.x.ai`, which is also different from the inference API.
 
@@ -195,4 +194,3 @@ Example with time filter:
 curl "https://management-api.x.ai/audit/teams/{teamId}/events?pageSize=50&eventTimeFrom=2025-01-01T00:00:00Z" \\
     -H "Authorization: Bearer <Your Management API Key>"
 ```
-{% endraw %}

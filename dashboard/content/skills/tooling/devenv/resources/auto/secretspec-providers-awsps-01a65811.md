@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # AWS Systems Manager Parameter Store Provider
 
 The AWS Parameter Store provider stores secrets as encrypted
@@ -226,4 +225,3 @@ $ secretspec run --provider awsps -- deploy
 
 Terminal window
 
-{% endraw %}

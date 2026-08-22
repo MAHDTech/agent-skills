@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
 Choose the perfect plan for your journeyChoose the perfect plan for your
@@ -83,4 +82,3 @@ Now Available:
     
   \*Rolling out to select customers
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -574,4 +573,3 @@ Be mindful of unbounded table growth:
 - Review [Reducers](https://spacetimedb.com/docs/functions/reducers) for efficient data
   modification patterns
 
-{% endraw %}

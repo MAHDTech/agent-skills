@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -172,4 +171,3 @@ Check the [SpacetimeDB documentation](https://spacetimedb.com/docs) and
 [GitHub repository](https://github.com/clockworklabs/SpacetimeDB) for
 the latest migration features and capabilities.
 
-{% endraw %}

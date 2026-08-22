@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -354,4 +353,3 @@ echo "$input" | jq -r '.model.display_name'
 - **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Look up every configuration
   key and default keybinding.
 
-{% endraw %}

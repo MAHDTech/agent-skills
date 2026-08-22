@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # Selenium
 
 This WebDriver testing example will use
@@ -50,8 +49,8 @@ Click me if you want to see how to set a project up from scratch
 If you want to install the dependencies from scratch, just run the
 following command.
 
-- [npm](#tab-panel-4479)
-- [yarn](#tab-panel-4480)
+- [npm](#tab-panel-4497)
+- [yarn](#tab-panel-4498)
 
 ```
 npm install mocha chai selenium-webdriver
@@ -64,8 +63,8 @@ yarn add mocha chai selenium-webdriver
 I suggest also adding a `"test": "mocha"` item in the `package.json`
 `"scripts"` key so that running Mocha can be called simply with
 
-- [npm](#tab-panel-4481)
-- [yarn](#tab-panel-4482)
+- [npm](#tab-panel-4499)
+- [yarn](#tab-panel-4500)
 
 ```
 npm test
@@ -125,8 +124,8 @@ WebDriver related items.
 Now that we are all set up with our dependencies and our test script,
 let’s run it!
 
-- [npm](#tab-panel-4483)
-- [yarn](#tab-panel-4484)
+- [npm](#tab-panel-4501)
+- [yarn](#tab-panel-4502)
 
 ```
 npm test
@@ -161,4 +160,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

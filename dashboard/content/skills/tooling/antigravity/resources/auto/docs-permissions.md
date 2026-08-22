@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -143,4 +142,3 @@ execute_url(aws.amazon.com)        # Prompt AWS console actuation
 mcp(sql/execute_mutation)          # Prompt modifying SQL queries
 ```
 
-{% endraw %}

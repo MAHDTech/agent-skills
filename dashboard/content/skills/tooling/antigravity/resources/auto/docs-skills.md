@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -179,4 +178,3 @@ When reviewing code, follow these steps:
 - Suggest alternatives when possible
 ```
 
-{% endraw %}

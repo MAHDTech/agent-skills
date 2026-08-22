@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -381,4 +380,3 @@ The proposed notification-based approach:
 ## Revision history
 
 * **2025-11-28**: Initial draft proposal
-{% endraw %}

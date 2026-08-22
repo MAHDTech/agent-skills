@@ -7,8 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
-{% raw %}
 # Continuous Integration
 
 It is possible to run [WebDriver](https://www.w3.org/TR/webdriver/)
@@ -59,5 +57,4 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}{% raw %}
-{% endraw %}
+

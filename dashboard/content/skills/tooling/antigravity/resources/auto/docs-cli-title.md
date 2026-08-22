@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -86,4 +85,3 @@ chmod +x ~/.gemini/antigravity-cli/title.sh
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Manage secure
   directory permissions.
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "tauri"
 +++
 
-{% raw %}
 # tauri@2.7.0
 
 [← tauri releases](https://v2.tauri.app/release/tauri/) [View on
@@ -66,4 +65,3 @@ on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
 
-{% endraw %}

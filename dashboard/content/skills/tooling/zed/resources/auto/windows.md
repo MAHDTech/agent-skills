@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "zed"
 +++
 
-{% raw %}
 ![Sky](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/sky.0d_pal_fz~dz0.webp)
 
 ![Zed's
@@ -435,4 +434,3 @@ nowwindows nowwindows nowwindows nowwindows nowwindows nowwindows
 nowwindows nowwindows nowwindows nowwindows nowwindows nowwindows
 nowwindows nowwindows now
 
-{% endraw %}

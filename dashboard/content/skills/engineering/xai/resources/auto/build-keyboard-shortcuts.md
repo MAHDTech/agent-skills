@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 # Keyboard Shortcuts
 
 Press `Ctrl+.` (or `Ctrl+X` on Windows and in terminals without the Kitty keyboard protocol) to open this list inside the TUI; entries that do not apply in the current context are dimmed.
@@ -82,4 +81,3 @@ Focus the scrollback with `Tab`, then navigate. Bare-letter keys require vim mod
 * WezTerm needs `enable_kitty_keyboard = true` for `Ctrl+Enter` and `Shift+Enter`.
 
 See [Terminal Support](https://docs.x.ai/build/cli/terminal-support) for fixes and diagnostics.
-{% endraw %}

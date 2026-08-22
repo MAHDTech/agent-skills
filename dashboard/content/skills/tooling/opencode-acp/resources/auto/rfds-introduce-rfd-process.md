@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -98,4 +97,3 @@ Well, partly because "dialog" emphasizes conversation and exploration rather tha
 
 * 2026-07-02: Added Active between Draft and Preview to show which RFDs have current maintainer or working-group bandwidth.
 * 2025-10-28: Initial version, created alongside RFD infrastructure
-{% endraw %}

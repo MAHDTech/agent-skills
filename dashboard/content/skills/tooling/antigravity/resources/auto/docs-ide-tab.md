@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -78,4 +77,3 @@ In your settings, you can customize the behavior of these features:
   jumping) within files listed in your `.gitignore` file. Tab will only
   ignore gitignored files if git is installed.
 
-{% endraw %}

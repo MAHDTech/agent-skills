@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # AWS Secrets Manager Provider
 
 The AWS Secrets Manager provider integrates with AWS for centralized
@@ -163,4 +162,3 @@ $ export AWS_DEFAULT_REGION=us-east-1
 
 Terminal window
 
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Model Capabilities
 
 # Video Editing
@@ -115,4 +114,3 @@ console.log(withScarf.providerMetadata?.xai?.videoUrl);
 * [Video Extension](https://docs.x.ai/developers/model-capabilities/video/extension) — Extend existing videos
 * [API Reference](https://docs.x.ai/developers/rest-api-reference) — Full endpoint documentation
 * [Imagine API Landing Page](https://x.ai/api/imagine) — Showcase of the Imagine API in action
-{% endraw %}

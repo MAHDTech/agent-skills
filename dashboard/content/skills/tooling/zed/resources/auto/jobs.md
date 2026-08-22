@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "zed"
 +++
 
-{% raw %}
 # Join the Zed Team
 
 ## [Open Positions](#open-positions)
@@ -57,4 +56,3 @@ Reasons why we love to work at Zed.
 
 Don't see a role that fits? [Send us an email](mailto:jobs@zed.dev).
 
-{% endraw %}

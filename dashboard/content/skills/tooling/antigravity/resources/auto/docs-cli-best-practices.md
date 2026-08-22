@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -171,4 +170,3 @@ Learn how to configure settings and customize visual layouts:
 - **[Plugins & Skills](https://antigravity.google/docs/cli/plugins)**: Create your own custom
   slash commands.
 
-{% endraw %}

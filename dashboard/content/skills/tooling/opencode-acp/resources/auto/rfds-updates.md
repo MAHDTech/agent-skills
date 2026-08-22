@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "opencode-acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -17,6 +16,18 @@ skill_name = "opencode-acp"
 > Lifecycle updates for ACP Requests for Dialog
 
 This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](https://agentclientprotocol.com/updates).
+
+<Update label="August 20, 2026" tags={["Completed"]}>
+  ## Terminal Authentication RFD moves to Completed
+
+  The Terminal Authentication RFD has been stabilized and is now part of the
+  protocol. Clients can advertise terminal authentication support, run an Agent's
+  configured interactive login flow, and reconnect after it succeeds. The v1 and
+  v2 wire shapes are now included in the stable schemas and SDK types. Please
+  review the [authentication documentation](https://agentclientprotocol.com/protocol/v1/authentication) and the
+  [RFD](https://agentclientprotocol.com/rfds/auth-methods) for the version-specific capability and lifecycle
+  semantics.
+</Update>
 
 <Update label="August 5, 2026" tags={["Draft"]}>
   ## Session Notices RFD moves to Draft stage
@@ -432,4 +443,3 @@ This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP 
 
   The RFD for adding a session/list method to the protocol has been moved to Draft stage. Please review the [RFD](https://agentclientprotocol.com/rfds/session-list) for more information on the current proposal and provide feedback as work on the implementation begins.
 </Update>
-{% endraw %}

@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Basic Usage
 
 Once your project has a `secretspec.toml` file and you have selected a
@@ -114,4 +113,3 @@ These options do not change your saved preferences.
 - Learn how [profiles](https://secretspec.dev/concepts/profiles/) separate environments
 - Explore available [providers](https://secretspec.dev/concepts/providers/)
 
-{% endraw %}

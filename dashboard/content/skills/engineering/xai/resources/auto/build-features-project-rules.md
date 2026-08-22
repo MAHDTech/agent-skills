@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "xai"
 +++
 
-{% raw %}
 #### Features
 
 # AGENTS.md
@@ -50,4 +49,3 @@ grok inspect
 ```
 
 This lists each rules file Grok found, with its path and approximate token count.
-{% endraw %}

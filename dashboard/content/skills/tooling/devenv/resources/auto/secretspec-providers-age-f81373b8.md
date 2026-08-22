@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # age Provider
 
 The age provider keeps secrets in a single
@@ -237,4 +236,3 @@ backups. Rotate and erase identities, re-encrypt the blob, and manage
 repository history according to your retention policy when that risk
 matters.
 
-{% endraw %}

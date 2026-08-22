@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -289,4 +288,3 @@ The `terminal/release` kills the command if still running and releases all resou
 After release the terminal ID becomes invalid for all other `terminal/*` methods.
 
 If the terminal was added to a tool call, the client **SHOULD** continue to display its output after release.
-{% endraw %}

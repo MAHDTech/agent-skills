@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-{% raw %}
 Version: 2.0.0
 
 On this page
@@ -1375,4 +1374,3 @@ defining TaggedEnum types in a module, use `partial record`, not
 `partial class`. See the [module docs](https://spacetimedb.com/docs/tables/column-types) for
 more details.
 
-{% endraw %}

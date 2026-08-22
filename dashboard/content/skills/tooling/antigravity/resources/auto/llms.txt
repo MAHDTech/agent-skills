@@ -45,6 +45,7 @@
 - [features](https://antigravity.google/docs/features): Learn about features.
 - [models](https://antigravity.google/docs/models): Learn about models.
 - [projects](https://antigravity.google/docs/projects): Learn about projects.
+- [remote-control](https://antigravity.google/docs/remote-control): Learn about remote-control.
 - [settings](https://antigravity.google/docs/settings): Learn about settings.
 - [agent-settings](https://antigravity.google/docs/agent-settings): Learn about agent-settings.
 - [artifact-review](https://antigravity.google/docs/artifact-review): Learn about artifact-review.
@@ -100,9 +101,15 @@
 
 ### Antigravity SDK
 - [sdk-overview](https://antigravity.google/docs/sdk/overview): Learn about sdk-overview.
-- [mcp](https://antigravity.google/docs/sdk/mcp): Learn about mcp.
+- [sdk-personas](https://antigravity.google/docs/sdk/personas): Learn about sdk-personas.
+- [sdk-tools](https://antigravity.google/docs/sdk/tools): Learn about sdk-tools.
+- [sdk-mcp](https://antigravity.google/docs/sdk/mcp): Learn about sdk-mcp.
+- [sdk-policies](https://antigravity.google/docs/sdk/policies): Learn about sdk-policies.
+- [sdk-subagents](https://antigravity.google/docs/sdk/subagents): Learn about sdk-subagents.
+- [sdk-structured-output](https://antigravity.google/docs/sdk/structured-output): Learn about sdk-structured-output.
+- [sdk-lifecycle](https://antigravity.google/docs/sdk/lifecycle): Learn about sdk-lifecycle.
 
-### Antigravity IDE
+### Antigravity for IDEs
 - [ide-overview](https://antigravity.google/docs/ide/overview): Learn about ide-overview.
 - [ide-getting-started](https://antigravity.google/docs/ide/getting-started): Learn about ide-getting-started.
 - [tab](https://antigravity.google/docs/ide/tab): Learn about tab.

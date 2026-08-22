@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "devenv"
 +++
 
-{% raw %}
 # Ad-hoc Developer Environments
 
 Added in `1.6`
@@ -98,4 +97,3 @@ While ad-hoc environments are convenient, they have some limitations:
 
 - Complex configurations are better managed in a `devenv.nix` file
 - Some complex options may be harder to express on the command line
-{% endraw %}

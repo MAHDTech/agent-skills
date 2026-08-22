@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-{% raw %}
 Markdownkeyboard_arrow_down
 
 content_copyCopy Markdown
@@ -172,4 +171,3 @@ request. You can manage approvals in two ways:
     To keep you in your flow, Antigravity CLI displays a Fast Path Alert
     directly above your prompt box when a subagent requests permission.
 
-{% endraw %}

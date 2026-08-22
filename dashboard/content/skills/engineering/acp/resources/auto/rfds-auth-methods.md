@@ -7,7 +7,6 @@ mermaid = false
 skill_name = "acp"
 +++
 
-{% raw %}
 > ## Documentation Index
 > Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
 > Use this file to discover all available pages before exploring further.
@@ -194,6 +193,8 @@ than giving the Client special knowledge of environment variables.
 The original authentication RFD also discussed elicitation. That material was
 removed and moved to a separate proposal.
 
+* 2026-08-20: Moved terminal authentication to Completed and stabilized its v1
+  and v2 SDK types, schemas, capabilities, and protocol documentation.
 * 2026-07-27: Removed the remaining unstable `env_var` types and made the Rust
   SDK decode legacy descriptors as `agent` in both protocol versions.
 * 2026-07-24: Moved terminal authentication to Preview, defined it as an
@@ -205,4 +206,3 @@ removed and moved to a separate proposal.
   `name`.
 * 2026-02-27: Updated the proposal to reflect the implementation.
 * 2026-01-14: Incorporated Core Maintainer feedback.
-{% endraw %}
