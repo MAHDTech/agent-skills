@@ -132,6 +132,8 @@ workspace:
 Configure the visual shell behavior and customize your configuration
 profiles:
 
+- **[Teamwork agent teams (`/teamwork-preview`)](https://antigravity.google/docs/teamwork)**:
+  Launch collaborative multi-agent teams for long-horizon projects.
 - **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Customize
   key maps, buffering, and JSON rules.
 - **[Permissions & Sandbox](https://antigravity.google/docs/cli/sandbox)**: Enforce security

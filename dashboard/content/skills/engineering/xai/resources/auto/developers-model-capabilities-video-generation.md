@@ -253,7 +253,33 @@ On `grok-imagine-video-1.5`, [reference-to-video](https://docs.x.ai/developers/m
 | Limit | Max **3** voices per request |
 | Prompt | Reference voices by index: `<AUDIO_0>`, `<AUDIO_1>`, `<AUDIO_2>` |
 
-Generated videos include an audio track by default.
+Generated videos include an audio track by default. Pass `generate_audio=False` to request a silent video:
+
+```python customLanguage="pythonXAI"
+import os
+import xai_sdk
+
+client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
+
+response = client.video.generate(
+    prompt="A paper boat drifting down a rain-soaked street",
+    model="grok-imagine-video-1.5",
+    generate_audio=False,
+)
+
+print(response.url)
+```
+
+```bash
+curl -X POST https://api.x.ai/v1/videos/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -d '{
+    "model": "grok-imagine-video-1.5",
+    "prompt": "A paper boat drifting down a rain-soaked street",
+    "generate_audio": false
+  }'
+```
 
 ### Example
 

@@ -183,12 +183,15 @@ maintain security boundaries:
   requiring user authorization, the request automatically bubbles up to
   the main UI/Subagent panel.
 
-## Multi-Agent Teamwork (Ultra Plan Only)
+## Multi-agent teamwork (`/teamwork-preview`)
 
-Antigravity 2.0 introduces advanced multi-agent orchestration for
-complex high-level goals.
+Antigravity 2.0 introduces multi-agent orchestration for large
+engineering tasks, complex simulations, and deep research campaigns.
 
-Using `/teamwork-preview` prompts the main agent to launch a
-collaborative multi-agent framework. This framework features built-in
-error recovery, automatic retries, and task coordination, allowing you
-to define the high-level goal while the platform manages the agent team.
+Using [`/teamwork-preview`](https://antigravity.google/docs/teamwork) coordinates a team of
+specialized AI agents designed for large software projects, multi-file
+refactoring, and complex research. The team handles milestone
+decomposition, parallel implementation, and independent verification
+checks, allowing you to define the high-level goals while the platform
+manages agent coordination. Learn more in the [Teamwork
+documentation](https://antigravity.google/docs/teamwork).

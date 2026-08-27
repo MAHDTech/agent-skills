@@ -92,4 +92,3 @@ Release builds of your app will now be signed automatically.
 on GitHub](https://github.com/sponsors/tauri-apps)
 
 © 2026 Tauri Contributors. CC-BY / MIT
-

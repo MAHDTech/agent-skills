@@ -2467,7 +2467,7 @@ batch_requests.append(chat)
 # Image generation
 image_req = client.image.prepare(
     prompt="A sleek modern laptop on a minimalist desk",
-    model="grok-imagine-image",
+    model="grok-imagine-image-2.0",
     batch_request_id="img_001",
 )
 batch_requests.append(image_req)
@@ -2475,7 +2475,7 @@ batch_requests.append(image_req)
 # Image edit
 image_edit_req = client.image.prepare(
     prompt="Add a rainbow in the background",
-    model="grok-imagine-image",
+    model="grok-imagine-image-2.0",
     image_url="https://picsum.photos/800",
     batch_request_id="img_edit_001",
 )
@@ -2484,7 +2484,7 @@ batch_requests.append(image_edit_req)
 # Video generation
 video_req = client.video.prepare(
     prompt="A product rotating on a turntable with dramatic lighting",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     batch_request_id="vid_001",
 )
 batch_requests.append(video_req)
@@ -2580,7 +2580,7 @@ batchRequests.push({
   batch_request: {
     image_generation: {
       prompt: "A sleek modern laptop on a minimalist desk",
-      model: "grok-imagine-image",
+      model: "grok-imagine-image-2.0",
     },
   },
 });
@@ -2591,7 +2591,7 @@ batchRequests.push({
   batch_request: {
     image_edit: {
       prompt: "Add a rainbow in the background",
-      model: "grok-imagine-image",
+      model: "grok-imagine-image-2.0",
       image: { url: "https://picsum.photos/800", type: "image_url" },
     },
   },
@@ -2603,7 +2603,7 @@ batchRequests.push({
   batch_request: {
     video_generation: {
       prompt: "A product rotating on a turntable with dramatic lighting",
-      model: "grok-imagine-video",
+      model: "grok-imagine-video-1.5",
     },
   },
 });
@@ -3210,9 +3210,9 @@ Each line in the file is a JSON object with four fields: `custom_id` (unique ide
 {"custom_id": "chat-1", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "grok-4.3", "messages": [{"role": "user", "content": "Classify this as positive, negative, or neutral: The product exceeded my expectations!"}]}}
 {"custom_id": "search-1", "method": "POST", "url": "/v1/responses", "body": {"model": "grok-4.3", "tools": [{"type": "web_search"}, {"type": "x_search"}], "input": [{"role": "user", "content": "What are the latest SpaceX launches?"}]}}
 {"custom_id": "mcp-1", "method": "POST", "url": "/v1/responses", "body": {"model": "grok-4.3", "tools": [{"type": "mcp", "server_label": "deepwiki", "server_url": "https://mcp.deepwiki.com/mcp"}], "input": [{"role": "user", "content": "What does the xai-sdk-python repo do?"}]}}
-{"custom_id": "img-1", "method": "POST", "url": "/v1/images/generations", "body": {"model": "grok-imagine-image", "prompt": "A futuristic city skyline at sunset"}}
-{"custom_id": "img-edit-1", "method": "POST", "url": "/v1/images/edits", "body": {"model": "grok-imagine-image", "prompt": "Add a rainbow", "image": {"url": "https://picsum.photos/800"}}}
-{"custom_id": "vid-1", "method": "POST", "url": "/v1/videos/generations", "body": {"model": "grok-imagine-video", "prompt": "A rocket launching from Mars", "duration": 8}}
+{"custom_id": "img-1", "method": "POST", "url": "/v1/images/generations", "body": {"model": "grok-imagine-image-2.0", "prompt": "A futuristic city skyline at sunset"}}
+{"custom_id": "img-edit-1", "method": "POST", "url": "/v1/images/edits", "body": {"model": "grok-imagine-image-2.0", "prompt": "Add a rainbow", "image": {"url": "https://picsum.photos/800"}}}
+{"custom_id": "vid-1", "method": "POST", "url": "/v1/videos/generations", "body": {"model": "grok-imagine-video-1.5", "prompt": "A rocket launching from Mars", "duration": 8}}
 {"custom_id": "vid-edit-1", "method": "POST", "url": "/v1/videos/edits", "body": {"model": "grok-imagine-video", "prompt": "Make it slow motion", "video": {"url": "https://lorem.video/cat_360p_3s"}}}
 {"custom_id": "vid-ext-1", "method": "POST", "url": "/v1/videos/extensions", "body": {"model": "grok-imagine-video", "prompt": "The camera slowly pans to reveal a sunset", "video": {"url": "https://lorem.video/cat_360p_3s"}, "duration": 6}}
 ```
@@ -3231,7 +3231,7 @@ Supported `url` values:
 | `/v1/videos/edits` | [Video editing](https://docs.x.ai/developers/model-capabilities/video/editing) |
 | `/v1/videos/extensions` | [Video extension](https://docs.x.ai/developers/model-capabilities/video/extension) |
 
-Only batch-enabled models are accepted. Image and video requests currently support `grok-imagine-image` and `grok-imagine-video`; other Imagine models (including `grok-imagine-image-2.0` and `grok-imagine-video-1.5`) are rejected with "not supported for batch processing".
+Only batch-enabled models are accepted. Refer to the relevant [model pages](https://docs.x.ai/developers/models) for the most up-to-date information; models that are not batch-enabled are rejected with "not supported for batch processing".
 
 Upload the file via the [Files API](https://docs.x.ai/developers/files), then create a batch referencing it:
 
@@ -8294,7 +8294,7 @@ New to the xAI API? Follow the [Quickstart](https://docs.x.ai/developers/quickst
 |----------|-------|
 | Model name | `grok-4.6` |
 | Context window | 500,000 tokens |
-| Knowledge cutoff | February 1, 2026 |
+| Knowledge cutoff | January 2026 |
 | Modalities | Text and image input; text output |
 | Output limit | No text output limit |
 | Input price | $2.00 / 1M tokens |
@@ -11465,7 +11465,7 @@ ws.on("message", data => {
 
 ## Call control
 
-Use `refer` to transfer the caller to another PSTN or SIP destination:
+Use `refer` to transfer the caller to another PSTN or SIP destination. The request blocks until the transfer resolves; the HTTP status reports whether the destination answered. See [FAQ](#faq) for status codes, failed-transfer session behavior, and conversation resumption.
 
 ```bash customLanguage="bash"
 curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/refer" \
@@ -11542,6 +11542,61 @@ Replace `{number}` with your Direct SIP phone number. If you configured `allowed
 
 1. In your carrier, contact center, or PBX, create an outbound route or SIP trunk.
 2. Set the destination to `sip:{number}@sip.voice.x.ai;transport=tls`.
+
+## FAQ
+
+These answers cover the Speech to Speech API SIP path: transfer success and failure with reason codes, what happens when a transfer fails, and how to continue a conversation on a later SIP call.
+
+### How do I get transfer success or failure with a reason code?
+
+There is no separate WebSocket transfer event. `POST /v1/realtime/calls/{call_id}/refer` returns the outcome synchronously.
+
+A `200` with an empty JSON body (`{}`) means the transfer completed: the REFER succeeded and the destination answered, not merely that the REFER was accepted or that the destination started ringing.
+
+Downstream SIP rejections return `502` with the carrier's SIP status in the body:
+
+```json customLanguage="json"
+{
+  "error": "transfer rejected by downstream: SIP 403 Forbidden"
+}
+```
+
+Other statuses are also possible:
+
+| Status | Meaning |
+| --- | --- |
+| `400` | `target_uri` is not a `tel:` or `sip:` URI |
+| `404` | No SIP participant on this call |
+| `502` | Transfer rejected by downstream; the body includes the SIP code and reason when available |
+| `504` | Transfer timed out |
+| `500` | Internal error |
+
+### Does the session stay usable if a transfer fails?
+
+Yes. While the REFER is pending, the WebSocket stays open and the caller hears dialtone. After a `502`, that same realtime session stays connected. The failed transfer is a no-op on the xAI side: the caller remains on the call, and the agent can keep talking.
+
+This path does not automatically start a new session or inject a failure-reason prompt. If the agent should tell the caller why the transfer failed, read the `refer` HTTP response and continue on this session, or resume later as below.
+
+### Can I reattach a resumed conversation to a new SIP call?
+
+[Session resumption](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#session-resumption) caches transcripts and tool results so a later SIP call can continue the same conversation. You must opt in on both the original session and the resuming session. History expires after 30 minutes of inactivity.
+
+1. On the first call, open `wss://api.x.ai/v1/realtime?call_id={call_id}` and immediately send `session.update` with `resumption.enabled` set to `true`. Save that `call_id`.
+2. On the later call, open `wss://api.x.ai/v1/realtime?call_id={new_call_id}&conversation_id={saved_call_id}` and send the same `session.update` again. That restores the prior turns and keeps saving for future reconnects.
+3. There is no dedicated resumption-complete event. Restore happens as soon as that `session.update` is processed; replayed turns arrive as `conversation.item.created` events.
+
+```json customLanguage="json"
+{
+  "type": "session.update",
+  "session": {
+    "resumption": { "enabled": true }
+  }
+}
+```
+
+### Can I transfer to a Twilio SIP Domain?
+
+Yes. A `sip:` `target_uri` is forwarded as the SIP `Refer-To` value, including URI parameters used to route into a Twilio Programmable Voice SIP Domain or conference. Custom SIP headers are not sent on the REFER.
 
 
 ===/developers/model-capabilities/audio/speech-to-text===
@@ -11748,14 +11803,14 @@ Configuration is done via URL query parameters — no setup message required. Au
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sample_rate` | integer | `16000` | Audio sample rate in Hz. |
-| `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, or `alaw`. |
+| `sample_rate` | integer | `16000` | Audio sample rate in Hz. With `encoding=opus`: `8000`, `16000`, `24000`, or `48000` only. |
+| `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, `alaw`, or `opus`. See [Opus Streaming](#opus-streaming). |
 | `interim_results` | boolean | `false` | When `true`, emit partial transcripts `is_final=false` every ~500 ms. |
-| `endpointing` | integer | `10` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
+| `endpointing` | integer | `400` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
 | `language` | string | | Language code for text formatting. See [Supported Languages](#supported-languages). |
 | `diarize` | boolean | | When `true`, enables speaker diarization. Words include a `speaker` field identifying the detected speaker. |
 | `filler_words` | boolean | `false` | When `true`, filler words (e.g. `uh`, `um`, `er`) are included in the transcript. When `false` (default), filler words are automatically removed. |
-| `multichannel` | boolean | `false` | Per-channel transcription. Requires `channels` ≥ 2. |
+| `multichannel` | boolean | `false` | Per-channel transcription. Requires `channels` ≥ 2. Not supported with `encoding=opus`. |
 | `channels` | integer | `1` | Number of interleaved audio channels (max 8). |
 | `keyterm` | string | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the parameter for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `smart_turn` | number | | End-of-turn detection threshold (0.0–1.0). When set, enables Smart Turn — an ML model predicts whether the speaker has finished their thought at each silence boundary. See [Smart Turn](#smart-turn). |
@@ -11769,7 +11824,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 | `transcript.created` | Server ready — wait for this before sending audio. |
 | `transcript.partial` | Transcript result with `text`, `words`, `is_final`, `speech_final`, `start`, `duration`. Includes `channel_index` when `multichannel=true`. Includes `end_of_turn_confidence` when `smart_turn` is enabled. |
 | `transcript.done` | Final transcript after `audio.done`. `duration` always present. Includes `channel_index` when `multichannel=true` — one event sent per channel. Connection closes after this. |
-| `error` | Error with `message` field. Connection stays open. |
+| `error` | Error with `message` field. Most errors (including undecodable audio frames) close the connection; client message parse errors keep it open. |
 
 The `transcript.partial` event uses `is_final` and `speech_final` to convey three states:
 
@@ -11781,7 +11836,7 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 
 ### Client Messages
 
-* **Binary frames** — raw audio in the specified encoding (streamed in real-time-paced chunks, e.g. 100 ms)
+* **Binary frames** — raw audio in the specified encoding (streamed in real-time-paced chunks, e.g. 100 ms). With `encoding=opus`, each binary frame must contain exactly one Opus packet — see [Opus Streaming](#opus-streaming).
 * **`{"type": "finalize"}`** — force the current utterance to finalize as `speech_final` immediately for PTT
 * **`{"type": "audio.done"}`** — signal end of audio, triggers `transcript.done`
 
@@ -11798,6 +11853,26 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 ```json
 {"type": "Finalize", "channel": 0}
 ```
+
+### Opus Streaming
+
+Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s at 24 kHz versus 48 KB/s for PCM16, with no client-side resampling.
+
+**How it works:**
+
+* Send **exactly one raw Opus packet per binary WebSocket frame**. Opus packets don't mark their own boundaries — the WebSocket framing does — so never concatenate packets or split one across frames.
+* Encode mono audio at `8000`, `16000`, `24000`, or `48000` Hz. Other sample rates are rejected with `400`.
+* `multichannel` is not supported with Opus — mono only.
+* Send raw packets, not containers. To transcribe an Ogg-Opus or WebM file, use the [batch endpoint](#supported-audio-formats) instead — it auto-detects containers.
+* If a frame can't be decoded, the server sends an `error` event and closes the session. Misframed packets often decode as noise rather than an error, so double-check that your encoder emits one whole packet per frame.
+
+**Example URL:**
+
+```
+wss://api.x.ai/v1/stt?sample_rate=24000&encoding=opus&interim_results=true
+```
+
+**Typical use case:** Dictation and live transcription from mobile or other bandwidth-constrained clients, where streaming raw PCM is wasteful. Most platform audio APIs and WebRTC stacks produce Opus packets natively.
 
 ### Multichannel Streaming
 
@@ -11968,6 +12043,7 @@ ws.on("message", (data) => {
 * **Enable `interim_results`** for responsive UX — show transcription as the user speaks
 * **Use `language=en`** to enable text formatting — numbers and currencies are written in their standard form
 * **Send 100 ms audio chunks** (3,200 bytes at 16 kHz PCM16) for a good balance of latency and efficiency
+* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s at 24 kHz versus 48 KB/s for raw PCM. See [Opus Streaming](#opus-streaming)
 * **Wait for `transcript.created`** before sending audio — the server needs to initialize its ASR backend
 
 ## Error Handling
@@ -14454,7 +14530,7 @@ Images are returned as URLs by default. URLs are temporary, so download or proce
 
 ### Multiple Images
 
-Generate multiple images in a single request using the `sample_batch()` method and the `n` parameter. This returns a list of `ImageResponse` objects.
+Generate multiple images in a single request with the `n` parameter (`1`–`10`). On the REST API and OpenAI-compatible SDKs, `n` is optional and defaults to `1`. The xAI Python SDK uses `sample()` for a single image and `sample_batch(n=...)` for more than one — `n` is required on `sample_batch()`.
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -14538,7 +14614,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Aspect Ratio
 
-Control image dimensions with the `aspect_ratio` parameter.
+Control image dimensions with the `aspect_ratio` parameter. When omitted, the default is `auto`, which lets the model pick the best ratio for the prompt.
 
 | Ratio | Use case |
 |-------|----------|
@@ -14547,8 +14623,10 @@ Control image dimensions with the `aspect_ratio` parameter.
 | `4:3` / `3:4` | Presentations, portraits |
 | `3:2` / `2:3` | Photography |
 | `2:1` / `1:2` | Banners, headers |
-| `19.5:9` / `9:19.5` | Modern smartphone displays |
-| `20:9` / `9:20` | Ultra-wide displays |
+| `19.5:9` / `9:19.5` | Modern smartphone displays (iPhone) |
+| `20:9` / `9:20` | Modern smartphone displays (Android) |
+| `21:9` | Cinematic widescreen |
+| `5:2` | Wide banners |
 | `auto` | Model auto-selects the best ratio for the prompt |
 
 ```python customLanguage="pythonXAI"
@@ -14626,10 +14704,10 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Resolution
 
-You can specify different resolutions of the output image. Currently supported image resolutions are:
+You can specify different resolutions of the output image with the `resolution` parameter. Currently supported image resolutions are:
 
-* 1k
-* 2k
+* `1k` (default when omitted)
+* `2k`
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -14710,9 +14788,34 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 Control generation quality with the optional `quality` parameter. Allowed values are `low` and `medium`. When omitted, the default is `medium`. The parameter is only supported for `grok-imagine-image-2.0`.
 
+```python customLanguage="pythonXAI"
+import xai_sdk
+
+client = xai_sdk.Client()
+
+response = client.image.sample(
+    prompt="A watercolor painting of a lighthouse at dawn",
+    model="grok-imagine-image-2.0",
+    quality="low",
+)
+
+print(response.url)
+```
+
+```bash
+curl -X POST https://api.x.ai/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -d '{
+    "model": "grok-imagine-image-2.0",
+    "prompt": "A watercolor painting of a lighthouse at dawn",
+    "quality": "low"
+  }'
+```
+
 ### Base64 Output
 
-For embedding images directly without downloading, request base64:
+Control the output format with the `response_format` parameter. When omitted, the default is `url`, which returns temporary hosted URLs. For embedding images directly without downloading, request base64:
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -19870,7 +19973,33 @@ On `grok-imagine-video-1.5`, [reference-to-video](https://docs.x.ai/developers/m
 | Limit | Max **3** voices per request |
 | Prompt | Reference voices by index: `<AUDIO_0>`, `<AUDIO_1>`, `<AUDIO_2>` |
 
-Generated videos include an audio track by default.
+Generated videos include an audio track by default. Pass `generate_audio=False` to request a silent video:
+
+```python customLanguage="pythonXAI"
+import os
+import xai_sdk
+
+client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
+
+response = client.video.generate(
+    prompt="A paper boat drifting down a rain-soaked street",
+    model="grok-imagine-video-1.5",
+    generate_audio=False,
+)
+
+print(response.url)
+```
+
+```bash
+curl -X POST https://api.x.ai/v1/videos/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -d '{
+    "model": "grok-imagine-video-1.5",
+    "prompt": "A paper boat drifting down a rain-soaked street",
+    "generate_audio": false
+  }'
+```
 
 ### Example
 
@@ -20540,6 +20669,32 @@ On `grok-imagine-video-1.5`, give your subject a voice by passing up to **3** pr
 
 `reference_audios` accepts preset voices; voice references with your own audio files are available to trusted partners [on request](https://x.ai/contact-sales?interest=imagine). Use a voice alongside reference images or on its own, and tag voices in the prompt as `<AUDIO_0>`, `<AUDIO_1>`, and `<AUDIO_2>` (with `<IMAGE_0>`… when you also pass images).
 
+```python customLanguage="pythonXAI"
+import os
+import xai_sdk
+
+client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
+
+response = client.video.generate(
+    prompt="The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+    model="grok-imagine-video-1.5",
+    reference_image_urls=[
+        "<IMAGE_URL_1>",
+        "<IMAGE_URL_2>",
+        "<IMAGE_URL_3>",
+    ],
+    reference_audios=[
+        {"voice_id": "eve"},
+        {"voice_id": "leo"},
+    ],
+    duration=8,
+    aspect_ratio="9:16",
+    resolution="720p",
+)
+
+print(response.url)
+```
+
 ```python customLanguage="pythonRequests"
 import os
 import time
@@ -20555,9 +20710,16 @@ response = requests.post(
     headers=headers,
     json={
         "model": "grok-imagine-video-1.5",
-        "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
-        "reference_images": [{"url": "<IMAGE_URL_1>"}],
-        "reference_audios": [{"voice_id": "eve"}],
+        "prompt": "The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+        "reference_images": [
+            {"url": "<IMAGE_URL_1>"},
+            {"url": "<IMAGE_URL_2>"},
+            {"url": "<IMAGE_URL_3>"},
+        ],
+        "reference_audios": [
+            {"voice_id": "eve"},
+            {"voice_id": "leo"},
+        ],
         "duration": 8,
         "aspect_ratio": "9:16",
         "resolution": "720p",
@@ -20587,9 +20749,16 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
     "model": "grok-imagine-video-1.5",
-    "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
-    "reference_images": [{"url": "<IMAGE_URL_1>"}],
-    "reference_audios": [{"voice_id": "eve"}],
+    "prompt": "The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+    "reference_images": [
+      {"url": "<IMAGE_URL_1>"},
+      {"url": "<IMAGE_URL_2>"},
+      {"url": "<IMAGE_URL_3>"}
+    ],
+    "reference_audios": [
+      {"voice_id": "eve"},
+      {"voice_id": "leo"}
+    ],
     "duration": 8,
     "aspect_ratio": "9:16",
     "resolution": "720p"
@@ -24236,7 +24405,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
 * `object` (string, required) — The object type of this resource. Always set to \`response\`.
 
-* `output` (array\\<object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
+* `output` (array\\<object | object | object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
 
 * `parallel_tool_calls` (boolean, required) — Whether to allow the model to run parallel tool calls.
 
@@ -24274,7 +24443,7 @@ Generates a response based on text or image prompts. The response ID can be used
 
   * `type` (string, required) — Type is always \`"function"\`.
 
-* `tools` (array\\<object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
+* `tools` (array\\<object | object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
 
 * `top_logprobs` (integer, required) — An integer between 0 and 8 specifying the number of most likely tokens to return at each token position.
 
@@ -24624,7 +24793,7 @@ Retrieve a previously generated response.
 
 * `object` (string, required) — The object type of this resource. Always set to \`response\`.
 
-* `output` (array\\<object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
+* `output` (array\\<object | object | object | object | object | object | object | object | object | object | object | object\>, required) — The response generated by the model.
 
 * `parallel_tool_calls` (boolean, required) — Whether to allow the model to run parallel tool calls.
 
@@ -24662,7 +24831,7 @@ Retrieve a previously generated response.
 
   * `type` (string, required) — Type is always \`"function"\`.
 
-* `tools` (array\\<object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
+* `tools` (array\\<object | object | object | object | object | object | object | object | object\>, required) — A list of tools the model may call in JSON-schema. Currently, only functions and web search are supported as tools. A max of 128 tools are supported.
 
 * `top_logprobs` (integer, required) — An integer between 0 and 8 specifying the number of most likely tokens to return at each token position.
 
@@ -26538,17 +26707,17 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
 
-* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample).
+* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 
 * `interim_results` (boolean, optional, default: false) — When \`true\`, the server emits partial transcript events (\`is\_final=false\`) approximately every 500 ms while audio is being processed. When \`false\` (default), only finalized results are sent.
 
-* `endpointing` (integer, optional, default: 10) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 10ms.
+* `endpointing` (integer, optional, default: 400) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 400ms.
 
 * `language` (string, optional, default: ) — Language code (e.g. \`en\`, \`fr\`, \`de\`, \`ja\`). When set, enables Inverse Text Normalization — spoken-form numbers, currencies, and units are converted to their written form.
 
-* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2.
+* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2. Not supported with \`encoding=opus\`.
 
 * `channels` (integer, optional, default: 1) — Number of interleaved audio channels. Required when \`multichannel=true\`. Min: 2, Max: 8.
 
@@ -26566,7 +26735,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Client Messages
 
-* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.
+* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly. With \`encoding=opus\`, each binary frame must contain exactly one raw Opus packet — never concatenate packets or split one across frames. An undecodable frame sends an \`error\` event and closes the session.
 
 * `finalize` — Force the current utterance to finalize as \`speech\_final\` immediately, without waiting for VAD endpointing or Smart Turn. The session stays open so you can continue streaming audio. Accepts \`finalize\` or \`Finalize\` as the type value. When \`multichannel=true\`, optional \`channel\` (0-based) limits the finalize to that channel; omit \`channel\` to finalize every channel.
 
@@ -26580,7 +26749,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 * `transcript.done` — Final transcript after \`audio.done\`. \`duration\` always present. One per channel when \`multichannel=true\`. Connection closes after this event.
 
-* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts) close the connection. Only client message parse errors keep the connection open.
+* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts, undecodable audio frames) close the connection. Only client message parse errors keep the connection open.
 
 ### Example Message Flow
 
@@ -28139,17 +28308,17 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
 
-* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample).
+* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 
 * `interim_results` (boolean, optional, default: false) — When \`true\`, the server emits partial transcript events (\`is\_final=false\`) approximately every 500 ms while audio is being processed. When \`false\` (default), only finalized results are sent.
 
-* `endpointing` (integer, optional, default: 10) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 10ms.
+* `endpointing` (integer, optional, default: 400) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 400ms.
 
 * `language` (string, optional, default: ) — Language code (e.g. \`en\`, \`fr\`, \`de\`, \`ja\`). When set, enables Inverse Text Normalization — spoken-form numbers, currencies, and units are converted to their written form.
 
-* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2.
+* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2. Not supported with \`encoding=opus\`.
 
 * `channels` (integer, optional, default: 1) — Number of interleaved audio channels. Required when \`multichannel=true\`. Min: 2, Max: 8.
 
@@ -28167,7 +28336,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Client Messages
 
-* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.
+* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly. With \`encoding=opus\`, each binary frame must contain exactly one raw Opus packet — never concatenate packets or split one across frames. An undecodable frame sends an \`error\` event and closes the session.
 
 * `finalize` — Force the current utterance to finalize as \`speech\_final\` immediately, without waiting for VAD endpointing or Smart Turn. The session stays open so you can continue streaming audio. Accepts \`finalize\` or \`Finalize\` as the type value. When \`multichannel=true\`, optional \`channel\` (0-based) limits the finalize to that channel; omit \`channel\` to finalize every channel.
 
@@ -28181,7 +28350,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 * `transcript.done` — Final transcript after \`audio.done\`. \`duration\` always present. One per channel when \`multichannel=true\`. Connection closes after this event.
 
-* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts) close the connection. Only client message parse errors keep the connection open.
+* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts, undecodable audio frames) close the connection. Only client message parse errors keep the connection open.
 
 ### Example Message Flow
 
@@ -35930,6 +36099,13 @@ Do not treat this user assignment as a guarantee that is broader than Cursor's
 published security documentation. Review current infrastructure and encryption
 controls there.
 
+## Sharing a Bot is not a security boundary
+
+A public share link lets others copy the Bot's configuration. It does not share
+your computer or logins. Still, do not put secrets, customer data, or internal
+URLs in a Bot you share. See [Share a Bot](https://docs.x.ai/grok-bot/bots#share-a-bot) and the
+[third-party bot terms](https://x.ai/legal/bot-sharing-terms).
+
 ## Cursor account and data settings
 
 Grok Bot uses Cursor authentication and account data settings.
@@ -36046,6 +36222,26 @@ The copy is named "`<name>` copy" and carries the profile, settings, enabled
 skills, routines, and avatar. It does not copy conversation history, learned
 memory, or chat attachments. Rename it and provide the new scope before
 assigning work.
+
+## Share a Bot
+
+Share a public link when someone else should start from the same Bot.
+
+1. Open the Bot and copy its share link.
+2. Send the link. The recipient opens a preview on
+   [x.ai](https://x.ai) and can choose **Add to Grok Bot**.
+3. They need the Grok Bot app to finish adding it.
+
+The link is public. Anyone who has it can view the Bot's shared configuration,
+including its identity, description, skills, and routines. Remove API keys,
+internal URLs, customer data, and anything else you would not put in a public
+document before you share.
+
+Adding a shared Bot creates a copy on the recipient's account. It does not give
+them your computer, logins, or conversation history.
+
+Shared Bots are created by other users, not by SpaceXAI. Adding one accepts the
+[third-party bot terms](https://x.ai/legal/bot-sharing-terms).
 
 ## Delete a Bot
 
@@ -36432,6 +36628,17 @@ When **Teach a task** is available, record one browser workflow from the
 computer view. The Bot turns the demonstration into a draft skill that you can
 review and test. The rollout may be gradual, and the recording is limited to
 ten minutes.
+
+## Can I share a Bot with someone else?
+
+Yes. Copy a public share link from the Bot. Anyone with the link can preview it
+on [x.ai](https://x.ai) and add a copy to their account. They do not get your
+computer, logins, or conversation history.
+
+The link exposes the Bot's configuration. Strip secrets and anything
+confidential before you share. Adding a shared Bot accepts the
+[third-party bot terms](https://x.ai/legal/bot-sharing-terms). See
+[Share a Bot](https://docs.x.ai/grok-bot/bots#share-a-bot).
 
 ## What happens if I delete a Bot?
 

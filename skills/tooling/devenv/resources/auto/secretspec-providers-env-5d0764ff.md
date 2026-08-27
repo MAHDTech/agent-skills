@@ -77,4 +77,3 @@ the rest of this provider, references are read-only.
   variables
 - Testing with temporary environment variables
 - Working with containerized applications that use environment variables
-

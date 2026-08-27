@@ -38,11 +38,11 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
+| grok-imagine-image | $0.02 / image |
 | grok-imagine-image-2.0 | $0.04 / image |
 | grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-image | $0.02 / image |
-| grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 

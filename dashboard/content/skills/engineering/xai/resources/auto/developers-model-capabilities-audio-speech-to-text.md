@@ -210,14 +210,14 @@ Configuration is done via URL query parameters — no setup message required. Au
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sample_rate` | integer | `16000` | Audio sample rate in Hz. |
-| `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, or `alaw`. |
+| `sample_rate` | integer | `16000` | Audio sample rate in Hz. With `encoding=opus`: `8000`, `16000`, `24000`, or `48000` only. |
+| `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, `alaw`, or `opus`. See [Opus Streaming](#opus-streaming). |
 | `interim_results` | boolean | `false` | When `true`, emit partial transcripts `is_final=false` every ~500 ms. |
-| `endpointing` | integer | `10` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
+| `endpointing` | integer | `400` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
 | `language` | string | | Language code for text formatting. See [Supported Languages](#supported-languages). |
 | `diarize` | boolean | | When `true`, enables speaker diarization. Words include a `speaker` field identifying the detected speaker. |
 | `filler_words` | boolean | `false` | When `true`, filler words (e.g. `uh`, `um`, `er`) are included in the transcript. When `false` (default), filler words are automatically removed. |
-| `multichannel` | boolean | `false` | Per-channel transcription. Requires `channels` ≥ 2. |
+| `multichannel` | boolean | `false` | Per-channel transcription. Requires `channels` ≥ 2. Not supported with `encoding=opus`. |
 | `channels` | integer | `1` | Number of interleaved audio channels (max 8). |
 | `keyterm` | string | | A key term to bias transcription toward (e.g. product names, proper nouns). Repeat the parameter for multiple terms (e.g. `keyterm=Understand+The+Universe`). Max 100 terms, each up to 50 characters. |
 | `smart_turn` | number | | End-of-turn detection threshold (0.0–1.0). When set, enables Smart Turn — an ML model predicts whether the speaker has finished their thought at each silence boundary. See [Smart Turn](#smart-turn). |
@@ -231,7 +231,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 | `transcript.created` | Server ready — wait for this before sending audio. |
 | `transcript.partial` | Transcript result with `text`, `words`, `is_final`, `speech_final`, `start`, `duration`. Includes `channel_index` when `multichannel=true`. Includes `end_of_turn_confidence` when `smart_turn` is enabled. |
 | `transcript.done` | Final transcript after `audio.done`. `duration` always present. Includes `channel_index` when `multichannel=true` — one event sent per channel. Connection closes after this. |
-| `error` | Error with `message` field. Connection stays open. |
+| `error` | Error with `message` field. Most errors (including undecodable audio frames) close the connection; client message parse errors keep it open. |
 
 The `transcript.partial` event uses `is_final` and `speech_final` to convey three states:
 
@@ -243,7 +243,7 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 
 ### Client Messages
 
-* **Binary frames** — raw audio in the specified encoding (streamed in real-time-paced chunks, e.g. 100 ms)
+* **Binary frames** — raw audio in the specified encoding (streamed in real-time-paced chunks, e.g. 100 ms). With `encoding=opus`, each binary frame must contain exactly one Opus packet — see [Opus Streaming](#opus-streaming).
 * **`{"type": "finalize"}`** — force the current utterance to finalize as `speech_final` immediately for PTT
 * **`{"type": "audio.done"}`** — signal end of audio, triggers `transcript.done`
 
@@ -260,6 +260,26 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 ```json
 {"type": "Finalize", "channel": 0}
 ```
+
+### Opus Streaming
+
+Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s at 24 kHz versus 48 KB/s for PCM16, with no client-side resampling.
+
+**How it works:**
+
+* Send **exactly one raw Opus packet per binary WebSocket frame**. Opus packets don't mark their own boundaries — the WebSocket framing does — so never concatenate packets or split one across frames.
+* Encode mono audio at `8000`, `16000`, `24000`, or `48000` Hz. Other sample rates are rejected with `400`.
+* `multichannel` is not supported with Opus — mono only.
+* Send raw packets, not containers. To transcribe an Ogg-Opus or WebM file, use the [batch endpoint](#supported-audio-formats) instead — it auto-detects containers.
+* If a frame can't be decoded, the server sends an `error` event and closes the session. Misframed packets often decode as noise rather than an error, so double-check that your encoder emits one whole packet per frame.
+
+**Example URL:**
+
+```
+wss://api.x.ai/v1/stt?sample_rate=24000&encoding=opus&interim_results=true
+```
+
+**Typical use case:** Dictation and live transcription from mobile or other bandwidth-constrained clients, where streaming raw PCM is wasteful. Most platform audio APIs and WebRTC stacks produce Opus packets natively.
 
 ### Multichannel Streaming
 
@@ -430,6 +450,7 @@ ws.on("message", (data) => {
 * **Enable `interim_results`** for responsive UX — show transcription as the user speaks
 * **Use `language=en`** to enable text formatting — numbers and currencies are written in their standard form
 * **Send 100 ms audio chunks** (3,200 bytes at 16 kHz PCM16) for a good balance of latency and efficiency
+* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s at 24 kHz versus 48 KB/s for raw PCM. See [Opus Streaming](#opus-streaming)
 * **Wait for `transcript.created`** before sending audio — the server needs to initialize its ASR backend
 
 ## Error Handling

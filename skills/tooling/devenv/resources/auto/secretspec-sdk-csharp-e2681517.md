@@ -77,6 +77,13 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
+## Inline specifications (0.20+)
+
+Use `WithInlineSpec(spec, baseDir)` to resolve strict inline-spec v1
+declarations from an object serialized by `System.Text.Json`. `baseDir`
+resolves relative provider paths, and an older native library reports a
+capability error.
+
 ## Scopes (0.17+)
 
 Use `WithScope("api")` to resolve only a named `[scopes.api]` subset.

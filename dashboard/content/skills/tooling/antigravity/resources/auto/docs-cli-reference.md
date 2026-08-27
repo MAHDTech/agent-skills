@@ -54,8 +54,10 @@ menu.
 | **`/skills`** | Tools & Tasks | — | Browse loaded local and global Agent Skills. |
 | **[`/statusline`](https://antigravity.google/docs/cli/commands/statusline)** | Configurations | — | Open the Status Bar customization overlay. |
 | **`/tasks`** | Tools & Tasks | — | Open the Task Manager Panel to monitor background shell execution logs. |
+| **[`/teamwork-preview`](https://antigravity.google/docs/teamwork)** `<task>` | Reasoning | `/teamwork` | Launch [collaborative multi-agent teams](https://antigravity.google/docs/teamwork) for long-horizon projects (paid plans). |
 | **[`/title`](https://antigravity.google/docs/cli/commands/title) \[on/off\]** | Configurations | — | Toggle or set terminal window title updates. |
 | **[`/usage`](https://antigravity.google/docs/cli/commands/usage)** | Utilities | `/quota` | Display model quota usage. |
+| **[`/voice`](https://antigravity.google/docs/cli/commands/voice)** | Utilities | `/record` | Dictate a prompt using your microphone. |
 
 ## Default keybindings
 
@@ -93,6 +95,7 @@ These keys are active when writing instructions inside the prompt box.
 | **`Ctrl+Z`** | `prompt.undo_text` | Reverts the last edit. |
 | **`Ctrl+Shift+Z`** | `prompt.redo_text` | Redoes the last undone text operation. |
 | **`Ctrl+D`** | `—` | Forward delete (only when the prompt box is non-empty). |
+| **`F5`** | `voice.start_dictation` | Starts or stops [voice dictation](https://antigravity.google/docs/cli/commands/voice). |
 
 ### Navigation & scrolling
 

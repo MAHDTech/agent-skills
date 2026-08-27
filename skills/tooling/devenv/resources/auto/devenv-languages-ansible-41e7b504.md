@@ -1,0 +1,79 @@
+# ansible
+
+## Options
+
+### languages.ansible.enable
+
+Whether to enable tools for Ansible development.
+
+*Type:* boolean
+
+*Default:*
+
+```
+false
+```
+
+*Example:*
+
+```
+true
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/languages/ansible.nix>
+
+### languages.ansible.package
+
+The Ansible package to use.
+
+*Type:* package
+
+*Default:*
+
+```
+pkgs.ansible
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/languages/ansible.nix>
+
+### languages.ansible.lsp.enable
+
+Whether to enable Ansible Language Server.
+
+*Type:* boolean
+
+*Default:*
+
+```
+true
+```
+
+*Example:*
+
+```
+true
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/languages/ansible.nix>
+
+### languages.ansible.lsp.package
+
+The Ansible language server package to use.
+
+*Type:* null or package
+
+*Default:*
+
+```
+pkgs.ansible-language-server
+```
+
+*Declared by:*
+
+- <https://github.com/cachix/devenv/blob/main/src/modules/languages/ansible.nix>

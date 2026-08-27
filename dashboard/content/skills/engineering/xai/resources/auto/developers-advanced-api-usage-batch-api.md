@@ -136,7 +136,7 @@ batch_requests.append(chat)
 # Image generation
 image_req = client.image.prepare(
     prompt="A sleek modern laptop on a minimalist desk",
-    model="grok-imagine-image",
+    model="grok-imagine-image-2.0",
     batch_request_id="img_001",
 )
 batch_requests.append(image_req)
@@ -144,7 +144,7 @@ batch_requests.append(image_req)
 # Image edit
 image_edit_req = client.image.prepare(
     prompt="Add a rainbow in the background",
-    model="grok-imagine-image",
+    model="grok-imagine-image-2.0",
     image_url="https://picsum.photos/800",
     batch_request_id="img_edit_001",
 )
@@ -153,7 +153,7 @@ batch_requests.append(image_edit_req)
 # Video generation
 video_req = client.video.prepare(
     prompt="A product rotating on a turntable with dramatic lighting",
-    model="grok-imagine-video",
+    model="grok-imagine-video-1.5",
     batch_request_id="vid_001",
 )
 batch_requests.append(video_req)
@@ -249,7 +249,7 @@ batchRequests.push({
   batch_request: {
     image_generation: {
       prompt: "A sleek modern laptop on a minimalist desk",
-      model: "grok-imagine-image",
+      model: "grok-imagine-image-2.0",
     },
   },
 });
@@ -260,7 +260,7 @@ batchRequests.push({
   batch_request: {
     image_edit: {
       prompt: "Add a rainbow in the background",
-      model: "grok-imagine-image",
+      model: "grok-imagine-image-2.0",
       image: { url: "https://picsum.photos/800", type: "image_url" },
     },
   },
@@ -272,7 +272,7 @@ batchRequests.push({
   batch_request: {
     video_generation: {
       prompt: "A product rotating on a turntable with dramatic lighting",
-      model: "grok-imagine-video",
+      model: "grok-imagine-video-1.5",
     },
   },
 });
@@ -879,9 +879,9 @@ Each line in the file is a JSON object with four fields: `custom_id` (unique ide
 {"custom_id": "chat-1", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "grok-4.3", "messages": [{"role": "user", "content": "Classify this as positive, negative, or neutral: The product exceeded my expectations!"}]}}
 {"custom_id": "search-1", "method": "POST", "url": "/v1/responses", "body": {"model": "grok-4.3", "tools": [{"type": "web_search"}, {"type": "x_search"}], "input": [{"role": "user", "content": "What are the latest SpaceX launches?"}]}}
 {"custom_id": "mcp-1", "method": "POST", "url": "/v1/responses", "body": {"model": "grok-4.3", "tools": [{"type": "mcp", "server_label": "deepwiki", "server_url": "https://mcp.deepwiki.com/mcp"}], "input": [{"role": "user", "content": "What does the xai-sdk-python repo do?"}]}}
-{"custom_id": "img-1", "method": "POST", "url": "/v1/images/generations", "body": {"model": "grok-imagine-image", "prompt": "A futuristic city skyline at sunset"}}
-{"custom_id": "img-edit-1", "method": "POST", "url": "/v1/images/edits", "body": {"model": "grok-imagine-image", "prompt": "Add a rainbow", "image": {"url": "https://picsum.photos/800"}}}
-{"custom_id": "vid-1", "method": "POST", "url": "/v1/videos/generations", "body": {"model": "grok-imagine-video", "prompt": "A rocket launching from Mars", "duration": 8}}
+{"custom_id": "img-1", "method": "POST", "url": "/v1/images/generations", "body": {"model": "grok-imagine-image-2.0", "prompt": "A futuristic city skyline at sunset"}}
+{"custom_id": "img-edit-1", "method": "POST", "url": "/v1/images/edits", "body": {"model": "grok-imagine-image-2.0", "prompt": "Add a rainbow", "image": {"url": "https://picsum.photos/800"}}}
+{"custom_id": "vid-1", "method": "POST", "url": "/v1/videos/generations", "body": {"model": "grok-imagine-video-1.5", "prompt": "A rocket launching from Mars", "duration": 8}}
 {"custom_id": "vid-edit-1", "method": "POST", "url": "/v1/videos/edits", "body": {"model": "grok-imagine-video", "prompt": "Make it slow motion", "video": {"url": "https://lorem.video/cat_360p_3s"}}}
 {"custom_id": "vid-ext-1", "method": "POST", "url": "/v1/videos/extensions", "body": {"model": "grok-imagine-video", "prompt": "The camera slowly pans to reveal a sunset", "video": {"url": "https://lorem.video/cat_360p_3s"}, "duration": 6}}
 ```
@@ -900,7 +900,7 @@ Supported `url` values:
 | `/v1/videos/edits` | [Video editing](https://docs.x.ai/developers/model-capabilities/video/editing) |
 | `/v1/videos/extensions` | [Video extension](https://docs.x.ai/developers/model-capabilities/video/extension) |
 
-Only batch-enabled models are accepted. Image and video requests currently support `grok-imagine-image` and `grok-imagine-video`; other Imagine models (including `grok-imagine-image-2.0` and `grok-imagine-video-1.5`) are rejected with "not supported for batch processing".
+Only batch-enabled models are accepted. Refer to the relevant [model pages](https://docs.x.ai/developers/models) for the most up-to-date information; models that are not batch-enabled are rejected with "not supported for batch processing".
 
 Upload the file via the [Files API](https://docs.x.ai/developers/files), then create a batch referencing it:
 

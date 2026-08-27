@@ -33,7 +33,7 @@ Settings:
 1.  Open the **Settings** panel by pressing `Cmd + ,` (or `Ctrl + ,` on
     Linux/Windows), or click **Settings** at the bottom of the left
     sidebar.
-2.  Navigate to the **Account** section.
+2.  Navigate to the **App** section.
 3.  Toggle **Enable Remote Control** to **On**.
 4.  *(Optional)* Set a custom **Nickname** (e.g., `workstation-primary`
     or `server-machine`) to easily identify this machine in your

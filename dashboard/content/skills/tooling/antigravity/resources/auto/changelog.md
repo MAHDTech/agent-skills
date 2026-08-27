@@ -33,6 +33,181 @@ Description
 
 ------------------------------------------------------------------------
 
+[2.11.0](https://antigravity.google/releases?tab=hub&version=2.11.0 "View release 2.11.0")  
+August 26, 2026
+
+### Generative UI and UI improvements
+
+Antigravity 2.11.0 adds generative UI to render HTML artifacts inline in
+chat, alongside several UX improvements and bug fixes.
+
+Improvements (10)
+
+- Added support for referencing and inlining external files directly
+  using `@path/to/file` syntax within `AGENTS.md` and custom rule files.
+- Added support for rendering YAML frontmatter as a formatted metadata
+  card in markdown files and artifacts.
+- Added support for KaTeX math formatting, Chart.js, and Plotly charts
+  in generative UI widgets and artifact previews.
+- Added the ability to split terminals side-by-side in the terminal
+  panel using a dedicated split button or keyboard shortcut
+  (`Ctrl+Shift+5` on Linux/Windows, `Cmd+\` on Mac), complete with
+  draggable divider resizing and tree indicators in the terminal list.
+- Added the Darcula theme preset and syntax highlighting color palette.
+- Added support for viewing specific page ranges (StartPage and EndPage)
+  in multi-page documents (like PDFs) and specifying image resolution
+  (MediaResolution) in the `view_file` tool.
+- Added support for hover preview card on skills chip in chat.
+- Added support for defining a `rules:` key in custom markdown agent
+  frontmatter to bind specific rule files directly to an agent.
+- Added support for discovering custom skills, agents, and rules defined
+  in `skills.json`, `agents.json`, and `rules.json` configuration files
+  located within project subdirectories.
+- Several overall UX improvements for performance, accessibility, and
+  project configurations.
+
+Fixes (30)
+
+- Fixed an issue where slash commands unavailable to a selected custom
+  agent were incorrectly shown in the command menu.
+- Fixed an issue where image attachments in the message composer were
+  lost when switching between conversations.
+- Fixed an issue where Ogg audio and video files were assigned generic
+  MIME types that could cause model errors.
+- Fixed an issue where custom color themes with transparency or alpha
+  channels caused UI text to render in red.
+- Fixed an icon mismatch where the title bar overflow menu displayed a
+  generic terminal icon instead of matching the tab icon in the side
+  panel.
+- Fixed a memory leak where uncommitted conversation renders could leave
+  agent state updates running in the background.
+- Fixed a memory leak where rapidly switching between conversations
+  could leave background streaming connections open indefinitely.
+- Fixed an issue where clicking a comment link would not scroll to the
+  comment if it was located below the visible fold in virtualized file
+  and diff viewers.
+- Fixed an issue where project folder names with special characters or
+  spaces were improperly decoded twice.
+- Fixed an issue where newly added files in the review pane displayed an
+  inaccurate added line count due to trailing newlines.
+- Fixed an issue where users authenticated via Workforce Identity
+  Federation (WIF / Enterprise sign-in) were logged out prematurely
+  after one hour due to token refresh endpoint routing.
+- Fixed a z-index stacking conflict where inline file change panels
+  overlapped the @-mention dropdown menu.
+- Fixed an issue where the side panel overflow menu incorrectly marked
+  the last-clicked action with a checkmark.
+- Fixed an issue where form controls and scrollbars inside generative UI
+  widgets did not adapt to the dark or light theme.
+- Fixed an issue where Enterprise users authenticating via Application
+  Default Credentials could erroneously see an "Out of credits" error
+  message.
+- Fixed cold-start token endpoint routing to prevent HTTP 429 resource
+  exhaustion errors on launch, and cached account authentication status
+  to eliminate redundant backend checks on user interactions.
+- Fixed an issue where long terminal commands in permission prompts
+  caused the popup layout to overflow.
+- Fixed an issue where rapid consecutive agent status updates caused
+  repeated notification chime sounds.
+- Fixed an issue where expanded tool steps and collapsible sections
+  could collapse or remount when earlier steps updated during long
+  conversations.
+- Fixed an issue where disabled menu items displayed an active pointer
+  cursor instead of a disabled cursor.
+- Fixed an issue where previously configured command permission allow
+  and deny rules were ignored after migrating to the updated permissions
+  system.
+- Disabled the Git Push action in repositories without a configured
+  remote, and added clear tooltips explaining why VCS actions are
+  disabled.
+- Fixed an issue where pasting text into the integrated terminal using
+  Ctrl+V failed unless clipboard read permissions were explicitly
+  granted.
+- Fixed an issue where artifacts created in nested subdirectories could
+  fail to appear in the artifacts panel.
+- Fixed an issue where signed-in users clicking "Manage" in Settings
+  briefly saw an unauthenticated account overlay.
+- Fixed an issue where selecting text in an assistant response failed to
+  show the "Quote" button if the mouse drag released below the message
+  bubble.
+- Fixed authentication race conditions that could cause error loops when
+  signing in again or leave stale account state after signing out.
+- Fixed an issue where a single corrupted or empty project file could
+  cause the entire projects sidebar to appear empty.
+- Fixed an issue in the file viewer where selecting a single code token
+  or word failed to display the comment button.
+- Fixed an issue where temporary network disruptions or DNS lookup
+  timeouts during startup caused permanent account failure screens
+  instead of automatically retrying.
+
+Patches (0)
+
+[2.10.0](https://antigravity.google/releases?tab=hub&version=2.10.0 "View release 2.10.0")  
+August 24, 2026
+
+### Embedded Terminals, Git Version Control, and Audio Attachments
+
+Antigravity 2.10.0 introduces an embedded terminal and Git-native
+version control directly in the sidebar, alongside audio file
+attachments, interactive image commenting, rich MCP tool execution
+previews, and core performance optimizations.
+
+Improvements (13)
+
+- Added an embedded terminal directly in the sidebar (Ctrl/Cmd + \`),
+  allowing you to run build commands, test suites, and scripts without
+  switching applications.
+- Introduced Git version control in the Review pane to inspect working
+  tree diffs, stage and unstage files, and commit changes directly
+  within the app.
+- Improved Git responsiveness and reduced background CPU usage on large
+  repositories and projects with submodules.
+- Added support for attaching audio files (MP3, WAV, M4A, AAC, OGG,
+  FLAC, OPUS) up to 20MB via file picker or drag-and-drop.
+- You can now drag to select regions and leave comments directly on any
+  image in the file viewer, with smooth scrolling for tall images.
+- Model Context Protocol (MCP) and custom tool execution steps now
+  display structured headers, expandable argument blocks, and formatted
+  result previews.
+- Redesigned pending review comments in the chat input with unified
+  attachment badges, file-grouped hover previews, and quick modal access
+  for queued messages.
+- Improved sidebar smoothness and message streaming responsiveness
+  during active generation.
+- URL artifact cards now open supported links (such as local dev servers
+  and Google Docs, Sheets, Slides, and Drive) directly in an in-app
+  preview pane.
+- Improved folder picker navigation with live directory suggestions,
+  Windows path support, and inline new folder creation.
+- File search in the @-mention menu is now typo-tolerant, making it
+  easier to reference files with approximate names.
+- Markdown file previews and artifacts now cleanly format frontmatter
+  metadata as a structured key-value summary.
+- Double-clicking an option in single-select questions and confirmation
+  prompts now immediately selects and submits the answer.
+
+Fixes (8)
+
+- Fixed an issue where the slash command menu and input suggestions
+  displayed commands unsupported by the active custom agent.
+- Fixed an issue where goal progress and summary sections were missing
+  from the chat interface during /goal execution.
+- Fixed an issue where unsaved edits to artifact comments could be lost
+  when switching tabs or moving the cursor away.
+- Fixed an issue where comments on image files were missing their
+  cropped preview and comment text in the comments modal.
+- Fixed an issue where image attachments in the chat composer were lost
+  when switching between conversations.
+- Fixed an issue in project settings where selecting "Inherit General"
+  for Sandbox Mode failed to save.
+- Fixed an issue where quoted text and context items in question headers
+  appeared as raw markup instead of interactive pills.
+- Fixed an issue during business login where license lookup errors would
+  leave users on an error screen instead of prompting for a Google Cloud
+  project ID.
+
+Patches (0)
+
 [2.9.1](https://antigravity.google/releases?tab=hub&version=2.9.1 "View release 2.9.1")  
 August 20, 2026
 
@@ -751,6 +926,215 @@ Fixes (3)
   importing from Antigravity 1.0.
 - Resolved an issue where Google One credits were not being applied or
   utilized.
+
+Patches (0)
+
+[1.1.22](https://antigravity.google/download#antigravity-cli "View release 1.1.22")  
+August 27, 2026
+
+### Model selection command arguments, reasoning effort autocompletion, transient retry handling, and UI performance fixes
+
+Adds direct `/model ` switching with inline ghost text autocompletion,
+dynamic `/effort` hint completion, artifact filesystem event coalescing,
+and fixes for transient HTTP 502 retries, CPU redraw utilization, and
+Windows path resolution.
+
+Improvements (3)
+
+- Added a `/model ` argument to switch models by name, slug, or label
+  and set defaults in one step with inline ghost text autocompletion.
+- Improved the `/effort` hint to complete typed text dynamically instead
+  of displaying a static placeholder.
+- Improved artifact handling in sessions generating many files by
+  coalescing bursts of filesystem events into a single rescan.
+
+Fixes (8)
+
+- Fixed selectable reasoning effort configuration for Gemini 3.1 Pro and
+  Gemini 3.5 Flash when authenticating via Gemini API keys.
+- Fixed continuous interface redraws when the tasks panel or subagent
+  detail panel was open with no active tasks, significantly reducing
+  idle CPU usage.
+- Fixed running subagent elapsed timers freezing on screen while the
+  parent agent was in a waiting state.
+- Fixed transient HTTP 502 Bad Gateway errors terminating runs by adding
+  automatic retry handling with backoff.
+- Fixed `self` subagents launched from unconfigured sessions
+  re-resolving configurations from scratch and drifting from parent
+  autonomous execution modes.
+- Fixed Windows file deletion sharing violations by retrying deletions
+  with backoff before failing.
+- Fixed headless daemon startup banner printing unsupported localhost
+  browser URLs to service manager logs.
+- Fixed the built-in `migrate-workflows` skill to properly handle
+  Windows path separators and home directories.
+
+Patches (0)
+
+[1.1.21](https://antigravity.google/download#antigravity-cli "View release 1.1.21")  
+August 26, 2026
+
+### Voice dictation, embedded ripgrep code search, status line cost metrics, and UTF-8 encoding fixes
+
+Adds `/voice` dictation with `mic-serve` SSH forwarding, embedded
+ripgrep for consistent agent code search, custom status line cost
+tracking, granular script runner permission suggestions, and UTF-8 file
+editing and MCP error fixes.
+
+Improvements (7)
+
+- Added `/voice` dictation to transcribe speech directly into the prompt
+  with `f5` and `/voice` toggle shortcuts, introduced the `mic-serve`
+  subcommand to forward a local microphone over SSH, and improved quota
+  messaging for concurrent stream limits.
+- Added a `cost` field to the status line data model, exposing unrounded
+  estimated session costs to track running token spend.
+- Improved agent code search by bundling an embedded `ripgrep` binary
+  instead of invoking external system binaries, increasing search
+  performance and cross-platform consistency.
+- Improved the `always-proceed` permission mode to auto-approve MCP tool
+  calls and page reads without prompting.
+- Improved allow-always permission suggestions for script runners
+  (`npm run`, `yarn`, `pnpm`, `cargo run`) by scoping approvals to
+  specific script names.
+- Improved conversation titles by generating them automatically on
+  creation, providing meaningful session names in the resume picker.
+- Improved error diagnostics when an MCP server configured for Google
+  credentials cannot locate Application Default Credentials (ADC).
+
+Fixes (4)
+
+- Fixed corrupted file edits in documents containing non-ASCII text (CJK
+  characters, accented letters, emoji) caused by inexact offset matches
+  producing invalid UTF-8.
+- Fixed sessions stalling mid-response when a tool result or file diff
+  contained invalid UTF-8.
+- Fixed file writes being reported as failures after successfully saving
+  to disk, preventing unnecessary agent retry loops on large files and
+  notebooks.
+- Fixed precedence resolution so explicitly configured skill and plugin
+  paths take priority over automatically discovered customizations
+  during name collisions.
+
+Patches (0)
+
+[1.1.20](https://antigravity.google/download#antigravity-cli "View release 1.1.20")  
+August 25, 2026
+
+### Skill icon branding, empty directory indexing in @-completion, and headless exit code fixes
+
+Adds skill icon branding with Unicode alignment in catalogs and slash
+commands, indexes empty directories in `@` path completion,
+auto-approves workspace-scoped read access in review mode, and fixes
+headless print mode error handling.
+
+Improvements (4)
+
+- Added skill icon and visual branding support across the CLI,
+  displaying emoji icons declared under `metadata.icon` in `SKILL.md`
+  frontmatter across the `/skills` catalog list view, detail inspection
+  headers, and slash command autocompletion popups with multi-byte
+  Unicode display width calculation.
+- Improved `@` file path autocompletion by indexing empty directories
+  alongside files in ripgrep search results, enabling directory-only and
+  unpopulated structures to be traversed.
+- Improved permission management by automatically granting
+  workspace-scoped read access under the default review mode, removing
+  repetitive approval prompts for reading or listing workspace files
+  while strictly maintaining confirmation for modifications and external
+  access.
+- Improved Git repository inspection performance by skipping recursive
+  submodule worktree scans while continuing to track commit pointer
+  updates.
+
+Fixes (5)
+
+- Fixed print mode (`-p`/`--print`, including `--output-format json` and
+  `stream-json`) treating benign tool execution errors and permission
+  denials as fatal run failures with non-zero exit codes.
+- Fixed the CLI overwriting and discarding unparsed configuration in
+  `settings.json` when encountering an unrecognized setting value or
+  syntax error on startup.
+- Fixed `/skills`, `/plugins`, `/agents`, and `/hooks` commands
+  reporting that no customizations were found when invoked without an
+  explicit agent configuration by mounting built-in customizations.
+- Fixed CJK draft jitter in the main prompt by normalizing boundary
+  whitespace in streaming transcript updates.
+- Fixed the conversation spinner animation loop continuing to tick in
+  the background after turn completion, eliminating idle CPU wakeups.
+
+Patches (0)
+
+[1.1.19](https://antigravity.google/download#antigravity-cli "View release 1.1.19")  
+August 22, 2026
+
+### Dynamic remote control port allocation, banner logo toggles, and rendering flags
+
+Introduces automatic free port selection for `--remote-control`,
+environment controls to suppress logo art for narrow terminals and
+screen readers, and renderer bypass options.
+
+Improvements (2)
+
+- Added the `AGY_CLI_HIDE_LOGO` environment variable for narrow
+  terminals, screen readers, and recordings to suppress logo art while
+  retaining version and account details.
+- Added `AGY_CLI_DISABLE_ESCAPE_SEQUENCE_OPTIMIZATIONS` to bypass the
+  renderer's dirty-rectangle and diffing optimizations.
+
+Fixes (1)
+
+- Fixed `--remote-control` failing when a default port was occupied by
+  automatically binding to an available port provided by the operating
+  system.
+
+Patches (0)
+
+[1.1.18](https://antigravity.google/download#antigravity-cli "View release 1.1.18")  
+August 22, 2026
+
+### Project name flags, customizable picker keybindings, typo-tolerant @-completion, and audio attachments
+
+Adds support for passing project names to `--project`, customizable
+keybindings for conversation management, typo-tolerant `@` file
+completion, and standard audio attachments alongside reliability and
+terminal layout fixes.
+
+Improvements (6)
+
+- Added support for passing a project name to `--project`, which
+  previously accepted only a project ID and failed on anything else.
+- Added `item.rename` and `item.delete` keybindings for the conversation
+  picker's rename and delete actions, allowing `F2` and `F4` to be
+  rebound in `keybindings.json` on keyboards without function keys.
+- Improved `@` file path completion with a typo-tolerant fallback, so a
+  query with a transposed or mistyped character still finds the file
+  without outranking exact matches.
+- Improved audio attachments by recognizing standard formats Gemini
+  models accept, including `.wav`, `.mp3`, `.m4a`, `.aac`, `.flac`, and
+  `.opus`.
+- Improved keystroke responsiveness on Windows by discarding key-release
+  events reported by the console, cutting rendering work per keystroke.
+- Improved the artifact viewer footer by placing the outline shortcut
+  next to scroll and page hints for clearer document navigation.
+
+Fixes (6)
+
+- Fixed print mode (`-p`) exiting successfully with an empty response
+  when the agent state stream dropped mid-run; it now surfaces the
+  stream error and exits non-zero.
+- Fixed a valueless prompt flag swallowing the next flag as its prompt
+  (such as `--print --sandbox "do the task"`), turning both that and
+  stray trailing arguments into explicit errors.
+- Fixed expanded `/btw` cards pushing footer hints and prompt off-screen
+  on long answers by clamping output to terminal height with scroll
+  support.
+- Fixed `/resume` opening below the fold instead of the active workspace
+  when running the CLI from a subdirectory.
+- Fixed text losing styling after file links where the link's styling
+  reset also cleared surrounding prose formatting.
+- Fixed stray characters appearing in the prompt every few seconds by
+  restricting periodic input-mode re-arming to terminal multiplexers.
 
 Patches (0)
 
@@ -3195,6 +3579,108 @@ Improvements (1)
 - Google Antigravity
 
 Fixes (0)
+
+Patches (0)
+
+[0.1.15](https://antigravity.google/download#antigravity-sdk "View release 0.1.15")  
+August 25, 2026
+
+### Subagent-scoped custom tools, context compaction lifecycle hooks, and universal JSON schema normalization
+
+The 0.1.15 release introduces subagent-exclusive tool scoping to reduce
+context overhead, adds an `on_compaction` lifecycle hook for observing
+context checkpointing, expands platform compatibility with Alpine Linux
+musl wheels, resolves workspace path normalization and custom Vertex
+endpoint routing, and adds universal JSON Schema normalization for
+custom Python tools when targeting local OpenAI-compatible LLM
+endpoints.
+
+Improvements (9)
+
+- **Subagent-Scoped Custom Tools**: Custom tools can now be registered
+  directly on subagents without requiring registration on the root
+  agent, strictly isolating them to the subagent's context and reducing
+  root context tokens.
+- **Context Compaction Lifecycle Hook**: Improved support for the
+  `on_compaction` lifecycle hook to accurately capture compaction events
+  and summaries when long-running conversations trigger checkpointing.
+- **Custom Base URL & Secure Vertex Proxy Support**: `VertexEndpoint`
+  now supports routing requests to custom `base_url` reverse proxies or
+  enterprise gateways without leaking ambient Google Cloud Application
+  Default Credentials (ADC) OAuth tokens or conflicting with
+  project/location configurations.
+- **Universal JSON Schema Normalization for Custom Tools**: Custom
+  Python tools now produce standard OpenAPI / JSON Schema compliant
+  parameter definitions with lowercase types and camelCase combiners,
+  eliminating schema errors when connecting to local OpenAI-compatible
+  engines such as Ollama, LM Studio, or vLLM.
+- **`from_bytes` Helper Export**: Exported the `from_bytes` helper in
+  top-level `google.antigravity` alongside `from_file` for creating
+  binary and multimodal content payloads.
+- **PEP 656 musllinux Wheel Support**: Added `musllinux_1_1` wheel
+  platform tags for x86_64 and aarch64 architectures, enabling direct
+  installation via pip on Alpine Linux containers.
+- **Isolated Harness Environment Configuration**: Added per-connection
+  environment dictionary resolution for `ANTIGRAVITY_HARNESS_PATH`,
+  avoiding mutation of global `os.environ`.
+- **Tool Call Metadata Preservation**: Preserved `id`, `step_id`, and
+  `server_name` metadata across all `ToolResult` executions, including
+  batch calls, errors, and unknown tools.
+- **Relative Workspace Path Normalization**:
+  `LocalAgentConfig(workspaces=...)` now resolves relative directory
+  paths and tilde (`~`) expansions against the current working directory
+  (`os.getcwd()`).
+
+Fixes (6)
+
+- **Local OpenAI Tool Schema Validation**: Fixed HTTP 400 "Invalid
+  discriminator value" errors on local OpenAI endpoints by
+  canonicalizing tool parameter schemas to standard JSON Schema.
+- **Vertex Custom Gateway Token Leaks**: Fixed host GCP OAuth bearer
+  token leakage and environment variable collisions when using custom
+  `base_url` endpoints with `VertexEndpoint`.
+- **Subagent Custom Tool Routing**: Fixed tool dispatch failures when
+  subagents defined tools not registered on the root agent.
+- **`UsageMetadata` Service Tier Loss**: Fixed `UsageMetadata.__sub__`
+  dropping the `service_tier` field when calculating per-turn usage
+  deltas.
+- **WebSocket Deprecation Warnings**: Resolved `DeprecationWarning`
+  exceptions when reading WebSocket close codes across varying
+  websockets library versions.
+- **OpenTelemetry Optional Dependency Guard**: Fixed test collection
+  failures on minimal environments lacking `opentelemetry.sdk`.
+
+Patches (1)
+
+- **Deprecated `TriggerDelivery` Removal**: Removed the unused
+  `TriggerDelivery` enum from `types.py`.
+
+[0.1.14](https://antigravity.google/download#antigravity-sdk "View release 0.1.14")  
+August 21, 2026
+
+### Workspace path resolution against current working directory, compaction event deduplication, and Vertex auth overrides
+
+Resolves relative workspace paths against the current working directory,
+prevents duplicate compaction hook dispatches and compaction index
+inflation, and adds support for Vertex AI gateway authentication
+overrides.
+
+Improvements (1)
+
+- **Vertex Endpoint Authentication Overrides**: Enhanced
+  `VertexEndpoint` to support custom authentication headers and token
+  overrides when routing inference requests through API gateways or
+  proxy servers.
+
+Fixes (2)
+
+- **Workspace Path Resolution**: Fixed relative workspace paths in
+  `LocalAgentConfig(workspaces=[...])` incorrectly resolving against
+  `app_data_dir` instead of the process working directory.
+- **Compaction Hook Deduplication**: Fixed `on_compaction` hook
+  dispatching multiple times per compaction event and resolved
+  over-counting in `compaction_indices` by adding terminal state
+  deduplication.
 
 Patches (0)
 

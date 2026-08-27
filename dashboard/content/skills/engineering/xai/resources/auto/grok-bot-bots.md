@@ -82,6 +82,26 @@ skills, routines, and avatar. It does not copy conversation history, learned
 memory, or chat attachments. Rename it and provide the new scope before
 assigning work.
 
+## Share a Bot
+
+Share a public link when someone else should start from the same Bot.
+
+1. Open the Bot and copy its share link.
+2. Send the link. The recipient opens a preview on
+   [x.ai](https://x.ai) and can choose **Add to Grok Bot**.
+3. They need the Grok Bot app to finish adding it.
+
+The link is public. Anyone who has it can view the Bot's shared configuration,
+including its identity, description, skills, and routines. Remove API keys,
+internal URLs, customer data, and anything else you would not put in a public
+document before you share.
+
+Adding a shared Bot creates a copy on the recipient's account. It does not give
+them your computer, logins, or conversation history.
+
+Shared Bots are created by other users, not by SpaceXAI. Adding one accepts the
+[third-party bot terms](https://x.ai/legal/bot-sharing-terms).
+
 ## Delete a Bot
 
 Deleting a Bot removes its active profile, conversation, and routines from Grok

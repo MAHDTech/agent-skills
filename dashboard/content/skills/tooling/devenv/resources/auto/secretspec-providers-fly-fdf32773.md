@@ -240,4 +240,3 @@ in the provider URI.
 - `secretspec delete` first lists names so it can report whether
   anything was removed. The listing never contains plaintext values.
 
-

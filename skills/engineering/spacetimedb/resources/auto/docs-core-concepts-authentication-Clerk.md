@@ -284,4 +284,3 @@ await getToken({ template: '<YOUR_TEMPLATE_NAME>' });
 
 and ensure your SpacetimeDB authentication layer validates the
 corresponding issuer and signing keys.
-

@@ -90,7 +90,7 @@ Images are returned as URLs by default. URLs are temporary, so download or proce
 
 ### Multiple Images
 
-Generate multiple images in a single request using the `sample_batch()` method and the `n` parameter. This returns a list of `ImageResponse` objects.
+Generate multiple images in a single request with the `n` parameter (`1`–`10`). On the REST API and OpenAI-compatible SDKs, `n` is optional and defaults to `1`. The xAI Python SDK uses `sample()` for a single image and `sample_batch(n=...)` for more than one — `n` is required on `sample_batch()`.
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -174,7 +174,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Aspect Ratio
 
-Control image dimensions with the `aspect_ratio` parameter.
+Control image dimensions with the `aspect_ratio` parameter. When omitted, the default is `auto`, which lets the model pick the best ratio for the prompt.
 
 | Ratio | Use case |
 |-------|----------|
@@ -183,8 +183,10 @@ Control image dimensions with the `aspect_ratio` parameter.
 | `4:3` / `3:4` | Presentations, portraits |
 | `3:2` / `2:3` | Photography |
 | `2:1` / `1:2` | Banners, headers |
-| `19.5:9` / `9:19.5` | Modern smartphone displays |
-| `20:9` / `9:20` | Ultra-wide displays |
+| `19.5:9` / `9:19.5` | Modern smartphone displays (iPhone) |
+| `20:9` / `9:20` | Modern smartphone displays (Android) |
+| `21:9` | Cinematic widescreen |
+| `5:2` | Wide banners |
 | `auto` | Model auto-selects the best ratio for the prompt |
 
 ```python customLanguage="pythonXAI"
@@ -262,10 +264,10 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Resolution
 
-You can specify different resolutions of the output image. Currently supported image resolutions are:
+You can specify different resolutions of the output image with the `resolution` parameter. Currently supported image resolutions are:
 
-* 1k
-* 2k
+* `1k` (default when omitted)
+* `2k`
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -346,9 +348,34 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 Control generation quality with the optional `quality` parameter. Allowed values are `low` and `medium`. When omitted, the default is `medium`. The parameter is only supported for `grok-imagine-image-2.0`.
 
+```python customLanguage="pythonXAI"
+import xai_sdk
+
+client = xai_sdk.Client()
+
+response = client.image.sample(
+    prompt="A watercolor painting of a lighthouse at dawn",
+    model="grok-imagine-image-2.0",
+    quality="low",
+)
+
+print(response.url)
+```
+
+```bash
+curl -X POST https://api.x.ai/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
+  -d '{
+    "model": "grok-imagine-image-2.0",
+    "prompt": "A watercolor painting of a lighthouse at dawn",
+    "quality": "low"
+  }'
+```
+
 ### Base64 Output
 
-For embedding images directly without downloading, request base64:
+Control the output format with the `response_format` parameter. When omitted, the default is `url`, which returns temporary hosted URLs. For embedding images directly without downloading, request base64:
 
 ```python customLanguage="pythonXAI"
 import xai_sdk

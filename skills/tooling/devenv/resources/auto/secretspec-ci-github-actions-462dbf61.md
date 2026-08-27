@@ -52,4 +52,3 @@ anywhere the CLI is installed.
 
 Both resolve through the same provider chain and fail on a missing
 required secret.
-

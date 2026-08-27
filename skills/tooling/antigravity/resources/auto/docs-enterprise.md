@@ -17,7 +17,8 @@ Supported products: [Antigravity 2.0](https://antigravity.google/product/antigra
 Code](https://antigravity.google/docs/ide/extensions/vscode) [Visual Studio
 (Preview)](https://antigravity.google/docs/ide/extensions/visual-studio) [JetBrains
 (Preview)](https://antigravity.google/docs/ide/extensions/jetbrains) [Zed
-(Preview)](https://antigravity.google/docs/ide/extensions/zed)
+(Preview)](https://antigravity.google/docs/ide/extensions/zed) [Xcode
+(Preview)](https://antigravity.google/docs/ide/extensions/xcode)
 
 ## Overview & Key Benefits
 

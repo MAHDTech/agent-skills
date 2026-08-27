@@ -3101,4 +3101,3 @@ Congratulations! You've built a chat app with SpacetimeDB.
 - Learn about [Procedures](https://spacetimedb.com/docs/functions/procedures) for making
   external API calls
 
-

@@ -112,7 +112,7 @@ ws.on("message", data => {
 
 ## Call control
 
-Use `refer` to transfer the caller to another PSTN or SIP destination:
+Use `refer` to transfer the caller to another PSTN or SIP destination. The request blocks until the transfer resolves; the HTTP status reports whether the destination answered. See [FAQ](#faq) for status codes, failed-transfer session behavior, and conversation resumption.
 
 ```bash customLanguage="bash"
 curl -X POST "https://api.x.ai/v1/realtime/calls/$CALL_ID/refer" \
@@ -189,3 +189,58 @@ Replace `{number}` with your Direct SIP phone number. If you configured `allowed
 
 1. In your carrier, contact center, or PBX, create an outbound route or SIP trunk.
 2. Set the destination to `sip:{number}@sip.voice.x.ai;transport=tls`.
+
+## FAQ
+
+These answers cover the Speech to Speech API SIP path: transfer success and failure with reason codes, what happens when a transfer fails, and how to continue a conversation on a later SIP call.
+
+### How do I get transfer success or failure with a reason code?
+
+There is no separate WebSocket transfer event. `POST /v1/realtime/calls/{call_id}/refer` returns the outcome synchronously.
+
+A `200` with an empty JSON body (`{}`) means the transfer completed: the REFER succeeded and the destination answered, not merely that the REFER was accepted or that the destination started ringing.
+
+Downstream SIP rejections return `502` with the carrier's SIP status in the body:
+
+```json customLanguage="json"
+{
+  "error": "transfer rejected by downstream: SIP 403 Forbidden"
+}
+```
+
+Other statuses are also possible:
+
+| Status | Meaning |
+| --- | --- |
+| `400` | `target_uri` is not a `tel:` or `sip:` URI |
+| `404` | No SIP participant on this call |
+| `502` | Transfer rejected by downstream; the body includes the SIP code and reason when available |
+| `504` | Transfer timed out |
+| `500` | Internal error |
+
+### Does the session stay usable if a transfer fails?
+
+Yes. While the REFER is pending, the WebSocket stays open and the caller hears dialtone. After a `502`, that same realtime session stays connected. The failed transfer is a no-op on the xAI side: the caller remains on the call, and the agent can keep talking.
+
+This path does not automatically start a new session or inject a failure-reason prompt. If the agent should tell the caller why the transfer failed, read the `refer` HTTP response and continue on this session, or resume later as below.
+
+### Can I reattach a resumed conversation to a new SIP call?
+
+[Session resumption](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech#session-resumption) caches transcripts and tool results so a later SIP call can continue the same conversation. You must opt in on both the original session and the resuming session. History expires after 30 minutes of inactivity.
+
+1. On the first call, open `wss://api.x.ai/v1/realtime?call_id={call_id}` and immediately send `session.update` with `resumption.enabled` set to `true`. Save that `call_id`.
+2. On the later call, open `wss://api.x.ai/v1/realtime?call_id={new_call_id}&conversation_id={saved_call_id}` and send the same `session.update` again. That restores the prior turns and keeps saving for future reconnects.
+3. There is no dedicated resumption-complete event. Restore happens as soon as that `session.update` is processed; replayed turns arrive as `conversation.item.created` events.
+
+```json customLanguage="json"
+{
+  "type": "session.update",
+  "session": {
+    "resumption": { "enabled": true }
+  }
+}
+```
+
+### Can I transfer to a Twilio SIP Domain?
+
+Yes. A `sip:` `target_uri` is forwarded as the SIP `Refer-To` value, including URI parameters used to route into a Twilio Programmable Voice SIP Domain or conference. Custom SIP headers are not sent on the REFER.

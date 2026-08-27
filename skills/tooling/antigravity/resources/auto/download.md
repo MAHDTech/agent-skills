@@ -12,30 +12,30 @@ Linux
 
 ## Antigravity 2.0
 
-[v2.9.1](https://antigravity.google/changelog?tab=hub "View Antigravity 2.0 Changelog")
+[v2.11.0](https://antigravity.google/changelog?tab=hub "View Antigravity 2.0 Changelog")
 
 [Download for Apple
-Silicon](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/darwin-arm/Antigravity.dmg)[Download
+Silicon](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/darwin-arm/Antigravity.dmg)[Download
 for
-Intel](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/darwin-x64/Antigravity.dmg)
+Intel](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/darwin-x64/Antigravity.dmg)
 
 Minimum Requirements
 
 macOS 12 (Monterey) or later (Apple Silicon or Intel)
 
 [Download for
-x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/windows-x64/Antigravity-x64.exe)[Download
+x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/windows-x64/Antigravity-x64.exe)[Download
 for
-ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/windows-arm/Antigravity-arm64.exe)
+ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/windows-arm/Antigravity-arm64.exe)
 
 Minimum Requirements
 
 Windows 10 (64-bit) or later
 
 [Download for
-x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/linux-x64/Antigravity.tar.gz)[Download
+x64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/linux-x64/Antigravity.tar.gz)[Download
 for
-ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.9.1-4871453687021568/linux-arm/Antigravity.tar.gz)
+ARM64](https://storage.googleapis.com/antigravity-public/antigravity-hub/2.11.0-6376446768316416/linux-arm/Antigravity.tar.gz)
 
 Minimum Requirements
 
@@ -44,7 +44,7 @@ glibc \>= 2.28, glibcxx \>= 3.4.25 (e.g. Ubuntu 20+, Debian 10+, Fedora
 
 ## Antigravity CLI
 
-[v1.1.17](https://antigravity.google/changelog?tab=cli "View Antigravity CLI Changelog")
+[v1.1.22](https://antigravity.google/changelog?tab=cli "View Antigravity CLI Changelog")
 
 Work with Antigravity directly in your codebase. Build, debug, and ship
 from your terminal. Describe what you need, and Antigravity handles the
@@ -124,6 +124,13 @@ Zed (Enterprise support in Preview).
 
 [View Docs](https://antigravity.google/docs/ide/extensions/zed)
 
+### Xcode
+
+Native agentic development inside Xcode for macOS, iOS, iPadOS, watchOS,
+and visionOS (Enterprise support in Preview).
+
+[View Docs](https://antigravity.google/docs/ide/extensions/xcode)
+
 ### Antigravity IDE (Standalone)
 
 [v2.5.5](https://antigravity.google/changelog?tab=ide "View Antigravity IDE Changelog")
@@ -148,7 +155,7 @@ ARM64](https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.5.5
 
 ## Antigravity SDK
 
-[v0.1.13](https://antigravity.google/changelog?tab=sdk "View Antigravity SDK Changelog")
+[v0.1.15](https://antigravity.google/changelog?tab=sdk "View Antigravity SDK Changelog")
 
 Construct, configure, and orchestrate custom autonomous agents with the
 official Python SDK. Co-optimized with the Gemini family of models.

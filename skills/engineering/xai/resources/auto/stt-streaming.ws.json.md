@@ -21,14 +21,14 @@
       "type": "integer",
       "required": false,
       "default": 16000,
-      "description": "Audio sample rate in Hz. Supported values: `8000`, `16000`, `22050`, `24000`, `44100`, `48000`."
+      "description": "Audio sample rate in Hz. Supported values: `8000`, `16000`, `22050`, `24000`, `44100`, `48000`. With `encoding=opus`, only `8000`, `16000`, `24000`, and `48000` are supported."
     },
     {
       "name": "encoding",
       "type": "string",
       "required": false,
       "default": "pcm",
-      "description": "Audio encoding format. `pcm` — signed 16-bit little-endian (2 bytes/sample). `mulaw` — G.711 µ-law (1 byte/sample). `alaw` — G.711 A-law (1 byte/sample)."
+      "description": "Audio encoding format. `pcm` — signed 16-bit little-endian (2 bytes/sample). `mulaw` — G.711 µ-law (1 byte/sample). `alaw` — G.711 A-law (1 byte/sample). `opus` — raw Opus packets, one packet per binary WebSocket frame, mono only."
     },
     {
       "name": "interim_results",
@@ -41,8 +41,8 @@
       "name": "endpointing",
       "type": "integer",
       "required": false,
-      "default": 10,
-      "description": "Silence duration in milliseconds before the server fires a `speech_final=true` event, indicating the speaker stopped talking. Range: 0–5000. Set to `0` for no delay (fire on any VAD silence boundary). Default: 10ms."
+      "default": 400,
+      "description": "Silence duration in milliseconds before the server fires a `speech_final=true` event, indicating the speaker stopped talking. Range: 0–5000. Set to `0` for no delay (fire on any VAD silence boundary). Default: 400ms."
     },
     {
       "name": "language",
@@ -56,7 +56,7 @@
       "type": "boolean",
       "required": false,
       "default": false,
-      "description": "When `true`, enables per-channel transcription for interleaved multichannel audio. Requires `channels` to be set to ≥ 2."
+      "description": "When `true`, enables per-channel transcription for interleaved multichannel audio. Requires `channels` to be set to ≥ 2. Not supported with `encoding=opus`."
     },
     {
       "name": "channels",
@@ -109,11 +109,11 @@
   "clientMessages": [
     {
       "type": "Binary frame (audio)",
-      "description": "Send raw audio as binary WebSocket frames in the encoding specified by the `encoding` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.",
+      "description": "Send raw audio as binary WebSocket frames in the encoding specified by the `encoding` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly. With `encoding=opus`, each binary frame must contain exactly one raw Opus packet — never concatenate packets or split one across frames. An undecodable frame sends an `error` event and closes the session.",
       "schema": {
         "type": "string",
         "format": "binary",
-        "description": "Raw audio bytes in the specified encoding (pcm, mulaw, or alaw)."
+        "description": "Raw audio bytes in the specified encoding (pcm, mulaw, alaw, or opus)."
       },
       "example": "(raw binary audio data)"
     },
@@ -317,7 +317,7 @@
     },
     {
       "type": "error",
-      "description": "An error occurred during the session. Most errors (pipeline failures, stream timeouts) close the connection. Only client message parse errors keep the connection open.",
+      "description": "An error occurred during the session. Most errors (pipeline failures, stream timeouts, undecodable audio frames) close the connection. Only client message parse errors keep the connection open.",
       "schema": {
         "type": "object",
         "required": ["type", "message"],

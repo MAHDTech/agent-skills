@@ -398,4 +398,3 @@ automatic - Focus management handled correctly - RTL languages supported
 (direction auto-detected) - Translations include assistive text - \`\`
 is \`aria-hidden\` (visual aid only) - Touch devices: keyboard hints
 auto-hidden
-

@@ -95,6 +95,7 @@
 - [statusline](https://antigravity.google/docs/cli/commands/statusline): Learn about statusline.
 - [title](https://antigravity.google/docs/cli/commands/title): Learn about title.
 - [usage](https://antigravity.google/docs/cli/commands/usage): Learn about usage.
+- [voice](https://antigravity.google/docs/cli/commands/voice): Learn about voice.
 - [cli-best-practices](https://antigravity.google/docs/cli/best-practices): Learn about cli-best-practices.
 - [cli-troubleshooting](https://antigravity.google/docs/cli/troubleshooting): Learn about cli-troubleshooting.
 - [cli-reference](https://antigravity.google/docs/cli/reference): Learn about cli-reference.

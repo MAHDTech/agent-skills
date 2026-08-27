@@ -1370,4 +1370,3 @@ Checks:
 - Confirm mounts are read-only and at the expected path.
 - Confirm publish step and log markers are emitted by the same runtime
   instance.
-

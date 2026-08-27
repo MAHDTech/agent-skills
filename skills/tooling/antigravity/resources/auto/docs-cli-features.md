@@ -82,6 +82,7 @@ inspect agent capabilities.
 | Command | Category | Purpose |
 |:---|:---|:---|
 | **`/resume`** *(alias `/switch`)* | Conversation | Open the conversation picker to resume or switch sessions. |
+| **[`/teamwork-preview <task>`](https://antigravity.google/docs/teamwork)** | Reasoning | Launch [collaborative multi-agent teams](https://antigravity.google/docs/teamwork) for long-horizon projects (paid plans). |
 | **`/rewind`** *(alias `/undo`)* | Conversation | Roll back conversation history to a previous checkpoint. |
 | **`/rename <name>`** | Conversation | Rename the active conversation thread for easier tracking. |
 | **`/permissions`** | Configuration | Select agent autonomy level (`request-review`, `always-proceed`, or `strict`). |

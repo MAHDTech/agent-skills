@@ -43,6 +43,7 @@ secretspec.toml
 | [null](https://secretspec.dev/providers/null/) (0.19+) | No storage; uses a manifest default, ephemeral generation, or an ephemeral run prompt | ✗ | ✗ | N/A | — |
 | [systemd-credential](https://secretspec.dev/providers/systemd-credential/) (0.17+) | Credentials passed to the current systemd service | ✓ | ✗ | Depends on the unit’s credential source | [Via systemd-creds](https://www.freedesktop.org/software/systemd/man/latest/systemd-creds.html) |
 | [fly](https://secretspec.dev/providers/fly/) (0.20+) | Fly.io application secrets through `flyctl` | ✗ | ✓ | ✓ | — |
+| [cloudflare](https://secretspec.dev/providers/cloudflare/) (0.20+) | Cloudflare account-level Secrets Store through its REST API | ✗ | ✓ | ✓ | — |
 | [pass](https://secretspec.dev/providers/pass/) | Unix `pass` password store | ✓ | ✓ | ✓ | [Via GnuPG](https://gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html) |
 | [gopass](https://secretspec.dev/providers/gopass/) (0.15+) | `gopass` password store (git-synced, GPG-encrypted) | ✓ | ✓ | ✓ | [Via GnuPG](https://gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html) |
 | [protonpass](https://secretspec.dev/providers/protonpass/) | Proton Pass | ✓ | ✓ | ✓ | — |
@@ -64,6 +65,7 @@ secretspec.toml
 | [infisical](https://secretspec.dev/providers/infisical/) (0.16+) | Infisical (requires the `infisical` build feature) | ✓ | ✓ | ✓ | — |
 | [age](https://secretspec.dev/providers/age/) (0.17+) | An age-encrypted file (requires the `age` build feature) | ✓ | ✓ | ✓ | — |
 | [sops](https://secretspec.dev/providers/sops/) (0.17+) | SOPS-encrypted files (requires the `sops` build feature and SOPS CLI) | ✓ | ✓ | ✓ | Depends on the configured SOPS key service |
+| [kubernetes](https://secretspec.dev/providers/kubernetes/) (0.20+) | Kubernetes ConfigMaps and Secrets (requires the `kubernetes` build feature) | ✓ | ✓ | [Secrets can be encrypted at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#ensure-all-secrets-are-encrypted) | — |
 
 “TPM-backed keys” means the local key used by the provider can be
 protected by a [TPM

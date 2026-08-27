@@ -231,4 +231,3 @@ the shared `dcli` state.
 Treat it as highly sensitive; Dashlane prefixes it with `dls_` so secret
 scanners can recognize it.
 
-

@@ -147,6 +147,32 @@ On `grok-imagine-video-1.5`, give your subject a voice by passing up to **3** pr
 
 `reference_audios` accepts preset voices; voice references with your own audio files are available to trusted partners [on request](https://x.ai/contact-sales?interest=imagine). Use a voice alongside reference images or on its own, and tag voices in the prompt as `<AUDIO_0>`, `<AUDIO_1>`, and `<AUDIO_2>` (with `<IMAGE_0>`… when you also pass images).
 
+```python customLanguage="pythonXAI"
+import os
+import xai_sdk
+
+client = xai_sdk.Client(api_key=os.getenv("XAI_API_KEY"))
+
+response = client.video.generate(
+    prompt="The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+    model="grok-imagine-video-1.5",
+    reference_image_urls=[
+        "<IMAGE_URL_1>",
+        "<IMAGE_URL_2>",
+        "<IMAGE_URL_3>",
+    ],
+    reference_audios=[
+        {"voice_id": "eve"},
+        {"voice_id": "leo"},
+    ],
+    duration=8,
+    aspect_ratio="9:16",
+    resolution="720p",
+)
+
+print(response.url)
+```
+
 ```python customLanguage="pythonRequests"
 import os
 import time
@@ -162,9 +188,16 @@ response = requests.post(
     headers=headers,
     json={
         "model": "grok-imagine-video-1.5",
-        "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
-        "reference_images": [{"url": "<IMAGE_URL_1>"}],
-        "reference_audios": [{"voice_id": "eve"}],
+        "prompt": "The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+        "reference_images": [
+            {"url": "<IMAGE_URL_1>"},
+            {"url": "<IMAGE_URL_2>"},
+            {"url": "<IMAGE_URL_3>"},
+        ],
+        "reference_audios": [
+            {"voice_id": "eve"},
+            {"voice_id": "leo"},
+        ],
         "duration": 8,
         "aspect_ratio": "9:16",
         "resolution": "720p",
@@ -194,9 +227,16 @@ REQUEST_ID=$(curl -s -X POST https://api.x.ai/v1/videos/generations \
   -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
     "model": "grok-imagine-video-1.5",
-    "prompt": "The person from <IMAGE_1> speaks to camera with the voice from <AUDIO_0>.",
-    "reference_images": [{"url": "<IMAGE_URL_1>"}],
-    "reference_audios": [{"voice_id": "eve"}],
+    "prompt": "The person from <IMAGE_1> presents the product from <IMAGE_2> on the set from <IMAGE_3>, speaking with the voice from <AUDIO_0>. A second speaker with the voice from <AUDIO_1> replies.",
+    "reference_images": [
+      {"url": "<IMAGE_URL_1>"},
+      {"url": "<IMAGE_URL_2>"},
+      {"url": "<IMAGE_URL_3>"}
+    ],
+    "reference_audios": [
+      {"voice_id": "eve"},
+      {"voice_id": "leo"}
+    ],
     "duration": 8,
     "aspect_ratio": "9:16",
     "resolution": "720p"

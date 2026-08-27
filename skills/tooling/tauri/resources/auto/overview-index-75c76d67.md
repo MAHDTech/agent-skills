@@ -333,9 +333,9 @@ Dellafiore](https://v2.tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ilde
 
 [![alprimak](https://v2.tauri.app/_astro/9585448_2qXJrg.webp)](https://github.com/alprimak)
 
-[![austenc](https://v2.tauri.app/_astro/575421_25DHJ2.webp)](https://github.com/austenc)
-
 [![BE-CH](https://v2.tauri.app/_astro/1050050_1wOecB.webp)](https://github.com/BE-CH)
+
+[![ChristosCM](https://v2.tauri.app/_astro/25385925_1pPpTH.webp)](https://github.com/ChristosCM)
 
 [![ErikBjare](https://v2.tauri.app/_astro/1405370_232MYL.webp)](https://github.com/ErikBjare)
 
@@ -343,11 +343,13 @@ Dellafiore](https://v2.tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ilde
 
 [![fastrepl](https://v2.tauri.app/_astro/142983232_Z1zrm3v.webp)](https://github.com/fastrepl)
 
-[![guoliu](https://v2.tauri.app/_astro/8460804_ZafJqt.webp)](https://github.com/guoliu)
+[![guoliu](https://v2.tauri.app/_astro/8460804_22gl3.webp)](https://github.com/guoliu)
 
 [![hobbestherat](https://v2.tauri.app/_astro/7561053_ZRde3E.webp)](https://github.com/hobbestherat)
 
 [![Jesper-Andersen](https://v2.tauri.app/_astro/38454312_Z1qoLqf.webp)](https://github.com/Jesper-Andersen)
+
+[![JitPackJoyride](https://v2.tauri.app/_astro/40203625_14zcn8.webp)](https://github.com/JitPackJoyride)
 
 [![jonahgeorge](https://v2.tauri.app/_astro/2058205_1khPSt.webp)](https://github.com/jonahgeorge)
 
@@ -360,8 +362,6 @@ Dellafiore](https://v2.tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ilde
 [![Lavanic](https://v2.tauri.app/_astro/58156322_dCbf3.webp)](https://github.com/Lavanic)
 
 [![Leay15](https://v2.tauri.app/_astro/32212558_1ttLLR.webp)](https://github.com/Leay15)
-
-[![LucaR01](https://v2.tauri.app/_astro/74206091_Z1nAir9.webp)](https://github.com/LucaR01)
 
 [![marcelgundermann](https://v2.tauri.app/_astro/26166998_1i0ILo.webp)](https://github.com/marcelgundermann)
 
@@ -380,8 +380,6 @@ Dellafiore](https://v2.tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ilde
 [![sean-hale-dev](https://v2.tauri.app/_astro/61203664_Z2q6mCv.webp)](https://github.com/sean-hale-dev)
 
 [![sedrakpc](https://v2.tauri.app/_astro/6464002_Z3MHlX.webp)](https://github.com/sedrakpc)
-
-[![SilkePilon](https://v2.tauri.app/_astro/64040187_Z1KY0Qh.webp)](https://github.com/SilkePilon)
 
 [![Sir-Thom](https://v2.tauri.app/_astro/90110920_Z1rxeDV.webp)](https://github.com/Sir-Thom)
 

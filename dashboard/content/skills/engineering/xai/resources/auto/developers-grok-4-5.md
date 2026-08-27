@@ -84,7 +84,7 @@ New to the xAI API? Follow the [Quickstart](https://docs.x.ai/developers/quickst
 |----------|-------|
 | Model name | `grok-4.6` |
 | Context window | 500,000 tokens |
-| Knowledge cutoff | February 1, 2026 |
+| Knowledge cutoff | January 2026 |
 | Modalities | Text and image input; text output |
 | Output limit | No text output limit |
 | Input price | $2.00 / 1M tokens |

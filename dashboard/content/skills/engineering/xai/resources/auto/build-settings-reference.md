@@ -299,4 +299,3 @@ Project-scoped and user-scoped. Evaluation order: **deny > ask > allow**.
 | `disabled` | `[skills]` / `[plugins]` | name lists | Discover but do not activate. |
 | `enabled` | `[plugins]` | name lists | Explicitly enable plugins (project plugins may default off). |
 | `skills` / `rules` / `agents` / `mcps` / `hooks` | `[compat.cursor]` / `[compat.claude]` | `true` / `false` (default `true`) | Scan Cursor or Claude harness directories. |
-

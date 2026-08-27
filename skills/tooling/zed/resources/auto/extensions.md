@@ -32,7 +32,7 @@ Snippets
 
 HTML
 
-6.3M
+6.4M
 
 HTML support.
 
@@ -68,31 +68,31 @@ Java support.
 
 Java Extension Contributors
 
-[](https://zed.dev/extensions/catppuccin)
-
-Catppuccin
-
-982k
-
-🦀 Soothing pastel theme for Zed
-
-Catppuccin
-
 [](https://zed.dev/extensions/dockerfile)
 
 Dockerfile
 
-971k
+1.0M
 
 Dockerfile and Docker Compose support.
 
 d1y, joshmeads
 
+[](https://zed.dev/extensions/catppuccin)
+
+Catppuccin
+
+987k
+
+🦀 Soothing pastel theme for Zed
+
+Catppuccin
+
 [](https://zed.dev/extensions/sql)
 
 SQL
 
-789k
+797k
 
 SQL language support.
 
@@ -102,7 +102,7 @@ nervenes, notpeter, phileix, tammyxiong
 
 PHP
 
-759k
+765k
 
 PHP support.
 
@@ -112,7 +112,7 @@ Piotr Osiewicz
 
 Vue
 
-653k
+656k
 
 Vue support.
 
@@ -122,7 +122,7 @@ Zed Industries
 
 Ruby
 
-531k
+535k
 
 Ruby support.
 
@@ -132,7 +132,7 @@ Vitaly Slobodin
 
 Catppuccin Icons
 
-487k
+491k
 
 🦊 Soothing pastel icons for Zed
 
@@ -142,7 +142,7 @@ Catppuccin
 
 macOS Classic Theme
 
-475k
+477k
 
 A macOS native style theme, let it same like native app in macOS.
 
@@ -152,7 +152,7 @@ Jason Lee
 
 SCSS & SASS
 
-452k
+455k
 
 SCSS and SASS support
 
@@ -162,7 +162,7 @@ Raunak Raj
 
 C#
 
-429k
+437k
 
 C# support.
 
@@ -172,7 +172,7 @@ fminkowski, Fabian Freimueller
 
 Material Icon Theme
 
-413k
+417k
 
 Material Design icons.
 
@@ -182,7 +182,7 @@ Zed Industries
 
 Make
 
-407k
+410k
 
 Makefile syntax highlighting
 
@@ -193,7 +193,7 @@ Alexander, Donnie Adams
 
 Tokyo Night Themes
 
-406k
+409k
 
 Tokyo Night Themes
 
@@ -203,7 +203,7 @@ ssaunderss
 
 XML
 
-400k
+406k
 
 XML syntax support.
 
@@ -213,7 +213,7 @@ sweetppro
 
 Lua
 
-363k
+367k
 
 Lua support.
 
@@ -223,7 +223,7 @@ Max Brunsfeld
 
 Terraform
 
-331k
+336k
 
 Terraform support.
 
@@ -233,7 +233,7 @@ Caius Durling, Daniel Banck
 
 One Dark Pro
 
-294k
+296k
 
 A port of VSCode One Dark Pro with some tweaks
 
@@ -243,17 +243,27 @@ MordFustang21
 
 LOG
 
-279k
+282k
 
 Syntax highlighting for log files.
 
 nervenes, notpeter, d1y
 
+[](https://zed.dev/extensions/elixir)
+
+Elixir
+
+277k
+
+Elixir support.
+
+Marshall Bowers, Alonso Rocha Tapia
+
 [](https://zed.dev/extensions/dart)
 
 Dart
 
-275k
+277k
 
 Dart and Flutter development support.
 
@@ -263,7 +273,7 @@ Abdullah Alsigar, Flo, ybbond, nielsenko
 
 Swift
 
-274k
+276k
 
 Swift support.
 
@@ -273,27 +283,17 @@ ejjonny, Samuser107 L.Longheval
 
 Kotlin
 
-272k
+275k
 
 Kotlin language support.
 
 evrsen, cholwell
 
-[](https://zed.dev/extensions/elixir)
-
-Elixir
-
-271k
-
-Elixir support.
-
-Marshall Bowers, Alonso Rocha Tapia
-
 [](https://zed.dev/extensions/svelte)
 
 Svelte
 
-264k
+266k
 
 Svelte support
 
@@ -303,7 +303,7 @@ Zed Industries
 
 Astro
 
-259k
+261k
 
 Astro support.
 
@@ -313,7 +313,7 @@ Alvaro Gaona, 0xk1f0
 
 Github Theme
 
-248k
+250k
 
 GitHub themes for Zed
 
@@ -323,7 +323,7 @@ Pyae Sone Aung, Clay Tercek
 
 Dracula
 
-247k
+249k
 
 Official Dracula theme for Zed
 
@@ -333,7 +333,7 @@ Ben Hamment
 
 VSCode Dark Modern
 
-240k
+244k
 
 VSCode Dark Modern Theme for Zed
 
@@ -343,7 +343,7 @@ kcamcam
 
 Nightfox
 
-239k
+243k
 
 🦊 A port of the Neovim Nightfox themes. Includes all variants as opaque
 and blurred version.
@@ -354,7 +354,7 @@ cange
 
 Emmet
 
-231k
+233k
 
 Emmet support
 
@@ -364,7 +364,7 @@ Piotr Osiewicz
 
 LaTeX
 
-227k
+229k
 
 LaTeX language server and syntax highlighting for Zed. See wiki on
 GitHub for help.
@@ -375,7 +375,7 @@ Ruben Zukic, Oli Callaghan, Luke Naylor, Jan Solanti
 
 Zig
 
-214k
+215k
 
 Zig support.
 
@@ -385,7 +385,7 @@ Allan Calix
 
 Snazzy
 
-199k
+200k
 
 A port of the popular Snazzy color scheme for the Zed editor.
 
@@ -395,7 +395,7 @@ eivs
 
 Prisma
 
-190k
+192k
 
 Prisma support.
 
@@ -405,7 +405,7 @@ Matthew Gramigna, Victor Quiroz
 
 Nix
 
-184k
+185k
 
 Nix support.
 
@@ -415,7 +415,7 @@ Hasit Mistry
 
 PowerShell
 
-182k
+184k
 
 PowerShell support
 
@@ -425,7 +425,7 @@ Thanabodee Charoenpiriyakij
 
 Catppuccin Blur
 
-178k
+180k
 
 Catppuccin themes with blur
 

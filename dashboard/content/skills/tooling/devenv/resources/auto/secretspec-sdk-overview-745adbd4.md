@@ -10,9 +10,9 @@ skill_name = "devenv"
 # SDK Overview
 
 SecretSpec ships SDKs for Rust, Python, Go, Ruby, Node.js/TypeScript,
-Haskell, PHP, C# (0.16+), and Swift (0.18+). They all resolve secrets
-from the same declarative `secretspec.toml`, and they all behave
-identically, because they share one resolver.
+Haskell, PHP, C# (0.16+), Swift (0.18+) and JVM languages (0.20+). They
+all resolve secrets from the same declarative `secretspec.toml`, and
+they all behave identically, because they share one resolver.
 
 > **C# compatibility:** Available since SecretSpec 0.16. The 0.15.0
 > NuGet package is an unsupported package-ID bootstrap; use version 0.16
@@ -43,6 +43,8 @@ over that core rather than a reimplementation:
   [ext-php-rs](https://github.com/davidcole1340/ext-php-rs) extension
   that embeds the resolver (working under FPM with no `ffi.enable`), and
   falls back to loading the same C ABI at runtime through `ext-ffi`.
+- **JVM (0.20+)** loads the same C ABI with JNA from a runtime-specific
+  native asset in the Jar package.
 
 Because resolution happens in one place, every provider, chain, profile,
 and generator works the same in every language, and a new provider added
@@ -67,7 +69,8 @@ resolved = SecretSpec.builder().with_provider("keyring://").with_reason("boot").
 See each language’s page for the idiomatic spelling: [Rust](https://secretspec.dev/sdk/rust),
 [Python](https://secretspec.dev/sdk/python), [Go](https://secretspec.dev/sdk/go), [Ruby](https://secretspec.dev/sdk/ruby),
 [Node.js](https://secretspec.dev/sdk/nodejs), [Haskell](https://secretspec.dev/sdk/haskell), [PHP](https://secretspec.dev/sdk/php), [C#
-(0.16+)](https://secretspec.dev/sdk/csharp), and [Swift (0.18+)](https://secretspec.dev/sdk/swift).
+(0.16+)](https://secretspec.dev/sdk/csharp), [Swift (0.18+)](https://secretspec.dev/sdk/swift) and [JVM languages
+(0.20+)](https://secretspec.dev/sdk/jvm).
 
 Every builder also takes a [scope (0.17+)](https://secretspec.dev/concepts/scopes/), resolving
 only a named subset of the profile and returning the selected name on
@@ -120,6 +123,9 @@ install and no runtime library path to set:
 - **PHP** ships as a normal PHP extension (provisioned like
   `ext-redis`), with an `ext-ffi` fallback that dlopens the bundled
   `cdylib`.
+- **JVM** ships the `cdylib` as runtime-specific native assets in one
+  Jar package and loads the matching asset through JNA; glibc/musl
+  Linux, Intel/Arm macOS, and x64/Arm64 Windows assets are included.
 
 Because the resolver is linked or embedded directly, the SDKs do not
 depend on a separately installed `cdylib` or an
@@ -144,11 +150,12 @@ SecretSpec 0.17.
 | Swift (0.18+) | — | — | ✓ | ✓ | — | — |
 | PHP | ✓ | ✓ | — | ✓ | ✓ (0.17+) | — |
 | Haskell (source) | ✓ | — | — | — | ✓ (0.17+) | — |
+| JVM (0.20+) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 Most Linux packages build against a manylinux_2_28 baseline (glibc 2.28
-or newer); the C# package additionally ships musl Linux assets. Hackage
-distributes the Haskell SDK as source, so its row records the platforms
-CI builds and tests. Contributors: the [SDK
+or newer); the C# and JVM packages additionally ship musl Linux assets.
+Hackage distributes the Haskell SDK as source, so its row records the
+platforms CI builds and tests. Contributors: the [SDK
 development](https://secretspec.dev/development/sdks) page documents how these artifacts are
 built and how to add a platform.
 

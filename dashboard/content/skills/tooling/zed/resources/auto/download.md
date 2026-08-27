@@ -10,11 +10,11 @@ skill_name = "zed"
 ![Zed's
 logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
 
-# 1.16.1
+# 1.17.2
 
-August 19, 2026
+August 26, 2026
 
-[](https://zed.dev/releases/stable/1.16.1)
+[](https://zed.dev/releases/stable/1.17.2)
 
 View changelog →
 

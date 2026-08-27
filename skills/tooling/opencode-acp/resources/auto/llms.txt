@@ -2,8 +2,6 @@
 
 > The Agent Client Protocol (ACP) is a protocol that standardizes communication between code editors.
 
-## Docs
-
 - [Introduction](https://agentclientprotocol.com/get-started/introduction.md): Get started with the Agent Client Protocol.
 - [Architecture](https://agentclientprotocol.com/get-started/architecture.md): Overview of the Agent Client Protocol architecture.
 - [Agents](https://agentclientprotocol.com/get-started/agents.md): Agents implementing the Agent Client Protocol.

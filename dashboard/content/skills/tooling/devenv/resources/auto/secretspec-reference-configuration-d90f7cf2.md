@@ -767,6 +767,7 @@ inherits whichever form `[profiles.default]` uses.
 | [env](https://secretspec.dev/providers/env/#use-existing-secrets) | Variable name | Rejected | Reads the variable | — (read-only) |
 | [systemd credentials (0.17+)](https://secretspec.dev/providers/systemd-credential/#use-an-existing-credential-name) | Credential filename | Rejected | Reads the credential | — (read-only) |
 | [Fly.io secrets (0.20+)](https://secretspec.dev/providers/fly/#use-existing-secrets) | Fly app secret name | Rejected | Error: Fly.io does not expose plaintext values | ✅ write-only via `flyctl secrets set` |
+| [Cloudflare Secrets Store (0.20+)](https://secretspec.dev/providers/cloudflare/#use-existing-secrets-020) | Account-secret name in the selected store | Rejected | Error: Cloudflare’s management API does not expose plaintext values | ✅ write-only via the Cloudflare API |
 | [pass](https://secretspec.dev/providers/pass/#use-existing-secrets) | Entry path | Rejected | Reads the entry | ✅ |
 | [Gopass (0.15+)](https://secretspec.dev/providers/gopass/#use-existing-secrets) | Entry path, including any mount-point prefix | Rejected | Reads the entry | ✅ |
 | [LastPass](https://secretspec.dev/providers/lastpass/#use-existing-secrets) | Item name | Rejected | Reads the item | ✅ |
@@ -782,6 +783,7 @@ inherits whichever form `[profiles.default]` uses.
 | [Azure Key Vault (0.15+)](https://secretspec.dev/providers/akv/#use-existing-secrets) | Secret name; `version` pins a version (0.20+) | Rejected | Reads latest or the pinned version (0.20+) | — (read-only) |
 | [Azure App Configuration (0.20+)](https://secretspec.dev/providers/aac/#use-existing-key-values) | App Configuration key | Rejected | Reads the direct value or resolves its canonical Key Vault reference | — (read-only) |
 | [Infisical (0.16+)](https://secretspec.dev/providers/infisical/#use-existing-secrets) | Folder and key; `version` also applies | Rejected | Reads the latest version | ✅ unless a version is pinned |
+| [Kubernetes (0.20+)](https://secretspec.dev/providers/kubernetes/#use-existing-secrets) | Secret key | Rejected | Reads entry | ✅ |
 
 A provider rejects coordinates it has no equivalent for, with an error
 naming the coordinate (for example, `field` on the env provider).

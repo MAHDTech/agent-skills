@@ -24,49 +24,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- refresh
-
-- file_copy
-
-- developer_mode_tv
-
-- plus_code
-
-- code
-
-- deployed_code
-
-- search_spark
-
-- device_hub
-
 - dashboard_customize
 
-- spark
+- terminal
+
+- refresh
 
 - data_object
 
-- terminal
+- device_hub
+
+- file_copy
+
+- deployed_code
+
+- code
+
+- merge
+
+- folder
+
+- keyboard_tab
+
+- commit
+
+- pen_spark
+
+- search_spark
+
+- keyboard_return
 
 - code_blocks
 
 - keyboard_command_key
 
-- commit
+- spark
 
-- folder
+- spark
 
-- pen_spark
-
-- keyboard_return
-
-- keyboard_tab
-
-- merge
+- plus_code
 
 - check_circle
 
-- spark
+- developer_mode_tv
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -198,6 +198,39 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/teamwork-when-ai-becomes-a-research-partner)
+
+![Teamwork: When AI Becomes a Research
+Partner](https://antigravity.google/assets/image/blog/teamwork-square.jpg)
+
+Teamwork: When AI Becomes a Research Partner
+
+Aug 27, 2026ResearchProduct
+
+Read blog
+
+[](https://antigravity.google/blog/visualizing-with-the-help-of-antigravity)
+
+![Visualizing with the help of
+Antigravity](https://antigravity.google/assets/image/blog/visualizing-with-antigravity-square.png)
+
+Visualizing with the help of Antigravity
+
+Aug 26, 2026Product
+
+Read blog
+
+[](https://antigravity.google/blog/vcs-and-terminal)
+
+![Improving the Version Control
+Experience](https://antigravity.google/assets/image/blog/VSC-Blog-1x1.png)
+
+Improving the Version Control Experience
+
+Aug 24, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/remote-control-for-antigravity)
 
 ![Antigravity Anywhere with Remote
@@ -262,39 +295,6 @@ Antigravity](https://antigravity.google/assets/image/blog/3.6-Flash---Square.png
 Gemini 3.6 Flash in Google Antigravity
 
 Jul 21, 2026Model
-
-Read blog
-
-[](https://antigravity.google/blog/google-io-2026)
-
-![Google Antigravity @ I/O
-2026](https://antigravity.google/assets/image/blog/Google-IO---Square.jpg)
-
-Google Antigravity @ I/O 2026
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-2)
-
-![Introducing Google Antigravity
-2.0](https://antigravity.google/assets/image/blog/AGY2-Square.jpg)
-
-Introducing Google Antigravity 2.0
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-antigravity-built-an-os)
-
-![Google Antigravity Built an OS (and
-more)](https://antigravity.google/assets/image/blog/Agent-Teams-Square.jpg)
-
-Google Antigravity Built an OS (and more)
-
-May 19, 2026Product
 
 Read blog
 
@@ -325,49 +325,49 @@ play_arrowPlay intro
 
 play_arrow
 
-- refresh
-
-- file_copy
-
-- developer_mode_tv
-
-- plus_code
-
-- code
-
-- deployed_code
-
-- search_spark
-
-- device_hub
-
 - dashboard_customize
 
-- spark
+- terminal
+
+- refresh
 
 - data_object
 
-- terminal
+- device_hub
+
+- file_copy
+
+- deployed_code
+
+- code
+
+- merge
+
+- folder
+
+- keyboard_tab
+
+- commit
+
+- pen_spark
+
+- search_spark
+
+- keyboard_return
 
 - code_blocks
 
 - keyboard_command_key
 
-- commit
+- spark
 
-- folder
+- spark
 
-- pen_spark
-
-- keyboard_return
-
-- keyboard_tab
-
-- merge
+- plus_code
 
 - check_circle
 
-- spark
+- developer_mode_tv
 
 ![](https://antigravity.google/assets/image/antigravity-cursor.png)
 
@@ -499,6 +499,39 @@ Level up your entire team
 
 Latest Blogs[View blog](https://antigravity.google/blog)
 
+[](https://antigravity.google/blog/teamwork-when-ai-becomes-a-research-partner)
+
+![Teamwork: When AI Becomes a Research
+Partner](https://antigravity.google/assets/image/blog/teamwork-square.jpg)
+
+Teamwork: When AI Becomes a Research Partner
+
+Aug 27, 2026ResearchProduct
+
+Read blog
+
+[](https://antigravity.google/blog/visualizing-with-the-help-of-antigravity)
+
+![Visualizing with the help of
+Antigravity](https://antigravity.google/assets/image/blog/visualizing-with-antigravity-square.png)
+
+Visualizing with the help of Antigravity
+
+Aug 26, 2026Product
+
+Read blog
+
+[](https://antigravity.google/blog/vcs-and-terminal)
+
+![Improving the Version Control
+Experience](https://antigravity.google/assets/image/blog/VSC-Blog-1x1.png)
+
+Improving the Version Control Experience
+
+Aug 24, 2026Product
+
+Read blog
+
 [](https://antigravity.google/blog/remote-control-for-antigravity)
 
 ![Antigravity Anywhere with Remote
@@ -563,39 +596,6 @@ Antigravity](https://antigravity.google/assets/image/blog/3.6-Flash---Square.png
 Gemini 3.6 Flash in Google Antigravity
 
 Jul 21, 2026Model
-
-Read blog
-
-[](https://antigravity.google/blog/google-io-2026)
-
-![Google Antigravity @ I/O
-2026](https://antigravity.google/assets/image/blog/Google-IO---Square.jpg)
-
-Google Antigravity @ I/O 2026
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/introducing-google-antigravity-2)
-
-![Introducing Google Antigravity
-2.0](https://antigravity.google/assets/image/blog/AGY2-Square.jpg)
-
-Introducing Google Antigravity 2.0
-
-May 19, 2026Product
-
-Read blog
-
-[](https://antigravity.google/blog/google-antigravity-built-an-os)
-
-![Google Antigravity Built an OS (and
-more)](https://antigravity.google/assets/image/blog/Agent-Teams-Square.jpg)
-
-Google Antigravity Built an OS (and more)
-
-May 19, 2026Product
 
 Read blog
 

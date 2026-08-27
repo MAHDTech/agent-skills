@@ -111,6 +111,13 @@ Do not treat this user assignment as a guarantee that is broader than Cursor's
 published security documentation. Review current infrastructure and encryption
 controls there.
 
+## Sharing a Bot is not a security boundary
+
+A public share link lets others copy the Bot's configuration. It does not share
+your computer or logins. Still, do not put secrets, customer data, or internal
+URLs in a Bot you share. See [Share a Bot](https://docs.x.ai/grok-bot/bots#share-a-bot) and the
+[third-party bot terms](https://x.ai/legal/bot-sharing-terms).
+
 ## Cursor account and data settings
 
 Grok Bot uses Cursor authentication and account data settings.

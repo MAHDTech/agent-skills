@@ -156,4 +156,3 @@ The searchbox implements the [ARIA combobox](https://www.w3.org/WAI/ARIA/apg/pat
 - The root element of your template must have `role="option"` or `role="group"`
 - Without sub-results, your template root is the `<a role="option">` itself
 - With sub-results, your template root is a `role="group"` element wrapping the main result and its sub-results together, with each navigable item as a `role="option"` child (as shown in the full template above)
-

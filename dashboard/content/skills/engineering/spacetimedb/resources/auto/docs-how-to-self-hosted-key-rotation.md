@@ -1380,4 +1380,3 @@ Checks:
 - Confirm publish step and log markers are emitted by the same runtime
   instance.
 
-

@@ -320,4 +320,3 @@ link to our list of blog posts:
 
 This has been a quick overview of Zola. You can now dive into the rest
 of the documentation.
-

@@ -168,4 +168,3 @@ By default, results display in a single column. You can change the layout of the
 ```
 
 See [CSS Variables](https://pagefind.app/docs/css-variables/) for all available layout variables.
-

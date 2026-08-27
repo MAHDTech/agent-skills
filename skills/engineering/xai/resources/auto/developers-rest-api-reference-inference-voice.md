@@ -1064,17 +1064,17 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
 
-* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample).
+* `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 
 * `interim_results` (boolean, optional, default: false) — When \`true\`, the server emits partial transcript events (\`is\_final=false\`) approximately every 500 ms while audio is being processed. When \`false\` (default), only finalized results are sent.
 
-* `endpointing` (integer, optional, default: 10) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 10ms.
+* `endpointing` (integer, optional, default: 400) — Silence duration in milliseconds before the server fires a \`speech\_final=true\` event, indicating the speaker stopped talking. Range: 0–5000. Set to \`0\` for no delay (fire on any VAD silence boundary). Default: 400ms.
 
 * `language` (string, optional, default: ) — Language code (e.g. \`en\`, \`fr\`, \`de\`, \`ja\`). When set, enables Inverse Text Normalization — spoken-form numbers, currencies, and units are converted to their written form.
 
-* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2.
+* `multichannel` (boolean, optional, default: false) — When \`true\`, enables per-channel transcription for interleaved multichannel audio. Requires \`channels\` to be set to ≥ 2. Not supported with \`encoding=opus\`.
 
 * `channels` (integer, optional, default: 1) — Number of interleaved audio channels. Required when \`multichannel=true\`. Min: 2, Max: 8.
 
@@ -1092,7 +1092,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Client Messages
 
-* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly.
+* `Binary frame (audio)` — Send raw audio as binary WebSocket frames in the encoding specified by the \`encoding\` query parameter. Audio should be streamed in real-time-paced chunks (e.g. 100 ms at a time). No base64 encoding — send raw bytes directly. With \`encoding=opus\`, each binary frame must contain exactly one raw Opus packet — never concatenate packets or split one across frames. An undecodable frame sends an \`error\` event and closes the session.
 
 * `finalize` — Force the current utterance to finalize as \`speech\_final\` immediately, without waiting for VAD endpointing or Smart Turn. The session stays open so you can continue streaming audio. Accepts \`finalize\` or \`Finalize\` as the type value. When \`multichannel=true\`, optional \`channel\` (0-based) limits the finalize to that channel; omit \`channel\` to finalize every channel.
 
@@ -1106,7 +1106,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 * `transcript.done` — Final transcript after \`audio.done\`. \`duration\` always present. One per channel when \`multichannel=true\`. Connection closes after this event.
 
-* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts) close the connection. Only client message parse errors keep the connection open.
+* `error` — An error occurred during the session. Most errors (pipeline failures, stream timeouts, undecodable audio frames) close the connection. Only client message parse errors keep the connection open.
 
 ### Example Message Flow
 

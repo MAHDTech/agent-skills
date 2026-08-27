@@ -221,4 +221,3 @@ the shared `dcli` state.
 `DASHLANE_SERVICE_DEVICE_KEYS` grants full read access to the vault.
 Treat it as highly sensitive; Dashlane prefixes it with `dls_` so secret
 scanners can recognize it.
-
