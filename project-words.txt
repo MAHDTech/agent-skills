@@ -212,5 +212,10 @@ webmail
 worktree
 worktrees
 WSJF
+bunfig
+clippy
+crossterm
+nextest
+ratatui
 xclip
 docstrings
