@@ -36,7 +36,7 @@ resolved.set_as_env()      # export everything into os.environ
 A missing required secret raises `MissingRequiredError`; any other
 failure raises `SecretSpecError` (with a stable `.kind`).
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 from secretspec import CallerContext, SecretSpec
@@ -47,14 +47,14 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `.with_inline_spec(spec, base_dir)` to resolve a strict inline-spec
 v1 dictionary without a manifest file. `base_dir` resolves relative
 provider paths. An inline call uses the versioned native entry point, so
 it cannot fall back to a filesystem manifest on an older runtime.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `.with_scope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `resolved.scope` and `report.scope`:

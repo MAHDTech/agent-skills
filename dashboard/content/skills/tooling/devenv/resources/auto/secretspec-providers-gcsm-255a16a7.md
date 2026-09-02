@@ -9,8 +9,9 @@ skill_name = "devenv"
 
 # Google Cloud Secret Manager Provider
 
-The Google Cloud Secret Manager provider integrates with GCP for
-centralized secret management.
+The [Google Cloud Secret
+Manager](https://cloud.google.com/security/products/secret-manager)
+provider integrates with GCP for centralized secret management.
 
 ## At a glance
 
@@ -106,7 +107,7 @@ or address the secret with an explicit
 [`ref`](https://secretspec.dev/reference/configuration/#secret-references), which is exempt
 from the convention.
 
-### Reading secrets stored by 0.19
+### Reading legacy secrets
 
 SecretSpec 0.20 reads the new id first. When that secret holds no value,
 the read falls back to the 0.19 `secretspec-{project}-{profile}-{key}`

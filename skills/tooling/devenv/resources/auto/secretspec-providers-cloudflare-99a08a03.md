@@ -1,7 +1,7 @@
 # Cloudflare Secrets Store provider
 
-The Cloudflare provider publishes declared values to an account-level
-[Cloudflare Secrets
+The [Cloudflare](https://www.cloudflare.com/) provider publishes
+declared values to an account-level [Cloudflare Secrets
 Store](https://developers.cloudflare.com/secrets-store/) through the
 Cloudflare REST API.
 
@@ -49,7 +49,7 @@ provider. Keep the authoritative value in a readable provider and select
 
 ## Setup
 
-### Prerequisites (0.20+)
+### Prerequisites
 
 - SecretSpec 0.20 or newer
 - A Cloudflare account with a Secrets Store
@@ -59,7 +59,7 @@ provider. Keep the authoritative value in a readable provider and select
 The official SecretSpec CLI includes this provider. Custom minimal Rust
 builds enable it with `--features cloudflare`.
 
-### Wrangler authentication (0.20+)
+### Wrangler authentication
 
 With `auth=wrangler`, SecretSpec runs:
 
@@ -84,7 +84,7 @@ If the executable has another name or location, set
 `SECRETSPEC_WRANGLER_PATH`. SecretSpec never invokes `npx`
 automatically.
 
-### Authentication with provider credentials (0.20+)
+### Authentication with provider credentials
 
 For CI or a machine identity, declare the `api_token` [provider
 credential](https://secretspec.dev/reference/provider-credentials/):
@@ -108,7 +108,7 @@ Use a scoped user or account API token with **Secrets Store Write** on
 only the required account. Do not use the full-access Global API Key for
 new setups.
 
-### Environment fallback (0.20+)
+### Environment fallback
 
 `CLOUDFLARE_API_TOKEN` supplies the `api_token` credential when no
 explicit provider credential exists. `CLOUDFLARE_ACCOUNT_ID` supplies
@@ -131,7 +131,7 @@ and environment fallbacks.
 
 ## Configuration
 
-### URI format (0.20+)
+### URI format
 
 ```
 cloudflare://STORE_ID[?account_id=ACCOUNT_ID][&scopes=LIST][&auth=MODE][&wrangler_profile=NAME]
@@ -147,13 +147,13 @@ cloudflare://STORE_ID[?account_id=ACCOUNT_ID][&scopes=LIST][&auth=MODE][&wrangle
 - `wrangler_profile` selects a named Wrangler auth profile and requires
   `auth=wrangler`.
 
-### URI examples (0.20+)
+### URI examples
 
 ```
 cloudflare://STORE_ID?account_id=ACCOUNT_IDcloudflare://STORE_ID?account_id=ACCOUNT_ID&auth=tokencloudflare://STORE_ID?account_id=ACCOUNT_ID&auth=wranglercloudflare://STORE_ID?account_id=ACCOUNT_ID&scopes=workers,containerscloudflare://STORE_ID?account_id=ACCOUNT_ID&auth=wrangler&wrangler_profile=production
 ```
 
-## Storage model (0.20+)
+## Storage model
 
 The provider maps a declaration key directly to an account-secret name.
 For example, `DATABASE_URL` maps to:
@@ -169,7 +169,7 @@ and store when two profiles must hold different values for the same key.
 Cloudflare Workers can bind that account secret to any binding name; the
 SecretSpec key does not need to match the Worker’s binding variable.
 
-## Use existing secrets (0.20+)
+## Use existing secrets
 
 A [`ref`](https://secretspec.dev/reference/configuration/#secret-references) changes the
 Cloudflare secret name updated or deleted by SecretSpec:
@@ -183,7 +183,7 @@ secretspec.toml
 The reference remains write-only: it can select an existing name but
 cannot retrieve its plaintext value.
 
-## Discover secret names (0.20+)
+## Discover secret names
 
 Cloudflare’s list API exposes names, IDs, scopes, comments, and status
 without returning values. SecretSpec uses that metadata for declaration
@@ -198,7 +198,7 @@ Terminal window
 The generated manifest contains required declarations for active or
 pending secret names, not defaults or values.
 
-## CI/CD (0.20+)
+## CI/CD
 
 Use a short-lived or account-owned token scoped to Secrets Store Write:
 
@@ -209,7 +209,7 @@ Use a short-lived or account-owned token scoped to Secrets Store Write:
 The account ID and store ID are attribution, not credentials, and can
 stay in the checked-in provider URI.
 
-## Security considerations and limitations (0.20+)
+## Security considerations and limitations
 
 - Cloudflare’s management API accepts values for creation and
   replacement but never returns them. Plaintext access exists only

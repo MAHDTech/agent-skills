@@ -1,7 +1,8 @@
 # Azure Key Vault Provider
 
-The Azure Key Vault provider integrates with Azure for centralized
-secret management.
+The [Azure Key
+Vault](https://azure.microsoft.com/en-us/products/key-vault) provider
+integrates with Azure for centralized secret management.
 
 ## At a glance
 

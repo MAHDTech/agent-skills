@@ -47,14 +47,14 @@ devenv includes a built in shell hook that automatically activates your develope
   mkdir ($nu.default-config-dir | path join autoload)
   devenv hook nu | save --force ($nu.default-config-dir | path join autoload/devenv-hook.nu)
   ```
- ## Trusting a project [Section titled “Trusting a project”](#trusting-a-project) Before a project can auto activate, you need to explicitly trust it. This is a security measure that prevents untrusted projects from modifying your shell. Navigate to the project directory and run: 
+ ### Passing arguments to `devenv shell` [Section titled “Passing arguments to devenv shell”](#passing-arguments-to-devenv-shell) ## Trusting a project [Section titled “Trusting a project”](#trusting-a-project) Before a project can auto activate, you need to explicitly trust it. This is a security measure that prevents untrusted projects from modifying your shell. Navigate to the project directory and run: 
 ```sh
 $ cd ~/myproject
 $ devenv allow
 devenv: allowed /home/user/myproject
 ```
  To activate one or more profiles whenever the project is entered, pass them when allowing it: 
-```shell-session
+```shellsession
 $ devenv --profile backend --profile observability allow
 devenv: allowed /home/user/myproject with profile backend, observability
 ```
@@ -4595,9 +4595,9 @@ true
 ```nix
 true
 ```
- *Declared by:* * <https://github.com/cachix/devenv/blob/main/src/modules/languages/java.nix> ### languages.java.lsp.package [Section titled “languages.java.lsp.package”](#languagesjavalsppackage) The Java language server package to use. *Type:* package *Default:* 
+ *Declared by:* * <https://github.com/cachix/devenv/blob/main/src/modules/languages/java.nix> ### languages.java.lsp.package [Section titled “languages.java.lsp.package”](#languagesjavalsppackage) The Java language server package to use. The Java language server package by default inherits the JDK from `languages.java.jdk.package`. *Type:* package *Default:* 
 ```nix
-pkgs.jdt-language-server
+pkgs.jdt-language-server.override { jdk = cfg.jdk.package; }
 ```
  *Declared by:* * <https://github.com/cachix/devenv/blob/main/src/modules/languages/java.nix> ### languages.java.maven.enable [Section titled “languages.java.maven.enable”](#languagesjavamavenenable) Whether to enable maven. *Type:* boolean *Default:* 
 ```nix
@@ -6767,7 +6767,7 @@ inputs:
 $ cat devenv.lock
 ```
  `devenv info` also shows locked inputs. ## Pinning an individual package version [Section titled “Pinning an individual package version”](#pinning-an-individual-package-version) Pinning a nixpkgs input selects one revision of the whole package collection. To select an exact version of an individual package instead, add the [nixpkgs-multiverse](https://github.com/fzakaria/nixpkgs-multiverse) input: 
-```shell-session
+```shellsession
 $ devenv inputs add nixpkgs-multiverse github:fzakaria/nixpkgs-multiverse
 ```
  Then select packages by attribute and version in `devenv.nix`: devenv.nix 

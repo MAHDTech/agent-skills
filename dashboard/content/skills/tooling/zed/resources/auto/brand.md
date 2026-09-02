@@ -25,7 +25,7 @@ Copy SVG
 
 SVG
 
-[PNG](https://zed.dev/_next/static/media/logo-new-black.11zkaf~-lqzw1.png)
+[PNG](https://zed.dev/_next/static/media/logo-new-black.3matcz9uzlamn.png)
 
 Pure White (#FFF)
 
@@ -33,7 +33,7 @@ Copy SVG
 
 SVG
 
-[PNG](https://zed.dev/_next/static/media/logo-new-white.0gnyg5qr0_x6r.png)
+[PNG](https://zed.dev/_next/static/media/logo-new-white.1f-yetharnqi0.png)
 
 Brand Blue (#1348DC) & Black
 
@@ -41,7 +41,7 @@ Copy SVG
 
 SVG
 
-[PNG](https://zed.dev/_next/static/media/logo-new-blue-black.16678~z36t.8f.png)
+[PNG](https://zed.dev/_next/static/media/logo-new-blue-black.3_6bkayi9-u4j.png)
 
 Brand Blue (#1348DC) & White
 
@@ -49,7 +49,7 @@ Copy SVG
 
 SVG
 
-[PNG](https://zed.dev/_next/static/media/logo-new-blue-white.0njp7cyj-a4~a.png)
+[PNG](https://zed.dev/_next/static/media/logo-new-blue-white.20gadidtceld_.png)
 
 ### [Logomark](#logomark)
 
@@ -59,20 +59,20 @@ the other, meaning you can choose to use either of them as you wish, as
 long as you respect the color guidelines above.
 
 ![Zed's
-logo](https://zed.dev/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 [Download
-PNG](https://zed.dev/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+PNG](https://zed.dev/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 Copy SVG
 
 SVG
 
 ![Zed's
-logo](https://zed.dev/_next/static/media/logo_wordmark_black_bigger.0pz1~p-ykiygl.png)
+logo](https://zed.dev/_next/static/media/logo_wordmark_black_bigger.2877pop7hmjx0.png)
 
 [Download
-PNG](https://zed.dev/_next/static/media/logo_wordmark_black_bigger.0pz1~p-ykiygl.png)
+PNG](https://zed.dev/_next/static/media/logo_wordmark_black_bigger.2877pop7hmjx0.png)
 
 Copy SVG
 
@@ -82,13 +82,13 @@ SVG
 
 Each version of the Zed app (stable and preview) has a different icon.
 
-![Zed's logo](https://zed.dev/_next/static/media/stable-app-logo.06nn-bqvtdgcl.png)
+![Zed's logo](https://zed.dev/_next/static/media/stable-app-logo.0lgsg40_u_1r5.png)
 
-[Download PNG](https://zed.dev/_next/static/media/stable-app-logo.06nn-bqvtdgcl.png)
+[Download PNG](https://zed.dev/_next/static/media/stable-app-logo.0lgsg40_u_1r5.png)
 
-![Zed's logo](https://zed.dev/_next/static/media/preview-app-logo.0nw_0ukesh~lr.png)
+![Zed's logo](https://zed.dev/_next/static/media/preview-app-logo.21jb2eaq0qsn5.png)
 
-[Download PNG](https://zed.dev/_next/static/media/preview-app-logo.0nw_0ukesh~lr.png)
+[Download PNG](https://zed.dev/_next/static/media/preview-app-logo.21jb2eaq0qsn5.png)
 
 ## [Trademark](#trademark)
 

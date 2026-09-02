@@ -1,7 +1,7 @@
 # Bitwarden Password Manager Provider
 
-The `bw` provider reads and writes secrets in Bitwarden Password Manager
-by using the official `bw` CLI.
+The [Bitwarden Password Manager](https://bitwarden.com/products/) (`bw`)
+provider reads and writes secrets by using the official `bw` CLI.
 
 ## At a glance
 
@@ -120,7 +120,7 @@ bw://[collection]bw://[org@collection]bw://?server=https://vault.company.combw:/
   steps when the `bw` CLI is pointed somewhere else. See [Self-hosted
   servers](#self-hosted-servers).
 
-### Organizations and collections (0.18+)
+### Organizations and collections
 
 Names and IDs are interchangeable: SecretSpec resolves a name to the ID
 the `bw` CLI requires. Names match case-insensitively, and one
@@ -177,7 +177,7 @@ Profiles can select different aliases or the provider directly:
 
 secretspec.toml
 
-### Discover declarations (0.18+)
+### Discover declarations
 
 SecretSpec 0.18+ can initialize a manifest from the items visible
 through a Bitwarden provider URI. Scope discovery to a collection, and
@@ -240,7 +240,7 @@ the same way as values in the URI. The complete precedence is:
 
 ## Storage model
 
-### Convention item names (0.20+)
+### Convention item names
 
 SecretSpec-managed convention items use the title
 `secretspec/{project}/{profile}/{key}` by default. Project and profile
@@ -345,7 +345,7 @@ contains the requested text, also case-insensitively. Use the complete
 custom-field name to avoid an unintended partial match.
 `field = "notes"` addresses a Secure Note’s body.
 
-### How items are matched (0.18+)
+### How items are matched
 
 Resolved item titles are matched **in full, case-insensitively** —
 `test database` finds `Test Database`, but `API_KEY` never matches
@@ -383,7 +383,7 @@ secretspec.toml
 
 `ref.item` is matched against the Bitwarden item name, not its item ID.
 
-### Migrating bare item names (0.20+)
+### Migrating bare item names
 
 Releases through 0.19 wrote convention secrets under their bare keys.
 Those titles contain no project or profile ownership, so SecretSpec

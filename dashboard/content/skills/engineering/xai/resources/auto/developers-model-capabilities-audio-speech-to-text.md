@@ -210,7 +210,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sample_rate` | integer | `16000` | Audio sample rate in Hz. With `encoding=opus`: `8000`, `16000`, `24000`, or `48000` only. |
+| `sample_rate` | integer | `16000` | Audio sample rate in Hz. Ignored for `encoding=opus` — Opus packets are sample-rate-agnostic. |
 | `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, `alaw`, or `opus`. See [Opus Streaming](#opus-streaming). |
 | `interim_results` | boolean | `false` | When `true`, emit partial transcripts `is_final=false` every ~500 ms. |
 | `endpointing` | integer | `400` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
@@ -263,12 +263,12 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 
 ### Opus Streaming
 
-Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s at 24 kHz versus 48 KB/s for PCM16, with no client-side resampling.
+Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s versus 48 KB/s for PCM16 at 24 kHz, with no client-side resampling.
 
 **How it works:**
 
 * Send **exactly one raw Opus packet per binary WebSocket frame**. Opus packets don't mark their own boundaries — the WebSocket framing does — so never concatenate packets or split one across frames.
-* Encode mono audio at `8000`, `16000`, `24000`, or `48000` Hz. Other sample rates are rejected with `400`.
+* Omit `sample_rate` — Opus packets don't carry one, and the parameter is ignored for this encoding. Encode at whatever rate your audio source produces.
 * `multichannel` is not supported with Opus — mono only.
 * Send raw packets, not containers. To transcribe an Ogg-Opus or WebM file, use the [batch endpoint](#supported-audio-formats) instead — it auto-detects containers.
 * If a frame can't be decoded, the server sends an `error` event and closes the session. Misframed packets often decode as noise rather than an error, so double-check that your encoder emits one whole packet per frame.
@@ -276,7 +276,7 @@ Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 
 **Example URL:**
 
 ```
-wss://api.x.ai/v1/stt?sample_rate=24000&encoding=opus&interim_results=true
+wss://api.x.ai/v1/stt?encoding=opus&interim_results=true
 ```
 
 **Typical use case:** Dictation and live transcription from mobile or other bandwidth-constrained clients, where streaming raw PCM is wasteful. Most platform audio APIs and WebRTC stacks produce Opus packets natively.
@@ -450,7 +450,7 @@ ws.on("message", (data) => {
 * **Enable `interim_results`** for responsive UX — show transcription as the user speaks
 * **Use `language=en`** to enable text formatting — numbers and currencies are written in their standard form
 * **Send 100 ms audio chunks** (3,200 bytes at 16 kHz PCM16) for a good balance of latency and efficiency
-* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s at 24 kHz versus 48 KB/s for raw PCM. See [Opus Streaming](#opus-streaming)
+* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s versus 48 KB/s for raw PCM at 24 kHz. See [Opus Streaming](#opus-streaming)
 * **Wait for `transcript.created`** before sending audio — the server needs to initialize its ASR backend
 
 ## Error Handling

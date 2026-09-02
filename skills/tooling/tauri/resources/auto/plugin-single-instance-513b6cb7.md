@@ -131,7 +131,7 @@ The Single Instance plugin will publish a service named
 `org.{id}.SingleInstance`.
 
 `{id}` will be the `identifier` from your `tauri.conf.json` file, but
-with with dots (`.`) and dashes (`-`) replaced by underline (`_`).
+with dots (`.`) and dashes (`-`) replaced by underline (`_`).
 
 For example, if your identifier is `net.mydomain.MyApp`:
 

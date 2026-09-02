@@ -2,10 +2,28 @@
 
 Keep up with news about Zed.
 
+[](https://zed.dev/blog/agentic-xanadu)
+
+![Xanadu Was Waiting for
+Agents](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/introducing-delta/xanadu-thumb.webp)
+
+## Xanadu Was Waiting for Agents
+
+Ted Nelson specified the docuverse sixty years ago. The technology
+finally arrived, and so did its native users.
+
+![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
+
+Nathan Sobo
+
+September 1st, 2026
+
+Newest
+
 [](https://zed.dev/blog/introducing-delta)
 
 ![Introducing
-Delta](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/introducing-delta/thumbnail.webp)
+Delta](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/introducing-delta/delta-thumb.webp)
 
 ## Introducing Delta
 
@@ -17,8 +35,6 @@ Zed.
 Nathan Sobo
 
 August 12th, 2026
-
-Newest
 
 [](https://zed.dev/blog/sandboxing)
 
@@ -36,21 +52,19 @@ Cameron Mcloughlin
 
 August 5th, 2026
 
-[](https://zed.dev/blog/hidden-gems-part-4)
+[](https://zed.dev/blog/agentic-xanadu)
 
-![Hidden Gems: Part
-4](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/https://images.zed.dev/blog/hidden-gems-part-4/thumbnail.webp)
+## Xanadu Was Waiting for Agents
 
-## Hidden Gems: Part 4
+![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
 
-Favorite workflows and hidden features from the Zed team and community.
+------------------------------------------------------------------------
 
-![Joseph
-Lyons](https://avatars.githubusercontent.com/u/19867440?v=4&s=2048)
+![Nathan Sobo](https://avatars.githubusercontent.com/u/1789?v=4&s=2048)
 
-Joseph Lyons
+Sep 01, 2026
 
-June 23rd, 2026
+------------------------------------------------------------------------
 
 [](https://zed.dev/blog/introducing-delta)
 

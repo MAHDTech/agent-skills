@@ -9,9 +9,9 @@ skill_name = "devenv"
 
 # OpenBao Provider
 
-The OpenBao provider integrates with OpenBao’s KV (Key-Value) secrets
-engine using OpenBao’s own provider identity and configuration
-conventions.
+The [OpenBao](https://openbao.org/) provider integrates with OpenBao’s
+KV (Key-Value) secrets engine using OpenBao’s own provider identity and
+configuration conventions.
 
 ## At a glance
 
@@ -98,7 +98,7 @@ Keep the server default unless the workload deliberately relies on
 another trust boundary, such as a tightly controlled Agent host and
 network constraints.
 
-### Custom authentication mounts (0.18+)
+### Custom authentication mounts
 
 AppRole and JWT methods mounted somewhere other than their defaults can
 be selected with `?auth_mount=`. The value is relative to `/v1/auth`:

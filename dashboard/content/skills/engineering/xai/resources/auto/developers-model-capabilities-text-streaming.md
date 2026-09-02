@@ -37,7 +37,7 @@ client = Client(
 
 chat = client.chat.create(model="grok-4.6")
 chat.append(
-    system("You are Grok, a helpful and maximally truthful AI built by xAI."),
+    system("You are Grok, a helpful and useful AI built by xAI."),
 )
 chat.append(
     user("Explain how neural networks learn in two sentences.")
@@ -64,7 +64,7 @@ client = OpenAI(
 stream = client.chat.completions.create(
     model="grok-4.6",
     messages=[
-        {"role": "system", "content": "You are Grok, a helpful and maximally truthful AI built by xAI."},
+        {"role": "system", "content": "You are Grok, a helpful and useful AI built by xAI."},
         {"role": "user", "content": "Explain how neural networks learn in two sentences."},
     ],
     stream=True # Set streaming here
@@ -85,7 +85,7 @@ const openai = new OpenAI({
 const stream = await openai.chat.completions.create({
     model: "grok-4.6",
     messages: [
-        { role: "system", content: "You are Grok, a helpful and maximally truthful AI built by xAI." },
+        { role: "system", content: "You are Grok, a helpful and useful AI built by xAI." },
         {
             role: "user",
             content: "Explain how neural networks learn in two sentences.",
@@ -106,7 +106,7 @@ import { streamText } from 'ai';
 const result = streamText({
   model: xai.responses('grok-4.6'),
   system:
-    "You are Grok, a helpful and maximally truthful AI built by xAI.",
+    "You are Grok, a helpful and useful AI built by xAI.",
   prompt: 'Explain how neural networks learn in two sentences.',
 });
 
@@ -124,7 +124,7 @@ curl https://api.x.ai/v1/chat/completions \\
     "messages": [
         {
             "role": "system",
-            "content": "You are Grok, a helpful and maximally truthful AI built by xAI."
+            "content": "You are Grok, a helpful and useful AI built by xAI."
         },
         {
             "role": "user",

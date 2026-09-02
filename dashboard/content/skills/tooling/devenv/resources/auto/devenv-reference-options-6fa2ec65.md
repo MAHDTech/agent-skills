@@ -9202,11 +9202,12 @@ in[devenv/blob/main/src/modules/languages/java.nix](https://github.com/cachix/de
 
 ### [`languages.java.lsp.package`\#](#languagesjavalsppackage)
 
-The Java language server package to use.
+The Java language server package to use. The Java language server
+package by default inherits the JDK from `languages.java.jdk.package`.
 
 Type`package`
 
-Default`pkgs.jdt-language-server`
+Default`pkgs.jdt-language-server.override { jdk = cfg.jdk.package; }`
 
 Declared
 in[devenv/blob/main/src/modules/languages/java.nix](https://github.com/cachix/devenv/blob/main/src/modules/languages/java.nix)

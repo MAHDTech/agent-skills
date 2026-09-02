@@ -158,8 +158,17 @@ access to paid features, support, or any other benefits. Sponsorship is
 entirely optional and simply a way to financially support Zed if you
 choose. We're very grateful for your support, if you choose to do so!
 
+Zed for Business
+
+## The editor your team loves. The controls your org needs.
+
+Your developers already chose the world's fastest code editor. Manage
+their AI features, data sharing, and spend for every seat.
+
+[Get Started](https://dashboard.zed.dev/create-organization)
+
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 ## Daily drive with Zed
 

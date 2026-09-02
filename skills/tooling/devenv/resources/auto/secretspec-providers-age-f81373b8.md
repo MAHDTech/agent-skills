@@ -1,12 +1,11 @@
 # age Provider
 
-The age provider keeps secrets in a single
-[age](https://age-encryption.org)-encrypted file that you can commit to
-your repository. The plaintext inside is a dotenv-style `KEY=value` blob
-that SecretSpec encrypts to one or more age recipients and decrypts with
-your age identity. A read decrypts the blob; a write decrypts it,
-updates one key, and re-encrypts the whole blob to the current
-recipients.
+The [age](https://age-encryption.org) provider keeps secrets in a single
+age-encrypted file that you can commit to your repository. The plaintext
+inside is a dotenv-style `KEY=value` blob that SecretSpec encrypts to
+one or more age recipients and decrypts with your age identity. A read
+decrypts the blob; a write decrypts it, updates one key, and re-encrypts
+the whole blob to the current recipients.
 
 ## At a glance
 
@@ -125,7 +124,7 @@ and environment fallbacks.
 
 ## Configuration
 
-### Discover declarations (0.18+)
+### Discover declarations
 
 SecretSpec 0.18+ can initialize a manifest from the key names already in
 an age file. Reflection decrypts the file in memory to enumerate its

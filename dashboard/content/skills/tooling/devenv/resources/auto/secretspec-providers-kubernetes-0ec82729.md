@@ -9,8 +9,8 @@ skill_name = "devenv"
 
 # Kubernetes Provider
 
-The Kubernetes provider reads from and writes to Kubernetes ConfigMaps
-or Secrets.
+The [Kubernetes](https://kubernetes.io/) provider reads from and writes
+to Kubernetes ConfigMaps or Secrets.
 
 # At a glance
 

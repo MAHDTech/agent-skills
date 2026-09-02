@@ -1,10 +1,10 @@
-![Sky](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/sky.0d_pal_fz~dz0.webp)
+![Sky](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/sky.17ai2wza4841b.webp)
 
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 ![Green
-Field](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/green.00mcps67p-jq~.webp)
+Field](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/green.01u-3fo70w9gl.webp)
 
 # Zed for Windows
 
@@ -18,22 +18,22 @@ So over-engineered, Zed on Windows is more native than Microsoft's own
 editor.
 
 ![Zed's multibuffers on
-Windows](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-multibuffer.14_-6w.khb5dk.webp)
+Windows](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-multibuffer.3w62uz3v2bsol.webp)
 
 Zed's multibuffers on Windows
 
 ![Zed's direct integration with
-WSL](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-wsl.16jf8c98gn93z.webp)
+WSL](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-wsl.3-93wxb3dwq0q.webp)
 
 Zed's direct integration with WSL
 
 ![Reimplementing Glyph
-Rasterization](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-glyph.15wjsk3wxu-hf.webp)
+Rasterization](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-glyph.3z1-wr2iz-mt6.webp)
 
 Reimplementing Glyph Rasterization
 
 ![Rendering Paths on
-Windows](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-paths.12qy19-m5h4j2.webp)
+Windows](https://zed.dev/cdn-cgi/image/width=2048,quality=75,format=auto/_next/static/media/windows-paths.3ovov84v9mejs.webp)
 
 Rendering Paths on Windows
 

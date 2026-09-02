@@ -13,7 +13,7 @@ SecretSpec groups compatible reads and providers can batch or
 parallelize them, but the remote service, proxy, or provider CLI still
 determines the cost of each read.
 
-## Cache one provider (0.19+)
+## Cache one provider
 
 Provider caching places a faster local secret store in front of an
 authoritative provider. A fresh cache entry returns without constructing
@@ -34,7 +34,7 @@ The alias remains the authoritative provider, so its [provider
 credentials](https://secretspec.dev/concepts/providers/#provider-credentials) stay next to
 `uri` and `cache`.
 
-## Cache a fallback route (0.17+)
+## Cache a fallback route
 
 When more than one provider can authoritatively answer, use a route
 alias. `fallback` lists its providers in read order and `cache.provider`
@@ -282,7 +282,7 @@ Do not merge aliases that intentionally use different identities,
 endpoints, namespaces, or other security settings. Those are distinct
 routes even if they use the same provider type.
 
-### Tune per-address concurrency (0.17+)
+### Tune per-address concurrency
 
 Providers using SecretSpec’s default per-address fetch path read up to
 eight unique addresses concurrently. Test a few caps when latency grows

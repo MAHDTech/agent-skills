@@ -56,6 +56,8 @@ mkdir ($nu.default-config-dir | path join autoload)devenv hook nu | save --force
 
 Terminal window
 
+### Passing arguments to `devenv shell`
+
 ## Trusting a project
 
 Before a project can auto activate, you need to explicitly trust it.
@@ -76,6 +78,8 @@ them when allowing it:
 ```
 $ devenv --profile backend --profile observability allowdevenv: allowed /home/user/myproject with profile backend, observability
 ```
+
+Terminal window
 
 The selected profiles also apply to subsequent devenv commands in the
 project. An explicit `--profile` takes priority. Run plain

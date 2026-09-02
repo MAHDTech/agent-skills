@@ -1,7 +1,9 @@
 # Azure App Configuration Provider
 
-The Azure App Configuration provider reads and manages ordinary
-key-values and resolves canonical Azure Key Vault references.
+The [Azure App
+Configuration](https://learn.microsoft.com/en-us/azure/azure-app-configuration/)
+provider reads and manages ordinary key-values and resolves canonical
+Azure Key Vault references.
 
 ## At a glance
 

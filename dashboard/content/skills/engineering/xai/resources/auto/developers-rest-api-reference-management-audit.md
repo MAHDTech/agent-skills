@@ -56,7 +56,6 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
     * `email` (string) — User's email. May not always populated.
 
     * `profileImage` (string) — The key of the profile image under which it can be fetched from our assets server.
-      TODO(pohlen): This should be the profile picture URL.
 
     * `givenName` (string) — User's given name.
 

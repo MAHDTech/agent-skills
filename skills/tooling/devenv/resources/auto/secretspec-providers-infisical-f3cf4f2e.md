@@ -1,8 +1,8 @@
 # Infisical Provider
 
-The Infisical provider integrates with
-[Infisical](https://infisical.com) over its REST API, for both Infisical
-Cloud and self-hosted instances.
+The [Infisical](https://infisical.com) provider integrates with
+Infisical over its REST API, for both Infisical Cloud and self-hosted
+instances.
 
 ## At a glance
 

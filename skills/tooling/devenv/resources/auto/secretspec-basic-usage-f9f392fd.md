@@ -56,7 +56,7 @@ The `--` separates SecretSpec’s options from the command you want to
 run. SecretSpec stops before starting the command if a required secret
 is missing.
 
-## Add a declaration (0.18+)
+## Add a declaration
 
 Declare a new secret without editing `secretspec.toml` by hand, then
 store its value:
@@ -70,7 +70,7 @@ Terminal window
 `add` changes only the declaration. It never asks for or stores the
 secret value.
 
-## Delete stored values (0.18+)
+## Delete stored values
 
 Remove a stored value from its provider:
 

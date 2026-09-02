@@ -9,7 +9,7 @@ skill_name = "devenv"
 
 # Ruby SDK
 
-The Ruby SDK (`secretspec`) is a thin client over the `secretspec-ffi` C
+The Ruby SDK (`secretspec`) is a thin client over the `libsecretspec` C
 ABI, linked into a native C extension at build time. Resolution happens
 in the Rust core, so the SDK inherits every provider with no Ruby-side
 logic.
@@ -34,7 +34,7 @@ resolved.set_as_env!    # export everything into ENV
 A missing required secret raises `Secretspec::MissingRequiredError`; any
 other failure raises `Secretspec::Error` (with a stable `#kind`).
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 builder = Secretspec::SecretSpec.builder.with_caller(  Secretspec::CallerContext.new(    name: "git",    version: "2.51.0",    operation: "credential_get",    resource: "github.com"  ))
@@ -44,14 +44,14 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `.with_inline_spec(spec, base_dir)` to resolve a strict inline-spec
 v1 hash at its logical provider-path base directory. The extension links
 the separate native call symbol, so an older archive cannot fall back to
 a manifest search.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `.with_scope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `resolved.scope` and `report.scope`:
@@ -79,16 +79,16 @@ puts typed.database_url
 
 ## Native library
 
-The published platform gems bundle the `secretspec-ffi` archive and
+The published platform gems bundle the `libsecretspec` archive and
 statically link it into the mkmf extension at install time.
 
-### Linking with pkg-config (0.19+)
+### Linking with pkg-config
 
 Install one library type with
 [cargo-c](https://github.com/lu-zero/cargo-c):
 
 ```
-# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash secretspec-ffi/scripts/cinstall.sh "$PREFIX" static
+# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash libsecretspec/scripts/cinstall.sh "$PREFIX" static
 ```
 
 Terminal window

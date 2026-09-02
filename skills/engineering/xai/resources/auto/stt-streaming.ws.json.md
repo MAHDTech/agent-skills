@@ -21,7 +21,7 @@
       "type": "integer",
       "required": false,
       "default": 16000,
-      "description": "Audio sample rate in Hz. Supported values: `8000`, `16000`, `22050`, `24000`, `44100`, `48000`. With `encoding=opus`, only `8000`, `16000`, `24000`, and `48000` are supported."
+      "description": "Audio sample rate in Hz. Supported values: `8000`, `16000`, `22050`, `24000`, `44100`, `48000`. Ignored with `encoding=opus` — Opus packets are sample-rate-agnostic."
     },
     {
       "name": "encoding",

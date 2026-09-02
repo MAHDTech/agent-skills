@@ -109,14 +109,15 @@ true
 
 ### languages.java.lsp.package
 
-The Java language server package to use.
+The Java language server package to use. The Java language server
+package by default inherits the JDK from `languages.java.jdk.package`.
 
 *Type:* package
 
 *Default:*
 
 ```
-pkgs.jdt-language-server
+pkgs.jdt-language-server.override { jdk = cfg.jdk.package; }
 ```
 
 *Declared by:*

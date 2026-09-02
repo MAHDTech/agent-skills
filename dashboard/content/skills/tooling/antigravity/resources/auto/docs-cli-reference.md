@@ -27,6 +27,7 @@ menu.
 |:---|:---|:---|:---|
 | **`/add-dir <path>`** | Utilities | — | Add a directory path to the active workspace. |
 | **[`/agents`](https://antigravity.google/docs/cli/commands/agents)** | Tools & Tasks | — | Open the [Agent Manager Panel](https://antigravity.google/docs/cli/commands/agents) to switch custom agents and monitor background subagents. |
+| **[`/boost`](https://antigravity.google/docs/boost)** `<task>` | Reasoning | — | Run on-demand multi-agent deep reasoning loops. |
 | **`/artifact`** | Tools & Tasks | — | Open the Artifact Review Panel. |
 | **`/btw <query>`** | Utilities | — | Ask a side question in the background without interrupting the main conversation. |
 | **`/clear`** | Utilities | `/new` | Clear the terminal and reset active conversation contexts. |
