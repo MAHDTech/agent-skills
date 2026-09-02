@@ -1,0 +1,10 @@
+[build]
+rustflags = ["-Wrust-2024-compatibility"]
+
+[alias]
+test-all = "test --workspace --all-targets --all-features"
+lint = "clippy --workspace --all-targets --all-features -- -D warnings"
+lint-fix = "clippy --fix --workspace --all-targets --all-features --allow-staged --allow-no-vcs"
+check-all = "check --workspace --all-targets --all-features"
+fmt-check = "fmt --all -- --check"
+fix-all = "fix --workspace --all-targets --allow-staged --allow-no-vcs"
