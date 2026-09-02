@@ -20,6 +20,11 @@ thiserror = { workspace = true }
 chrono = { workspace = true }
 typed-builder = { workspace = true }
 walkdir = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+sha2 = { workspace = true }
+dirs = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }
+wiremock = { workspace = true }

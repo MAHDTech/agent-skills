@@ -176,7 +176,7 @@ fn test_lint_absolute_and_relative_links() {
         SkillCategory::Engineering,
         "links-test",
         "Link validation test.",
-        content,
+        &content,
     );
     skill.path = skill_dir.join("SKILL.md");
 
