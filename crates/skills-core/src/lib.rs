@@ -5,9 +5,11 @@
 
 pub mod error;
 pub mod models;
+pub mod parser;
 
 pub use error::{Result, SkillError};
 pub use models::*;
+pub use parser::{MarkdownSection, ParsedSkill, SkillParser, TemplatePlaceholder};
 
 /// Returns the current crate version.
 #[must_use]
