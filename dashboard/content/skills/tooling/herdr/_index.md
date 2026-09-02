@@ -32,6 +32,7 @@ This skill serves two distinct roles:
 - **Configuration Reference:** See [resources/auto/herdr-docs-configuration.md](@/skills/tooling/herdr/resources/auto/herdr-docs-configuration.md) for `config.toml` options and keybinding chords.
 - **Agent Integrations Reference:** See [resources/auto/herdr-docs-integrations.md](@/skills/tooling/herdr/resources/auto/herdr-docs-integrations.md) for agent lifecycle detection and session restore plugins.
 - **Socket API Reference:** See [resources/auto/herdr-docs-socket-api.md](@/skills/tooling/herdr/resources/auto/herdr-docs-socket-api.md) for IPC and low-level socket protocol commands.
+- **Alacritty macOS Keybindings Guide:** See [resources/manual/herdr-alacritty.md](@/skills/tooling/herdr/resources/manual/herdr-alacritty.md) for binding macOS Command (Cmd/Super) keys to Herdr actions via Kitty CSI-u escape sequences in Alacritty.
 
 ---
 
@@ -224,6 +225,7 @@ herdr
   - `prefix+-`: Split down
   - `prefix+c`: New tab
   - `prefix+q`: Detach session (leaves background processes running)
+- **Alacritty macOS Command Keys:** When running inside Alacritty on macOS, map Command-key shortcuts using Kitty CSI-u escapes (see [resources/manual/herdr-alacritty.md](@/skills/tooling/herdr/resources/manual/herdr-alacritty.md)).
 - **Stopping Server:** `herdr server stop`
 
 ### Configuration
