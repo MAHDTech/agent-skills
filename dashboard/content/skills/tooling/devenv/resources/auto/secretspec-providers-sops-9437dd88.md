@@ -9,8 +9,8 @@ skill_name = "devenv"
 
 # SOPS Provider
 
-The `sops` provider reads and writes secrets in files encrypted with
-[SOPS](https://getsops.io).
+The [`sops`](https://getsops.io) provider reads and writes secrets in
+files encrypted with SOPS.
 
 ## At a glance
 

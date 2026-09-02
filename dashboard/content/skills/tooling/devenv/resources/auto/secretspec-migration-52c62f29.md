@@ -40,7 +40,7 @@ $ secretspec import dotenv://.env
 
 Terminal window
 
-### From another provider (0.18+)
+### From another provider
 
 Use `init --from` with any provider that supports declaration discovery.
 For example, you can discover declarations from an AWS Parameter Store

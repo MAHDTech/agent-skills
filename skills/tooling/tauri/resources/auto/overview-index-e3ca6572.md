@@ -347,8 +347,6 @@ Dellafiore](https://tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ildella
 
 [![hobbestherat](https://tauri.app/_astro/7561053_ZRde3E.webp)](https://github.com/hobbestherat)
 
-[![Jesper-Andersen](https://tauri.app/_astro/38454312_Z1qoLqf.webp)](https://github.com/Jesper-Andersen)
-
 [![JitPackJoyride](https://tauri.app/_astro/40203625_14zcn8.webp)](https://github.com/JitPackJoyride)
 
 [![jonahgeorge](https://tauri.app/_astro/2058205_1khPSt.webp)](https://github.com/jonahgeorge)
@@ -362,6 +360,8 @@ Dellafiore](https://tauri.app/_astro/256_1J7TeD.webp)](https://linktr.ee/ildella
 [![Lavanic](https://tauri.app/_astro/58156322_dCbf3.webp)](https://github.com/Lavanic)
 
 [![Leay15](https://tauri.app/_astro/32212558_1ttLLR.webp)](https://github.com/Leay15)
+
+[![LucaR01](https://tauri.app/_astro/74206091_Z1nAir9.webp)](https://github.com/LucaR01)
 
 [![marcelgundermann](https://tauri.app/_astro/26166998_1i0ILo.webp)](https://github.com/marcelgundermann)
 

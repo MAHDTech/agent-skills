@@ -132,7 +132,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP wrapper for Anthropic's Claude
 
-    **0.70.0**, <a href="https://github.com/agentclientprotocol/claude-agent-acp"><Icon icon="github" /></a>
+    **0.73.0**, <a href="https://github.com/agentclientprotocol/claude-agent-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -165,7 +165,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Tencent Cloud's official intelligent coding tool
 
-    **2.140.0**
+    **2.143.0**
   </Card>
 
   <Card
@@ -179,7 +179,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP adapter for OpenAI's coding assistant
 
-    **1.6.2**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
+    **1.8.0**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -248,7 +248,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Cursor's coding agent
 
-    **2026.08.11**
+    **2026.08.31**
   </Card>
 
   <Card
@@ -279,7 +279,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Devin CLI coding agent by Cognition
 
-    **3000.6.2**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
+    **3000.6.7**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -293,7 +293,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.3.21**
+    **0.3.26**
   </Card>
 
   <Card
@@ -310,7 +310,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.5.0**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.5.2**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -322,7 +322,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.205.1**
+    **0.209.1**
   </Card>
 
   <Card
@@ -640,7 +640,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google's official CLI for Gemini
 
-    **0.57.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
+    **0.58.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -656,7 +656,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     GitHub's AI pair programmer
 
-    **1.0.80**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
+    **1.0.82**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -668,7 +668,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP agent powered by Zhipu AI's GLM Coding Plan models (glm-5.1, glm-5-turbo, glm-4.7, glm-4.5-air). Supports streaming, tool calls, mid-session model switching, image input via Z.AI Coding Plan Vision MCP, and session load/fork/resume with on-disk persistence.
 
-    **1.6.1**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
+    **1.8.0**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -696,7 +696,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A local, extensible, open source AI agent that automates engineering tasks
 
-    **1.47.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
+    **1.48.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -710,7 +710,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **1.0.12**
+    **1.0.17**
   </Card>
 
   <Card
@@ -724,7 +724,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.118**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.125**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -740,7 +740,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     AI Coding Agent by JetBrains
 
-    **3032.2.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
+    **3032.4.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -754,7 +754,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.5.5**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.5.6**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -768,7 +768,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Moonshot AI's coding assistant
 
-    **1.49.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
+    **1.50.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -856,7 +856,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.18.23**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.25**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -911,7 +911,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.22.2**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.22.3**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card

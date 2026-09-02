@@ -68,7 +68,7 @@ When using profiles, inheritance works as follows:
 4.  **Profile-specific secrets**: Secrets not in the default profile can
     be added to any profile
 
-### Standalone profiles (0.19+)
+### Standalone profiles
 
 Set `inherit = false` in a non-default profile’s `defaults` table when
 its secret set is unrelated to `[profiles.default]`:
@@ -85,7 +85,7 @@ field-by-field inheritance for secrets explicitly redeclared in the
 standalone profile. Omitting it preserves the existing inheritance
 behavior. A standalone profile must declare at least one secret.
 
-### Switching reference models (0.19+)
+### Switching reference models
 
 Legacy `ref` and provider-scoped `refs` are alternative forms of one
 inherited address-model setting. Declaring either one in a profile

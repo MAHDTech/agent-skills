@@ -20,7 +20,7 @@ contract:
   resolver the way `pdo` or `redis` do. It needs no `ffi.enable` and
   works under PHP-FPM and the web SAPI out of the box — the recommended
   path for Laravel and Symfony.
-- **`ext-ffi`** dlopens the `secretspec-ffi` shared library at runtime.
+- **`ext-ffi`** dlopens the `libsecretspec` shared library at runtime.
   Nothing to compile, ideal for CLI tools and local development;
   requires the FFI extension enabled.
 
@@ -74,7 +74,7 @@ automatically.
 
 ### Option B — ext-ffi (quick start / CLI)
 
-The FFI backend dlopens the `secretspec-ffi` library at runtime. Enable
+The FFI backend dlopens the `libsecretspec` library at runtime. Enable
 the bundled FFI extension — in CLI it is on by default; for the web SAPI
 set:
 
@@ -91,7 +91,7 @@ $ vendor/bin/secretspec-install-lib
 
 Terminal window
 
-That downloads the right `secretspec-ffi` library from the matching
+That downloads the right `libsecretspec` library from the matching
 GitHub release into the package. Alternatively, point
 `SECRETSPEC_FFI_LIB` at a library you built or placed yourself. The SDK
 looks at `SECRETSPEC_FFI_LIB` first, then the downloaded copy, then a
@@ -130,7 +130,7 @@ There is also a one-shot form using named arguments:
 $resolved = SecretSpec::resolve(provider: 'keyring://', reason: 'boot');
 ```
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 use Secretspec\CallerContext;use Secretspec\SecretSpec;
@@ -141,14 +141,14 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `withInlineSpec($spec, $baseDir)` to resolve a strict inline-spec v1
 PHP array. The embedded extension or FFI fallback uses the versioned
 native call; an older cdylib raises a capability error instead of
 searching for a manifest.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `withScope('api')` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `$resolved->scope` and
@@ -287,7 +287,7 @@ try {
 
 The SDK chooses a backend automatically: if the `secretspec-php-native`
 extension is loaded it is used directly (no `ffi.enable`, no library to
-locate); otherwise the SDK dlopens the `secretspec-ffi` library via
+locate); otherwise the SDK dlopens the `libsecretspec` library via
 `ext-ffi`, looking first at `SECRETSPEC_FFI_LIB`, then the copy
 `vendor/bin/secretspec-install-lib` places in the package, then a local
 Cargo `target/` directory. Both backends call the identical Rust

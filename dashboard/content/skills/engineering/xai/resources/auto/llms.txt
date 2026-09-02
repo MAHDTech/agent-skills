@@ -9,7 +9,7 @@ We offer a range of models supporting multiple use cases and modalities.
 
 ### [Code API](https://docs.x.ai/build/overview)
 
-Agentic coding with Grok Build (\{\{LATEST\_CODE\_MODEL\_NAME}}), our coding model, on the API and CLI.
+Agentic coding with Grok Build (grok-4.6), our coding model, on the API and CLI.
 
 * Agentic coding workflows
 * Powers Grok Build
@@ -11803,7 +11803,7 @@ Configuration is done via URL query parameters — no setup message required. Au
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sample_rate` | integer | `16000` | Audio sample rate in Hz. With `encoding=opus`: `8000`, `16000`, `24000`, or `48000` only. |
+| `sample_rate` | integer | `16000` | Audio sample rate in Hz. Ignored for `encoding=opus` — Opus packets are sample-rate-agnostic. |
 | `encoding` | string | `pcm` | Audio encoding: `pcm`, `mulaw`, `alaw`, or `opus`. See [Opus Streaming](#opus-streaming). |
 | `interim_results` | boolean | `false` | When `true`, emit partial transcripts `is_final=false` every ~500 ms. |
 | `endpointing` | integer | `400` | Silence duration (ms) before utterance-final event. Range: 0–5000. `0` = fire on any VAD silence boundary. |
@@ -11856,12 +11856,12 @@ The `transcript.partial` event uses `is_final` and `speech_final` to convey thre
 
 ### Opus Streaming
 
-Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s at 24 kHz versus 48 KB/s for PCM16, with no client-side resampling.
+Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 KB/s versus 48 KB/s for PCM16 at 24 kHz, with no client-side resampling.
 
 **How it works:**
 
 * Send **exactly one raw Opus packet per binary WebSocket frame**. Opus packets don't mark their own boundaries — the WebSocket framing does — so never concatenate packets or split one across frames.
-* Encode mono audio at `8000`, `16000`, `24000`, or `48000` Hz. Other sample rates are rejected with `400`.
+* Omit `sample_rate` — Opus packets don't carry one, and the parameter is ignored for this encoding. Encode at whatever rate your audio source produces.
 * `multichannel` is not supported with Opus — mono only.
 * Send raw packets, not containers. To transcribe an Ogg-Opus or WebM file, use the [batch endpoint](#supported-audio-formats) instead — it auto-detects containers.
 * If a frame can't be decoded, the server sends an `error` event and closes the session. Misframed packets often decode as noise rather than an error, so double-check that your encoder emits one whole packet per frame.
@@ -11869,7 +11869,7 @@ Set `encoding=opus` to stream compressed audio instead of raw PCM — roughly 4 
 **Example URL:**
 
 ```
-wss://api.x.ai/v1/stt?sample_rate=24000&encoding=opus&interim_results=true
+wss://api.x.ai/v1/stt?encoding=opus&interim_results=true
 ```
 
 **Typical use case:** Dictation and live transcription from mobile or other bandwidth-constrained clients, where streaming raw PCM is wasteful. Most platform audio APIs and WebRTC stacks produce Opus packets natively.
@@ -12043,7 +12043,7 @@ ws.on("message", (data) => {
 * **Enable `interim_results`** for responsive UX — show transcription as the user speaks
 * **Use `language=en`** to enable text formatting — numbers and currencies are written in their standard form
 * **Send 100 ms audio chunks** (3,200 bytes at 16 kHz PCM16) for a good balance of latency and efficiency
-* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s at 24 kHz versus 48 KB/s for raw PCM. See [Opus Streaming](#opus-streaming)
+* **Use `encoding=opus` on bandwidth-constrained clients** — ~4 KB/s versus 48 KB/s for raw PCM at 24 kHz. See [Opus Streaming](#opus-streaming)
 * **Wait for `transcript.created`** before sending audio — the server needs to initialize its ASR backend
 
 ## Error Handling
@@ -14786,7 +14786,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Quality
 
-Control generation quality with the optional `quality` parameter. Allowed values are `low` and `medium`. When omitted, the default is `medium`. The parameter is only supported for `grok-imagine-image-2.0`.
+Control generation quality with the optional `quality` parameter. Allowed values are `low`, `medium`, and `auto`. When omitted, the default is `auto`, which lets the service choose the quality for each request. Auto currently uses `low` for image generation and `medium` for [image editing](https://docs.x.ai/developers/model-capabilities/images/editing). Images are billed at the quality they are served at (see [Pricing](https://docs.x.ai/developers/pricing)). Pass `low` or `medium` to pin a specific quality. The parameter is only supported for `grok-imagine-image-2.0`.
 
 ```python customLanguage="pythonXAI"
 import xai_sdk
@@ -14974,7 +14974,7 @@ asyncio.run(generate_concurrently())
 
 # Multi-Image Editing
 
-Use up to three source images for a single image edit. You can specify images in the order they are sent in the request. By default, the output aspect ratio follows the first input image. You can override this by setting the `aspect_ratio` parameter to a specific ratio, such as `"1:1"` or `"16:9"`.
+Use up to five source images for a single image edit. You can specify images in the order they are sent in the request. By default, the output aspect ratio follows the first input image. You can override this by setting the `aspect_ratio` parameter to a specific ratio, such as `"1:1"` or `"16:9"`.
 
 Each source image can be a public URL, a base64-encoded data URI, or a `file_id` from the [Files API](https://docs.x.ai/developers/files) — and you can mix kinds within a single request. See [Imagine → Files API Integration](https://docs.x.ai/developers/model-capabilities/imagine/files/inputs) for `file_id` details and examples.
 
@@ -15858,7 +15858,7 @@ print(vid.url)
 
 # Imagine Overview
 
-The Imagine API lets you generate and edit images and videos with Grok Imagine models. Use it for image generation, image editing with up to 3 reference images, video generation from text or still images, video editing, and more.
+The Imagine API lets you generate and edit images and videos with Grok Imagine models. Use it for image generation, image editing with up to 5 reference images, video generation from text or still images, video editing, and more.
 
 ## Pricing
 
@@ -15921,7 +15921,7 @@ console.log(image.base64);
 
 ## Image Editing
 
-Edit a source image with natural language. Provide a public image URL or base64-encoded data URI, then describe the change you want Grok Imagine to apply. Multi-image editing supports up to 3 source images in a single request for combining subjects, transferring styles, and composing scenes.
+Edit a source image with natural language. Provide a public image URL or base64-encoded data URI, then describe the change you want Grok Imagine to apply. Multi-image editing supports up to 5 source images in a single request for combining subjects, transferring styles, and composing scenes.
 
 ```python customLanguage="pythonXAI"
 import base64
@@ -16046,7 +16046,7 @@ done
 
 Beyond the top use cases above, the Imagine API supports several additional workflows:
 
-* **[Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)** — Combine up to 3 source images in a single edit for compositing subjects, transferring styles, and building scenes from multiple references.
+* **[Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)** — Combine up to 5 source images in a single edit for compositing subjects, transferring styles, and building scenes from multiple references.
 * **[Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation)** — Generate videos from text prompts with configurable duration (up to 15s), aspect ratio, and resolution.
 * **[Video Editing](https://docs.x.ai/developers/model-capabilities/video/editing)** — Modify an existing video with a text prompt while preserving the rest of the scene.
 * **[Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)** — Guide a generated video with one or more reference images that influence the output without forcing the first frame.
@@ -16150,7 +16150,7 @@ const completion = await client.chat.completions.create({
     messages: [
         {
             role: "system",
-            content: "You are Grok, a helpful and maximally truthful AI built by xAI."
+            content: "You are Grok, a helpful and useful AI built by xAI."
         },
         {
             role: "user",
@@ -16169,7 +16169,7 @@ import { generateText } from 'ai';
 const result = await generateText({
   model: xai('grok-4.6'),
   system:
-    "You are Grok, a helpful and maximally truthful AI built by xAI.",
+    "You are Grok, a helpful and useful AI built by xAI.",
   prompt: 'Explain how neural networks learn in two sentences.',
 });
 
@@ -16185,7 +16185,7 @@ curl https://api.x.ai/v1/chat/completions \
     "messages": [
         {
             "role": "system",
-            "content": "You are Grok, a helpful and maximally truthful AI built by xAI."
+            "content": "You are Grok, a helpful and useful AI built by xAI."
         },
         {
             "role": "user",
@@ -18320,7 +18320,7 @@ client = Client(
 
 chat = client.chat.create(model="grok-4.6")
 chat.append(
-    system("You are Grok, a helpful and maximally truthful AI built by xAI."),
+    system("You are Grok, a helpful and useful AI built by xAI."),
 )
 chat.append(
     user("Explain how neural networks learn in two sentences.")
@@ -18347,7 +18347,7 @@ client = OpenAI(
 stream = client.chat.completions.create(
     model="grok-4.6",
     messages=[
-        {"role": "system", "content": "You are Grok, a helpful and maximally truthful AI built by xAI."},
+        {"role": "system", "content": "You are Grok, a helpful and useful AI built by xAI."},
         {"role": "user", "content": "Explain how neural networks learn in two sentences."},
     ],
     stream=True # Set streaming here
@@ -18368,7 +18368,7 @@ const openai = new OpenAI({
 const stream = await openai.chat.completions.create({
     model: "grok-4.6",
     messages: [
-        { role: "system", content: "You are Grok, a helpful and maximally truthful AI built by xAI." },
+        { role: "system", content: "You are Grok, a helpful and useful AI built by xAI." },
         {
             role: "user",
             content: "Explain how neural networks learn in two sentences.",
@@ -18389,7 +18389,7 @@ import { streamText } from 'ai';
 const result = streamText({
   model: xai.responses('grok-4.6'),
   system:
-    "You are Grok, a helpful and maximally truthful AI built by xAI.",
+    "You are Grok, a helpful and useful AI built by xAI.",
   prompt: 'Explain how neural networks learn in two sentences.',
 });
 
@@ -18407,7 +18407,7 @@ curl https://api.x.ai/v1/chat/completions \\
     "messages": [
         {
             "role": "system",
-            "content": "You are Grok, a helpful and maximally truthful AI built by xAI."
+            "content": "You are Grok, a helpful and useful AI built by xAI."
         },
         {
             "role": "user",
@@ -20818,11 +20818,11 @@ done
 
 | Model | Cost |
 | --- | --- |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-image-2.0 | $0.04 / image |
 | grok-imagine-image | $0.02 / image |
-| grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 
@@ -21072,11 +21072,11 @@ All prices are in USD. For per-model details, see the [models page](https://docs
 
 | Model | Cost |
 | --- | --- |
+| grok-imagine-image-quality | $0.05 / image |
 | grok-imagine-image-2.0 | $0.04 / image |
 | grok-imagine-image | $0.02 / image |
-| grok-imagine-image-quality | $0.05 / image |
-| grok-imagine-video | $0.050 / sec |
 | grok-imagine-video-1.5 | $0.080 / sec |
+| grok-imagine-video | $0.050 / sec |
 
 ### Voice Pricing
 
@@ -21455,11 +21455,11 @@ The table below lists RPS and TPM limits at each tier for every model. You can a
 | grok-4.20-0309-non-reasoning | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-build-0.1 | T0: 37, T1: 50, T2: 75, T3: 125, T4: 208 | T0: 10M, T1: 15M, T2: 25M, T3: 45M, T4: 85M |
 | grok-4.20-multi-agent-0309 | T0: 9, T1: 12, T2: 18, T3: 31, T4: 56 | T0: 2.5M, T1: 3.7M, T2: 6.2M, T3: 11M, T4: 21M |
+| grok-imagine-image-quality | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
 | grok-imagine-image-2.0 | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
 | grok-imagine-image | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
-| grok-imagine-image-quality | T0: 6, T1: 12, T2: 25, T3: 50, T4: 100 | — |
-| grok-imagine-video | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
 | grok-imagine-video-1.5 | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
+| grok-imagine-video | T0: 10, T1: 20, T2: 39, T3: 79, T4: 158 | — |
 
 ### What counts toward TPM
 
@@ -21530,6 +21530,12 @@ def request_with_backoff(prompt, max_retries=5):
 # Release Notes
 
 ## August
+
+### Imagine image API updates
+
+* **Auto quality.** The `quality` parameter on `grok-imagine-image-2.0` now accepts `auto`, and the default when `quality` is omitted has moved from `medium` to `auto`. Auto currently uses `low` for image generation and `medium` for image editing. Images are billed at the quality they are served at. Pass `low` or `medium` explicitly to pin a specific quality. See [Image Generation](https://docs.x.ai/developers/model-capabilities/images/generation#quality).
+* **Five reference images.** Image editing now accepts up to 5 source images per request (was 3). See [Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing).
+* **New aspect ratios.** Image generation and editing accept `21:9` (cinematic widescreen) and `5:2` (wide banners). See [Image Generation](https://docs.x.ai/developers/model-capabilities/images/generation#aspect-ratio).
 
 ### Grok 4.6
 
@@ -26707,7 +26713,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. Ignored with \`encoding=opus\` — Opus packets are sample-rate-agnostic.
 
 * `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 
@@ -28308,7 +28314,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. Ignored with \`encoding=opus\` — Opus packets are sample-rate-agnostic.
 
 * `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 
@@ -28953,7 +28959,6 @@ API endpoint for GET requests to /audit/teams/\{teamId}/events.
     * `email` (string) — User's email. May not always populated.
 
     * `profileImage` (string) — The key of the profile image under which it can be fetched from our assets server.
-      TODO(pohlen): This should be the profile picture URL.
 
     * `givenName` (string) — User's given name.
 
@@ -32367,7 +32372,7 @@ When inline citations are enabled, each `output_text` content block includes an 
       "content": [
         {
           "type": "output_text",
-          "text": "**xAI is an artificial intelligence company founded by Elon Musk in March 2023.** Its stated mission is to \"understand the universe\" by building advanced AI systems that accelerate human scientific discovery.[[1]](https://x.ai/company)\n\n### Key Details\n- **Flagship product**: Grok, a family of frontier AI models focused on reasoning, code, voice, image generation, and video. These are trained on massive infrastructure, including what the company describes as the world's largest supercluster (Colossus). Grok powers chatbots, APIs, and multimodal tools available via a unified API.[[2]](https://x.ai/)\n- **Current status (as of mid-2026)**: xAI operates as a subsidiary of SpaceX following an acquisition in February 2026. It is also connected to the X social platform (formerly Twitter), which xAI effectively became the parent of in 2025. The company has expanded into data centers and enterprise AI offerings (e.g., integrations with Amazon Bedrock and Databricks).[[3]](https://en.wikipedia.org/wiki/XAI_(company))\n- **Headquarters and team**: Based in the Stanford Research Park in Palo Alto, California. It was initially founded with a team of AI researchers and is led by Elon Musk as CEO.\n\nxAI positions itself as building maximally truth-seeking AI, distinct from other labs in its approach. Its official website (x.ai) highlights developer tools, API access, and ongoing model releases. Note that there is an unrelated blockchain/gaming project called Xai (xai.games), but the primary reference to \"xAI\" in this context is Musk's AI venture.[[4]](https://xai.games/)\n\nFor the latest updates, check x.ai or @xai on X.",
+          "text": "**xAI is an artificial intelligence company founded by Elon Musk in March 2023.** Its stated mission is to \"understand the universe\" by building advanced AI systems that accelerate human scientific discovery.[[1]](https://x.ai/company)\n\n### Key Details\n- **Flagship product**: Grok, a family of frontier AI models focused on reasoning, code, voice, image generation, and video. These are trained on massive infrastructure, including what the company describes as the world's largest supercluster (Colossus). Grok powers chatbots, APIs, and multimodal tools available via a unified API.[[2]](https://x.ai/)\n- **Current status (as of mid-2026)**: xAI operates as a subsidiary of SpaceX following an acquisition in February 2026. It is also connected to the X social platform (formerly Twitter), which xAI effectively became the parent of in 2025. The company has expanded into data centers and enterprise AI offerings (e.g., integrations with Amazon Bedrock and Databricks).[[3]](https://en.wikipedia.org/wiki/XAI_(company))\n- **Headquarters and team**: Based in the Stanford Research Park in Palo Alto, California. It was initially founded with a team of AI researchers and is led by Elon Musk as CEO.\n\nxAI positions itself as building useful AI, distinct from other labs in its approach. Its official website (x.ai) highlights developer tools, API access, and ongoing model releases. Note that there is an unrelated blockchain/gaming project called Xai (xai.games), but the primary reference to \"xAI\" in this context is Musk's AI venture.[[4]](https://xai.games/)\n\nFor the latest updates, check x.ai or @xai on X.",
           "logprobs": [],
           "annotations": [
             {

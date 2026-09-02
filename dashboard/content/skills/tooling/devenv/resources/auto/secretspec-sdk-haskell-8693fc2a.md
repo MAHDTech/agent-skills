@@ -10,7 +10,7 @@ skill_name = "devenv"
 # Haskell SDK
 
 The Haskell SDK (`secretspec-hs`) is a thin client over the
-`secretspec-ffi` C ABI, linked at build time via the Haskell FFI.
+`libsecretspec` C ABI, linked at build time via the Haskell FFI.
 Resolution happens in the Rust core, so the SDK inherits every provider
 with no Haskell-side logic.
 
@@ -48,7 +48,7 @@ failure throws `SecretSpecError` (with a stable `errorKind`).
 call `S.close resolved` when done so they do not accumulate in the temp
 dir.
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 let caller = S.CallerContext      "git" (Just "2.51.0") (Just "credential_get") (Just "github.com")    configured = S.builder & S.withCaller caller
@@ -58,13 +58,13 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `withInlineSpec spec baseDir` with an Aeson JSON value to resolve
 strict inline-spec v1 declarations. `baseDir` resolves relative provider
 paths; an older static archive fails to link the versioned call symbol.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `withScope "api"` to resolve only a named `[scopes.api]` subset. The
 selected name is available through `resolvedScope` and `reportScope`:
@@ -113,29 +113,29 @@ Terminal window
 
 ## Building
 
-The build links the `secretspec-ffi` archive statically. Stage the `.a`
+The build links the `libsecretspec` archive statically. Stage the `.a`
 in a directory of its own (so the linker picks the archive, not the
 co-located `.so`) and pass its native dependencies to the linker:
 
 ```
-$ cargo build -p secretspec-ffi
+$ cargo build -p libsecretspec
 $ TARGET="$(cargo metadata --no-deps --format-version 1 \  | grep -o '"target_directory":"[^"]*"' | head -1 | sed 's/.*:"\(.*\)"/\1/')"
 # Stage the staticlib alone, and capture its native-static-libs for the linker.$ LIBDIR="$(mktemp -d)"
-$ cp "$TARGET/debug/libsecretspec_ffi.a" "$LIBDIR/"
-$ NATIVE_LIBS="$(cargo rustc -q -p secretspec-ffi --crate-type staticlib -- \  --print native-static-libs 2>&1 | sed -n 's/^note: native-static-libs: //p' | tail -1)"
+$ cp "$TARGET/debug/libsecretspec.a" "$LIBDIR/"
+$ NATIVE_LIBS="$(cargo rustc -q -p libsecretspec --crate-type staticlib -- \  --print native-static-libs 2>&1 | sed -n 's/^note: native-static-libs: //p' | tail -1)"
 $ cabal build --extra-lib-dirs="$LIBDIR" --ghc-options="-optl${NATIVE_LIBS// / -optl}"
 $ cabal test  --extra-lib-dirs="$LIBDIR" --ghc-options="-optl${NATIVE_LIBS// / -optl}"
 ```
 
 Terminal window
 
-### Linking with pkg-config (0.19+)
+### Linking with pkg-config
 
 Install one library type with
 [cargo-c](https://github.com/lu-zero/cargo-c):
 
 ```
-# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash secretspec-ffi/scripts/cinstall.sh "$PREFIX" static
+# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash libsecretspec/scripts/cinstall.sh "$PREFIX" static
 ```
 
 Terminal window

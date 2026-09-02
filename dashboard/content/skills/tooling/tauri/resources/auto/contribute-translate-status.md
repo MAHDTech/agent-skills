@@ -1098,7 +1098,7 @@ PRs in your language!
   file](https://github.com/tauri-apps/tauri-docs/new/v2?filename=src/content/docs/zh-cn/security/lifecycle.mdx)
 
 **日本語 (ja)**  
-79 done, 43 outdated, 3 missing  
+84 done, 38 outdated, 3 missing  
 
 ### outdated
 
@@ -1107,34 +1107,6 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/about/index.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/about/index.mdx?since=2025-08-16T21:54:44.000Z))
-- [concept/Inter-Process
-  Communication/brownfield.md](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/brownfield.md)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/Inter-Process%20Communication/brownfield.md),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/brownfield.md?since=2025-03-29T18:57:42.000Z))
-- [concept/Inter-Process
-  Communication/index.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/Inter-Process%20Communication/index.mdx),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/index.mdx?since=2025-03-29T18:57:42.000Z))
-- [concept/Inter-Process
-  Communication/isolation.md](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/Inter-Process%20Communication/isolation.md)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/Inter-Process%20Communication/isolation.md),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/Inter-Process%20Communication/isolation.md?since=2025-03-29T18:57:42.000Z))
-- [concept/architecture.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/architecture.mdx)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/architecture.mdx),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/architecture.mdx?since=2025-03-29T18:57:42.000Z))
-- [concept/index.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/concept/index.mdx)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/concept/index.mdx),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/concept/index.mdx?since=2025-03-29T18:57:42.000Z))
 - [develop/Plugins/develop-mobile.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/develop/Plugins/develop-mobile.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/develop/Plugins/develop-mobile.mdx),
@@ -1295,6 +1267,11 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/plugin/opener.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/plugin/opener.mdx?since=2025-11-09T01:33:56.000Z))
+- [plugin/single-instance.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/plugin/single-instance.mdx)
+  ([outdated
+  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/plugin/single-instance.mdx),
+  [source change
+  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/plugin/single-instance.mdx?since=2025-12-11T17:08:32.000Z))
 - [plugin/stronghold.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/plugin/stronghold.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/plugin/stronghold.mdx),
@@ -1310,11 +1287,6 @@ PRs in your language!
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/security/index.mdx),
   [source change
   history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/security/index.mdx?since=2025-08-16T21:12:59.000Z))
-- [start/migrate/from-tauri-1.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/migrate/from-tauri-1.mdx)
-  ([outdated
-  translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/start/migrate/from-tauri-1.mdx),
-  [source change
-  history](https://github.com/tauri-apps/tauri-docs/commits/v2/src/content/docs/start/migrate/from-tauri-1.mdx?since=2025-08-19T22:30:31.000Z))
 - [start/prerequisites.mdx](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/start/prerequisites.mdx)
   ([outdated
   translation](https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/ja/start/prerequisites.mdx),

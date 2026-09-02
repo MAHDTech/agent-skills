@@ -9,9 +9,9 @@ skill_name = "devenv"
 
 # KeePass KDBX Provider
 
-The KDBX provider reads and writes encrypted
-[KeePass](https://keepass.info/) databases directly, without requiring
-KeePass or KeePassXC to be installed.
+The [KeePass KDBX](https://keepass.info/) provider reads and writes
+encrypted databases directly, without requiring KeePass or KeePassXC to
+be installed.
 
 ## At a glance
 

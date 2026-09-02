@@ -9,8 +9,9 @@ skill_name = "devenv"
 
 # Fly.io secrets provider
 
-The Fly.io provider publishes declared values to an application’s
-encrypted secret vault through [`flyctl`](https://fly.io/docs/flyctl/).
+The [Fly.io](https://fly.io/) provider publishes declared values to an
+application’s encrypted secret vault through
+[`flyctl`](https://fly.io/docs/flyctl/).
 
 ## At a glance
 

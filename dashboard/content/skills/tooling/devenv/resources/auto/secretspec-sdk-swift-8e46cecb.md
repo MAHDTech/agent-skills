@@ -9,15 +9,12 @@ skill_name = "devenv"
 
 # Swift SDK
 
-> **Version compatibility:** The Swift SDK is available in SecretSpec
-> 0.18+.
-
 The Swift SDK is a thin `Codable` wrapper over the same Rust resolver
 and versioned C ABI as the other language SDKs. Every provider, fallback
 chain, profile, scope, generator, reference, and `as_path` secret
 therefore works without Swift-side resolution logic.
 
-## Install (0.18+)
+## Install
 
 In Xcode, choose **File → Add Package Dependencies** and enter:
 
@@ -96,7 +93,7 @@ func oneShot() throws {
 }
 ```
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 let builder = SecretSpec.builder().withCaller(CallerContext(    name: "git",    version: "2.51.0",    operation: "credential_get",    resource: "github.com"))
@@ -106,7 +103,7 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `try builder.withInlineSpec(spec, baseDir: ...)` with an `Encodable`
 declaration to resolve strict inline-spec v1 JSON. The base directory

@@ -22,6 +22,7 @@ listed, SecretSpec checks them from left to right.
 | [`bws`](https://secretspec.dev/providers/bws/) | `access_token` | `BWS_ACCESS_TOKEN` | 0.15+ |
 | [`cloudflare`](https://secretspec.dev/providers/cloudflare/) | `api_token` | `CLOUDFLARE_API_TOKEN` | 0.20+ |
 | [`dashlane`](https://secretspec.dev/providers/dashlane/) | `service_device_keys` | `DASHLANE_SERVICE_DEVICE_KEYS` | 0.18+ |
+| [`ejson`](https://secretspec.dev/providers/ejson/) | `private_key` | — | 0.20+ |
 | [`fly`](https://secretspec.dev/providers/fly/) | `access_token` | `FLY_API_TOKEN` → `FLY_ACCESS_TOKEN` | 0.20+ |
 | [`infisical`](https://secretspec.dev/providers/infisical/) | `client_id` | `INFISICAL_CLIENT_ID` | 0.16+ |
 | [`infisical`](https://secretspec.dev/providers/infisical/) | `client_secret` | `INFISICAL_CLIENT_SECRET` | 0.16+ |

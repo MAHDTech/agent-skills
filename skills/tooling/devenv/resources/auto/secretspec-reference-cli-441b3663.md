@@ -245,7 +245,7 @@ Terminal window
 A read-only source provider is rejected. An alias that declares no
 credentials reports that there is nothing to store.
 
-### docker configure (0.20+)
+### docker configure
 
 Configure Docker to retrieve credentials for one registry through
 SecretSpec.
@@ -280,7 +280,7 @@ The command adds a registry-specific `credHelpers` entry to Docker’s
 `config.json`, prompts with a default of **No**, and refuses to replace
 an existing helper.
 
-### docker login (0.20+)
+### docker login
 
 Store a password or token in the embedded Docker credential store:
 
@@ -295,7 +295,7 @@ registry and physical Docker configuration pair uses a separate
 SecretSpec project identity. This command rejects `--file`; use
 `secretspec set` for custom-manifest credentials.
 
-### docker logout (0.20+)
+### docker logout
 
 Remove a password or token from the embedded Docker credential store:
 
@@ -308,7 +308,7 @@ Terminal window
 Use the same provider override supplied to `login`. This does not remove
 the Docker helper registration; use `unconfigure` for that.
 
-### docker unconfigure (0.20+)
+### docker unconfigure
 
 Remove one or all Docker credentials configured by SecretSpec in the
 active Docker configuration.
@@ -325,7 +325,7 @@ other registry helpers, stored authentication entries, and unrelated
 Docker options. See [Docker credentials](https://secretspec.dev/integrations/docker/) for
 complete setup, custom manifest, and ownership details.
 
-### git configure (0.20+)
+### git configure
 
 Configure Git to retrieve an HTTP(S) or SMTP password or token through
 SecretSpec. Repository-local configuration is the default.
@@ -364,7 +364,7 @@ unrelated Git configuration are not replaced. See [Git
 credentials](https://secretspec.dev/integrations/git/) for setup examples and the ownership
 model.
 
-### git login (0.20+)
+### git login
 
 Store an embedded Git password or token, prompting securely on a
 terminal or reading it from piped standard input.
@@ -381,7 +381,7 @@ the username is read from managed Git configuration unless passed
 explicitly. `git login` rejects `--file`; use `secretspec set` for
 custom manifest declarations.
 
-### git logout (0.20+)
+### git logout
 
 Remove the embedded username and password or token for one exact target
 without removing its Git helper configuration.
@@ -396,7 +396,7 @@ For SMTP, the username is read from managed Git configuration unless
 passed explicitly. `git logout` rejects `--file`; use
 `secretspec delete` for custom manifest declarations.
 
-### git unconfigure (0.20+)
+### git unconfigure
 
 Remove one or all Git credentials configured by SecretSpec in the
 selected scope.
@@ -555,7 +555,7 @@ The same pattern works in every SDK: Go
 `Convert.toSecretSpec(resolved.fieldsJson())`, Ruby
 `SecretSpec.from_dynamic!(resolved.fields)`.
 
-### add (0.18+)
+### add
 
 Add a secret declaration to an existing `secretspec.toml`. This edits
 only the selected profile and preserves the manifest’s comments,
@@ -621,7 +621,7 @@ selector, making a missing `--profile` visible before the write.
 `set` rejects composed secrets because their values are derived and
 read-only. Available since SecretSpec 0.16.
 
-### delete (0.18+)
+### delete
 
 Delete stored provider values without changing their declarations in
 `secretspec.toml`.
@@ -848,7 +848,7 @@ pretending the migration completed. Source deletion was introduced in
 SecretSpec 0.18; independent endpoint refs and operation-wide preflight
 are available in 0.19+.
 
-### cache clear (0.17+)
+### cache clear
 
 Delete cached provider values for one secret, or for every cached secret
 in the active profile. Authoritative fallback providers are not
@@ -916,7 +916,7 @@ $ secretspec audit --action get -n 52026-06-04T18:06:29Z  get    found  GITHUB_T
 
 Terminal window
 
-### completions (0.20+)
+### completions
 
 Generate a completion script that asks the same command definition used
 by `secretspec --help` for suggestions. Completion results include every

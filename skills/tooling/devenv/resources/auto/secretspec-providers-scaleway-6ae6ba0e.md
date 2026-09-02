@@ -1,8 +1,8 @@
 # Scaleway Secret Manager Provider
 
-The Scaleway Secret Manager provider stores secrets in [Scaleway Secret
-Manager](https://www.scaleway.com/en/secret-manager/) through its
-`v1beta1` REST API.
+The [Scaleway Secret
+Manager](https://www.scaleway.com/en/secret-manager/) provider stores
+secrets in Scaleway Secret Manager through its `v1beta1` REST API.
 
 ## At a glance
 

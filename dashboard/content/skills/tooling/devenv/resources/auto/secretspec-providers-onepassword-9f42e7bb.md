@@ -9,8 +9,9 @@ skill_name = "devenv"
 
 # 1Password Provider
 
-The 1Password provider integrates with 1Password for team-based secret
-management with advanced access controls.
+The [1Password](https://1password.com/) provider integrates with
+1Password for team-based secret management with advanced access
+controls.
 
 ## At a glance
 

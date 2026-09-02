@@ -353,6 +353,9 @@ auto-rebuild, and auto-publish on file changes.
 - `--dotnet-version <VERSION>` — Target .NET SDK major version for C#
   projects (e.g. 8 or 10). Auto-detected when omitted.
 
+- `--native-aot` — Build C# projects with NativeAOT-LLVM. Ignored with
+  .NET 10 because NativeAOT-LLVM is always used.
+
 - `--run <COMMAND>` — Command to run the client development server
   (overrides spacetime.json config)
 

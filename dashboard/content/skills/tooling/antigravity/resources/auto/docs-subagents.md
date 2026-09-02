@@ -192,10 +192,22 @@ maintain security boundaries:
   requiring user authorization, the request automatically bubbles up to
   the main UI/Subagent panel.
 
-## Multi-agent teamwork (`/teamwork-preview`)
+## Multi-agent orchestrators
 
-Antigravity 2.0 introduces multi-agent orchestration for large
-engineering tasks, complex simulations, and deep research campaigns.
+Antigravity 2.0 provides two advanced multi-agent orchestrators designed
+for different task scales and execution horizons:
+
+### 1. Boost deep reasoning (`/boost`)
+
+Invoking [`/boost`](https://antigravity.google/docs/boost) launches a three-tier multi-agent
+reasoning hierarchy (`Orchestrator` -\> `DeepCoder` / `DeepInvestigator`
+coordinators -\> isolated execution workers). It tackles tough
+concurrency bugs, algorithmic challenges, and non-trivial refactoring
+within interactive coding sessions (seconds to hours) with independent
+verification loops. Learn more in the [Boost
+documentation](https://antigravity.google/docs/boost).
+
+### 2. Multi-agent teamwork (`/teamwork-preview`)
 
 Using [`/teamwork-preview`](https://antigravity.google/docs/teamwork) coordinates a team of
 specialized AI agents designed for large software projects, multi-file
@@ -204,4 +216,17 @@ decomposition, parallel implementation, and independent verification
 checks, allowing you to define the high-level goals while the platform
 manages agent coordination. Learn more in the [Teamwork
 documentation](https://antigravity.google/docs/teamwork).
+
+------------------------------------------------------------------------
+
+## Next steps
+
+Explore related documentation and guides:
+
+- [Boost deep reasoning (`/boost`)](https://antigravity.google/docs/boost): Explore on-demand
+  multi-agent reasoning.
+- [Teamwork agent teams (`/teamwork-preview`)](https://antigravity.google/docs/teamwork): Learn
+  how collaborative agent teams execute long-horizon campaigns.
+- [Slash commands catalog](https://antigravity.google/docs/slash-commands): Review all available
+  slash commands across Antigravity 2.0 and the CLI.
 

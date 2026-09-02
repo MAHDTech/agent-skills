@@ -49,6 +49,7 @@ secretspec.toml
 | [dotenv](https://secretspec.dev/providers/dotenv/) | A `.env` file | ✓ | ✓ | ✗ | — |
 | [file](https://secretspec.dev/providers/file/) (0.19+) | One plaintext UTF-8 file per secret | ✓ | ✓ | ✗ | — |
 | [env](https://secretspec.dev/providers/env/) | Current process environment | ✓ | ✗ | ✗ | — |
+| [ejson](https://secretspec.dev/providers/ejson/) (0.20+) | EJSON encrypted file (requires the `ejson` build feature and EJSON CLI) | ✓ | ✗ | ✓ | — |
 | [null](https://secretspec.dev/providers/null/) (0.19+) | No storage; uses a manifest default, ephemeral generation, or an ephemeral run prompt | ✗ | ✗ | N/A | — |
 | [systemd-credential](https://secretspec.dev/providers/systemd-credential/) (0.17+) | Credentials passed to the current systemd service | ✓ | ✗ | Depends on the unit’s credential source | [Via systemd-creds](https://www.freedesktop.org/software/systemd/man/latest/systemd-creds.html) |
 | [fly](https://secretspec.dev/providers/fly/) (0.20+) | Fly.io application secrets through `flyctl` | ✗ | ✓ | ✓ | — |
@@ -189,7 +190,7 @@ URIs:
 
 secretspec.toml
 
-### Alias ref templates (0.19+)
+### Alias ref templates
 
 A leaf alias can map the logical `{project}`, `{profile}`, and `{key}`
 into its provider’s native coordinates. This lets every link in a

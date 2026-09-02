@@ -9,9 +9,9 @@ sourceC](https://github.com/zed-industries/zed)
 [Read the blog post →](https://zed.dev/blog/zeta2)
 
 ![The UI for Zed, the text
-editor](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/video-poster.0p4d-n3.ayrkk.webp)![The
+editor](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/video-poster.25qbtzpkdm0pd.webp)![The
 UI for Zed, the text
-editor](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/video-poster.0p4d-n3.ayrkk.webp)
+editor](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/video-poster.25qbtzpkdm0pd.webp)
 
 What developers are saying
 
@@ -98,7 +98,7 @@ Zeta2 uses the language server to retrieve the type and symbol
 definitions around your cursor, so predictions understand your code's
 actual structure rather than guessing.
 
-[See Pull Request→](https://github.com/zed-industries/zed/pull/44036)
+[See Pull Request →](https://github.com/zed-industries/zed/pull/44036)
 
 Evaluation built into the pipeline
 
@@ -106,7 +106,7 @@ We score predictions only on the code that changed, using diff-aware
 metrics and line-level exact match to measure real accuracy rather than
 copy fidelity.
 
-[See Pull Request→](https://github.com/zed-industries/zed/pull/43485)
+[See Pull Request →](https://github.com/zed-industries/zed/pull/43485)
 
 Training data from real edits
 
@@ -114,14 +114,14 @@ Multi-file commits are split into single-change examples, stratified by
 repository, and supplemented with distillation from a larger teacher
 model.
 
-[See Pull Request→](https://github.com/zed-industries/zed/pull/44369)
+[See Pull Request →](https://github.com/zed-industries/zed/pull/44369)
 
 Experimenting with different, more efficient prompt formats
 
 Allowing the model to output a subset of the editable region to reduce
 the number of tokens it has to generate
 
-[See Pull Request→](https://github.com/zed-industries/zed/pull/51185)
+[See Pull Request →](https://github.com/zed-industries/zed/pull/51185)
 
 Your choice of model
 
@@ -259,7 +259,7 @@ M
 /
 
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 ## Daily drive with Zed
 

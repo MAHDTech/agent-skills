@@ -1064,7 +1064,7 @@ Full schemas and examples: [`/stt-streaming.ws.json`](https://docs.x.ai/stt-stre
 
 ### Query Parameters
 
-* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. With \`encoding=opus\`, only \`8000\`, \`16000\`, \`24000\`, and \`48000\` are supported.
+* `sample_rate` (integer, optional, default: 16000) — Audio sample rate in Hz. Supported values: \`8000\`, \`16000\`, \`22050\`, \`24000\`, \`44100\`, \`48000\`. Ignored with \`encoding=opus\` — Opus packets are sample-rate-agnostic.
 
 * `encoding` (string, optional, default: pcm) — Audio encoding format. \`pcm\` — signed 16-bit little-endian (2 bytes/sample). \`mulaw\` — G.711 µ-law (1 byte/sample). \`alaw\` — G.711 A-law (1 byte/sample). \`opus\` — raw Opus packets, one packet per binary WebSocket frame, mono only.
 

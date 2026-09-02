@@ -1,13 +1,14 @@
 # JVM SDK
 
-> **Version compatibility:** Available since SecretSpec 0.20.
-
 The JVM SDK (`org.cachix.secretspec-jvm`) is a thin client over the same
 Rust resolver as the CLI. Every provider, fallback chain, profile,
 generator, reference, and `as_path` secret therefore works without
 JVM-side resolution logic.
 
-## Install (0.20+)
+The 0.20+ JVM package carries native assets under the `libsecretspec`
+embedded C ABI name.
+
+## Install
 
 ### Using gradle
 
@@ -63,7 +64,43 @@ public class QuickStartExample {
 names. Other failures throw `SecretSpecException`, whose `kind()` method
 returns a stable error category.
 
-## Scopes (0.17+)
+## Inline Spec (0.20+)
+
+Use `withInlineSpec(spec, baseDir)` to use an inline specification. Can
+be useful if you want to embed the specification inside your
+application.
+
+``` astro-code
+package org.cachix.examples;
+
+import org.cachix.secretspec.SecretSpec;
+
+public class InlineSpecExample {
+
+    public static void main(String[] args) {
+        try (var resolved = SecretSpec.builder()
+            .withInlineSpec(
+                "{\n" +
+                "  \"project\": { \"name\": \"java-inline\" },\n" +
+                "  \"providers\": { \"env\": \"dotenv://inline.env\" },\n" +
+                "  \"profiles\": { \"default\": { \"secrets\": {\n" +
+                "    \"DATABASE_URL\": { \"description\": \"Database URL\", \"providers\": [\"env\"] }\n" +
+                "  } } }\n" +
+                "}",
+                System.getProperty("user.dir")
+            )
+            .withReason("boot web app")
+            .load()
+        ) {
+            System.out.println(resolved.provider() + " (" + resolved.profile() + ")");
+            System.out.println(resolved.secret("DATABASE_URL").get());
+            resolved.setAsSystemProperties();
+        }
+    }
+}
+```
+
+## Scopes
 
 Use `withScope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `Resolved.scope()` and
@@ -172,7 +209,7 @@ public class AsPathExample {
 }
 ```
 
-## Caller (0.20+)
+## Caller
 
 Caller context answers *what* invoked SecretSpec (for example, `git`).
 It is deliberately separate from the user-supplied access reason, which
@@ -214,6 +251,5 @@ public class CallerExample {
 
 The Jar runtime asset is selected automatically. For local SDK
 development, `SECRETSPEC_FFI_LIB` can point to a particular
-`libsecretspec_ffi` build. From a SecretSpec source checkout, the SDK
-also searches an ancestor Cargo `target/debug` or `target/release`
-directory.
+`libsecretspec` build. From a SecretSpec source checkout, the SDK also
+searches an ancestor Cargo `target/debug` or `target/release` directory.

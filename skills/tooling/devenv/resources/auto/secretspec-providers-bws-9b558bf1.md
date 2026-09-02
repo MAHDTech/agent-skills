@@ -1,9 +1,10 @@
 # Bitwarden Secrets Manager Provider
 
-The Bitwarden Secrets Manager (BWS) provider integrates with Bitwarden
-for centralized, end-to-end encrypted secret management. SecretSpec 0.17
-and later invoke the separately installed official `bws` CLI instead of
-linking the Bitwarden SDK.
+The [Bitwarden Secrets
+Manager](https://bitwarden.com/products/secrets-manager/) (BWS) provider
+integrates with Bitwarden for centralized, end-to-end encrypted secret
+management. SecretSpec 0.17 and later invoke the separately installed
+official `bws` CLI instead of linking the Bitwarden SDK.
 
 ## At a glance
 

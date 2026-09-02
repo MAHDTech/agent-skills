@@ -9,12 +9,12 @@ skill_name = "devenv"
 
 # Null Provider
 
-The null provider always reports that a value is missing. SecretSpec can
-then use the declaration’s committed `default`, generate a fresh value,
-or—in SecretSpec 0.19+—ask the operator during `run` when
-`prompt = true`. This is useful for non-sensitive environment
-configuration and values that should exist for only one invocation or
-resolution.
+The [null](https://man7.org/linux/man-pages/man4/null.4.html) provider
+always reports that a value is missing. SecretSpec can then use the
+declaration’s committed `default`, generate a fresh value, or—in
+SecretSpec 0.19+—ask the operator during `run` when `prompt = true`.
+This is useful for non-sensitive environment configuration and values
+that should exist for only one invocation or resolution.
 
 ## At a glance
 
@@ -62,7 +62,7 @@ environment and gives that value to the child process. A later `run`,
 `get`, `check`, or SDK value-carrying resolution generates a new value.
 Value-free reports mark the secret as generated without minting it.
 
-## Ephemeral operator input (0.19+)
+## Ephemeral operator input
 
 Combine `prompt = true` with `null` when the value must always come from
 the operator and must never be stored:

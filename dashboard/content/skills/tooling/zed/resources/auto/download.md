@@ -8,7 +8,7 @@ skill_name = "zed"
 +++
 
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 # 1.17.2
 

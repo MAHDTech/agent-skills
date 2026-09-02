@@ -13,11 +13,11 @@ Created by the team that developed Atom, Electron, and Tree-sitter, Zed
 is crafted from the ground-up for performance, collaboration, and the
 future.
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-1.0lw~af66igx1i.png)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-1.1x07f3_j7ecwa.png)
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-2.0.z_gho7e.lgv.png)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-2.3fusjur74o_9e.png)
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-3.045tsv898u0pb.png)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-3.0dib0qv1l08nu.png)
 
 ## Breadcrumbs
 
