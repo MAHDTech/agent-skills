@@ -217,5 +217,13 @@ clippy
 crossterm
 nextest
 ratatui
+chrono
+codegen
+reqwest
+rustflags
+rustls
+thiserror
+walkdir
+Wrust
 xclip
 docstrings

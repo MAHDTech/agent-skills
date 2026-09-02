@@ -1,0 +1,100 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/skills-core",
+    "crates/skills-tui",
+    "crates/ask-cli",
+]
+default-members = ["crates/ask-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80.0"
+authors = ["MAHDTech"]
+license = "MIT"
+repository = "https://github.com/MAHDTech/agent-skills"
+homepage = "https://github.com/MAHDTech/agent-skills"
+readme = "README.md"
+
+[workspace.dependencies]
+# Internal workspace crates
+skills-core = { path = "crates/skills-core", version = "0.1.0" }
+skills-tui = { path = "crates/skills-tui", version = "0.1.0" }
+
+# Serialization and data models
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+serde_yaml = "0.9.34"
+chrono = { version = "0.4.38", features = ["serde"] }
+typed-builder = "0.20.0"
+
+# Async runtime and networking
+tokio = { version = "1.40.0", features = ["full"] }
+reqwest = { version = "0.12.7", default-features = false, features = ["json", "rustls-tls", "stream"] }
+
+# CLI and Terminal UI
+clap = { version = "4.5.17", features = ["derive", "cargo", "env"] }
+ratatui = { version = "0.28.1", features = ["all-widgets", "crossterm"] }
+crossterm = { version = "0.28.1", features = ["event-stream"] }
+comfy-table = "7.1.1"
+colored = "2.1.0"
+color-eyre = "0.6.3"
+
+# Logging and Diagnostics
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt"] }
+
+# Error Handling
+thiserror = "1.0.63"
+anyhow = "1.0.87"
+
+# Filesystem and System Utilities
+walkdir = "2.5.0"
+dirs = "5.0.1"
+sha2 = "0.10.8"
+
+# Test and Development Dependencies
+tempfile = "3.12.0"
+assert_cmd = "2.0.16"
+predicates = "3.1.2"
+wiremock = "0.6.2"
+
+[workspace.lints.rust]
+rust_2024_compatibility = { level = "warn", priority = -1 }
+missing_debug_implementations = "warn"
+unreachable_pub = "warn"
+unsafe_code = "forbid"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+doc_markdown = "warn"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.test]
+opt-level = 0
+debug = true
+
+[profile.bench]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
