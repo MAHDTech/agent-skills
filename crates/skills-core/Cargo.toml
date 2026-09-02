@@ -7,6 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 readme.workspace = true
+description = "Core domain models, error types, and abstractions for agent skills"
 
 [lints]
 workspace = true
@@ -18,3 +19,6 @@ serde_yaml = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true }
 typed-builder = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
