@@ -16,8 +16,8 @@ We will migrate all internal developer tooling from Bun/TypeScript to a unified 
 1. **Independent Tooling:** The repository's internal tooling is completely decoupled from downstream consumer installation. Rewriting the CLI tools in Rust will not affect `skills.sh` or end-users.
 2. **Cargo Workspace:** A single Cargo workspace with `crates/` hosting:
    - `skills-core`: Shared domain models, YAML frontmatter parsing, markdown linting, sync logic, and resource downloader.
-   - `skills-cli`: Binary CLI for `skills` command (`--action lint|sync|install|uninstall|download-resources|clean-resources`).
-   - `dashboard-cli`: Binary CLI for `dashboard` command (`--action build|serve|css|lint`).
+   - `skills-tui`: Terminal user interface powered by Ratatui and Crossterm.
+   - `ask-cli`: Unified binary CLI providing the `ask` entrypoint with `skills`, `dashboard`, and `tui` subcommands.
 3. **Devenv & Toolchain:**
    - Manage the Rust toolchain via `rust-toolchain.toml` with `languages.rust.toolchainFile` in `devenv.nix`.
    - Enable `mold` linker for fast incremental compilation on Linux.
