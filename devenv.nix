@@ -12,12 +12,18 @@ let
 
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [
+    cargo-audit
+    cargo-deny
+    cargo-nextest
+    cargo-watch
+    clang
     codeql
     convco
     figlet
     git
     hello
     jq
+    mold
     pagefind
     pandoc
     ripgrep
@@ -32,6 +38,8 @@ in
   env = {
     AGENT_SKILLS_HOME = config.devenv.root;
     PROJECT = config.name;
+    RUST_BACKTRACE = "1";
+    RUST_LOG = "info";
   };
 
   cachix = lib.mkIf isNative {
@@ -108,6 +116,10 @@ in
     shell = {
       enable = isNative;
     };
+    rust = {
+      enable = isNative;
+      mold.enable = pkgs.stdenv.isLinux;
+    };
   };
 
   git-hooks = lib.mkIf isNative {
@@ -123,6 +135,7 @@ in
     hooks = {
       action-validator.enable = true;
       actionlint.enable = true;
+      cargo-check.enable = true;
       check-json.enable = true;
       check-merge-conflicts.enable = true;
       check-shebang-scripts-are-executable = {
@@ -133,6 +146,7 @@ in
       };
       check-symlinks.enable = true;
       check-yaml.enable = true;
+      clippy.enable = true;
       commitizen.enable = true;
       convco = {
         enable = true;
@@ -246,6 +260,7 @@ in
         ];
       };
       ripsecrets.enable = true;
+      rustfmt.enable = true;
       shellcheck.enable = true;
       shfmt.enable = true;
       skills-test = {
@@ -312,13 +327,36 @@ in
   };
 
   scripts = {
+    ask = {
+      description = "Unified ask CLI management tool";
+      exec = ''
+        if [ -f Cargo.toml ]; then
+          cargo run -p ask-cli -- "$@"
+        else
+          echo "ask-cli not yet available; Cargo.toml not found"
+          exit 1
+        fi
+      '';
+    };
     skills = {
       description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|download-resources|clean-resources|test>)";
-      exec = "bun run skills \"$@\"";
+      exec = ''
+        if [ -f Cargo.toml ]; then
+          cargo run -p ask-cli -- skills "$@"
+        else
+          bun run skills "$@"
+        fi
+      '';
     };
     dashboard = {
       description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test|lint>)";
-      exec = "bun run dashboard \"$@\"";
+      exec = ''
+        if [ -f Cargo.toml ]; then
+          cargo run -p ask-cli -- dashboard "$@"
+        else
+          bun run dashboard "$@"
+        fi
+      '';
     };
     codeql-run = {
       package = pkgs.bash;
@@ -330,6 +368,9 @@ in
   };
 
   enterTest = ''
+    if [ -f Cargo.toml ]; then
+      cargo nextest run --workspace --all-targets || cargo test --workspace --all-targets
+    fi
     bun test bin/skills/lib.test.ts
     bun test bin/skills/lint.test.ts
     bun test bin/skills/downloader.test.ts
