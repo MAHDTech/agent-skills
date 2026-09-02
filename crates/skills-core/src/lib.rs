@@ -4,10 +4,12 @@
 //! parsing, linting primitives, error types, and synchronization models.
 
 pub mod error;
+pub mod lint;
 pub mod models;
 pub mod parser;
 
 pub use error::{Result, SkillError};
+pub use lint::SkillLinter;
 pub use models::*;
 pub use parser::{MarkdownSection, ParsedSkill, SkillParser, TemplatePlaceholder};
 
