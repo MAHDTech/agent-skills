@@ -1,6 +1,8 @@
 # AWS Systems Manager Parameter Store Provider
 
-The AWS Parameter Store provider stores secrets as encrypted
+The [AWS Systems Manager Parameter
+Store](https://aws.amazon.com/systems-manager/features/#Parameter_Store)
+provider stores secrets as encrypted
 [`SecureString`](https://docs.aws.amazon.com/systems-manager/latest/userguide/secure-string-parameter-kms-encryption.html)
 parameters.
 

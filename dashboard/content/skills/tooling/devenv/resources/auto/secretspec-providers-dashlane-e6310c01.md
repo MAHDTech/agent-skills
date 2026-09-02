@@ -9,12 +9,11 @@ skill_name = "devenv"
 
 # Dashlane Provider
 
-The Dashlane provider reads secrets from a
-[Dashlane](https://www.dashlane.com/) vault through the [Dashlane
-CLI](https://cli.dashlane.com/) (`dcli`). It is a **read-only**
-provider: `dcli` can list and read vault items but has no command that
-creates or edits one, so items are authored in a Dashlane app and read
-from here.
+The [Dashlane](https://www.dashlane.com/) provider reads secrets from a
+Dashlane vault through the [Dashlane CLI](https://cli.dashlane.com/)
+(`dcli`). It is a **read-only** provider: `dcli` can list and read vault
+items but has no command that creates or edits one, so items are
+authored in a Dashlane app and read from here.
 
 ## At a glance
 

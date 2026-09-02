@@ -9,7 +9,9 @@ skill_name = "devenv"
 
 # File Provider
 
-The file provider reads and writes one plaintext UTF-8 file per secret.
+The
+[file](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html)
+provider reads and writes one plaintext UTF-8 file per secret.
 
 ## At a glance
 
@@ -144,7 +146,7 @@ Referenced files are writable when filesystem permissions allow it.
 Treat runtime-managed mounts as read-only unless their owner explicitly
 permits SecretSpec to replace or delete entries.
 
-## Extract from a document (0.19+)
+## Extract from a document
 
 Several declarations can select values from one JSON file without making
 JSON part of the provider itself:

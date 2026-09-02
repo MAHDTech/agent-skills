@@ -337,7 +337,7 @@ curl -X POST https://api.x.ai/v1/images/generations \
 
 ### Quality
 
-Control generation quality with the optional `quality` parameter. Allowed values are `low` and `medium`. When omitted, the default is `medium`. The parameter is only supported for `grok-imagine-image-2.0`.
+Control generation quality with the optional `quality` parameter. Allowed values are `low`, `medium`, and `auto`. When omitted, the default is `auto`, which lets the service choose the quality for each request. Auto currently uses `low` for image generation and `medium` for [image editing](https://docs.x.ai/developers/model-capabilities/images/editing). Images are billed at the quality they are served at (see [Pricing](https://docs.x.ai/developers/pricing)). Pass `low` or `medium` to pin a specific quality. The parameter is only supported for `grok-imagine-image-2.0`.
 
 ```python customLanguage="pythonXAI"
 import xai_sdk

@@ -87,7 +87,7 @@ Required and defaulted secrets are generated as `String`; secrets that
 may be absent are `Option<String>`. Field names use Rust snake case, so
 `DATABASE_URL` becomes `database_url`.
 
-## Describing secrets in Rust (0.20+)
+## Describing secrets in Rust
 
 Starting with SecretSpec 0.20, `Spec` is the format-independent
 declaration API. Build one directly in Rust when an application owns its
@@ -204,7 +204,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Scopes (0.17+)
+## Scopes
 
 A [scope](https://secretspec.dev/concepts/scopes/) resolves only a named subset of a profile.
 Scopes are available through the untyped `Secrets` API:
@@ -234,7 +234,7 @@ secret, so hiding one would leave that field unfillable.
 separate manifest or the untyped API when a component needs a narrowed
 set.
 
-## Resolving one secret (0.19+)
+## Resolving one secret
 
 `resolve()` answers whether the whole profile can be satisfied, so a
 single missing required secret fails it and returns nothing. When a
@@ -282,7 +282,7 @@ needs to identify the software integration, use the separate caller
 context below; unlike a default reason, it cannot satisfy
 `require_reason`.
 
-## Caller context (0.20+)
+## Caller context
 
 Software integrations can record what invoked SecretSpec without
 replacing the user-supplied access reason:
@@ -297,7 +297,7 @@ context is caller-asserted audit metadata, not an authenticated
 identity, and never satisfies `require_reason`. Do not put credentials
 or secret values in it.
 
-## Interactive prompting (0.20+)
+## Interactive prompting
 
 `Secrets::ensure_secrets` prompts for and stores any missing required
 secret when stdin is a real terminal. Generated builders opt into the

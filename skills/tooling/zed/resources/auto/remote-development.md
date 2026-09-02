@@ -8,11 +8,11 @@ sourceC](https://github.com/zed-industries/zed)
 
 [Read the blog post →](https://zed.dev/blog/remote-development)
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/ssh-hero-light.0xg530j~z08_~.jpg)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/ssh-hero-dark.0hr0i13u.032t.jpg)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/ssh-hero-light.2wpu6ipd2zlea.jpg)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/ssh-hero-dark.1jjanu57bad5o.jpg)
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-l2.027-3bs7435qe.png)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-d2.0q.miw14~01co.png)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-l2.075tbg6-yzncw.png)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-d2.2butu_lnqkvk_.png)
 
-![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-l3.15.ug4cmze4bt.png)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-d3.0xe181.fv25q_.png)
+![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-l3.3zohg180of9nu.png)![](https://zed.dev/cdn-cgi/image/width=1920,quality=75,format=auto/_next/static/media/hero-d3.2wjbxt-xvew9l.png)
 
 ## Code at the speed of thought, even while remote
 
@@ -76,7 +76,7 @@ Even while remote, take full advantage of all Zed’s features, like
 extensions, collab, the agent, and more.
 
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 ## Daily drive with Zed
 

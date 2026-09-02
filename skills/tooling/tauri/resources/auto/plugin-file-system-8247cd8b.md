@@ -572,7 +572,7 @@ To apply a scope to any `fs` command, use the `fs:scope` permission:
 
 src-tauri/capabilities/default.json
 
-To apply a scope to a specific `fs` command, use the the object form of
+To apply a scope to a specific `fs` command, use the object form of
 permissions `{ "identifier": string, "allow"?: [], "deny"?: [] }`:
 
 ```

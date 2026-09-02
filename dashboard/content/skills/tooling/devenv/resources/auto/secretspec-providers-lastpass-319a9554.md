@@ -9,8 +9,8 @@ skill_name = "devenv"
 
 # LastPass Provider
 
-The LastPass provider integrates with LastPass password manager for
-secure cloud-based secret storage.
+The [LastPass](https://www.lastpass.com/) provider integrates with
+LastPass password manager for secure cloud-based secret storage.
 
 ## At a glance
 

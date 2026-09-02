@@ -69,7 +69,7 @@ $ secretspec run --provider dotenv:.env.fixtures -- cargo test
 
 Terminal window
 
-## Different coordinates per provider (0.19+)
+## Different coordinates per provider
 
 The original `ref` remains useful when every provider understands one
 address. When endpoints organize the same logical secret differently,

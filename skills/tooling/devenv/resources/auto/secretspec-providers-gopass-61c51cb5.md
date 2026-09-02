@@ -1,6 +1,6 @@
 # Gopass Provider
 
-The Gopass provider integrates with [gopass](https://www.gopass.pw/), a
+The [Gopass](https://www.gopass.pw/) provider integrates with gopass, a
 multi-user, multi-store abstraction layer on top of `pass` that keeps
 secrets GPG-encrypted and syncs them via git.
 

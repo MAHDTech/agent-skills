@@ -29,6 +29,8 @@ need to be shared across developers.
 | `uuid` | UUID v4 (36 chars) | none |
 | `command` | stdout of command | `command` (string, required) |
 | `rsa_private_key` | 2048-bit RSA private key (PKCS1 PEM) | `bits` (int) |
+| `openpgp_private_key` (0.21+) | ASCII-armored OpenPGP transferable secret key | `user_id` (required), `algorithm` (`"ed25519"` or `"rsa"`), `bits` (RSA only), `capabilities` (`["sign"]`, `["encrypt"]`, or both) |
+| `ssh_private_key` (0.21+) | Unencrypted OpenSSH Ed25519 private key | `algorithm` (`"ed25519"` or `"rsa"`), `bits` (RSA only), `comment` (string) |
 
 ### Command type
 
@@ -41,6 +43,53 @@ MONGO_KEY = { description = "MongoDB keyfile", type = "command", generate = { co
 
 `command` requires `generate = { command = "..." }` rather than just
 `generate = true`.
+
+### OpenPGP private keys
+
+`openpgp_private_key` generates a GnuPG-compatible OpenPGP v4 key
+entirely in process; neither `gpg` nor another executable is required.
+Its modern default uses an Ed25519 certification-only primary key and
+puts routine operations on separate Ed25519 signing and Curve25519
+encryption subkeys.
+
+The User ID is required. With no `capabilities`, SecretSpec creates both
+signing and encryption subkeys:
+
+```
+[profiles.default]GENERAL_KEY = { description = "Service OpenPGP key", type = "openpgp_private_key", generate = { user_id = "Service Bot <service@example.com>" } }
+# A signing-only key has no encryption subkey.RELEASE_KEY = { description = "Release signing key", type = "openpgp_private_key", generate = { user_id = "Release Bot <releases@example.com>", capabilities = ["sign"] } }
+# RSA is available for consumers that require it; 3072 bits is the default.LEGACY_KEY = { description = "Legacy-compatible OpenPGP key", type = "openpgp_private_key", generate = { user_id = "Legacy Bot <legacy@example.com>", algorithm = "rsa", bits = 4096 } }
+```
+
+`capabilities` must be a non-empty list containing `"sign"`,
+`"encrypt"`, or both without duplicates. `algorithm` defaults to
+`"ed25519"`. Selecting `"rsa"` uses RSA for the primary key and every
+requested subkey; `bits` defaults to 3072 and accepts values from 2048
+through 8192. `bits` is invalid with `"ed25519"`.
+
+The result is one `-----BEGIN PGP PRIVATE KEY BLOCK-----` value that can
+be imported by GnuPG and other OpenPGP tools. It has no OpenPGP
+passphrase and no expiration; protect it with an encrypted provider and
+rotate it according to the consuming system’s policy. Set
+`as_path = true` when a command needs a temporary key file rather than
+the armored value in an environment variable.
+
+### SSH private keys
+
+`ssh_private_key` generates an unencrypted OpenSSH private key entirely
+in process. `generate = true` uses Ed25519, the sensible default for new
+SSH keys:
+
+```
+[profiles.default]DEPLOY_KEY = { description = "Deployment SSH key", type = "ssh_private_key", generate = true }
+# RSA is available for compatibility; 3072 bits is the default.LEGACY_DEPLOY_KEY = { description = "Legacy deployment key", type = "ssh_private_key", generate = { algorithm = "rsa", bits = 4096, comment = "deploy@example.com" } }
+```
+
+RSA sizes from 2048 through 8192 bits are accepted. `bits` is invalid
+with Ed25519. `comment` is optional and cannot contain control
+characters. Generated keys are not passphrase-encrypted, so store them
+in an encrypted provider. Set `as_path = true` when a command needs the
+key in a temporary file rather than in an environment variable.
 
 ## How it works
 
@@ -56,7 +105,7 @@ MONGO_KEY = { description = "MongoDB keyfile", type = "command", generate = { co
 - Setting `type` without `generate` is informational only and does not
   trigger auto-generation.
 
-## Ephemeral generation with null (0.19+)
+## Ephemeral generation with null
 
 Use `providers = ["null"]` when the value should be generated on demand
 and never written to provider storage:
@@ -79,6 +128,8 @@ retrieve the same value.
 # 64-byte key encoded as base64ENCRYPTION_KEY = { description = "Encryption key", type = "base64", generate = { bytes = 64 } }
 # RSA private key (default 2048-bit)JWT_SIGNING_KEY = { description = "JWT signing key", type = "rsa_private_key", generate = true }
 # RSA private key with custom key sizeTLS_KEY = { description = "TLS private key", type = "rsa_private_key", generate = { bits = 4096 } }
+# OpenPGP signing key (requires SecretSpec 0.21+)RELEASE_KEY = { description = "Release signing key", type = "openpgp_private_key", generate = { user_id = "Release Bot <releases@example.com>", capabilities = ["sign"] } }
+# OpenSSH Ed25519 private key (requires SecretSpec 0.21+)DEPLOY_KEY = { description = "Deployment SSH key", type = "ssh_private_key", generate = true }
 # Informational type only, no generationEXTERNAL_API_KEY = { description = "Provided by vendor", type = "password" }
 ```
 

@@ -2,7 +2,7 @@
 
 # Imagine Overview
 
-The Imagine API lets you generate and edit images and videos with Grok Imagine models. Use it for image generation, image editing with up to 3 reference images, video generation from text or still images, video editing, and more.
+The Imagine API lets you generate and edit images and videos with Grok Imagine models. Use it for image generation, image editing with up to 5 reference images, video generation from text or still images, video editing, and more.
 
 ## Pricing
 
@@ -65,7 +65,7 @@ console.log(image.base64);
 
 ## Image Editing
 
-Edit a source image with natural language. Provide a public image URL or base64-encoded data URI, then describe the change you want Grok Imagine to apply. Multi-image editing supports up to 3 source images in a single request for combining subjects, transferring styles, and composing scenes.
+Edit a source image with natural language. Provide a public image URL or base64-encoded data URI, then describe the change you want Grok Imagine to apply. Multi-image editing supports up to 5 source images in a single request for combining subjects, transferring styles, and composing scenes.
 
 ```python customLanguage="pythonXAI"
 import base64
@@ -190,7 +190,7 @@ done
 
 Beyond the top use cases above, the Imagine API supports several additional workflows:
 
-* **[Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)** — Combine up to 3 source images in a single edit for compositing subjects, transferring styles, and building scenes from multiple references.
+* **[Multi-Image Editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)** — Combine up to 5 source images in a single edit for compositing subjects, transferring styles, and building scenes from multiple references.
 * **[Video Generation](https://docs.x.ai/developers/model-capabilities/video/generation)** — Generate videos from text prompts with configurable duration (up to 15s), aspect ratio, and resolution.
 * **[Video Editing](https://docs.x.ai/developers/model-capabilities/video/editing)** — Modify an existing video with a text prompt while preserving the rest of the scene.
 * **[Reference-to-Video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)** — Guide a generated video with one or more reference images that influence the output without forcing the first frame.

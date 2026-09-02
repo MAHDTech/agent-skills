@@ -1,7 +1,7 @@
 # Passbolt Provider
 
-The Passbolt provider reads and writes resources in a self-hosted
-[Passbolt](https://www.passbolt.com/) server through the
+The [Passbolt](https://www.passbolt.com/) provider reads and writes
+resources in a self-hosted Passbolt server through the
 community-maintained
 [`go-passbolt-cli`](https://github.com/passbolt/go-passbolt-cli).
 

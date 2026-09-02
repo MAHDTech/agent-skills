@@ -1,7 +1,8 @@
 # Vault Provider
 
-The Vault provider integrates with HashiCorp Vault for centralized
-secret management using the KV (Key-Value) secrets engine.
+The [Vault](https://developer.hashicorp.com/vault) provider integrates
+with HashiCorp Vault for centralized secret management using the KV
+(Key-Value) secrets engine.
 
 ## At a glance
 
@@ -72,7 +73,7 @@ Keep the server default unless the workload deliberately relies on
 another trust boundary, such as a tightly controlled Agent host and
 network constraints.
 
-### Custom authentication mounts (0.18+)
+### Custom authentication mounts
 
 AppRole and JWT methods mounted somewhere other than their defaults can
 be selected with `?auth_mount=`. The value is relative to `/v1/auth`:
@@ -85,7 +86,7 @@ The provider logs in at `/v1/auth/platform-approle/login` and
 `/v1/auth/ci-jwt/login`, respectively. The KV mount remains the provider
 URI path (`secret` in these examples).
 
-### JWT / OIDC authentication (0.17+)
+### JWT / OIDC authentication
 
 Select JWT with `?auth=jwt`. The provider performs the `auth/jwt/login`
 exchange itself. The JWT comes from `VAULT_JWT` when set. Otherwise, in
@@ -170,7 +171,7 @@ For KV v2, `DATABASE_URL` for project `myapp` and profile `production`
 is read from
 `GET /v1/secret/data/secretspec/myapp/production/DATABASE_URL`.
 
-## Provider caching (0.17+)
+## Provider caching
 
 A KV v2 mount can hold a [cached provider
 route’s](https://secretspec.dev/concepts/providers/caching/) entries. Vault expires them

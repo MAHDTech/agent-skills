@@ -1,10 +1,10 @@
 # systemd Credential Provider
 
-The systemd credential provider reads credentials that the service
-manager passed to the current process. It is a read-only delivery
-provider: systemd selects and optionally decrypts each credential before
-SecretSpec starts, and SecretSpec reads the resulting file from
-`$CREDENTIALS_DIRECTORY`.
+The [systemd](https://systemd.io/) credential provider reads credentials
+that the service manager passed to the current process. It is a
+read-only delivery provider: systemd selects and optionally decrypts
+each credential before SecretSpec starts, and SecretSpec reads the
+resulting file from `$CREDENTIALS_DIRECTORY`.
 
 ## At a glance
 

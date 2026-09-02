@@ -9,16 +9,16 @@ skill_name = "devenv"
 
 # C# SDK
 
-> **Version compatibility:** Available since SecretSpec 0.16. The 0.15.0
-> NuGet package is an unsupported bootstrap artifact used to reserve the
-> package ID; use version 0.16 or later for the API below.
+> **Native library name:** SecretSpec 0.20+ packages the embedded C ABI
+> as `libsecretspec` (`libsecretspec.*`). The runtime loader still
+> accepts the pre-0.20 `secretspec_ffi` filenames.
 
 The C# SDK (`Cachix.SecretSpec`) is a thin client over the same Rust
 resolver as the CLI. Every provider, fallback chain, profile, generator,
 reference, and `as_path` secret therefore works without C#-side
 resolution logic.
 
-## Install (0.16+)
+## Install
 
 ```
 $ dotnet add package Cachix.SecretSpec
@@ -76,7 +76,7 @@ using var resolved = SecretSpec.Resolve(
     reason: "boot web app");
 ```
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 var builder = SecretSpec.Builder().WithCaller(new CallerContext{    Name = "git",    Version = "2.51.0",    Operation = "credential_get",    Resource = "github.com",});
@@ -86,14 +86,14 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `WithInlineSpec(spec, baseDir)` to resolve strict inline-spec v1
 declarations from an object serialized by `System.Text.Json`. `baseDir`
 resolves relative provider paths, and an older native library reports a
 capability error.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `WithScope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `Resolved.Scope` and
@@ -191,7 +191,6 @@ var certificatePath = resolved.Secrets["TLS_CERT"].Get();
 
 The NuGet runtime asset is selected automatically. For local SDK
 development, `SECRETSPEC_FFI_LIB` can point to a particular
-`libsecretspec_ffi` build. From a SecretSpec source checkout, the SDK
-also searches an ancestor Cargo `target/debug` or `target/release`
-directory.
+`libsecretspec` build. From a SecretSpec source checkout, the SDK also
+searches an ancestor Cargo `target/debug` or `target/release` directory.
 

@@ -147,6 +147,7 @@ in
           "dashboard/content/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
+          "^skills\\.sh\\.json$"
           "\\.versionrc$"
         ];
         args = [

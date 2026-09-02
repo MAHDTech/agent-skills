@@ -53,6 +53,8 @@ input:
 $ devenv inputs add nixpkgs-multiverse github:fzakaria/nixpkgs-multiverse
 ```
 
+Terminal window
+
 Then select packages by attribute and version in `devenv.nix`:
 
 ```

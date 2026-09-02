@@ -9,9 +9,8 @@ skill_name = "devenv"
 
 # Proton Pass Provider
 
-The Proton Pass provider integrates with [Proton
-Pass](https://proton.me/pass) for end-to-end encrypted cloud secret
-storage.
+The [Proton Pass](https://proton.me/pass) provider integrates with
+Proton Pass for end-to-end encrypted cloud secret storage.
 
 ## At a glance
 

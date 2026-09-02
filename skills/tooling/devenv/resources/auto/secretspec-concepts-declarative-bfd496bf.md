@@ -29,7 +29,8 @@ SECRET_NAME = {  description = "Human-readable explanation",  # Required: shown 
   secrets (see [Composed Secrets](https://secretspec.dev/concepts/composed-secrets/) for the
   strict template and dependency semantics)
 - `type`: Secret type for auto-generation (`password`, `hex`, `base64`,
-  `uuid`, `command`)
+  `uuid`, `command`, `rsa_private_key`, `openpgp_private_key` (0.21+),
+  and `ssh_private_key` (0.21+))
 - `generate`: Enable auto-generation when the secret is missing (`true`
   or a table with options)
 - `prompt` (0.19+): Securely ask for a missing value during

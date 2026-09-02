@@ -115,7 +115,7 @@ explicitly redeclared secrets from inheriting omitted fields. The
 setting has no effect on the `default` profile itself. A standalone
 profile must declare at least one secret.
 
-#### Cross-secret presence constraints (0.17+)
+#### Cross-secret presence constraints
 
 A profile can require alternative credentials by assigning secrets to a
 named group:
@@ -150,7 +150,7 @@ Each secret variable is defined as a table with the following fields:
 | `as_path` | boolean | No | Write secret to temp file and return file path (default: false) |
 | `encoding` (0.19+) | `"base64"`, `"base64url"`, or `"hex"` | No | Encode logical values before storage writes and decode stored values after reads |
 | `extract` (0.19+) | table | No | Select one logical value from stored JSON (0.19+) or INI (0.20+) data with a pointer |
-| `type` | string | No | Secret type for generation: `password`, `hex`, `base64`, `uuid`, `command`, `rsa_private_key` |
+| `type` | string | No | Secret type for generation: `password`, `hex`, `base64`, `uuid`, `command`, `rsa_private_key`, `openpgp_private_key` (0.21+), `ssh_private_key` (0.21+) |
 | `generate` | boolean or table | No | Enable auto-generation when secret is missing |
 | `prompt` (0.19+) | boolean | No | Securely prompt for a missing value during `secretspec run`; the selected provider controls persistence |
 
@@ -418,7 +418,7 @@ Terminal window
 These explicitly scoped CLI commands operate on the user-global config
 only — edit `secretspec.toml` by hand to change project-level aliases.
 
-#### SecretSpec 0.15 alias values
+#### Credential-aware alias values
 
 In SecretSpec 0.15 and later, an alias value is either a bare provider
 URI string or a table that also declares the credentials the provider
@@ -468,7 +468,7 @@ cached alias itself. Bare provider names and literal URIs have no alias
 identity, so they use provider convention naming unless the secret
 declares legacy `ref`.
 
-#### SecretSpec 0.19 inline provider cache
+#### Inline provider cache
 
 Use `uri` and `cache` when one provider is authoritative. `credentials`
 remains optional and configures that same provider:
@@ -492,7 +492,7 @@ The alias remains both the selected cached route and the build key for
 its authoritative provider, so its configured credentials apply
 normally.
 
-#### SecretSpec 0.17 cached fallback alias values
+#### Cached fallback alias values
 
 A cached fallback alias uses `fallback` and `cache` when more than one
 provider can answer:
@@ -525,7 +525,7 @@ the cached fallback alias. See [Provider
 caching](https://secretspec.dev/concepts/providers/caching/) for freshness, failure,
 invalidation, and clearing behavior.
 
-#### SecretSpec 0.14 alias values
+#### Legacy bare-URI alias values
 
 In SecretSpec 0.14, every alias value must be a provider URI string:
 
@@ -590,7 +590,7 @@ bytes rather than the stored textual representation. When combined with
 | Rust SDK | Files cleaned up when `ValidatedSecrets` is dropped; use `keep_temp_files()` to persist |
 | Rust SDK types | `PathBuf` or `Option<PathBuf>` instead of `String` |
 
-### Secret Encoding (0.19+)
+### Secret Encoding
 
 `encoding` (0.19+) defines the textual representation stored by
 providers and the cache. It is independent of `as_path`: decoded UTF-8
@@ -618,7 +618,7 @@ cache. Defaults and composed results are already logical and are not
 transformed. The `secretspec import` command copies the stored
 representation verbatim, avoiding double encoding.
 
-### Structured Extraction (0.19+)
+### Structured Extraction
 
 `extract` (0.19+) selects one logical secret from structured text read
 from a provider or cache. It supports JSON (0.19+) and INI (0.20+). JSON
@@ -722,7 +722,7 @@ resolution order](https://secretspec.dev/concepts/providers/fallback/); a `ref` 
 the `providers` fallback chain, and each provider is asked for the same
 coordinates.
 
-#### Provider-scoped references (0.19+)
+#### Provider-scoped references
 
 Use `refs` when one logical secret already has different native
 coordinates in different providers. Keys are leaf provider aliases; they
@@ -765,6 +765,7 @@ inherits whichever form `[profiles.default]` uses.
 | [dotenv](https://secretspec.dev/providers/dotenv/#use-existing-secrets) | `.env` key | Rejected | Reads the key | ✅ |
 | [file (0.19+)](https://secretspec.dev/providers/file/#use-existing-files) | Relative file path beneath the configured root | Rejected | Reads the complete UTF-8 file | ✅ |
 | [env](https://secretspec.dev/providers/env/#use-existing-secrets) | Variable name | Rejected | Reads the variable | — (read-only) |
+| [EJSON (0.20+)](https://secretspec.dev/providers/ejson/#use-existing-secrets) | RFC 6901 JSON Pointer | Rejected | Reads the selected JSON string | — (read-only) |
 | [systemd credentials (0.17+)](https://secretspec.dev/providers/systemd-credential/#use-an-existing-credential-name) | Credential filename | Rejected | Reads the credential | — (read-only) |
 | [Fly.io secrets (0.20+)](https://secretspec.dev/providers/fly/#use-existing-secrets) | Fly app secret name | Rejected | Error: Fly.io does not expose plaintext values | ✅ write-only via `flyctl secrets set` |
 | [Cloudflare Secrets Store (0.20+)](https://secretspec.dev/providers/cloudflare/#use-existing-secrets-020) | Account-secret name in the selected store | Rejected | Error: Cloudflare’s management API does not expose plaintext values | ✅ write-only via the Cloudflare API |
@@ -818,7 +819,7 @@ names a vault, and item paths on provider URIs are errors.
 - `check --explain` and `check --json` attribute ref secrets to the
   store URI they resolved from.
 
-### Prompt on missing during run (0.19+)
+### Prompt on missing during run
 
 Use `prompt = true` when `secretspec run` should ask the operator after
 every configured provider has returned missing. Prompting is the value
@@ -871,6 +872,8 @@ provider:
 # Custom optionsAPI_TOKEN = { description = "API token", type = "hex", generate = { bytes = 32 } }SESSION_KEY = { description = "Session key", type = "base64", generate = { bytes = 64 } }
 # Shell commandMONGO_KEY = { description = "MongoDB keyfile", type = "command", generate = { command = "openssl rand -base64 765" } }
 # RSA private key (PKCS1 PEM)JWT_SIGNING_KEY = { description = "JWT signing key", type = "rsa_private_key", generate = true }
+# OpenPGP signing key (0.21+)RELEASE_KEY = { description = "Release signing key", type = "openpgp_private_key", generate = { user_id = "Release Bot <releases@example.com>", capabilities = ["sign"] } }
+# OpenSSH Ed25519 private key (0.21+)DEPLOY_KEY = { description = "Deployment SSH key", type = "ssh_private_key", generate = true }
 # Type without generate: informational only, no auto-generationMANUAL_SECRET = { description = "Manually managed", type = "password" }
 ```
 
@@ -884,6 +887,38 @@ provider:
 | `uuid` | UUID v4 (36 chars) | none |
 | `command` | stdout of command | `command` (string, required) |
 | `rsa_private_key` | 2048-bit RSA private key (PKCS1 PEM) | `bits` (int) |
+| `openpgp_private_key` (0.21+) | ASCII-armored OpenPGP v4 transferable secret key | `user_id` (required), `algorithm` (`"ed25519"` or `"rsa"`), `bits` (RSA only), `capabilities` (`["sign"]`, `["encrypt"]`, or both) |
+| `ssh_private_key` (0.21+) | Unencrypted OpenSSH Ed25519 private key | `algorithm` (`"ed25519"` or `"rsa"`), `bits` (RSA only), `comment` (string) |
+
+#### OpenPGP private-key generation
+
+`openpgp_private_key` is generated entirely in Rust and does not invoke
+GnuPG. The default `algorithm = "ed25519"` creates an Ed25519
+certification-only primary key plus separate Ed25519 signing and/or
+Curve25519 encryption subkeys. For compatibility with RSA-only
+consumers, `algorithm = "rsa"` uses RSA for the primary key and all
+requested subkeys. RSA defaults to 3072 bits; `bits` accepts 2048
+through 8192 and is invalid with `"ed25519"`.
+
+Omitting `capabilities` selects both; the list must otherwise contain
+`"sign"`, `"encrypt"`, or both without duplicates. `generate = true` is
+invalid because every generated certificate requires an explicit
+`user_id`.
+
+The ASCII-armored transferable secret key has no OpenPGP passphrase and
+no expiration. Store it with an encrypted provider when it needs
+protection at rest. Its public certificate and fingerprint can be
+derived after import by OpenPGP tooling; SecretSpec stores the secret
+key as one logical value.
+
+#### SSH private-key generation
+
+`ssh_private_key` is generated entirely in Rust. `generate = true`
+creates an unencrypted Ed25519 OpenSSH private key. Select
+`algorithm = "rsa"` for compatibility; RSA defaults to 3072 bits and
+accepts 2048 through 8192. `bits` is invalid with Ed25519. An optional
+`comment` is embedded in the key and must not contain control
+characters.
 
 #### Behavior
 
@@ -898,6 +933,11 @@ provider:
 - `generate` and `default` cannot both be set on the same secret
 - `type = "command"` requires `generate = { command = "..." }` (not just
   `generate = true`)
+- `type = "openpgp_private_key"` (0.21+) requires `generate.user_id`;
+  omitted `algorithm` and `capabilities` default to Ed25519/Curve25519
+  and both signing and encryption, respectively
+- `type = "ssh_private_key"` (0.21+) defaults to Ed25519; RSA generation
+  is available with `generate = { algorithm = "rsa", bits = 4096 }`
 - The value-free preflights — [`check --json` /
   `check --explain`](https://secretspec.dev/reference/cli/#resolution-report---json----explain)
   and the SDKs’ report/no-values resolutions — never mint a value. Since

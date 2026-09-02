@@ -239,21 +239,21 @@ Native speed
 Written in Rust, rendered at 120fps. When your agent edits 50 files, you
 see every change as it happens.
 
-[Learn about Zed→](https://zed.dev/blog/videogame)
+[Learn about Zed →](https://zed.dev/blog/videogame)
 
 Fine-grain tool control
 
 A granular settings system for configuring permissions for what tools
 your agent has access to.
 
-[View Tool Permissions→](https://zed.dev/docs/ai/tool-permissions)
+[View Tool Permissions →](https://zed.dev/docs/ai/tool-permissions)
 
 Open source, open protocol, open model
 
 Zed, Zeta, and ACP are all open source. The editor, the model, and the
 protocol, built in public.
 
-[Explore ACP→](https://zed.dev/acp)
+[Explore ACP →](https://zed.dev/acp)
 
 ## Recently Shipped
 
@@ -282,32 +282,32 @@ Shipped in 2025
 
 Copen_router: Support effort-based reasoning
 
-@codello•\#61308•1d ago•View →
+@codello•\#61308•6d ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61497)
 
 ERagent: Add ask_user tool using elicitation forms
 
-@e-r-w•\#61497•1w ago•View →
+@e-r-w•\#61497•2w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/62669)
 
 Gagent_ui: Add reload controls for failed agent connections
 
-@gaojunran•\#62669•2d ago•View →
+@gaojunran•\#62669•1w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61147)
 
 Tagent_ui: Persist the most recently selected agent, not whichever write
 finishes last
 
-@tnayuki•\#61147•2d ago•View →
+@tnayuki•\#61147•1w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/62670)
 
 Agoogle_ai: Add Gemini 3.7 Flash
 
-@ArneshBanerjee•\#62670•1w ago•View →
+@ArneshBanerjee•\#62670•2w ago•View →
 
 [](https://github.com/zed-industries/zed/pull/61220)
 
@@ -325,7 +325,7 @@ Vagent: OpenCode model updates (+6 Go, +7/-1 Zen, removed Free)
 
 Aedit_prediction: Support self-hosted Sweep Next Edit models
 
-@avoidthekitchen•\#51139•4w ago•View →
+@avoidthekitchen•\#51139•1mo ago•View →
 
 [View More on GitHub
 →](https://github.com/zed-industries/zed/pulls?q=is%3Apr+is%3Amerged+label%3Aarea%3Aai)
@@ -338,19 +338,19 @@ The Fastest AI Code Editor
 
 Benchmark results comparing Zed to other AI-enabled editors.
 
-[Read Post→](https://zed.dev/blog/on-programming-with-agents)
+[Read Post →](https://zed.dev/blog/on-programming-with-agents)
 
 On Programming with Agents
 
 How we think about the role of AI in software development.
 
-[Read Post→](https://zed.dev/blog/on-programming-with-agents)
+[Read Post →](https://zed.dev/blog/on-programming-with-agents)
 
 Bring Your Own Agent
 
 Connect Claude Agent, Codex, or Gemini CLI to Zed via ACP.
 
-[Read Post→](https://zed.dev/blog/bring-your-own-agent-to-zed)
+[Read Post →](https://zed.dev/blog/bring-your-own-agent-to-zed)
 
 More Resources
 
@@ -375,7 +375,7 @@ Pricing & Plans—Details about using Zed's hosted models
 View →
 
 ![Zed's
-logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.11rssg-7g1jg..png)
+logo](https://zed.dev/cdn-cgi/image/width=2048,quality=100,format=auto/_next/static/media/logo_wordmark_white_bigger.3loqk4pxc_cwi.png)
 
 ## Daily drive with Zed
 

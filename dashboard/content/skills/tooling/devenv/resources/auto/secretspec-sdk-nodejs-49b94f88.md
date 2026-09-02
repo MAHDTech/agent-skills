@@ -37,7 +37,7 @@ resolved.setAsEnv();     // export everything into process.env
 A missing required secret throws `MissingRequiredError`; any other
 failure throws `SecretSpecError` (with a stable `.kind`).
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 const builder = SecretSpec.builder().withCaller({  name: 'git',  version: '2.51.0',  operation: 'credential_get',  resource: 'github.com',});
@@ -47,14 +47,14 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Use `.withInlineSpec(spec, baseDir)` (or `loadAsync`/`reportAsync`) to
 resolve a strict inline-spec v1 object. `baseDir` resolves relative
 provider paths; the embedded addon submits the versioned native request
 directly.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `.withScope('api')` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `resolved.scope` and `report.scope`:

@@ -11,14 +11,12 @@ skill_name = "devenv"
 and persistent out-of-tree environmentsRead post
 →](https://devenv.sh/blog/2026/07/28/devenv-22-attach-to-running-processes-and-persistent-out-of-tree-environments/)
 
-Developer Environments using Nix
-
 # Your whole development environment, declared.
 
 Define packages, languages, services, tasks, secrets, and tooling once.
 Give every developer—and CI—the same fast, reproducible environment.
 
-Describe your stack
+Generate with AI →
 
 Rust + Postgres
 
@@ -30,277 +28,501 @@ Go + MySQL
 
 Rails + React
 
-[View examples](https://devenv.sh/examples/)
+Ready to compose
 
-Generate config →
+**Ingredient streams**Drag anything into the file. Send configured items
+back to remove them.
 
-Generates a complete `devenv.nix` via [devenv.new](https://devenv.new/)
-
-devenv.nix · preview
+![](https://devenv.sh/_astro/devenv-mark.BVQ3twVL.webp)![](https://devenv.sh/_astro/devenv-mark-dark.oPfRewUL.webp)devenv.nix
 
 Copy
 
 ``` landing-terminal-body
-{ pkgs, ... }: {
-  languages.rust.enable = true;
-
-  services.postgres = {
-    enable = true;
-    initialDatabases = [{ name = "app"; }];
-  };
-
-  packages = [ pkgs.cargo-watch ];
-}
+{ pkgs, ... }: {  languages = {    # devenv.sh/languages/rust/    rust = {      enable = true;      channel = "stable";    };  };   services = {    # devenv.sh/services/postgres/    postgres = {      enable = true;      initialDatabases = [{ name = "app"; }];    };     # devenv.sh/services/redis/    redis.enable = true;  };   # devenv.sh/tasks/  tasks."app:test".exec = "cargo test";   # devenv.sh/integrations/secretspec/  processes.api.exec =    "secretspec run -- cargo run";   packages = [    # devenv.sh/packages/    pkgs.docker  ];}
 ```
 
-devenv.yaml
+Ydevenv.yaml
 
 Copy
 
 ``` landing-terminal-body
 ```
 
-\<100ms
+![](https://devenv.sh/_astro/devenv-mark.BVQ3twVL.webp)![](https://devenv.sh/_astro/devenv-mark-dark.oPfRewUL.webp)devenv.nix✦
 
-cached shell startup
+Composing with AI
 
-100k+
+## Teaching your stack to speak Nix.
 
-prebuilt packages
-
-58
-
-languages
-
-Linux · macOS · WSL
-
-x64 · ARM64
+Reading your stack
 
 Languages · Services · Tools
 
-![](https://cdn.simpleicons.org/rust/888888)Rust
+![](https://devenv.sh/technology-icons/ansible-73a7f1.svg)ANAnsible
 
-![](https://cdn.simpleicons.org/python/888888)Python
+![](https://devenv.sh/technology-icons/c-9a8ee8.svg)CC
 
-![](https://cdn.simpleicons.org/nodedotjs/888888)Node.js
+![](https://devenv.sh/technology-icons/clojure-64b99a.svg)CLClojure
 
-![](https://cdn.simpleicons.org/go/888888)Go
+![](https://devenv.sh/technology-icons/cplusplus-df9a62.svg)C+C++
 
-![](https://cdn.simpleicons.org/ruby/888888)Ruby
+![](https://devenv.sh/technology-icons/crystal-d97583.svg)CRCrystal
 
-![](https://cdn.simpleicons.org/php/888888)PHP
+CUCUE
 
-![](https://cdn.simpleicons.org/typescript/888888)TypeScript
+![](https://devenv.sh/technology-icons/dart-73a7f1.svg)DADart
 
-![](https://cdn.simpleicons.org/elixir/888888)Elixir
+![](https://devenv.sh/technology-icons/deno-9a8ee8.svg)DEDeno
 
-![](https://cdn.simpleicons.org/kotlin/888888)Kotlin
+![](https://devenv.sh/technology-icons/dotnet-64b99a.svg)NE.NET
 
-![](https://cdn.simpleicons.org/swift/888888)Swift
+![](https://devenv.sh/technology-icons/elixir-df9a62.svg)ELElixir
 
-![](https://cdn.simpleicons.org/haskell/888888)Haskell
+![](https://devenv.sh/technology-icons/elm-d97583.svg)ELElm
 
-![](https://cdn.simpleicons.org/scala/888888)Scala
+![](https://devenv.sh/technology-icons/erlang-66b7c5.svg)ERErlang
 
-![](https://cdn.simpleicons.org/dotnet/888888).NET
+![](https://devenv.sh/technology-icons/fortran-73a7f1.svg)FOFortran
 
-![](https://cdn.simpleicons.org/lua/888888)Lua
+![](https://devenv.sh/technology-icons/gnu-9a8ee8.svg)GNGNU Awk
 
-![](https://cdn.simpleicons.org/erlang/888888)Erlang
+![](https://devenv.sh/technology-icons/gleam-64b99a.svg)GLGleam
 
-![](https://cdn.simpleicons.org/ocaml/888888)OCaml
+![](https://devenv.sh/technology-icons/go-df9a62.svg)GOGo
 
-![](https://cdn.simpleicons.org/perl/888888)Perl
+HAHare
 
-![](https://cdn.simpleicons.org/dart/888888)Dart
+![](https://devenv.sh/technology-icons/haskell-66b7c5.svg)HAHaskell
 
-![](https://cdn.simpleicons.org/cplusplus/888888)C++
+![](https://devenv.sh/technology-icons/helm-73a7f1.svg)HEHelm
 
-![](https://cdn.simpleicons.org/nim/888888)Nim
+IDIdris
 
-![](https://cdn.simpleicons.org/crystal/888888)Crystal
+![](https://devenv.sh/technology-icons/openjdk-64b99a.svg)JAJava
 
-![](https://cdn.simpleicons.org/zig/888888)Zig
+![](https://devenv.sh/technology-icons/javascript-f7df1e.svg)JAJavaScript
 
-![](https://cdn.simpleicons.org/r/888888)R
+JSJsonnet
 
-![](https://cdn.simpleicons.org/julia/888888)Julia
+![](https://devenv.sh/technology-icons/julia-66b7c5.svg)JUJulia
 
-![](https://cdn.simpleicons.org/rust/888888)Rust
+![](https://devenv.sh/technology-icons/kotlin-73a7f1.svg)KOKotlin
 
-![](https://cdn.simpleicons.org/python/888888)Python
+LELean 4
 
-![](https://cdn.simpleicons.org/nodedotjs/888888)Node.js
+LOLobster
 
-![](https://cdn.simpleicons.org/go/888888)Go
+![](https://devenv.sh/technology-icons/lua-df9a62.svg)LULua
 
-![](https://cdn.simpleicons.org/ruby/888888)Ruby
+![](https://devenv.sh/technology-icons/nim-d97583.svg)NINim
 
-![](https://cdn.simpleicons.org/php/888888)PHP
+![](https://devenv.sh/technology-icons/nixos-66b7c5.svg)NINix
 
-![](https://cdn.simpleicons.org/typescript/888888)TypeScript
+![](https://devenv.sh/technology-icons/ocaml-73a7f1.svg)OCOCaml
 
-![](https://cdn.simpleicons.org/elixir/888888)Elixir
+ODOdin
 
-![](https://cdn.simpleicons.org/kotlin/888888)Kotlin
+![](https://devenv.sh/technology-icons/opentofu-64b99a.svg)OPOpenTofu
 
-![](https://cdn.simpleicons.org/swift/888888)Swift
+PAPascal
 
-![](https://cdn.simpleicons.org/haskell/888888)Haskell
+![](https://devenv.sh/technology-icons/perl-d97583.svg)PEPerl
 
-![](https://cdn.simpleicons.org/scala/888888)Scala
+![](https://devenv.sh/technology-icons/php-66b7c5.svg)PHPHP
 
-![](https://cdn.simpleicons.org/dotnet/888888).NET
+PKPkl
 
-![](https://cdn.simpleicons.org/lua/888888)Lua
+![](https://devenv.sh/technology-icons/purescript-9a8ee8.svg)PUPureScript
 
-![](https://cdn.simpleicons.org/erlang/888888)Erlang
+![](https://devenv.sh/technology-icons/python-64b99a.svg)PYPython
 
-![](https://cdn.simpleicons.org/ocaml/888888)OCaml
+![](https://devenv.sh/technology-icons/r-df9a62.svg)RR
 
-![](https://cdn.simpleicons.org/perl/888888)Perl
+![](https://devenv.sh/technology-icons/racket-d97583.svg)RARacket
 
-![](https://cdn.simpleicons.org/dart/888888)Dart
+RARaku
 
-![](https://cdn.simpleicons.org/cplusplus/888888)C++
+![](https://devenv.sh/technology-icons/robotframework-73a7f1.svg)RORobot Framework
 
-![](https://cdn.simpleicons.org/nim/888888)Nim
+![](https://devenv.sh/technology-icons/ruby-9a8ee8.svg)RURuby
 
-![](https://cdn.simpleicons.org/crystal/888888)Crystal
+![](https://devenv.sh/technology-icons/rust-ce422b.svg)![](https://devenv.sh/technology-icons/rust-e8664a.svg)RURust
 
-![](https://cdn.simpleicons.org/zig/888888)Zig
+![](https://devenv.sh/technology-icons/scala-df9a62.svg)SCScala
 
-![](https://cdn.simpleicons.org/r/888888)R
+![](https://devenv.sh/technology-icons/gnubash-d97583.svg)SHShell
 
-![](https://cdn.simpleicons.org/julia/888888)Julia
+![](https://devenv.sh/technology-icons/solidity-66b7c5.svg)SOSolidity
 
-![](https://cdn.simpleicons.org/postgresql/888888)PostgreSQL
+STStandard ML
 
-![](https://cdn.simpleicons.org/redis/888888)Redis
+![](https://devenv.sh/technology-icons/swift-9a8ee8.svg)SWSwift
 
-![](https://cdn.simpleicons.org/mysql/888888)MySQL
+![](https://devenv.sh/technology-icons/terraform-64b99a.svg)TETerraform
 
-![](https://cdn.simpleicons.org/mongodb/888888)MongoDB
+![](https://devenv.sh/technology-icons/latex-df9a62.svg)TETeX Live
 
-![](https://cdn.simpleicons.org/mariadb/888888)MariaDB
+![](https://devenv.sh/technology-icons/typescript-d97583.svg)TYTypeScript
 
-![](https://cdn.simpleicons.org/elasticsearch/888888)Elasticsearch
+![](https://devenv.sh/technology-icons/typst-66b7c5.svg)TYTypst
 
-![](https://cdn.simpleicons.org/rabbitmq/888888)RabbitMQ
+UNUnison
 
-![](https://cdn.simpleicons.org/minio/888888)MinIO
+VV
 
-![](https://cdn.simpleicons.org/caddy/888888)Caddy
+VAVala
 
-![](https://cdn.simpleicons.org/nginx/888888)nginx
+![](https://devenv.sh/technology-icons/zig-df9a62.svg)ZIZig
 
-![](https://cdn.simpleicons.org/clickhouse/888888)ClickHouse
+![](https://devenv.sh/technology-icons/ansible-73a7f1.svg)ANAnsible
 
-![](https://cdn.simpleicons.org/natsdotio/888888)NATS
+![](https://devenv.sh/technology-icons/c-9a8ee8.svg)CC
 
-![](https://cdn.simpleicons.org/meilisearch/888888)Meilisearch
+![](https://devenv.sh/technology-icons/clojure-64b99a.svg)CLClojure
 
-![](https://cdn.simpleicons.org/apachecouchdb/888888)CouchDB
+![](https://devenv.sh/technology-icons/cplusplus-df9a62.svg)C+C++
 
-![](https://cdn.simpleicons.org/influxdb/888888)InfluxDB
+![](https://devenv.sh/technology-icons/crystal-d97583.svg)CRCrystal
 
-![](https://cdn.simpleicons.org/opensearch/888888)OpenSearch
+CUCUE
 
-![](https://cdn.simpleicons.org/keycloak/888888)Keycloak
+![](https://devenv.sh/technology-icons/dart-73a7f1.svg)DADart
 
-![](https://cdn.simpleicons.org/vault/888888)Vault
+![](https://devenv.sh/technology-icons/deno-9a8ee8.svg)DEDeno
 
-![](https://cdn.simpleicons.org/apachekafka/888888)Kafka
+![](https://devenv.sh/technology-icons/dotnet-64b99a.svg)NE.NET
 
-![](https://cdn.simpleicons.org/postgresql/888888)PostgreSQL
+![](https://devenv.sh/technology-icons/elixir-df9a62.svg)ELElixir
 
-![](https://cdn.simpleicons.org/redis/888888)Redis
+![](https://devenv.sh/technology-icons/elm-d97583.svg)ELElm
 
-![](https://cdn.simpleicons.org/mysql/888888)MySQL
+![](https://devenv.sh/technology-icons/erlang-66b7c5.svg)ERErlang
 
-![](https://cdn.simpleicons.org/mongodb/888888)MongoDB
+![](https://devenv.sh/technology-icons/fortran-73a7f1.svg)FOFortran
 
-![](https://cdn.simpleicons.org/mariadb/888888)MariaDB
+![](https://devenv.sh/technology-icons/gnu-9a8ee8.svg)GNGNU Awk
 
-![](https://cdn.simpleicons.org/elasticsearch/888888)Elasticsearch
+![](https://devenv.sh/technology-icons/gleam-64b99a.svg)GLGleam
 
-![](https://cdn.simpleicons.org/rabbitmq/888888)RabbitMQ
+![](https://devenv.sh/technology-icons/go-df9a62.svg)GOGo
 
-![](https://cdn.simpleicons.org/minio/888888)MinIO
+HAHare
 
-![](https://cdn.simpleicons.org/caddy/888888)Caddy
+![](https://devenv.sh/technology-icons/haskell-66b7c5.svg)HAHaskell
 
-![](https://cdn.simpleicons.org/nginx/888888)nginx
+![](https://devenv.sh/technology-icons/helm-73a7f1.svg)HEHelm
 
-![](https://cdn.simpleicons.org/clickhouse/888888)ClickHouse
+IDIdris
 
-![](https://cdn.simpleicons.org/natsdotio/888888)NATS
+![](https://devenv.sh/technology-icons/openjdk-64b99a.svg)JAJava
 
-![](https://cdn.simpleicons.org/meilisearch/888888)Meilisearch
+![](https://devenv.sh/technology-icons/javascript-f7df1e.svg)JAJavaScript
 
-![](https://cdn.simpleicons.org/apachecouchdb/888888)CouchDB
+JSJsonnet
 
-![](https://cdn.simpleicons.org/influxdb/888888)InfluxDB
+![](https://devenv.sh/technology-icons/julia-66b7c5.svg)JUJulia
 
-![](https://cdn.simpleicons.org/opensearch/888888)OpenSearch
+![](https://devenv.sh/technology-icons/kotlin-73a7f1.svg)KOKotlin
 
-![](https://cdn.simpleicons.org/keycloak/888888)Keycloak
+LELean 4
 
-![](https://cdn.simpleicons.org/vault/888888)Vault
+LOLobster
 
-![](https://cdn.simpleicons.org/apachekafka/888888)Kafka
+![](https://devenv.sh/technology-icons/lua-df9a62.svg)LULua
 
-![](https://cdn.simpleicons.org/docker/888888)Docker
+![](https://devenv.sh/technology-icons/nim-d97583.svg)NINim
 
-![](https://cdn.simpleicons.org/nixos/888888)Nix
+![](https://devenv.sh/technology-icons/nixos-66b7c5.svg)NINix
 
-![](https://cdn.simpleicons.org/githubactions/888888)GitHub Actions
+![](https://devenv.sh/technology-icons/ocaml-73a7f1.svg)OCOCaml
 
-![](https://cdn.simpleicons.org/vscodium/888888)VS Code
+ODOdin
 
-![](https://cdn.simpleicons.org/intellijidea/888888)IntelliJ
+![](https://devenv.sh/technology-icons/opentofu-64b99a.svg)OPOpenTofu
 
-![](https://cdn.simpleicons.org/zedindustries/888888)Zed
+PAPascal
 
-![](https://cdn.simpleicons.org/android/888888)Android
+![](https://devenv.sh/technology-icons/perl-d97583.svg)PEPerl
 
-![](https://cdn.simpleicons.org/wordpress/888888)WordPress
+![](https://devenv.sh/technology-icons/php-66b7c5.svg)PHPHP
 
-![](https://cdn.simpleicons.org/terraform/888888)Terraform
+PKPkl
 
-![](https://cdn.simpleicons.org/opentofu/888888)OpenTofu
+![](https://devenv.sh/technology-icons/purescript-9a8ee8.svg)PUPureScript
 
-![](https://cdn.simpleicons.org/claude/888888)Claude Code
+![](https://devenv.sh/technology-icons/python-64b99a.svg)PYPython
 
-![](https://cdn.simpleicons.org/linux/888888)Linux
+![](https://devenv.sh/technology-icons/r-df9a62.svg)RR
 
-![](https://cdn.simpleicons.org/apple/888888)macOS
+![](https://devenv.sh/technology-icons/racket-d97583.svg)RARacket
 
-![](https://cdn.simpleicons.org/docker/888888)Docker
+RARaku
 
-![](https://cdn.simpleicons.org/nixos/888888)Nix
+![](https://devenv.sh/technology-icons/robotframework-73a7f1.svg)RORobot Framework
 
-![](https://cdn.simpleicons.org/githubactions/888888)GitHub Actions
+![](https://devenv.sh/technology-icons/ruby-9a8ee8.svg)RURuby
 
-![](https://cdn.simpleicons.org/vscodium/888888)VS Code
+![](https://devenv.sh/technology-icons/rust-ce422b.svg)![](https://devenv.sh/technology-icons/rust-e8664a.svg)RURust
 
-![](https://cdn.simpleicons.org/intellijidea/888888)IntelliJ
+![](https://devenv.sh/technology-icons/scala-df9a62.svg)SCScala
 
-![](https://cdn.simpleicons.org/zedindustries/888888)Zed
+![](https://devenv.sh/technology-icons/gnubash-d97583.svg)SHShell
 
-![](https://cdn.simpleicons.org/android/888888)Android
+![](https://devenv.sh/technology-icons/solidity-66b7c5.svg)SOSolidity
 
-![](https://cdn.simpleicons.org/wordpress/888888)WordPress
+STStandard ML
 
-![](https://cdn.simpleicons.org/terraform/888888)Terraform
+![](https://devenv.sh/technology-icons/swift-9a8ee8.svg)SWSwift
 
-![](https://cdn.simpleicons.org/opentofu/888888)OpenTofu
+![](https://devenv.sh/technology-icons/terraform-64b99a.svg)TETerraform
 
-![](https://cdn.simpleicons.org/claude/888888)Claude Code
+![](https://devenv.sh/technology-icons/latex-df9a62.svg)TETeX Live
 
-![](https://cdn.simpleicons.org/linux/888888)Linux
+![](https://devenv.sh/technology-icons/typescript-d97583.svg)TYTypeScript
 
-![](https://cdn.simpleicons.org/apple/888888)macOS
+![](https://devenv.sh/technology-icons/typst-66b7c5.svg)TYTypst
+
+UNUnison
+
+VV
+
+VAVala
+
+![](https://devenv.sh/technology-icons/zig-df9a62.svg)ZIZig
+
+![](https://devenv.sh/technology-icons/adminer-34567c.svg)![](https://devenv.sh/technology-icons/adminer-7fa6c9.svg)ADAdminer
+
+BLBlackfire
+
+![](https://devenv.sh/technology-icons/caddy-1f88c0.svg)![](https://devenv.sh/technology-icons/caddy-48a9db.svg)CACaddy
+
+![](https://devenv.sh/technology-icons/apachecassandra-1287b1.svg)![](https://devenv.sh/technology-icons/apachecassandra-44b5d9.svg)CACassandra
+
+![](https://devenv.sh/technology-icons/clickhouse-ffcc01.svg)CLClickHouse
+
+![](https://devenv.sh/technology-icons/cockroachlabs-6933ff.svg)![](https://devenv.sh/technology-icons/cockroachlabs-9674ff.svg)COCockroachDB
+
+![](https://devenv.sh/technology-icons/apachecouchdb-e42528.svg)![](https://devenv.sh/technology-icons/apachecouchdb-f05a5c.svg)COCouchDB
+
+DYDynamoDB Local
+
+ELElasticMQ
+
+![](https://devenv.sh/technology-icons/elasticsearch-005571.svg)![](https://devenv.sh/technology-icons/elasticsearch-36b8c5.svg)ELElasticsearch
+
+GAGarage
+
+HThttpbin
+
+![](https://devenv.sh/technology-icons/influxdb-22adf6.svg)INInfluxDB
+
+![](https://devenv.sh/technology-icons/apachekafka-231f20.svg)![](https://devenv.sh/technology-icons/apachekafka-f4f1f2.svg)KAKafka
+
+![](https://devenv.sh/technology-icons/keycloak-4d4d4d.svg)![](https://devenv.sh/technology-icons/keycloak-b8b8b8.svg)KEKeycloak
+
+MAMailHog
+
+MAMailpit
+
+![](https://devenv.sh/technology-icons/meilisearch-ff5caa.svg)![](https://devenv.sh/technology-icons/meilisearch-ff7dba.svg)MEMeilisearch
+
+MEMemcached
+
+![](https://devenv.sh/technology-icons/minio-c72e49.svg)![](https://devenv.sh/technology-icons/minio-e76078.svg)MIMinIO
+
+![](https://devenv.sh/technology-icons/mongodb-47a248.svg)![](https://devenv.sh/technology-icons/mongodb-65c466.svg)MOMongoDB
+
+![](https://devenv.sh/technology-icons/eclipsemosquitto-3c5280.svg)![](https://devenv.sh/technology-icons/eclipsemosquitto-7f95c5.svg)MOMosquitto
+
+![](https://devenv.sh/technology-icons/mysql-4479a1.svg)![](https://devenv.sh/technology-icons/mysql-71a8d1.svg)MYMySQL
+
+![](https://devenv.sh/technology-icons/natsdotio-27aae1.svg)![](https://devenv.sh/technology-icons/natsdotio-45bded.svg)NANATS
+
+![](https://devenv.sh/technology-icons/nginx-009639.svg)![](https://devenv.sh/technology-icons/nginx-33c66a.svg)NGnginx
+
+![](https://devenv.sh/technology-icons/nixos-5277c3.svg)![](https://devenv.sh/technology-icons/nixos-7fa0e2.svg)NINixseparatedebuginfod
+
+![](https://devenv.sh/technology-icons/opensearch-005eb8.svg)![](https://devenv.sh/technology-icons/opensearch-4a9be8.svg)OPOpenSearch
+
+![](https://devenv.sh/technology-icons/opentelemetry-000000.svg)![](https://devenv.sh/technology-icons/opentelemetry-f5f5f5.svg)OPOpenTelemetry
+Collector
+
+![](https://devenv.sh/technology-icons/postgresql-4169e1.svg)![](https://devenv.sh/technology-icons/postgresql-7895f0.svg)POPostgreSQL
+
+![](https://devenv.sh/technology-icons/prometheus-e6522c.svg)![](https://devenv.sh/technology-icons/prometheus-f07859.svg)PRPrometheus
+
+![](https://devenv.sh/technology-icons/rabbitmq-ff6600.svg)![](https://devenv.sh/technology-icons/rabbitmq-ff8533.svg)RARabbitMQ
+
+![](https://devenv.sh/technology-icons/redis-ff4438.svg)![](https://devenv.sh/technology-icons/redis-ff6c63.svg)RERedis
+
+![](https://devenv.sh/technology-icons/rustfs-0196d0.svg)![](https://devenv.sh/technology-icons/rustfs-32bceb.svg)RURustFS
+
+![](https://devenv.sh/technology-icons/turso-4ff8d2.svg)SQsqld
+
+![](https://devenv.sh/technology-icons/tailscale-242424.svg)![](https://devenv.sh/technology-icons/tailscale-f2f2f2.svg)TATailscale
+Funnel
+
+![](https://devenv.sh/technology-icons/temporal-000000.svg)![](https://devenv.sh/technology-icons/temporal-ffffff.svg)TETemporal
+
+TITideways
+
+![](https://devenv.sh/technology-icons/apache-d22128.svg)![](https://devenv.sh/technology-icons/apache-ee5c61.svg)TRTraffic
+Server
+
+TYTypesense
+
+VAVarnish
+
+![](https://devenv.sh/technology-icons/vault-ffec6e.svg)VAVault
+
+WIWireMock
+
+![](https://devenv.sh/technology-icons/adminer-34567c.svg)![](https://devenv.sh/technology-icons/adminer-7fa6c9.svg)ADAdminer
+
+BLBlackfire
+
+![](https://devenv.sh/technology-icons/caddy-1f88c0.svg)![](https://devenv.sh/technology-icons/caddy-48a9db.svg)CACaddy
+
+![](https://devenv.sh/technology-icons/apachecassandra-1287b1.svg)![](https://devenv.sh/technology-icons/apachecassandra-44b5d9.svg)CACassandra
+
+![](https://devenv.sh/technology-icons/clickhouse-ffcc01.svg)CLClickHouse
+
+![](https://devenv.sh/technology-icons/cockroachlabs-6933ff.svg)![](https://devenv.sh/technology-icons/cockroachlabs-9674ff.svg)COCockroachDB
+
+![](https://devenv.sh/technology-icons/apachecouchdb-e42528.svg)![](https://devenv.sh/technology-icons/apachecouchdb-f05a5c.svg)COCouchDB
+
+DYDynamoDB Local
+
+ELElasticMQ
+
+![](https://devenv.sh/technology-icons/elasticsearch-005571.svg)![](https://devenv.sh/technology-icons/elasticsearch-36b8c5.svg)ELElasticsearch
+
+GAGarage
+
+HThttpbin
+
+![](https://devenv.sh/technology-icons/influxdb-22adf6.svg)INInfluxDB
+
+![](https://devenv.sh/technology-icons/apachekafka-231f20.svg)![](https://devenv.sh/technology-icons/apachekafka-f4f1f2.svg)KAKafka
+
+![](https://devenv.sh/technology-icons/keycloak-4d4d4d.svg)![](https://devenv.sh/technology-icons/keycloak-b8b8b8.svg)KEKeycloak
+
+MAMailHog
+
+MAMailpit
+
+![](https://devenv.sh/technology-icons/meilisearch-ff5caa.svg)![](https://devenv.sh/technology-icons/meilisearch-ff7dba.svg)MEMeilisearch
+
+MEMemcached
+
+![](https://devenv.sh/technology-icons/minio-c72e49.svg)![](https://devenv.sh/technology-icons/minio-e76078.svg)MIMinIO
+
+![](https://devenv.sh/technology-icons/mongodb-47a248.svg)![](https://devenv.sh/technology-icons/mongodb-65c466.svg)MOMongoDB
+
+![](https://devenv.sh/technology-icons/eclipsemosquitto-3c5280.svg)![](https://devenv.sh/technology-icons/eclipsemosquitto-7f95c5.svg)MOMosquitto
+
+![](https://devenv.sh/technology-icons/mysql-4479a1.svg)![](https://devenv.sh/technology-icons/mysql-71a8d1.svg)MYMySQL
+
+![](https://devenv.sh/technology-icons/natsdotio-27aae1.svg)![](https://devenv.sh/technology-icons/natsdotio-45bded.svg)NANATS
+
+![](https://devenv.sh/technology-icons/nginx-009639.svg)![](https://devenv.sh/technology-icons/nginx-33c66a.svg)NGnginx
+
+![](https://devenv.sh/technology-icons/nixos-5277c3.svg)![](https://devenv.sh/technology-icons/nixos-7fa0e2.svg)NINixseparatedebuginfod
+
+![](https://devenv.sh/technology-icons/opensearch-005eb8.svg)![](https://devenv.sh/technology-icons/opensearch-4a9be8.svg)OPOpenSearch
+
+![](https://devenv.sh/technology-icons/opentelemetry-000000.svg)![](https://devenv.sh/technology-icons/opentelemetry-f5f5f5.svg)OPOpenTelemetry
+Collector
+
+![](https://devenv.sh/technology-icons/postgresql-4169e1.svg)![](https://devenv.sh/technology-icons/postgresql-7895f0.svg)POPostgreSQL
+
+![](https://devenv.sh/technology-icons/prometheus-e6522c.svg)![](https://devenv.sh/technology-icons/prometheus-f07859.svg)PRPrometheus
+
+![](https://devenv.sh/technology-icons/rabbitmq-ff6600.svg)![](https://devenv.sh/technology-icons/rabbitmq-ff8533.svg)RARabbitMQ
+
+![](https://devenv.sh/technology-icons/redis-ff4438.svg)![](https://devenv.sh/technology-icons/redis-ff6c63.svg)RERedis
+
+![](https://devenv.sh/technology-icons/rustfs-0196d0.svg)![](https://devenv.sh/technology-icons/rustfs-32bceb.svg)RURustFS
+
+![](https://devenv.sh/technology-icons/turso-4ff8d2.svg)SQsqld
+
+![](https://devenv.sh/technology-icons/tailscale-242424.svg)![](https://devenv.sh/technology-icons/tailscale-f2f2f2.svg)TATailscale
+Funnel
+
+![](https://devenv.sh/technology-icons/temporal-000000.svg)![](https://devenv.sh/technology-icons/temporal-ffffff.svg)TETemporal
+
+TITideways
+
+![](https://devenv.sh/technology-icons/apache-d22128.svg)![](https://devenv.sh/technology-icons/apache-ee5c61.svg)TRTraffic
+Server
+
+TYTypesense
+
+VAVarnish
+
+![](https://devenv.sh/technology-icons/vault-ffec6e.svg)VAVault
+
+WIWireMock
+
+![](https://devenv.sh/technology-icons/docker-54b9f5.svg)+Docker
+
+![](https://devenv.sh/technology-icons/git-e47758.svg)+Git
+
+![](https://devenv.sh/technology-icons/curl-72a7e8.svg)+curl
+
+{}jq
+
+rgripgrep
+
+![](https://devenv.sh/technology-icons/rust-d2a85d.svg)+cargo-watch
+
+AWSAWS CLI
+
+![](https://devenv.sh/technology-icons/terraform-9b82e5.svg)+Terraform CLI
+
+![](https://devenv.sh/technology-icons/nodedotjs-70b678.svg)+Node.js 22
+
+\$✓ShellCheck
+
+![](https://devenv.sh/technology-icons/just-c79a6b.svg)\$\_just
+
+✓Test task
+
+›\_App process
+
+![](https://devenv.sh/technology-icons/1password-a98bff.svg)◇SecretSpec
+
+![](https://devenv.sh/technology-icons/git-e47758.svg)✓Pre-commit
+
+![](https://devenv.sh/technology-icons/docker-54b9f5.svg)+Docker
+
+![](https://devenv.sh/technology-icons/git-e47758.svg)+Git
+
+![](https://devenv.sh/technology-icons/curl-72a7e8.svg)+curl
+
+{}jq
+
+rgripgrep
+
+![](https://devenv.sh/technology-icons/rust-d2a85d.svg)+cargo-watch
+
+AWSAWS CLI
+
+![](https://devenv.sh/technology-icons/terraform-9b82e5.svg)+Terraform CLI
+
+![](https://devenv.sh/technology-icons/nodedotjs-70b678.svg)+Node.js 22
+
+\$✓ShellCheck
+
+![](https://devenv.sh/technology-icons/just-c79a6b.svg)\$\_just
+
+✓Test task
+
+›\_App process
+
+![](https://devenv.sh/technology-icons/1password-a98bff.svg)◇SecretSpec
+
+![](https://devenv.sh/technology-icons/git-e47758.svg)✓Pre-commit
 
 ## Three steps. Done.
 
@@ -341,7 +563,8 @@ $ devenv shell
 
 ## Your whole stack, declared together
 
-Languages, services, processes, tasks, secrets — all declarative.
+Languages, services, processes, tasks, and secrets. Everything is
+declarative.
 
 [](https://devenv.sh/languages/)
 
@@ -349,7 +572,7 @@ Languages, services, processes, tasks, secrets — all declarative.
 
 Languages
 
-Python, Rust, Go, Node, Ruby, PHP, Java, Elixir, and more — with version
+Python, Rust, Go, Node, Ruby, PHP, Java, Elixir, and more, with version
 pinning and LSP servers.
 
 [](https://devenv.sh/services/)
@@ -420,7 +643,7 @@ next prompt.
 
 [](https://devenv.sh/ad-hoc-developer-environments/)
 
-Ad-hoc shells — zero config
+Ad-hoc shells, zero config
 
 Spin up a temporary environment without writing a `devenv.nix`. Great
 for experiments, scripts, and CI matrices.
@@ -607,7 +830,7 @@ STRIPE_SECRET_KEY = { required = true }
 
 ↓
 
-🐚`$ secretspec run -- npm start` — exposed only to the app
+🐚`$ secretspec run -- npm start`, exposed only to the app
 
 Packaging
 
@@ -664,7 +887,7 @@ stack.](https://github.com/cachix/devenv/tree/main/examples)
 
 ## Start building.
 
-Set up your first environment in minutes — or generate one from the hero
+Set up your first environment in minutes, or generate one from the hero
 above.
 
 [Get Started](https://devenv.sh/getting-started/)[View on

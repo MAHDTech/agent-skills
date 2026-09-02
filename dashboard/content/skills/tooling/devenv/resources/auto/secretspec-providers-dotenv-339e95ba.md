@@ -9,8 +9,9 @@ skill_name = "devenv"
 
 # Dotenv Provider
 
-The Dotenv provider stores secrets in local `.env` files for development
-setups and compatibility with existing tools.
+The [Dotenv](https://github.com/cachix/dotenv-ng) provider stores
+secrets in local `.env` files for development setups and compatibility
+with existing tools.
 
 ## At a glance
 

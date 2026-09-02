@@ -1,9 +1,9 @@
 # Go SDK
 
-The Go SDK (`secretspec-go`) is a thin client over the `secretspec-ffi`
-C ABI, loaded via [purego](https://github.com/ebitengine/purego)
-(dlopen, no cgo). Resolution happens in the Rust core, so the SDK
-inherits every provider with no Go-side logic.
+The Go SDK (`secretspec-go`) is a thin client over the `libsecretspec` C
+ABI, loaded via [purego](https://github.com/ebitengine/purego) (dlopen,
+no cgo). Resolution happens in the Rust core, so the SDK inherits every
+provider with no Go-side logic.
 
 ## Quick start
 
@@ -37,7 +37,7 @@ func main() {
 A missing required secret returns `*MissingRequiredError`; any other
 failure returns `*Error` (with a stable `.Kind`).
 
-## Caller context (0.20+)
+## Caller context
 
 ```
 builder := secretspec.New().WithCaller(secretspec.CallerContext{    Name: "git",    Version: "2.51.0",    Operation: "credential_get",    Resource: "github.com",})
@@ -47,7 +47,7 @@ Caller context identifies the invoking integration in audit records but
 never satisfies `require_reason`. Do not put credentials or secret
 values in it.
 
-## Inline specifications (0.20+)
+## Inline specifications
 
 Applications that own their declarations in code can resolve a strict
 JSON inline specification without creating a temporary `secretspec.toml`
@@ -66,7 +66,7 @@ manifests relative to `baseDir`. The SDK requires the native
 `secretspec_call` capability for inline specs; an older library returns
 a capability error rather than falling back to a filesystem search.
 
-## Scopes (0.17+)
+## Scopes
 
 Use `WithScope("api")` to resolve only a named `[scopes.api]` subset.
 The selected name is available as `Resolved.Scope` and `Report.Scope`:
@@ -126,7 +126,7 @@ func main() {
 
 ## Library discovery
 
-The native `secretspec-ffi` cdylib is resolved at runtime, in order:
+The native `libsecretspec` cdylib is resolved at runtime, in order:
 
 1.  The `SECRETSPEC_FFI_LIB` environment variable (an explicit path).
 2.  A library embedded at build time with `-tags embed_lib`.
@@ -135,8 +135,8 @@ The native `secretspec-ffi` cdylib is resolved at runtime, in order:
 
 The SDK uses [purego](https://github.com/ebitengine/purego), so the
 cdylib is loaded at runtime, not linked. Either install/build
-`libsecretspec_ffi` and set `SECRETSPEC_FFI_LIB`, or stage the
-per-platform library into `lib/` and build with `-tags embed_lib` for a
+`libsecretspec` and set `SECRETSPEC_FFI_LIB`, or stage the per-platform
+library into `lib/` and build with `-tags embed_lib` for a
 self-contained binary. The embedded library is extracted to a per-user,
 owner-only cache directory at first use, and is not distributed through
 the Go module proxy.
@@ -144,9 +144,8 @@ the Go module proxy.
 ## Static linking
 
 For a self-contained binary with no runtime library to locate, build
-with `-tags static` instead. This uses cgo and links
-`libsecretspec_ffi.a` directly into the Go binary. In a development
-checkout:
+with `-tags static` instead. This uses cgo and links `libsecretspec.a`
+directly into the Go binary. In a development checkout:
 
 ```
 $ bash scripts/stage-staticlib.sh
@@ -155,13 +154,13 @@ $ CGO_ENABLED=1 go build -tags static ./...
 
 Terminal window
 
-## Linking with pkg-config (0.19+)
+## Linking with pkg-config
 
 Install one library type with
 [cargo-c](https://github.com/lu-zero/cargo-c):
 
 ```
-# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash secretspec-ffi/scripts/cinstall.sh "$PREFIX" static
+# Use "static" (the default) or "shared"; use separate prefixes for both.$ bash libsecretspec/scripts/cinstall.sh "$PREFIX" static
 ```
 
 Terminal window
