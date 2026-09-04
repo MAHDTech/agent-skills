@@ -1,8 +1,9 @@
 //! Core domain engine for Agent Skills.
+// cspell:words Syncer
 //!
 //! Provides the foundational domain models, category definitions, frontmatter
 //! parsing, linting primitives, error types, remote skill downloader, installer engine,
-//! and synchronization models.
+//! and multi-target skill synchronization engine.
 
 pub mod downloader;
 pub mod error;
@@ -10,6 +11,7 @@ pub mod installer;
 pub mod lint;
 pub mod models;
 pub mod parser;
+pub mod sync;
 
 pub use downloader::SkillDownloader;
 pub use error::{Result, SkillError};
@@ -22,6 +24,9 @@ pub use installer::{
 pub use lint::SkillLinter;
 pub use models::*;
 pub use parser::{MarkdownSection, ParsedSkill, SkillParser, TemplatePlaceholder};
+pub use sync::{
+    ConflictStrategy, SkillSyncer, SyncAction, SyncActionKind, SyncError, SyncPlan, SyncSummary,
+};
 
 /// Returns the current crate version.
 #[must_use]
