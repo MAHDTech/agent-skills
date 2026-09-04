@@ -71,6 +71,7 @@ Orchestrating the lifecycle of codebase issues in a continuous loop:
 - `/tars-backlog-implement` - reach for this when you want to dynamically batch and implement triaged issues using parallel sub-agents in isolated clones, with hub `tars-gate` / spoke `tars-spoke` runners.
 - [/tars-backlog-review](@/skills/review/tars-backlog-review/_index.md) - reach for this during the implementation phase of the backlog loop to assess a subagent's code changes for compliance with the spec and repo standards.
 - `/tars-backlog-create-issue` - reach for this when you need to create a backlog ticket in `.tars/issues/todo/` following the standard frontmatter, markdown sections, and review guidelines.
+- [/tars-run-factory](@/skills/tooling/tars-run-factory/_index.md) - reach for this to run the unattended TARS software factory foreman over a repository backlog via the agy CLI and tars-agy plugin.
 
 ## Changing existing code safely
 
@@ -155,6 +156,7 @@ Beyond `/code-review` on the main flow:
 - `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
+- `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 
