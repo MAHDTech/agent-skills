@@ -16,7 +16,7 @@ Run the `/skill-router` skill to browse the catalog and find the right skill for
 
 ## Category structure
 
-Skills are organised by topic under `skills/<category>/<name>/SKILL.md`. Categories include `engineering`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `game-development`, and `tooling`, plus `in-progress/` and `deprecated/` lifecycle buckets. The category is the folder, not a frontmatter field.
+Skills are organised by topic under `skills/<category>/<name>/SKILL.md`. Categories include `engineering`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `game-development`, and `tooling`, plus an `in-progress/` lifecycle bucket for drafts. The category is the folder, not a frontmatter field. Retired skills live outside `skills/` under `skills-archive/<category>/<name>/`, keeping their original category; they remain browsable on the dashboard but are never installed.
 
 ## Linting and syncing
 

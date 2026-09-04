@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-description: Periodically audit the whole skill collection for health - validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /deprecate-skill to retire.
+description: Periodically audit the whole skill collection for health - validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /archive-skill to retire.
 ---
 
 # Skill Audit
@@ -20,29 +20,29 @@ Two mechanical gates come first - they are cheap and catch drift a read-through 
 
 Walk the whole collection. Each pass carries an exhaustive bound - every skill, every reference, no sampling.
 
-1. **Inventory.** List every promoted skill - one per `skills/<category>/<name>/`, excluding the `in-progress/` and `deprecated/` **lifecycle buckets** - grouped by category. This inventory is what the rest of the audit checks against.
+1. **Inventory.** List every promoted skill - one per `skills/<category>/<name>/`, excluding the `in-progress/` **lifecycle bucket** (archived skills live outside `skills/`, under `skills-archive/`, and are out of scope) - grouped by category. This inventory is what the rest of the audit checks against.
 2. **Per-skill review.** Apply the checklist below to _every_ skill in the inventory.
-3. **Cross-reference integrity.** Collect every `/skill-name` mentioned in any `SKILL.md` and confirm each resolves to a promoted skill of that name. A reference to a deprecated or nonexistent skill is a **dangling reference** - record it. Then confirm the `/skill-router` index names every promoted skill exactly once, and names nothing deprecated or gone.
+3. **Cross-reference integrity.** Collect every `/skill-name` mentioned in any `SKILL.md` and confirm each resolves to a promoted skill of that name. A reference to an archived or nonexistent skill is a **dangling reference** - record it. Then confirm the `/skill-router` index names every promoted skill exactly once, and names nothing archived or gone.
 
    ```bash
    # promoted skill names (the inventory)
-   ls -d skills/*/*/ | grep -vE '/(in-progress|deprecated)/' | xargs -n1 basename
+   ls -d skills/*/*/ | grep -v '/in-progress/' | xargs -n1 basename
    # every /skill-name reference to reconcile against it
    grep -rhoE '/[a-z][a-z0-9]+(-[a-z0-9]+)*' skills --include=SKILL.md | sort -u
    ```
 
 4. **Collection-level review.** Across the whole set, look for:
    - **Duplication or conflict** - two skills covering the same **branch**, or giving contradictory guidance. Recommend a merge or a sharper boundary between them.
-   - **Retirement candidates** - a skill superseded, stale, or that no realistic task would reach. Route to `/deprecate-skill`.
+   - **Retirement candidates** - a skill superseded, stale, or that no realistic task would reach. Route to `/archive-skill`.
    - **Gaps** - a recurring task with no skill to serve it. Route to `/skill-creator`.
-5. **Report.** Emit one findings list. Each finding names the skill(s) it touches, the problem, and a recommended action - edit or create via `/skill-creator`, retire via `/deprecate-skill`, fix a reference in place.
+5. **Report.** Emit one findings list. Each finding names the skill(s) it touches, the problem, and a recommended action - edit or create via `/skill-creator`, retire via `/archive-skill`, fix a reference in place.
 
 ## Per-skill checklist (reference)
 
 For each skill in the inventory:
 
 - **Frontmatter valid** - `name` equals the directory, kebab-case, prefix-free, ≤64 chars, no "claude"/"anthropic"; `description` is one line, ≤1024 chars, stating what it does _and_ when to use it. Canonical keys only - no legacy `custom:`, `triggers:`, `category:`, or `type:`.
-- **Categorised right** - sits in the topic bucket matching what it does, and is not stranded in `in-progress/` or `deprecated/` while still live.
+- **Categorised right** - sits in the topic bucket matching what it does, and is not stranded in `in-progress/` while still live, nor sitting in `skills-archive/` while something still routes to it.
 - **Description earns its load** - one trigger per branch, leading word front-loaded, no identity already stated in the body.
 - **Body is lean** - no **sediment** (stale lines), no **sprawl** (simply too long), no **duplication** (one meaning, one place), no **no-op** (default behaviour restated), no **negation** (steer by the positive target).
 - **References resolve** - its `/skill-name` mentions and sibling-file pointers all hit live targets.

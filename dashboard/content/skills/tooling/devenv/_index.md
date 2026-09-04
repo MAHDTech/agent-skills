@@ -55,7 +55,7 @@ devenv --no-tui shell --quiet -- \
 
 **Never** run bare `devenv shell` without `--no-tui` in an agent context. **Never** dismiss or ignore a secretspec authorization prompt - fix the env (`SECRETSPEC_PROVIDER=env` + required vars) instead.
 
-Other skills (for example the tars-backlog pipeline) must **not** restate these flags. If a project has `devenv.nix` or `devenv.yaml`, follow **this** skill when building any command that enters the devenv shell. Backlog prepare freezes the resulting opaque command strings into `.tars/run.env`; implementers only execute those strings.
+Other skills must **not** restate these flags. If a project has `devenv.nix` or `devenv.yaml`, follow **this** skill when building any command that enters the devenv shell.
 
 ## Pre-commit Hooks and Testing
 
