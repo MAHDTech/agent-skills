@@ -1,16 +1,24 @@
 //! Core domain engine for Agent Skills.
 //!
 //! Provides the foundational domain models, category definitions, frontmatter
-//! parsing, linting primitives, error types, remote skill downloader, and synchronization models.
+//! parsing, linting primitives, error types, remote skill downloader, installer engine,
+//! and synchronization models.
 
 pub mod downloader;
 pub mod error;
+pub mod installer;
 pub mod lint;
 pub mod models;
 pub mod parser;
 
 pub use downloader::SkillDownloader;
 pub use error::{Result, SkillError};
+pub use installer::{
+    EnvironmentResolver, FileLockGuard, InstallMode, InstallOptions, InstallResult, InstalledSkill,
+    InstalledSkillsRegistry, Installer, InstallerBuilder, InstallerError, IntegrityStatus,
+    PathValidator, SkillFileEntry, SkillInstaller, SkillRecord, TargetEnvironment,
+    UninstallOptions, UninstallResult, UpdateResult,
+};
 pub use lint::SkillLinter;
 pub use models::*;
 pub use parser::{MarkdownSection, ParsedSkill, SkillParser, TemplatePlaceholder};
