@@ -62,10 +62,21 @@ Repeat up to `--cycles` times:
 1. **Sense.** `tars-agy inspect <workspace_root>` (all sessions, JSON). Record: sessions running, completed, parked; any `CONTRACT_REFUSED`, `DELEGATION_REFUSED`, `REGRESSED`, or `SESSION_REOPENED` events new since the last cycle.
 2. **Act.** `agy -p "/tars-run-batch all[ --merge]" --add-dir <workspace_root> --output-format json --print-timeout 45m`
    - The invocation blocks until the batch turn finishes. Exit code and `.status` decide success.
+   - **The re-invoke rule (measured ~10x on agy 1.1.26):** an invocation may die mid-run with
+     `"timeout waiting for response"` while awaiting a long subagent, regardless of
+     `--print-timeout`. This is NOT a run failure: verify `pgrep -x agy` shows no dangling
+     process, then re-invoke the same command. The store resumes the run exactly where it was.
+     Count these separately in the ledger; they do not count toward the two-consecutive-failures
+     stop condition unless the store shows no forward progress between deaths.
+   - The engine reviews internally: every leg runs refresh, rebase, land, flake rerun,
+     peer review (DOYLE token required), rework, next issue, in that order. The foreman
+     never dispatches reviews itself; `/tars-review-pr <n> --yolo` exists only for reviewing
+     a PR outside a drain.
 3. **Route** on what the run reports (the engine returns typed directives; read them from the response and from `tars-agy inspect`):
    - **drained**: the backlog is empty. Go to shift end.
    - **pending_ci**: checks are still running on open PRs. Wait 10 minutes (your runtime's pacing mechanism), then next cycle.
-   - **approval_needed / pending_human_merge with DOYLE available**: for each open `tars/issue-*` PR awaiting review, run `agy -p "/tars-review-pr <n>" --add-dir <workspace_root> --output-format json --print-timeout 30m`. At most ONE review per PR head sha per shift; the engine reworks rather than re-reviewing the same commit.
+   - **approval_needed / pending_human_merge with DOYLE available**: just re-invoke the drain;
+     the engine reviews those PRs first, before starting new work. No per-PR dispatch.
    - **human_door / approval_needed without DOYLE**: park. Go to shift end.
    - **stalled** or a breaker trip: park. Go to shift end. Never restart a stalled issue yourself.
 4. **Ledger.** Append the cycle line before starting the next cycle.

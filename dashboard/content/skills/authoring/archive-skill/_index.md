@@ -42,6 +42,8 @@ Three ways a skill leaves the live set:
 
    The directory basename is unchanged, so `name` still equals it and lint stays green.
 
+   Relative links from the moved skill to live skills now resolve inside `skills-archive/`; repoint them through the live tree (`../../../skills/<category>/<name>/SKILL.md`) so the link checker keeps passing.
+
 2. **Mark it archived in frontmatter.** Add a `metadata` block (or extend the existing one) with the archive date and, when there is one, the successor's name. Both values are strings:
 
    ```yaml
