@@ -81,6 +81,26 @@ Repeat up to `--cycles` times:
    - **stalled** or a breaker trip: park. Go to shift end. Never restart a stalled issue yourself.
 4. **Ledger.** Append the cycle line before starting the next cycle.
 
+## Persistent foreman (v2, optional)
+
+Per-leg `agy -p` pays process startup every invocation. One long-lived process avoids it:
+
+```bash
+agy --input-format stream-json --output-format stream-json --add-dir <workspace_root>
+```
+
+- Feed one prompt per leg as an NDJSON `user` event on stdin; read NDJSON back: one `init`,
+  many `step_update`, exactly one `result` per turn.
+- The `result` event carries the same envelope fields as `-p` JSON (`status`, `response`,
+  `usage`); treat a missing `result` after the watchdog window as the re-invoke case: kill
+  the process, check `pgrep -x agy`, start a fresh one, resume the same leg.
+- `step_update` events carry `tool_name` and `subagent_info`, so the whole spoke tree is
+  observable live instead of post-hoc.
+- Slash commands answered by the CLI itself (like `/model`) are an error in this mode; only
+  send the `/tars-*` leg prompts.
+- Fall back to per-leg `-p` whenever the persistent process misbehaves; both modes obey the
+  same ledger and stop conditions.
+
 ## Stop conditions (any one ends the shift immediately)
 
 - Backlog drained.
