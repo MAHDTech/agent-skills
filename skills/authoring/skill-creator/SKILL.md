@@ -21,16 +21,16 @@ skills/<category>/<name>/SKILL.md
 ```
 
 - **`<category>`** is one of the nine topic buckets: `engineering`, `game-development`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Category comes from the directory - never from a frontmatter key.
-- Two **lifecycle buckets** sit outside the topic tree: `in-progress/` holds drafts, and `deprecated/` holds retired skills.
+- One **lifecycle bucket** sits inside the tree: `in-progress/` holds drafts. Retired skills leave `skills/` entirely for the top-level **archive**, `skills-archive/<category>/<name>/`, which keeps the original category.
 
-**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README and index. A skill in `in-progress/` or `deprecated/` is deliberately excluded - move it into a topic bucket to promote it, move it to `deprecated/` to retire it.
+**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README, index, and installer. A skill in `in-progress/` is deliberately excluded - move it into a topic bucket to promote it. To retire one, use `/archive-skill`, which moves it to `skills-archive/` where it stays readable on the dashboard but is never installed.
 
 ## Naming
 
 The name is prefix-free kebab-case, and it must equal the directory basename (`skills/writing/proofread/` is named `proofread`).
 
 - **Verb-first for an action** the skill performs (`sculpt-code`, `git-resolve-conflicts`); **a noun for a body of knowledge** it holds (`tdd`, `agent-guidelines`).
-- **Keep only a genuine subject scope** as a prefix - `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on; a project or subsystem name is a genuine scope too (`tars-` for the `.tars` backlog tooling, so `tars-backlog-*` is correct). Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
+- **Keep only a genuine subject scope** as a prefix - `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on; a project or subsystem name is a genuine scope too (`acme-` for skills that only make sense inside the Acme tool, so `acme-deploy` is correct). Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
 - 1–64 characters, and it must not contain "anthropic" or "claude".
 
 ## Canonical frontmatter

@@ -22,7 +22,6 @@
         "research",
         "sculpt-code",
         "spacetimedb",
-        "tars-backlog-implement",
         "tdd",
         "upgrade-dependencies",
         "xai"
@@ -46,11 +45,6 @@
         "prioritize-backlog",
         "software-factory",
         "store-plan",
-        "tars-backlog-audit",
-        "tars-backlog-create-issue",
-        "tars-backlog-loop",
-        "tars-backlog-prepare",
-        "tars-backlog-triage",
         "to-spec",
         "to-tickets",
         "wayfinder"
@@ -64,8 +58,7 @@
         "pr-build-context",
         "pr-create-test-plan",
         "pr-edge-cases",
-        "rfc-review",
-        "tars-backlog-review"
+        "rfc-review"
       ]
     },
     {
@@ -106,7 +99,7 @@
       "title": "Authoring",
       "description": "Create and maintain the skills themselves.",
       "skills": [
-        "deprecate-skill",
+        "archive-skill",
         "skill-audit",
         "skill-creator",
         "skill-router"
@@ -127,6 +120,7 @@
         "prek",
         "scratchpad",
         "tailwind",
+        "tars-run-factory",
         "tauri",
         "zed",
         "zola"
