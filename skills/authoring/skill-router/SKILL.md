@@ -69,6 +69,8 @@ Not new features - working on code that already exists:
 
 ## Crossing sessions
 
+- [/tars-goal](../../planning/tars-goal/SKILL.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
+
 - `/handoff` - reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
 - `/store-plan` - reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
 
