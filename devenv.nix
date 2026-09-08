@@ -133,6 +133,13 @@ in
       "^\\.cache/"
     ];
     hooks = {
+      factory-supervisor-tests = {
+        enable = true;
+        name = "Factory Supervisor Tests";
+        entry = "run-factory-tests";
+        pass_filenames = false;
+        always_run = true;
+      };
       action-validator.enable = true;
       actionlint.enable = true;
       cargo-check.enable = true;
@@ -327,6 +334,11 @@ in
   };
 
   scripts = {
+    run-factory-tests = {
+      exec = ''
+        bun test skills/tooling/tars-run-factory/resources/manual "$@"
+      '';
+    };
     ask = {
       description = "Unified ask CLI management tool";
       exec = ''
@@ -375,5 +387,6 @@ in
     bun test bin/skills/lint.test.ts
     bun test bin/skills/downloader.test.ts
     bun test bin/dashboard
+    run-factory-tests
   '';
 }
