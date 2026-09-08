@@ -113,7 +113,8 @@ agy --input-format stream-json --output-format stream-json --add-dir <workspace_
 - Record the exact refusal, tool, target, conversation and any completed work before deciding the next action.
 - An explicitly authorized guard provocation follows its agreed test procedure; record the expected refusal as evidence.
 - For an incidental refusal, continue authorized work when the refused operation can be omitted or replaced with an independently permitted operation that still satisfies the task.
-  - Supply known skill instructions and tool schemas inline instead of asking the run to discover private plugin directories.
+  - Supply known skill instructions, their required delegation rules and tool schemas inline instead of asking the run to discover private plugin directories.
+  - Bind each inline brief to its tool surface: `tars` for the hub, `tars-spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
   - Edit authorized files directly inside the assigned worktree instead of creating private scratch helpers.
   - Forward the correction to every affected spoke.
 - Keep the refused target and operation off limits. Never use another tool, identity or path alias to obtain the same denied access, weaken a hook, or widen permissions as recovery.
@@ -121,6 +122,14 @@ agy --input-format stream-json --output-format stream-json --add-dir <workspace_
 - Existing authorization covers this recovery; do not ask again merely because an incidental operation was refused.
 - Allow one corrected retry for a refusal. If it repeats, its effect is uncertain, or completion requires additional access or an unanswered human decision, stop and report the concrete blocker.
 - Verify the corrected action and inspect fresh response, transcript and deny logs. Report a recovered refusal as recovered, never as a refusal-free run.
+
+## Independent review evidence
+
+- Require the host to poll native `manage_subagents` completion before consuming a spoke's final delivery, following the plugin's delegation rules.
+- Reconcile completion claims with each dispatched conversation's own tool results, final delivery and artifact writer stamp. Host-authored inbox text, a deliverable heading, or an artifact filename alone does not establish completion.
+- Accept each report only from its designated review spoke, with verification commands and outcomes supported by the executing spoke's own trace. A hub-written substitute satisfies neither role.
+- Check a claimed missing MCP capability against actual calls and results on that spoke's surface. A missing result or wrong server name is not proof that the spoke has no MCP tools.
+- Stop on contradictory provenance before a verdict or landing. Preserve the suspect evidence and completed issue work; prepare a corrected brief before retrying. Never repair provenance by rewriting a report or writer stamp as the hub.
 
 ## Stop conditions (any one ends the shift immediately)
 

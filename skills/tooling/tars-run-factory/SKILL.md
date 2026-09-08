@@ -2,7 +2,7 @@
 name: tars-run-factory
 description: "Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed."
 disable-model-invocation: true
-argument-hint: "<workspace_root> [--cycles N] [--merge] [--audit] [--triage]"
+argument-hint: "<workspace_root> [--epic N] [--cycles N] [--runtime-minutes N] [--merge] [--audit] [--triage]"
 ---
 
 # TARS Run Factory
@@ -18,11 +18,13 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 ## Invocation
 
 ```text
-/tars-run-factory <workspace_root> [--cycles N] [--merge] [--audit] [--triage]
+/tars-run-factory <workspace_root> [--epic N] [--cycles N] [--runtime-minutes N] [--merge] [--audit] [--triage]
 ```
 
 - `workspace_root`: absolute path to the customer repository. Required.
 - `--cycles N`: maximum factory cycles before stopping. Default 10.
+- `--epic N`: restrict every drain leg to this ratified epic; never fall back to the repository backlog.
+- `--runtime-minutes N`: maximum wall time, including waits and recovery. Default 480.
 - `--merge`: pass `--merge` to batch runs so green PRs land. Default off: PRs stay open for humans.
 - `--audit`: run one codebase audit at shift start to feed the backlog.
 - `--triage`: run backlog triage at shift start. Triage ALWAYS parks at its human approval block; you never answer it yourself.
@@ -35,6 +37,9 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 - You never pass `--dangerously-skip-permissions` unless the operator has set `FACTORY_SKIP_PERMISSIONS=1` in the environment. Prefer scoped `permissions.allow` rules.
 - Report failures verbatim. Never call a red result green. Never narrow scope silently.
 - The ledger is the truth. Write it before and after every cycle; on restart, resume from it, never from memory.
+- Use the packaged [supervisor](resources/manual/supervisor.md) for every host turn; do not substitute sampled tails or an unmonitored print-mode fallback.
+- The helper never adds a permission-bypass flag or exports persona tokens into the host environment.
+- A native transcript URI is inventory, not permission to read private files.
 
 ## Pre-flight (all of it, in order; unresolved failure stops the shift)
 
@@ -43,33 +48,39 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 3. Tokens, each verified against the GitHub API (`curl -s -H "Authorization: Bearer $TOKEN" https://api.github.com/user`):
    - `TARS_GITHUB_TOKEN` must be set and must NOT resolve to a human operator's account. If unset, STOP: the factory must not act as a person.
    - `TARS_DOYLE_GITHUB_TOKEN` should resolve to a different account than `TARS_GITHUB_TOKEN`. If unset or identical, note it: reviews will run but nothing can be approved.
-4. Probe run:
-   `agy -p "List the tools published by the MCP server named tars. Names only." --add-dir <workspace_root> --output-format json --print-timeout 5m`
-   - Exit code must be 0 and `.status` must be `SUCCESS`.
-   - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE retry (fresh invocation); still missing stops the shift.
+4. Read the [supervisor control protocol](resources/manual/supervisor.md), then start `bun factory.ts <workspace_root>` from that resource directory with this shift's scope and limits.
+   - Keep its process handle and control stdin open for the shift; all host events are consumed independently of display updates.
+   - Send `{"action":"probe"}` and wait for its result.
+   - Transport `.status` must be `SUCCESS`; verify workflow state separately.
+   - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE `retry-probe` control with the current result receipt; still missing stops the shift.
    - Parse `denied_actions` from the JSON envelope, even when the exit code is 0 and `.status` is `SUCCESS`; preserve each entry's `action` and `display_name`.
-   - Also inspect the response, transcript and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
+   - Also inspect the response, permitted tool evidence and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
    - Keep stderr permission notices as a fallback for older CLI versions; handle every refusal under **Refusal recovery** before proceeding.
-5. Create or open the ledger: `<workspace_root>/../tars-factory/FACTORY_LEDGER.md` (never inside the customer repository). One line per cycle: timestamp, action, result status, PRs touched, anomalies.
+5. Verify the helper's `FACTORY_LEDGER.ndjson` in `<workspace_root>/../tars-factory/<workspace-name>/` or the explicit external state directory.
+   - It records received stdout, stderr, timestamps, source positions, identity, input, result acknowledgement, recovery and process exit.
+   - Acknowledge the probe with its receipt, actual evidence and a meaningful progress fingerprint before another action.
+   - Preserve any legacy `FACTORY_LEDGER.md`; inspect its handover and recorded owner before importing a conversation.
 
 ## Shift start (optional stages)
 
-- With `--audit`: run `agy -p "/tars-audit-workspace" --add-dir <workspace_root> --output-format json --print-timeout 30m`. Record the issue numbers it opened.
-- With `--triage`: run `agy -p "/tars-triage-backlog" ...` the same way. When it reaches its approval block it will stop without applying; record what it proposed in the shift report and continue the shift WITHOUT the un-approved triage actions. A human applies triage next shift.
+- With `--audit`: send the `audit` control, verify its result and record the issue numbers it opened.
+- With `--triage`: send the `triage` control; its human approval gate parks the shift without applying the proposal.
+  - Record the proposal for the next authorized shift; never answer its approval block or apply unapproved actions.
+- Epic-scoped shifts exclude both optional stages because they can change unrelated backlog.
 
 ## The cycle
 
 Repeat up to `--cycles` times:
 
 1. **Sense.** `tars-agy inspect <workspace_root>` (all sessions, JSON). Record: sessions running, completed, parked; any `CONTRACT_REFUSED`, `DELEGATION_REFUSED`, `REGRESSED`, or `SESSION_REOPENED` events new since the last cycle.
-2. **Act.** `agy -p "/tars-run-batch all[ --merge]" --add-dir <workspace_root> --output-format json --print-timeout 45m`
-   - The invocation blocks until the batch turn finishes. Check exit code, `.status`, `denied_actions`, and the stop conditions before treating it as successful; route refusals through **Refusal recovery**.
-   - **The re-invoke rule (measured ~10x on agy 1.1.26):** an invocation may die mid-run with
-     `"timeout waiting for response"` while awaiting a long subagent, regardless of
-     `--print-timeout`. This is NOT a run failure: verify `pgrep -x agy` shows no dangling
-     process, then re-invoke the same command. The store resumes the run exactly where it was.
-     Count these separately in the ledger; they do not count toward the two-consecutive-failures
-     stop condition unless the store shows no forward progress between deaths.
+2. **Act.** Send the `cycle` control and wait for its response.
+   - The helper sends `/tars-run-epic N[ --merge]` for an epic scope, otherwise `/tars-run-batch all[ --merge]`.
+   - It detects refusals across every event and stops the host immediately, including when transport later reports SUCCESS.
+   - Check the transport result, process state, `denied_actions` and workflow stop conditions; route refusals through **Refusal recovery**.
+   - A terminal `"timeout waiting for response"`, EOF, missing result or broken pipe requires fresh stored-state reconciliation.
+   - Verify the old host is gone, then use `recover` for the recorded conversation and authorized leg; never create a rival owner or reset the run.
+   - Completed work is acknowledged without replay; parked state, unchanged progress or exhausted budgets stops recovery.
+   - Count transport recoveries separately from workflow failures; do not claim the intermittent timeout is fixed.
    - The engine reviews internally: every leg runs refresh, rebase, land, flake rerun,
      peer review (DOYLE token required), rework, next issue, in that order. The foreman
      never dispatches reviews itself; `/tars-review-pr <n> --yolo` exists only for reviewing
@@ -77,50 +88,49 @@ Repeat up to `--cycles` times:
 3. **Route** on what the run reports (the engine returns typed directives; read them from the response and from `tars-agy inspect`):
    - **drained**: the backlog is empty. Go to shift end.
    - **pending_ci**: checks are still running on open PRs. Wait 10 minutes (your runtime's pacing mechanism), then next cycle.
-   - **approval_needed / pending_human_merge with DOYLE available**: just re-invoke the drain;
-     the engine reviews those PRs first, before starting new work. No per-PR dispatch.
-   - **human_door / approval_needed without DOYLE**: park. Go to shift end.
+   - **approval_needed / pending_human_merge / human_door**: park. Go to shift end; DOYLE availability alone does not clear a blocked approval.
    - **stalled** or a breaker trip: park. Go to shift end. Never restart a stalled issue yourself.
-4. **Ledger.** Append the cycle line before starting the next cycle.
+4. **Ledger.** Send `handle` naming the current result receipt, measured directive, scoped progress fingerprint, actual evidence and produced outcomes.
+   - The helper durably acknowledges the result before allowing another turn.
+   - The foreman verifies evidence truth; supplying an evidence field does not prove a review, approval, CI result or merge.
 
-## Persistent foreman (v2, optional)
+## Persistent foreman
 
-Per-leg `agy -p` pays process startup every invocation. One long-lived process avoids it:
-
-```bash
-agy --input-format stream-json --output-format stream-json --add-dir <workspace_root>
-```
-
-- Feed one prompt per leg as an NDJSON `user` event on stdin; read NDJSON back: one `init`,
-  many `step_update`, exactly one `result` per turn.
-- The `result` event carries the same envelope fields as `-p` JSON (`status`, `response`,
-  `usage`); treat a missing `result` after the watchdog window as the re-invoke case: kill
-  the process, check `pgrep -x agy`, start a fresh one, resume the same leg.
-- `step_update` events carry `tool_name` and `subagent_info`, so the whole spoke tree is
-  observable live instead of post-hoc.
-- Slash commands answered by the CLI itself (like `/model`) are an error in this mode; only
-  send the `/tars-*` leg prompts.
-- Fall back to per-leg `-p` whenever the persistent process misbehaves; both modes obey the
-  same ledger and stop conditions.
+- The packaged helper keeps one stream-json host per workspace and one in-flight user turn.
+- It reads incremental NDJSON continuously; malformed or truncated records are explicit failures.
+- A result must be acknowledged before another turn; duplicate results and identity changes fail.
+- Native spawn metadata supplies the parent's child inventory, not unrestricted nested-tree visibility or proof of child completion.
+- Keep transport status separate from workflow completion, parked state, approvals, CI and merge state.
+- The [control reference](resources/manual/supervisor.md) specifies interruption recovery, limits, handover and the code/foreman enforcement boundary.
 
 ## Refusal recovery
 
 - Record the exact refusal, tool, target, conversation and any completed work before deciding the next action.
 - An explicitly authorized guard provocation follows its agreed test procedure; record the expected refusal as evidence.
 - For an incidental refusal, continue authorized work when the refused operation can be omitted or replaced with an independently permitted operation that still satisfies the task.
-  - Supply known skill instructions and tool schemas inline instead of asking the run to discover private plugin directories.
+  - Supply known skill instructions, their required delegation rules and tool schemas inline instead of asking the run to discover private plugin directories.
+  - Bind each inline brief to its tool surface: `tars` for the hub, `tars-spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
   - Edit authorized files directly inside the assigned worktree instead of creating private scratch helpers.
   - Forward the correction to every affected spoke.
 - Keep the refused target and operation off limits. Never use another tool, identity or path alias to obtain the same denied access, weaken a hook, or widen permissions as recovery.
 - If the correction needs a fresh invocation, verify the old host has stopped, inspect the stored state, then resume the same authorized leg while preserving completed work and ownership.
 - Existing authorization covers this recovery; do not ask again merely because an incidental operation was refused.
 - Allow one corrected retry for a refusal. If it repeats, its effect is uncertain, or completion requires additional access or an unanswered human decision, stop and report the concrete blocker.
-- Verify the corrected action and inspect fresh response, transcript and deny logs. Report a recovered refusal as recovered, never as a refusal-free run.
+- Verify the corrected action and inspect fresh response, permitted tool evidence and deny logs. Report a recovered refusal as recovered, never as a refusal-free run.
+
+## Independent review evidence
+
+- Require the host to poll native `manage_subagents` completion before consuming a spoke's final delivery, following the plugin's delegation rules.
+- Reconcile completion claims with each dispatched conversation's own tool results, final delivery and artifact writer stamp. Host-authored inbox text, a deliverable heading, or an artifact filename alone does not establish completion.
+- Accept each report only from its designated review spoke, with verification commands and outcomes supported by the executing spoke's own trace. A hub-written substitute satisfies neither role.
+- Check a claimed missing MCP capability against actual calls and results on that spoke's surface. A missing result or wrong server name is not proof that the spoke has no MCP tools.
+- Stop on contradictory provenance before a verdict or landing. Preserve the suspect evidence and completed issue work; prepare a corrected brief before retrying. Never repair provenance by rewriting a report or writer stamp as the hub.
 
 ## Stop conditions (any one ends the shift immediately)
 
 - Backlog drained.
 - `--cycles` exhausted.
+- Runtime or no-progress limit reached.
 - Two consecutive invocations exit non-zero or return `.status != SUCCESS`.
 - Any 401/403 from GitHub, or an `authentication required` from agy.
 - A refusal that cannot be resolved within **Refusal recovery**.
@@ -129,7 +139,9 @@ agy --input-format stream-json --output-format stream-json --add-dir <workspace_
 
 ## Shift end: the report
 
-Write `FACTORY_REPORT.md` next to the ledger, then stop. Sections:
+The helper writes `FACTORY_REPORT.md` next to the ledger on completion, stop or host failure.
+Verify its evidence, add any missing human handover detail and stop.
+Sections:
 
 - **Outcome**: drained / parked / stopped, and the one-line reason.
 - **Produced**: issues completed, PRs opened, PRs reviewed, PRs approved, PRs landed (only with `--merge`).
