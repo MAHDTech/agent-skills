@@ -41,7 +41,7 @@ See also: the [antigravity](@/skills/tooling/antigravity/_index.md) skill for `a
 - Report failures verbatim. Never call a red result green. Never narrow scope silently.
 - The ledger is the truth. Write it before and after every cycle; on restart, resume from it, never from memory.
 
-## Pre-flight (all of it, in order; any failure stops the shift before anything runs)
+## Pre-flight (all of it, in order; unresolved failure stops the shift)
 
 1. `agy --version` succeeds. Record the version.
 2. `git -C <workspace_root> status --porcelain` is empty and `git -C <workspace_root> remote get-url origin` resolves. A dirty tree or missing remote stops the shift.
@@ -52,10 +52,9 @@ See also: the [antigravity](@/skills/tooling/antigravity/_index.md) skill for `a
    `agy -p "List the tools published by the MCP server named tars. Names only." --add-dir <workspace_root> --output-format json --print-timeout 5m`
    - Exit code must be 0 and `.status` must be `SUCCESS`.
    - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE retry (fresh invocation); still missing stops the shift.
-   - Parse `denied_actions` from the JSON envelope; `(.denied_actions // []) | length` must be zero, even when the exit code is 0 and `.status` is `SUCCESS`.
-   - Any entry stops the shift; preserve its `action` and `display_name` with the stderr notice.
+   - Parse `denied_actions` from the JSON envelope, even when the exit code is 0 and `.status` is `SUCCESS`; preserve each entry's `action` and `display_name`.
    - Also inspect the response, transcript and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
-   - Keep stderr permission notices as a fallback for older CLI versions; report the exact refusal and leave permission changes to the operator.
+   - Keep stderr permission notices as a fallback for older CLI versions; handle every refusal under **Refusal recovery** before proceeding.
 5. Create or open the ledger: `<workspace_root>/../tars-factory/FACTORY_LEDGER.md` (never inside the customer repository). One line per cycle: timestamp, action, result status, PRs touched, anomalies.
 
 ## Shift start (optional stages)
@@ -69,7 +68,7 @@ Repeat up to `--cycles` times:
 
 1. **Sense.** `tars-agy inspect <workspace_root>` (all sessions, JSON). Record: sessions running, completed, parked; any `CONTRACT_REFUSED`, `DELEGATION_REFUSED`, `REGRESSED`, or `SESSION_REOPENED` events new since the last cycle.
 2. **Act.** `agy -p "/tars-run-batch all[ --merge]" --add-dir <workspace_root> --output-format json --print-timeout 45m`
-   - The invocation blocks until the batch turn finishes. Check exit code, `.status`, `denied_actions`, and the stop conditions before treating it as successful.
+   - The invocation blocks until the batch turn finishes. Check exit code, `.status`, `denied_actions`, and the stop conditions before treating it as successful; route refusals through **Refusal recovery**.
    - **The re-invoke rule (measured ~10x on agy 1.1.26):** an invocation may die mid-run with
      `"timeout waiting for response"` while awaiting a long subagent, regardless of
      `--print-timeout`. This is NOT a run failure: verify `pgrep -x agy` shows no dangling
@@ -109,13 +108,27 @@ agy --input-format stream-json --output-format stream-json --add-dir <workspace_
 - Fall back to per-leg `-p` whenever the persistent process misbehaves; both modes obey the
   same ledger and stop conditions.
 
+## Refusal recovery
+
+- Record the exact refusal, tool, target, conversation and any completed work before deciding the next action.
+- An explicitly authorized guard provocation follows its agreed test procedure; record the expected refusal as evidence.
+- For an incidental refusal, continue authorized work when the refused operation can be omitted or replaced with an independently permitted operation that still satisfies the task.
+  - Supply known skill instructions and tool schemas inline instead of asking the run to discover private plugin directories.
+  - Edit authorized files directly inside the assigned worktree instead of creating private scratch helpers.
+  - Forward the correction to every affected spoke.
+- Keep the refused target and operation off limits. Never use another tool, identity or path alias to obtain the same denied access, weaken a hook, or widen permissions as recovery.
+- If the correction needs a fresh invocation, verify the old host has stopped, inspect the stored state, then resume the same authorized leg while preserving completed work and ownership.
+- Existing authorization covers this recovery; do not ask again merely because an incidental operation was refused.
+- Allow one corrected retry for a refusal. If it repeats, its effect is uncertain, or completion requires additional access or an unanswered human decision, stop and report the concrete blocker.
+- Verify the corrected action and inspect fresh response, transcript and deny logs. Report a recovered refusal as recovered, never as a refusal-free run.
+
 ## Stop conditions (any one ends the shift immediately)
 
 - Backlog drained.
 - `--cycles` exhausted.
 - Two consecutive invocations exit non-zero or return `.status != SUCCESS`.
 - Any 401/403 from GitHub, or an `authentication required` from agy.
-- Any nonempty `denied_actions` array in a JSON envelope or stream `result`, any stderr permission-denial notice, or any hook refusal in the response, transcript or TARS deny logs.
+- A refusal that cannot be resolved within **Refusal recovery**.
 - A `human_door`, an un-approvable review backlog, or a stalled/breaker-tripped issue.
 - The same issue reappears in rework after the engine has spent its auto-rework lives.
 
