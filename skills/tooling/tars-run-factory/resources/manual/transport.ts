@@ -154,7 +154,7 @@ export class Host {
         else {
             try { await this.child.stdin.end() } catch (error) { this.fail(error) }
         }
-        const timer = setTimeout(() => this.fail(new Error("clean shutdown timeout")), 1000)
+        const timer = setTimeout(() => this.fail(new Error("clean shutdown timeout")), 10_000)
         try { await this.exited } finally { clearTimeout(timer) }
     }
 }

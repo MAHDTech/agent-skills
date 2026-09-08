@@ -93,6 +93,7 @@ bun factory.ts /absolute/customer/workspace --epic 42 --cycles 10 --runtime-minu
 - Cycle exhaustion, runtime exhaustion and two consecutive failed or unchanged-progress results stop the shift.
 - Runtime is wall time from the durable start, including waits and restarts.
 - EOF, malformed control input and termination signals shut down the host and write `FACTORY_REPORT.md`.
+- Normal stdin closure allows ten seconds for host cleanup before bounded termination escalation.
 - Host failures immediately write a handover and leave the control loop available for permitted recovery.
 - After a foreman interruption, restart with the same invocation and state directory; an orphaned host must be gone before acquisition.
 - An unfinished durable leg requires reconciliation before new input.

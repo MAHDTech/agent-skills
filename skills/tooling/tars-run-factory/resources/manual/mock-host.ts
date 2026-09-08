@@ -48,4 +48,7 @@ lines.on("line", (line) => {
     if (mode === "late-denial") setTimeout(() => emit({ event: "step_update", step_update: { tool_info: { name: "view_file", parameters: { path: "/private" }, error: { message: "tool call denied by pre-tool hook" } } } }), 20)
     if (mode === "duplicate") emit({ event: "result", result: { status: "SUCCESS" } })
 })
-lines.on("close", () => process.exit(0))
+lines.on("close", () => {
+    if (mode === "slow-close") setTimeout(() => process.exit(0), 1500)
+    else process.exit(0)
+})
