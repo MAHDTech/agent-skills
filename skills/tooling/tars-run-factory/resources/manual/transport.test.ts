@@ -40,6 +40,16 @@ test("two turns share a process, each waits for durable handling", async () => {
     })
 })
 
+test("normal shutdown allows asynchronous host cleanup without termination", async () => {
+    await fixture("slow-close", async (host, ledger) => {
+        await host.send("first", 1000)
+        host.handled({ workflow: "stopped" })
+        await host.close()
+        expect(ledger.receipts.some((receipt) => receipt.channel === "failure")).toBe(false)
+        expect(ledger.receipts.find((receipt) => receipt.channel === "exit")?.payload).toMatchObject({ code: 0, signal: null })
+    })
+})
+
 test.each([
     ["eof", "missing result"], ["timeout", "timeout"], ["malformed", "JSON"],
     ["truncated", "truncated"], ["denial", "denied"], ["stderr", "denied"],
