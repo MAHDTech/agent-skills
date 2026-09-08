@@ -47,7 +47,10 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
    `agy -p "List the tools published by the MCP server named tars. Names only." --add-dir <workspace_root> --output-format json --print-timeout 5m`
    - Exit code must be 0 and `.status` must be `SUCCESS`.
    - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE retry (fresh invocation); still missing stops the shift.
-   - stderr must contain no permission soft-deny notices. Any soft-deny stops the shift; report the exact notice and the `permissions.allow` rule that would clear it.
+   - Parse `denied_actions` from the JSON envelope; `(.denied_actions // []) | length` must be zero, even when the exit code is 0 and `.status` is `SUCCESS`.
+   - Any entry stops the shift; preserve its `action` and `display_name` with the stderr notice.
+   - Also inspect the response, transcript and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
+   - Keep stderr permission notices as a fallback for older CLI versions; report the exact refusal and leave permission changes to the operator.
 5. Create or open the ledger: `<workspace_root>/../tars-factory/FACTORY_LEDGER.md` (never inside the customer repository). One line per cycle: timestamp, action, result status, PRs touched, anomalies.
 
 ## Shift start (optional stages)
@@ -61,7 +64,7 @@ Repeat up to `--cycles` times:
 
 1. **Sense.** `tars-agy inspect <workspace_root>` (all sessions, JSON). Record: sessions running, completed, parked; any `CONTRACT_REFUSED`, `DELEGATION_REFUSED`, `REGRESSED`, or `SESSION_REOPENED` events new since the last cycle.
 2. **Act.** `agy -p "/tars-run-batch all[ --merge]" --add-dir <workspace_root> --output-format json --print-timeout 45m`
-   - The invocation blocks until the batch turn finishes. Exit code and `.status` decide success.
+   - The invocation blocks until the batch turn finishes. Check exit code, `.status`, `denied_actions`, and the stop conditions before treating it as successful.
    - **The re-invoke rule (measured ~10x on agy 1.1.26):** an invocation may die mid-run with
      `"timeout waiting for response"` while awaiting a long subagent, regardless of
      `--print-timeout`. This is NOT a run failure: verify `pgrep -x agy` shows no dangling
@@ -107,7 +110,7 @@ agy --input-format stream-json --output-format stream-json --add-dir <workspace_
 - `--cycles` exhausted.
 - Two consecutive invocations exit non-zero or return `.status != SUCCESS`.
 - Any 401/403 from GitHub, or an `authentication required` from agy.
-- Any permission soft-deny notice on stderr mid-shift.
+- Any nonempty `denied_actions` array in a JSON envelope or stream `result`, any stderr permission-denial notice, or any hook refusal in the response, transcript or TARS deny logs.
 - A `human_door`, an un-approvable review backlog, or a stalled/breaker-tripped issue.
 - The same issue reappears in rework after the engine has spent its auto-rework lives.
 
