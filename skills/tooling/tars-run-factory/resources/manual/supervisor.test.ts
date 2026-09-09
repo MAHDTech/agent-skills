@@ -56,6 +56,18 @@ test("epic invocation never becomes a repository-wide batch", async () => {
     }, { smoke: false, epic: 42, merge: true })
 })
 
+test("partial SUCCESS cannot advance the workflow", async () => {
+    await fixture(async (supervisor, ledger, directory) => {
+        await supervisor.control({ action: "status" })
+        expect(supervisor.position.phase).toBe("failed")
+        await expect(handle(supervisor, "drained")).rejects.toThrow("current result")
+        await expect(supervisor.control({ action: "status" })).rejects.toThrow("handled")
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "stdin")).toHaveLength(1)
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "handled")).toHaveLength(0)
+        expect(readFileSync(join(directory, "FACTORY_REPORT.md"), "utf8")).toContain("returning partial output")
+    }, {}, "partial-timeout")
+})
+
 test("cycle and no-progress budgets stop with handovers", async () => {
     await fixture(async (supervisor, _ledger, directory) => {
         await supervisor.control({ action: "status" })

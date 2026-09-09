@@ -62,6 +62,9 @@ export class Host {
             this.consume(this.child.stderr, (bytes) => {
                 stderrPosition += bytes.length
                 stderr += stderrDecoder.write(bytes)
+                if (/(?:^|\n)(?:\[agy\] print timeout after [^\n]*; returning partial output|error:)/i.test(stderr)) {
+                    this.fail(new Error(stderr.trim()))
+                }
                 this.turn.notice(stderr)
                 if (this.turn.stop) this.fail(new Error(this.turn.stop.reason))
                 if (stderr.endsWith("\n")) flushStderr()

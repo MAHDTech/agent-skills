@@ -29,6 +29,7 @@ bun factory.ts /absolute/customer/workspace --epic 42 --cycles 10 --runtime-minu
 - Feed one JSON object per line to the helper's stdin.
 - Its stdout emits `ready`, `state`, `control_error` or `stopped` envelopes.
 - Raw host output is continuously consumed into `FACTORY_LEDGER.ndjson`, even while the foreman is not displaying output.
+- A CLI partial-output timeout or fatal `error:` stderr notice fails the host even when its result says SUCCESS or its exit code is 0.
 - `phase: result` requires acknowledgement of that result's `resultSeq`.
 - `phase: failed` requires fresh reconciliation or a stop; it never starts a replacement automatically.
 - A `control_error` did not authorize progression; correct the control within existing permission or stop.

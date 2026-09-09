@@ -73,6 +73,30 @@ test("writing after process exit is explicit and never starts a replacement", as
     })
 })
 
+test("ordinary tool errors do not become fatal host notices", async () => {
+    await fixture("tool-error", async (host) => {
+        const result = await host.send("first", 1000)
+        expect(result.transport).toBe("SUCCESS")
+        expect(host.failure).toBeUndefined()
+        host.handled({ workflow: "continue" })
+    })
+})
+
+test.each(["partial-timeout", "split-timeout", "late-timeout", "fatal-stderr"])("%s prevents acknowledgement and another prompt", async (mode) => {
+    await fixture(mode, async (host, ledger) => {
+        await host.send("first", 1000).catch(() => {})
+        const failure = await Promise.race([host.failed, new Promise<undefined>((resolve) => setTimeout(resolve, 100))])
+        expect(failure).toBeInstanceOf(Error)
+        expect(() => host.handled({ workflow: "continue" })).toThrow()
+        await expect(host.send("second", 1000)).rejects.toThrow()
+        await host.close()
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "stdin")).toHaveLength(1)
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "handled")).toHaveLength(0)
+        expect(ledger.receipts.some((receipt) => receipt.channel === "stderr")).toBe(true)
+        expect(ledger.receipts.some((receipt) => receipt.channel === "exit")).toBe(true)
+    })
+})
+
 test("broken stdin pipe terminates and records the old host before recovery", async () => {
     await fixture("brokenpipe", async (host, ledger) => {
         await host.initialized
