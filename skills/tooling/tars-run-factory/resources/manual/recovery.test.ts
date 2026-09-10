@@ -61,7 +61,7 @@ test("unknown refusal stops; exact independently permitted correction gets one d
     })
 })
 
-test.each(["parked", "authentication"] as const)("%s never accepts a corrected retry", async (kind) => {
+test.each(["parked", "authentication", "content_filter"] as const)("%s never accepts a corrected retry", async (kind) => {
     await fixture(async (ledger, request) => {
         request.stop = { kind, reason: "human decision required" }
         await expect(reconcileRecovery(request, ledger, inspect)).rejects.toThrow("parked")
