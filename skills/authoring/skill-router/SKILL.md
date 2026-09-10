@@ -134,6 +134,7 @@ Beyond `/code-review` on the main flow:
 - `/prek` - reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
 - `/opencode` - reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
 - [/acp](../../engineering/acp/SKILL.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
+- [/mcp](../../engineering/mcp/SKILL.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
 - `/opencode-acp` - reach for this when controlling OpenCode over the Agent Client Protocol.
 - [/pagefind](../../tooling/pagefind/SKILL.md) - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
