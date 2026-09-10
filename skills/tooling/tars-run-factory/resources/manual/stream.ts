@@ -41,7 +41,7 @@ export class Ndjson {
 }
 
 export interface Stop {
-    kind: "refusal" | "parked" | "authentication"
+    kind: "refusal" | "parked" | "authentication" | "content_filter"
     reason: string
     tool?: string
     target?: string
@@ -50,6 +50,7 @@ export interface Stop {
 const refusal = /denied|refused|permission.{0,30}(?:required|reject)|not (?:allowed|permitted)|outside this session's workspace/i
 const parked = /\b(?:approval_needed|pending_human_merge|human_door|stalled|breaker.{0,12}trip|REVIEW_REQUIRED)\b/i
 const authentication = /authentication required|\b(?:401|403)\b.{0,40}(?:github|unauthorized|forbidden)|github.{0,40}\b(?:401|403)\b/i
+const contentFilter = /\b(?:response (?:was )?blocked by content safety filters|STOP_REASON_CONTENT_FILTER)\b/i
 
 export class Turn {
     conversation?: string
@@ -74,11 +75,12 @@ export class Turn {
         this.phase = "idle"
     }
 
-    notice(text: string, tool?: string, target?: string) {
+    notice(text: string, tool?: string, target?: string, terminalError = false) {
         const kind = authentication.test(text) ? "authentication"
-            : parked.test(text) ? "parked"
+            : terminalError && contentFilter.test(text) ? "content_filter"
+                : parked.test(text) ? "parked"
                 : refusal.test(text) ? "refusal" : undefined
-        const priority = { refusal: 1, parked: 2, authentication: 3 }
+        const priority = { refusal: 1, parked: 2, content_filter: 3, authentication: 4 }
         if (kind && (!this.stop || priority[kind] > priority[this.stop.kind])) {
             this.stop = { kind, reason: text, tool, target }
         }
@@ -88,7 +90,7 @@ export class Turn {
         const step = object(event.step_update)
         const result = object(event.result)
         for (const error of [event.error, step.error, result.error]) {
-            if (error) this.notice(JSON.stringify(error))
+            if (error) this.notice(JSON.stringify(error), undefined, undefined, true)
         }
         const identity = event.conversation_id ?? step.conversation_id ?? result.conversation_id
         if (typeof identity === "string") {
@@ -101,7 +103,7 @@ export class Turn {
             if (typeof result.status !== "string") throw new Error("result missing transport status")
             this.transport = result.status
             this.response = typeof result.response === "string" ? result.response : JSON.stringify(result.response ?? "")
-            this.notice(this.response)
+            this.notice(this.response, undefined, undefined, result.status !== "SUCCESS")
             if (Array.isArray(result.denied_actions) && result.denied_actions.length) {
                 this.notice(`denied_actions: ${JSON.stringify(result.denied_actions)}`)
             }
@@ -110,7 +112,7 @@ export class Turn {
         }
         if (event.event !== "step_update") return
         const tool = object(step.tool_info)
-        if (tool.error) this.notice(JSON.stringify(tool.error), String(tool.name ?? step.tool_name ?? ""), JSON.stringify(tool.parameters ?? {}))
+        if (tool.error) this.notice(JSON.stringify(tool.error), String(tool.name ?? step.tool_name ?? ""), JSON.stringify(tool.parameters ?? {}), true)
         if (tool.output !== undefined) this.notice(typeof tool.output === "string" ? tool.output : JSON.stringify(tool.output), String(tool.name ?? step.tool_name ?? ""), JSON.stringify(tool.parameters ?? {}))
         if (step.step_type === "agent_response" && typeof step.text_delta === "string") {
             this.responseText += step.text_delta

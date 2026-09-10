@@ -37,6 +37,31 @@ describe("stream framing", () => {
 
 describe("turn decisions", () => {
     test.each([
+        { event: "result", result: { status: "ERROR", error: "response blocked by content safety filters" } },
+        { event: "step_update", step_update: { error: "The response was blocked by content safety filters. Please try rephrasing your request." } },
+        { event: "result", result: { status: "ERROR", error: { stop_reason: "STOP_REASON_CONTENT_FILTER" } } },
+    ])("content-filter errors stop the turn: %j", (event) => {
+        const turn = new Turn()
+        turn.begin()
+        turn.accept(event)
+        expect(turn.stop?.kind).toBe("content_filter")
+        expect(() => turn.begin()).toThrow("turn stopped")
+    })
+
+    test.each([
+        "Review the content safety filter configuration.",
+        "The documented error is STOP_REASON_CONTENT_FILTER.",
+        "The fixture contains: response blocked by content safety filters",
+    ])("successful prose and tool output may quote filter diagnostics: %s", (text) => {
+        const turn = new Turn()
+        turn.begin()
+        turn.accept({ event: "step_update", step_update: { tool_info: { output: text } } })
+        turn.accept({ event: "step_update", step_update: { step_type: "agent_response", text_delta: text } })
+        turn.accept({ event: "result", result: { status: "SUCCESS", response: text } })
+        expect(turn.stop).toBeUndefined()
+    })
+
+    test.each([
         { event: "step_update", step_update: { tool_info: { name: "view_file", output: { error: "permission denied" } } } },
         { event: "step_update", step_update: { error: { message: "permission denied" } } },
         { event: "result", result: { status: "SUCCESS", error: { message: "permission denied" } } },

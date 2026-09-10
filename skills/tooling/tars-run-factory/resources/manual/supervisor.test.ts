@@ -84,6 +84,22 @@ test("cycle and no-progress budgets stop with handovers", async () => {
     })
 })
 
+test("content-filter errors cannot be acknowledged or retried unchanged", async () => {
+    await fixture(async (supervisor, ledger, directory) => {
+        await supervisor.control({ action: "status" })
+        expect(supervisor.position.phase).toBe("failed")
+        expect(supervisor.position.stop?.kind).toBe("content_filter")
+        await expect(handle(supervisor)).rejects.toThrow("current result")
+        await expect(supervisor.control({ action: "status" })).rejects.toThrow("handled")
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "stdin")).toHaveLength(1)
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "handled")).toHaveLength(0)
+        expect(readFileSync(join(directory, "FACTORY_REPORT.md"), "utf8")).toContain("content safety filters")
+        await supervisor.control({ action: "recover", reconciliation: { disposition: "resume", progress: "fresh", evidence: { observed: "unchanged leg" } } })
+        expect(supervisor.position.phase).toBe("stopped")
+        expect(ledger.receipts.filter((receipt) => receipt.channel === "launch")).toHaveLength(1)
+    }, {}, "content-filter")
+})
+
 test("terminal failure writes handover and preserves evidence for recovery", async () => {
     await fixture(async (supervisor, ledger, directory) => {
         await supervisor.control({ action: "status" })

@@ -13,6 +13,10 @@ lines.on("line", (line) => {
     }
     if (mode === "eof") process.exit(1)
     if (mode === "timeout") return
+    if (mode === "content-filter") {
+        emit({ event: "result", result: { status: "ERROR", response: "", error: "response blocked by content safety filters" } })
+        return
+    }
     if (["partial-timeout", "split-timeout", "late-timeout", "fatal-stderr"].includes(mode ?? "")) {
         const notice = mode === "fatal-stderr" ? "error: host stream failed\n"
             : "[agy] print timeout after 5s with turn in progress; returning partial output\n"
@@ -66,9 +70,10 @@ lines.on("line", (line) => {
     }
     const response = mode === "missing-server" ? "No MCP server was loaded."
         : prompt.startsWith("List the tools") ? "start_session advance_wave" : `turn ${turns}`
-    emit({ event: "result", result: { status: "SUCCESS", response } })
+    const result = { event: "result", result: { status: "SUCCESS", response } }
+    if (mode === "duplicate") process.stdout.write([result, result].map((event) => JSON.stringify(event) + "\n").join(""))
+    else emit(result)
     if (mode === "late-denial") setTimeout(() => emit({ event: "step_update", step_update: { tool_info: { name: "view_file", parameters: { path: "/private" }, error: { message: "tool call denied by pre-tool hook" } } } }), 20)
-    if (mode === "duplicate") emit({ event: "result", result: { status: "SUCCESS" } })
 })
 lines.on("close", () => {
     if (mode === "slow-close") setTimeout(() => process.exit(0), 1500)
