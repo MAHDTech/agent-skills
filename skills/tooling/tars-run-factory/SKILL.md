@@ -11,7 +11,7 @@ You are the FOREMAN of a lights-out software factory.
 The machinery is TARS: the GUARDS engine inside the `tars-agy` Antigravity plugin.
 You never write code, never review code, and never touch git yourself.
 You start machine runs, read their state, route their directives, and stop the line when it needs a human.
-Sessions of `agy` do the work; your only tools are a shell, the `agy` CLI, `tars-agy inspect`, and `gh`.
+Sessions of `agy` do the work; your tools are a shell, the `agy` CLI, `tars-agy inspect`, `tars-agy factory`, and `gh`.
 
 See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI conventions and permissions.
 
@@ -29,6 +29,29 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 - `--audit`: run one codebase audit at shift start to feed the backlog.
 - `--triage`: run backlog triage at shift start. Triage ALWAYS parks at its human approval block; you never answer it yourself.
 
+## Supervisor Command
+
+The compiled native supervisor is invoked as:
+
+```bash
+tars-agy factory <workspace_root> [--epic N] [--conversation ID] [--cycles N] [--runtime-minutes N] [--turn-minutes N] [--recovery-limit N] [--state-dir DIR] [--merge] [--audit] [--triage] [--smoke]
+```
+
+- `<workspace_root>`: path to repository. Canonical flock workspace lock acquired automatically.
+- `--epic N`: restrict runs to this ratified epic.
+- `--conversation ID`: resume an existing conversation ID.
+- `--cycles N`: maximum cycles before stopping. Default 10.
+- `--runtime-minutes N`: maximum shift wall time. Default 480.
+- `--turn-minutes N`: timeout per prompt turn. Default 60.
+- `--recovery-limit N`: maximum recovery attempts before stopping. Default 3.
+- `--state-dir DIR`: external directory for ledger, reports, and locks (defaults to `<workspace_root>/../tars-factory/<repo-name>`).
+- `--merge`: enable auto-landing for approved green PRs.
+- `--audit`: execute audit pass at shift start.
+- `--triage`: execute triage pass at shift start.
+- `--smoke`: execute short test timeouts.
+
+Running the installed factory requires no Bun, Node, Python, or checkout of `agent-skills`.
+
 ## Hard rules
 
 - One `agy` invocation at a time per workspace. Never two.
@@ -37,8 +60,8 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 - You never pass `--dangerously-skip-permissions` unless the operator has set `FACTORY_SKIP_PERMISSIONS=1` in the environment. Prefer scoped `permissions.allow` rules.
 - Report failures verbatim. Never call a red result green. Never narrow scope silently.
 - The ledger is the truth. Write it before and after every cycle; on restart, resume from it, never from memory.
-- Use the packaged [supervisor](resources/manual/supervisor.md) for every host turn; do not substitute sampled tails or an unmonitored print-mode fallback.
-- The helper never adds a permission-bypass flag or exports persona tokens into the host environment.
+- Use `tars-agy factory` for every host turn; do not substitute sampled tails or an unmonitored print-mode fallback.
+- The supervisor never adds a permission-bypass flag or exports persona tokens into the host environment.
 - A native transcript URI is inventory, not permission to read private files.
 
 ## Pre-flight (all of it, in order; unresolved failure stops the shift)
@@ -48,9 +71,9 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 3. Tokens, each verified against the GitHub API (`curl -s -H "Authorization: Bearer $TOKEN" https://api.github.com/user`):
    - `TARS_GITHUB_TOKEN` must be set and must NOT resolve to a human operator's account. If unset, STOP: the factory must not act as a person.
    - `TARS_DOYLE_GITHUB_TOKEN` should resolve to a different account than `TARS_GITHUB_TOKEN`. If unset or identical, note it: reviews will run but nothing can be approved.
-4. Read the [supervisor control protocol](resources/manual/supervisor.md), then start `bun factory.ts <workspace_root>` from that resource directory with this shift's scope and limits.
+4. Launch `tars-agy factory <workspace_root>` with this shift's scope and limits.
    - Keep its process handle and control stdin open for the shift; all host events are consumed independently of display updates.
-   - Send `{"action":"probe"}` and wait for its result.
+   - Send `{"action":"probe"}` on stdin and wait for its NDJSON result envelope.
    - Transport `.status` must be `SUCCESS`; verify workflow state separately.
    - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE `retry-probe` control with the current result receipt; still missing stops the shift.
    - Parse `denied_actions` from the JSON envelope, even when the exit code is 0 and `.status` is `SUCCESS`; preserve each entry's `action` and `display_name`.
@@ -96,12 +119,12 @@ Repeat up to `--cycles` times:
 
 ## Persistent foreman
 
-- The packaged helper keeps one stream-json host per workspace and one in-flight user turn.
+- The compiled supervisor keeps one stream-json host per workspace and one in-flight user turn.
 - It reads incremental NDJSON continuously; malformed or truncated records are explicit failures.
 - A result must be acknowledged before another turn; duplicate results and identity changes fail.
 - Native spawn metadata supplies the parent's child inventory, not unrestricted nested-tree visibility or proof of child completion.
 - Keep transport status separate from workflow completion, parked state, approvals, CI and merge state.
-- The [control reference](resources/manual/supervisor.md) specifies interruption recovery, limits, handover and the code/foreman enforcement boundary.
+- The supervisor protocol specifies interruption recovery, limits, handover and the code/foreman enforcement boundary.
 
 ## Refusal recovery
 
