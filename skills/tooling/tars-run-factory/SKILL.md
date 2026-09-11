@@ -29,6 +29,8 @@ See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI convent
 - `--audit`: run one codebase audit at shift start to feed the backlog.
 - `--triage`: run backlog triage at shift start. Triage ALWAYS parks at its human approval block; you never answer it yourself.
 
+The foreman session running `/tars-run-factory` must be started in a directory outside `<workspace_root>` (such as the platform workspace or an admin shell), not inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `tars-agy factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Furthermore, running `agy` inside `<workspace_root>` restricts the agent's security boundary to that repository, preventing it from inspecting `<workspace_root>/../tars-factory/`.
+
 ## Supervisor Command
 
 The compiled native supervisor is invoked as:
@@ -55,6 +57,7 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
 ## Hard rules
 
 - One `agy` invocation at a time per workspace. Never two.
+- The foreman session always runs outside `<workspace_root>` (never inside the target repository).
 - You never run `git push`, `git merge`, or `gh pr merge`. Only the engine writes.
 - You never answer a human gate, an interview, or a triage approval. Park and report instead.
 - You never pass `--dangerously-skip-permissions` unless the operator has set `FACTORY_SKIP_PERMISSIONS=1` in the environment. Prefer scoped `permissions.allow` rules.
@@ -68,10 +71,13 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
 
 1. `agy --version` succeeds. Record the version.
 2. `git -C <workspace_root> status --porcelain` is empty and `git -C <workspace_root> remote get-url origin` resolves. A dirty tree or missing remote stops the shift.
-3. Tokens, each verified against the GitHub API (`curl -s -H "Authorization: Bearer $TOKEN" https://api.github.com/user`):
-   - `TARS_GITHUB_TOKEN` must be set and must NOT resolve to a human operator's account. If unset, STOP: the factory must not act as a person.
-   - `TARS_DOYLE_GITHUB_TOKEN` should resolve to a different account than `TARS_GITHUB_TOKEN`. If unset or identical, note it: reviews will run but nothing can be approved.
+3. Credentials and environment health via `tars-agy doctor <workspace_root>`:
+   - Run `tars-agy doctor <workspace_root>`.
+   - Verify the `github` check reports status `ok`.
+   - Note that the engine natively resolves non-human `TARS_GITHUB_TOKEN` (author persona) and `TARS_DOYLE_GITHUB_TOKEN` (reviewer persona) from `~/.config/tars/credentials` (mode 0600), and that persona tokens are never exported into the shell.
+   - If `--merge` is specified, verify doctor output confirms distinct bot accounts for author and reviewer. If reviewer credentials are unset or identical to the author, note it: reviews will run but nothing can be approved.
 4. Launch `tars-agy factory <workspace_root>` with this shift's scope and limits.
+   - The foreman session must be launched from outside `<workspace_root>` so that no interactive `agy` process occupies the target repository (which would violate the single-agy invariant).
    - Keep its process handle and control stdin open for the shift; all host events are consumed independently of display updates.
    - Send `{"action":"probe"}` on stdin and wait for its NDJSON result envelope.
    - Transport `.status` must be `SUCCESS`; verify workflow state separately.
