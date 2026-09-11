@@ -116,6 +116,7 @@
         "devenv",
         "herdr",
         "install-skills",
+        "nix-shell",
         "opencode",
         "opencode-acp",
         "pagefind",
