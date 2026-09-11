@@ -136,6 +136,7 @@ Beyond `/code-review` on the main flow:
 - [/acp](../../engineering/acp/SKILL.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
 - [/mcp](../../engineering/mcp/SKILL.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
 - `/opencode-acp` - reach for this when controlling OpenCode over the Agent Client Protocol.
+- [/nix-shell](../../tooling/nix-shell/SKILL.md) - reach for this when running ad-hoc CLI utilities or diagnostic tools in ephemeral Nix shells.
 - [/pagefind](../../tooling/pagefind/SKILL.md) - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.

@@ -229,3 +229,7 @@ xclip
 docstrings
 approvable
 headlessly
+dnsutils
+gnused
+graphviz
+hexdump
