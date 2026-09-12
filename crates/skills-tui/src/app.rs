@@ -4,7 +4,7 @@ use std::io::{stdout, Stdout};
 use std::panic::{set_hook, take_hook};
 
 use crossterm::cursor::Show;
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture, KeyCode, KeyEvent, KeyEventKind};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -195,6 +195,56 @@ impl App {
     /// Sets the active view tab directly.
     pub fn set_tab(&mut self, view: ActiveView) {
         self.active_view = view;
+    }
+
+    /// Handles keyboard events, updating navigation tab, selection cursor, or termination flag.
+    ///
+    /// Discards release events and unmapped keys, returning `false`.
+    /// Returns `true` if the key event produced a state transition.
+    pub fn handle_key_event(&mut self, key: KeyEvent) -> bool {
+        if key.kind == KeyEventKind::Release {
+            return false;
+        }
+
+        match key.code {
+            KeyCode::Tab => {
+                self.next_tab();
+                true
+            }
+            KeyCode::BackTab => {
+                self.prev_tab();
+                true
+            }
+            KeyCode::Char('1') => {
+                self.set_tab(ActiveView::Explorer);
+                true
+            }
+            KeyCode::Char('2') => {
+                self.set_tab(ActiveView::Inspector);
+                true
+            }
+            KeyCode::Char('3') => {
+                self.set_tab(ActiveView::Linter);
+                true
+            }
+            KeyCode::Char('4') => {
+                self.set_tab(ActiveView::Runner);
+                true
+            }
+            KeyCode::Char('q') | KeyCode::Esc => {
+                self.quit();
+                true
+            }
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.select_next();
+                true
+            }
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.select_prev();
+                true
+            }
+            _ => false,
+        }
     }
 
     /// Sets the search filter query and resets selected index to 0.

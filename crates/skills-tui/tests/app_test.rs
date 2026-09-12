@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
 use ratatui::backend::TestBackend;
 use ratatui::Terminal;
 use skills_core::dashboard::{DashboardSummary, HealthScore, TargetDistribution};
@@ -80,42 +81,116 @@ fn test_app_default_initialization() {
 }
 
 #[test]
-fn test_app_tab_cycling() {
+fn test_app_tab_cycling_via_key_events() {
     let mut app = App::new();
     assert_eq!(app.active_view, ActiveView::Explorer);
 
-    app.next_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Tab)));
     assert_eq!(app.active_view, ActiveView::Inspector);
 
-    app.next_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Tab)));
     assert_eq!(app.active_view, ActiveView::Linter);
 
-    app.next_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Tab)));
     assert_eq!(app.active_view, ActiveView::Runner);
 
-    app.next_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Tab)));
     assert_eq!(app.active_view, ActiveView::Explorer);
 
-    app.prev_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::BackTab)));
     assert_eq!(app.active_view, ActiveView::Runner);
 
-    app.prev_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::BackTab)));
     assert_eq!(app.active_view, ActiveView::Linter);
 
-    app.prev_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::BackTab)));
     assert_eq!(app.active_view, ActiveView::Inspector);
 
-    app.prev_tab();
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::BackTab)));
     assert_eq!(app.active_view, ActiveView::Explorer);
 }
 
 #[test]
-fn test_app_direct_tab_selection() {
+fn test_app_direct_tab_selection_via_key_events() {
     let mut app = App::new();
-    for view in ActiveView::all() {
-        app.set_tab(*view);
-        assert_eq!(app.active_view, *view);
-    }
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('1'))));
+    assert_eq!(app.active_view, ActiveView::Explorer);
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('2'))));
+    assert_eq!(app.active_view, ActiveView::Inspector);
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('3'))));
+    assert_eq!(app.active_view, ActiveView::Linter);
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('4'))));
+    assert_eq!(app.active_view, ActiveView::Runner);
+}
+
+#[test]
+fn test_app_selection_bounds_via_key_events() {
+    let mut empty_app = App::new();
+    assert!(empty_app.selected_skill().is_none());
+    assert!(empty_app.handle_key_event(KeyEvent::from(KeyCode::Down)));
+    assert_eq!(empty_app.selected_index, 0);
+    assert!(empty_app.handle_key_event(KeyEvent::from(KeyCode::Up)));
+    assert_eq!(empty_app.selected_index, 0);
+
+    let skills = vec![
+        create_mock_skill("skill-a", SkillCategory::Engineering, "Skill A description"),
+        create_mock_skill("skill-b", SkillCategory::Engineering, "Skill B description"),
+    ];
+    let mut app = App::with_skills(skills);
+    assert_eq!(app.selected_index, 0);
+    assert_eq!(app.selected_skill().unwrap().name(), "skill-a");
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('j'))));
+    assert_eq!(app.selected_index, 1);
+    assert_eq!(app.selected_skill().unwrap().name(), "skill-b");
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Down)));
+    assert_eq!(app.selected_index, 1);
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('k'))));
+    assert_eq!(app.selected_index, 0);
+    assert_eq!(app.selected_skill().unwrap().name(), "skill-a");
+
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Up)));
+    assert_eq!(app.selected_index, 0);
+}
+
+#[test]
+fn test_app_quit_via_key_events() {
+    let mut app = App::new();
+    assert!(app.is_running());
+    assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('q'))));
+    assert!(!app.is_running());
+
+    let mut app2 = App::new();
+    assert!(app2.is_running());
+    assert!(app2.handle_key_event(KeyEvent::from(KeyCode::Esc)));
+    assert!(!app2.is_running());
+}
+
+#[test]
+fn test_app_ignore_release_key_events() {
+    let mut app = App::new();
+    let release_event = KeyEvent {
+        code: KeyCode::Char('q'),
+        modifiers: KeyModifiers::NONE,
+        kind: KeyEventKind::Release,
+        state: KeyEventState::NONE,
+    };
+    assert!(!app.handle_key_event(release_event));
+    assert!(app.is_running());
+}
+
+#[test]
+fn test_app_unhandled_key_events() {
+    let mut app = App::new();
+    assert!(!app.handle_key_event(KeyEvent::from(KeyCode::Char('z'))));
+    assert_eq!(app.active_view, ActiveView::Explorer);
+    assert!(app.is_running());
 }
 
 #[test]
@@ -154,38 +229,6 @@ fn test_app_search_filter() {
 }
 
 #[test]
-fn test_app_selection_bounds() {
-    let mut empty_app = App::new();
-    assert!(empty_app.selected_skill().is_none());
-    empty_app.select_next();
-    assert_eq!(empty_app.selected_index, 0);
-    empty_app.select_prev();
-    assert_eq!(empty_app.selected_index, 0);
-
-    let skills = vec![
-        create_mock_skill("skill-a", SkillCategory::Engineering, "Skill A description"),
-        create_mock_skill("skill-b", SkillCategory::Engineering, "Skill B description"),
-    ];
-    let mut app = App::with_skills(skills);
-    assert_eq!(app.selected_index, 0);
-    assert_eq!(app.selected_skill().unwrap().name(), "skill-a");
-
-    app.select_next();
-    assert_eq!(app.selected_index, 1);
-    assert_eq!(app.selected_skill().unwrap().name(), "skill-b");
-
-    app.select_next();
-    assert_eq!(app.selected_index, 1);
-
-    app.select_prev();
-    assert_eq!(app.selected_index, 0);
-    assert_eq!(app.selected_skill().unwrap().name(), "skill-a");
-
-    app.select_prev();
-    assert_eq!(app.selected_index, 0);
-}
-
-#[test]
 fn test_app_notification_stack() {
     let mut app = App::new();
     assert!(app.latest_notification().is_none());
@@ -205,14 +248,6 @@ fn test_app_notification_stack() {
         Some("Second notification".to_string())
     );
     assert!(app.dismiss_notification().is_none());
-}
-
-#[test]
-fn test_app_quit_state() {
-    let mut app = App::new();
-    assert!(app.is_running());
-    app.quit();
-    assert!(!app.is_running());
 }
 
 #[test]
