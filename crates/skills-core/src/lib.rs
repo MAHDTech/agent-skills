@@ -3,8 +3,9 @@
 //!
 //! Provides the foundational domain models, category definitions, frontmatter
 //! parsing, linting primitives, error types, remote skill downloader, installer engine,
-//! and multi-target skill synchronization engine.
+//! multi-target skill synchronization engine, and dashboard telemetry aggregation.
 
+pub mod dashboard;
 pub mod downloader;
 pub mod error;
 pub mod installer;
@@ -13,6 +14,12 @@ pub mod models;
 pub mod parser;
 pub mod sync;
 
+pub use dashboard::{
+    calculate_category_distributions, calculate_health_score, calculate_prompt_tokens,
+    calculate_skill_metric, calculate_target_distributions,
+    calculate_target_distributions_with_root, calculate_total_tokens, CategoryDistribution,
+    DashboardEngine, DashboardSummary, HealthScore, SkillMetric, TargetDistribution,
+};
 pub use downloader::SkillDownloader;
 pub use error::{Result, SkillError};
 pub use installer::{
