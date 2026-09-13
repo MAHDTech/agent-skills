@@ -3,6 +3,7 @@ name: to-spec
 description: Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker - no interview, just synthesis of what you have already discussed.
 disable-model-invocation: true
 metadata:
+  group: planning-pipeline
   source: mattpocock/skills
   license: MIT
 ---

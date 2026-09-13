@@ -1,6 +1,8 @@
 ---
 name: estimate-work
 description: Size and estimate a body of work to set expectations and sequence delivery - turn a plan or ticket set into defensible estimates with ranges, named assumptions, and surfaced risk instead of false-precise point numbers. Use when the user wants to estimate or size work, forecast how long something will take, choose between relative sizing and time-based estimates, calibrate against past delivery, or decide whether to spike before committing.
+metadata:
+  group: planning-pipeline
 ---
 
 # Estimate Work

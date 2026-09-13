@@ -2,6 +2,7 @@
 name: opencode-acp
 description: Control OpenCode directly via the Agent Client Protocol (ACP). Start sessions, send prompts, resume conversations, and manage OpenCode updates. Use when driving OpenCode headless or programmatically over ACP - starting a session, sending prompts, resuming a prior session, or checking and triggering OpenCode updates.
 metadata:
+  group: opencode
   version: 1.0.2
   author: Benjamin Jesuiter <bjesuiter@gmail.com>
   license: MIT

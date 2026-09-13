@@ -4,6 +4,8 @@ description: Create structured GitHub issues from conversation context using gh 
 disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_issue
+metadata:
+  group: github
 ---
 
 # Create GitHub Issue from Conversation

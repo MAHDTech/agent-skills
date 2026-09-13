@@ -1,11 +1,13 @@
 ---
 name: pr-edge-cases
 description: Review branch changes for test gaps, logic edge cases, failure modes, and integration risks. Use when you want the changes on a branch probed for what breaks - untested paths, boundary conditions, race conditions, and integration hazards - before merging.
+metadata:
+  group: review
 ---
 
 # PR Edge Case Review
 
-Review branch changes for logic correctness. This skill finds what breaks, not what looks bad - use `/sculpt-code` for code quality.
+Review branch changes for logic correctness. This skill finds what breaks, not what looks bad - use refactoring or sculpting code for code quality.
 
 ## Instructions
 
@@ -28,7 +30,7 @@ Review branch changes for logic correctness. This skill finds what breaks, not w
 
 ### 2. Logic Errors
 
-Flag logic that produces _wrong behavior_, not merely code that could read more cleanly (that is `/sculpt-code`'s job).
+Flag logic that produces _wrong behavior_, not merely code that could read more cleanly (that is refactoring or sculpting code's job).
 
 - Conditional branches that are unintentionally mutually exclusive or unreachable, so a case that should run never does
 - Inverted or off-by-one comparisons (`<` vs `<=`, `&&` vs `||`, negation errors) that select the wrong branch

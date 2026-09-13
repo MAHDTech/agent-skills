@@ -2,6 +2,8 @@
 name: tars-goal
 description: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal.
 argument-hint: "[objective or file reference] [optional token budget]"
+metadata:
+  group: tars
 ---
 
 # TARS Goal

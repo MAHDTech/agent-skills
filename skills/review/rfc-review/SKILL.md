@@ -1,6 +1,8 @@
 ---
 name: rfc-review
 description: Review an RFC or design doc for problem clarity (SCQA), compliance, security, and performance, and return the few most important issues. Use when reviewing someone's RFC or design proposal before it's approved.
+metadata:
+  group: review
 ---
 
 # Request for Comments (RFC) Review

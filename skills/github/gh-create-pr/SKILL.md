@@ -5,6 +5,8 @@ disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_pr
   - https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+metadata:
+  group: github
 ---
 
 <!-- omit in toc -->

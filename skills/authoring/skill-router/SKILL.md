@@ -3,6 +3,7 @@ name: skill-router
 description: Route to the right skill for the task at hand - a map of every skill in this collection and when to reach for it.
 disable-model-invocation: true
 metadata:
+  group: authoring
   source: mattpocock/skills
   license: MIT
 ---

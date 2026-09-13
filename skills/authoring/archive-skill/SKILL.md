@@ -1,6 +1,8 @@
 ---
 name: archive-skill
 description: Retire a skill cleanly - move its directory from skills/<category>/ into skills-archive/<category>/, mark it archived in frontmatter with what replaced it, purge or redirect every inbound /skill-name reference (the router included), then re-run lint and sync. Use when you want to archive, deprecate, retire, remove, replace, or merge away a skill, or a /skill-audit flagged one for retirement. Covers when to archive vs delete vs merge and how to avoid dangling references. Cross-references /skill-creator and /skill-router.
+metadata:
+  group: authoring
 ---
 
 # Archive Skill

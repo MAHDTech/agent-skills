@@ -93,7 +93,7 @@ Add missing TODOs for: known shortcuts, deferred work, temporary workarounds, an
 ### 8. Readability & Cognitive Load
 
 - Comments explain **why**, never **what** (delete `# increment counter` above `counter += 1`)
-- Prune noisy, bloated comments and keep comments minimal (see the [code-comments](../code-comments/SKILL.md) skill)
+- Prune noisy, bloated comments and keep comments minimal (see the code comments skill)
 - Add a brief comment above grouped code blocks (~5+ lines doing one thing)
 - Convert paragraph-style comments to bullet points when feasible
 - Strategic whitespace: blank lines between logical sections
@@ -129,4 +129,4 @@ For a bigger cleanup - removing accumulated engineering debt, untangling oversiz
 1. **Map before editing.** Survey the messy area first: noisy modules, duplicated logic, dead code, public contracts, and the tests around them. Know what you're touching before you touch it.
 2. **One theme per pass.** Pick a single cleanup theme at a time - delete dead code, simplify control flow, extract a helper, or modernise one stale pattern - not all at once.
 3. **State the behaviour and the check.** Before each pass, name the current behaviour, the structural improvement, and the smallest check that proves behaviour stayed stable. Run that check after every pass.
-4. **Keep migrations separate.** Framework migrations, dependency upgrades, and architecture moves are their own task - see `/upgrade-dependencies` - don't smuggle them into a refactor. Lean on a green test suite, or `/characterization-tests` when there isn't one, as the safety net.
+4. **Keep migrations separate.** Framework migrations, dependency upgrades, and architecture moves are their own task (such as dependency upgrades); don't smuggle them into a refactor. Lean on a green test suite, or characterization tests when there isn't one, as the safety net.
