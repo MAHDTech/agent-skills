@@ -7,7 +7,6 @@ use std::path::PathBuf;
 #[derive(ValueEnum, Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum OutputFormat {
     /// Standard human-readable plain text output.
-    #[default]
     #[value(name = "plain", help = "Human-readable plain text")]
     Plain,
 
@@ -20,6 +19,7 @@ pub enum OutputFormat {
     Yaml,
 
     /// Formatted ASCII or Unicode bordered table.
+    #[default]
     #[value(name = "table", help = "Formatted bordered table")]
     Table,
 }
@@ -71,7 +71,7 @@ pub struct Cli {
         short = 'f',
         long = "format",
         value_enum,
-        default_value_t = OutputFormat::Plain,
+        default_value_t = OutputFormat::Table,
         global = true,
         help = "Output formatting style"
     )]
@@ -146,7 +146,11 @@ pub enum SkillsCommands {
     /// Install skill symlinks into agent configuration directories.
     #[command(about = "Install skill symlinks into agent configuration directories")]
     Install {
-        /// Target execution environment (e.g. gemini, claude).
+        /// Path to skill directory or catalog skill identifier.
+        #[arg(help = "Path to skill directory or catalog skill identifier")]
+        source: Option<String>,
+
+        /// Target execution environment (e.g. antigravity, claude, cursor).
         #[arg(short, long, help = "Target execution environment")]
         target: Option<String>,
     },
@@ -154,6 +158,10 @@ pub enum SkillsCommands {
     /// Remove skill symlinks from agent configuration directories.
     #[command(about = "Remove skill symlinks from agent configuration directories")]
     Uninstall {
+        /// Unique identifier of the installed skill to remove.
+        #[arg(help = "Unique identifier of the installed skill to remove")]
+        skill: Option<String>,
+
         /// Target execution environment to remove symlinks from.
         #[arg(
             short,
@@ -166,6 +174,10 @@ pub enum SkillsCommands {
     /// Validate skill frontmatter schemas and markdown formatting rules.
     #[command(about = "Validate skill frontmatter schemas and markdown formatting rules")]
     Lint {
+        /// Optional path to skill directory or SKILL.md file; defaults to repository root.
+        #[arg(help = "Optional path to skill directory or SKILL.md file")]
+        path: Option<PathBuf>,
+
         /// Automatically apply safe fixes for detected lint violations.
         #[arg(
             long,
@@ -183,6 +195,14 @@ pub enum SkillsCommands {
             help = "Simulate synchronization actions without writing changes to disk"
         )]
         dry_run: bool,
+    },
+
+    /// Download remote skill content from a specified URL.
+    #[command(about = "Download remote skill content from a specified URL")]
+    Download {
+        /// URL pointing to remote skill markdown or resource.
+        #[arg(help = "URL pointing to remote skill markdown or resource")]
+        url: String,
     },
 
     /// Download external resource assets for skills requiring remote files.
@@ -248,7 +268,7 @@ pub enum DashboardCommands {
 }
 
 /// Arguments for launching the interactive terminal user interface.
-#[derive(Args, Debug, Clone, PartialEq, Eq)]
+#[derive(Args, Debug, Clone, PartialEq, Eq, Default)]
 pub struct TuiArgs {
     /// Event polling tick rate in milliseconds.
     #[arg(

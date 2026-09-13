@@ -300,3 +300,159 @@ fn test_cli_action_flag() {
         .code(0)
         .stdout(predicate::str::contains("--action"));
 }
+
+#[test]
+fn test_skills_list_table_output() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "list"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("ID / Directory"))
+        .stdout(predicate::str::contains("Name"))
+        .stdout(predicate::str::contains("Category"))
+        .stdout(predicate::str::contains("Description"));
+}
+
+#[test]
+fn test_skills_list_json_format() {
+    let assert = Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "list", "--format", "json"])
+        .assert()
+        .success()
+        .code(0);
+
+    let stdout_bytes = assert.get_output().stdout.clone();
+    let json_val: serde_json::Value = serde_json::from_slice(&stdout_bytes)
+        .expect("skills list --format json should return valid JSON");
+    assert!(json_val.is_array());
+}
+
+#[test]
+fn test_skills_list_yaml_format() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "list", "--format", "yaml"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("dir_name:"));
+}
+
+#[test]
+fn test_skills_list_category_filter() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "list", "--category", "engineering"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("engineering"));
+}
+
+#[test]
+fn test_skills_show_valid_skill() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "show", "domain-modeling"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Identifier:  domain-modeling"))
+        .stdout(predicate::str::contains("Category:    engineering"));
+}
+
+#[test]
+fn test_skills_show_not_found() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "show", "non-existent-skill-xyz"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Skill not found for query 'non-existent-skill-xyz'",
+        ));
+}
+
+#[test]
+fn test_skills_lint_workspace() {
+    let assert = Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "lint"])
+        .assert();
+
+    let code = assert.get_output().status.code().unwrap_or(1);
+    assert!(
+        code == 0 || code == 2,
+        "Lint should exit with 0 (clean) or 2 (lint errors)"
+    );
+}
+
+#[test]
+fn test_skills_sync_dry_run() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "sync", "--dry-run"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Synchronization Plan"))
+        .stdout(predicate::str::contains("dry_run: true"));
+}
+
+#[test]
+fn test_dashboard_summary_table() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard", "summary"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Catalog Overview Metric"))
+        .stdout(predicate::str::contains("Diagnostic Quality Metric"))
+        .stdout(predicate::str::contains("Category"))
+        .stdout(predicate::str::contains("Target Environment"));
+}
+
+#[test]
+fn test_dashboard_default_summary() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Catalog Overview Metric"))
+        .stdout(predicate::str::contains("Diagnostic Quality Metric"));
+}
+
+#[test]
+fn test_dashboard_summary_json() {
+    let assert = Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard", "summary", "--format", "json"])
+        .assert()
+        .success()
+        .code(0);
+
+    let stdout_bytes = assert.get_output().stdout.clone();
+    let json_val: serde_json::Value = serde_json::from_slice(&stdout_bytes)
+        .expect("dashboard summary --format json should return valid JSON");
+    assert!(json_val.get("total_skills").is_some());
+    assert!(json_val.get("health").is_some());
+}
+
+#[test]
+fn test_tui_help_flags() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["tui", "--help"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("--tick-rate"))
+        .stdout(predicate::str::contains("--start-view"));
+}
