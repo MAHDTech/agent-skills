@@ -111,9 +111,13 @@ pub enum Commands {
 /// Arguments and subcommands for skill catalog operations.
 #[derive(Args, Debug, Clone, PartialEq, Eq)]
 pub struct SkillsArgs {
+    /// Action flag for compatibility with scripts.
+    #[arg(long = "action", help = "Action flag for compatibility with scripts")]
+    pub action: Option<String>,
+
     /// Specific skills catalog operation to perform.
     #[command(subcommand)]
-    pub command: SkillsCommands,
+    pub command: Option<SkillsCommands>,
 }
 
 /// Catalog operations supported under the `skills` subcommand.
@@ -197,9 +201,13 @@ pub enum SkillsCommands {
 /// Arguments and subcommands for static documentation and dashboard operations.
 #[derive(Args, Debug, Clone, PartialEq, Eq)]
 pub struct DashboardArgs {
+    /// Action flag for compatibility with scripts.
+    #[arg(long = "action", help = "Action flag for compatibility with scripts")]
+    pub action: Option<String>,
+
     /// Specific dashboard operation to perform.
     #[command(subcommand)]
-    pub command: DashboardCommands,
+    pub command: Option<DashboardCommands>,
 }
 
 /// Operations supported under the `dashboard` subcommand.

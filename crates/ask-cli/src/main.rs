@@ -100,11 +100,26 @@ async fn run_skills(
     args: SkillsArgs,
     format: OutputFormat,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    tracing::debug!(
-        "Dispatching skills subcommand: {:?}, format: {:?}",
-        args.command,
-        format
-    );
+    if let Some(ref action) = args.action {
+        let status = std::process::Command::new("bun")
+            .arg("run")
+            .arg("bin/skills/index.ts")
+            .arg("--action")
+            .arg(action)
+            .status()?;
+        if !status.success() {
+            std::process::exit(status.code().unwrap_or(1));
+        }
+        return Ok(());
+    }
+
+    if let Some(ref cmd) = args.command {
+        tracing::debug!(
+            "Dispatching skills subcommand: {:?}, format: {:?}",
+            cmd,
+            format
+        );
+    }
     Ok(())
 }
 
@@ -114,11 +129,26 @@ async fn run_dashboard(
     args: DashboardArgs,
     format: OutputFormat,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    tracing::debug!(
-        "Dispatching dashboard subcommand: {:?}, format: {:?}",
-        args.command,
-        format
-    );
+    if let Some(ref action) = args.action {
+        let status = std::process::Command::new("bun")
+            .arg("run")
+            .arg("bin/dashboard/index.ts")
+            .arg("--action")
+            .arg(action)
+            .status()?;
+        if !status.success() {
+            std::process::exit(status.code().unwrap_or(1));
+        }
+        return Ok(());
+    }
+
+    if let Some(ref cmd) = args.command {
+        tracing::debug!(
+            "Dispatching dashboard subcommand: {:?}, format: {:?}",
+            cmd,
+            format
+        );
+    }
     Ok(())
 }
 

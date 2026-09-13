@@ -266,3 +266,37 @@ fn test_cli_exit_code_mapping() {
         .failure()
         .code(2);
 }
+
+#[test]
+fn test_cli_action_flag() {
+    let repo_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(&repo_root)
+        .args(["skills", "--action", "lint"])
+        .assert()
+        .success()
+        .code(0);
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "--help"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("--action"));
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard", "--help"])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("--action"));
+}
