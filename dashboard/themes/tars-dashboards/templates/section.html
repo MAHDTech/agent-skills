@@ -5,6 +5,12 @@
 <div class="prose max-w-none" data-pagefind-body>
   <h1>{{ section.title }}</h1>
 
+  {% if section.extra.archived %}
+    <div class="p-4 mb-6 rounded-md text-sm" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-muted)">
+      Archived on {{ section.extra.archived }}.{% if section.extra.replaced_by %} Replaced by {{ section.extra.replaced_by }}.{% endif %} Not installed by <code>npx skills add MAHDTech/agent-skills</code>; source: <a href="{{ section.extra.source_url }}" target="_blank" rel="noopener noreferrer">{{ section.extra.source_url }}</a>.
+    </div>
+  {% endif %}
+
   {% if section.description %}
     <p style="color: var(--color-muted)">{{ section.description }}</p>
   {% endif %}

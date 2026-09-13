@@ -2,6 +2,7 @@
 name: code-review
 description: Review the changes since a fixed point (a commit, branch, tag, or merge-base) along two axes - Standards, meaning does the code follow this repo's documented conventions plus a baseline of common code smells, and Spec, meaning does the code do what the originating issue, ticket, or PRD asked for. Runs both reviews as parallel sub-agents and reports them side by side without merging or reranking them. Use when the user wants to review a branch, a pull request, work-in-progress changes, or asks to review the diff since some point.
 metadata:
+  group: review
   source: mattpocock/skills
   license: MIT
 ---
@@ -37,7 +38,7 @@ Look for the originating spec, in this order:
 
 1. Issue or ticket references in the commit messages - conventional-commit footers such as `Closes #45`, or a `#123` in the body. Fetch the referenced issue with `gh issue view <number>`, or the pull-request description with `gh pr view`.
 2. A path the user passed as an argument.
-3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature. In this repo, specs and tickets are typically produced by `/to-spec` and `/to-tickets`, so that is the artefact the Spec axis checks against.
+3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature. In this repo, specs and tickets are typically produced by specification and ticket breakdown, so that is the artefact the Spec axis checks against.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent skips and reports "no spec available".
 
 ### 3. Identify the standards sources
@@ -88,6 +89,6 @@ Reporting them separately stops one axis from masking the other.
 
 - `/pr-build-context` - gather high-signal context on a pull request before the review.
 - `/pr-create-test-plan`, `/pr-edge-cases` - draft a manual test plan, or probe edge cases and failure modes on a branch.
-- `/diagnosing-bugs` - when the Spec axis surfaces a real defect, hand it off to run the defect down.
+- bug diagnosis - when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

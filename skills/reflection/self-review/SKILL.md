@@ -35,7 +35,7 @@ Post-implementation reflection pass. Run after completing a task to catch loose 
 
 ### 3. More modular?
 
-> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup - untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt - reach for `/sculpt-code` instead.
+> Scope: this is a light post-diff pass over what you just changed. For a deeper, staged cleanup - untangling oversized modules, collapsing duplicated logic across the codebase, reducing engineering debt - reach for code refactoring instead.
 
 - Are there functions doing more than one thing that should be split?
 - Is there duplicated logic across the diff that should be extracted?

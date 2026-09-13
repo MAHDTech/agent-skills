@@ -2,6 +2,8 @@
 name: software-factory
 description: Run a feature through four approval gates - Product, Architecture, Program Design, Slices - so every decision that matters is made and signed off before implementation code exists.
 disable-model-invocation: true
+metadata:
+  group: planning-pipeline
 ---
 
 # Software Factory
@@ -81,12 +83,12 @@ Slice the approved design into **tracer bullets** and hand off:
 
 Review the resulting tickets with the user and run the approval protocol on the slice plan. Record where the tickets live in `00-status.md` - the tracker owns slice progress from here, so the status file points at it rather than copying it.
 
-Then build them: `/implement`, which drives `/tdd` per slice. After each slice, prove it runs - execute it, curl it, or drive the UI - and show the user the result before asking whether to continue or re-steer.
+Then build them: an implementation pass, which drives a test-driven development loop per slice. After each slice, prove it runs - execute it, curl it, or drive the UI - and show the user the result before asking whether to continue or re-steer.
 
 ## Standing rules
 
 - **Compact at every boundary.** At the end of each gate and each slice, make sure nothing decided lives only in the chat. Say plainly that this is a safe point to start a fresh session - a new one must be able to continue from the docs alone. When the harness warns that context is low, compact immediately, wherever you are.
 - **Keep the human in the code.** Small slices, reviewable diffs. When the user has gone a long stretch without reading any code, say so at a slice boundary - losing touch with the codebase costs weeks, right when the agent hits the bug it cannot solve.
-- **Record what outlives the feature.** When a gate produces a decision bigger than this feature, use `/domain-modeling` to write it down as an ADR. Facts that live outside the repo but that a future session needs - env var names, test accounts, third-party dashboards - belong in `docs/external/`. Files on disk are free context.
+- **Record what outlives the feature.** When a gate produces a decision bigger than this feature, use domain modeling to write it down as an ADR. Facts that live outside the repo but that a future session needs - env var names, test accounts, third-party dashboards - belong in `docs/external/`. Files on disk are free context.
 
 > The four-gate playbook and the compact-at-every-boundary rule come from Dex Horthy (HumanLayer), via his appearance on David Ondrej's podcast.

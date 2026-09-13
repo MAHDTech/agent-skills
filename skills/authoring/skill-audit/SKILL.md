@@ -1,6 +1,8 @@
 ---
 name: skill-audit
 description: Periodically audit the whole skill collection for health - validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /archive-skill to retire.
+metadata:
+  group: authoring
 ---
 
 # Skill Audit
