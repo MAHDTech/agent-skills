@@ -36,7 +36,7 @@ Start a clean decision log by copying the header from `resources/manual/decision
 
 ## Logging a Row
 
-Write entries in plain, direct language as if briefing a colleague. Avoid AI buzzwords, puffery, and abstract corporate speak (the [unslop](../../writing/unslop/SKILL.md) skill applies to decision logs too).
+Write entries in plain, direct language as if briefing a colleague. Avoid AI buzzwords, puffery, and abstract corporate speak (the unslop skill applies to decision logs too).
 
 ### Using the Helper Script
 

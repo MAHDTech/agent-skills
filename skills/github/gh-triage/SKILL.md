@@ -3,6 +3,7 @@ name: gh-triage
 description: Triage a GitHub backlog - move issues and external PRs through a state machine of triage roles (categorise, verify, grill if needed, write agent-ready briefs) using the gh CLI and GitHub labels. Use when triaging your GitHub issues and PRs, deciding what's ready for an agent or a human, or turning a backlog into agent-ready briefs.
 disable-model-invocation: true
 metadata:
+  group: github
   source: mattpocock/skills
   license: MIT
 resources:
@@ -80,7 +81,7 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims - check it out, run the relevant tests or commands (through the project's dev shell, e.g. `devenv --no-tui shell -- <cmd>`). Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
-4. **Grill (if needed).** If the request needs fleshing out, run the `/grilling` and `/domain-modeling` skills together - grill it into shape one question at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
+4. **Grill (if needed).** If the request needs fleshing out, interview the user to grill the requirements into shape one question at a time, sharpening domain terms and updating `CONTEXT.md`/ADRs inline as decisions land.
 
 5. **Apply the outcome:**
    - `ready-for-agent` - post an agent brief comment ([AGENT-BRIEF.md](resources/manual/docs/AGENT-BRIEF.md)).

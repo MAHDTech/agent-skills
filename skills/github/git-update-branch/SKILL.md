@@ -1,6 +1,8 @@
 ---
 name: git-update-branch
 description: Bring a feature branch up to date with its base branch safely - fetch first, detect the base, choose rebase vs merge deliberately, use --force-with-lease, and hand conflicts off cleanly. Use when a branch has fallen behind its base, when the user wants to rebase or merge in the latest from the base/default branch, when a PR reports merge conflicts or an out-of-date branch, or when deciding between rebase and merge for an update.
+metadata:
+  group: github
 ---
 
 # Update a Branch Against Its Base

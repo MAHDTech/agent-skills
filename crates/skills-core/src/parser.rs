@@ -9,7 +9,9 @@ use typed_builder::TypedBuilder;
 use walkdir::WalkDir;
 
 use crate::error::{Result, SkillError};
-use crate::models::{ResourceFile, ResourceKind, Skill, SkillCategory, SkillFrontmatter};
+use crate::models::{
+    ResourceFile, ResourceKind, Skill, SkillCategory, SkillFrontmatter, SkillTree,
+};
 
 /// Represents a structured heading section in a skill markdown body.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
@@ -166,7 +168,31 @@ impl ParsedSkill {
             .and_then(|n| n.to_str())
             .unwrap_or(self.frontmatter.name.as_str())
             .to_string();
-        let promoted = category.is_promoted();
+
+        let tree = SkillParser::infer_tree_and_category_from_path(&path)
+            .map_or(SkillTree::Live, |(t, _)| t);
+
+        let promoted = if tree == SkillTree::Archive {
+            false
+        } else {
+            category.is_promoted()
+        };
+
+        let group = self
+            .frontmatter
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("group").cloned());
+        let archived = self
+            .frontmatter
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("archived").cloned());
+        let replaced_by = self.frontmatter.metadata.as_ref().and_then(|m| {
+            m.get("replaced-by")
+                .or_else(|| m.get("replaced_by"))
+                .cloned()
+        });
 
         let raw = format!(
             "---\n{}---\n{}",
@@ -179,6 +205,10 @@ impl ParsedSkill {
             .dir_name(dir_name)
             .category(category)
             .promoted(promoted)
+            .tree(tree)
+            .group(group)
+            .archived(archived)
+            .replaced_by(replaced_by)
             .frontmatter(self.frontmatter)
             .content(self.body)
             .raw(raw)
@@ -651,19 +681,47 @@ impl SkillParser {
             .unwrap_or_else(|| parsed.name())
             .to_string();
 
+        let (tree, inferred_category) = Self::infer_tree_and_category_from_path(path)?;
         let category = if let Some(ref cat) = parsed.frontmatter.category {
             cat.clone()
         } else {
-            Self::infer_category_from_path(path)
+            inferred_category
         };
+
+        // Promotion invariant: archived skills are NEVER promoted
+        let promoted = if tree == SkillTree::Archive {
+            false
+        } else {
+            category.is_promoted()
+        };
+
+        let group = parsed
+            .frontmatter
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("group").cloned());
+        let archived = parsed
+            .frontmatter
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("archived").cloned());
+        let replaced_by = parsed.frontmatter.metadata.as_ref().and_then(|m| {
+            m.get("replaced-by")
+                .or_else(|| m.get("replaced_by"))
+                .cloned()
+        });
 
         let resources = self.discover_resources_internal(parent)?;
 
         Ok(Skill::builder()
             .path(path.to_path_buf())
             .dir_name(dir_name)
-            .category(category.clone())
-            .promoted(category.is_promoted())
+            .category(category)
+            .promoted(promoted)
+            .tree(tree)
+            .group(group)
+            .archived(archived)
+            .replaced_by(replaced_by)
             .frontmatter(parsed.frontmatter)
             .content(parsed.body)
             .raw(content)
@@ -671,29 +729,67 @@ impl SkillParser {
             .build())
     }
 
-    /// Infers skill category from directory layout (e.g. `skills/<category>/<name>/SKILL.md`).
-    #[must_use]
-    pub fn infer_category_from_path(path: &Path) -> SkillCategory {
-        let components: Vec<_> = path
+    /// Infers skill tree and category from directory layout.
+    ///
+    /// Supported layouts:
+    /// - `skills/<category>/<name>/SKILL.md` -> `(SkillTree::Live, <category>)`
+    /// - `skills-archive/<category>/<name>/SKILL.md` -> `(SkillTree::Archive, <category>)`
+    ///
+    /// # Errors
+    /// Returns `SkillError::FrontmatterValidation` if a path within `skills-archive` is missing
+    /// the intermediate category directory (e.g. `skills-archive/<name>/SKILL.md`).
+    pub fn infer_tree_and_category_from_path(path: &Path) -> Result<(SkillTree, SkillCategory)> {
+        let components: Vec<String> = path
             .components()
             .map(|c| c.as_os_str().to_string_lossy().to_string())
             .collect();
 
-        // Check for `skills/<category>/<name>/SKILL.md`
         for i in 0..components.len() {
-            if components[i] == "skills" && i + 1 < components.len() {
+            if components[i] == "skills-archive" {
+                let remaining = &components[i + 1..];
+                if remaining.is_empty() {
+                    return Err(SkillError::FrontmatterValidation {
+                        path: path.to_path_buf(),
+                        message: "Bare skills-archive path is forbidden".to_string(),
+                    });
+                }
+                if remaining.len() == 1 {
+                    return Err(SkillError::FrontmatterValidation {
+                        path: path.to_path_buf(),
+                        message: "Bare skills-archive/<name>/ is forbidden: category directory is required (e.g. 'skills-archive/<category>/<name>/SKILL.md')".to_string(),
+                    });
+                }
+                if remaining.len() == 2 && remaining[1].eq_ignore_ascii_case("SKILL.md") {
+                    return Err(SkillError::FrontmatterValidation {
+                        path: path.to_path_buf(),
+                        message: "Bare skills-archive/<name>/ is forbidden: category directory is required (e.g. 'skills-archive/<category>/<name>/SKILL.md')".to_string(),
+                    });
+                }
+                if remaining.len() >= 2 {
+                    let cat_str = &remaining[0];
+                    let category = SkillCategory::from_str(cat_str).unwrap();
+                    return Ok((SkillTree::Archive, category));
+                }
+            } else if components[i] == "skills" && i + 1 < components.len() {
                 let cat_str = &components[i + 1];
-                return SkillCategory::from_str(cat_str).unwrap();
+                return Ok((SkillTree::Live, SkillCategory::from_str(cat_str).unwrap()));
             }
         }
 
-        // Fallback: grandparent directory name
+        // Fallback: live tree, grandparent category
         if components.len() >= 3 {
             let cat_str = &components[components.len() - 3];
-            return SkillCategory::from_str(cat_str).unwrap();
+            return Ok((SkillTree::Live, SkillCategory::from_str(cat_str).unwrap()));
         }
 
-        SkillCategory::Engineering
+        Ok((SkillTree::Live, SkillCategory::Engineering))
+    }
+
+    /// Infers skill category from directory layout (e.g. `skills/<category>/<name>/SKILL.md`).
+    #[must_use]
+    pub fn infer_category_from_path(path: &Path) -> SkillCategory {
+        Self::infer_tree_and_category_from_path(path)
+            .map_or(SkillCategory::Engineering, |(_, cat)| cat)
     }
 
     fn discover_resources_internal(&self, skill_dir: &Path) -> Result<Vec<ResourceFile>> {
@@ -752,35 +848,47 @@ impl SkillParser {
     }
 
     fn discover_skills_internal(&self, root: &Path) -> Result<Vec<Skill>> {
-        let search_dir = if root.join("skills").is_dir() {
-            root.join("skills")
-        } else {
-            root.to_path_buf()
-        };
+        let mut search_dirs = Vec::new();
+
+        let live_dir = root.join("skills");
+        if live_dir.is_dir() {
+            search_dirs.push(live_dir);
+        }
+
+        let archive_dir = root.join("skills-archive");
+        if archive_dir.is_dir() {
+            search_dirs.push(archive_dir);
+        }
+
+        if search_dirs.is_empty() {
+            search_dirs.push(root.to_path_buf());
+        }
 
         let mut skills = Vec::new();
 
-        for entry in WalkDir::new(&search_dir).follow_links(false) {
-            let entry = match entry {
-                Ok(e) => e,
-                Err(err) => return Err(SkillError::io(root, err.into())),
-            };
+        for dir in search_dirs {
+            for entry in WalkDir::new(&dir).follow_links(false) {
+                let entry = match entry {
+                    Ok(e) => e,
+                    Err(err) => return Err(SkillError::io(root, err.into())),
+                };
 
-            if entry.file_type().is_file() {
-                let name = entry.file_name().to_string_lossy();
-                if name.eq_ignore_ascii_case("SKILL.md") {
-                    let path = entry.path();
-                    match self.parse_file_internal(path) {
-                        Ok(mut skill) => {
-                            // Relativize path against root
-                            if let Ok(rel) = path.strip_prefix(root) {
-                                skill.path = rel.to_path_buf();
+                if entry.file_type().is_file() {
+                    let name = entry.file_name().to_string_lossy();
+                    if name.eq_ignore_ascii_case("SKILL.md") {
+                        let path = entry.path();
+                        match self.parse_file_internal(path) {
+                            Ok(mut skill) => {
+                                // Relativize path against root
+                                if let Ok(rel) = path.strip_prefix(root) {
+                                    skill.path = rel.to_path_buf();
+                                }
+                                skills.push(skill);
                             }
-                            skills.push(skill);
-                        }
-                        Err(e) => {
-                            if !self.lenient {
-                                return Err(e);
+                            Err(e) => {
+                                if !self.lenient {
+                                    return Err(e);
+                                }
                             }
                         }
                     }

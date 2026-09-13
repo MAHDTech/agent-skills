@@ -1,6 +1,6 @@
 ---
 name: upgrade-dependencies
-description: Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime - read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on /characterization-tests for the net and /diagnosing-bugs when an upgrade breaks something.
+description: Safely upgrade dependencies, frameworks, or a language/runtime version across a codebase, including risky major-version bumps and framework migrations. Use when bumping a package, stepping a major version, migrating a framework, or updating a runtime - read the changelog first, move in small reversible steps behind a green safety net, handle transitive and lockfile changes, and stage the rollout. Lean on characterization tests for the net and bug diagnosis when an upgrade breaks something.
 ---
 
 # Upgrade Dependencies
@@ -15,7 +15,7 @@ Run the suite and the upgrade commands through the project's toolchain - for exa
 
 Before touching a single version, get the affected code **green**: run the suite and confirm it passes on the current versions. That green is your **safety net** - the signal that an upgrade changed behaviour.
 
-If the code path you are upgrading has no tests, that net does not exist yet. Build it first with /characterization-tests, which pins current behaviour so an upgrade that alters it turns red.
+If the code path you are upgrading has no tests, that net does not exist yet. Build it first with characterization tests, which pins current behaviour so an upgrade that alters it turns red.
 
 Completion: a green test suite - or fresh characterization tests - covering the code that touches the dependency, run at least once on the current versions.
 
@@ -45,7 +45,7 @@ Completion: each intended version bumped, the dependency tree resolves cleanly, 
 
 Run the suite after each step. Work the breaks the changelog predicted - renamed APIs, changed defaults, removed options - until it is green again.
 
-When a break is **mysterious** - a test fails and the changelog gave no warning - run /diagnosing-bugs, using the red test as the ready-made feedback loop, rather than guessing at the upgrade.
+When a break is **mysterious** - a test fails and the changelog gave no warning - run bug diagnosis, using the red test as the ready-made feedback loop, rather than guessing at the upgrade.
 
 Completion: the suite is green on the new versions, with every failure understood rather than muted.
 

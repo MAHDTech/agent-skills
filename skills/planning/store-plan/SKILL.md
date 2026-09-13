@@ -2,6 +2,8 @@
 name: store-plan
 description: Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's docs/plans/ directory.
 disable-model-invocation: true
+metadata:
+  group: planning-pipeline
 ---
 
 <!-- omit in toc -->

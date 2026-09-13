@@ -87,7 +87,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Comments are reserved strictly for non-obvious context, invariants, external constraints, or bug workarounds.
 - Keep comments concise (1-2 lines maximum). Never write multi-paragraph essays for a single line of code.
 - Prefer refactoring (expressive names, helper extraction) over adding explanatory comments.
-- See the [code-comments](../../engineering/code-comments/SKILL.md) skill for the full comment decision matrix and audit workflows.
+- See concise code commenting guidelines for the full comment decision matrix and audit workflows.
 
 ## 7. Markdown & Code Fence Compliance
 

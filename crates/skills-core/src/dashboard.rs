@@ -14,7 +14,7 @@ use typed_builder::TypedBuilder;
 use crate::error::Result;
 use crate::installer::{EnvironmentResolver, InstalledSkillsRegistry, TargetEnvironment};
 use crate::lint::SkillLinter;
-use crate::models::{LintIssue, LintReport, LintSeverity, Skill, SkillCategory};
+use crate::models::{LintIssue, LintReport, LintSeverity, Skill, SkillCategory, SkillTree};
 use crate::parser::SkillParser;
 
 // -----------------------------------------------------------------------------
@@ -233,19 +233,19 @@ impl DashboardEngine {
             })
             .collect();
 
-        let active_skills = skills
-            .iter()
-            .filter(|s| s.category != SkillCategory::Deprecated)
-            .count();
+        let active_skills = skills.iter().filter(|s| s.tree == SkillTree::Live).count();
         let inactive_skills = skills
             .iter()
-            .filter(|s| s.category == SkillCategory::Deprecated)
+            .filter(|s| s.tree == SkillTree::Archive)
             .count();
         let promoted_skills = skills
             .iter()
-            .filter(|s| s.promoted || s.category.is_promoted())
+            .filter(|s| (s.promoted || s.category.is_promoted()) && s.tree == SkillTree::Live)
             .count();
-        let lifecycle_skills = skills.iter().filter(|s| s.category.is_lifecycle()).count();
+        let lifecycle_skills = skills
+            .iter()
+            .filter(|s| s.category.is_lifecycle() && s.tree == SkillTree::Live)
+            .count();
         let user_invoked_skills = skills.iter().filter(|s| s.is_user_invoked()).count();
         let model_invoked_skills = skills.iter().filter(|s| !s.is_user_invoked()).count();
         let forked_skills = skills.iter().filter(|s| s.is_forked()).count();
@@ -607,11 +607,12 @@ mod tests {
         description: &str,
         content: &str,
     ) -> Skill {
+        let promoted = category.is_promoted();
         Skill::builder()
             .path(PathBuf::from(format!("skills/{dir_name}/SKILL.md")))
             .dir_name(dir_name.to_string())
             .category(category)
-            .promoted(false)
+            .promoted(promoted)
             .frontmatter(
                 SkillFrontmatter::builder()
                     .name(dir_name.to_string())
