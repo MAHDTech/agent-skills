@@ -3,6 +3,7 @@ name: to-tickets
 description: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker - as one file per ticket locally, or as native blocking links on a real tracker.
 disable-model-invocation: true
 metadata:
+  group: planning-pipeline
   source: mattpocock/skills
   license: MIT
 ---
@@ -111,6 +112,6 @@ not layer-by-layer implementation.
 
 In either form, avoid specific file paths or code snippets - they go stale fast. Exception: if exploratory prototyping produced a snippet that encodes a decision more precisely than prose can (a state machine, reducer, schema, or type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts - not a working demo, just the important bits.
 
-Work the frontier one ticket at a time with `/implement`, clearing context between tickets.
+Work the frontier one ticket at a time, implementing one ticket at a time and clearing context between tickets.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).

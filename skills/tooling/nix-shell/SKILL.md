@@ -27,7 +27,7 @@ Distinguish between ad-hoc utilities and project dependencies:
   - Temporary tools needed by the agent during a debugging or analysis task.
 - **Do NOT Use Ephemeral Nix Shells for:**
   - Project build, test, lint, or runtime dependencies (e.g., compilers, project language runtimes, test frameworks, pre-commit hooks).
-  - If a repository utilizes `devenv`, project-level tools belong in `devenv.nix` (see the [devenv](../devenv/SKILL.md) skill). Never use `nix shell` as a permanent bypass for repository build environments.
+  - If a repository utilizes `devenv`, project-level tools belong in `devenv.nix` (see the devenv skill). Never use `nix shell` as a permanent bypass for repository build environments.
 
 ## Modern Command Syntax
 

@@ -4,6 +4,7 @@ description: Use when creating a new skill or editing an existing one in this re
 metadata:
   source: mattpocock/skills
   license: MIT
+  group: authoring
 ---
 
 # Skill Creator
@@ -49,7 +50,7 @@ description: What the skill does AND when to reach for it, in the user's own wor
 - **`disable-model-invocation: true`** - makes the skill **user-invoked** (see below).
 - **`argument-hint`** - a short usage hint for a skill that takes an argument.
 - **`context: fork`** with **`agent: <type>`** (used together, e.g. `agent: general-purpose`) - runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
-- **`metadata:`** - a flat string→string map for provenance. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`).
+- **`metadata:`** - a flat string→string map for provenance and grouping. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`). Use `group: <group-name>` to declare membership in a cohesive cross-reference group (standard groups: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, `tars`). Skills are self-contained by default; cross-references via `/skill-name` mentions or relative markdown links are only permitted between skills in the same group (`skill-router` is exempt).
 - **`resources:`** - a YAML **list** of source URLs. It is functional, not decorative: `skills --action download-resources` reads it (see `bin/skills/downloader.ts`) to (re)fetch the vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and many reference skills rely on it. Keep it intact; never strip it.
 
 That is the complete allowed set, so the frontmatter stays small. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` - forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.

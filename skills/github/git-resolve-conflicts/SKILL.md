@@ -4,6 +4,8 @@ description: Resolve merge conflicts systematically with context-aware 3-tier cl
 disable-model-invocation: true
 context: fork
 agent: general-purpose
+metadata:
+  group: github
 ---
 
 <!-- omit in toc -->

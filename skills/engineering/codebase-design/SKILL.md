@@ -97,7 +97,7 @@ Good interfaces make testing natural.
 
 3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
 
-For the red to green loop that exercises these seams, run `/tdd`.
+For the red to green loop that exercises these seams, run test-driven development.
 
 ## Relationships
 
