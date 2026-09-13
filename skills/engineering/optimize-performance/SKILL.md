@@ -1,13 +1,13 @@
 ---
 name: optimize-performance
-description: Improve the performance of a hot path with measurement-first discipline - profile to find the real bottleneck, set a target, change one thing, re-measure, and stop when the target is met. Use when code is too slow, memory-hungry, or throughput-bound and you want to make it deliberately faster without ever guessing at the cause. For a performance regression - code that was fast and got slow - run /diagnosing-bugs instead, which treats the slowdown as a bug to bisect.
+description: Improve the performance of a hot path with measurement-first discipline - profile to find the real bottleneck, set a target, change one thing, re-measure, and stop when the target is met. Use when code is too slow, memory-hungry, or throughput-bound and you want to make it deliberately faster without ever guessing at the cause. For a performance regression - code that was fast and got slow - run bug diagnosis instead, which treats the slowdown as a bug to bisect.
 ---
 
 # Optimize Performance
 
 You cannot make faster what you cannot measure. Every phase here defends one rule: **measure, don't guess.** Profile to find where the resource actually goes, change one thing, and let the numbers - not intuition - say whether it worked.
 
-This is deliberate optimisation of code that was never fast enough. For code that _was_ fast and got slow - a performance **regression** - run /diagnosing-bugs, which bisects the slowdown like any other bug.
+This is deliberate optimisation of code that was never fast enough. For code that _was_ fast and got slow - a performance **regression** - run bug diagnosis, which bisects the slowdown like any other bug.
 
 Run measurements through the project's toolchain - for example `devenv --no-tui shell -- <cmd>` - so results are comparable across runs.
 

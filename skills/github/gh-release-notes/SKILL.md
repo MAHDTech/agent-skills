@@ -1,6 +1,8 @@
 ---
 name: gh-release-notes
 description: Generate human-readable release notes for a version from the merged history and cut a GitHub release with the gh CLI - gather the commit and PR range since the last tag, group changes by type, write curated notes, and publish. Use when the user wants to cut a release, tag a version, write a changelog or release notes, or summarise what shipped since the last tag. Pairs well with conventional-commit history but does not require it.
+metadata:
+  group: github
 ---
 
 # Generate Release Notes and Cut a Release

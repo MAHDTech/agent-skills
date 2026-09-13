@@ -32,6 +32,7 @@ typed-builder = "0.20.0"
 # Async runtime and networking
 tokio = { version = "1.40.0", features = ["full"] }
 reqwest = { version = "0.12.7", default-features = false, features = ["json", "rustls-tls", "stream"] }
+futures = "0.3.34"
 
 # CLI and Terminal UI
 clap = { version = "4.5.17", features = ["derive", "cargo", "env"] }

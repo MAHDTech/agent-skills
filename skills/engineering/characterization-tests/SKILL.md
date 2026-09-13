@@ -1,19 +1,19 @@
 ---
 name: characterization-tests
-description: Pin down the existing behaviour of untested or legacy code with characterization (golden-master / approval) tests before you change it, so refactors and upgrades stay safe. Use when you must modify, refactor, or upgrade code that has no tests, want to capture current behaviour as an oracle even where it looks wrong, or need a safety net before a risky change. Distinct from /tdd, which specifies new behaviour test-first; this tests around existing behaviour. Pairs with /sculpt-code and /upgrade-dependencies.
+description: Pin down the existing behaviour of untested or legacy code with characterization (golden-master / approval) tests before you change it, so refactors and upgrades stay safe. Use when you must modify, refactor, or upgrade code that has no tests, want to capture current behaviour as an oracle even where it looks wrong, or need a safety net before a risky change. Distinct from test-driven development, which specifies new behaviour test-first; this tests around existing behaviour. Pairs with code refactoring and dependency upgrades.
 ---
 
 # Characterization Tests
 
 Legacy or untested code you are about to change is a cliff with no guardrail. A **characterization test** captures what the code _currently does_ - its **oracle** is present behaviour, not correct behaviour - so any change that alters that behaviour turns a test red. Build the net first, then change the code.
 
-This is test-_around_ existing behaviour. For test-_first_ design of _new_ behaviour, run /tdd. Once the net is green, /sculpt-code and /upgrade-dependencies are safe to run against it.
+This is test-_around_ existing behaviour. For test-_first_ design of _new_ behaviour, run test-driven development. Once the net is green, code refactoring and dependency upgrades are safe to run against it.
 
 Run the suite through the project's toolchain - for example `devenv --no-tui shell -- <cmd>` - so red and green mean the same thing every run.
 
 ## Phase 1 - Find the seam
 
-A **seam** is a place where you can observe the code's behaviour without reaching inside it (shared vocabulary with /tdd and /codebase-design). Pick the **highest** seam that still covers the code you are about to change - a whole function, module, HTTP endpoint, or CLI invocation - so you pin behaviour without depending on internal structure you are about to move.
+A **seam** is a place where you can observe the code's behaviour without reaching inside it (shared vocabulary with test-driven development and modular codebase design). Pick the **highest** seam that still covers the code you are about to change - a whole function, module, HTTP endpoint, or CLI invocation - so you pin behaviour without depending on internal structure you are about to move.
 
 If the code will not run in isolation because it is wired straight to a clock, network, database, or global state, that is a dependency to break, not a reason to test deeper. Introduce a seam - inject the dependency, wrap the call, subclass-and-override - so the code runs under a harness you control.
 
@@ -43,7 +43,7 @@ Completion: every branch in the change region is covered and deterministic, and 
 
 The net is live. Now change the code:
 
-- **Pure refactor** (behaviour must not change): the characterization tests stay green, untouched. A red test means you changed behaviour by accident - revert and take a smaller step. Run /sculpt-code.
+- **Pure refactor** (behaviour must not change): the characterization tests stay green, untouched. A red test means you changed behaviour by accident - revert and take a smaller step. Run code refactoring.
 - **Intended behaviour change**: update the affected expected values, or re-approve the golden master, in the **same commit** as the code change - so the diff shows exactly which behaviour moved and a reviewer can see it.
 
-If a later upgrade or refactor breaks a characterization test you did not mean to touch, run /diagnosing-bugs with that red test as the ready-made feedback loop.
+If a later upgrade or refactor breaks a characterization test you did not mean to touch, run bug diagnosis with that red test as the ready-made feedback loop.

@@ -7,6 +7,46 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use typed_builder::TypedBuilder;
 
+/// Origin tree classification for an Agent Skill.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum SkillTree {
+    /// Active, installable skills located under `skills/<category>/<name>/`.
+    #[default]
+    Live,
+    /// Retired skills preserved for reference under `skills-archive/<category>/<name>/`.
+    Archive,
+}
+
+impl SkillTree {
+    /// Returns the root directory folder name matching this tree.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Live => "skills",
+            Self::Archive => "skills-archive",
+        }
+    }
+
+    /// Returns `true` if this tree represents archived skills.
+    #[must_use]
+    pub fn is_archive(&self) -> bool {
+        matches!(self, Self::Archive)
+    }
+
+    /// Returns `true` if this tree represents live skills.
+    #[must_use]
+    pub fn is_live(&self) -> bool {
+        matches!(self, Self::Live)
+    }
+}
+
+impl fmt::Display for SkillTree {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 /// All supported skill categories, matching standard directory structures.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -21,7 +61,6 @@ pub enum SkillCategory {
     Authoring,
     Tooling,
     InProgress,
-    Deprecated,
     #[serde(untagged)]
     Custom(String),
 }
@@ -41,7 +80,6 @@ impl SkillCategory {
             Self::Authoring => "authoring",
             Self::Tooling => "tooling",
             Self::InProgress => "in-progress",
-            Self::Deprecated => "deprecated",
             Self::Custom(s) => s.as_str(),
         }
     }
@@ -60,7 +98,6 @@ impl SkillCategory {
             Self::Authoring => "Authoring",
             Self::Tooling => "Tooling",
             Self::InProgress => "In Progress",
-            Self::Deprecated => "Deprecated",
             Self::Custom(s) => s.as_str(),
         }
     }
@@ -79,15 +116,14 @@ impl SkillCategory {
             Self::Authoring => "Create and maintain the skills themselves.",
             Self::Tooling => "Environments, CLIs, and agent conventions.",
             Self::InProgress => "Drafts not yet promoted.",
-            Self::Deprecated => "Retired skills kept for reference.",
             Self::Custom(_) => "Custom user-defined category.",
         }
     }
 
-    /// Returns `true` if this category represents a lifecycle bucket (`in-progress` or `deprecated`).
+    /// Returns `true` if this category represents a lifecycle bucket (`in-progress`).
     #[must_use]
     pub fn is_lifecycle(&self) -> bool {
-        matches!(self, Self::InProgress | Self::Deprecated)
+        matches!(self, Self::InProgress)
     }
 
     /// Returns `true` if skills in this category are promoted to public indexes.
@@ -115,7 +151,7 @@ impl SkillCategory {
     /// Returns an iterator over all standard lifecycle categories.
     #[must_use]
     pub fn standard_lifecycle() -> &'static [Self] {
-        &[Self::InProgress, Self::Deprecated]
+        &[Self::InProgress]
     }
 }
 
@@ -140,7 +176,6 @@ impl FromStr for SkillCategory {
             "authoring" => Self::Authoring,
             "tooling" => Self::Tooling,
             "in-progress" => Self::InProgress,
-            "deprecated" => Self::Deprecated,
             other => Self::Custom(other.to_string()),
         })
     }
@@ -256,6 +291,25 @@ pub struct Skill {
     /// Whether this skill is promoted to top-level catalogs.
     pub promoted: bool,
 
+    /// Skill tree origin: live (`skills/`) or archive (`skills-archive/`).
+    #[builder(default = SkillTree::Live)]
+    pub tree: SkillTree,
+
+    /// Explicit group identifier from frontmatter metadata (`metadata.group`).
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group: Option<String>,
+
+    /// Archive date ISO string from frontmatter metadata (`metadata.archived`).
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archived: Option<String>,
+
+    /// Replacement skill name from frontmatter metadata (`metadata.replaced-by`).
+    #[builder(default, setter(into))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub replaced_by: Option<String>,
+
     /// Parsed frontmatter structure.
     pub frontmatter: SkillFrontmatter,
 
@@ -301,6 +355,30 @@ impl Skill {
     #[must_use]
     pub fn is_forked(&self) -> bool {
         self.frontmatter.context.as_deref() == Some("fork")
+    }
+
+    /// Returns `true` if the skill resides in the archive tree.
+    #[must_use]
+    pub fn is_archived(&self) -> bool {
+        self.tree.is_archive()
+    }
+
+    /// Returns the declared group from frontmatter metadata if present.
+    #[must_use]
+    pub fn group(&self) -> Option<&str> {
+        self.group.as_deref()
+    }
+
+    /// Returns the archived ISO date string if present.
+    #[must_use]
+    pub fn archived_date(&self) -> Option<&str> {
+        self.archived.as_deref()
+    }
+
+    /// Returns the replacement skill identifier if present.
+    #[must_use]
+    pub fn replaced_by(&self) -> Option<&str> {
+        self.replaced_by.as_deref()
     }
 }
 

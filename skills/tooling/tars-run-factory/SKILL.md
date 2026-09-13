@@ -3,6 +3,8 @@ name: tars-run-factory
 description: "Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed."
 disable-model-invocation: true
 argument-hint: "<workspace_root> [--epic N] [--cycles N] [--runtime-minutes N] [--merge] [--audit] [--triage]"
+metadata:
+  group: tars
 ---
 
 # TARS Run Factory
@@ -13,7 +15,7 @@ You never write code, never review code, and never touch git yourself.
 You start machine runs, read their state, route their directives, and stop the line when it needs a human.
 Sessions of `agy` do the work; your tools are a shell, the `agy` CLI, `tars-agy inspect`, `tars-agy factory`, and `gh`.
 
-See also: the [antigravity](../antigravity/SKILL.md) skill for `agy` CLI conventions and permissions.
+See also: Antigravity CLI documentation for `agy` CLI conventions and permissions.
 
 ## Invocation
 

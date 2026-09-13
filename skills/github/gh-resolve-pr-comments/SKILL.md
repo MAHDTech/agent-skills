@@ -4,6 +4,8 @@ description: Triage and resolve GitHub PR review comments with categorized actio
 disable-model-invocation: true
 resources:
   - https://cli.github.com/manual/gh_pr
+metadata:
+  group: github
 ---
 
 <!-- omit in toc -->

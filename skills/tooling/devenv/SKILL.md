@@ -62,7 +62,7 @@ Other skills must **not** restate these flags. If a project has `devenv.nix` or 
 > - **DO NOT add `pkgs.pre-commit` or `pre-commit` package/input to `devenv.nix`.** If a hook runner package is needed, use `pkgs.prek` or `git-hooks.git-hooks`.
 > - ALWAYS use `prek` to run or manage pre-commit hooks (e.g., `prek run -a`).
 
-Devenv gives us the ability to run tests and linters seamlessly. The project-level hooks are run via `prek` (see the [prek](../prek/SKILL.md) skill).
+Devenv gives us the ability to run tests and linters seamlessly. The project-level hooks are run via `prek` (see the prek skill).
 - `SECRETSPEC_REASON="running tests" devenv --no-tui test`: This triggers all pre-commit hooks (managed by `prek`) and other defined tests and is **mandatory** as part of testing. Prefer the non-interactive prefix from **Non-Interactive Agent and CI Invocations** when an agent or gate runs this.
 
 **Verification Hook Run (ALL Repositories):**

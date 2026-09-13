@@ -3,6 +3,8 @@ name: pr-create-test-plan
 description: Generate a manual test plan for a branch's changes - hands-on verification of real user flows and integration behaviour, not unit-test edge cases. Use when you want a copy-paste test plan a reviewer can run by hand before merging a PR.
 context: fork
 agent: general-purpose
+metadata:
+  group: review
 ---
 
 # PR Test Plan
@@ -142,7 +144,7 @@ Run `cat TEST_PLAN.md` to view the full plan.
 
 ## Style Reference
 
-Follow the same style used in `/gh-create-pr`:
+Follow the same style used in creating the pull request:
 
 - **Bold the what**, plain text the how
 - No fluff -- every step must verify something real that a human needs to see

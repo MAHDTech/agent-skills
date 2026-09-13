@@ -1,3 +1,4 @@
+// cspell:words unpromoted
 //! Skill static analysis and linting engine.
 
 use std::collections::HashMap;
@@ -7,7 +8,7 @@ use typed_builder::TypedBuilder;
 use walkdir::WalkDir;
 
 use crate::error::Result;
-use crate::models::{LintIssue, LintReport, LintSeverity, Skill, SkillCategory};
+use crate::models::{LintIssue, LintReport, LintSeverity, Skill, SkillCategory, SkillTree};
 use crate::parser::SkillParser;
 
 /// Configurable static analysis and linting engine for Agent Skills.
@@ -48,6 +49,7 @@ impl SkillLinter {
         Self::check_frontmatter(skill, &mut report);
         Self::check_naming(skill, &mut report);
         Self::check_category(skill, &mut report);
+        Self::check_archived_metadata(skill, &mut report);
         Self::check_em_dashes(&skill.raw, &skill.path, &mut report);
         self.check_links(skill, &mut report);
         Self::check_code_blocks(skill, &mut report);
@@ -85,6 +87,8 @@ impl SkillLinter {
         }
 
         Self::check_duplicate_names(skills, &mut aggregated);
+        Self::check_archived_replaced_by(skills, &mut aggregated);
+        Self::check_cross_references(skills, &mut aggregated);
         aggregated
     }
 
@@ -231,6 +235,48 @@ impl SkillLinter {
                     .severity(LintSeverity::Warning)
                     .build(),
             );
+        }
+    }
+
+    fn check_archived_metadata(skill: &Skill, report: &mut LintReport) {
+        match skill.tree {
+            SkillTree::Archive => {
+                if let Some(ref date_str) = skill.archived {
+                    if chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d").is_err() {
+                        report.add(
+                            LintIssue::builder()
+                                .file(skill.path.clone())
+                                .rule("archived-metadata")
+                                .message(format!(
+                                    "Invalid archived date '{date_str}': expected ISO format YYYY-MM-DD"
+                                ))
+                                .severity(LintSeverity::Error)
+                                .build(),
+                        );
+                    }
+                } else {
+                    report.add(
+                        LintIssue::builder()
+                            .file(skill.path.clone())
+                            .rule("archived-metadata")
+                            .message("Archived skill must declare 'metadata.archived' ISO date string (YYYY-MM-DD)")
+                            .severity(LintSeverity::Error)
+                            .build(),
+                    );
+                }
+            }
+            SkillTree::Live => {
+                if skill.archived.is_some() {
+                    report.add(
+                        LintIssue::builder()
+                            .file(skill.path.clone())
+                            .rule("archived-metadata")
+                            .message("Live skill must not declare 'metadata.archived'; retired skills belong under skills-archive/")
+                            .severity(LintSeverity::Error)
+                            .build(),
+                    );
+                }
+            }
         }
     }
 
@@ -458,8 +504,10 @@ impl SkillLinter {
                     .path()
                     .strip_prefix(&full_skill_dir)
                     .unwrap_or(entry.path());
-                let rel_str = rel_path.to_string_lossy();
-                if rel_str.contains("resources/manual") || rel_str.contains("manual") {
+                let is_manual = rel_path
+                    .parent()
+                    .is_some_and(|p| p.components().any(|c| c.as_os_str() == "manual"));
+                if is_manual {
                     if let Ok(content) = fs::read_to_string(entry.path()) {
                         Self::check_em_dashes(&content, entry.path(), report);
                     }
@@ -477,37 +525,303 @@ impl SkillLinter {
 
         for (name, skill_group) in names_map {
             if skill_group.len() > 1 {
-                let promoted_count = skill_group.iter().filter(|s| s.promoted).count();
+                let has_live = skill_group.iter().any(|s| s.tree == SkillTree::Live);
+                let has_archive = skill_group.iter().any(|s| s.tree == SkillTree::Archive);
                 let paths_str = skill_group
                     .iter()
                     .map(|s| s.path.to_string_lossy().to_string())
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                if promoted_count > 1 {
+                if has_live && has_archive {
                     report.add(
                         LintIssue::builder()
                             .file(skill_group[0].path.clone())
                             .rule("duplicate-skill-names")
                             .message(format!(
-                                "Duplicate skill name '{name}' detected across promoted categories: [{paths_str}]"
+                                "Duplicate skill name '{name}' detected across trees (live and archive): [{paths_str}]"
                             ))
                             .severity(LintSeverity::Error)
                             .build(),
                     );
                 } else {
+                    let promoted_count = skill_group.iter().filter(|s| s.promoted).count();
+                    if promoted_count > 1 {
+                        report.add(
+                            LintIssue::builder()
+                                .file(skill_group[0].path.clone())
+                                .rule("duplicate-skill-names")
+                                .message(format!(
+                                    "Duplicate skill name '{name}' detected across promoted categories: [{paths_str}]"
+                                ))
+                                .severity(LintSeverity::Error)
+                                .build(),
+                        );
+                    } else {
+                        report.add(
+                            LintIssue::builder()
+                                .file(skill_group[0].path.clone())
+                                .rule("duplicate-skill-names")
+                                .message(format!(
+                                    "Duplicate skill name '{name}' detected between promoted and lifecycle categories: [{paths_str}]"
+                                ))
+                                .severity(LintSeverity::Warning)
+                                .build(),
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    fn check_archived_replaced_by(skills: &[Skill], report: &mut LintReport) {
+        let mut catalog: HashMap<&str, &Skill> = HashMap::new();
+        for skill in skills {
+            catalog.insert(&skill.dir_name, skill);
+            catalog.insert(skill.name(), skill);
+        }
+
+        for skill in skills {
+            if skill.tree != SkillTree::Archive {
+                continue;
+            }
+
+            if let Some(ref replaced_by) = skill.replaced_by {
+                if let Some(target) = catalog.get(replaced_by.as_str()) {
+                    if target.tree != SkillTree::Live {
+                        report.add(
+                            LintIssue::builder()
+                                .file(skill.path.clone())
+                                .rule("archived-replaced-by")
+                                .message(format!(
+                                    "Archived skill replaces with archived skill '{replaced_by}'; replacement must be a live promoted skill"
+                                ))
+                                .severity(LintSeverity::Error)
+                                .build(),
+                        );
+                    } else if !target.promoted {
+                        report.add(
+                            LintIssue::builder()
+                                .file(skill.path.clone())
+                                .rule("archived-replaced-by")
+                                .message(format!(
+                                    "Archived skill replaces with unpromoted skill '{replaced_by}'; replacement must be a live promoted skill"
+                                ))
+                                .severity(LintSeverity::Error)
+                                .build(),
+                        );
+                    }
+                } else {
                     report.add(
                         LintIssue::builder()
-                            .file(skill_group[0].path.clone())
-                            .rule("duplicate-skill-names")
+                            .file(skill.path.clone())
+                            .rule("archived-replaced-by")
                             .message(format!(
-                                "Duplicate skill name '{name}' detected between promoted and lifecycle categories: [{paths_str}]"
+                                "Archived skill replaces with unknown skill '{replaced_by}'"
                             ))
-                            .severity(LintSeverity::Warning)
+                            .severity(LintSeverity::Error)
                             .build(),
                     );
                 }
             }
+        }
+    }
+
+    #[allow(clippy::needless_range_loop, clippy::too_many_lines)]
+    fn check_cross_references(skills: &[Skill], report: &mut LintReport) {
+        let mut catalog: HashMap<&str, &Skill> = HashMap::new();
+        for skill in skills {
+            catalog.insert(&skill.dir_name, skill);
+            catalog.insert(skill.name(), skill);
+        }
+
+        for source in skills {
+            // Archived skills are exempt as sources
+            if source.tree == SkillTree::Archive {
+                continue;
+            }
+
+            // Universal router is exempt as source
+            if source.name() == "skill-router" || source.dir_name == "skill-router" {
+                continue;
+            }
+
+            let mut in_fence = false;
+
+            for (line_idx, raw_line) in source.content.lines().enumerate() {
+                let line_num = line_idx + 1;
+                let trimmed = raw_line.trim();
+
+                // Skip fenced code blocks (``` or ~~~)
+                if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
+                    in_fence = !in_fence;
+                    continue;
+                }
+                if in_fence {
+                    continue;
+                }
+
+                // 1. Scan slash commands: /<identifier>
+                let char_indices: Vec<(usize, char)> = raw_line.char_indices().collect();
+                for i in 0..char_indices.len() {
+                    let (_byte_pos, c) = char_indices[i];
+                    if c == '/' {
+                        // Check preceding character boundary
+                        if i > 0 {
+                            let (_, prev_c) = char_indices[i - 1];
+                            if prev_c.is_ascii_alphanumeric()
+                                || prev_c == '_'
+                                || prev_c == '.'
+                                || prev_c == '/'
+                                || prev_c == '-'
+                            {
+                                continue;
+                            }
+                        }
+
+                        // Collect candidate kebab-case name
+                        let mut end = i + 1;
+                        while end < char_indices.len() {
+                            let (_, next_c) = char_indices[end];
+                            if next_c.is_ascii_lowercase()
+                                || next_c.is_ascii_digit()
+                                || next_c == '-'
+                            {
+                                end += 1;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if end > i + 1 {
+                            let start_byte = char_indices[i + 1].0;
+                            let end_byte = if end < char_indices.len() {
+                                char_indices[end].0
+                            } else {
+                                raw_line.len()
+                            };
+                            let candidate_name = &raw_line[start_byte..end_byte];
+                            let clean_name = candidate_name.trim_end_matches('-');
+
+                            // Check succeeding character boundary
+                            if end < char_indices.len() {
+                                let (_, next_c) = char_indices[end];
+                                if next_c.is_ascii_alphanumeric()
+                                    || next_c == '_'
+                                    || next_c == '.'
+                                    || next_c == '/'
+                                {
+                                    continue;
+                                }
+                            }
+
+                            if let Some(&target) = catalog.get(clean_name) {
+                                Self::validate_cross_reference(
+                                    source, target, clean_name, line_num, report,
+                                );
+                            }
+                        }
+                    }
+                }
+
+                // 2. Scan Markdown relative links: [text](target)
+                let mut remaining = raw_line;
+                while let Some(open_bracket) = remaining.find('[') {
+                    let after_open = &remaining[open_bracket + 1..];
+                    if let Some(close_bracket) = after_open.find(']') {
+                        let after_close = &after_open[close_bracket + 1..];
+                        if after_close.starts_with('(') {
+                            if let Some(close_paren) = after_close.find(')') {
+                                let link_url = after_close[1..close_paren].trim();
+                                if !link_url.starts_with("http://")
+                                    && !link_url.starts_with("https://")
+                                    && !link_url.starts_with('#')
+                                    && !link_url.starts_with("mailto:")
+                                {
+                                    let clean_url = link_url
+                                        .split('#')
+                                        .next()
+                                        .unwrap_or(link_url)
+                                        .split('?')
+                                        .next()
+                                        .unwrap_or(link_url);
+                                    let path_obj = Path::new(clean_url);
+
+                                    // Check if link target is a skill file or contains a skill directory
+                                    for comp in path_obj.components() {
+                                        let name_str = comp.as_os_str().to_string_lossy();
+                                        let clean_name = name_str.as_ref();
+                                        if let Some(&target) = catalog.get(clean_name) {
+                                            if target.dir_name != source.dir_name
+                                                && target.name() != source.name()
+                                            {
+                                                Self::validate_cross_reference(
+                                                    source, target, clean_name, line_num, report,
+                                                );
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                remaining = &after_close[close_paren + 1..];
+                                continue;
+                            }
+                        }
+                    }
+                    remaining = after_open;
+                }
+            }
+        }
+    }
+
+    fn validate_cross_reference(
+        source: &Skill,
+        target: &Skill,
+        target_name: &str,
+        line_num: usize,
+        report: &mut LintReport,
+    ) {
+        // Self-reference is valid
+        if source.dir_name == target.dir_name || source.name() == target.name() {
+            return;
+        }
+
+        // Live skills may never reference archived skills
+        if target.tree == SkillTree::Archive {
+            report.add(
+                LintIssue::builder()
+                    .file(source.path.clone())
+                    .line(Some(line_num))
+                    .rule("cross-reference-group")
+                    .message(format!(
+                        "Forbidden cross-reference to archived skill '{target_name}' from live skill '{}'",
+                        source.name()
+                    ))
+                    .severity(LintSeverity::Error)
+                    .build(),
+            );
+            return;
+        }
+
+        // Must share identical metadata.group
+        let src_grp = source.group();
+        let tgt_grp = target.group();
+
+        if src_grp.is_none() || tgt_grp.is_none() || src_grp != tgt_grp {
+            report.add(
+                LintIssue::builder()
+                    .file(source.path.clone())
+                    .line(Some(line_num))
+                    .rule("cross-reference-group")
+                    .message(format!(
+                        "Forbidden cross-reference from '{}' (group: {}) to '{target_name}' (group: {}): skills are self-contained by default and may only reference skills in the same declared 'metadata.group'",
+                        source.name(),
+                        src_grp.unwrap_or("none"),
+                        tgt_grp.unwrap_or("none"),
+                    ))
+                    .severity(LintSeverity::Error)
+                    .build(),
+            );
         }
     }
 
