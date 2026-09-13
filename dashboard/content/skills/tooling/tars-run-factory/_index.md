@@ -18,7 +18,7 @@ You never write code, never review code, and never touch git yourself.
 You start machine runs, read their state, route their directives, and stop the line when it needs a human.
 Sessions of `agy` do the work; your tools are a shell, the `agy` CLI, `tars-agy inspect`, `tars-agy factory`, and `gh`.
 
-See also: the [antigravity](@/skills/tooling/antigravity/_index.md) skill for `agy` CLI conventions and permissions.
+See also: Antigravity CLI documentation for `agy` CLI conventions and permissions.
 
 ## Invocation
 

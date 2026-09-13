@@ -41,7 +41,7 @@ Look for the originating spec, in this order:
 
 1. Issue or ticket references in the commit messages - conventional-commit footers such as `Closes #45`, or a `#123` in the body. Fetch the referenced issue with `gh issue view <number>`, or the pull-request description with `gh pr view`.
 2. A path the user passed as an argument.
-3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature. In this repo, specs and tickets are typically produced by `/to-spec` and `/to-tickets`, so that is the artefact the Spec axis checks against.
+3. A PRD or spec file under `docs/`, `specs/`, `plans/`, or a scratch directory, matching the branch name or feature. In this repo, specs and tickets are typically produced by specification and ticket breakdown, so that is the artefact the Spec axis checks against.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent skips and reports "no spec available".
 
 ### 3. Identify the standards sources
@@ -92,7 +92,7 @@ Reporting them separately stops one axis from masking the other.
 
 - `/pr-build-context` - gather high-signal context on a pull request before the review.
 - `/pr-create-test-plan`, `/pr-edge-cases` - draft a manual test plan, or probe edge cases and failure modes on a branch.
-- `/diagnosing-bugs` - when the Spec axis surfaces a real defect, hand it off to run the defect down.
+- bug diagnosis - when the Spec axis surfaces a real defect, hand it off to run the defect down.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 

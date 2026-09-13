@@ -147,7 +147,7 @@ Run `cat TEST_PLAN.md` to view the full plan.
 
 ## Style Reference
 
-Follow the same style used in `/gh-create-pr`:
+Follow the same style used in creating the pull request:
 
 - **Bold the what**, plain text the how
 - No fluff -- every step must verify something real that a human needs to see

@@ -12,7 +12,7 @@ mermaid = false
 
 # Grill Me with Docs
 
-The comprehensive entry point into an ambiguous problem or architectural initiative. This skill combines the relentless 1-at-a-time decision interview of `/grilling` with the active domain modeling and decision capture of `/domain-modeling`.
+The comprehensive entry point into an ambiguous problem or architectural initiative. This skill combines the relentless 1-at-a-time decision interview of `/grilling` with active domain modeling and decision capture.
 
 ## The Workflow
 
@@ -45,7 +45,7 @@ As terms, boundaries, and concepts are clarified during the interview, record th
 
 - **Check against existing terms:** Call out conflicting or overloaded words ("You said 'account' - do you mean Customer or User?").
 - **Keep it free of implementation details:** `CONTEXT.md` is a ubiquitous language glossary, not a technical spec.
-- Follow the format defined in [CONTEXT-FORMAT.md](@/skills/engineering/domain-modeling/resources/manual/CONTEXT-FORMAT.md).
+- Follow standard ubiquitous language glossary conventions: definitions, boundary rules, and rejected terms.
 
 ## 3. Recording Architectural Decision Records (ADRs)
 
@@ -55,7 +55,7 @@ Only create an ADR when a settled decision meets all three criteria:
 2. **Surprising without context** - Future engineers would ask "why did they build it this way?".
 3. **Real trade-off** - Chosen among genuine alternatives with distinct advantages and disadvantages.
 
-When all three are met, create `docs/adr/000X-slug.md` using the format in [ADR-FORMAT.md](@/skills/engineering/domain-modeling/resources/manual/ADR-FORMAT.md).
+When all three are met, create `docs/adr/000X-slug.md` documenting context, decision, and consequences.
 
 ## 4. Closing the Session
 
