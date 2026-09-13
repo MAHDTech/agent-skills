@@ -3,8 +3,9 @@
 //!
 //! Provides the foundational domain models, category definitions, frontmatter
 //! parsing, linting primitives, error types, remote skill downloader, installer engine,
-//! multi-target skill synchronization engine, and dashboard telemetry aggregation.
+//! multi-target skill synchronization engine, repository artifact generation, and dashboard telemetry aggregation.
 
+pub mod artifacts;
 pub mod dashboard;
 pub mod downloader;
 pub mod error;
@@ -14,6 +15,10 @@ pub mod models;
 pub mod parser;
 pub mod sync;
 
+pub use artifacts::{
+    escape_zola_shortcodes, rewrite_skill_links, strip_legacy_raw_wrapper, sync_resources,
+    ArtifactsEngine, ArtifactsGenerator, ArtifactsOptions, ArtifactsSummary,
+};
 pub use dashboard::{
     calculate_category_distributions, calculate_health_score, calculate_prompt_tokens,
     calculate_skill_metric, calculate_target_distributions,
