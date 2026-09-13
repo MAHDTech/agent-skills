@@ -2,8 +2,8 @@
 
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
-use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Gauge, Paragraph, Row, Table, Tabs};
+use ratatui::text::Line;
+use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use ratatui::Frame;
 
 use crate::app::{ActiveView, App};
@@ -13,6 +13,12 @@ pub mod explorer;
 
 #[path = "views/inspector.rs"]
 pub mod inspector;
+
+#[path = "views/linter.rs"]
+pub mod linter;
+
+#[path = "views/runner.rs"]
+pub mod runner;
 
 /// Primary rendering entry point drawing the full application UI onto the terminal frame.
 pub fn draw(frame: &mut Frame, app: &App) {
@@ -59,8 +65,8 @@ pub fn render_viewport(frame: &mut Frame, app: &App, area: Rect) {
     match app.active_view {
         ActiveView::Explorer => render_explorer_view(frame, app, area),
         ActiveView::Inspector => render_inspector_view(frame, app, area),
-        ActiveView::Linter => render_linter_view(frame, app, area),
-        ActiveView::Runner => render_runner_view(frame, app, area),
+        ActiveView::Linter => linter::render_linter(frame, app, area),
+        ActiveView::Runner => runner::render_runner(frame, app, area),
     }
 }
 
@@ -81,8 +87,15 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
             ActiveView::Inspector => {
                 "Tab: Switch View | 1-4: Select | j/k: Scroll Preview | q: Quit"
             }
-            ActiveView::Linter | ActiveView::Runner => {
-                "Tab: Switch View | 1-4: Select | /: Search | Esc: Clear | q: Quit"
+            ActiveView::Linter => {
+                "Tab: Switch View | 1-4: Select | j/k: Select Issue | Enter: Jump to Skill | r: Rescan | q: Quit"
+            }
+            ActiveView::Runner => {
+                if app.runner_input_active {
+                    "Enter/Esc: Done | Backspace: Erase | Tab: Next Field"
+                } else {
+                    "Tab: Field | Enter/i: Edit | c: Copy Prompt | e: Export File | j/k: Scroll | r: Reset | q: Quit"
+                }
             }
         }
     };
@@ -116,143 +129,4 @@ fn render_explorer_view(frame: &mut Frame, app: &App, area: Rect) {
 
 fn render_inspector_view(frame: &mut Frame, app: &App, area: Rect) {
     inspector::render_inspector(frame, app, area);
-}
-
-fn render_linter_view(frame: &mut Frame, app: &App, area: Rect) {
-    let block = Block::default()
-        .borders(Borders::ALL)
-        .title(" Linter & Diagnostics ");
-
-    let Some(summary) = &app.summary else {
-        let p = Paragraph::new("Telemetry and diagnostic metrics not loaded").block(block);
-        frame.render_widget(p, area);
-        return;
-    };
-
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Length(4), Constraint::Min(0)])
-        .split(area);
-
-    let health_score = summary.health.score.clamp(0.0, 100.0);
-    let gauge_color = if health_score >= 80.0 {
-        Color::Green
-    } else if health_score >= 50.0 {
-        Color::Yellow
-    } else {
-        Color::Red
-    };
-
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let percent = health_score.round() as u16;
-
-    let gauge = Gauge::default()
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(" Overall Health Score "),
-        )
-        .gauge_style(Style::default().fg(gauge_color))
-        .percent(percent)
-        .label(format!("{health_score:.1}%"));
-    frame.render_widget(gauge, chunks[0]);
-
-    let details = vec![
-        Line::from(vec![
-            Span::styled(
-                "Total Skills: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(summary.total_skills.to_string()),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Active Skills: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(summary.active_skills.to_string()),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Inactive Skills: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(summary.inactive_skills.to_string()),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Clean Skills: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(summary.health.clean_skills.to_string()),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Diagnostic Errors: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::styled(
-                summary.health.total_errors.to_string(),
-                Style::default().fg(Color::Red),
-            ),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Diagnostic Warnings: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::styled(
-                summary.health.total_warnings.to_string(),
-                Style::default().fg(Color::Yellow),
-            ),
-        ]),
-    ];
-
-    let p = Paragraph::new(details).block(block);
-    frame.render_widget(p, chunks[1]);
-}
-
-fn render_runner_view(frame: &mut Frame, app: &App, area: Rect) {
-    let block = Block::default()
-        .borders(Borders::ALL)
-        .title(" Execution Runner ");
-
-    let Some(summary) = &app.summary else {
-        let p = Paragraph::new("Runner target metrics not loaded").block(block);
-        frame.render_widget(p, area);
-        return;
-    };
-
-    let header = Row::new(vec!["Environment", "Installed", "Active", "Coverage"]).style(
-        Style::default()
-            .fg(Color::Cyan)
-            .add_modifier(Modifier::BOLD),
-    );
-
-    let rows: Vec<Row> = summary
-        .targets
-        .iter()
-        .map(|target| {
-            Row::new(vec![
-                target.environment.identifier().to_string(),
-                target.installed_count.to_string(),
-                target.active_count.to_string(),
-                format!("{:.1}%", target.percentage),
-            ])
-        })
-        .collect();
-
-    let table = Table::new(
-        rows,
-        [
-            Constraint::Percentage(30),
-            Constraint::Percentage(20),
-            Constraint::Percentage(20),
-            Constraint::Percentage(30),
-        ],
-    )
-    .header(header)
-    .block(block);
-
-    frame.render_widget(table, area);
 }
