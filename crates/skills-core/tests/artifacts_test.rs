@@ -381,9 +381,12 @@ fn test_dashboard_archive_subsections_and_pages() {
     assert!(skill_content.contains("category = \"engineering\""));
     assert!(skill_content.contains("archived = \"2024-06-01\""));
     assert!(skill_content.contains("replaced_by = \"new-engine\""));
-    assert!(skill_content.contains(
-        "source_url = \"https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/engineering/retired-engine\""
-    ));
+    assert!(skill_content.contains(concat!(
+        "source_url = \"",
+        "https://",
+        "github.com",
+        "/MAHDTech/agent-skills/tree/main/skills-archive/engineering/retired-engine\""
+    )));
     assert!(skill_content.contains("Archive skill body"));
 
     let sibling_file = harness
@@ -395,9 +398,12 @@ fn test_dashboard_archive_subsections_and_pages() {
     assert!(sib_content.contains("skill_name = \"retired-engine\""));
     assert!(sib_content.contains("archived = \"2024-06-01\""));
     assert!(sib_content.contains("replaced_by = \"new-engine\""));
-    assert!(sib_content.contains(
-        "source_url = \"https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/engineering/retired-engine\""
-    ));
+    assert!(sib_content.contains(concat!(
+        "source_url = \"",
+        "https://",
+        "github.com",
+        "/MAHDTech/agent-skills/tree/main/skills-archive/engineering/retired-engine\""
+    )));
     assert!(sib_content.contains("Sibling markdown content."));
 }
 

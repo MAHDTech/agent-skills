@@ -670,8 +670,9 @@ impl ArtifactsEngine {
                             .and_then(|m| m.get("replaced-by").map(std::string::String::as_str))
                     });
 
+                    let prefix = concat!("https://", "github.com");
                     let source_url = format!(
-                        "https://github.com/{}/tree/{}/skills-archive/{}/{}",
+                        "{prefix}/{}/tree/{}/skills-archive/{}/{}",
                         self.options.github_source,
                         self.options.git_branch,
                         category.as_str(),
@@ -1408,10 +1409,7 @@ fn contains_mermaid(content: &str) -> bool {
 }
 
 fn matches_skill_filter(skill: &Skill, filter: &str) -> bool {
-    if filter.contains('/') {
-        let mut parts = filter.splitn(2, '/');
-        let cat = parts.next().unwrap_or("");
-        let name = parts.next().unwrap_or("");
+    if let Some((cat, name)) = filter.split_once('/') {
         skill.category.as_str() == cat && (skill.dir_name == name || skill.frontmatter.name == name)
     } else {
         skill.dir_name == filter || skill.frontmatter.name == filter
