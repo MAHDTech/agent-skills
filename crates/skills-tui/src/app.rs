@@ -137,6 +137,10 @@ pub struct App {
     pub summary: Option<DashboardSummary>,
     /// Active search filter query string.
     pub search_filter: String,
+    /// State flag indicating whether the interactive search prompt is active.
+    pub search_active: bool,
+    /// Vertical line scroll offset in the inspector markdown preview.
+    pub inspector_scroll: usize,
     /// FIFO queue of transient notification messages.
     pub notifications: Vec<String>,
     /// Execution control flag for the application event loop.
@@ -160,6 +164,8 @@ impl App {
             skills: Vec::new(),
             summary: None,
             search_filter: String::new(),
+            search_active: false,
+            inspector_scroll: 0,
             notifications: Vec::new(),
             running: true,
             selected_index: 0,
@@ -180,6 +186,38 @@ impl App {
     pub fn with_summary(mut self, summary: DashboardSummary) -> Self {
         self.summary = Some(summary);
         self
+    }
+
+    /// Activates search mode so typing directs input into the search filter.
+    pub fn activate_search(&mut self) {
+        self.search_active = true;
+    }
+
+    /// Deactivates search mode, returning keyboard focus to navigation.
+    pub fn deactivate_search(&mut self) {
+        self.search_active = false;
+    }
+
+    /// Appends a character to the search filter and resets the selection cursor to 0.
+    pub fn push_search_char(&mut self, c: char) {
+        self.search_filter.push(c);
+        self.selected_index = 0;
+    }
+
+    /// Removes the last character from the search filter and resets the selection cursor to 0.
+    pub fn pop_search_char(&mut self) {
+        self.search_filter.pop();
+        self.selected_index = 0;
+    }
+
+    /// Decrements the inspector preview scroll offset with lower bound 0.
+    pub fn scroll_inspector_up(&mut self) {
+        self.inspector_scroll = self.inspector_scroll.saturating_sub(1);
+    }
+
+    /// Increments the inspector preview scroll offset.
+    pub fn scroll_inspector_down(&mut self) {
+        self.inspector_scroll = self.inspector_scroll.saturating_add(1);
     }
 
     /// Advances circularly to the next view tab.
@@ -204,6 +242,37 @@ impl App {
     pub fn handle_key_event(&mut self, key: KeyEvent) -> bool {
         if key.kind == KeyEventKind::Release {
             return false;
+        }
+
+        if self.search_active {
+            return match key.code {
+                KeyCode::Esc => {
+                    self.clear_search_filter();
+                    self.deactivate_search();
+                    true
+                }
+                KeyCode::Enter => {
+                    self.deactivate_search();
+                    true
+                }
+                KeyCode::Backspace => {
+                    self.pop_search_char();
+                    true
+                }
+                KeyCode::Char(c) => {
+                    self.push_search_char(c);
+                    true
+                }
+                KeyCode::Down => {
+                    self.select_next();
+                    true
+                }
+                KeyCode::Up => {
+                    self.select_prev();
+                    true
+                }
+                _ => false,
+            };
         }
 
         match key.code {
@@ -235,28 +304,50 @@ impl App {
                 self.quit();
                 true
             }
+            KeyCode::Char('/') if self.active_view == ActiveView::Explorer => {
+                self.activate_search();
+                true
+            }
+            KeyCode::Enter if self.active_view == ActiveView::Explorer => {
+                if self.selected_skill().is_some() {
+                    self.set_tab(ActiveView::Inspector);
+                    true
+                } else {
+                    false
+                }
+            }
             KeyCode::Char('j') | KeyCode::Down => {
-                self.select_next();
+                if self.active_view == ActiveView::Inspector {
+                    self.scroll_inspector_down();
+                } else {
+                    self.select_next();
+                }
                 true
             }
             KeyCode::Char('k') | KeyCode::Up => {
-                self.select_prev();
+                if self.active_view == ActiveView::Inspector {
+                    self.scroll_inspector_up();
+                } else {
+                    self.select_prev();
+                }
                 true
             }
             _ => false,
         }
     }
 
-    /// Sets the search filter query and resets selected index to 0.
+    /// Sets the search filter query, resets selected index to 0, and resets inspector scroll to 0.
     pub fn set_search_filter(&mut self, filter: impl Into<String>) {
         self.search_filter = filter.into();
         self.selected_index = 0;
+        self.inspector_scroll = 0;
     }
 
-    /// Clears the search filter query and resets selected index to 0.
+    /// Clears the search filter query, resets selected index to 0, and resets inspector scroll to 0.
     pub fn clear_search_filter(&mut self) {
         self.search_filter.clear();
         self.selected_index = 0;
+        self.inspector_scroll = 0;
     }
 
     /// Returns references to all skills matching the search filter query across name, dir, category, or description.
@@ -289,19 +380,21 @@ impl App {
         }
     }
 
-    /// Moves selection down to the next skill, bounded by the filtered collection size.
+    /// Moves selection down to the next skill, bounded by the filtered collection size, and resets inspector scroll to 0.
     pub fn select_next(&mut self) {
         let count = self.filtered_skills().len();
         if count > 0 && self.selected_index + 1 < count {
             self.selected_index += 1;
         }
+        self.inspector_scroll = 0;
     }
 
-    /// Moves selection up to the previous skill, bounded by index 0.
+    /// Moves selection up to the previous skill, bounded by index 0, and resets inspector scroll to 0.
     pub fn select_prev(&mut self) {
         if self.selected_index > 0 {
             self.selected_index -= 1;
         }
+        self.inspector_scroll = 0;
     }
 
     /// Enqueues a transient status notification message.
@@ -333,5 +426,230 @@ impl App {
     #[must_use]
     pub fn is_running(&self) -> bool {
         self.running
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
+    use skills_core::models::{Skill, SkillCategory, SkillFrontmatter};
+
+    use super::*;
+
+    fn create_test_skill(name: &str) -> Skill {
+        let frontmatter = SkillFrontmatter::builder()
+            .name(name)
+            .description(format!("{name} description"))
+            .build();
+
+        Skill::builder()
+            .path(PathBuf::from(format!("skills/{name}/SKILL.md")))
+            .dir_name(name)
+            .category(SkillCategory::Engineering)
+            .promoted(false)
+            .frontmatter(frontmatter)
+            .content(format!("#{name}\nInstructions"))
+            .raw(format!("---\nname: {name}\n---\n#{name}"))
+            .build()
+    }
+
+    #[test]
+    fn test_app_search_active_toggle() {
+        let mut app = App::new();
+        assert!(!app.search_active);
+
+        app.activate_search();
+        assert!(app.search_active);
+
+        app.deactivate_search();
+        assert!(!app.search_active);
+    }
+
+    #[test]
+    fn test_app_search_char_push_and_pop() {
+        let mut app = App::new();
+        app.selected_index = 5;
+
+        app.push_search_char('f');
+        assert_eq!(app.search_filter, "f");
+        assert_eq!(app.selected_index, 0);
+
+        app.selected_index = 3;
+        app.push_search_char('o');
+        assert_eq!(app.search_filter, "fo");
+        assert_eq!(app.selected_index, 0);
+
+        app.selected_index = 2;
+        app.pop_search_char();
+        assert_eq!(app.search_filter, "f");
+        assert_eq!(app.selected_index, 0);
+
+        app.pop_search_char();
+        assert_eq!(app.search_filter, "");
+        assert_eq!(app.selected_index, 0);
+    }
+
+    #[test]
+    fn test_app_inspector_scroll_bounds() {
+        let mut app = App::new();
+        assert_eq!(app.inspector_scroll, 0);
+
+        app.scroll_inspector_up();
+        assert_eq!(app.inspector_scroll, 0);
+
+        app.scroll_inspector_down();
+        assert_eq!(app.inspector_scroll, 1);
+
+        app.scroll_inspector_down();
+        assert_eq!(app.inspector_scroll, 2);
+
+        app.scroll_inspector_up();
+        assert_eq!(app.inspector_scroll, 1);
+    }
+
+    #[test]
+    fn test_app_selection_change_resets_inspector_scroll() {
+        let skills = vec![create_test_skill("skill-1"), create_test_skill("skill-2")];
+        let mut app = App::with_skills(skills);
+
+        app.scroll_inspector_down();
+        app.scroll_inspector_down();
+        assert_eq!(app.inspector_scroll, 2);
+
+        app.select_next();
+        assert_eq!(app.inspector_scroll, 0);
+
+        app.scroll_inspector_down();
+        assert_eq!(app.inspector_scroll, 1);
+
+        app.select_prev();
+        assert_eq!(app.inspector_scroll, 0);
+
+        app.scroll_inspector_down();
+        app.set_search_filter("skill");
+        assert_eq!(app.inspector_scroll, 0);
+
+        app.scroll_inspector_down();
+        app.clear_search_filter();
+        assert_eq!(app.inspector_scroll, 0);
+    }
+
+    #[test]
+    fn test_search_mode_key_events() {
+        let mut app = App::new();
+        app.activate_search();
+
+        let char_event = KeyEvent {
+            code: KeyCode::Char('t'),
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(char_event));
+        assert_eq!(app.search_filter, "t");
+        assert!(app.search_active);
+
+        let backspace_event = KeyEvent {
+            code: KeyCode::Backspace,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(backspace_event));
+        assert_eq!(app.search_filter, "");
+        assert!(app.search_active);
+
+        let enter_event = KeyEvent {
+            code: KeyCode::Enter,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(enter_event));
+        assert!(!app.search_active);
+
+        app.activate_search();
+        app.push_search_char('x');
+        let esc_event = KeyEvent {
+            code: KeyCode::Esc,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(esc_event));
+        assert_eq!(app.search_filter, "");
+        assert!(!app.search_active);
+        assert!(app.is_running());
+    }
+
+    #[test]
+    fn test_explorer_enter_navigates_to_inspector() {
+        let mut app = App::new();
+        assert_eq!(app.active_view, ActiveView::Explorer);
+
+        let enter_event = KeyEvent {
+            code: KeyCode::Enter,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        // Empty catalog -> returns false
+        assert!(!app.handle_key_event(enter_event));
+        assert_eq!(app.active_view, ActiveView::Explorer);
+
+        app.skills = vec![create_test_skill("demo")];
+        assert!(app.handle_key_event(enter_event));
+        assert_eq!(app.active_view, ActiveView::Inspector);
+    }
+
+    #[test]
+    fn test_inspector_scroll_key_events() {
+        let mut app = App::with_skills(vec![
+            create_test_skill("demo-1"),
+            create_test_skill("demo-2"),
+        ]);
+        app.set_tab(ActiveView::Inspector);
+
+        let j_event = KeyEvent {
+            code: KeyCode::Char('j'),
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(j_event));
+        assert_eq!(app.inspector_scroll, 1);
+        assert_eq!(app.selected_index, 0);
+
+        let down_event = KeyEvent {
+            code: KeyCode::Down,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(down_event));
+        assert_eq!(app.inspector_scroll, 2);
+        assert_eq!(app.selected_index, 0);
+
+        let k_event = KeyEvent {
+            code: KeyCode::Char('k'),
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(k_event));
+        assert_eq!(app.inspector_scroll, 1);
+        assert_eq!(app.selected_index, 0);
+
+        let up_event = KeyEvent {
+            code: KeyCode::Up,
+            modifiers: KeyModifiers::NONE,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        assert!(app.handle_key_event(up_event));
+        assert_eq!(app.inspector_scroll, 0);
+        assert_eq!(app.selected_index, 0);
     }
 }
