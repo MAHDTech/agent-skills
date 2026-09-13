@@ -3,10 +3,16 @@
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Gauge, List, ListItem, Paragraph, Row, Table, Tabs};
+use ratatui::widgets::{Block, Borders, Gauge, Paragraph, Row, Table, Tabs};
 use ratatui::Frame;
 
 use crate::app::{ActiveView, App};
+
+#[path = "views/explorer.rs"]
+pub mod explorer;
+
+#[path = "views/inspector.rs"]
+pub mod inspector;
 
 /// Primary rendering entry point drawing the full application UI onto the terminal frame.
 pub fn draw(frame: &mut Frame, app: &App) {
@@ -62,17 +68,32 @@ pub fn render_viewport(frame: &mut Frame, app: &App, area: Rect) {
 pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
     let footer_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(70), Constraint::Percentage(30)])
+        .constraints([Constraint::Percentage(85), Constraint::Percentage(15)])
         .split(area);
 
-    let shortcuts =
-        Paragraph::new("Tab: Switch View | 1-4: Select | /: Search | Esc: Clear | q: Quit")
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(" Keybindings "),
-            )
-            .style(Style::default().fg(Color::Gray));
+    let shortcuts_text = if app.search_active {
+        "Esc: Cancel | Enter: Done | Backspace: Erase | Down/Up: Select | Tab: Switch View | q: Quit"
+    } else {
+        match app.active_view {
+            ActiveView::Explorer => {
+                "Tab: Switch View | 1-4: Select | /: Search | Enter: Inspect | j/k: Select | q: Quit"
+            }
+            ActiveView::Inspector => {
+                "Tab: Switch View | 1-4: Select | j/k: Scroll Preview | q: Quit"
+            }
+            ActiveView::Linter | ActiveView::Runner => {
+                "Tab: Switch View | 1-4: Select | /: Search | Esc: Clear | q: Quit"
+            }
+        }
+    };
+
+    let shortcuts = Paragraph::new(shortcuts_text)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(" Keybindings "),
+        )
+        .style(Style::default().fg(Color::Gray));
     frame.render_widget(shortcuts, footer_chunks[0]);
 
     let total = app.skills.len();
@@ -90,108 +111,11 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
 }
 
 fn render_explorer_view(frame: &mut Frame, app: &App, area: Rect) {
-    let skills = app.filtered_skills();
-    let block = Block::default()
-        .borders(Borders::ALL)
-        .title(" Skill Explorer ");
-
-    if skills.is_empty() {
-        let message = if app.search_filter.is_empty() {
-            "No skills loaded in catalog"
-        } else {
-            "No skills found matching filter"
-        };
-        let p = Paragraph::new(message).block(block);
-        frame.render_widget(p, area);
-        return;
-    }
-
-    let items: Vec<ListItem> = skills
-        .iter()
-        .enumerate()
-        .map(|(idx, skill)| {
-            let is_selected = idx == app.selected_index;
-            let style = if is_selected {
-                Style::default()
-                    .fg(Color::Black)
-                    .bg(Color::Cyan)
-                    .add_modifier(Modifier::BOLD)
-            } else {
-                Style::default().fg(Color::White)
-            };
-
-            let line = Line::from(vec![
-                Span::raw(format!("{:<28} ", skill.name())),
-                Span::styled(
-                    format!("[{}] ", skill.category.as_str()),
-                    Style::default().fg(Color::Blue),
-                ),
-                Span::raw(skill.dir_name.as_str()),
-            ]);
-            ListItem::new(line).style(style)
-        })
-        .collect();
-
-    let list = List::new(items).block(block);
-    frame.render_widget(list, area);
+    explorer::render_explorer(frame, app, area);
 }
 
 fn render_inspector_view(frame: &mut Frame, app: &App, area: Rect) {
-    let block = Block::default()
-        .borders(Borders::ALL)
-        .title(" Skill Inspector ");
-
-    let Some(skill) = app.selected_skill() else {
-        let p = Paragraph::new("No skill selected for inspection").block(block);
-        frame.render_widget(p, area);
-        return;
-    };
-
-    let lines = vec![
-        Line::from(vec![
-            Span::styled("Name: ", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(skill.name()),
-        ]),
-        Line::from(vec![
-            Span::styled("Path: ", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(skill.path.display().to_string()),
-        ]),
-        Line::from(vec![
-            Span::styled("Category: ", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(skill.category.as_str()),
-        ]),
-        Line::from(vec![
-            Span::styled("Promoted: ", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(if skill.promoted { "yes" } else { "no" }),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "User Invoked: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(if skill.is_user_invoked() { "yes" } else { "no" }),
-        ]),
-        Line::from(vec![
-            Span::styled(
-                "Subagent Fork: ",
-                Style::default().add_modifier(Modifier::BOLD),
-            ),
-            Span::raw(if skill.is_forked() { "yes" } else { "no" }),
-        ]),
-        Line::from(vec![
-            Span::styled("Resources: ", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(format!("{} attached", skill.resources.len())),
-        ]),
-        Line::from(""),
-        Line::from(vec![Span::styled(
-            "Description:",
-            Style::default().add_modifier(Modifier::BOLD),
-        )]),
-        Line::from(skill.description()),
-    ];
-
-    let p = Paragraph::new(lines).block(block);
-    frame.render_widget(p, area);
+    inspector::render_inspector(frame, app, area);
 }
 
 fn render_linter_view(frame: &mut Frame, app: &App, area: Rect) {
