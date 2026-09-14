@@ -7,14 +7,9 @@ use std::path::PathBuf;
 
 fn error_to_exit_code(err: &SkillError) -> i32 {
     match err {
-        SkillError::Lint {
-            count: _,
-            details: _,
-        }
-        | SkillError::FrontmatterValidation {
-            path: _,
-            message: _,
-        } => 2,
+        SkillError::Lint { .. }
+        | SkillError::FrontmatterValidation { .. }
+        | SkillError::Yaml { .. } => 2,
         _ => 1,
     }
 }
@@ -227,6 +222,14 @@ fn test_cli_exit_code_mapping() {
         error_to_exit_code(&SkillError::FrontmatterValidation {
             path: PathBuf::from("test"),
             message: "invalid".into(),
+        }),
+        2
+    );
+    let yaml_err = serde_yaml::from_str::<serde_yaml::Value>(":").unwrap_err();
+    assert_eq!(
+        error_to_exit_code(&SkillError::Yaml {
+            path: PathBuf::from("test"),
+            source: yaml_err,
         }),
         2
     );
