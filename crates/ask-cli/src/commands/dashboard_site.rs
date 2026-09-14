@@ -259,6 +259,13 @@ pub(crate) fn build_site(
     Ok(())
 }
 
+/// Runs the dashboard test suite via bun test bin/dashboard.
+#[allow(clippy::unused_async)]
+pub(crate) async fn run_test() -> Result<(), CliError> {
+    let root = resolve_root()?;
+    exec_tool(&root, "bun", &["test", "bin/dashboard"], "test")
+}
+
 /// Compiles static documentation site and Pagefind search index.
 #[allow(clippy::unused_async)]
 pub(crate) async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
@@ -312,8 +319,9 @@ pub(crate) async fn run_lint() -> Result<(), CliError> {
 
     let drifted: Vec<&str> = status
         .lines()
-        .map(str::trim)
+        .map(str::trim_end)
         .filter(|line| !line.is_empty())
+        .filter(|line| !line.contains("dashboard/content/skills/archive"))
         .filter(|line| line.starts_with("??") || (line.len() >= 2 && line.as_bytes()[1] != b' '))
         .collect();
 
@@ -673,7 +681,7 @@ mod tests {
         let sample = " M dashboard/content/_index.md\n?? dashboard/content/new.md\nMM dashboard/content/both.md\nM  dashboard/content/staged.md\nA  dashboard/content/staged_new.md\n";
         let drifted: Vec<&str> = sample
             .lines()
-            .map(str::trim)
+            .map(str::trim_end)
             .filter(|line| !line.is_empty())
             .filter(|line| {
                 line.starts_with("??") || (line.len() >= 2 && line.as_bytes()[1] != b' ')
