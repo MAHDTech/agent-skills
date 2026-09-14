@@ -35,9 +35,10 @@ dashboard/static/build/
 dashboard/static/pagefind/
 dashboard/skill_dates.toml
 
-# Backlog Tickets (TARS)
-.tars/
+# Whitelist TARS config
+!.tars/
+!.tars/config.yaml
 
-# Scratch directory for AI scripts
-scratch/
+# Blacklist TARS scratch
+.tars/scratch/
 
