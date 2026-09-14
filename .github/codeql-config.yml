@@ -1,14 +1,22 @@
 ---
-##################################################
-# Name: codeql-config.yml
-# Description: Custom CodeQL configuration
-#
-# Excludes generated/vendored paths from analysis
-# to reduce noise and false positives.
-##################################################
+# CodeQL paths-ignore for compiled languages requires build-mode: none.
 
 name: "Agent Skills CodeQL Configuration"
 
 paths-ignore:
+  # --- Build and tooling output ---
+  - "target/**"
+  - "**/target/**"
+  - ".devenv/**"
+  - ".direnv/**"
+  # .tars contains symlinked agent scratch and external worktree state.
+  - ".tars/**"
+
+  # --- Frontend build output and dependencies ---
   - "dashboard/public/**"
   - "node_modules/**"
+
+  # --- Non-shipping Rust code ---
+  - "**/tests/**"
+  - "**/benches/**"
+  - "**/examples/**"
