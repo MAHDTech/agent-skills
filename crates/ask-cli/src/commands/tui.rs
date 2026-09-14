@@ -6,7 +6,7 @@ use std::io::Stdout;
 use std::time::Duration;
 
 use crate::cli::TuiArgs;
-use crate::commands::resolve_root;
+use crate::commands::{resolve_root, CliError};
 use skills_core::dashboard::DashboardEngine;
 use skills_core::error::SkillError;
 use skills_core::parser::SkillParser;
@@ -25,7 +25,7 @@ fn parse_active_view(view_str: &str) -> Option<ActiveView> {
 }
 
 /// Launches the interactive terminal user interface.
-pub async fn run(args: TuiArgs) -> Result<(), SkillError> {
+pub async fn run(args: TuiArgs) -> Result<(), CliError> {
     let root = resolve_root()?;
     let skills = SkillParser::discover_skills(&root)?;
     let summary = DashboardEngine::new().analyze_repository(&root)?;
@@ -47,7 +47,8 @@ pub async fn run(args: TuiArgs) -> Result<(), SkillError> {
     let restore_result =
         restore_terminal().map_err(|e| SkillError::GeneralIo(std::io::Error::other(e.to_string())));
 
-    loop_result.and(restore_result)
+    loop_result.and(restore_result)?;
+    Ok(())
 }
 
 async fn run_event_loop(

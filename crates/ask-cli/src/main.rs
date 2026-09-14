@@ -63,6 +63,22 @@ pub fn error_to_exit_code(err: &SkillError) -> i32 {
     }
 }
 
+/// Translates general and structured CLI errors into standardized process exit codes.
+#[must_use]
+pub fn cli_error_to_exit_code(err: &(dyn std::error::Error + 'static)) -> i32 {
+    if let Some(cli_err) = err.downcast_ref::<commands::CliError>() {
+        match cli_err {
+            commands::CliError::Subprocess { code, .. } => code.unwrap_or(1),
+            commands::CliError::Skill(s) => error_to_exit_code(s),
+            commands::CliError::Io(_) => 1,
+        }
+    } else if let Some(skill_err) = err.downcast_ref::<SkillError>() {
+        error_to_exit_code(skill_err)
+    } else {
+        1
+    }
+}
+
 /// Main command dispatcher evaluating options and routing execution.
 pub async fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
@@ -103,12 +119,8 @@ async fn main() {
     }
 
     if let Err(err) = run(cli).await {
-        if let Some(skill_err) = err.downcast_ref::<SkillError>() {
-            eprintln!("Error: {skill_err}");
-            std::process::exit(error_to_exit_code(skill_err));
-        }
         eprintln!("Error: {err}");
-        std::process::exit(1);
+        std::process::exit(cli_error_to_exit_code(&*err));
     }
 
     std::process::exit(0);
@@ -156,5 +168,31 @@ mod tests {
             }),
             1
         );
+    }
+    #[test]
+    fn test_cli_error_to_exit_code() {
+        let sub_err = commands::CliError::Subprocess {
+            command: "test".into(),
+            code: Some(42),
+        };
+        assert_eq!(cli_error_to_exit_code(&sub_err), 42);
+
+        let sub_err_none = commands::CliError::Subprocess {
+            command: "test".into(),
+            code: None,
+        };
+        assert_eq!(cli_error_to_exit_code(&sub_err_none), 1);
+
+        let lint_err = commands::CliError::Skill(SkillError::Lint {
+            count: 1,
+            details: "lint".into(),
+        });
+        assert_eq!(cli_error_to_exit_code(&lint_err), 2);
+
+        let io_err = commands::CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::PermissionDenied,
+            "denied",
+        ));
+        assert_eq!(cli_error_to_exit_code(&io_err), 1);
     }
 }

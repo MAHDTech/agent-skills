@@ -379,16 +379,12 @@ fn test_skills_show_not_found() {
 
 #[test]
 fn test_skills_lint_workspace() {
-    let assert = Command::cargo_bin("ask")
+    Command::cargo_bin("ask")
         .unwrap()
         .args(["skills", "lint"])
-        .assert();
-
-    let code = assert.get_output().status.code().unwrap_or(1);
-    assert!(
-        code == 0 || code == 2,
-        "Lint should exit with 0 (clean) or 2 (lint errors)"
-    );
+        .assert()
+        .success()
+        .code(0);
 }
 
 #[test]
@@ -455,4 +451,106 @@ fn test_tui_help_flags() {
         .code(0)
         .stdout(predicate::str::contains("--tick-rate"))
         .stdout(predicate::str::contains("--start-view"));
+}
+
+#[test]
+fn test_skills_lint_invalid_skill_exit_code() {
+    let temp = tempfile::tempdir().unwrap();
+    let skill_dir = temp.path().join("invalid-skill");
+    std::fs::create_dir_all(&skill_dir).unwrap();
+    std::fs::write(
+        skill_dir.join("SKILL.md"),
+        "---\ndescription: Missing name field\n---\n# Content\n",
+    )
+    .unwrap();
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "lint", skill_dir.to_str().unwrap()])
+        .assert()
+        .failure()
+        .code(2);
+}
+
+#[test]
+fn test_skills_lint_fix() {
+    let temp = tempfile::tempdir().unwrap();
+    let skill_dir = temp.path().join("fixable-skill");
+    std::fs::create_dir_all(&skill_dir).unwrap();
+    let content_with_em_dash =
+        "---\nname: fixable-skill\ndescription: A valid description\n---\n# Content \u{2014} with em dash\n";
+    let skill_file = skill_dir.join("SKILL.md");
+    std::fs::write(&skill_file, content_with_em_dash).unwrap();
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "lint", "--fix", skill_dir.to_str().unwrap()])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains(
+            "Fixed 1 issue(s) across 1 file(s).",
+        ));
+
+    let fixed_content = std::fs::read_to_string(&skill_file).unwrap();
+    assert!(!fixed_content.contains('\u{2014}'));
+    assert!(fixed_content.contains('-'));
+}
+
+#[test]
+fn test_skills_install_missing_argument_exit_code_2() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "install"])
+        .assert()
+        .failure()
+        .code(2)
+        .stderr(predicate::str::contains("<SOURCE>"));
+}
+
+#[test]
+fn test_skills_uninstall_missing_argument_exit_code_2() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "uninstall"])
+        .assert()
+        .failure()
+        .code(2)
+        .stderr(predicate::str::contains("<SKILL>"));
+}
+
+#[test]
+fn test_skills_download_caching() {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let port = listener.local_addr().unwrap().port();
+
+    std::thread::spawn(move || {
+        if let Ok((mut stream, _)) = listener.accept() {
+            use std::io::{Read, Write};
+            let mut buf = [0u8; 1024];
+            let _ = stream.read(&mut buf);
+            let response = "HTTP/1.1 200 OK\r\nContent-Length: 18\r\n\r\n# Downloaded Skill";
+            let _ = stream.write_all(response.as_bytes());
+            let _ = stream.flush();
+        }
+    });
+
+    let temp = tempfile::tempdir().unwrap();
+    let url = format!("http://127.0.0.1:{port}/sample-skill.md");
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .env("AGENT_SKILLS_HOME", temp.path())
+        .args(["skills", "download", &url])
+        .assert()
+        .success()
+        .code(0)
+        .stdout(predicate::str::contains("Cached remote skill to"))
+        .stdout(predicate::str::contains("# Downloaded Skill"));
+
+    let slug = skills_core::downloader::SkillDownloader::smart_slugify(&url, None);
+    let cached_file = temp.path().join(".cache").join("skills").join(slug);
+    assert!(cached_file.exists());
+    let cached_content = std::fs::read_to_string(cached_file).unwrap();
+    assert_eq!(cached_content, "# Downloaded Skill");
 }

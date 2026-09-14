@@ -6,12 +6,12 @@ use comfy_table::{Attribute, Cell, CellAlignment, Table};
 use std::path::Path;
 
 use crate::cli::{DashboardArgs, DashboardCommands, OutputFormat};
-use crate::commands::resolve_root;
+use crate::commands::{resolve_root, CliError};
 use skills_core::dashboard::DashboardEngine;
 use skills_core::error::SkillError;
 
 /// Dispatches dashboard telemetry and static documentation operations.
-pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), SkillError> {
+pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
         return run_action_script(action);
     }
@@ -35,23 +35,25 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), SkillE
     }
 }
 
-fn run_action_script(action: &str) -> Result<(), SkillError> {
+fn run_action_script(action: &str) -> Result<(), CliError> {
     let status = std::process::Command::new("bun")
         .arg("run")
         .arg("bin/dashboard/index.ts")
         .arg("--action")
         .arg(action)
-        .status()
-        .map_err(SkillError::GeneralIo)?;
+        .status()?;
 
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: format!("bun run bin/dashboard/index.ts --action {action}"),
+            code: status.code(),
+        });
     }
     Ok(())
 }
 
 #[allow(clippy::unused_async)]
-async fn run_build(output: Option<&Path>) -> Result<(), SkillError> {
+async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
     let mut cmd = std::process::Command::new("bun");
     cmd.arg("run")
         .arg("bin/dashboard/index.ts")
@@ -60,15 +62,18 @@ async fn run_build(output: Option<&Path>) -> Result<(), SkillError> {
     if let Some(out) = output {
         cmd.arg("--output").arg(out);
     }
-    let status = cmd.status().map_err(SkillError::GeneralIo)?;
+    let status = cmd.status()?;
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: "bun run bin/dashboard/index.ts --action build".to_string(),
+            code: status.code(),
+        });
     }
     Ok(())
 }
 
 #[allow(clippy::unused_async)]
-async fn run_serve(port: u16) -> Result<(), SkillError> {
+async fn run_serve(port: u16) -> Result<(), CliError> {
     let status = std::process::Command::new("bun")
         .arg("run")
         .arg("bin/dashboard/index.ts")
@@ -76,49 +81,55 @@ async fn run_serve(port: u16) -> Result<(), SkillError> {
         .arg("serve")
         .arg("--port")
         .arg(port.to_string())
-        .status()
-        .map_err(SkillError::GeneralIo)?;
+        .status()?;
 
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: format!("bun run bin/dashboard/index.ts --action serve --port {port}"),
+            code: status.code(),
+        });
     }
     Ok(())
 }
 
 #[allow(clippy::unused_async)]
-async fn run_css() -> Result<(), SkillError> {
+async fn run_css() -> Result<(), CliError> {
     let status = std::process::Command::new("bun")
         .arg("run")
         .arg("bin/dashboard/index.ts")
         .arg("--action")
         .arg("css")
-        .status()
-        .map_err(SkillError::GeneralIo)?;
+        .status()?;
 
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: "bun run bin/dashboard/index.ts --action css".to_string(),
+            code: status.code(),
+        });
     }
     Ok(())
 }
 
 #[allow(clippy::unused_async)]
-async fn run_lint() -> Result<(), SkillError> {
+async fn run_lint() -> Result<(), CliError> {
     let status = std::process::Command::new("bun")
         .arg("run")
         .arg("bin/dashboard/index.ts")
         .arg("--action")
         .arg("lint")
-        .status()
-        .map_err(SkillError::GeneralIo)?;
+        .status()?;
 
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: "bun run bin/dashboard/index.ts --action lint".to_string(),
+            code: status.code(),
+        });
     }
     Ok(())
 }
 
 #[allow(clippy::too_many_lines, clippy::unused_async)]
-async fn run_summary(format: OutputFormat) -> Result<(), SkillError> {
+async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
     let root = resolve_root()?;
     let summary = DashboardEngine::new().analyze_repository(&root)?;
 

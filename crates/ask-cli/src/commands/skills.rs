@@ -9,7 +9,7 @@ use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, Table};
 
 use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands};
-use crate::commands::resolve_root;
+use crate::commands::{resolve_root, CliError};
 use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
 use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, UninstallOptions};
@@ -19,7 +19,7 @@ use skills_core::parser::SkillParser;
 use skills_core::sync::SkillSyncer;
 
 /// Dispatches catalog operations to skills-core domain engines.
-pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), SkillError> {
+pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
         return run_action_script(action);
     }
@@ -37,10 +37,10 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), SkillErro
             }
             SkillsCommands::Show { skill } => run_show(skill, format).await,
             SkillsCommands::Install { source, target } => {
-                run_install(source.as_deref(), target.as_deref()).await
+                run_install(source, target.as_deref()).await
             }
             SkillsCommands::Uninstall { skill, target } => {
-                run_uninstall(skill.as_deref(), target.as_deref()).await
+                run_uninstall(skill, target.as_deref()).await
             }
             SkillsCommands::Lint { path, fix } => run_lint(path.as_deref(), *fix, format).await,
             SkillsCommands::Sync { dry_run } => run_sync(*dry_run).await,
@@ -53,17 +53,19 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), SkillErro
     }
 }
 
-fn run_action_script(action: &str) -> Result<(), SkillError> {
+fn run_action_script(action: &str) -> Result<(), CliError> {
     let status = std::process::Command::new("bun")
         .arg("run")
         .arg("bin/skills/index.ts")
         .arg("--action")
         .arg(action)
-        .status()
-        .map_err(SkillError::GeneralIo)?;
+        .status()?;
 
     if !status.success() {
-        std::process::exit(status.code().unwrap_or(1));
+        return Err(CliError::Subprocess {
+            command: format!("bun run bin/skills/index.ts --action {action}"),
+            code: status.code(),
+        });
     }
     Ok(())
 }
@@ -73,7 +75,7 @@ async fn run_list(
     category: Option<&str>,
     json_flag: bool,
     format: OutputFormat,
-) -> Result<(), SkillError> {
+) -> Result<(), CliError> {
     let root = resolve_root()?;
     let mut skills = SkillParser::discover_skills(&root)?;
     skills.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
@@ -131,7 +133,7 @@ async fn run_list(
 }
 
 #[allow(clippy::unused_async)]
-async fn run_show(query: &str, format: OutputFormat) -> Result<(), SkillError> {
+async fn run_show(query: &str, format: OutputFormat) -> Result<(), CliError> {
     let root = resolve_root()?;
     let skills = SkillParser::discover_skills(&root)?;
     let skill = skills
@@ -203,31 +205,28 @@ fn resolve_target_environment(target: Option<&str>) -> TargetEnvironment {
 }
 
 #[allow(clippy::unused_async)]
-async fn run_install(source: Option<&str>, target: Option<&str>) -> Result<(), SkillError> {
-    let source_str = source.ok_or_else(|| SkillError::NotFound {
-        query: "source argument is required for install".to_string(),
-    })?;
-
+async fn run_install(source: &str, target: Option<&str>) -> Result<(), CliError> {
     let root = resolve_root()?;
-    let source_path = if Path::new(source_str).join("SKILL.md").exists() {
-        PathBuf::from(source_str)
+    let source_path = if Path::new(source).join("SKILL.md").exists() {
+        PathBuf::from(source)
     } else {
         let skills = SkillParser::discover_skills(&root)?;
         let skill = skills
             .into_iter()
             .find(|s| {
-                s.dir_name.eq_ignore_ascii_case(source_str)
-                    || s.name().eq_ignore_ascii_case(source_str)
+                s.dir_name.eq_ignore_ascii_case(source) || s.name().eq_ignore_ascii_case(source)
             })
             .ok_or_else(|| SkillError::NotFound {
-                query: source_str.to_string(),
+                query: source.to_string(),
             })?;
         root.join(skill.path.parent().unwrap_or_else(|| Path::new("")))
     };
 
     let target_env = resolve_target_environment(target);
     let options = InstallOptions::default();
-    let result = Installer::new().install(&source_path, &target_env, &options)?;
+    let result = Installer::new()
+        .install(&source_path, &target_env, &options)
+        .map_err(SkillError::from)?;
 
     println!(
         "Successfully installed skill '{}' (version {}) into {} via {:?}",
@@ -241,14 +240,12 @@ async fn run_install(source: Option<&str>, target: Option<&str>) -> Result<(), S
 }
 
 #[allow(clippy::unused_async)]
-async fn run_uninstall(skill: Option<&str>, target: Option<&str>) -> Result<(), SkillError> {
-    let skill_id = skill.ok_or_else(|| SkillError::NotFound {
-        query: "skill identifier is required for uninstall".to_string(),
-    })?;
-
+async fn run_uninstall(skill: &str, target: Option<&str>) -> Result<(), CliError> {
     let target_env = resolve_target_environment(target);
     let options = UninstallOptions::default();
-    let result = Installer::new().uninstall(skill_id, &target_env, &options)?;
+    let result = Installer::new()
+        .uninstall(skill, &target_env, &options)
+        .map_err(SkillError::from)?;
 
     println!(
         "Successfully uninstalled skill '{}' from {}",
@@ -259,13 +256,67 @@ async fn run_uninstall(skill: Option<&str>, target: Option<&str>) -> Result<(), 
     Ok(())
 }
 
+fn collect_markdown_files(path: &Path, files: &mut Vec<PathBuf>) {
+    if path.is_file() {
+        if path.extension().and_then(|s| s.to_str()) == Some("md") {
+            files.push(path.to_path_buf());
+        }
+    } else if path.is_dir() {
+        if let Ok(entries) = std::fs::read_dir(path) {
+            for entry in entries.flatten() {
+                let entry_path = entry.path();
+                if entry_path.is_dir() {
+                    collect_markdown_files(&entry_path, files);
+                } else if entry_path.extension().and_then(|s| s.to_str()) == Some("md") {
+                    files.push(entry_path);
+                }
+            }
+        }
+    }
+}
+
 #[allow(clippy::unused_async)]
-async fn run_lint(path: Option<&Path>, _fix: bool, format: OutputFormat) -> Result<(), SkillError> {
+async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Result<(), CliError> {
     let root = resolve_root()?;
     let target = match path {
         Some(p) => p.to_path_buf(),
         None => root.clone(),
     };
+
+    if fix {
+        let files_to_scan = if target.is_file() {
+            vec![target.clone()]
+        } else {
+            let scan_dir = if path.is_none() && root.join("skills").is_dir() {
+                root.join("skills")
+            } else {
+                target.clone()
+            };
+            let mut files = Vec::new();
+            collect_markdown_files(&scan_dir, &mut files);
+            files
+        };
+
+        let mut total_fixes = 0;
+        let mut files_modified = 0;
+
+        for file in files_to_scan {
+            if let Ok(content) = std::fs::read_to_string(&file) {
+                if content.contains('\u{2014}') {
+                    let count = content.matches('\u{2014}').count();
+                    let sanitized = content.replace('\u{2014}', "-");
+                    if std::fs::write(&file, sanitized).is_ok() {
+                        total_fixes += count;
+                        files_modified += 1;
+                    }
+                }
+            }
+        }
+
+        if files_modified > 0 && format != OutputFormat::Json {
+            println!("Fixed {total_fixes} issue(s) across {files_modified} file(s).");
+        }
+    }
 
     let linter = SkillLinter::new();
     let report = if target.is_file() {
@@ -307,14 +358,15 @@ async fn run_lint(path: Option<&Path>, _fix: bool, format: OutputFormat) -> Resu
         return Err(SkillError::Lint {
             count: report.error_count(),
             details: format!("Found {} lint error(s)", report.error_count()),
-        });
+        }
+        .into());
     }
 
     Ok(())
 }
 
 #[allow(clippy::unused_async)]
-async fn run_sync(dry_run: bool) -> Result<(), SkillError> {
+async fn run_sync(dry_run: bool) -> Result<(), CliError> {
     let root = resolve_root()?;
     let catalog_dir = if root.join("skills").is_dir() {
         root.join("skills")
@@ -326,7 +378,7 @@ async fn run_sync(dry_run: bool) -> Result<(), SkillError> {
         .with_targets(TargetEnvironment::all_standard())
         .with_dry_run(dry_run);
 
-    let plan = syncer.create_plan()?;
+    let plan = syncer.create_plan().map_err(SkillError::from)?;
 
     println!("Synchronization Plan (actions: {}):", plan.actions.len());
     for action in &plan.actions {
@@ -338,7 +390,7 @@ async fn run_sync(dry_run: bool) -> Result<(), SkillError> {
         );
     }
 
-    let summary = syncer.execute_plan(&plan)?;
+    let summary = syncer.execute_plan(&plan).map_err(SkillError::from)?;
 
     println!(
         "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
@@ -348,13 +400,22 @@ async fn run_sync(dry_run: bool) -> Result<(), SkillError> {
     Ok(())
 }
 
-async fn run_download(url: &str) -> Result<(), SkillError> {
+async fn run_download(url: &str) -> Result<(), CliError> {
     let content = SkillDownloader::new().fetch_url(url).await?;
+    let root = resolve_root()?;
+    let cache_dir = root.join(".cache").join("skills");
+    std::fs::create_dir_all(&cache_dir)?;
+
+    let filename = SkillDownloader::smart_slugify(url, None);
+    let destination = cache_dir.join(&filename);
+    std::fs::write(&destination, &content)?;
+
+    println!("Cached remote skill to {}", destination.display());
     println!("{content}");
     Ok(())
 }
 
-async fn run_download_resources(_force: bool) -> Result<(), SkillError> {
+async fn run_download_resources(_force: bool) -> Result<(), CliError> {
     let root = resolve_root()?;
     let skills = SkillParser::discover_skills(&root)?;
     let downloader = SkillDownloader::new();
@@ -368,7 +429,7 @@ async fn run_download_resources(_force: bool) -> Result<(), SkillError> {
 }
 
 #[allow(clippy::unused_async)]
-async fn run_clean_resources() -> Result<(), SkillError> {
+async fn run_clean_resources() -> Result<(), CliError> {
     let root = resolve_root()?;
     let skills = SkillParser::discover_skills(&root)?;
     let count = SkillDownloader::new().clean_all_resources(&skills)?;

@@ -148,7 +148,7 @@ pub enum SkillsCommands {
     Install {
         /// Path to skill directory or catalog skill identifier.
         #[arg(help = "Path to skill directory or catalog skill identifier")]
-        source: Option<String>,
+        source: String,
 
         /// Target execution environment (e.g. antigravity, claude, cursor).
         #[arg(short, long, help = "Target execution environment")]
@@ -160,7 +160,7 @@ pub enum SkillsCommands {
     Uninstall {
         /// Unique identifier of the installed skill to remove.
         #[arg(help = "Unique identifier of the installed skill to remove")]
-        skill: Option<String>,
+        skill: String,
 
         /// Target execution environment to remove symlinks from.
         #[arg(
