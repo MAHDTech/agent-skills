@@ -39,7 +39,8 @@ jobs:
 
       - id: build_dashboard
         name: Build Dashboard
-        uses: ./.github/actions/build-dashboard
+        shell: devenv --no-tui shell --quiet -- bash -e {0}
+        run: ask dashboard build
 
       - id: upload_pages_artifact
         name: Upload Pages Artifact
