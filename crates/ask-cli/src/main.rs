@@ -1,13 +1,14 @@
 //! Main entry point for the `ask` CLI binary.
 
 pub mod cli;
+pub mod commands;
 
 use clap::{CommandFactory, Parser};
 use std::io::IsTerminal;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::fmt;
 
-use crate::cli::{Cli, Commands, DashboardArgs, OutputFormat, SkillsArgs, TuiArgs};
+use crate::cli::{Cli, Commands, TuiArgs};
 use skills_core::error::SkillError;
 
 /// Configures the tracing subscriber to output exclusively to standard error.
@@ -50,15 +51,26 @@ pub fn init_logging(verbose: u8, quiet: bool) -> Result<(), Box<dyn std::error::
 #[must_use]
 pub fn error_to_exit_code(err: &SkillError) -> i32 {
     match err {
-        SkillError::Lint {
-            count: _,
-            details: _,
-        }
-        | SkillError::FrontmatterValidation {
-            path: _,
-            message: _,
-        } => 2,
+        SkillError::Lint { .. }
+        | SkillError::FrontmatterValidation { .. }
+        | SkillError::Yaml { .. } => 2,
         _ => 1,
+    }
+}
+
+/// Translates general and structured CLI errors into standardized process exit codes.
+#[must_use]
+pub fn cli_error_to_exit_code(err: &(dyn std::error::Error + 'static)) -> i32 {
+    if let Some(cli_err) = err.downcast_ref::<commands::CliError>() {
+        match cli_err {
+            commands::CliError::Subprocess { code, .. } => code.unwrap_or(1),
+            commands::CliError::Skill(s) => error_to_exit_code(s),
+            commands::CliError::Io(_) => 1,
+        }
+    } else if let Some(skill_err) = err.downcast_ref::<SkillError>() {
+        error_to_exit_code(skill_err)
+    } else {
+        1
     }
 }
 
@@ -67,11 +79,12 @@ pub async fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
         None => {
             if std::io::stdin().is_terminal() && std::io::stdout().is_terminal() {
-                run_tui(TuiArgs {
+                commands::tui::run(TuiArgs {
                     tick_rate: Some(250),
                     start_view: None,
                 })
                 .await
+                .map_err(Into::into)
             } else {
                 let mut cmd = Cli::command();
                 cmd.print_help()?;
@@ -79,77 +92,16 @@ pub async fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }
         }
-        Some(Commands::Tui(tui_args)) => run_tui(tui_args).await,
-        Some(Commands::Skills(skills_args)) => run_skills(skills_args, cli.format).await,
+        Some(Commands::Tui(tui_args)) => commands::tui::run(tui_args).await.map_err(Into::into),
+        Some(Commands::Skills(skills_args)) => commands::skills::run(skills_args, cli.format)
+            .await
+            .map_err(Into::into),
         Some(Commands::Dashboard(dashboard_args)) => {
-            run_dashboard(dashboard_args, cli.format).await
+            commands::dashboard::run(dashboard_args, cli.format)
+                .await
+                .map_err(Into::into)
         }
     }
-}
-
-/// Launches the interactive terminal user interface.
-#[allow(clippy::unused_async)]
-async fn run_tui(args: TuiArgs) -> Result<(), Box<dyn std::error::Error>> {
-    tracing::debug!("Launching TUI with args: {:?}", args);
-    Ok(())
-}
-
-/// Dispatches catalog operations to skills-core.
-#[allow(clippy::unused_async)]
-async fn run_skills(
-    args: SkillsArgs,
-    format: OutputFormat,
-) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(ref action) = args.action {
-        let status = std::process::Command::new("bun")
-            .arg("run")
-            .arg("bin/skills/index.ts")
-            .arg("--action")
-            .arg(action)
-            .status()?;
-        if !status.success() {
-            std::process::exit(status.code().unwrap_or(1));
-        }
-        return Ok(());
-    }
-
-    if let Some(ref cmd) = args.command {
-        tracing::debug!(
-            "Dispatching skills subcommand: {:?}, format: {:?}",
-            cmd,
-            format
-        );
-    }
-    Ok(())
-}
-
-/// Dispatches static documentation operations.
-#[allow(clippy::unused_async)]
-async fn run_dashboard(
-    args: DashboardArgs,
-    format: OutputFormat,
-) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(ref action) = args.action {
-        let status = std::process::Command::new("bun")
-            .arg("run")
-            .arg("bin/dashboard/index.ts")
-            .arg("--action")
-            .arg(action)
-            .status()?;
-        if !status.success() {
-            std::process::exit(status.code().unwrap_or(1));
-        }
-        return Ok(());
-    }
-
-    if let Some(ref cmd) = args.command {
-        tracing::debug!(
-            "Dispatching dashboard subcommand: {:?}, format: {:?}",
-            cmd,
-            format
-        );
-    }
-    Ok(())
 }
 
 #[tokio::main]
@@ -162,12 +114,8 @@ async fn main() {
     }
 
     if let Err(err) = run(cli).await {
-        if let Some(skill_err) = err.downcast_ref::<SkillError>() {
-            eprintln!("Error: {skill_err}");
-            std::process::exit(error_to_exit_code(skill_err));
-        }
         eprintln!("Error: {err}");
-        std::process::exit(1);
+        std::process::exit(cli_error_to_exit_code(&*err));
     }
 
     std::process::exit(0);
@@ -194,6 +142,14 @@ mod tests {
             }),
             2
         );
+        let yaml_err = serde_yaml::from_str::<serde_yaml::Value>(":").unwrap_err();
+        assert_eq!(
+            error_to_exit_code(&SkillError::Yaml {
+                path: PathBuf::from("test"),
+                source: yaml_err,
+            }),
+            2
+        );
         assert_eq!(
             error_to_exit_code(&SkillError::GeneralIo(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
@@ -215,5 +171,31 @@ mod tests {
             }),
             1
         );
+    }
+    #[test]
+    fn test_cli_error_to_exit_code() {
+        let sub_err = commands::CliError::Subprocess {
+            command: "test".into(),
+            code: Some(42),
+        };
+        assert_eq!(cli_error_to_exit_code(&sub_err), 42);
+
+        let sub_err_none = commands::CliError::Subprocess {
+            command: "test".into(),
+            code: None,
+        };
+        assert_eq!(cli_error_to_exit_code(&sub_err_none), 1);
+
+        let lint_err = commands::CliError::Skill(SkillError::Lint {
+            count: 1,
+            details: "lint".into(),
+        });
+        assert_eq!(cli_error_to_exit_code(&lint_err), 2);
+
+        let io_err = commands::CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::PermissionDenied,
+            "denied",
+        ));
+        assert_eq!(cli_error_to_exit_code(&io_err), 1);
     }
 }

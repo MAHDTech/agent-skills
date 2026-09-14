@@ -25,6 +25,11 @@ comfy-table = { workspace = true }
 colored = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+ratatui = { workspace = true }
 
 [dev-dependencies]
 assert_cmd = { workspace = true }
