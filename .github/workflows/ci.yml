@@ -5,6 +5,10 @@ on:
     branches:
       - trunk
       - main
+  push:
+    branches:
+      - trunk
+      - main
 
 permissions:
   contents: read
@@ -12,9 +16,14 @@ permissions:
   # actions: write is required by setup-devenv to delete/purge old nix caches
   actions: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - id: checkout_repository
         name: Checkout Repository
