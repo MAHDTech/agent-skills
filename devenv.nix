@@ -351,11 +351,7 @@ in
     dashboard = {
       description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test|lint>)";
       exec = ''
-        if [ -f Cargo.toml ]; then
-          cargo run -p ask-cli -- dashboard "$@"
-        else
-          bun run dashboard "$@"
-        fi
+        ask dashboard "$@"
       '';
     };
     codeql-run = {
