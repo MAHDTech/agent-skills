@@ -42,12 +42,12 @@ If you are working on the skills in this repository, install them from your loca
 2. Install the skills into your agent tools:
 
    ```bash
-   bun run skills --action install
+   ask skills install
    ```
 
 3. Verify the install by checking an agent's skills location (for example `~/.agents/skills/`) to confirm the symlinks were created, then trigger a skill from your agent to see it run.
 
-`skills --action install` symlinks the working tree into each detected agent's skills location:
+`ask skills install` symlinks the working tree into each detected agent's skills location:
 
 - `~/.agents/skills/` for OpenCode, Goose, and Antigravity (registered via `~/.gemini/config/skills.json`)
 - `~/.claude/skills/` for Claude Code
@@ -56,8 +56,8 @@ It auto-detects which tools are installed and only wires those. It is idempotent
 
 The three commands you will use:
 
-| Command                     | What it does                                                                                                                                    |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `skills --action install`   | Wire the skills into your machine's agent tools (idempotent)                                                                                    |
-| `skills --action uninstall` | Remove every symlink this repo owns                                                                                                             |
-| `skills --action sync`      | Do both of the above **and** regenerate the README, `agents/AGENTS.md`, `skills.sh.json`, and dashboard - the "make everything current" command |
+| Command                | What it does                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ask skills install`   | Wire the skills into your machine's agent tools (idempotent)                                                                                    |
+| `ask skills uninstall` | Remove every symlink this repo owns                                                                                                             |
+| `ask skills sync`      | Do both of the above **and** regenerate the README, `agents/AGENTS.md`, `skills.sh.json`, and dashboard - the "make everything current" command |

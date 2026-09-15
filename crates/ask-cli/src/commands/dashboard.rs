@@ -13,7 +13,7 @@ use skills_core::error::SkillError;
 /// Dispatches dashboard telemetry and static documentation operations.
 pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
-        return run_action_script(action);
+        return run_action(action, format).await;
     }
 
     if let Some(ref cmd) = args.command {
@@ -35,96 +35,284 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliErr
     }
 }
 
-fn run_action_script(action: &str) -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg(action)
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: format!("bun run bin/dashboard/index.ts --action {action}"),
-            code: status.code(),
-        });
+async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> {
+    match action {
+        "summary" => run_summary(format).await,
+        "build" => run_build(None).await,
+        "serve" => run_serve(1111).await,
+        "css" => run_css().await,
+        "lint" => run_lint().await,
+        other => Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("Unknown dashboard action: '{other}'"),
+        ))),
     }
-    Ok(())
 }
 
-#[allow(clippy::unused_async)]
-async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
-    let mut cmd = std::process::Command::new("bun");
-    cmd.arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("build");
-    if let Some(out) = output {
-        cmd.arg("--output").arg(out);
-    }
-    let status = cmd.status()?;
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action build".to_string(),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
-async fn run_serve(port: u16) -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("serve")
-        .arg("--port")
-        .arg(port.to_string())
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: format!("bun run bin/dashboard/index.ts --action serve --port {port}"),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
 async fn run_css() -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("css")
-        .status()?;
+    let root = resolve_root()?;
+    let status = match std::process::Command::new("tailwindcss")
+        .current_dir(&root)
+        .args([
+            "-i",
+            "dashboard/css/input.css",
+            "-o",
+            "dashboard/static/build/css/generated.css",
+        ])
+        .status()
+    {
+        Ok(status) => status,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Err(CliError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "tailwindcss not found - run inside devenv shell (`devenv --no-tui shell`)",
+            )));
+        }
+        Err(err) => return Err(CliError::Io(err)),
+    };
 
     if !status.success() {
         return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action css".to_string(),
+            command:
+                "tailwindcss -i dashboard/css/input.css -o dashboard/static/build/css/generated.css"
+                    .to_string(),
             code: status.code(),
         });
+    }
+
+    println!("Successfully compiled Tailwind CSS styles.");
+    Ok(())
+}
+
+fn write_skill_dates(root: &Path) -> Result<(), CliError> {
+    let skills = skills_core::parser::SkillParser::discover_skills(root)?;
+    let mut dates: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+    let mut git_warned = false;
+
+    for skill in &skills {
+        let skill_rel = format!("{}/{}", skill.category.as_str(), skill.dir_name);
+        let git_path = format!("skills/{skill_rel}");
+        match std::process::Command::new("git")
+            .current_dir(root)
+            .args(["log", "-1", "--date=short", "--format=%cd", "--", &git_path])
+            .output()
+        {
+            Ok(output) if output.status.success() => {
+                let date_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                if !date_str.is_empty() {
+                    dates.insert(skill_rel, date_str);
+                }
+            }
+            Ok(_) | Err(_) => {
+                if !git_warned {
+                    eprintln!("Warning: Failed to retrieve git history for skills.");
+                    git_warned = true;
+                }
+            }
+        }
+    }
+
+    let mut toml_content =
+        String::from("# Generated by `ask dashboard build` from git - do not commit.\n[dates]\n");
+    for (key, val) in &dates {
+        toml_content.push_str(&format!("{key:?} = {val:?}\n"));
+    }
+
+    let target_file = root.join("dashboard").join("skill_dates.toml");
+    std::fs::write(&target_file, toml_content)?;
+    Ok(())
+}
+
+fn clean_output_dir(root: &Path) -> Result<(), CliError> {
+    let dev_pagefind = root.join("dashboard").join("static").join("pagefind");
+    if dev_pagefind.exists() {
+        let _ = std::fs::remove_dir_all(&dev_pagefind);
+    }
+    let public_dir = root.join("dashboard").join("public");
+    if public_dir.exists() {
+        let _ = std::fs::remove_dir_all(&public_dir);
     }
     Ok(())
 }
 
-#[allow(clippy::unused_async)]
-async fn run_lint() -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("lint")
-        .status()?;
+async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
+    let root = resolve_root()?;
+    println!("Syncing generated content...");
+    skills_core::artifacts::ArtifactsEngine::from_env(&root).generate_all()?;
 
-    if !status.success() {
+    println!("Building CSS...");
+    run_css().await?;
+
+    println!("Reading last-modified dates from git...");
+    write_skill_dates(&root)?;
+
+    println!("Cleaning output directory...");
+    clean_output_dir(&root)?;
+
+    println!("Building Zola site...");
+    let mut zola_cmd = std::process::Command::new("zola");
+    zola_cmd
+        .current_dir(&root)
+        .args(["--root", "dashboard", "build"]);
+    if let Some(out) = output {
+        zola_cmd.arg("--output-dir").arg(out);
+    }
+    let zola_status = match zola_cmd.status() {
+        Ok(s) => s,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Err(CliError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "zola not found - run inside devenv shell (`devenv --no-tui shell`)",
+            )));
+        }
+        Err(err) => return Err(CliError::Io(err)),
+    };
+    if !zola_status.success() {
         return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action lint".to_string(),
-            code: status.code(),
+            command: "zola --root dashboard build".to_string(),
+            code: zola_status.code(),
         });
     }
+
+    println!("Indexing with Pagefind...");
+    let site_dir = output.unwrap_or_else(|| Path::new("dashboard/public"));
+    let site_dir_str = site_dir.to_string_lossy();
+    let pagefind_status = match std::process::Command::new("pagefind")
+        .current_dir(&root)
+        .args(["--site", &site_dir_str, "--output-subdir", "pagefind"])
+        .status()
+    {
+        Ok(s) => s,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Err(CliError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "pagefind not found - run inside devenv shell (`devenv --no-tui shell`)",
+            )));
+        }
+        Err(err) => return Err(CliError::Io(err)),
+    };
+    if !pagefind_status.success() {
+        return Err(CliError::Subprocess {
+            command: format!("pagefind --site {site_dir_str} --output-subdir pagefind"),
+            code: pagefind_status.code(),
+        });
+    }
+
+    println!("Site built successfully to dashboard/public.");
+    Ok(())
+}
+
+async fn run_serve(port: u16) -> Result<(), CliError> {
+    let root = resolve_root()?;
+    run_build(None).await?;
+
+    println!("Starting local preview server on port {port}...");
+    let port_str = port.to_string();
+    let mut zola_child = match std::process::Command::new("zola")
+        .current_dir(&root)
+        .args(["--root", "dashboard", "serve", "--port", &port_str])
+        .spawn()
+    {
+        Ok(child) => child,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Err(CliError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "zola not found - run inside devenv shell (`devenv --no-tui shell`)",
+            )));
+        }
+        Err(err) => return Err(CliError::Io(err)),
+    };
+
+    let mut tailwind_child = match std::process::Command::new("tailwindcss")
+        .current_dir(&root)
+        .args([
+            "-i",
+            "dashboard/css/input.css",
+            "-o",
+            "dashboard/static/build/css/generated.css",
+            "--watch",
+        ])
+        .spawn()
+    {
+        Ok(child) => child,
+        Err(err) => {
+            let _ = zola_child.kill();
+            if err.kind() == std::io::ErrorKind::NotFound {
+                return Err(CliError::Io(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "tailwindcss not found - run inside devenv shell (`devenv --no-tui shell`)",
+                )));
+            }
+            return Err(CliError::Io(err));
+        }
+    };
+
+    tokio::select! {
+        _ = tokio::signal::ctrl_c() => {
+            println!("\nReceived shutdown signal, terminating preview servers...");
+        }
+        res = tokio::task::spawn_blocking(move || zola_child.wait()) => {
+            if let Ok(Ok(status)) = res {
+                tracing::info!("Zola server exited with: {status:?}");
+            }
+        }
+    }
+
+    let _ = tailwind_child.kill();
+    Ok(())
+}
+
+async fn run_lint() -> Result<(), CliError> {
+    let root = resolve_root()?;
+    println!("Regenerating dashboard content without staging...");
+    let options = skills_core::artifacts::ArtifactsOptions {
+        repo_only: true,
+        no_stage: true,
+        ..Default::default()
+    };
+    skills_core::artifacts::ArtifactsEngine::with_options(&root, options).generate_all()?;
+
+    let status_output = std::process::Command::new("git")
+        .current_dir(&root)
+        .args(["status", "--porcelain", "--", "dashboard/content"])
+        .output()?;
+
+    let status_str = String::from_utf8_lossy(&status_output.stdout);
+    let drifted: Vec<&str> = status_str
+        .lines()
+        .filter(|line| !line.is_empty())
+        .filter(|line| line.starts_with("??") || line.as_bytes().get(1).is_some_and(|&b| b != b' '))
+        .collect();
+
+    let _ = std::process::Command::new("git")
+        .current_dir(&root)
+        .args([
+            "checkout",
+            "--",
+            "README.md",
+            "agents/AGENTS.md",
+            "skills.sh.json",
+            "dashboard/content",
+        ])
+        .status();
+
+    let _ = std::process::Command::new("git")
+        .current_dir(&root)
+        .args(["clean", "-fdq", "dashboard/content"])
+        .status();
+
+    if !drifted.is_empty() {
+        return Err(SkillError::Lint {
+            count: drifted.len(),
+            details: format!(
+                "dashboard/content is out of date with the skills. Run 'ask dashboard build', then stage and commit the regenerated dashboard files.\nDrifted paths:\n{}",
+                drifted.join("\n")
+            ),
+        }
+        .into());
+    }
+
+    println!("Done! Dashboard content is committed and up to date.");
     Ok(())
 }
 

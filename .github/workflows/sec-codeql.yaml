@@ -9,7 +9,6 @@
 #   - Weekly schedule (Sunday 00:00 UTC)
 #
 # Scans:
-#   - JavaScript/TypeScript code
 #   - Rust code
 #   - GitHub Actions workflows
 #
@@ -64,8 +63,6 @@ jobs:
       matrix:
         include:
           - language: actions
-            build-mode: none
-          - language: javascript-typescript
             build-mode: none
           - language: rust
             build-mode: none

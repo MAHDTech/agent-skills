@@ -289,6 +289,30 @@ fn test_cli_action_flag() {
 
     Command::cargo_bin("ask")
         .unwrap()
+        .current_dir(&repo_root)
+        .args(["skills", "--action", "sync"])
+        .assert()
+        .success()
+        .code(0);
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(&repo_root)
+        .args(["dashboard", "--action", "css"])
+        .assert()
+        .success()
+        .code(0);
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(&repo_root)
+        .args(["dashboard", "--action", "lint"])
+        .assert()
+        .success()
+        .code(0);
+
+    Command::cargo_bin("ask")
+        .unwrap()
         .args(["skills", "--help"])
         .assert()
         .success()
