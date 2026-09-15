@@ -18,6 +18,53 @@ npx skills add MAHDTech/agent-skills
 bunx skills add MAHDTech/agent-skills
 ```
 
+## CLI and TUI
+
+The unified `ask` binary provides command-line catalog management and an interactive terminal interface.
+
+```bash
+# Launch interactive terminal user interface
+ask
+
+# Or explicitly launch the TUI
+ask tui
+```
+
+### Global Options
+
+- `-v, --verbose`: Increase logging verbosity.
+- `-q, --quiet`: Suppress logging output.
+- `-f, --format <FORMAT>`: Output format (plain, json, yaml, table).
+- `-c, --config <PATH>`: Path to optional configuration file.
+- `-h, --help`: Print help information.
+- `-V, --version`: Print version information.
+
+### Skills Commands
+
+- `ask skills list`: List discovered skills in table, plain, json, or yaml formats.
+- `ask skills show <NAME>`: Display skill metadata, arguments, and full instructions.
+- `ask skills install <SOURCE>`: Install or symlink skills into detected agent environments.
+- `ask skills uninstall <SKILL>`: Remove installed skill symlinks from target environments.
+- `ask skills lint`: Validate frontmatter schema, file structure, and naming rules.
+- `ask skills sync`: Reconcile tool symlinks and regenerate derived documentation.
+- `ask skills download-resources`: Fetch external referenced resources across all skills.
+- `ask skills clean-resources`: Remove downloaded resources to return to clean state.
+
+### Dashboard Commands
+
+- `ask dashboard summary`: Display catalog metrics, category counts, and tree distribution.
+- `ask dashboard build`: Generate static documentation site with search index.
+- `ask dashboard serve`: Launch local preview server and Tailwind watcher.
+- `ask dashboard css`: Compile Tailwind CSS stylesheets.
+- `ask dashboard lint`: Verify committed documentation matches generated artifacts.
+
+### TUI View Modes
+
+- `Explorer`: Navigate skills by category with live preview and filter support.
+- `Inspector`: Inspect detailed metadata, frontmatter, and skill instructions.
+- `Linter`: Review catalog validation issues and rule violations interactively.
+- `Runner`: Execute skill workflows and catalog synchronization directly.
+
 ## Documentation
 
 - [dashboard](docs/dashboard.md)

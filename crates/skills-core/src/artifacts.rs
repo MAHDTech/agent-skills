@@ -331,6 +331,41 @@ impl ArtifactsEngine {
             # Using Bun\n\
             bunx skills add {source}\n\
             ```\n\n\
+            ## CLI and TUI\n\n\
+            The unified `ask` binary provides command-line catalog management and an interactive terminal interface.\n\n\
+            ```bash\n\
+            # Launch interactive terminal user interface\n\
+            ask\n\n\
+            # Or explicitly launch the TUI\n\
+            ask tui\n\
+            ```\n\n\
+            ### Global Options\n\n\
+            - `-v, --verbose`: Increase logging verbosity.\n\
+            - `-q, --quiet`: Suppress logging output.\n\
+            - `-f, --format <FORMAT>`: Output format (plain, json, yaml, table).\n\
+            - `-c, --config <PATH>`: Path to optional configuration file.\n\
+            - `-h, --help`: Print help information.\n\
+            - `-V, --version`: Print version information.\n\n\
+            ### Skills Commands\n\n\
+            - `ask skills list`: List discovered skills in table, plain, json, or yaml formats.\n\
+            - `ask skills show <NAME>`: Display skill metadata, arguments, and full instructions.\n\
+            - `ask skills install <SOURCE>`: Install or symlink skills into detected agent environments.\n\
+            - `ask skills uninstall <SKILL>`: Remove installed skill symlinks from target environments.\n\
+            - `ask skills lint`: Validate frontmatter schema, file structure, and naming rules.\n\
+            - `ask skills sync`: Reconcile tool symlinks and regenerate derived documentation.\n\
+            - `ask skills download-resources`: Fetch external referenced resources across all skills.\n\
+            - `ask skills clean-resources`: Remove downloaded resources to return to clean state.\n\n\
+            ### Dashboard Commands\n\n\
+            - `ask dashboard summary`: Display catalog metrics, category counts, and tree distribution.\n\
+            - `ask dashboard build`: Generate static documentation site with search index.\n\
+            - `ask dashboard serve`: Launch local preview server and Tailwind watcher.\n\
+            - `ask dashboard css`: Compile Tailwind CSS stylesheets.\n\
+            - `ask dashboard lint`: Verify committed documentation matches generated artifacts.\n\n\
+            ### TUI View Modes\n\n\
+            - `Explorer`: Navigate skills by category with live preview and filter support.\n\
+            - `Inspector`: Inspect detailed metadata, frontmatter, and skill instructions.\n\
+            - `Linter`: Review catalog validation issues and rule violations interactively.\n\
+            - `Runner`: Execute skill workflows and catalog synchronization directly.\n\n\
             {docs_content}## Available Skills\n\n\
             {catalog_content}\n"
         );

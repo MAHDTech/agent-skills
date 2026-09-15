@@ -10,6 +10,7 @@ use comfy_table::{Attribute, Cell, Table};
 
 use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands};
 use crate::commands::{resolve_root, CliError};
+use skills_core::artifacts::ArtifactsEngine;
 use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
 use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, UninstallOptions};
@@ -21,7 +22,7 @@ use skills_core::sync::SkillSyncer;
 /// Dispatches catalog operations to skills-core domain engines.
 pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
-        return run_action_script(action);
+        return run_action(action, format).await;
     }
 
     if let Some(ref cmd) = args.command {
@@ -53,21 +54,30 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError>
     }
 }
 
-fn run_action_script(action: &str) -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/skills/index.ts")
-        .arg("--action")
-        .arg(action)
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: format!("bun run bin/skills/index.ts --action {action}"),
-            code: status.code(),
-        });
+async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> {
+    match action {
+        "list" => run_list(None, false, format).await,
+        "show" => Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Action 'show' requires a skill name argument; use 'ask skills show <name>' instead",
+        ))),
+        "install" => {
+            let root = resolve_root()?;
+            run_install(&root.to_string_lossy(), None).await
+        }
+        "uninstall" => Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Action 'uninstall' requires a skill name argument; use 'ask skills uninstall <name>' instead",
+        ))),
+        "lint" => run_lint(None, false, format).await,
+        "sync" => run_sync(false).await,
+        "download-resources" => run_download_resources(false).await,
+        "clean-resources" => run_clean_resources().await,
+        other => Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("Unknown skills action: '{other}'"),
+        ))),
     }
-    Ok(())
 }
 
 #[allow(clippy::unused_async)]
@@ -371,7 +381,13 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
     let catalog_dir = if root.join("skills").is_dir() {
         root.join("skills")
     } else {
-        root
+        root.clone()
+    };
+
+    let artifacts = if !dry_run {
+        Some(ArtifactsEngine::from_env(&root).generate_all()?)
+    } else {
+        None
     };
 
     let syncer = SkillSyncer::new(catalog_dir)
@@ -396,6 +412,28 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
         summary.dry_run, summary.installed, summary.updated, summary.deleted, summary.no_ops
     );
+
+    if let Some(art) = artifacts {
+        let mut repo_files = 0;
+        if art.readme_updated {
+            repo_files += 1;
+        }
+        if art.agents_updated {
+            repo_files += 1;
+        }
+        if art.skills_sh_updated {
+            repo_files += 1;
+        }
+        let dashboard_pages = if art.dashboard_generated {
+            art.live_skills_count + art.archived_skills_count
+        } else {
+            0
+        };
+        println!(
+            "Artifacts synchronized: {} repository files updated, {} dashboard pages generated.",
+            repo_files, dashboard_pages
+        );
+    }
 
     Ok(())
 }

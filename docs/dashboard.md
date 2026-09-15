@@ -12,8 +12,14 @@ All commands must be run within the `devenv` shell environment:
 
 ```bash
 # Build the static site and Zola content
-devenv --no-tui shell -- dashboard --action build
+devenv --no-tui shell -- ask dashboard build
 
 # Build and serve the site with live reloading (defaults to http://localhost:1111)
-devenv --no-tui shell -- dashboard --action serve
+devenv --no-tui shell -- ask dashboard serve
+
+# Compile Tailwind CSS stylesheet directly
+devenv --no-tui shell -- ask dashboard css
+
+# Verify dashboard content matches skill source files
+devenv --no-tui shell -- ask dashboard lint
 ```

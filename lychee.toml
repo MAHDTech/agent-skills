@@ -16,8 +16,6 @@ exclude_path = [
   "skills/.*/resources/auto",
   "dashboard",
   ".out-of-scope",
-  "bin/skills/lib.test.ts",
-  "bin/skills/downloader.test.ts",
 ]
 
 # URL patterns to ignore (regex):

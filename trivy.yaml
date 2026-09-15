@@ -23,13 +23,11 @@ scan:
     - .git
     - .vscode
     - .codeql-db
-    - node_modules
 
   # Skip files
   skip-files:
     - "*.nix"
     - "Cargo.lock"
-    - "bun.lock"
     - "devenv.lock"
     - "flake.lock"
 
