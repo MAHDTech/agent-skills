@@ -40,6 +40,7 @@ in
     PROJECT = config.name;
     RUST_BACKTRACE = "1";
     RUST_LOG = "info";
+    NEXTEST_PAGER = "cat";
   };
 
   cachix = lib.mkIf isNative {
@@ -92,27 +93,8 @@ in
 
   languages = {
     nix.enable = isNative;
-    javascript = {
-      enable = isNative;
-      bun = {
-        enable = true;
-        install = {
-          enable = true;
-        };
-      };
-      npm = {
-        enable = false;
-      };
-      lsp = {
-        enable = true;
-      };
-    };
-    typescript = {
-      enable = isNative;
-      lsp = {
-        enable = true;
-      };
-    };
+    javascript.enable = false;
+    typescript.enable = false;
     shell = {
       enable = isNative;
     };
@@ -169,30 +151,16 @@ in
           "--no-must-find-files"
         ];
       };
-      dashboard-test = {
-        enable = true;
-        name = "Dashboard Test";
-        entry = "dashboard --action test";
-        files = "^(skills/|dashboard/|bin/)";
-        pass_filenames = false;
-        require_serial = true;
-      };
       dashboard-lint = {
         enable = true;
         name = "Dashboard Lint";
-        entry = "dashboard --action lint";
+        entry = "cargo run -p ask-cli -- dashboard lint";
         files = "^(skills/.*\\.md$|dashboard/content/)";
         pass_filenames = false;
         require_serial = true;
       };
       deadnix.enable = true;
       editorconfig-checker.enable = true;
-      eslint = {
-        enable = true;
-        settings = {
-          extensions = "\\.js$|\\.ts$";
-        };
-      };
       lychee = {
         enable = true;
         excludes = [
@@ -266,14 +234,14 @@ in
       skills-test = {
         enable = true;
         name = "Skills Lint";
-        entry = "skills --action lint";
-        files = "^(skills/.*\\.md|bin/skills/)";
+        entry = "cargo run -p ask-cli -- skills lint";
+        files = "^skills/.*\\.md$";
         pass_filenames = false;
       };
       skills-sync = {
         enable = true;
         name = "Skills Sync";
-        entry = "env SKILLS_REPO_ONLY=1 SKILLS_SKIP_DASHBOARD=1 skills --action sync";
+        entry = "env SKILLS_REPO_ONLY=1 SKILLS_SKIP_DASHBOARD=1 cargo run -p ask-cli -- skills sync";
         files = "SKILL\\.md$";
         pass_filenames = false;
         require_serial = true;
@@ -287,13 +255,6 @@ in
         enable = true;
         excludes = [
         ];
-      };
-      tsc = {
-        enable = true;
-        name = "TypeScript Type Check";
-        entry = "tsc --noEmit --project tsconfig.json";
-        files = "\\.ts$";
-        pass_filenames = false;
       };
       yamllint = {
         enable = true;
@@ -341,21 +302,13 @@ in
     skills = {
       description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|download-resources|clean-resources|test>)";
       exec = ''
-        if [ -f Cargo.toml ]; then
-          cargo run -p ask-cli -- skills "$@"
-        else
-          bun run skills "$@"
-        fi
+        cargo run -p ask-cli -- skills "$@"
       '';
     };
     dashboard = {
       description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test|lint>)";
       exec = ''
-        if [ -f Cargo.toml ]; then
-          cargo run -p ask-cli -- dashboard "$@"
-        else
-          bun run dashboard "$@"
-        fi
+        cargo run -p ask-cli -- dashboard "$@"
       '';
     };
     codeql-run = {
@@ -368,12 +321,6 @@ in
   };
 
   enterTest = ''
-    if [ -f Cargo.toml ]; then
-      cargo nextest run --workspace --all-targets || cargo test --workspace --all-targets
-    fi
-    bun test bin/skills/lib.test.ts
-    bun test bin/skills/lint.test.ts
-    bun test bin/skills/downloader.test.ts
-    bun test bin/dashboard
+    cargo nextest run --workspace --all-targets || cargo test --workspace --all-targets
   '';
 }

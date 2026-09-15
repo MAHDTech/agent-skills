@@ -9,9 +9,9 @@ See the [README.md](./README.md) for an overview of the project and available sk
 ## Structure
 
 - **Self-Contained Skill & Cross-Reference Policy:** Skills must stand alone without implicit dependencies. Cross-references (via `/skill-name` command invocations or relative Markdown links) are strictly forbidden across skills unless both skills explicitly declare membership in the same cohesive group via `metadata.group`. The six standard groups are: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, and `tars`. As exceptions, the universal router (`skill-router`) and all archived skills in `skills-archive/` are exempt as cross-reference sources. Live skills must never cross-reference archived skills.
-- Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling), with an `in-progress/` lifecycle bucket for drafts. Retired skills move to the top-level `skills-archive/<category>/<name>/` tree (same layout, original category kept): they stay on the dashboard for reference, but the installer and `npx skills add` never install them, and `skills --action sync` removes any local links to them. Archived skills carry `metadata.archived` (date) and optionally `metadata.replaced-by` (the successor's name) in their frontmatter; see the `archive-skill` skill.
+- Skills live under `skills/<category>/<name>/SKILL.md`, grouped by topic (engineering, game-development, planning, review, github, reflection, writing, authoring, tooling), with an `in-progress/` lifecycle bucket for drafts. Retired skills move to the top-level `skills-archive/<category>/<name>/` tree (same layout, original category kept): they stay on the dashboard for reference, but the installer and `npx skills add` never install them, and `ask skills sync` removes any local links to them. Archived skills carry `metadata.archived` (date) and optionally `metadata.replaced-by` (the successor's name) in their frontmatter; see the `archive-skill` skill.
 - Names are prefix-free kebab-case; each folder name matches the skill `name` in its frontmatter.
-- Additional scripts, documentation, static assets, or reference files live under a skill's `resources/` directory, split by ownership into exactly two subdirectories: `resources/auto/` (downloader-owned - (re)fetched from the skill's `resources:` frontmatter URLs by `skills --action download-resources`, safe to wipe; `clean-resources` removes only this) and `resources/manual/` (hand-authored; tooling never touches it). No files may sit directly in `resources/`; lint enforces this.
+- Additional scripts, documentation, static assets, or reference files live under a skill's `resources/` directory, split by ownership into exactly two subdirectories: `resources/auto/` (downloader-owned - (re)fetched from the skill's `resources:` frontmatter URLs by `ask skills download-resources`, safe to wipe; `ask skills clean-resources` removes only this) and `resources/manual/` (hand-authored; tooling never touches it). No files may sit directly in `resources/`; lint enforces this.
 - **CRITICAL LINKING RULE:** Never use absolute `file:///` URLs referencing local paths (e.g., `file:///home/...`). Always use relative paths for links referencing files within the repository (e.g., `../../tooling/prek/SKILL.md`). This ensures paths do not leak local user directories and resolve correctly in CI and other environments.
 - **CRITICAL STYLE RULE:** Never use em-dashes (Unicode U+2014) in any markdown, code comments, commit messages, PR descriptions, or skill files. Always use standard hyphens (`-`), colons, commas, parentheses, or separate sentences instead.
 - **CRITICAL MARKDOWN & CODE FENCE RULE:** All markdown (including `SKILL.md`, docs, and PR descriptions) MUST strictly comply with markdownlint:
@@ -28,14 +28,15 @@ See the [README.md](./README.md) for an overview of the project and available sk
 - **CRITICAL HOOK RUNNER RULE:** The standalone `pre-commit` CLI tool and package are DEPRECATED and MUST NOT be used or added to `devenv.nix` (e.g., NEVER add `pkgs.pre-commit` or `pre-commit` package/input). Differentiate between "pre-commit" (the Git lifecycle hook stage) and `prek` (the actual CLI binary tool). Always use `prek` (e.g., `pkgs.prek` or `git-hooks`).
 - **CRITICAL TESTING RULE:** ALWAYS run tests via `devenv --no-tui test` or the `run-tests` wrappers. This is the single guaranteed path.
 - If a specific linter or `prek` hook check doesn't exist, check the devenv MCP server or devenv agent docs. If you STILL don't find it, ask the user for confirmation.
-- Runtime: `bun`. Use `bun` for all scripts.
-- CLI Skills Tool: `bun run bin/skills/index.ts` (also `bun run skills`). Use this to lint and sync skills, and to symlink them for local development.
+- Runtime: Rust toolchain via devenv. The native `ask` CLI binary in `crates/ask-cli` manages skills and the dashboard.
+- CLI Tool: `ask` (or `cargo run -p ask-cli --`). Subcommands include `ask skills` for catalog management and `ask dashboard` for site operations. An interactive TUI is available via `ask tui` or bare `ask`.
 
 ## Dashboard
 
-- To build: `dashboard --action build` - syncs content, builds CSS, renders the site, indexes it (all-in-one).
-- To serve: `dashboard --action serve` - builds once, then serves with live reload. (Uses Zola & Tailwind.)
-- CSS only: `dashboard --action css` (escape hatch; `build` already does this).
+- To build: `ask dashboard build` - syncs content, builds CSS, renders the site, and indexes it (all-in-one).
+- To serve: `ask dashboard serve` - builds once, then serves with live reload using Zola and Tailwind.
+- CSS only: `ask dashboard css` (escape hatch; `build` already does this).
+- Lint only: `ask dashboard lint` (verifies committed dashboard content matches generated artifacts).
 
 ## Behaviour
 
