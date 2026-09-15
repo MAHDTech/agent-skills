@@ -290,7 +290,7 @@ fn test_cli_action_flag() {
     Command::cargo_bin("ask")
         .unwrap()
         .current_dir(&repo_root)
-        .args(["skills", "--action", "sync"])
+        .args(["dashboard", "--action", "summary"])
         .assert()
         .success()
         .code(0);

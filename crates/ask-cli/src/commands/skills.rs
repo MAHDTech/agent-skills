@@ -390,28 +390,37 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         None
     };
 
-    let syncer = SkillSyncer::new(catalog_dir)
-        .with_targets(TargetEnvironment::all_standard())
-        .with_dry_run(dry_run);
+    let repo_only = !dry_run
+        && (std::env::var("SKILLS_REPO_ONLY").is_ok()
+            || std::env::var("PRE_COMMIT").is_ok()
+            || std::env::var("CI").is_ok());
 
-    let plan = syncer.create_plan().map_err(SkillError::from)?;
+    if !repo_only {
+        let syncer = SkillSyncer::new(catalog_dir)
+            .with_targets(TargetEnvironment::all_standard())
+            .with_dry_run(dry_run);
 
-    println!("Synchronization Plan (actions: {}):", plan.actions.len());
-    for action in &plan.actions {
+        let plan = syncer.create_plan().map_err(SkillError::from)?;
+
+        println!("Synchronization Plan (actions: {}):", plan.actions.len());
+        for action in &plan.actions {
+            println!(
+                "  [{:?}] {} for {}",
+                action.kind,
+                action.skill_id,
+                action.target_env.display_name()
+            );
+        }
+
+        let summary = syncer.execute_plan(&plan).map_err(SkillError::from)?;
+
         println!(
-            "  [{:?}] {} for {}",
-            action.kind,
-            action.skill_id,
-            action.target_env.display_name()
+            "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
+            summary.dry_run, summary.installed, summary.updated, summary.deleted, summary.no_ops
         );
+    } else {
+        println!("Repository-only sync active: skipping machine target synchronization.");
     }
-
-    let summary = syncer.execute_plan(&plan).map_err(SkillError::from)?;
-
-    println!(
-        "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
-        summary.dry_run, summary.installed, summary.updated, summary.deleted, summary.no_ops
-    );
 
     if let Some(art) = artifacts {
         let mut repo_files = 0;

@@ -40,6 +40,8 @@ in
     PROJECT = config.name;
     RUST_BACKTRACE = "1";
     RUST_LOG = "info";
+    NEXTEST_PAGER = "cat";
+    CI = "1";
   };
 
   cachix = lib.mkIf isNative {
