@@ -39,7 +39,7 @@ async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> 
     match action {
         "summary" => run_summary(format).await,
         "build" => run_build(None).await,
-        "serve" => run_serve(1111).await,
+        "serve" => run_serve(3000).await,
         "css" => run_css().await,
         "lint" => run_lint().await,
         other => Err(CliError::Io(std::io::Error::new(

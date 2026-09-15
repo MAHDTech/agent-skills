@@ -61,10 +61,10 @@ async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> 
             std::io::ErrorKind::InvalidInput,
             "Action 'show' requires a skill name argument; use 'ask skills show <name>' instead",
         ))),
-        "install" => {
-            let root = resolve_root()?;
-            run_install(&root.to_string_lossy(), None).await
-        }
+        "install" => Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Action 'install' requires a skill target argument; use 'ask skills install <name>' instead",
+        ))),
         "uninstall" => Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
             "Action 'uninstall' requires a skill name argument; use 'ask skills uninstall <name>' instead",

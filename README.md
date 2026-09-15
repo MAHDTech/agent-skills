@@ -65,6 +65,18 @@ ask tui
 - `Linter`: Review catalog validation issues and rule violations interactively.
 - `Runner`: Execute skill workflows and catalog synchronization directly.
 
+## Development
+
+Enter the development shell or execute test suites using devenv:
+
+```bash
+# Enter interactive development shell
+devenv --no-tui shell
+
+# Run workspace test suite and pre-commit checks
+devenv --no-tui test
+```
+
 ## Documentation
 
 - [dashboard](docs/dashboard.md)

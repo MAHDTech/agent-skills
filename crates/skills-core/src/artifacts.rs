@@ -366,6 +366,14 @@ impl ArtifactsEngine {
             - `Inspector`: Inspect detailed metadata, frontmatter, and skill instructions.\n\
             - `Linter`: Review catalog validation issues and rule violations interactively.\n\
             - `Runner`: Execute skill workflows and catalog synchronization directly.\n\n\
+            ## Development\n\n\
+            Enter the development shell or execute test suites using devenv:\n\n\
+            ```bash\n\
+            # Enter interactive development shell\n\
+            devenv --no-tui shell\n\n\
+            # Run workspace test suite and pre-commit checks\n\
+            devenv --no-tui test\n\
+            ```\n\n\
             {docs_content}## Available Skills\n\n\
             {catalog_content}\n"
         );
