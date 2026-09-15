@@ -15,6 +15,7 @@
         "implement",
         "mcp",
         "nutanix-api-v4",
+        "nutanix-enterprise-ai",
         "nutanix-files",
         "nutanix-kubernetes-platform",
         "nutanix-objects",
