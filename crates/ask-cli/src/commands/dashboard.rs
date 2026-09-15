@@ -1,9 +1,11 @@
 //! Command handlers for the `ask dashboard` subcommands.
 
+#[path = "dashboard_site.rs"]
+mod dashboard_site;
+
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, Table};
-use std::path::Path;
 
 use crate::cli::{DashboardArgs, DashboardCommands, OutputFormat};
 use crate::commands::{resolve_root, CliError};
@@ -13,7 +15,18 @@ use skills_core::error::SkillError;
 /// Dispatches dashboard telemetry and static documentation operations.
 pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
-        return run_action_script(action);
+        return match action.as_str() {
+            "summary" => run_summary(format).await,
+            "build" => dashboard_site::run_build(None).await,
+            "serve" => dashboard_site::run_serve(3000).await,
+            "css" => dashboard_site::run_css().await,
+            "lint" => dashboard_site::run_lint().await,
+            "test" => dashboard_site::run_test().await,
+            other => Err(CliError::Skill(SkillError::validation(
+                "dashboard",
+                format!("Unknown dashboard action: {other}"),
+            ))),
+        };
     }
 
     if let Some(ref cmd) = args.command {
@@ -25,107 +38,16 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliErr
 
         match cmd {
             DashboardCommands::Summary => run_summary(format).await,
-            DashboardCommands::Build { output } => run_build(output.as_deref()).await,
-            DashboardCommands::Serve { port } => run_serve(*port).await,
-            DashboardCommands::Css => run_css().await,
-            DashboardCommands::Lint => run_lint().await,
+            DashboardCommands::Build { output } => {
+                dashboard_site::run_build(output.as_deref()).await
+            }
+            DashboardCommands::Serve { port } => dashboard_site::run_serve(*port).await,
+            DashboardCommands::Css => dashboard_site::run_css().await,
+            DashboardCommands::Lint => dashboard_site::run_lint().await,
         }
     } else {
         run_summary(format).await
     }
-}
-
-fn run_action_script(action: &str) -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg(action)
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: format!("bun run bin/dashboard/index.ts --action {action}"),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
-async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
-    let mut cmd = std::process::Command::new("bun");
-    cmd.arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("build");
-    if let Some(out) = output {
-        cmd.arg("--output").arg(out);
-    }
-    let status = cmd.status()?;
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action build".to_string(),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
-async fn run_serve(port: u16) -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("serve")
-        .arg("--port")
-        .arg(port.to_string())
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: format!("bun run bin/dashboard/index.ts --action serve --port {port}"),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
-async fn run_css() -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("css")
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action css".to_string(),
-            code: status.code(),
-        });
-    }
-    Ok(())
-}
-
-#[allow(clippy::unused_async)]
-async fn run_lint() -> Result<(), CliError> {
-    let status = std::process::Command::new("bun")
-        .arg("run")
-        .arg("bin/dashboard/index.ts")
-        .arg("--action")
-        .arg("lint")
-        .status()?;
-
-    if !status.success() {
-        return Err(CliError::Subprocess {
-            command: "bun run bin/dashboard/index.ts --action lint".to_string(),
-            code: status.code(),
-        });
-    }
-    Ok(())
 }
 
 #[allow(clippy::too_many_lines, clippy::unused_async)]
