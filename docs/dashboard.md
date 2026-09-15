@@ -14,7 +14,7 @@ All commands must be run within the `devenv` shell environment:
 # Build the static site and Zola content
 devenv --no-tui shell -- ask dashboard build
 
-# Build and serve the site with live reloading (defaults to http://localhost:1111)
+# Build and serve the site with live reloading (defaults to http://localhost:3000)
 devenv --no-tui shell -- ask dashboard serve
 
 # Compile Tailwind CSS stylesheet directly
