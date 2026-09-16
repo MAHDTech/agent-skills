@@ -77,60 +77,67 @@ pub(crate) fn exec_tool_capture(
     }
 }
 
-/// Scans the skills directory and writes a git-derived freshness metadata TOML sidecar.
+/// Scans both active skills and archived skills directories and writes a git-derived freshness metadata TOML sidecar.
 pub(crate) fn write_skill_dates(root: &Path) -> Result<(), CliError> {
-    let skills_dir = root.join("skills");
     let mut dates: BTreeMap<String, String> = BTreeMap::new();
     let mut git_warned = false;
+    let base_dirs = ["skills", "skills-archive"];
 
-    if skills_dir.is_dir() {
-        if let Ok(categories) = std::fs::read_dir(&skills_dir) {
-            for cat_entry in categories.flatten() {
-                let cat_path = cat_entry.path();
-                if !cat_path.is_dir() {
+    for base_dir in base_dirs {
+        let base_path = root.join(base_dir);
+        if !base_path.is_dir() {
+            continue;
+        }
+
+        let Ok(categories) = std::fs::read_dir(&base_path) else {
+            continue;
+        };
+
+        for cat_entry in categories.flatten() {
+            let cat_path = cat_entry.path();
+            if !cat_path.is_dir() {
+                continue;
+            }
+            let Some(cat_name) = cat_path.file_name().and_then(|n| n.to_str()) else {
+                continue;
+            };
+
+            let Ok(skills) = std::fs::read_dir(&cat_path) else {
+                continue;
+            };
+
+            for skill_entry in skills.flatten() {
+                let skill_path = skill_entry.path();
+                if !skill_path.is_dir() || !skill_path.join("SKILL.md").exists() {
                     continue;
                 }
-                let Some(cat_name) = cat_path.file_name().and_then(|n| n.to_str()) else {
+                let Some(skill_name) = skill_path.file_name().and_then(|n| n.to_str()) else {
                     continue;
                 };
 
-                if let Ok(skills) = std::fs::read_dir(&cat_path) {
-                    for skill_entry in skills.flatten() {
-                        let skill_path = skill_entry.path();
-                        if !skill_path.is_dir() || !skill_path.join("SKILL.md").exists() {
-                            continue;
+                let skill_rel = format!("{base_dir}/{cat_name}/{skill_name}");
+                let mut cmd = Command::new("git");
+                cmd.args([
+                    "log",
+                    "-1",
+                    "--date=short",
+                    "--format=%cd",
+                    "--",
+                    &skill_rel,
+                ])
+                .current_dir(root);
+
+                match cmd.output() {
+                    Ok(output) if output.status.success() => {
+                        let date_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                        if !date_str.is_empty() {
+                            dates.insert(format!("{cat_name}/{skill_name}"), date_str);
                         }
-                        let Some(skill_name) = skill_path.file_name().and_then(|n| n.to_str())
-                        else {
-                            continue;
-                        };
-
-                        let skill_rel = format!("skills/{cat_name}/{skill_name}");
-                        let mut cmd = Command::new("git");
-                        cmd.args([
-                            "log",
-                            "-1",
-                            "--date=short",
-                            "--format=%cd",
-                            "--",
-                            &skill_rel,
-                        ])
-                        .current_dir(root);
-
-                        match cmd.output() {
-                            Ok(output) if output.status.success() => {
-                                let date_str =
-                                    String::from_utf8_lossy(&output.stdout).trim().to_string();
-                                if !date_str.is_empty() {
-                                    dates.insert(format!("{cat_name}/{skill_name}"), date_str);
-                                }
-                            }
-                            Ok(_) | Err(_) => {
-                                if !git_warned {
-                                    tracing::warn!("Failed to retrieve git history for skills");
-                                    git_warned = true;
-                                }
-                            }
+                    }
+                    Ok(_) | Err(_) => {
+                        if !git_warned {
+                            tracing::warn!("Failed to retrieve git history for skills");
+                            git_warned = true;
                         }
                     }
                 }
@@ -259,13 +266,6 @@ pub(crate) fn build_site(
     Ok(())
 }
 
-/// Runs the dashboard test suite via bun test bin/dashboard.
-#[allow(clippy::unused_async)]
-pub(crate) async fn run_test() -> Result<(), CliError> {
-    let root = resolve_root()?;
-    exec_tool(&root, "bun", &["test", "bin/dashboard"], "test")
-}
-
 /// Compiles static documentation site and Pagefind search index.
 #[allow(clippy::unused_async)]
 pub(crate) async fn run_build(output: Option<&Path>) -> Result<(), CliError> {
@@ -321,7 +321,6 @@ pub(crate) async fn run_lint() -> Result<(), CliError> {
         .lines()
         .map(str::trim_end)
         .filter(|line| !line.is_empty())
-        .filter(|line| !line.contains("dashboard/content/skills/archive"))
         .filter(|line| line.starts_with("??") || (line.len() >= 2 && line.as_bytes()[1] != b' '))
         .collect();
 
@@ -598,12 +597,18 @@ mod tests {
     }
 
     #[test]
-    fn test_write_skill_dates_with_skill_discovery() {
+    fn test_write_skill_dates_scans_skills_and_archive() {
         let temp = tempdir().expect("failed to create temp dir");
         let root = temp.path();
-        let skill_dir = root.join("skills/analysis/code-review");
-        std::fs::create_dir_all(&skill_dir).expect("failed to create skill dir");
-        std::fs::write(skill_dir.join("SKILL.md"), "# Test Skill")
+
+        let active_skill = root.join("skills/analysis/code-review");
+        std::fs::create_dir_all(&active_skill).expect("failed to create active skill dir");
+        std::fs::write(active_skill.join("SKILL.md"), "# Active Skill")
+            .expect("failed to write SKILL.md");
+
+        let archive_skill = root.join("skills-archive/planning/plan-before-coding");
+        std::fs::create_dir_all(&archive_skill).expect("failed to create archive skill dir");
+        std::fs::write(archive_skill.join("SKILL.md"), "# Archive Skill")
             .expect("failed to write SKILL.md");
 
         write_skill_dates(root).expect("write_skill_dates should succeed");
@@ -677,8 +682,8 @@ mod tests {
     }
 
     #[test]
-    fn test_porcelain_drift_filtering() {
-        let sample = " M dashboard/content/_index.md\n?? dashboard/content/new.md\nMM dashboard/content/both.md\nM  dashboard/content/staged.md\nA  dashboard/content/staged_new.md\n";
+    fn test_porcelain_drift_filtering_includes_archive() {
+        let sample = " M dashboard/content/_index.md\n?? dashboard/content/new.md\n?? dashboard/content/skills/archive/planning/_index.md\nMM dashboard/content/both.md\nM  dashboard/content/staged.md\nA  dashboard/content/staged_new.md\n";
         let drifted: Vec<&str> = sample
             .lines()
             .map(str::trim_end)
@@ -688,9 +693,10 @@ mod tests {
             })
             .collect();
 
-        assert_eq!(drifted.len(), 3);
+        assert_eq!(drifted.len(), 4);
         assert!(drifted.contains(&" M dashboard/content/_index.md"));
         assert!(drifted.contains(&"?? dashboard/content/new.md"));
+        assert!(drifted.contains(&"?? dashboard/content/skills/archive/planning/_index.md"));
         assert!(drifted.contains(&"MM dashboard/content/both.md"));
         assert!(!drifted.contains(&"M  dashboard/content/staged.md"));
         assert!(!drifted.contains(&"A  dashboard/content/staged_new.md"));

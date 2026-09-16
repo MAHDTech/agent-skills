@@ -172,7 +172,7 @@ in
       dashboard-test = {
         enable = true;
         name = "Dashboard Test";
-        entry = "dashboard --action test";
+        entry = "bun test bin/dashboard";
         files = "^(skills/|dashboard/|bin/)";
         pass_filenames = false;
         require_serial = true;
@@ -349,7 +349,7 @@ in
       '';
     };
     dashboard = {
-      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|test|lint>)";
+      description = "Manage the dashboard (usage: dashboard --action <build|serve|css|lint>)";
       exec = ''
         ask dashboard "$@"
       '';

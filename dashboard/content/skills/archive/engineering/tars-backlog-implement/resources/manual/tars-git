@@ -1,0 +1,104 @@
+#!/bin/sh
+#
+# tars-git -- spoke-only git wrapper that cannot touch the parent repository.
+#
+# Usage (from the spoke clone, or with TARS_CWD set):
+#   sh tars-git <git-subcommand> [args...]
+#
+# Every git command a SPOKE runs should go through this. It resolves the
+# repository git would actually act on and refuses if that repository is not a
+# spoke clone under $TARS_SPOKE_ROOT.
+#
+# Why this exists (measured, not hypothetical): on 2026-08-11 three spokes
+# created branches -- and one committed -- in the developer's live repository.
+# In every case a `cd "$SPOKE_DIR"` had failed while `set -e` was suppressed by
+# a pipeline or redirect, so the following bare `git` ran against whatever tree
+# the shell was already in. Prompt-level rules were tightened twice and did not
+# stop it, because the fault is a script falling through, not an agent
+# disobeying. A wrapper that resolves the target itself cannot fall through.
+#
+# The Hub does NOT use this: the Hub legitimately fetches, merges and commits in
+# the repo root. This is the spoke's git.
+#
+# Environment:
+#   TARS_RUN_ENV        absolute path to run.env
+#   TARS_CWD            directory to run git in (default: pwd)
+#   TARS_ALLOW_ANY_CWD  set to 1 to bypass (warns; for humans, not agents)
+#
+# Exit: git's status, 64 on usage / missing run.env, 65 on a refused location.
+#
+
+set -eu
+
+TARS_CWD="${TARS_CWD:-.}"
+TARS_CWD=$(CDPATH='' cd -- "$TARS_CWD" 2>/dev/null && pwd -P) || {
+	echo "tars-git: cannot cd to target directory" >&2
+	exit 64
+}
+
+if [ "${1:-}" = "--" ]; then
+	shift
+fi
+
+if [ "$#" -eq 0 ]; then
+	echo "tars-git: usage: tars-git <git-subcommand> [args...]" >&2
+	exit 64
+fi
+
+find_run_env() {
+	if [ -n "${TARS_RUN_ENV:-}" ] && [ -f "$TARS_RUN_ENV" ]; then
+		echo "$TARS_RUN_ENV"
+		return 0
+	fi
+	if [ -f "$TARS_CWD/.tars/run.env" ]; then
+		echo "$TARS_CWD/.tars/run.env"
+		return 0
+	fi
+	echo ""
+	return 1
+}
+
+RUN_ENV=$(find_run_env) || {
+	echo "tars-git: no .tars/run.env found under $TARS_CWD (run tars-backlog-prepare first)" >&2
+	exit 64
+}
+
+# shellcheck disable=SC1090
+set -a
+# shellcheck source=/dev/null
+. "$RUN_ENV"
+set +a
+
+: "${TARS_SPOKE_ROOT:?tars-git: TARS_SPOKE_ROOT missing from run.env}"
+
+# Resolve the repository git would ACTUALLY act on from this cwd -- not the
+# directory we were handed. Discovery walks upward, so a failed cd inside a
+# subdirectory of the parent still resolves to the parent.
+TOPLEVEL=$(cd "$TARS_CWD" && git rev-parse --show-toplevel 2>/dev/null) || {
+	echo "tars-git: '$TARS_CWD' is not inside a git repository" >&2
+	exit 65
+}
+TOPLEVEL=$(readlink -f "$TOPLEVEL" 2>/dev/null || echo "$TOPLEVEL")
+SPOKES=$(readlink -f "$TARS_SPOKE_ROOT" 2>/dev/null || echo "$TARS_SPOKE_ROOT")
+
+case "$TOPLEVEL/" in
+"$SPOKES"/*) ;;
+*)
+	if [ "${TARS_ALLOW_ANY_CWD:-0}" = "1" ]; then
+		echo "tars-git: WARNING acting on a NON-SPOKE repository (TARS_ALLOW_ANY_CWD=1): $TOPLEVEL" >&2
+	else
+		echo "tars-git: REFUSING to run git against '$TOPLEVEL'." >&2
+		echo "tars-git:   That is not a spoke clone under \$TARS_SPOKE_ROOT ($SPOKES)." >&2
+		echo "tars-git:   Command was: git $*" >&2
+		echo "tars-git: An earlier 'cd' into your clone almost certainly failed. Note that" >&2
+		echo "tars-git: 'set -e' does NOT abort when the failure is masked by a pipeline or" >&2
+		echo "tars-git: a redirect -- check the cd's exit status explicitly, then retry." >&2
+		exit 65
+	fi
+	;;
+esac
+
+# Signing opens a 1Password approval window that a human must click, which hangs
+# a headless spoke while it holds the heavy-command mutex. Never --no-verify:
+# the hooks are the merge gate.
+exec git -C "$TARS_CWD" -c commit.gpgsign=false "$@"

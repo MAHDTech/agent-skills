@@ -21,7 +21,6 @@ pub async fn run(args: DashboardArgs, format: OutputFormat) -> Result<(), CliErr
             "serve" => dashboard_site::run_serve(3000).await,
             "css" => dashboard_site::run_css().await,
             "lint" => dashboard_site::run_lint().await,
-            "test" => dashboard_site::run_test().await,
             other => Err(CliError::Skill(SkillError::validation(
                 "dashboard",
                 format!("Unknown dashboard action: {other}"),
