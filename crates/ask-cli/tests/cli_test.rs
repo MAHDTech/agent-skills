@@ -312,6 +312,33 @@ fn test_cli_action_flag() {
         .success()
         .code(0);
 
+    let temp = tempfile::tempdir().unwrap();
+    let output_dir = temp.path().join("dist");
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(&repo_root)
+        .args(["dashboard", "--action", "build"])
+        .assert()
+        .success()
+        .code(0);
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(&repo_root)
+        .args([
+            "dashboard",
+            "build",
+            "--output",
+            output_dir.to_str().unwrap(),
+        ])
+        .assert()
+        .success()
+        .code(0);
+
+    assert!(output_dir.exists());
+    assert!(output_dir.join("index.html").exists());
+
     Command::cargo_bin("ask")
         .unwrap()
         .current_dir(&repo_root)
@@ -589,27 +616,6 @@ fn test_skills_download_caching() {
     assert!(cached_file.exists());
     let cached_content = std::fs::read_to_string(cached_file).unwrap();
     assert_eq!(cached_content, "# Downloaded Skill");
-}
-
-#[test]
-fn test_dashboard_build_with_output() {
-    let temp = tempfile::tempdir().unwrap();
-    let output_dir = temp.path().join("dist");
-
-    Command::cargo_bin("ask")
-        .unwrap()
-        .args([
-            "dashboard",
-            "build",
-            "--output",
-            output_dir.to_str().unwrap(),
-        ])
-        .assert()
-        .success()
-        .code(0);
-
-    assert!(output_dir.exists());
-    assert!(output_dir.join("index.html").exists());
 }
 
 #[test]
