@@ -590,3 +590,80 @@ fn test_skills_download_caching() {
     let cached_content = std::fs::read_to_string(cached_file).unwrap();
     assert_eq!(cached_content, "# Downloaded Skill");
 }
+
+#[test]
+fn test_dashboard_build_with_output() {
+    let temp = tempfile::tempdir().unwrap();
+    let output_dir = temp.path().join("dist");
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args([
+            "dashboard",
+            "build",
+            "--output",
+            output_dir.to_str().unwrap(),
+        ])
+        .assert()
+        .success()
+        .code(0);
+
+    assert!(output_dir.exists());
+    assert!(output_dir.join("index.html").exists());
+}
+
+#[test]
+fn test_skills_action_error_handling() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "--action", "show"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Action 'show' requires a skill name argument; use 'ask skills show <name>' instead",
+        ));
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "--action", "install"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Action 'install' requires a skill name argument; use 'ask skills install <name>' instead",
+        ));
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "--action", "uninstall"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Action 'uninstall' requires a skill name argument; use 'ask skills uninstall <name>' instead",
+        ));
+
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["skills", "--action", "unknown-action"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Unknown skills action: 'unknown-action'",
+        ));
+}
+
+#[test]
+fn test_dashboard_action_error_handling() {
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args(["dashboard", "--action", "unknown-action"])
+        .assert()
+        .failure()
+        .code(1)
+        .stderr(predicate::str::contains(
+            "Unknown dashboard action: 'unknown-action'",
+        ));
+}

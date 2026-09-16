@@ -299,7 +299,7 @@ in
       '';
     };
     skills = {
-      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|download-resources|clean-resources|test>)";
+      description = "Manage agent skills (usage: skills --action <lint|sync|install|uninstall|download-resources|clean-resources>)";
       exec = ''
         cargo run -p ask-cli -- skills "$@"
       '';

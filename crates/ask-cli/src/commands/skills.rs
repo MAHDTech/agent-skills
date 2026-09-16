@@ -63,7 +63,7 @@ async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> 
         ))),
         "install" => Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
-            "Action 'install' requires a skill target argument; use 'ask skills install <name>' instead",
+            "Action 'install' requires a skill name argument; use 'ask skills install <name>' instead",
         ))),
         "uninstall" => Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
