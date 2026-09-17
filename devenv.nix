@@ -150,6 +150,8 @@ in
           "lint"
           "--no-must-find-files"
         ];
+      };
+
       dashboard-lint = {
         enable = true;
         name = "Dashboard Lint";
