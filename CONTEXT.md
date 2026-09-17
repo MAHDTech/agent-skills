@@ -43,11 +43,11 @@ An interactive terminal interface powered by Ratatui for browsing skills, inspec
 
 ### Rust Workspace
 
-A single Cargo workspace containing modular crates in `crates/` replacing the legacy Bun/TypeScript scripts.
+The single Cargo workspace containing modular crates in `crates/` serving as the exclusive production implementation for developer CLI, TUI, and documentation generators.
 
 ## Relationships
 
 - A **Skill** belongs to a Category and owns zero or more **Skill Resources**.
 - **Skills Sync** reads **Skills** and updates project markdown tables, manifest JSON, and **Dashboard** content.
-- The **Unified CLI** provides CLI and **Terminal UI (TUI)** interfaces to drive local developer workflows and CI checks.
-- The **Rust Workspace** contains `skills-core`, `skills-tui`, and the unified CLI crate.
+- The **Unified CLI** (`ask`) provides CLI and **Terminal UI (TUI)** interfaces orchestrating catalog management and dashboard generation for local workflows and CI checks.
+- The **Rust Workspace** encapsulates `skills-core`, `skills-tui`, and `ask-cli` as the sole tooling runtime.
