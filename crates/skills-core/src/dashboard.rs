@@ -628,8 +628,12 @@ mod tests {
 
     #[test]
     fn test_empty_collection_safety() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let targets = vec![
+            TargetEnvironment::Custom(temp.path().join("claude")),
+            TargetEnvironment::Custom(temp.path().join("cursor")),
+        ];
         let engine = DashboardEngine::new();
-        let targets = vec![TargetEnvironment::ClaudeDesktop, TargetEnvironment::Cursor];
         let summary = engine.analyze_with_targets(&[], &targets);
 
         assert_eq!(summary.total_skills, 0);
