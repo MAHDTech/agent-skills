@@ -52,7 +52,7 @@ anyhow = "1.0.87"
 
 # Filesystem and System Utilities
 walkdir = "2.5.0"
-dirs = "5.0.1"
+dirs = "7.0.0"
 sha2 = "0.10.8"
 
 # Test and Development Dependencies
