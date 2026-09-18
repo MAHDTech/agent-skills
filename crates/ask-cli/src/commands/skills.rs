@@ -4,7 +4,6 @@
 use std::path::{Path, PathBuf};
 
 use colored::Colorize;
-use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, Table};
 
@@ -115,8 +114,7 @@ async fn run_list(
         }
     } else {
         let mut table = Table::new();
-        table.load_preset(UTF8_FULL);
-        table.apply_modifier(UTF8_ROUND_CORNERS);
+        table.load_style(UTF8_FULL.with_rounded_corners());
         table.set_header(vec![
             Cell::new("ID / Directory").add_attribute(Attribute::Bold),
             Cell::new("Name").add_attribute(Attribute::Bold),
