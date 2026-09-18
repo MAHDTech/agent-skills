@@ -3,7 +3,6 @@
 #[path = "dashboard_site.rs"]
 mod dashboard_site;
 
-use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, Table};
 
@@ -66,8 +65,7 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
     } else {
         // Table 1: Catalog Overview
         let mut overview_table = Table::new();
-        overview_table.load_preset(UTF8_FULL);
-        overview_table.apply_modifier(UTF8_ROUND_CORNERS);
+        overview_table.load_style(UTF8_FULL.with_rounded_corners());
         overview_table.set_header(vec![
             Cell::new("Catalog Overview Metric").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -125,8 +123,7 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
 
         // Table 2: Health and Diagnostic Quality
         let mut health_table = Table::new();
-        health_table.load_preset(UTF8_FULL);
-        health_table.apply_modifier(UTF8_ROUND_CORNERS);
+        health_table.load_style(UTF8_FULL.with_rounded_corners());
         health_table.set_header(vec![
             Cell::new("Diagnostic Quality Metric").add_attribute(Attribute::Bold),
             Cell::new("Value").add_attribute(Attribute::Bold),
@@ -156,8 +153,7 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
 
         // Table 3: Category Distribution
         let mut category_table = Table::new();
-        category_table.load_preset(UTF8_FULL);
-        category_table.apply_modifier(UTF8_ROUND_CORNERS);
+        category_table.load_style(UTF8_FULL.with_rounded_corners());
         category_table.set_header(vec![
             Cell::new("Category").add_attribute(Attribute::Bold),
             Cell::new("Skills").add_attribute(Attribute::Bold),
@@ -181,8 +177,7 @@ async fn run_summary(format: OutputFormat) -> Result<(), CliError> {
 
         // Table 4: Agent Target Environments
         let mut target_table = Table::new();
-        target_table.load_preset(UTF8_FULL);
-        target_table.apply_modifier(UTF8_ROUND_CORNERS);
+        target_table.load_style(UTF8_FULL.with_rounded_corners());
         target_table.set_header(vec![
             Cell::new("Target Environment").add_attribute(Attribute::Bold),
             Cell::new("Installed").add_attribute(Attribute::Bold),
