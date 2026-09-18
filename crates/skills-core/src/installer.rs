@@ -1000,42 +1000,55 @@ impl<'a> AtomicSwapCoordinator<'a> {
 
     /// Executes the directory swap, preserving the previous installation into `.backups/` if requested.
     pub fn execute_swap(&mut self, create_backup: bool) -> Result<(), InstallerError> {
-        let target_exists =
-            self.target_path.exists() || self.target_path.symlink_metadata().is_ok();
+        let target_exists = self.target_path.symlink_metadata().is_ok();
+        let mut temp_backup: Option<(PathBuf, bool)> = None;
 
         if target_exists {
-            let backup_dir = self.skills_dir.join(".backups");
-            let _ = fs::create_dir_all(&backup_dir);
-            let nonce = generate_nonce();
-            let backup_dest = backup_dir.join(format!("{}_{nonce}", self.skill_id));
-
             if create_backup {
-                if is_symlink(&self.target_path) {
-                    let link_target =
-                        fs::read_link(&self.target_path).map_err(|e| InstallerError::Io {
-                            path: self.target_path.clone(),
-                            source: e,
-                        })?;
-                    let meta_file = backup_dest.with_extension("symlink_info");
-                    fs::write(&meta_file, link_target.to_string_lossy().as_bytes()).map_err(
-                        |e| InstallerError::Io {
-                            path: meta_file,
-                            source: e,
-                        },
-                    )?;
-                } else if self.target_path.is_dir() {
-                    let _ = copy_dir_all(&self.target_path, &backup_dest, &[]);
-                }
-                self.backup_path = Some(backup_dest);
-            }
+                let backup_dir = self.skills_dir.join(".backups");
+                fs::create_dir_all(&backup_dir).map_err(|e| InstallerError::Io {
+                    path: backup_dir.clone(),
+                    source: e,
+                })?;
+                let nonce = generate_nonce();
+                let backup_dest = backup_dir.join(format!("{}_{nonce}", self.skill_id));
 
-            remove_dir_or_symlink_all(&self.target_path)?;
+                fs::rename(&self.target_path, &backup_dest).map_err(|e| InstallerError::Io {
+                    path: self.target_path.clone(),
+                    source: e,
+                })?;
+
+                if is_symlink(&backup_dest) {
+                    if let Ok(link_target) = fs::read_link(&backup_dest) {
+                        let meta_file = backup_dest.with_extension("symlink_info");
+                        let _ = fs::write(&meta_file, link_target.to_string_lossy().as_bytes());
+                    }
+                }
+
+                temp_backup = Some((backup_dest, true));
+            } else {
+                let nonce = generate_nonce();
+                let temp_dest = self
+                    .skills_dir
+                    .join(format!(".swap_tmp_{}_{nonce}", self.skill_id));
+
+                fs::rename(&self.target_path, &temp_dest).map_err(|e| InstallerError::Io {
+                    path: self.target_path.clone(),
+                    source: e,
+                })?;
+
+                temp_backup = Some((temp_dest, false));
+            }
         }
 
         if let Err(err) = fs::rename(&self.staging_path, &self.target_path) {
-            let rollback_status = if let Some(ref bk) = self.backup_path {
-                if bk.is_dir() {
-                    let _ = fs::rename(bk, &self.target_path);
+            if self.target_path.symlink_metadata().is_ok() {
+                let _ = remove_dir_or_symlink_all(&self.target_path);
+            }
+
+            let rollback_status = if let Some((ref bk, _)) = temp_backup {
+                // Replaced former bk.is_dir() check with symlink_metadata to support symlink targets.
+                if bk.symlink_metadata().is_ok() && fs::rename(bk, &self.target_path).is_ok() {
                     "restored_from_backup"
                 } else {
                     "backup_restoration_failed"
@@ -1053,6 +1066,18 @@ impl<'a> AtomicSwapCoordinator<'a> {
         }
 
         self.swapped = true;
+
+        if let Some((bk, is_permanent)) = temp_backup {
+            if is_permanent {
+                self.backup_path = Some(bk);
+            } else {
+                self.backup_path = None;
+                remove_dir_or_symlink_all(&bk)?;
+            }
+        } else {
+            self.backup_path = None;
+        }
+
         Ok(())
     }
 
@@ -1069,13 +1094,18 @@ impl<'a> AtomicSwapCoordinator<'a> {
         if self.swapped {
             let _ = remove_dir_or_symlink_all(&self.target_path);
             if let Some(ref bk) = self.backup_path {
-                if bk.is_dir() {
+                // Replaced former bk.is_dir() check with symlink_metadata to support symlink targets.
+                if bk.symlink_metadata().is_ok() {
                     let _ = fs::rename(bk, &self.target_path);
+                    let meta_file = bk.with_extension("symlink_info");
+                    if meta_file.symlink_metadata().is_ok() {
+                        let _ = fs::remove_file(meta_file);
+                    }
                 }
             }
             self.swapped = false;
         }
-        if self.staging_path.exists() {
+        if self.staging_path.symlink_metadata().is_ok() {
             let _ = remove_dir_or_symlink_all(&self.staging_path);
         }
     }
@@ -2161,4 +2191,221 @@ fn extract_skill_metadata(source_dir: &Path) -> (String, String, String) {
     );
 
     (fallback_name.clone(), fallback_name, "0.1.0".to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[test]
+    fn test_atomic_swap_overwrites_existing_directory_without_backup() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        fs::create_dir_all(&skills_dir).unwrap();
+
+        let target = skills_dir.join("existing-skill");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("v1.txt"), "version 1").unwrap();
+
+        let staging = skills_dir.join(".staging/staging_new");
+        fs::create_dir_all(&staging).unwrap();
+        fs::write(staging.join("v2.txt"), "version 2").unwrap();
+
+        let mut coordinator =
+            AtomicSwapCoordinator::new(&skills_dir, "existing-skill", staging.clone());
+
+        coordinator.execute_swap(false).unwrap();
+        assert_eq!(coordinator.backup_path(), None);
+        coordinator.commit();
+
+        assert!(target.join("v2.txt").exists());
+        assert!(!target.join("v1.txt").exists());
+
+        // Verify no temporary swap directories remain
+        for entry in fs::read_dir(&skills_dir).unwrap() {
+            let name = entry.unwrap().file_name().to_string_lossy().to_string();
+            assert!(!name.starts_with(".swap_tmp_"));
+        }
+    }
+
+    #[test]
+    fn test_atomic_swap_overwrites_existing_directory_with_backup() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        fs::create_dir_all(&skills_dir).unwrap();
+
+        let target = skills_dir.join("backed-skill");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("v1.txt"), "version 1").unwrap();
+
+        let staging = skills_dir.join(".staging/staging_v2");
+        fs::create_dir_all(&staging).unwrap();
+        fs::write(staging.join("v2.txt"), "version 2").unwrap();
+
+        let mut coordinator =
+            AtomicSwapCoordinator::new(&skills_dir, "backed-skill", staging.clone());
+
+        coordinator.execute_swap(true).unwrap();
+        let backup = coordinator
+            .backup_path()
+            .expect("backup path should be recorded")
+            .to_path_buf();
+        coordinator.commit();
+
+        assert!(target.join("v2.txt").exists());
+        assert!(!target.join("v1.txt").exists());
+        assert!(backup.join("v1.txt").exists());
+    }
+
+    #[test]
+    fn test_atomic_swap_overwrites_existing_symlink_without_backup() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        let ext_dir = root.join("external_source");
+        fs::create_dir_all(&skills_dir).unwrap();
+        fs::create_dir_all(&ext_dir).unwrap();
+        fs::write(ext_dir.join("ext.txt"), "ext content").unwrap();
+
+        let target = skills_dir.join("sym-skill");
+        create_symlink(&ext_dir, &target).unwrap();
+
+        let staging = skills_dir.join(".staging/sym_replacement");
+        fs::create_dir_all(&staging).unwrap();
+        fs::write(staging.join("installed.txt"), "installed").unwrap();
+
+        let mut coordinator = AtomicSwapCoordinator::new(&skills_dir, "sym-skill", staging.clone());
+
+        coordinator.execute_swap(false).unwrap();
+        coordinator.commit();
+
+        assert!(target.is_dir());
+        assert!(!is_symlink(&target));
+        assert!(target.join("installed.txt").exists());
+        // Ensure original external symlink source was not deleted
+        assert!(ext_dir.join("ext.txt").exists());
+    }
+
+    #[test]
+    fn test_atomic_swap_overwrites_existing_symlink_with_backup() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        let ext_dir = root.join("external_source");
+        fs::create_dir_all(&skills_dir).unwrap();
+        fs::create_dir_all(&ext_dir).unwrap();
+        fs::write(ext_dir.join("ext.txt"), "ext content").unwrap();
+
+        let target = skills_dir.join("sym-skill-backed");
+        create_symlink(&ext_dir, &target).unwrap();
+
+        let staging = skills_dir.join(".staging/sym_staging");
+        fs::create_dir_all(&staging).unwrap();
+        fs::write(staging.join("v2.txt"), "v2").unwrap();
+
+        let mut coordinator =
+            AtomicSwapCoordinator::new(&skills_dir, "sym-skill-backed", staging.clone());
+
+        coordinator.execute_swap(true).unwrap();
+        let backup = coordinator
+            .backup_path()
+            .expect("backup path should be present")
+            .to_path_buf();
+        coordinator.commit();
+
+        assert!(target.join("v2.txt").exists());
+        assert!(is_symlink(&backup));
+        assert!(backup.with_extension("symlink_info").exists());
+    }
+
+    #[test]
+    fn test_atomic_swap_rollback_restores_existing_directory_on_rename_failure() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        fs::create_dir_all(&skills_dir).unwrap();
+
+        let target = skills_dir.join("fail-skill");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("keep_me.txt"), "keep").unwrap();
+
+        let missing_staging = skills_dir.join(".staging/does_not_exist");
+
+        let mut coordinator =
+            AtomicSwapCoordinator::new(&skills_dir, "fail-skill", missing_staging);
+
+        let res = coordinator.execute_swap(false);
+        match res {
+            Err(InstallerError::AtomicSwapFailed {
+                rollback_status, ..
+            }) => {
+                assert_eq!(rollback_status, "restored_from_backup");
+            }
+            other => panic!("Expected AtomicSwapFailed error, got {:?}", other),
+        }
+
+        assert!(target.join("keep_me.txt").exists());
+    }
+
+    #[test]
+    fn test_atomic_swap_rollback_restores_existing_symlink_on_rename_failure() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        let ext_dir = root.join("external_source");
+        fs::create_dir_all(&skills_dir).unwrap();
+        fs::create_dir_all(&ext_dir).unwrap();
+        fs::write(ext_dir.join("keep_ext.txt"), "keep").unwrap();
+
+        let target = skills_dir.join("fail-symlink");
+        create_symlink(&ext_dir, &target).unwrap();
+
+        let missing_staging = skills_dir.join(".staging/does_not_exist");
+
+        let mut coordinator =
+            AtomicSwapCoordinator::new(&skills_dir, "fail-symlink", missing_staging);
+
+        let res = coordinator.execute_swap(false);
+        match res {
+            Err(InstallerError::AtomicSwapFailed {
+                rollback_status, ..
+            }) => {
+                assert_eq!(rollback_status, "restored_from_backup");
+            }
+            other => panic!("Expected AtomicSwapFailed error, got {:?}", other),
+        }
+
+        assert!(is_symlink(&target));
+        assert!(target.join("keep_ext.txt").exists());
+    }
+
+    #[test]
+    fn test_atomic_swap_coordinator_explicit_rollback_restores_symlink() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let skills_dir = root.join("skills");
+        let ext_dir = root.join("external_source");
+        fs::create_dir_all(&skills_dir).unwrap();
+        fs::create_dir_all(&ext_dir).unwrap();
+        fs::write(ext_dir.join("sym_live.txt"), "live").unwrap();
+
+        let target = skills_dir.join("rollback-symlink");
+        create_symlink(&ext_dir, &target).unwrap();
+
+        let staging = skills_dir.join(".staging/staging_sym");
+        fs::create_dir_all(&staging).unwrap();
+        fs::write(staging.join("new.txt"), "new").unwrap();
+
+        let mut coordinator = AtomicSwapCoordinator::new(&skills_dir, "rollback-symlink", staging);
+
+        coordinator.execute_swap(true).unwrap();
+        assert!(target.join("new.txt").exists());
+
+        coordinator.rollback();
+        assert!(is_symlink(&target));
+        assert!(target.join("sym_live.txt").exists());
+    }
 }
