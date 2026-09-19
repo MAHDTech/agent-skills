@@ -382,10 +382,10 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         root.clone()
     };
 
-    let artifacts = if !dry_run {
-        Some(ArtifactsEngine::from_env(&root).generate_all()?)
-    } else {
+    let artifacts = if dry_run {
         None
+    } else {
+        Some(ArtifactsEngine::from_env(&root).generate_all()?)
     };
 
     let repo_only = !dry_run
@@ -393,7 +393,9 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
             || std::env::var("PRE_COMMIT").is_ok()
             || std::env::var("CI").is_ok());
 
-    if !repo_only {
+    if repo_only {
+        println!("Repository-only sync active: skipping machine target synchronization.");
+    } else {
         let syncer = SkillSyncer::new(catalog_dir)
             .with_targets(TargetEnvironment::all_standard())
             .with_dry_run(dry_run);
@@ -416,8 +418,6 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
             "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
             summary.dry_run, summary.installed, summary.updated, summary.deleted, summary.no_ops
         );
-    } else {
-        println!("Repository-only sync active: skipping machine target synchronization.");
     }
 
     if let Some(art) = artifacts {
@@ -437,8 +437,7 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
             0
         };
         println!(
-            "Artifacts synchronized: {} repository files updated, {} dashboard pages generated.",
-            repo_files, dashboard_pages
+            "Artifacts synchronized: {repo_files} repository files updated, {dashboard_pages} dashboard pages generated."
         );
     }
 

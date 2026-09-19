@@ -444,7 +444,7 @@ fn test_linter_selection_jump_success() {
     assert!(app.handle_key_event(KeyEvent::from(KeyCode::Enter)));
     assert_eq!(app.active_view, ActiveView::Inspector);
     assert_eq!(app.selected_index, 1);
-    assert_eq!(app.selected_skill().map(|s| s.name()), Some("skill-b"));
+    assert_eq!(app.selected_skill().map(Skill::name), Some("skill-b"));
     assert!(app
         .latest_notification()
         .unwrap_or_default()
