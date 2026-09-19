@@ -46,7 +46,7 @@ pub fn init_logging(verbose: u8, quiet: bool) -> Result<(), Box<dyn std::error::
 
 /// Maps domain errors to standardized process exit codes:
 /// - Code 0: Success, clean termination, help, or version display.
-/// - Code 1: Runtime execution errors (I/O, network, lock contention, sync conflicts, unreachable targets).
+/// - Code 1: Runtime execution errors (I/O, network, lock contention, sync conflicts, unreachable targets, installer errors).
 /// - Code 2: Lint violations, schema validation failures, or command-line syntax parsing errors.
 #[must_use]
 pub fn error_to_exit_code(err: &SkillError) -> i32 {
