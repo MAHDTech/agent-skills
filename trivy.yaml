@@ -27,8 +27,6 @@ scan:
   # Skip files
   skip-files:
     - "*.nix"
-    - "Cargo.lock"
-    - "devenv.lock"
     - "flake.lock"
 
 vulnerability:
