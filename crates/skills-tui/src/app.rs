@@ -1,4 +1,5 @@
 //! Terminal lifecycle management, navigation routing, and central application state.
+// cspell:words RAII
 
 use std::collections::HashMap;
 use std::fmt::Write as _;
@@ -22,12 +23,14 @@ use skills_core::parser::{SkillParser, TemplatePlaceholder};
 /// Configures stdout in raw alternate screen mode with mouse tracking and panic protection.
 pub fn init_terminal() -> color_eyre::Result<Terminal<CrosstermBackend<Stdout>>> {
     enable_raw_mode()?;
+    let mut guard = TerminalGuard::new();
     let mut stdout_handle = stdout();
     execute!(stdout_handle, EnterAlternateScreen, EnableMouseCapture)?;
     install_panic_hook();
     let backend = CrosstermBackend::new(stdout_handle);
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
+    guard.disarm();
     Ok(terminal)
 }
 
@@ -51,6 +54,49 @@ pub fn install_panic_hook() {
         let _ = restore_terminal();
         original_hook(panic_info);
     }));
+}
+
+/// RAII drop guard that restores canonical terminal state if dropped while active.
+///
+/// Automatically invokes `restore_terminal()` on drop when active, ensuring that terminal
+/// settings (raw mode, alternate screen buffer, mouse capture) are restored if an error
+/// occurs during initialization or stack unwinding.
+#[derive(Debug)]
+pub struct TerminalGuard {
+    active: bool,
+}
+
+impl TerminalGuard {
+    /// Constructs a new active terminal guard.
+    #[must_use]
+    pub fn new() -> Self {
+        Self { active: true }
+    }
+
+    /// Disarms the guard, preventing terminal restoration upon drop.
+    pub fn disarm(&mut self) {
+        self.active = false;
+    }
+
+    /// Returns whether the guard is currently active.
+    #[must_use]
+    pub fn is_active(&self) -> bool {
+        self.active
+    }
+}
+
+impl Default for TerminalGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Drop for TerminalGuard {
+    fn drop(&mut self) {
+        if self.active {
+            let _ = restore_terminal();
+        }
+    }
 }
 
 /// Primary navigation tabs available within the terminal user interface.
@@ -1074,5 +1120,38 @@ mod tests {
         assert!(app.handle_key_event(up_event));
         assert_eq!(app.inspector_scroll, 0);
         assert_eq!(app.selected_index, 0);
+    }
+
+    #[test]
+    fn test_terminal_guard_new_is_active() {
+        let guard = TerminalGuard::new();
+        assert!(guard.is_active());
+    }
+
+    #[test]
+    fn test_terminal_guard_disarm() {
+        let mut guard = TerminalGuard::new();
+        assert!(guard.is_active());
+        guard.disarm();
+        assert!(!guard.is_active());
+    }
+
+    #[test]
+    fn test_terminal_guard_default() {
+        let guard = TerminalGuard::default();
+        assert!(guard.is_active());
+    }
+
+    #[test]
+    fn test_terminal_guard_drop_disarmed() {
+        let mut guard = TerminalGuard::new();
+        guard.disarm();
+        drop(guard);
+    }
+
+    #[test]
+    fn test_terminal_guard_drop_active() {
+        let guard = TerminalGuard::new();
+        drop(guard);
     }
 }
