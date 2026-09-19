@@ -605,6 +605,7 @@ pub enum InstallerError {
 }
 
 impl From<InstallerError> for SkillError {
+    #[allow(clippy::io_other_error, clippy::unnecessary_debug_formatting)]
     fn from(err: InstallerError) -> Self {
         match err {
             InstallerError::Io { path, source } => SkillError::Io { path, source },
@@ -634,7 +635,53 @@ impl From<InstallerError> for SkillError {
             InstallerError::RegistrySerialization { path, source } => {
                 SkillError::Json { path, source }
             }
-            other => SkillError::validation(PathBuf::new(), other.to_string()),
+            InstallerError::EnvironmentNotResolvable(env) => SkillError::target_unreachable(
+                format!("{env:?}"),
+                "Target environment could not be resolved on current platform",
+            ),
+            InstallerError::WindowsSymlinkPrivilegeRequired(msg) => SkillError::Symlink {
+                target: PathBuf::new(),
+                destination: PathBuf::new(),
+                message: format!(
+                    "Symlink creation failed: developer mode / unprivileged symlinks not available: {msg}"
+                ),
+            },
+            InstallerError::IntegrityMismatch {
+                id,
+                expected,
+                actual,
+            } => SkillError::GeneralIo(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!(
+                    "Integrity check failed for skill '{id}': expected SHA-256 {expected}, got {actual}"
+                ),
+            )),
+            InstallerError::AtomicSwapFailed {
+                staging,
+                target,
+                reason,
+                rollback_status,
+            } => SkillError::Io {
+                path: target,
+                source: std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!(
+                        "Atomic directory swap failed from {staging:?}: {reason}. Rollback status: {rollback_status}"
+                    ),
+                ),
+            },
+            InstallerError::InvalidSourcePath { path, reason } => SkillError::Io {
+                path,
+                source: std::io::Error::new(std::io::ErrorKind::NotFound, reason),
+            },
+            InstallerError::UnsupportedSchemaVersion { found, supported } => {
+                SkillError::GeneralIo(std::io::Error::new(
+                    std::io::ErrorKind::InvalidData,
+                    format!(
+                        "Unsupported registry schema version {found}, maximum supported is {supported}"
+                    ),
+                ))
+            }
         }
     }
 }
@@ -2629,5 +2676,68 @@ mod tests {
 
         let res = copy_dir_all(&src, &dst, &[]);
         assert!(matches!(res, Err(InstallerError::PathTraversal { .. })));
+    }
+
+    #[test]
+    fn test_installer_error_conversions_to_skill_error_never_frontmatter_validation() {
+        let errors: Vec<InstallerError> = vec![
+            InstallerError::Io {
+                path: PathBuf::from("/tmp/test"),
+                source: std::io::Error::new(std::io::ErrorKind::NotFound, "not found"),
+            },
+            InstallerError::PathTraversal {
+                path: PathBuf::from("/etc/passwd"),
+                boundary: PathBuf::from("/home/user"),
+            },
+            InstallerError::InvalidSkillId {
+                id: "invalid id!".to_string(),
+            },
+            InstallerError::SkillAlreadyInstalled {
+                id: "my-skill".to_string(),
+                existing_path: PathBuf::from("/installed/my-skill"),
+            },
+            InstallerError::SkillNotFound {
+                id: "missing-skill".to_string(),
+            },
+            InstallerError::EnvironmentNotResolvable(TargetEnvironment::Cursor),
+            InstallerError::LockTimeout {
+                lock_path: PathBuf::from("/tmp/lock"),
+                timeout_ms: 5000,
+                reason: "locked".to_string(),
+            },
+            InstallerError::RegistrySerialization {
+                path: PathBuf::from("/tmp/reg.json"),
+                source: serde_json::from_str::<serde_json::Value>("{invalid}").unwrap_err(),
+            },
+            InstallerError::UnsupportedSchemaVersion {
+                found: 99,
+                supported: 1,
+            },
+            InstallerError::IntegrityMismatch {
+                id: "tampered".to_string(),
+                expected: "hash1".to_string(),
+                actual: "hash2".to_string(),
+            },
+            InstallerError::WindowsSymlinkPrivilegeRequired("privilege error".to_string()),
+            InstallerError::AtomicSwapFailed {
+                staging: PathBuf::from("/tmp/staging"),
+                target: PathBuf::from("/tmp/target"),
+                reason: "failed".to_string(),
+                rollback_status: "rolled back".to_string(),
+            },
+            InstallerError::InvalidSourcePath {
+                path: PathBuf::from("/tmp/bad_source"),
+                reason: "invalid dir".to_string(),
+            },
+        ];
+
+        assert_eq!(errors.len(), 13);
+        for err in errors {
+            let skill_err: SkillError = err.into();
+            assert!(
+                !matches!(skill_err, SkillError::FrontmatterValidation { .. }),
+                "InstallerError converted to FrontmatterValidation unexpectedly: {skill_err:?}"
+            );
+        }
     }
 }
