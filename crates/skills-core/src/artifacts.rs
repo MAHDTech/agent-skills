@@ -844,6 +844,7 @@ impl ArtifactsEngine {
 
         let status = Command::new("git")
             .arg("add")
+            .arg("--")
             .args(&existing_files)
             .current_dir(&self.workspace_root)
             .status();
@@ -1505,4 +1506,114 @@ fn posix_normalize(path: &str) -> String {
 
 fn to_toml_string(value: &str) -> String {
     serde_json::to_string(value).unwrap_or_else(|_| format!("\"{value}\""))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_stage_files_no_stage() {
+        let dir = tempdir().unwrap();
+        let file = dir.path().join("test.txt");
+        fs::write(&file, "content").unwrap();
+
+        let options = ArtifactsOptions {
+            no_stage: true,
+            ..Default::default()
+        };
+        let engine = ArtifactsEngine::with_options(dir.path(), options);
+        let staged = engine.stage_files(&[file]).unwrap();
+        assert!(staged.is_empty());
+    }
+
+    #[test]
+    fn test_stage_files_empty_and_nonexistent() {
+        let dir = tempdir().unwrap();
+        let engine = ArtifactsEngine::new(dir.path());
+
+        let staged_empty = engine.stage_files(&[]).unwrap();
+        assert!(staged_empty.is_empty());
+
+        let nonexistent = dir.path().join("does_not_exist.txt");
+        let staged_nonexistent = engine.stage_files(&[nonexistent]).unwrap();
+        assert!(staged_nonexistent.is_empty());
+    }
+
+    #[test]
+    fn test_stage_files_hyphen_path_argument_injection_prevention() {
+        let dir = tempdir().unwrap();
+        let workspace = dir.path();
+
+        let init = Command::new("git")
+            .arg("init")
+            .current_dir(workspace)
+            .output();
+
+        if let Ok(output) = init {
+            if !output.status.success() {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        let hyphen_file = workspace.join("--injection-test.txt");
+        fs::write(&hyphen_file, "hyphen file content").unwrap();
+
+        let engine = ArtifactsEngine::new(workspace);
+        let staged = engine.stage_files(&[hyphen_file.clone()]).unwrap();
+        assert_eq!(staged, vec![hyphen_file]);
+
+        let status_output = Command::new("git")
+            .args(["status", "--porcelain"])
+            .current_dir(workspace)
+            .output()
+            .unwrap();
+        let status_str = String::from_utf8_lossy(&status_output.stdout);
+        assert!(
+            status_str.contains("A  --injection-test.txt")
+                || status_str.contains("A  \"--injection-test.txt\""),
+            "Expected staged hyphen file in git status, got: {status_str}"
+        );
+    }
+
+    #[test]
+    fn test_stage_files_standard_file() {
+        let dir = tempdir().unwrap();
+        let workspace = dir.path();
+
+        let init = Command::new("git")
+            .arg("init")
+            .current_dir(workspace)
+            .output();
+
+        if let Ok(output) = init {
+            if !output.status.success() {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        let normal_file = workspace.join("normal.txt");
+        fs::write(&normal_file, "normal file content").unwrap();
+
+        let engine = ArtifactsEngine::new(workspace);
+        let staged = engine.stage_files(&[normal_file.clone()]).unwrap();
+        assert_eq!(staged, vec![normal_file]);
+
+        let status_output = Command::new("git")
+            .args(["status", "--porcelain"])
+            .current_dir(workspace)
+            .output()
+            .unwrap();
+        let status_str = String::from_utf8_lossy(&status_output.stdout);
+        assert!(
+            status_str.contains("A  normal.txt"),
+            "Expected staged normal file in git status, got: {status_str}"
+        );
+    }
 }
