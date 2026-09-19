@@ -798,14 +798,34 @@ impl PathValidator {
         let norm_path = normalize_path(path);
         let norm_boundary = normalize_path(boundary);
 
-        if norm_path.starts_with(&norm_boundary) {
-            Ok(())
-        } else {
-            Err(InstallerError::PathTraversal {
+        if norm_path.is_absolute() != norm_boundary.is_absolute() {
+            return Err(InstallerError::PathTraversal {
                 path: path.to_path_buf(),
                 boundary: boundary.to_path_buf(),
-            })
+            });
         }
+
+        let count_leading_parents = |p: &Path| -> usize {
+            p.components()
+                .take_while(|c| matches!(c, Component::ParentDir))
+                .count()
+        };
+
+        if count_leading_parents(&norm_path) > count_leading_parents(&norm_boundary) {
+            return Err(InstallerError::PathTraversal {
+                path: path.to_path_buf(),
+                boundary: boundary.to_path_buf(),
+            });
+        }
+
+        if !norm_path.starts_with(&norm_boundary) {
+            return Err(InstallerError::PathTraversal {
+                path: path.to_path_buf(),
+                boundary: boundary.to_path_buf(),
+            });
+        }
+
+        Ok(())
     }
 }
 
@@ -816,9 +836,15 @@ pub fn normalize_path(path: &Path) -> PathBuf {
     for component in path.components() {
         match component {
             Component::CurDir => {}
-            Component::ParentDir => {
-                normalized.pop();
-            }
+            Component::ParentDir => match normalized.components().next_back() {
+                Some(Component::Normal(_)) => {
+                    normalized.pop();
+                }
+                Some(Component::RootDir) => {}
+                _ => {
+                    normalized.push(Component::ParentDir);
+                }
+            },
             c => {
                 normalized.push(c.as_os_str());
             }
@@ -2629,5 +2655,58 @@ mod tests {
 
         let res = copy_dir_all(&src, &dst, &[]);
         assert!(matches!(res, Err(InstallerError::PathTraversal { .. })));
+    }
+
+    #[test]
+    fn test_normalize_path_relative_parents() {
+        assert_eq!(
+            normalize_path(Path::new("../../etc/passwd")),
+            PathBuf::from("../../etc/passwd")
+        );
+        assert_eq!(
+            normalize_path(Path::new("a/../../b")),
+            PathBuf::from("../b")
+        );
+        assert_eq!(normalize_path(Path::new("a/b/../../c")), PathBuf::from("c"));
+        assert_eq!(
+            normalize_path(Path::new("/../../etc/passwd")),
+            PathBuf::from("/etc/passwd")
+        );
+        assert_eq!(
+            normalize_path(Path::new("./foo/./bar/")),
+            PathBuf::from("foo/bar")
+        );
+    }
+
+    #[test]
+    fn test_ensure_within_boundary_relative_parents() {
+        assert!(matches!(
+            PathValidator::ensure_within_boundary(Path::new("../../etc/passwd"), Path::new(".")),
+            Err(InstallerError::PathTraversal { .. })
+        ));
+        assert!(matches!(
+            PathValidator::ensure_within_boundary(
+                Path::new("../../skills/evil"),
+                Path::new("skills")
+            ),
+            Err(InstallerError::PathTraversal { .. })
+        ));
+        assert!(matches!(
+            PathValidator::ensure_within_boundary(Path::new("/etc/passwd"), Path::new(".")),
+            Err(InstallerError::PathTraversal { .. })
+        ));
+        assert!(matches!(
+            PathValidator::ensure_within_boundary(Path::new("etc/passwd"), Path::new("/var")),
+            Err(InstallerError::PathTraversal { .. })
+        ));
+        assert!(PathValidator::ensure_within_boundary(
+            Path::new("skills/pkg"),
+            Path::new("skills")
+        )
+        .is_ok());
+        assert!(
+            PathValidator::ensure_within_boundary(Path::new("foo/bar"), Path::new(".")).is_ok()
+        );
+        assert!(PathValidator::ensure_within_boundary(Path::new("."), Path::new(".")).is_ok());
     }
 }
