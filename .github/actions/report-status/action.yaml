@@ -36,20 +36,27 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        INPUT_RESULT: ${{ inputs.result }}
+        INPUT_SUCCESS_MESSAGE: ${{ inputs.success-message }}
+        INPUT_FAILURE_MESSAGE: ${{ inputs.failure-message }}
+        INPUT_REPOSITORY: ${{ inputs.repository }}
+        INPUT_SHA: ${{ inputs.sha }}
+        INPUT_WORKFLOW_NAME: ${{ inputs.workflow-name }}
+        INPUT_RUN_URL: ${{ inputs.run-url }}
       run: |
-        if [[ "${{ inputs.result }}" == "success" ]]; then
+        if [[ "${INPUT_RESULT}" == "success" ]]; then
           RESULT="success"
-          DESCRIPTION="${{ inputs.success-message }}"
+          DESCRIPTION="${INPUT_SUCCESS_MESSAGE}"
         else
           RESULT="failure"
-          DESCRIPTION="${{ inputs.failure-message }}"
+          DESCRIPTION="${INPUT_FAILURE_MESSAGE}"
         fi
         if ! ERR_MSG=$(gh api \
-          repos/${{ inputs.repository }}/statuses/${{ inputs.sha }} \
+          repos/"${INPUT_REPOSITORY}"/statuses/"${INPUT_SHA}" \
           -f state="${RESULT}" \
-          -f context="${{ inputs.workflow-name }}" \
+          -f context="${INPUT_WORKFLOW_NAME}" \
           -f description="${DESCRIPTION}" \
-          -f target_url="${{ inputs.run-url }}" 2>&1 >/dev/null); then
+          -f target_url="${INPUT_RUN_URL}" 2>&1 >/dev/null); then
 
           echo "Failed to report CI status: $ERR_MSG"
 
