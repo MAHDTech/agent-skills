@@ -46,7 +46,7 @@ pub fn init_logging(verbose: u8, quiet: bool) -> Result<(), Box<dyn std::error::
 
 /// Maps domain errors to standardized process exit codes:
 /// - Code 0: Success, clean termination, help, or version display.
-/// - Code 1: Runtime execution errors (I/O, network, lock contention).
+/// - Code 1: Runtime execution errors (I/O, network, lock contention, sync conflicts, unreachable targets).
 /// - Code 2: Lint violations, schema validation failures, or command-line syntax parsing errors.
 #[must_use]
 pub fn error_to_exit_code(err: &SkillError) -> i32 {
@@ -171,6 +171,21 @@ mod tests {
             }),
             1
         );
+        assert_eq!(
+            error_to_exit_code(&SkillError::sync_conflict(
+                "sync-skill",
+                "ClaudeDesktop",
+                "conflict occurred",
+            )),
+            1
+        );
+        assert_eq!(
+            error_to_exit_code(&SkillError::target_unreachable(
+                "Cursor",
+                "environment unreachable",
+            )),
+            1
+        );
     }
     #[test]
     fn test_cli_error_to_exit_code() {
@@ -197,5 +212,18 @@ mod tests {
             "denied",
         ));
         assert_eq!(cli_error_to_exit_code(&io_err), 1);
+
+        let sync_err = commands::CliError::Skill(SkillError::sync_conflict(
+            "sync-skill",
+            "ClaudeDesktop",
+            "conflict occurred",
+        ));
+        assert_eq!(cli_error_to_exit_code(&sync_err), 1);
+
+        let unreachable_err = commands::CliError::Skill(SkillError::target_unreachable(
+            "Cursor",
+            "environment unreachable",
+        ));
+        assert_eq!(cli_error_to_exit_code(&unreachable_err), 1);
     }
 }

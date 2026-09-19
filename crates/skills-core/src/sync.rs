@@ -254,14 +254,14 @@ impl From<SyncError> for SkillError {
             SyncError::Io { path, source } => SkillError::Io { path, source },
             SyncError::Installer(e) => e.into(),
             SyncError::UnresolvedConflict {
-                skill_id, reason, ..
-            } => SkillError::validation(
-                PathBuf::new(),
-                format!("Conflict on '{skill_id}': {reason}"),
+                skill_id,
+                target,
+                reason,
+            } => SkillError::sync_conflict(skill_id, format!("{target:?}"), reason),
+            SyncError::TargetUnreachable(env) => SkillError::target_unreachable(
+                format!("{env:?}"),
+                "Target environment could not be reached",
             ),
-            SyncError::TargetUnreachable(env) => {
-                SkillError::validation(PathBuf::new(), format!("Target unreachable: {env:?}"))
-            }
             SyncError::InvalidCatalog { path, reason } => SkillError::validation(path, reason),
         }
     }
@@ -940,5 +940,37 @@ mod tests {
         assert_eq!(summary.installed, 1);
         assert_eq!(summary.no_ops, 1);
         assert_eq!(summary.affected_skills, vec!["skill-a"]);
+    }
+
+    #[test]
+    fn test_sync_error_conversions_to_skill_error() {
+        let conflict_err = SyncError::UnresolvedConflict {
+            skill_id: "test-skill".to_string(),
+            target: TargetEnvironment::ClaudeDesktop,
+            reason: "local modifications detected".to_string(),
+        };
+        let skill_err: SkillError = conflict_err.into();
+        match skill_err {
+            SkillError::SyncConflict {
+                skill_id,
+                target,
+                reason,
+            } => {
+                assert_eq!(skill_id, "test-skill");
+                assert_eq!(target, "ClaudeDesktop");
+                assert_eq!(reason, "local modifications detected");
+            }
+            other => panic!("Expected SkillError::SyncConflict, got: {other:?}"),
+        }
+
+        let unreachable_err = SyncError::TargetUnreachable(TargetEnvironment::Cursor);
+        let skill_err_unreachable: SkillError = unreachable_err.into();
+        match skill_err_unreachable {
+            SkillError::TargetUnreachable { target, reason } => {
+                assert_eq!(target, "Cursor");
+                assert_eq!(reason, "Target environment could not be reached");
+            }
+            other => panic!("Expected SkillError::TargetUnreachable, got: {other:?}"),
+        }
     }
 }

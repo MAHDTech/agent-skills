@@ -149,6 +149,26 @@ pub enum SkillError {
         /// Discovered file paths sharing the identifier.
         paths: Vec<PathBuf>,
     },
+
+    /// Synchronization conflict between source catalog and target environment.
+    #[error("Synchronization conflict for skill '{skill_id}' in target '{target}': {reason}")]
+    SyncConflict {
+        /// Skill identifier experiencing conflict.
+        skill_id: String,
+        /// Target environment description.
+        target: String,
+        /// Reason explaining the synchronization conflict.
+        reason: String,
+    },
+
+    /// Target environment unreachable or inaccessible.
+    #[error("Target environment '{target}' is unreachable: {reason}")]
+    TargetUnreachable {
+        /// Target environment description.
+        target: String,
+        /// Failure reason.
+        reason: String,
+    },
 }
 
 impl SkillError {
@@ -185,6 +205,71 @@ impl SkillError {
         Self::Lint {
             count,
             details: details.into(),
+        }
+    }
+
+    /// Constructs a [`SkillError::SyncConflict`] error.
+    #[must_use]
+    pub fn sync_conflict(
+        skill_id: impl Into<String>,
+        target: impl Into<String>,
+        reason: impl Into<String>,
+    ) -> Self {
+        Self::SyncConflict {
+            skill_id: skill_id.into(),
+            target: target.into(),
+            reason: reason.into(),
+        }
+    }
+
+    /// Constructs a [`SkillError::TargetUnreachable`] error.
+    #[must_use]
+    pub fn target_unreachable(target: impl Into<String>, reason: impl Into<String>) -> Self {
+        Self::TargetUnreachable {
+            target: target.into(),
+            reason: reason.into(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sync_conflict_display_and_constructor() {
+        let err = SkillError::sync_conflict("test-skill", "ClaudeDesktop", "version mismatch");
+        assert_eq!(
+            err.to_string(),
+            "Synchronization conflict for skill 'test-skill' in target 'ClaudeDesktop': version mismatch"
+        );
+        match err {
+            SkillError::SyncConflict {
+                skill_id,
+                target,
+                reason,
+            } => {
+                assert_eq!(skill_id, "test-skill");
+                assert_eq!(target, "ClaudeDesktop");
+                assert_eq!(reason, "version mismatch");
+            }
+            _ => panic!("Expected SkillError::SyncConflict"),
+        }
+    }
+
+    #[test]
+    fn test_target_unreachable_display_and_constructor() {
+        let err = SkillError::target_unreachable("Cursor", "config directory not found");
+        assert_eq!(
+            err.to_string(),
+            "Target environment 'Cursor' is unreachable: config directory not found"
+        );
+        match err {
+            SkillError::TargetUnreachable { target, reason } => {
+                assert_eq!(target, "Cursor");
+                assert_eq!(reason, "config directory not found");
+            }
+            _ => panic!("Expected SkillError::TargetUnreachable"),
         }
     }
 }
