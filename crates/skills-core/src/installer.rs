@@ -1998,6 +1998,17 @@ pub fn copy_dir_all(
                 path: entry.path().to_path_buf(),
                 source: e,
             })?;
+
+            if link_target.is_absolute() {
+                return Err(InstallerError::PathTraversal {
+                    path: entry.path().to_path_buf(),
+                    boundary: src.to_path_buf(),
+                });
+            }
+
+            let resolved_target = entry.path().parent().unwrap_or(src).join(&link_target);
+            PathValidator::ensure_within_boundary(&resolved_target, src)?;
+
             create_symlink(&link_target, &target_file)?;
         } else if entry.file_type().is_file() {
             if let Some(parent) = target_file.parent() {
@@ -2344,7 +2355,7 @@ mod tests {
             }) => {
                 assert_eq!(rollback_status, "restored_from_backup");
             }
-            other => panic!("Expected AtomicSwapFailed error, got {:?}", other),
+            other => panic!("Expected AtomicSwapFailed error, got {other:?}"),
         }
 
         assert!(target.join("keep_me.txt").exists());
@@ -2375,7 +2386,7 @@ mod tests {
             }) => {
                 assert_eq!(rollback_status, "restored_from_backup");
             }
-            other => panic!("Expected AtomicSwapFailed error, got {:?}", other),
+            other => panic!("Expected AtomicSwapFailed error, got {other:?}"),
         }
 
         assert!(is_symlink(&target));
@@ -2407,5 +2418,216 @@ mod tests {
         coordinator.rollback();
         assert!(is_symlink(&target));
         assert!(target.join("sym_live.txt").exists());
+    }
+
+    /// Helper to create a complete mock skill folder with `SKILL.md` and resources.
+    fn create_test_skill_fixture(
+        root: &Path,
+        id: &str,
+        version: &str,
+        extra_files: &[(&str, &str)],
+    ) -> PathBuf {
+        let skill_dir = root.join(id);
+        fs::create_dir_all(skill_dir.join("resources/manual")).unwrap();
+        fs::create_dir_all(skill_dir.join("resources/auto")).unwrap();
+
+        let skill_md = format!(
+            "---\nname: {id}\ndescription: Test skill {id}\nmetadata:\n  version: \"{version}\"\n---\n# {id}\nSkill body content.\n"
+        );
+        fs::write(skill_dir.join("SKILL.md"), skill_md).unwrap();
+        fs::write(
+            skill_dir.join("resources/manual/guide.txt"),
+            "Manual guide content
+",
+        )
+        .unwrap();
+        fs::write(
+            skill_dir.join("resources/auto/data.json"),
+            "{\"status\":\"ok\"}\n",
+        )
+        .unwrap();
+
+        for (rel_path, content) in extra_files {
+            let full = skill_dir.join(rel_path);
+            if let Some(parent) = full.parent() {
+                fs::create_dir_all(parent).unwrap();
+            }
+            fs::write(full, content).unwrap();
+        }
+
+        skill_dir
+    }
+
+    #[test]
+    fn test_copy_mode_rejects_absolute_symlink() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let source = create_test_skill_fixture(root, "sym-abs-skill", "1.0.0", &[]);
+
+        let external_secret = root.join("external_secret.txt");
+        fs::write(
+            &external_secret,
+            "secret data
+",
+        )
+        .unwrap();
+
+        let symlink_path = source.join("leak_abs");
+        #[cfg(unix)]
+        {
+            if std::os::unix::fs::symlink(&external_secret, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(windows)]
+        {
+            if std::os::windows::fs::symlink_file(&external_secret, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(not(any(unix, windows)))]
+        return;
+
+        let installer = Installer::with_root(root);
+        let env = TargetEnvironment::Custom(root.join("installed"));
+        let options = InstallOptions::builder().mode(InstallMode::Copy).build();
+
+        let result = installer.install(&source, &env, &options);
+        match result {
+            Err(InstallerError::PathTraversal { path, boundary }) => {
+                let canonical_source = source.canonicalize().unwrap_or_else(|_| source.clone());
+                assert_eq!(boundary, canonical_source);
+                assert_eq!(path, canonical_source.join("leak_abs"));
+            }
+            other => panic!("Expected InstallerError::PathTraversal, got {other:?}"),
+        }
+
+        assert!(!root.join("installed/sym-abs-skill").exists());
+    }
+
+    #[test]
+    fn test_copy_mode_rejects_relative_escaping_symlink() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let source = create_test_skill_fixture(root, "sym-escape-skill", "1.0.0", &[]);
+
+        let escaping_target = Path::new("../../../escaped_target.txt");
+        let symlink_path = source.join("resources/manual/leak_rel");
+        #[cfg(unix)]
+        {
+            if std::os::unix::fs::symlink(escaping_target, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(windows)]
+        {
+            if std::os::windows::fs::symlink_file(escaping_target, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(not(any(unix, windows)))]
+        return;
+
+        let installer = Installer::with_root(root);
+        let env = TargetEnvironment::Custom(root.join("installed"));
+        let options = InstallOptions::builder().mode(InstallMode::Copy).build();
+
+        let result = installer.install(&source, &env, &options);
+        match result {
+            Err(InstallerError::PathTraversal { path, boundary }) => {
+                let canonical_source = source.canonicalize().unwrap_or_else(|_| source.clone());
+                assert_eq!(boundary, canonical_source);
+                let expected_resolved = normalize_path(
+                    &canonical_source
+                        .join("resources/manual")
+                        .join(escaping_target),
+                );
+                assert_eq!(normalize_path(&path), expected_resolved);
+            }
+            other => panic!("Expected InstallerError::PathTraversal, got {other:?}"),
+        }
+
+        assert!(!root.join("installed/sym-escape-skill").exists());
+    }
+
+    #[test]
+    fn test_copy_mode_preserves_internal_relative_symlink() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let source = create_test_skill_fixture(root, "sym-internal-skill", "1.0.0", &[]);
+
+        let internal_target_rel = Path::new("../manual/guide.txt");
+        let symlink_path = source.join("resources/auto/link_to_guide.txt");
+        #[cfg(unix)]
+        {
+            if std::os::unix::fs::symlink(internal_target_rel, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(windows)]
+        {
+            if std::os::windows::fs::symlink_file(internal_target_rel, &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(not(any(unix, windows)))]
+        return;
+
+        let installer = Installer::with_root(root);
+        let env = TargetEnvironment::Custom(root.join("installed"));
+        let options = InstallOptions::builder().mode(InstallMode::Copy).build();
+
+        let res = installer.install(&source, &env, &options).unwrap();
+        assert_eq!(res.skill.id, "sym-internal-skill");
+        assert_eq!(res.installed_mode, InstallMode::Copy);
+
+        let installed_dir = root.join("installed/sym-internal-skill");
+        let installed_link = installed_dir.join("resources/auto/link_to_guide.txt");
+
+        assert!(installed_link
+            .symlink_metadata()
+            .unwrap()
+            .file_type()
+            .is_symlink());
+        let raw_link = fs::read_link(&installed_link).unwrap();
+        assert_eq!(raw_link, internal_target_rel);
+
+        let content = fs::read_to_string(&installed_link).unwrap();
+        assert_eq!(
+            content,
+            "Manual guide content
+"
+        );
+    }
+
+    #[test]
+    fn test_copy_dir_all_rejects_escaping_symlink() {
+        let temp = TempDir::new().unwrap();
+        let root = temp.path();
+        let src = root.join("src_dir");
+        let dst = root.join("dst_dir");
+        fs::create_dir_all(&src).unwrap();
+        fs::write(src.join("file.txt"), "hello").unwrap();
+
+        let symlink_path = src.join("leak");
+        #[cfg(unix)]
+        {
+            if std::os::unix::fs::symlink(Path::new("../../escaped"), &symlink_path).is_err() {
+                return;
+            }
+        }
+        #[cfg(windows)]
+        {
+            if std::os::windows::fs::symlink_file(Path::new("../../escaped"), &symlink_path)
+                .is_err()
+            {
+                return;
+            }
+        }
+        #[cfg(not(any(unix, windows)))]
+        return;
+
+        let res = copy_dir_all(&src, &dst, &[]);
+        assert!(matches!(res, Err(InstallerError::PathTraversal { .. })));
     }
 }
