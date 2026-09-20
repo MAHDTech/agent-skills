@@ -23,12 +23,17 @@ See also: Antigravity CLI documentation for `agy` CLI conventions and permission
 ## Invocation
 
 ```text
-/tars-run-factory <workspace_root> [--epic N] [--cycles N] [--runtime-minutes N] [--merge] [--audit] [--triage]
+/tars-run-factory <workspace_root> (--issue N | --issues N,N | --epic N | --all) [--cycles N] [--runtime-minutes N] [--merge] [--audit] [--triage]
 ```
 
 - `workspace_root`: absolute path to the customer repository. Required.
 - `--cycles N`: maximum factory cycles before stopping. Default 10.
 - `--epic N`: restrict every drain leg to this ratified epic; never fall back to the repository backlog.
+- `--issue N`: run exactly one issue.
+- `--issues N,N`: run exactly these distinct positive issue numbers in the supplied order.
+- `--all`: explicitly authorize the unrestricted backlog and its configured chores-first phase.
+- Exactly one selection is required; missing, conflicting or invalid selections stop before execution.
+- Exact issue and epic selections exclude unrelated chores and chore bootstrap PRs; preserve an already recorded chore run during recovery.
 - `--runtime-minutes N`: maximum wall time, including waits and recovery. Default 480.
 - `--merge`: pass `--merge` to batch runs so green PRs land. Default off: PRs stay open for humans.
 - `--audit`: run one codebase audit at shift start to feed the backlog.
@@ -41,21 +46,21 @@ The foreman session running `/tars-run-factory` must be started in a directory o
 The compiled native supervisor is invoked as:
 
 ```bash
-tars-agy factory <workspace_root> [--epic N] [--conversation ID] [--cycles N] [--runtime-minutes N] [--turn-minutes N] [--recovery-limit N] [--state-dir DIR] [--merge] [--audit] [--triage] [--smoke]
+tars-agy factory <workspace_root> (--issue N | --issues N,N | --epic N | --all) [--conversation ID] [--cycles N] [--runtime-minutes N] [--turn-minutes N] [--recovery-limit N] [--state-dir DIR] [--merge] [--audit] [--triage] [--smoke]
 ```
 
 - `<workspace_root>`: path to repository. Canonical flock workspace lock acquired automatically.
 - `--epic N`: restrict runs to this ratified epic.
 - `--conversation ID`: resume an existing conversation ID.
 - `--cycles N`: maximum cycles before stopping. Default 10.
-- `--runtime-minutes N`: maximum shift wall time. Default 480.
-- `--turn-minutes N`: timeout per prompt turn. Default 60.
-- `--recovery-limit N`: maximum recovery attempts before stopping. Default 3.
+- `--runtime-minutes N`: shift wall time, including waits and recovery. Default and ceiling 480; preserve the original start across host restart and foreman handover.
+- `--turn-minutes N`: timeout per prompt turn. Default 90, bounded by the remaining shift time; allow the engine's one-hour CI wait and 65-minute MCP timeout to finish within that budget.
+- `--recovery-limit N`: consecutive recovery attempts without verified progress. Default and maximum 3; progress resets that counter, and refusal corrections retain their stricter single-retry limit.
 - `--state-dir DIR`: external directory for ledger, reports, and locks (defaults to `<workspace_root>/../tars-factory/<repo-name>`).
 - `--merge`: enable auto-landing for approved green PRs.
 - `--audit`: execute audit pass at shift start.
 - `--triage`: execute triage pass at shift start.
-- `--smoke`: execute short test timeouts.
+- `--smoke`: status-only transport fixture mode without live credential checks or workload execution.
 
 Running the installed factory requires no Bun, Node, Python, or checkout of `agent-skills`.
 
@@ -75,11 +80,13 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
 ## Pre-flight (all of it, in order; unresolved failure stops the shift)
 
 1. `agy --version` succeeds. Record the version.
+   - Load this skill from a durable regular-file projection with its `source.receipt.json`; verify its canonical source revision and skill digest.
+   - A link into a retired source worktree is not a usable installation; use the operator's prepared projection before execution.
 2. `git -C <workspace_root> status --porcelain` is empty and `git -C <workspace_root> remote get-url origin` resolves. A dirty tree or missing remote stops the shift.
 3. Credentials and environment health via `tars-agy doctor <workspace_root>`:
    - Run `tars-agy doctor <workspace_root>`.
    - Verify the `github` check reports status `ok`.
-   - Note that the engine natively resolves non-human `TARS_GITHUB_TOKEN` (author persona) and `TARS_DOYLE_GITHUB_TOKEN` (reviewer persona) from `~/.config/tars/credentials` (mode 0600), and that persona tokens are never exported into the shell.
+   - The engine resolves `TARS_HUB_TARS_GITHUB_TOKEN` (author) and optional `TARS_SPOKE_DOYLE_GITHUB_TOKEN` (reviewer) from `~/.config/tars/credentials` (mode 0600); persona tokens are never exported into the shell.
    - If `--merge` is specified, verify doctor output confirms distinct bot accounts for author and reviewer. If reviewer credentials are unset or identical to the author, note it: reviews will run but nothing can be approved.
 4. Launch `tars-agy factory <workspace_root>` with this shift's scope and limits.
    - The foreman session must be launched from outside `<workspace_root>` so that no interactive `agy` process occupies the target repository (which would violate the single-agy invariant).
@@ -87,6 +94,8 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
    - Send `{"action":"probe"}` on stdin and wait for its NDJSON result envelope.
    - Transport `.status` must be `SUCCESS`; verify workflow state separately.
    - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE `retry-probe` control with the current result receipt; still missing stops the shift.
+   - The current MCP servers are `hub` and `tars-spoke`; the supervisor launches `agy --agent tars` and probes `hub`.
+   - Hub discovery does not prove spoke capabilities; verify each delegated role's own permitted surface.
    - Parse `denied_actions` from the JSON envelope, even when the exit code is 0 and `.status` is `SUCCESS`; preserve each entry's `action` and `display_name`.
    - Also inspect the response, permitted tool evidence and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
    - Keep stderr permission notices as a fallback for older CLI versions; handle every refusal under **Refusal recovery** before proceeding.
@@ -94,13 +103,19 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
    - It records received stdout, stderr, timestamps, source positions, identity, input, result acknowledgement, recovery and process exit.
    - Acknowledge the probe with its receipt, actual evidence and a meaningful progress fingerprint before another action.
    - Preserve any legacy `FACTORY_LEDGER.md`; inspect its handover and recorded owner before importing a conversation.
+6. Send `record-installation` before audit, triage or workload execution.
+   - Supply an `installation` object with full `sourceRevision`, `integratedRevision`, `installedRevision` and `binarySha256` from the reviewed installation receipt.
+   - The supervisor checks the binary digest against its executable and preserves the three revision identities separately.
+   - The revision fields are operator provenance; a matching binary digest alone does not attest those commits.
+   - Missing provenance stops workload admission; do not invent revisions or reinstall during an active shift.
+   - Preserve the same receipt across host restart and coordinator handover; changed installation requires a new bounded shift after the prior terminal boundary is recorded.
 
 ## Shift start (optional stages)
 
 - With `--audit`: send the `audit` control, verify its result and record the issue numbers it opened.
 - With `--triage`: send the `triage` control; its human approval gate parks the shift without applying the proposal.
   - Record the proposal for the next authorized shift; never answer its approval block or apply unapproved actions.
-- Epic-scoped shifts exclude both optional stages because they can change unrelated backlog.
+- Exact issue and epic shifts exclude both optional stages because they can change unrelated backlog.
 
 ## The cycle
 
@@ -108,19 +123,21 @@ Repeat up to `--cycles` times:
 
 1. **Sense.** `tars-agy inspect <workspace_root>` (all sessions, JSON). Record: sessions running, completed, parked; any `CONTRACT_REFUSED`, `DELEGATION_REFUSED`, `REGRESSED`, or `SESSION_REOPENED` events new since the last cycle.
 2. **Act.** Send the `cycle` control and wait for its response.
-   - The helper sends `/tars-run-epic N[ --merge]` for an epic scope, otherwise `/tars-run-batch all[ --merge]`.
+   - The helper sends `/tars-run-issue N`, `/tars-run-batch --issues N,N`, `/tars-run-epic N` or `/tars-run-batch all` for the recorded selection.
+   - Every workload command carries explicit `--yolo`; `--merge` is independent and appears only when authorized.
    - It detects refusals across every event and stops the host immediately, including when transport later reports SUCCESS.
    - Check the transport result, process state, `denied_actions` and workflow stop conditions; route refusals through **Refusal recovery**.
    - A terminal `"timeout waiting for response"`, EOF, missing result or broken pipe requires fresh stored-state reconciliation.
    - Verify the old host is gone, then use `recover` for the recorded conversation and authorized leg; never create a rival owner or reset the run.
-   - Completed work is acknowledged without replay; parked state, unchanged progress or exhausted budgets stops recovery.
+   - Completed work is acknowledged without replay, even after the retry budget is spent.
+   - Parked state stops recovery; unchanged progress permits at most three recovery attempts across restarts, then stops.
    - Count transport recoveries separately from workflow failures; do not claim the intermittent timeout is fixed.
    - The engine reviews internally: every leg runs refresh, rebase, land, flake rerun,
      peer review (DOYLE token required), rework, next issue, in that order. The foreman
      never dispatches reviews itself; `/tars-review-pr <n> --yolo` exists only for reviewing
      a PR outside a drain.
 3. **Route** on what the run reports (the engine returns typed directives; read them from the response and from `tars-agy inspect`):
-   - **drained**: the backlog is empty. Go to shift end.
+   - **drained**: the selected workload is complete. Go to shift end.
    - **pending_ci**: checks are still running on open PRs. Wait 10 minutes (your runtime's pacing mechanism), then next cycle.
    - **approval_needed / pending_human_merge / human_door**: park. Go to shift end; DOYLE availability alone does not clear a blocked approval.
    - **stalled** or a breaker trip: park. Go to shift end. Never restart a stalled issue yourself.
@@ -133,6 +150,8 @@ Repeat up to `--cycles` times:
 - The compiled supervisor keeps one stream-json host per workspace and one in-flight user turn.
 - It reads incremental NDJSON continuously; malformed or truncated records are explicit failures.
 - A result must be acknowledged before another turn; duplicate results and identity changes fail.
+- A stop control, signal or outer deadline interrupts an active turn and terminates the owned host process group before reporting stopped.
+- Interrupted external writes retain unknown outcomes until reconciled; process termination alone does not prove a write failed.
 - Native spawn metadata supplies the parent's child inventory, not unrestricted nested-tree visibility or proof of child completion.
 - Keep transport status separate from workflow completion, parked state, approvals, CI and merge state.
 - The supervisor protocol specifies interruption recovery, limits, handover and the code/foreman enforcement boundary.
@@ -143,7 +162,7 @@ Repeat up to `--cycles` times:
 - An explicitly authorized guard provocation follows its agreed test procedure; record the expected refusal as evidence.
 - For an incidental refusal, continue authorized work when the refused operation can be omitted or replaced with an independently permitted operation that still satisfies the task.
   - Supply known skill instructions, their required delegation rules and tool schemas inline instead of asking the run to discover private plugin directories.
-  - Bind each inline brief to its tool surface: `tars` for the hub, `tars-spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
+  - Bind each inline brief to its tool surface: `hub` for the hub, `tars-spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
   - Edit authorized files directly inside the assigned worktree instead of creating private scratch helpers.
   - Forward the correction to every affected spoke.
 - Keep the refused target and operation off limits. Never use another tool, identity or path alias to obtain the same denied access, weaken a hook, or widen permissions as recovery.
@@ -175,6 +194,8 @@ Repeat up to `--cycles` times:
 
 The helper writes `FACTORY_REPORT.md` next to the ledger on completion, stop or host failure.
 Verify its evidence, add any missing human handover detail and stop.
+Verify the ledger's `run_boundary` records the outcome, selection, installation receipt and selected branch/candidate snapshots before another workload.
+A `snapshotError` or missing candidate is incomplete evidence; report it and reconcile the preserved run state before continuing.
 Sections:
 
 - **Outcome**: drained / parked / stopped, and the one-line reason.
