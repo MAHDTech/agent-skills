@@ -91,7 +91,7 @@ Running the installed factory requires no Bun, Node, Python, or checkout of `age
    - Send `{"action":"probe"}` on stdin and wait for its NDJSON result envelope.
    - Transport `.status` must be `SUCCESS`; verify workflow state separately.
    - The response must list the tars hub tools (`start_session`, `advance_wave`, ...). A missing server gets ONE `retry-probe` control with the current result receipt; still missing stops the shift.
-   - The current MCP servers are `hub` and `spoke`; the supervisor launches `agy --agent tars` and probes `hub`.
+   - The current MCP servers are `hub` and `tars-spoke`; the supervisor launches `agy --agent tars` and probes `hub`.
    - Hub discovery does not prove spoke capabilities; verify each delegated role's own permitted surface.
    - Parse `denied_actions` from the JSON envelope, even when the exit code is 0 and `.status` is `SUCCESS`; preserve each entry's `action` and `display_name`.
    - Also inspect the response, permitted tool evidence and TARS deny logs for hook refusals; an absent `denied_actions` field does not prove no hook denied a call.
@@ -159,7 +159,7 @@ Repeat up to `--cycles` times:
 - An explicitly authorized guard provocation follows its agreed test procedure; record the expected refusal as evidence.
 - For an incidental refusal, continue authorized work when the refused operation can be omitted or replaced with an independently permitted operation that still satisfies the task.
   - Supply known skill instructions, their required delegation rules and tool schemas inline instead of asking the run to discover private plugin directories.
-  - Bind each inline brief to its tool surface: `hub` for the hub, `spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
+  - Bind each inline brief to its tool surface: `hub` for the hub, `tars-spoke` for spokes. Include the actual argument schema and each spoke's own artifact write in its dispatch prompt; a hub-only schema bundle does not supply a spoke brief.
   - Edit authorized files directly inside the assigned worktree instead of creating private scratch helpers.
   - Forward the correction to every affected spoke.
 - Keep the refused target and operation off limits. Never use another tool, identity or path alias to obtain the same denied access, weaken a hook, or widen permissions as recovery.
