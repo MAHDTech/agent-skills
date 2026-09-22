@@ -16,12 +16,12 @@ use skills_core::installer::{InstallOptions, Installer, TargetEnvironment, Unins
 use skills_core::lint::SkillLinter;
 use skills_core::models::LintSeverity;
 use skills_core::parser::SkillParser;
-use skills_core::sync::SkillSyncer;
+use skills_core::sync::{ConflictStrategy, SkillSyncer, SyncAction, SyncActionKind};
 
 /// Dispatches catalog operations to skills-core domain engines.
 pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
     if let Some(ref action) = args.action {
-        return run_action(action, format).await;
+        return run_action(action, &args, format).await;
     }
 
     if let Some(ref cmd) = args.command {
@@ -53,23 +53,25 @@ pub async fn run(args: SkillsArgs, format: OutputFormat) -> Result<(), CliError>
     }
 }
 
-async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> {
+async fn run_action(action: &str, args: &SkillsArgs, format: OutputFormat) -> Result<(), CliError> {
+    if (args.source.is_some() || args.target.is_some())
+        && !matches!(action, "install" | "uninstall")
+        || args.dry_run && action != "sync"
+    {
+        return Err(CliError::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "SOURCE and --target require install/uninstall; --dry-run requires sync",
+        )));
+    }
     match action {
         "list" => run_list(None, false, format).await,
         "show" => Err(CliError::Io(std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
             "Action 'show' requires a skill name argument; use 'ask skills show <name>' instead",
         ))),
-        "install" => Err(CliError::Io(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "Action 'install' requires a skill name argument; use 'ask skills install <name>' instead",
-        ))),
-        "uninstall" => Err(CliError::Io(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "Action 'uninstall' requires a skill name argument; use 'ask skills uninstall <name>' instead",
-        ))),
+        "install" | "uninstall" => run_bulk_action(action, args).await,
         "lint" => run_lint(None, false, format).await,
-        "sync" => run_sync(false).await,
+        "sync" => run_sync(args.dry_run).await,
         "download-resources" => run_download_resources(false).await,
         "clean-resources" => run_clean_resources().await,
         other => Err(CliError::Io(std::io::Error::new(
@@ -77,6 +79,84 @@ async fn run_action(action: &str, format: OutputFormat) -> Result<(), CliError> 
             format!("Unknown skills action: '{other}'"),
         ))),
     }
+}
+
+#[allow(tail_expr_drop_order)]
+async fn run_bulk_action(action: &str, args: &SkillsArgs) -> Result<(), CliError> {
+    let targets = args
+        .target
+        .as_deref()
+        .map_or_else(TargetEnvironment::all_standard, |target| {
+            vec![resolve_target_environment(Some(target))]
+        });
+    let installer = Installer::new();
+    let mut failures = Vec::new();
+    for target in targets {
+        let sources = if let Some(source) = &args.source {
+            vec![source.clone()]
+        } else if action == "install" {
+            let root = resolve_root()?;
+            let catalog = if root.join("skills").is_dir() {
+                root.join("skills")
+            } else {
+                root
+            };
+            let mut skills: Vec<_> = SkillSyncer::new(catalog)
+                .discover_catalog_skills()
+                .map_err(SkillError::from)?
+                .into_values()
+                .map(|path| path.to_string_lossy().into_owned())
+                .collect();
+            skills.sort();
+            skills
+        } else {
+            let root = resolve_root()?;
+            let mut names: Vec<_> = repository_skill_names(&root, false)?;
+            names.extend(repository_skill_names(&root, true)?);
+            names.sort();
+            names.dedup();
+            let registry = installer.read_registry(&target).map_err(SkillError::from)?;
+            let target_dir = installer
+                .resolve_target_dir(&target)
+                .map_err(SkillError::from)?;
+            names.retain(|name| {
+                registry.get(name).is_some() || target_dir.join(name).symlink_metadata().is_ok()
+            });
+            names
+        };
+        for source in sources {
+            let result = if action == "install" {
+                run_install_target(&source, &target).await
+            } else {
+                run_uninstall_target(&source, &target).await
+            };
+            if let Err(error) = result {
+                failures.push(format!("{}: {source}: {error}", target.display_name()));
+            }
+        }
+    }
+    if !failures.is_empty() {
+        return Err(CliError::Io(std::io::Error::other(failures.join("\n"))));
+    }
+    Ok(())
+}
+
+fn repository_skill_names(root: &Path, archived: bool) -> Result<Vec<String>, CliError> {
+    let catalog = if archived {
+        root.join("skills-archive")
+    } else if root.join("skills").is_dir() {
+        root.join("skills")
+    } else {
+        root.to_path_buf()
+    };
+    if archived && !catalog.is_dir() {
+        return Ok(Vec::new());
+    }
+    Ok(SkillSyncer::new(catalog)
+        .discover_catalog_skills()
+        .map_err(SkillError::from)?
+        .into_keys()
+        .collect())
 }
 
 #[allow(clippy::unused_async)]
@@ -214,8 +294,13 @@ fn resolve_target_environment(target: Option<&str>) -> TargetEnvironment {
 
 #[allow(clippy::unused_async)]
 async fn run_install(source: &str, target: Option<&str>) -> Result<(), CliError> {
+    run_install_target(source, &resolve_target_environment(target)).await
+}
+
+#[allow(clippy::unused_async)]
+async fn run_install_target(source: &str, target_env: &TargetEnvironment) -> Result<(), CliError> {
     let root = resolve_root()?;
-    let source_path = if Path::new(source).join("SKILL.md").exists() {
+    let source_path = if Path::new(source).is_dir() || Path::new(source).components().count() > 1 {
         PathBuf::from(source)
     } else {
         let skills = SkillParser::discover_skills(&root)?;
@@ -230,10 +315,13 @@ async fn run_install(source: &str, target: Option<&str>) -> Result<(), CliError>
         root.join(skill.path.parent().unwrap_or_else(|| Path::new("")))
     };
 
-    let target_env = resolve_target_environment(target);
-    let options = InstallOptions::default();
+    let options = InstallOptions {
+        force: true,
+        create_backup: true,
+        ..Default::default()
+    };
     let result = Installer::new()
-        .install(&source_path, &target_env, &options)
+        .install(&source_path, target_env, &options)
         .map_err(SkillError::from)?;
 
     println!(
@@ -249,10 +337,14 @@ async fn run_install(source: &str, target: Option<&str>) -> Result<(), CliError>
 
 #[allow(clippy::unused_async)]
 async fn run_uninstall(skill: &str, target: Option<&str>) -> Result<(), CliError> {
-    let target_env = resolve_target_environment(target);
+    run_uninstall_target(skill, &resolve_target_environment(target)).await
+}
+
+#[allow(clippy::unused_async)]
+async fn run_uninstall_target(skill: &str, target_env: &TargetEnvironment) -> Result<(), CliError> {
     let options = UninstallOptions::default();
     let result = Installer::new()
-        .uninstall(skill, &target_env, &options)
+        .uninstall(skill, target_env, &options)
         .map_err(SkillError::from)?;
 
     println!(
@@ -382,31 +474,68 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
         root.clone()
     };
 
-    let artifacts = if !dry_run {
-        Some(ArtifactsEngine::from_env(&root).generate_all()?)
-    } else {
-        None
-    };
-
     let repo_only = !dry_run
         && (std::env::var("SKILLS_REPO_ONLY").is_ok()
             || std::env::var("PRE_COMMIT").is_ok()
             || std::env::var("CI").is_ok());
 
-    if !repo_only {
+    if repo_only {
+        println!("Repository-only sync active: skipping machine target synchronization.");
+    } else {
         let syncer = SkillSyncer::new(catalog_dir)
             .with_targets(TargetEnvironment::all_standard())
+            .with_conflict_strategy(ConflictStrategy::LocalWins)
             .with_dry_run(dry_run);
 
-        let plan = syncer.create_plan().map_err(SkillError::from)?;
+        let mut plan = syncer.create_plan().map_err(SkillError::from)?;
+        let mut archived_names = repository_skill_names(&root, true)?;
+        let live_names = repository_skill_names(&root, false)?;
+        archived_names.retain(|name| !live_names.contains(name));
+        archived_names.sort();
+        for target in &syncer.targets {
+            let target_dir = syncer
+                .installer
+                .resolve_target_dir(target)
+                .map_err(SkillError::from)?;
+            for name in &archived_names {
+                if let Some(action) = plan
+                    .actions
+                    .iter_mut()
+                    .find(|action| action.skill_id == *name && action.target_env == *target)
+                {
+                    action.kind = SyncActionKind::Delete;
+                    action.reason = "Skill archived in authoritative repository".to_string();
+                } else if target_dir.join(name).symlink_metadata().is_ok() {
+                    plan.actions.push(SyncAction {
+                        skill_id: name.clone(),
+                        target_env: target.clone(),
+                        kind: SyncActionKind::Delete,
+                        source_version: None,
+                        target_version: None,
+                        source_checksum: None,
+                        target_checksum: None,
+                        reason: "Skill archived in authoritative repository".to_string(),
+                    });
+                }
+            }
+        }
 
         println!("Synchronization Plan (actions: {}):", plan.actions.len());
+        println!(
+            "Repository is authoritative: {} conflicting target(s) will be replaced with backups.",
+            plan.conflicts().count()
+        );
         for action in &plan.actions {
             println!(
-                "  [{:?}] {} for {}",
-                action.kind,
+                "  [{}] {} for {}: {}",
+                if action.kind == SyncActionKind::Conflict {
+                    "Replace".to_string()
+                } else {
+                    format!("{:?}", action.kind)
+                },
                 action.skill_id,
-                action.target_env.display_name()
+                action.target_env.display_name(),
+                action.reason
             );
         }
 
@@ -416,9 +545,13 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
             "Sync complete (dry_run: {}): {} installed, {} updated, {} deleted, {} up-to-date.",
             summary.dry_run, summary.installed, summary.updated, summary.deleted, summary.no_ops
         );
-    } else {
-        println!("Repository-only sync active: skipping machine target synchronization.");
     }
+
+    let artifacts = if dry_run {
+        None
+    } else {
+        Some(ArtifactsEngine::from_env(&root).generate_all()?)
+    };
 
     if let Some(art) = artifacts {
         let mut repo_files = 0;
@@ -437,8 +570,7 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
             0
         };
         println!(
-            "Artifacts synchronized: {} repository files updated, {} dashboard pages generated.",
-            repo_files, dashboard_pages
+            "Artifacts synchronized: {repo_files} repository files updated, {dashboard_pages} dashboard pages generated."
         );
     }
 

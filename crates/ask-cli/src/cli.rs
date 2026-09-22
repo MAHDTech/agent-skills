@@ -110,10 +110,23 @@ pub enum Commands {
 
 /// Arguments and subcommands for skill catalog operations.
 #[derive(Args, Debug, Clone, PartialEq, Eq)]
+#[command(args_conflicts_with_subcommands = true)]
 pub struct SkillsArgs {
     /// Action flag for compatibility with scripts.
     #[arg(long = "action", help = "Action flag for compatibility with scripts")]
     pub action: Option<String>,
+
+    /// Optional skill directory or identifier for an action.
+    #[arg(value_name = "SOURCE", requires = "action")]
+    pub source: Option<String>,
+
+    /// Target for install/uninstall actions; defaults to all standard targets.
+    #[arg(short, long, requires = "action")]
+    pub target: Option<String>,
+
+    /// Preview synchronization without writing changes.
+    #[arg(long, requires = "action")]
+    pub dry_run: bool,
 
     /// Specific skills catalog operation to perform.
     #[command(subcommand)]

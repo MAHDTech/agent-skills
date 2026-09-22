@@ -1291,7 +1291,7 @@ impl Installer {
 
         // Verify that source contains SKILL.md
         let skill_md_path = source_path.join("SKILL.md");
-        if !skill_md_path.exists() {
+        if !skill_md_path.is_file() {
             return Err(InstallerError::InvalidSourcePath {
                 path: source_path.to_path_buf(),
                 reason: "Source directory does not contain SKILL.md".to_string(),
