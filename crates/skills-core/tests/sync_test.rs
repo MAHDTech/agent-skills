@@ -470,3 +470,64 @@ fn test_catalog_discovery_nested_categories() {
     let plan = syncer.create_plan().unwrap();
     assert_eq!(plan.installs().count(), 2);
 }
+
+#[test]
+#[cfg(unix)]
+fn test_sync_repairs_managed_link_after_worktree_removed() {
+    let h = TestHarness::new();
+    let old = create_mock_skill(&h.temp.path().join("old"), "skill-a", "1.0.0", "Body");
+    let source = create_mock_skill(&h.catalog_dir, "skill-a", "1.0.0", "Body");
+    Installer::new()
+        .install(&old, &h.target, &InstallOptions::default())
+        .unwrap();
+    fs::remove_dir_all(&old).unwrap();
+    let syncer = SkillSyncer::new(&h.catalog_dir).with_target(h.target.clone());
+    assert_eq!(syncer.create_plan().unwrap().updates().count(), 1);
+    assert_eq!(syncer.sync().unwrap().updated, 1);
+    assert_eq!(
+        h.agent_dir.join("skill-a").canonicalize().unwrap(),
+        source.canonicalize().unwrap()
+    );
+    assert!(syncer.create_plan().unwrap().is_noop());
+}
+
+#[test]
+#[cfg(unix)]
+fn test_sync_source_file_removal_is_not_tampering() {
+    let h = TestHarness::new();
+    let source = create_mock_skill(&h.catalog_dir, "skill-a", "1.0.0", "Body");
+    let syncer = SkillSyncer::new(&h.catalog_dir).with_target(h.target.clone());
+    syncer.sync().unwrap();
+    fs::remove_file(source.join("resources/manual/test.txt")).unwrap();
+    assert_eq!(syncer.sync().unwrap().updated, 1);
+    assert!(syncer.create_plan().unwrap().is_noop());
+}
+
+#[test]
+#[cfg(unix)]
+fn test_sync_rejects_redirected_symlink() {
+    let h = TestHarness::new();
+    create_mock_skill(&h.catalog_dir, "skill-a", "1.0.0", "Body");
+    let other = create_mock_skill(&h.temp.path().join("other"), "skill-a", "1.0.0", "Body");
+    let syncer = SkillSyncer::new(&h.catalog_dir).with_target(h.target.clone());
+    syncer.sync().unwrap();
+    fs::remove_file(h.agent_dir.join("skill-a")).unwrap();
+    std::os::unix::fs::symlink(other, h.agent_dir.join("skill-a")).unwrap();
+    assert!(syncer.create_plan().unwrap().has_conflicts());
+}
+
+#[test]
+fn test_sync_conflict_preflight_preserves_untracked_directory() {
+    let h = TestHarness::new();
+    create_mock_skill(&h.catalog_dir, "aaa-new", "1.0.0", "Body");
+    create_mock_skill(&h.catalog_dir, "zzz-existing", "1.0.0", "Body");
+    let untracked = create_mock_skill(&h.agent_dir, "zzz-existing", "1.0.0", "Hand copied");
+    let before = fs::read(untracked.join("SKILL.md")).unwrap();
+    let syncer = SkillSyncer::new(&h.catalog_dir).with_target(h.target.clone());
+    assert!(matches!(
+        syncer.sync(),
+        Err(SyncError::UnresolvedConflict { .. })
+    ));
+    assert!(!h.agent_dir.join("aaa-new").exists());
+    assert_eq!(fs::read(untracked.join("SKILL.md")).unwrap(), before);
+}
