@@ -41,6 +41,8 @@ dockerfiles
 drivedownload
 driveupload
 edgecase
+eframe
+egui
 endmacro
 endraw
 esac
@@ -152,6 +154,8 @@ retrans
 rfds
 rgba
 roundrect
+rustc
+rustdoc
 sarif
 sarifv
 scannability
@@ -201,6 +205,7 @@ toplevel
 unitless
 unmirrored
 unslop
+usize
 velero
 venv
 vercel

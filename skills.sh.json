@@ -12,6 +12,7 @@
         "codebase-design",
         "diagnosing-bugs",
         "domain-modeling",
+        "egui",
         "implement",
         "mcp",
         "nutanix-api-v4",
@@ -33,7 +34,8 @@
       "title": "Game Development",
       "description": "Game engines and game-development workflows.",
       "skills": [
-        "bevy-development"
+        "bevy-development",
+        "bevy-egui"
       ]
     },
     {
@@ -114,6 +116,7 @@
       "skills": [
         "agent-guidelines",
         "antigravity",
+        "cargo-doc",
         "devenv",
         "herdr",
         "install-skills",
