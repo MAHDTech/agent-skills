@@ -104,6 +104,7 @@ Beyond `/code-review` on the main flow:
 ## Game and database development
 
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
+- `/bevy-egui` - reach for this when integrating egui into Bevy 0.19 (bevy_egui, EguiPrimaryContextPass, input absorption, viewport cameras).
 - `/spacetimedb` - reach for this when working with SpacetimeDB database modules (schemas, reducers, views) or real-time client subscriptions.
 
 ## Cloud, infrastructure, and AI models
@@ -143,6 +144,8 @@ Beyond `/code-review` on the main flow:
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.
 - [/tailwind](../../tooling/tailwind/SKILL.md) - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
 - `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
+- `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
+- `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
 - [/zola](../../tooling/zola/SKILL.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](../../tooling/zed/SKILL.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
