@@ -148,6 +148,7 @@ Beyond `/code-review` on the main flow:
 - `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
 - `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
+- `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
