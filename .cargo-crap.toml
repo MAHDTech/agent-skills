@@ -9,13 +9,7 @@ try-weight = 0.2
 # Show uncovered line ranges in reports for failing functions
 uncovered-hints = true
 
-# Exclude standard test and benchmark directories automatically
-default-excludes = true
-
 # Additional file patterns to exclude from analysis
 exclude = [
-  "tests/**",
-  "benches/**",
-  "examples/**",
   "dashboard/**",
 ]

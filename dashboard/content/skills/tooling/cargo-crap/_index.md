@@ -153,18 +153,19 @@ try-weight = 0.2
 # Show uncovered line ranges in terminal reports for failing functions
 uncovered-hints = true
 
-# Exclude standard test and benchmark directories automatically
-default-excludes = true
-
 # Additional file patterns to exclude from analysis
 exclude = [
-    "tests/**",
-    "benches/**",
-    "examples/**",
     "src/generated/**",
     "src/proto/**",
 ]
 ```
+
+### Excluding Files and Patterns
+
+By default, `cargo-crap` automatically applies built-in exclusions for standard test and benchmark directories (`tests/**`, `benches/**`, `examples/**`).
+
+- **`exclude`**: Appends additional glob patterns to the defaults (such as generated code or protocol buffers).
+- **`default-excludes`**: Optional list of glob patterns that replaces the built-in defaults if specified (e.g. `default-excludes = ["benches/**", "examples/**"]`, or `default-excludes = []` to disable them), whereas `exclude` appends to the defaults.
 
 ### The `try-weight` Setting
 
