@@ -55,18 +55,50 @@ CRAP(m) = comp(m)^2 * (1 - cov(m)/100)^3 + comp(m)
 
 Standard `cargo test` is not sufficient for CRAP analysis. While `cargo test` executes test binaries and reports pass/fail outcomes, it does not instrument compiled machine code or produce line-level execution trace files.
 
-`cargo-llvm-cov` is a mandatory prerequisite. It leverages LLVM source-based code coverage flags (`-C instrument-coverage`) to generate standardized LCOV trace files (`lcov.info`) that `cargo-crap` ingests alongside Rust abstract syntax trees (ASTs).
+`cargo-llvm-cov` is a mandatory coverage engine prerequisite. It leverages LLVM source-based code coverage flags (`-C instrument-coverage`) to generate standardized LCOV trace files (`lcov.info`) that `cargo-crap` ingests alongside Rust abstract syntax trees (ASTs).
+
+### Pinning in Cargo.toml
+
+The recommended Cargo-native pattern is pinning `cargo-crap` directly in your workspace or crate manifests:
+
+- In root `Cargo.toml` under `[workspace.dependencies]`:
+
+```toml
+cargo-crap = "0.6.1"
+```
+
+- In crate `Cargo.toml` (such as `crates/ask-cli/Cargo.toml`) under `[dev-dependencies]`:
+
+```toml
+cargo-crap = { workspace = true, default-features = false }
+```
+
+Pinning the tool in `Cargo.toml` ensures that:
+
+- The exact CLI tool version is tracked in `Cargo.lock` by version control.
+- Automated dependency managers (such as Dependabot or Renovate) detect and propose updates automatically.
+- Continuous integration pipelines (such as `tars-cloud/actions` reusable workflows) automatically detect and resolve `cargo-crap` and its exact pinned version from `Cargo.lock`.
 
 ### Installing the Tooling
 
-Install both tools using `cargo-binstall` (fast binary installation) or `cargo install` (build from source):
+For coverage trace generation, install `cargo-llvm-cov`:
 
 ```bash
-# Install cargo-llvm-cov
 cargo binstall cargo-llvm-cov || cargo install cargo-llvm-cov
+```
 
-# Install cargo-crap
-cargo binstall cargo-crap || cargo install cargo-crap
+For `cargo-crap`, use one of the following local installation workflows:
+
+- **Pre-built binary (fastest)**:
+
+```bash
+cargo binstall cargo-crap
+```
+
+- **From source matching locked dependencies**:
+
+```bash
+cargo install --locked cargo-crap
 ```
 
 ## 3. Core Workflow
