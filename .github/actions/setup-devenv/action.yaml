@@ -20,7 +20,7 @@ runs:
   steps:
     - id: free_disk_space
       name: Free Disk Space
-      uses: ./.github/actions/free-disk-space
+      uses: tars-cloud/actions/composite/free-disk-space@feat/consumer-cargo-crap
 
     - id: install_nix
       name: Install Nix

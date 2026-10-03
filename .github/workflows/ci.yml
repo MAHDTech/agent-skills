@@ -53,16 +53,14 @@ jobs:
       - id: report_status
         name: Report Status
         if: always()
-        uses: ./.github/actions/report-status
+        uses: tars-cloud/actions/composite/report-status@feat/consumer-cargo-crap
         with:
-          result: ${{ job.status }}
-          success-message: "CI validation passed"
-          failure-message: "CI validation failed"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          workflow-name: ${{ github.workflow }}
-          repository: ${{ github.repository }}
-          sha: ${{ github.sha }}
-          run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          title: "CI Validation"
+          fail-on-error: "false"
+          results: |
+            setup=${{ steps.setup_devenv.outcome }}
+            prek=${{ steps.prek_run.outcome }}
+            test=${{ steps.devenv_test.outcome }}
 
       - id: write_summary
         name: Write Results Summary
