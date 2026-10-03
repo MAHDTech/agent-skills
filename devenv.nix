@@ -101,6 +101,7 @@ in
     };
     rust = {
       enable = isNative;
+      toolchainFile = ./rust-toolchain.toml;
       mold.enable = pkgs.stdenv.isLinux;
     };
   };
