@@ -24,12 +24,12 @@ concurrency:
 jobs:
   cargo-crap:
     name: Cargo CRAP
-    uses: tars-cloud/actions/.github/workflows/consumer-cargo-crap.yaml@feat/consumer-cargo-crap
+    uses: tars-cloud/actions/.github/workflows/consumer-cargo-crap.yaml@e36c5d93a66a395db6d01c32fdf3c67b6eaca0d2 # v3
     with:
       baseline-branch: trunk
       coverage-tool: llvm-cov
       post-comment: true
-      update-records-pr: false
+      update-records-pr: true
     secrets:
       app-id: ${{ secrets.APP_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}

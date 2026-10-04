@@ -53,7 +53,7 @@ jobs:
       - id: report_status
         name: Report Status
         if: always()
-        uses: tars-cloud/actions/composite/report-status@feat/consumer-cargo-crap
+        uses: tars-cloud/actions/composite/report-status@e36c5d93a66a395db6d01c32fdf3c67b6eaca0d2 # v3
         with:
           title: "CI Validation"
           fail-on-error: "false"

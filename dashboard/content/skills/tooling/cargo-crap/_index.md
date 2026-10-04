@@ -175,6 +175,61 @@ In Rust, the question mark operator `?` is standard practice for concise error p
 
 Integrate `cargo-crap` into continuous integration pipelines to prevent quality regressions from merging into production branches.
 
+### Reusable GitHub Actions Workflow (Recommended)
+
+The recommended CI setup uses the official reusable workflow from `tars-cloud/actions`. It automates the complete test, coverage, baseline comparison, and reporting pipeline, separating analysis execution from quality gate evaluation.
+
+Standard consumer caller workflow (`.github/workflows/cargo-crap.yaml`):
+
+```yaml
+name: Cargo CRAP
+
+on:
+  pull_request:
+    branches:
+      - trunk
+      - main
+  push:
+    branches:
+      - trunk
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  cargo-crap:
+    name: Cargo CRAP
+    uses: tars-cloud/actions/.github/workflows/consumer-cargo-crap.yaml@v3
+    with:
+      baseline-branch: trunk
+      coverage-tool: llvm-cov
+      post-comment: true
+      update-records-pr: true
+    secrets:
+      app-id: ${{ secrets.APP_ID }}
+      app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+```
+
+#### Quality Verdict and Reporting Separation
+
+The reusable workflow executes analysis and artifact generation before checking gating thresholds. Because quality verdicts are decoupled from publication steps, sticky PR comments, job summaries, and SARIF security uploads are always posted, even if the workflow run subsequently fails the quality gate.
+
+#### PR Comment and Summary Severity Levels
+
+The reusable workflow categorizes findings into three explicit severity levels for PR sticky comments and job summaries:
+
+- 🟢 **INFO:** All functions are within the threshold (default 30) and no score regressions detected; CI passes.
+- 🟠 **WARNING:** Scores regressed beyond `epsilon` (default 0.01), but all functions remain at or below the threshold; CI passes with warning annotation.
+- 🔴 **ERROR:** Any function strictly exceeds the threshold; CI fails with error annotation.
+
+#### Automated Baseline and Badge Maintenance
+
+Enabling `update-records-pr: true` configures automated baseline management on the designated baseline branch (e.g., `trunk`). When changes land on trunk, the workflow creates or updates a dedicated bot-owned `crap/next` pull request recording `.github/crap/baseline.json` and `.github/badges/crap-badge.json`, keeping metrics synchronized without manual intervention.
+
 ### Absolute Quality Gate
 
 Enforce an absolute ceiling across the entire codebase. If any function exceeds the threshold, the build fails:
@@ -272,19 +327,21 @@ Generate an endpoint JSON file for displaying dynamic CRAP status badges on repo
 cargo crap --workspace --lcov lcov.info --format shields --output crap-badge.json
 ```
 
-Publish `crap-badge.json` to GitHub Pages or a dedicated branch (such as `badges`), then link the badge in your `README.md`:
+Publish `crap-badge.json` via the reusable workflow (which records it at `.github/badges/crap-badge.json` on trunk) or to GitHub Pages / dedicated branch, then link the badge in your `README.md`.
+
+Official Shields.io endpoint badge URL format using URL-encoded query parameters:
 
 ```markdown
-![CRAP](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/<owner>/<repo>/<branch>/crap-badge.json)
+[![CRAP](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2F<owner>%2F<repo>%2Ftrunk%2F.github%2Fbadges%2Fcrap-badge.json&style=flat-square)](https://github.com/<owner>/<repo>/blob/trunk/.github/badges/crap-badge.json)
 ```
 
 ### Badge Status and Colors
 
-The badge endpoint automatically maps codebase health to colors:
+The badge colors reflect the count of flagged functions rather than a single repository average:
 
-- `passing` (brightgreen): 0 functions exceed the threshold.
-- `1-5 crappy` (yellow): Low count of crappy functions (minor debt).
-- `6+ crappy` (red): High count of crappy functions (significant refactoring required).
+- `brightgreen`: 0 functions exceed threshold (clean).
+- `orange`: 1-5 functions exceed threshold (minor debt).
+- `red`: 6+ functions exceed threshold (significant debt).
 
 ## 7. Traps and Operational Best Practices
 
