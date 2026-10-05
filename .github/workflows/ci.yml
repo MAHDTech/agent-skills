@@ -1,3 +1,4 @@
+---
 name: CI
 
 on:
@@ -9,12 +10,11 @@ on:
     branches:
       - trunk
       - main
+  workflow_dispatch: {}
 
 permissions:
   contents: read
-  statuses: write
-  # actions: write is required by setup-devenv to delete/purge old nix caches
-  actions: write
+  actions: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,53 +22,8 @@ concurrency:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - id: checkout_repository
-        name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - id: setup_devenv
-        name: Setup Devenv
-        uses: ./.github/actions/setup-devenv
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          cachix-cache-name: ${{ vars.CACHIX_CACHE_NAME }}
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          skip-push: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
-
-      - id: prek_run
-        name: Run pre-commit hooks
-        run: |
-          devenv --no-tui shell --verbose -- prek run -a
-
-      - id: devenv_test
-        name: Devenv test
-        run: |
-          devenv --no-tui test
-
-      - id: report_status
-        name: Report Status
-        if: always()
-        uses: tars-cloud/actions/composite/report-status@e36c5d93a66a395db6d01c32fdf3c67b6eaca0d2 # v3
-        with:
-          title: "CI Validation"
-          fail-on-error: "false"
-          results: |
-            setup=${{ steps.setup_devenv.outcome }}
-            prek=${{ steps.prek_run.outcome }}
-            test=${{ steps.devenv_test.outcome }}
-
-      - id: write_summary
-        name: Write Results Summary
-        if: always()
-        uses: ./.github/actions/step-summary
-        with:
-          title: "CI Results"
-          jobs: |
-            Setup Devenv|${{ steps.setup_devenv.outcome }}
-            Run pre-commit hooks|${{ steps.prek_run.outcome }}
-            Devenv test|${{ steps.devenv_test.outcome }}
+    name: CI Validation
+    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@d074dde42c3d810959a57df78516e3eddb2fa8f7 # v3
+    with:
+      job-name: validate
+      lint-command: prek run --all-files

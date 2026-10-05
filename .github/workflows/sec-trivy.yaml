@@ -26,7 +26,7 @@ concurrency:
 jobs:
   trivy:
     name: Trivy Scan
-    uses: tars-cloud/actions/.github/workflows/consumer-trivy.yaml@e36c5d93a66a395db6d01c32fdf3c67b6eaca0d2 # v3
+    uses: tars-cloud/actions/.github/workflows/consumer-trivy.yaml@d074dde42c3d810959a57df78516e3eddb2fa8f7 # v3
     with:
       timeout-minutes: 60
       config-file: auto

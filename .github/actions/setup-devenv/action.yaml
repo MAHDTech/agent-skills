@@ -20,7 +20,7 @@ runs:
   steps:
     - id: free_disk_space
       name: Free Disk Space
-      uses: tars-cloud/actions/composite/free-disk-space@e36c5d93a66a395db6d01c32fdf3c67b6eaca0d2 # v3
+      uses: tars-cloud/actions/composite/free-disk-space@d074dde42c3d810959a57df78516e3eddb2fa8f7 # v3
 
     - id: install_nix
       name: Install Nix
