@@ -6,7 +6,13 @@ Working on my _skill issues_.
 
 ![skill issues](./docs/images/skill-issues.png)
 
-These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.
+AI Agent skills that attempt to be compatible with;
+
+- Antigravity
+- Codex
+- Claude Code
+- Goose
+- OpenCode.
 
 ## Install
 
