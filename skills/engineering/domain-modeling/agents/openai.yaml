@@ -1,0 +1,7 @@
+interface:
+  display_name: "Domain Modeling"
+  short_description: "Build domain models with ubiquitous language and ADRs"
+  default_prompt: "Use $domain-modeling to sharpen domain models and record ADRs."
+
+policy:
+  allow_implicit_invocation: true

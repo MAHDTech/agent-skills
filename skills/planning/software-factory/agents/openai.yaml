@@ -1,0 +1,7 @@
+interface:
+  display_name: "Software Factory"
+  short_description: "Guide features through four design approval gates"
+  default_prompt: "Use $software-factory to run a feature through approval gates."
+
+policy:
+  allow_implicit_invocation: false

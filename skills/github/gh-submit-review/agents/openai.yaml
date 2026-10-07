@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Submit Review"
+  short_description: "Submit code reviews and comments to a pull request"
+  default_prompt: "Use $gh-submit-review to submit a review to a pull request."
+
+policy:
+  allow_implicit_invocation: false

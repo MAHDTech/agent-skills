@@ -107,6 +107,7 @@ Beyond `/code-review` on the main flow:
 
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
 - `/bevy-egui` - reach for this when integrating egui into Bevy 0.19 (bevy_egui, EguiPrimaryContextPass, input absorption, viewport cameras).
+- `/casita` - reach for this when working with Casita content-addressed repositories (immutable object graphs, CLI, Rust API, synchronization, or garbage collection).
 - `/spacetimedb` - reach for this when working with SpacetimeDB database modules (schemas, reducers, views) or real-time client subscriptions.
 
 ## Cloud, infrastructure, and AI models

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Self-Review"
+  short_description: "Review changes for simplification and idiomatic improvements"
+  default_prompt: "Use $self-review to review implementation changes and diffs."
+
+policy:
+  allow_implicit_invocation: true

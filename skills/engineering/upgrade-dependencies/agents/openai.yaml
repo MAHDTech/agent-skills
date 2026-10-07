@@ -1,0 +1,7 @@
+interface:
+  display_name: "Upgrade Dependencies"
+  short_description: "Safely upgrade dependencies and frameworks step by step"
+  default_prompt: "Use $upgrade-dependencies to safely upgrade project dependencies."
+
+policy:
+  allow_implicit_invocation: true

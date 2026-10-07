@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scratchpad"
+  short_description: "Manage temporary scripts and throwaway files safely"
+  default_prompt: "Use $scratchpad to isolate temporary scripts and files."
+
+policy:
+  allow_implicit_invocation: false

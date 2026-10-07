@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unslop"
+  short_description: "Remove AI buzzwords and add authentic human voice"
+  default_prompt: "Use $unslop to remove AI cliches and restore human voice."
+
+policy:
+  allow_implicit_invocation: true

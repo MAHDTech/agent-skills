@@ -1,0 +1,7 @@
+interface:
+  display_name: "TARS Run Factory"
+  short_description: "Run unattended TARS software factory over backlogs"
+  default_prompt: "Use $tars-run-factory to orchestrate unattended factory runs."
+
+policy:
+  allow_implicit_invocation: false

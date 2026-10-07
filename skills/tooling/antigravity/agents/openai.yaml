@@ -1,0 +1,7 @@
+interface:
+  display_name: "Antigravity"
+  short_description: "Guide and reference for Google Antigravity CLI and IDE"
+  default_prompt: "Use $antigravity to navigate Google Antigravity features."
+
+policy:
+  allow_implicit_invocation: true

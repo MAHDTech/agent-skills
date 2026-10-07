@@ -1,0 +1,7 @@
+interface:
+  display_name: "Optimize Performance"
+  short_description: "Profile and optimize code performance with benchmarks"
+  default_prompt: "Use $optimize-performance to benchmark, profile, and optimize code."
+
+policy:
+  allow_implicit_invocation: true

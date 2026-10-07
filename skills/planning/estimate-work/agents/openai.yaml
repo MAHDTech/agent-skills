@@ -1,0 +1,7 @@
+interface:
+  display_name: "Estimate Work"
+  short_description: "Size and estimate work with ranges and named assumptions"
+  default_prompt: "Use $estimate-work to estimate work with ranges and assumptions."
+
+policy:
+  allow_implicit_invocation: true

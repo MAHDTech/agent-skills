@@ -1,0 +1,7 @@
+interface:
+  display_name: "Wayfinder"
+  short_description: "Chart large nebulous efforts as an issue tracker map"
+  default_prompt: "Use $wayfinder to chart and navigate large ambiguous efforts."
+
+policy:
+  allow_implicit_invocation: false

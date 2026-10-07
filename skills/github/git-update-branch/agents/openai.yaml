@@ -1,0 +1,7 @@
+interface:
+  display_name: "Git Update Branch"
+  short_description: "Bring a feature branch up to date with its base branch"
+  default_prompt: "Use $git-update-branch to update a branch against its base."
+
+policy:
+  allow_implicit_invocation: false

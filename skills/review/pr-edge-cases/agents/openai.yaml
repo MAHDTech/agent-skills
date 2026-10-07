@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Edge Cases"
+  short_description: "Probe pull request changes for edge cases and failures"
+  default_prompt: "Use $pr-edge-cases to find logic edge cases and test gaps."
+
+policy:
+  allow_implicit_invocation: true

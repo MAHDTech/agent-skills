@@ -1,0 +1,57 @@
+# Casita
+
+> Casita is a pre-release verified content-addressed repository for immutable object graphs. Repository\<PS, SS\> combines physical payloads with revisioned immutable object records and named roots. Filesystem, IPLD, native Git, and custom formats keep their native identity while sharing one publication, synchronization, collection, and integrity model.
+
+Start with: cargo install --path crates/casita; casita --repository ./cache import ./project --root projects/demo; casita sync --from ./cache --to ./mirror --root projects/demo.
+
+The supported Rust API uses the non-generic casita::Repository: Repository::local(path).await opens local storage and Repository::memory() opens ephemeral storage. Custom payload/state backends use casita::experimental::Repository::new(payloads, state) with the experimental Cargo feature.
+
+## Documentation Sets
+
+- [Complete documentation](https://casita.rs/llms-full.txt): every page of the Casita documentation as Markdown
+
+## Documentation
+
+- [Introducing Casita: A content-addressed store for source code and build artifacts](https://casita.rs/blog/introducing-casita-a-content-addressed-store-for-source-code-and-build-artifacts/index.md): Source code and build artifacts sharing verified storage, synchronization, and garbage collection.
+- [CLI](https://casita.rs/cli/index.md): Common commands for storing, copying, and checking objects.
+- [Concepts](https://casita.rs/concepts/index.md): How objects, roots, verification, storage, and collection fit together.
+- [Blob Storage](https://casita.rs/concepts/blob-storage/index.md): How Casita identifies, stores, and reads immutable payload bytes.
+- [Deduplication](https://casita.rs/concepts/deduplication/index.md): How equal blobs and shared chunks reduce storage and transfer work.
+- [Directory Storage](https://casita.rs/concepts/directory-storage/index.md): How canonical directories link files and subdirectories into a graph.
+- [Garbage Collection](https://casita.rs/concepts/garbage-collection/index.md): What collection keeps, how to run it, and how it recovers.
+- [Imports](https://casita.rs/concepts/imports/index.md): How Casita turns external data into verified objects and a named root.
+- [Repository](https://casita.rs/concepts/repository/index.md): How payloads, object records, roots, and verification fit together.
+- [Division of Responsibility](https://casita.rs/concepts/responsibilities/index.md): Which guarantees belong to Casita, object formats, physical backends, higher-level tools, and deployments.
+- [Roots & Retention](https://casita.rs/concepts/roots-and-retention/index.md): What keeps an object graph available and how roots change safely.
+- [Shared Payload Services](https://casita.rs/concepts/shared-payload-services/index.md): Keep physical blobs safe when several repositories share one store.
+- [Sync](https://casita.rs/concepts/sync/index.md): How Casita copies verified objects and roots between repositories.
+- [Verification](https://casita.rs/concepts/verification/index.md): What Casita checks during publication, reads, sync, and integrity scans.
+- [Casitar Archives](https://casita.rs/design/casitar/index.md): Portable, closure-complete offline interchange for Casita object graphs.
+- [Quick Start](https://casita.rs/getting-started/index.md): Install Casita, store a directory, restore it, and copy it to another repository.
+- [Add a New Importer](https://casita.rs/guides/adding-an-importer/index.md): Turn a new input into verified Casita objects, with an optional CLI command.
+- [Import a Casitar Archive](https://casita.rs/guides/casitar/index.md): Restore a portable, verified Casitar closure archive through the generic importer interface.
+- [Define a Custom Object Format](https://casita.rs/guides/custom-formats/index.md): Verify a new object's identity, payload, and links in every repository that uses it.
+- [Capture and Restore a Filesystem Tree](https://casita.rs/guides/filesystem/index.md): Import, inspect, retain, refresh, and safely materialize a canonical filesystem graph.
+- [Preserve and Serve a Native Git View](https://casita.rs/guides/git/index.md): Import native Git objects without translating their identity, then inspect, materialize, or serve an immutable ref view.
+- [Import an OCI Image](https://casita.rs/guides/oci/index.md): Import a container image, keep its original layers, and check out its merged filesystem.
+- [Operate a Local Repository](https://casita.rs/guides/operations/index.md): Check roots and integrity, collect unused data, and back up a coherent repository.
+- [Run Applications from Casita](https://casita.rs/guides/run/index.md): Import an application tree, select its executable, and run a retained copy.
+- [Maintain an S3 Repository](https://casita.rs/guides/s3-maintenance/index.md): Inspect holds, shut down cleanly, and recover interrupted collection.
+- [Share an S3 Repository Across Owners](https://casita.rs/guides/s3-multi-owner/index.md): Use separate root names and one collector for several applications.
+- [Synchronize Repositories](https://casita.rs/guides/sync/index.md): Copy objects, roots, or one filesystem path into a verified destination.
+- [Import a Tar Archive](https://casita.rs/guides/tar/index.md): Stream a tar archive directly into a verified canonical filesystem graph.
+- [Cargo](https://casita.rs/integrations/cargo/index.md): How the experimental Cargo fork stores dependency data and build artifacts in Casita.
+- [Local IPC](https://casita.rs/integrations/ipc/index.md): Local JSON-RPC protocol for importing and restoring artifacts.
+- [Use Casita as a Rust Library](https://casita.rs/library/index.md): Open a repository, import data, and use the supported Rust API.
+- [What is Casita?](https://casita.rs/overview/index.md): Understand what Casita stores and when to use it.
+- [Reference](https://casita.rs/reference/index.md): Exact command, API, identity, format, feature, storage, and error contracts for Casita.
+- [Benchmarks](https://casita.rs/reference/benchmarks/index.md): Run and interpret Casita's reproducible performance suites.
+- [Cargo Features](https://casita.rs/reference/cargo-features/index.md): Compile-time feature flags, implications, and supported Casita capability sets.
+- [CLI Reference](https://casita.rs/reference/cli/index.md): Command syntax, important defaults, and repository effects.
+- [Errors and Integrity](https://casita.rs/reference/errors/index.md): Stable repository error categories, retry guidance, closure states, and fsck findings.
+- [Experimental Rust API](https://casita.rs/reference/experimental-rust-api/index.md): Custom backends, formats, sessions, transfer sources, and limits.
+- [Identifiers](https://casita.rs/reference/identifiers/index.md): Text forms and validation rules for Casita keys, digests, roots, revisions, paths, Git refs, and SSH endpoints.
+- [Local Repository](https://casita.rs/reference/local-repository/index.md): Standard persistent profile layout, process coordination, collection behavior, and operational boundaries.
+- [Object Formats](https://casita.rs/reference/object-formats/index.md): Built-in namespaces, native IDs, and the links each format retains.
+- [Rust API Reference](https://casita.rs/reference/rust-api/index.md): The supported Rust application API for built-in repository workflows.
+

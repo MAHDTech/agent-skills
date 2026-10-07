@@ -1,0 +1,7 @@
+interface:
+  display_name: "OpenCode ACP"
+  short_description: "Control OpenCode sessions via Agent Client Protocol"
+  default_prompt: "Use $opencode-acp to control OpenCode over ACP."
+
+policy:
+  allow_implicit_invocation: true

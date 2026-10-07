@@ -1,0 +1,7 @@
+interface:
+  display_name: "Code Comments"
+  short_description: "Write high-signal code comments and prune comment bloat"
+  default_prompt: "Use $code-comments to write concise comments and prune bloat."
+
+policy:
+  allow_implicit_invocation: true

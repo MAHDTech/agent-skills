@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Create PR"
+  short_description: "Create or update pull requests with generated notes"
+  default_prompt: "Use $gh-create-pr to create or update a pull request."
+
+policy:
+  allow_implicit_invocation: false

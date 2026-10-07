@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutanix Objects"
+  short_description: "Manage S3-compatible object storage on Nutanix Objects"
+  default_prompt: "Use $nutanix-objects to manage S3 buckets and object storage."
+
+policy:
+  allow_implicit_invocation: true

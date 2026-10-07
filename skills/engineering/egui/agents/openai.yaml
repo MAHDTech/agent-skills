@@ -1,0 +1,7 @@
+interface:
+  display_name: "Egui GUI"
+  short_description: "Build immediate-mode graphical user interfaces in Rust"
+  default_prompt: "Use $egui to build immediate-mode Rust graphical interfaces."
+
+policy:
+  allow_implicit_invocation: true

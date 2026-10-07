@@ -1,0 +1,7 @@
+interface:
+  display_name: "Simplify Docs"
+  short_description: "Simplify documentation for clarity and fast execution"
+  default_prompt: "Use $simplify-docs to simplify and restructure documentation."
+
+policy:
+  allow_implicit_invocation: true

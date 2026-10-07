@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tauri"
+  short_description: "Build and configure Tauri v2 desktop and mobile apps"
+  default_prompt: "Use $tauri to develop and configure Tauri applications."
+
+policy:
+  allow_implicit_invocation: true

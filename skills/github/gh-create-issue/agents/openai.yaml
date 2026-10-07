@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Create Issue"
+  short_description: "Create structured GitHub issues using the gh CLI"
+  default_prompt: "Use $gh-create-issue to create a GitHub issue from context."
+
+policy:
+  allow_implicit_invocation: false

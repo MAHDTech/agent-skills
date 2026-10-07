@@ -1,0 +1,7 @@
+interface:
+  display_name: "Tailwind CSS"
+  short_description: "Build and configure Tailwind CSS styles and utilities"
+  default_prompt: "Use $tailwind to write utility classes or configure Tailwind."
+
+policy:
+  allow_implicit_invocation: true

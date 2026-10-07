@@ -11,6 +11,7 @@ antipatterns
 apos
 approvable
 arcsize
+bao
 basenames
 binstall
 blockquotes
@@ -20,6 +21,8 @@ bunfig
 bunx
 byos
 cachix
+casita
+casitar
 cfasync
 cheatsheet
 checkboxed
@@ -58,6 +61,8 @@ endraw
 esac
 evals
 evans
+evictable
+fastcdc
 fips
 Fira
 Fire
@@ -83,6 +88,7 @@ husky
 icap
 icat
 imgcat
+IPLD
 iseconds
 jetbrainsmono
 jina
@@ -106,6 +112,7 @@ mattpocock
 mcafee
 mcpc
 mdns
+Merkle
 mgmt
 microbenchmark
 minto
@@ -124,6 +131,7 @@ nixfmt
 nixos
 nixpkgs
 nonblock
+nonblocking
 noninfringement
 npx
 ntnx
@@ -170,6 +178,7 @@ respawn
 retrans
 rfds
 rgba
+rootfs
 roundrect
 rustc
 rustdoc
@@ -225,6 +234,7 @@ toolsdirectory
 toplevel
 unitless
 unmirrored
+unrooted
 unslop
 usize
 velero
