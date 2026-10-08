@@ -434,7 +434,6 @@ impl ArtifactsEngine {
     }
 
     /// Generates dashboard content tree under `dashboard/content/skills/`.
-    #[allow(clippy::too_many_lines)]
     pub fn generate_dashboard_content(
         &self,
         live_skills: &[Skill],
@@ -453,33 +452,47 @@ impl ArtifactsEngine {
         let skill_filter = self.options.skill_filter.as_deref();
         let has_filter = category_filter.is_some() || skill_filter.is_some();
 
-        if has_filter {
-            fs::create_dir_all(&dashboard_content_dir)
-                .map_err(|e| SkillError::io(&dashboard_content_dir, e))?;
-            let root_index = dashboard_content_dir.join("_index.md");
-            if !root_index.exists() {
-                atomic_write(
-                    &root_index,
-                    "+++\ntitle = \"Skills Catalog\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n",
-                )?;
-            }
-        } else {
-            if dashboard_content_dir.exists() {
-                let _ = fs::remove_dir_all(&dashboard_content_dir);
-            }
-            fs::create_dir_all(&dashboard_content_dir)
-                .map_err(|e| SkillError::io(&dashboard_content_dir, e))?;
-            let root_index = dashboard_content_dir.join("_index.md");
-            atomic_write(
-                &root_index,
-                "+++\ntitle = \"Skills Catalog\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n",
-            )?;
-        }
+        prepare_dashboard_dir(&dashboard_content_dir, has_filter)?;
 
         let skills_root = self.workspace_root.join("skills");
         let archive_root = self.workspace_root.join("skills-archive");
 
         let mut weight = 1usize;
+        self.generate_live_categories(
+            &dashboard_content_dir,
+            live_skills,
+            category_filter,
+            skill_filter,
+            &skills_root,
+            &archive_root,
+            &mut weight,
+        )?;
+
+        self.generate_archive_section(
+            &dashboard_content_dir,
+            archived_skills,
+            category_filter,
+            skill_filter,
+            &skills_root,
+            &archive_root,
+            has_filter,
+            weight,
+        )?;
+
+        Ok(true)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn generate_live_categories(
+        &self,
+        dashboard_content_dir: &Path,
+        live_skills: &[Skill],
+        category_filter: Option<&str>,
+        skill_filter: Option<&str>,
+        skills_root: &Path,
+        archive_root: &Path,
+        weight: &mut usize,
+    ) -> Result<()> {
         for category in SkillCategory::standard_promoted() {
             let mut matching: Vec<&Skill> = live_skills
                 .iter()
@@ -502,10 +515,10 @@ impl ArtifactsEngine {
                 "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = {}\n+++\n",
                 to_toml_string(category.title()),
                 to_toml_string(category.description()),
-                weight
+                *weight
             );
             atomic_write(&cat_index, &cat_meta)?;
-            weight += 1;
+            *weight += 1;
 
             matching.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
 
@@ -531,8 +544,8 @@ impl ArtifactsEngine {
                     &s.content,
                     &content_base,
                     &skill_src_dir,
-                    &skills_root,
-                    Some(&archive_root),
+                    skills_root,
+                    Some(archive_root),
                 );
                 let skill_mermaid = contains_mermaid(&skill_body);
                 let safe_body = escape_zola_shortcodes(&skill_body);
@@ -554,8 +567,8 @@ impl ArtifactsEngine {
                         category: category.as_str(),
                         skill_name: &s.dir_name,
                         content_base: &content_base,
-                        skills_root: &skills_root,
-                        archive_root: Some(&archive_root),
+                        skills_root,
+                        archive_root: Some(archive_root),
                         extra_meta: "",
                     };
                     write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
@@ -578,8 +591,21 @@ impl ArtifactsEngine {
                 }
             }
         }
+        Ok(())
+    }
 
-        // Archive section generation
+    #[allow(clippy::too_many_arguments)]
+    fn generate_archive_section(
+        &self,
+        dashboard_content_dir: &Path,
+        archived_skills: &[Skill],
+        category_filter: Option<&str>,
+        skill_filter: Option<&str>,
+        skills_root: &Path,
+        archive_root: &Path,
+        has_filter: bool,
+        weight: usize,
+    ) -> Result<()> {
         let matching_archived: Vec<&Skill> = archived_skills
             .iter()
             .filter(|s| {
@@ -588,178 +614,179 @@ impl ArtifactsEngine {
             })
             .collect();
 
-        if !matching_archived.is_empty() || (!has_filter && !archived_skills.is_empty()) {
-            let archive_dir = dashboard_content_dir.join("archive");
-            fs::create_dir_all(&archive_dir).map_err(|e| SkillError::io(&archive_dir, e))?;
+        if matching_archived.is_empty() && (has_filter || archived_skills.is_empty()) {
+            return Ok(());
+        }
 
-            let archive_root_index = archive_dir.join("_index.md");
-            let archive_root_meta = format!(
-                "+++\ntitle = \"Archive\"\ndescription = \"Retired skills kept for reference.\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = {weight}\n+++\n"
+        let archive_dir = dashboard_content_dir.join("archive");
+        fs::create_dir_all(&archive_dir).map_err(|e| SkillError::io(&archive_dir, e))?;
+
+        let archive_root_index = archive_dir.join("_index.md");
+        let archive_root_meta = format!(
+            "+++\ntitle = \"Archive\"\ndescription = \"Retired skills kept for reference.\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = {weight}\n+++\n"
+        );
+        atomic_write(&archive_root_index, &archive_root_meta)?;
+
+        // Discover distinct categories in archived skills preserving standard order
+        let mut seen_categories = HashSet::new();
+        let mut ordered_categories = Vec::new();
+
+        for cat in SkillCategory::standard_promoted() {
+            if matching_archived.iter().any(|s| s.category == *cat) {
+                seen_categories.insert(cat.as_str().to_string());
+                ordered_categories.push(cat.clone());
+            }
+        }
+
+        for s in &matching_archived {
+            let cat_str = s.category.as_str().to_string();
+            if !seen_categories.contains(&cat_str) {
+                seen_categories.insert(cat_str);
+                ordered_categories.push(s.category.clone());
+            }
+        }
+
+        for category in ordered_categories {
+            let mut cat_skills: Vec<&Skill> = matching_archived
+                .iter()
+                .filter(|s| s.category == category)
+                .copied()
+                .collect();
+
+            if cat_skills.is_empty() {
+                continue;
+            }
+
+            let cat_dir = archive_dir.join(category.as_str());
+            fs::create_dir_all(&cat_dir).map_err(|e| SkillError::io(&cat_dir, e))?;
+
+            let cat_index = cat_dir.join("_index.md");
+            let cat_meta = format!(
+                "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"section.html\"\n+++\n",
+                to_toml_string(category.title()),
+                to_toml_string(category.description())
             );
-            atomic_write(&archive_root_index, &archive_root_meta)?;
+            atomic_write(&cat_index, &cat_meta)?;
 
-            // Discover distinct categories in archived skills preserving standard order
-            let mut seen_categories = HashSet::new();
-            let mut ordered_categories = Vec::new();
+            cat_skills.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
 
-            for cat in SkillCategory::standard_promoted() {
-                if matching_archived.iter().any(|s| s.category == *cat) {
-                    seen_categories.insert(cat.as_str().to_string());
-                    ordered_categories.push(cat.clone());
-                }
-            }
+            for s in cat_skills {
+                let skill_src_dir = if s.path.is_absolute() {
+                    s.path
+                        .parent()
+                        .unwrap_or(&self.workspace_root)
+                        .to_path_buf()
+                } else {
+                    let candidate = self.workspace_root.join(&s.path);
+                    candidate
+                        .parent()
+                        .unwrap_or(&self.workspace_root)
+                        .to_path_buf()
+                };
 
-            for s in &matching_archived {
-                let cat_str = s.category.as_str().to_string();
-                if !seen_categories.contains(&cat_str) {
-                    seen_categories.insert(cat_str);
-                    ordered_categories.push(s.category.clone());
-                }
-            }
+                let content_base = format!("skills/archive/{}/{}", category.as_str(), s.dir_name);
+                let out_dir = cat_dir.join(&s.dir_name);
+                fs::create_dir_all(&out_dir).map_err(|e| SkillError::io(&out_dir, e))?;
 
-            for category in ordered_categories {
-                let mut cat_skills: Vec<&Skill> = matching_archived
-                    .iter()
-                    .filter(|s| s.category == category)
-                    .copied()
-                    .collect();
-
-                if cat_skills.is_empty() {
-                    continue;
-                }
-
-                let cat_dir = archive_dir.join(category.as_str());
-                fs::create_dir_all(&cat_dir).map_err(|e| SkillError::io(&cat_dir, e))?;
-
-                let cat_index = cat_dir.join("_index.md");
-                let cat_meta = format!(
-                    "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"section.html\"\n+++\n",
-                    to_toml_string(category.title()),
-                    to_toml_string(category.description())
-                );
-                atomic_write(&cat_index, &cat_meta)?;
-
-                cat_skills.sort_by(|a, b| a.dir_name.cmp(&b.dir_name));
-
-                for s in cat_skills {
-                    let skill_src_dir = if s.path.is_absolute() {
-                        s.path
-                            .parent()
-                            .unwrap_or(&self.workspace_root)
-                            .to_path_buf()
-                    } else {
-                        let candidate = self.workspace_root.join(&s.path);
-                        candidate
-                            .parent()
-                            .unwrap_or(&self.workspace_root)
-                            .to_path_buf()
-                    };
-
-                    let content_base =
-                        format!("skills/archive/{}/{}", category.as_str(), s.dir_name);
-                    let out_dir = cat_dir.join(&s.dir_name);
-                    fs::create_dir_all(&out_dir).map_err(|e| SkillError::io(&out_dir, e))?;
-
-                    let archived_date =
-                        s.archived
-                            .as_deref()
-                            .or_else(|| {
-                                s.frontmatter.metadata.as_ref().and_then(|m| {
-                                    m.get("archived").map(std::string::String::as_str)
-                                })
-                            })
-                            .unwrap_or("");
-
-                    let replaced_by = s.replaced_by.as_deref().or_else(|| {
+                let archived_date = s
+                    .archived
+                    .as_deref()
+                    .or_else(|| {
                         s.frontmatter
                             .metadata
                             .as_ref()
-                            .and_then(|m| m.get("replaced-by").map(std::string::String::as_str))
-                    });
+                            .and_then(|m| m.get("archived").map(std::string::String::as_str))
+                    })
+                    .unwrap_or("");
 
-                    let prefix = concat!("https://", "github.com");
-                    let source_url = format!(
-                        "{prefix}/{}/tree/{}/skills-archive/{}/{}",
-                        self.options.github_source,
-                        self.options.git_branch,
-                        category.as_str(),
-                        s.dir_name
-                    );
+                let replaced_by = s.replaced_by.as_deref().or_else(|| {
+                    s.frontmatter
+                        .metadata
+                        .as_ref()
+                        .and_then(|m| m.get("replaced-by").map(std::string::String::as_str))
+                });
 
-                    let skill_body = rewrite_skill_links(
-                        &s.content,
-                        &content_base,
-                        &skill_src_dir,
-                        &skills_root,
-                        Some(&archive_root),
-                    );
-                    let skill_mermaid = contains_mermaid(&skill_body);
-                    let safe_body = escape_zola_shortcodes(&skill_body);
+                let prefix = concat!("https://", "github.com");
+                let source_url = format!(
+                    "{prefix}/{}/tree/{}/skills-archive/{}/{}",
+                    self.options.github_source,
+                    self.options.git_branch,
+                    category.as_str(),
+                    s.dir_name
+                );
 
-                    let replaced_by_toml = if let Some(rep) = replaced_by {
-                        if rep.is_empty() {
-                            String::new()
-                        } else {
-                            format!("replaced_by = {}\n", to_toml_string(rep))
-                        }
-                    } else {
+                let skill_body = rewrite_skill_links(
+                    &s.content,
+                    &content_base,
+                    &skill_src_dir,
+                    skills_root,
+                    Some(archive_root),
+                );
+                let skill_mermaid = contains_mermaid(&skill_body);
+                let safe_body = escape_zola_shortcodes(&skill_body);
+
+                let replaced_by_toml = if let Some(rep) = replaced_by {
+                    if rep.is_empty() {
                         String::new()
-                    };
+                    } else {
+                        format!("replaced_by = {}\n", to_toml_string(rep))
+                    }
+                } else {
+                    String::new()
+                };
 
-                    let skill_index = out_dir.join("_index.md");
-                    let skill_content = format!(
-                        "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"skill.html\"\n[extra]\nskill = true\ncategory = {}\nmermaid = {}\narchived = {}\n{}source_url = {}\n+++\n\n{}\n",
-                        to_toml_string(&s.dir_name),
-                        to_toml_string(s.frontmatter.description.trim()),
-                        to_toml_string(category.as_str()),
-                        skill_mermaid,
+                let skill_index = out_dir.join("_index.md");
+                let skill_content = format!(
+                    "+++\ntitle = {}\ndescription = {}\nsort_by = \"title\"\ntemplate = \"skill.html\"\n[extra]\nskill = true\ncategory = {}\nmermaid = {}\narchived = {}\n{}source_url = {}\n+++\n\n{}\n",
+                    to_toml_string(&s.dir_name),
+                    to_toml_string(s.frontmatter.description.trim()),
+                    to_toml_string(category.as_str()),
+                    skill_mermaid,
+                    to_toml_string(archived_date),
+                    replaced_by_toml,
+                    to_toml_string(&source_url),
+                    safe_body
+                );
+                atomic_write(&skill_index, &skill_content)?;
+
+                // Sibling files for archived skill
+                if skill_src_dir.is_dir() {
+                    let archive_extra = format!(
+                        "archived = {}\n{}source_url = {}\n",
                         to_toml_string(archived_date),
                         replaced_by_toml,
-                        to_toml_string(&source_url),
-                        safe_body
+                        to_toml_string(&source_url)
                     );
-                    atomic_write(&skill_index, &skill_content)?;
+                    let sibling_ctx = SiblingDocsContext {
+                        category: category.as_str(),
+                        skill_name: &s.dir_name,
+                        content_base: &content_base,
+                        skills_root,
+                        archive_root: Some(archive_root),
+                        extra_meta: &archive_extra,
+                    };
+                    write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
 
-                    // Sibling files for archived skill
-                    if skill_src_dir.is_dir() {
-                        let archive_extra = format!(
-                            "archived = {}\n{}source_url = {}\n",
-                            to_toml_string(archived_date),
-                            replaced_by_toml,
-                            to_toml_string(&source_url)
-                        );
-                        let sibling_ctx = SiblingDocsContext {
-                            category: category.as_str(),
-                            skill_name: &s.dir_name,
-                            content_base: &content_base,
-                            skills_root: &skills_root,
-                            archive_root: Some(&archive_root),
-                            extra_meta: &archive_extra,
-                        };
-                        write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
-
-                        // Mirror resources with archive metadata
-                        let resources_src = skill_src_dir.join("resources");
-                        if resources_src.is_dir() {
-                            let resources_dest = out_dir.join("resources");
-                            let res_content_base = format!("{content_base}/resources");
-                            let meta_tuple = (archived_date, replaced_by, source_url.as_str());
-                            sync_resources(
-                                &resources_src,
-                                &resources_dest,
-                                &res_content_base,
-                                category.as_str(),
-                                &s.dir_name,
-                                true,
-                                Some(meta_tuple),
-                            )?;
-                        }
+                    // Mirror resources with archive metadata
+                    let resources_src = skill_src_dir.join("resources");
+                    if resources_src.is_dir() {
+                        let resources_dest = out_dir.join("resources");
+                        let res_content_base = format!("{content_base}/resources");
+                        let meta_tuple = (archived_date, replaced_by, source_url.as_str());
+                        sync_resources(
+                            &resources_src,
+                            &resources_dest,
+                            &res_content_base,
+                            category.as_str(),
+                            &s.dir_name,
+                            true,
+                            Some(meta_tuple),
+                        )?;
                     }
                 }
             }
         }
-
-        Ok(true)
+        Ok(())
     }
 
     /// Stages updated files in the git index.
@@ -788,6 +815,32 @@ impl ArtifactsEngine {
             }
         }
     }
+}
+
+fn prepare_dashboard_dir(dashboard_content_dir: &Path, has_filter: bool) -> Result<()> {
+    if has_filter {
+        fs::create_dir_all(dashboard_content_dir)
+            .map_err(|e| SkillError::io(dashboard_content_dir, e))?;
+        let root_index = dashboard_content_dir.join("_index.md");
+        if !root_index.exists() {
+            atomic_write(
+                &root_index,
+                "+++\ntitle = \"Skills Catalog\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n",
+            )?;
+        }
+    } else {
+        if dashboard_content_dir.exists() {
+            let _ = fs::remove_dir_all(dashboard_content_dir);
+        }
+        fs::create_dir_all(dashboard_content_dir)
+            .map_err(|e| SkillError::io(dashboard_content_dir, e))?;
+        let root_index = dashboard_content_dir.join("_index.md");
+        atomic_write(
+            &root_index,
+            "+++\ntitle = \"Skills Catalog\"\nsort_by = \"title\"\ntemplate = \"section.html\"\nweight = 1\n+++\n\nWelcome to the agent skills catalog.\n",
+        )?;
+    }
+    Ok(())
 }
 
 /// Context for rendering sibling documentation markdown files alongside a skill.
