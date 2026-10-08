@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutanix Kubernetes Platform"
+  short_description: "Manage Nutanix Kubernetes Platform clusters and operations"
+  default_prompt: "Use $nutanix-kubernetes-platform to manage and operate NKP clusters."
+
+policy:
+  allow_implicit_invocation: true

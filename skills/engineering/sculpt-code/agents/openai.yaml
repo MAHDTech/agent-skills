@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sculpt Code"
+  short_description: "Refactor code for clarity, naming, and reduced debt"
+  default_prompt: "Use $sculpt-code to refactor and clean up code."
+
+policy:
+  allow_implicit_invocation: true

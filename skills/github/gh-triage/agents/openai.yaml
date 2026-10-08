@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Triage"
+  short_description: "Triage GitHub backlog issues and external pull requests"
+  default_prompt: "Use $gh-triage to triage GitHub issues and pull requests."
+
+policy:
+  allow_implicit_invocation: false

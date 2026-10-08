@@ -1,0 +1,7 @@
+interface:
+  display_name: "Model Context Protocol"
+  short_description: "Build and debug Model Context Protocol servers and tools"
+  default_prompt: "Use $mcp to design, build, or debug MCP servers."
+
+policy:
+  allow_implicit_invocation: true

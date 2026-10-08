@@ -107,6 +107,7 @@ Beyond `/code-review` on the main flow:
 
 - `/bevy-development` - reach for this when working in the Bevy game engine (Rust ECS, systems, assets, states, scheduling).
 - `/bevy-egui` - reach for this when integrating egui into Bevy 0.19 (bevy_egui, EguiPrimaryContextPass, input absorption, viewport cameras).
+- `/casita` - reach for this when working with Casita content-addressed repositories (immutable object graphs, CLI, Rust API, synchronization, or garbage collection).
 - `/spacetimedb` - reach for this when working with SpacetimeDB database modules (schemas, reducers, views) or real-time client subscriptions.
 
 ## Cloud, infrastructure, and AI models
@@ -148,6 +149,7 @@ Beyond `/code-review` on the main flow:
 - `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
 - `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
+- `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Diagnosing Bugs"
+  short_description: "Diagnose hard bugs using tight feedback loops and bisection"
+  default_prompt: "Use $diagnosing-bugs to isolate and diagnose hard bugs."
+
+policy:
+  allow_implicit_invocation: true

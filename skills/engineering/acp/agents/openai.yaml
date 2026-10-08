@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent Client Protocol"
+  short_description: "Build and integrate Agent Client Protocol agents and clients"
+  default_prompt: "Use $acp to build or integrate Agent Client Protocol systems."
+
+policy:
+  allow_implicit_invocation: true

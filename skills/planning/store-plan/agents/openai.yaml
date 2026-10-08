@@ -1,0 +1,7 @@
+interface:
+  display_name: "Store Plan"
+  short_description: "Save conversation plans and decisions to docs/plans"
+  default_prompt: "Use $store-plan to record decisions and plans in docs/plans."
+
+policy:
+  allow_implicit_invocation: false

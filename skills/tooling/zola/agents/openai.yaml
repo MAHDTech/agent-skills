@@ -1,0 +1,7 @@
+interface:
+  display_name: "Zola"
+  short_description: "Build and customize sites using Zola static generator"
+  default_prompt: "Use $zola to configure, build, or customize Zola sites."
+
+policy:
+  allow_implicit_invocation: true

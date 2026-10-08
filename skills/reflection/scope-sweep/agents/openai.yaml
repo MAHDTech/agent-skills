@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scope Sweep"
+  short_description: "Check for missed items, edge cases, and incomplete tasks"
+  default_prompt: "Use $scope-sweep to catch missed requirements before completion."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Productionize App"
+  short_description: "Prepare applications for production deployment and hardening"
+  default_prompt: "Use $productionize-app to prepare applications for production."
+
+policy:
+  allow_implicit_invocation: false

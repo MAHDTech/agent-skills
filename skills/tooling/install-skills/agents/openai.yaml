@@ -1,0 +1,7 @@
+interface:
+  display_name: "Install Skills"
+  short_description: "Install and manage agent skills across supported runtimes"
+  default_prompt: "Use $install-skills to install and update agent skills."
+
+policy:
+  allow_implicit_invocation: false

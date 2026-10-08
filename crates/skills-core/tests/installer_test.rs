@@ -590,3 +590,121 @@ fn test_skill_installer_convenience_wrapper() {
     assert_eq!(uninstalled.len(), 2);
     assert_eq!(skill_installer.list_installed().unwrap().len(), 0);
 }
+
+// -----------------------------------------------------------------------------
+// 18. InstallerError to SkillError Mapping
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_installer_error_into_skill_error_all_variants() {
+    use skills_core::error::SkillError;
+
+    let io_err = InstallerError::Io {
+        path: PathBuf::from("/test/path"),
+        source: std::io::Error::new(std::io::ErrorKind::NotFound, "not found"),
+    };
+    let skill_err: SkillError = io_err.into();
+    assert!(matches!(skill_err, SkillError::Io { .. }));
+
+    let traversal_err = InstallerError::PathTraversal {
+        path: PathBuf::from("/outside"),
+        boundary: PathBuf::from("/base"),
+    };
+    let skill_err: SkillError = traversal_err.into();
+    assert!(matches!(skill_err, SkillError::PathTraversal { .. }));
+
+    let id_err = InstallerError::InvalidSkillId {
+        id: "invalid!id".into(),
+    };
+    let skill_err: SkillError = id_err.into();
+    assert!(matches!(skill_err, SkillError::InvalidSkillName { .. }));
+
+    let dup_err = InstallerError::SkillAlreadyInstalled {
+        id: "my-skill".into(),
+        existing_path: PathBuf::from("/installed/my-skill"),
+    };
+    let skill_err: SkillError = dup_err.into();
+    assert!(matches!(skill_err, SkillError::DuplicateSkill { .. }));
+
+    let not_found_err = InstallerError::SkillNotFound {
+        id: "missing-skill".into(),
+    };
+    let skill_err: SkillError = not_found_err.into();
+    assert!(matches!(skill_err, SkillError::NotFound { .. }));
+
+    let lock_err = InstallerError::LockTimeout {
+        lock_path: PathBuf::from("/lock"),
+        timeout_ms: 5000,
+        reason: "busy".into(),
+    };
+    let skill_err: SkillError = lock_err.into();
+    assert!(matches!(skill_err, SkillError::LockTimeout { .. }));
+
+    let json_err: serde_json::Error =
+        serde_json::from_str::<serde_json::Value>("{invalid}").unwrap_err();
+    let reg_err = InstallerError::RegistrySerialization {
+        path: PathBuf::from("/reg.json"),
+        source: json_err,
+    };
+    let skill_err: SkillError = reg_err.into();
+    assert!(matches!(skill_err, SkillError::Json { .. }));
+
+    let fallback_err = InstallerError::EnvironmentNotResolvable(TargetEnvironment::Cursor);
+    let skill_err: SkillError = fallback_err.into();
+    assert!(matches!(
+        skill_err,
+        SkillError::FrontmatterValidation { .. }
+    ));
+}
+
+// -----------------------------------------------------------------------------
+// 19. TargetEnvironment default_skills_dir Tests
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_target_environment_default_skills_dir() {
+    let dummy_home = PathBuf::from("/mock/home");
+
+    // Claude Desktop
+    let claude_dir = TargetEnvironment::ClaudeDesktop.default_skills_dir(Some(&dummy_home));
+    #[cfg(target_os = "macos")]
+    assert_eq!(
+        claude_dir,
+        dummy_home.join("Library/Application Support/Claude/skills")
+    );
+    #[cfg(not(target_os = "macos"))]
+    assert_eq!(claude_dir, dummy_home.join(".claude/skills"));
+
+    // Cursor
+    let cursor_dir = TargetEnvironment::Cursor.default_skills_dir(Some(&dummy_home));
+    assert_eq!(cursor_dir, dummy_home.join(".cursor/skills"));
+
+    // Antigravity without workspace
+    let agy_home_dir = (TargetEnvironment::Antigravity {
+        workspace_root: None,
+    })
+    .default_skills_dir(Some(&dummy_home));
+    assert_eq!(agy_home_dir, dummy_home.join(".agents/skills"));
+
+    // Antigravity with workspace
+    let ws_root = PathBuf::from("/mock/workspace");
+    let agy_ws_dir = (TargetEnvironment::Antigravity {
+        workspace_root: Some(ws_root.clone()),
+    })
+    .default_skills_dir(Some(&dummy_home));
+    assert_eq!(agy_ws_dir, ws_root.join(".agents/skills"));
+
+    // Custom relative
+    let custom_rel = TargetEnvironment::Custom(PathBuf::from("relative/skills"))
+        .default_skills_dir(Some(&dummy_home));
+    assert_eq!(custom_rel, dummy_home.join("relative/skills"));
+
+    // Custom absolute
+    let custom_abs = TargetEnvironment::Custom(PathBuf::from("/absolute/skills"))
+        .default_skills_dir(Some(&dummy_home));
+    assert_eq!(custom_abs, PathBuf::from("/absolute/skills"));
+
+    // Fallback home
+    let default_cursor = TargetEnvironment::Cursor.default_skills_dir(None);
+    assert!(default_cursor.ends_with(".cursor/skills"));
+}

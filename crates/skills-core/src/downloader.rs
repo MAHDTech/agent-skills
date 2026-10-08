@@ -314,16 +314,16 @@ impl SkillDownloader {
     /// Checks if a MIME content-type is non-text.
     #[must_use]
     pub fn is_non_text_content_type(content_type: &str) -> bool {
+        const PREFIXES: &[&str] = &["image/", "audio/", "video/", "font/"];
+        const CONTAINS: &[&str] = &[
+            "application/pdf",
+            "application/zip",
+            "application/octet-stream",
+            "application/x-tar",
+            "application/gzip",
+        ];
         let lower = content_type.to_ascii_lowercase();
-        lower.starts_with("image/")
-            || lower.starts_with("audio/")
-            || lower.starts_with("video/")
-            || lower.starts_with("font/")
-            || lower.contains("application/pdf")
-            || lower.contains("application/zip")
-            || lower.contains("application/octet-stream")
-            || lower.contains("application/x-tar")
-            || lower.contains("application/gzip")
+        PREFIXES.iter().any(|p| lower.starts_with(p)) || CONTAINS.iter().any(|c| lower.contains(c))
     }
 
     /// Checks if a URL targets an `llms.txt` or `llms-full.txt` index file.

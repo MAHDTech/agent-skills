@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Release Notes"
+  short_description: "Generate human-readable release notes and cut releases"
+  default_prompt: "Use $gh-release-notes to generate release notes and publish."
+
+policy:
+  allow_implicit_invocation: false

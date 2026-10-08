@@ -1,0 +1,7 @@
+interface:
+  display_name: "Git Resolve Conflicts"
+  short_description: "Resolve git merge conflicts with context-aware analysis"
+  default_prompt: "Use $git-resolve-conflicts to resolve merge conflicts safely."
+
+policy:
+  allow_implicit_invocation: false

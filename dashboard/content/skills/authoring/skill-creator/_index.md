@@ -89,6 +89,8 @@ A skill's content is ranked by how immediately the agent needs it - the **inform
 ```text
 skills/<category>/<name>/
   SKILL.md          # entry point - steps and top-tier reference
+  agents/           # optional; harness-specific configurations
+    openai.yaml     # OpenAI Codex / ChatGPT app UI metadata and policy
   resources/        # optional; holds ONLY these two subdirectories:
     auto/           # downloader-owned - (re)fetched from the `resources:` URLs; never hand-edit
     manual/         # hand-authored scripts, docs, references, and static files
@@ -121,7 +123,30 @@ State the target behaviour, not the banned one. **Negation** backfires: _don't t
 
 ## Stay host-agnostic
 
-A skill runs across multiple agent runtimes - Claude Code, OpenCode, Goose, Antigravity CLI - so it must bind to no single host's tooling. Name the **capability**, not the product: "your task-tracking tool", "your agent's subagent mechanism", never one runtime's command, tool name, or built-in. Never bake in a personal or absolute path; keep paths repo-relative. A skill that reads the same on every host stays predictable on every host.
+A skill runs across multiple agent runtimes - Claude Code, OpenCode, Goose, Antigravity CLI, and OpenAI Codex - so the core `SKILL.md` must bind to no single host's tooling. Name the **capability**, not the product: "your task-tracking tool", "your agent's subagent mechanism", never one runtime's command, tool name, or built-in. Never bake in a personal or absolute path; keep paths repo-relative. A skill that reads the same on every host stays predictable on every host. Harness-specific UI metadata or policies belong exclusively in sidecars like `agents/openai.yaml`, keeping `SKILL.md` pure and universal.
+
+## Harness compatibility: `agents/openai.yaml`
+
+While `SKILL.md` is the universal, runtime-agnostic entry point, individual harnesses may define metadata sidecars under the `agents/` directory. OpenAI Codex and the ChatGPT desktop application read `agents/openai.yaml` to configure UI presentation, invocation policies, and tool dependencies:
+
+```yaml
+interface:
+  display_name: "Skill Creator"
+  short_description: "Create or update skills with progressive disclosure"
+  default_prompt: "Use $skill-creator to create a new agent skill."
+
+policy:
+  allow_implicit_invocation: true
+```
+
+Key rules for `agents/openai.yaml`:
+
+- **`display_name`**: Human-facing Title Case name for skill lists, pickers, and badges.
+- **`short_description`**: Strictly between 25 and 64 characters long. No HTML angle brackets (`<` or `>`), no em-dashes, and unslop.
+- **`default_prompt`**: Suggested prompt template for user invocation; must reference the skill name using `$skill-name` syntax.
+- **`policy.allow_implicit_invocation`**: Set to `false` for user-invoked skills (`disable-model-invocation: true`), destructive operations, or specialized handoffs. Set to `true` (or omit) for standard model-invoked skills.
+- **`dependencies.tools`**: Optional list declaring external tools such as MCP servers (`type: "mcp"`, `value`, `description`, `transport: "streamable_http"`, `url`).
+- **Formatting**: Keys must be unquoted, all string values must be quoted in double quotes, and indentation must be 2 spaces.
 
 ## When to split
 
@@ -147,9 +172,10 @@ Prune sentence by sentence: run the no-op test on each sentence in isolation, an
 
 Regenerate the derived artifacts and the router:
 
-1. `devenv --no-tui shell -- skills --action lint` - validate frontmatter, naming, and placement.
-2. `devenv --no-tui shell -- skills --action sync` - regenerate the README, `agents/AGENTS.md`, the Zola dashboard, and `skills.sh.json`.
-3. Update the `/skill-router` index so the new or renamed skill is reachable.
+1. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and `policy`.
+2. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, and placement.
+3. `devenv --no-tui shell -- ask dashboard build` - regenerate the README, `agents/AGENTS.md`, and the Zola dashboard.
+4. Update the `/skill-router` index so the new or renamed skill is reachable.
 
 Done when lint passes, sync leaves no further diff, and the router names the skill.
 

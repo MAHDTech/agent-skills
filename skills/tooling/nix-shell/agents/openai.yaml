@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nix Shell"
+  short_description: "Run CLI utilities inside ephemeral Nix shells"
+  default_prompt: "Use $nix-shell to run missing CLI tools in Nix shells."
+
+policy:
+  allow_implicit_invocation: true

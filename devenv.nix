@@ -13,7 +13,9 @@ let
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [
     cargo-audit
+    cargo-edit
     cargo-deny
+    cargo-llvm-cov
     cargo-nextest
     cargo-watch
     clang
@@ -100,6 +102,7 @@ in
     };
     rust = {
       enable = isNative;
+      toolchainFile = ./rust-toolchain.toml;
       mold.enable = pkgs.stdenv.isLinux;
     };
   };
@@ -317,6 +320,12 @@ in
       description = "Run CodeQL static analysis locally.";
       exec = ''
         ./scripts/codeql-run.sh "$@"
+      '';
+    };
+    crap = {
+      description = "Run cargo-crap analysis";
+      exec = ''
+        cargo llvm-cov --workspace --lcov --output-path lcov.info && cargo crap --workspace --lcov lcov.info "$@"
       '';
     };
   };

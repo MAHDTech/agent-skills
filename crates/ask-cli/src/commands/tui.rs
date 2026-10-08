@@ -68,16 +68,66 @@ async fn run_event_loop(
             ))
         })?;
 
-        match event {
-            Event::Key(key) => {
-                app.handle_key_event(key);
-            }
-            Event::Quit => {
-                app.quit();
-            }
-            Event::Tick | Event::Resize(..) | Event::Mouse(..) => {}
-        }
+        handle_app_event(app, event);
     }
 
     Ok(())
+}
+
+fn handle_app_event(app: &mut App, event: Event) {
+    match event {
+        Event::Key(key) => {
+            app.handle_key_event(key);
+        }
+        Event::Quit => {
+            app.quit();
+        }
+        Event::Tick | Event::Resize(..) | Event::Mouse(..) => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+
+    #[test]
+    fn test_parse_active_view_valid() {
+        assert_eq!(parse_active_view("explorer"), Some(ActiveView::Explorer));
+        assert_eq!(parse_active_view("EXPLORER"), Some(ActiveView::Explorer));
+        assert_eq!(parse_active_view("inspector"), Some(ActiveView::Inspector));
+        assert_eq!(parse_active_view("Inspector"), Some(ActiveView::Inspector));
+        assert_eq!(parse_active_view("linter"), Some(ActiveView::Linter));
+        assert_eq!(parse_active_view("LINTER"), Some(ActiveView::Linter));
+        assert_eq!(parse_active_view("runner"), Some(ActiveView::Runner));
+        assert_eq!(parse_active_view("Runner"), Some(ActiveView::Runner));
+    }
+
+    #[test]
+    fn test_parse_active_view_invalid() {
+        assert_eq!(parse_active_view(""), None);
+        assert_eq!(parse_active_view("unknown"), None);
+        assert_eq!(parse_active_view("dash"), None);
+    }
+
+    #[test]
+    fn test_handle_app_event() {
+        let mut app = App::new();
+        assert!(app.is_running());
+
+        // Key event
+        let key = KeyEvent::new(KeyCode::Char('q'), KeyModifiers::NONE);
+        handle_app_event(&mut app, Event::Key(key));
+
+        // Quit event
+        let mut app2 = App::new();
+        handle_app_event(&mut app2, Event::Quit);
+        assert!(!app2.is_running());
+
+        // Passive events
+        let mut app3 = App::new();
+        handle_app_event(&mut app3, Event::Tick);
+        handle_app_event(&mut app3, Event::Resize(80, 24));
+        assert!(app3.is_running());
+    }
 }

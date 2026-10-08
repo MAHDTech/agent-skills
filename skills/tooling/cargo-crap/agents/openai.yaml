@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cargo CRAP"
+  short_description: "Measure and gate Change Risk Anti-Patterns metric in Rust"
+  default_prompt: "Use $cargo-crap to analyze code risk and test coverage."
+
+policy:
+  allow_implicit_invocation: true

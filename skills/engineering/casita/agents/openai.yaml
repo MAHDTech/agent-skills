@@ -1,0 +1,7 @@
+interface:
+  display_name: "Casita"
+  short_description: "Content-addressed store for immutable graphs and artifacts"
+  default_prompt: "Use $casita to inspect or manage content-addressed object graphs."
+
+policy:
+  allow_implicit_invocation: true

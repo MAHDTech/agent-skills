@@ -1,0 +1,7 @@
+interface:
+  display_name: "Proofread"
+  short_description: "Proofread posts for grammar, typos, and skimmability"
+  default_prompt: "Use $proofread to check posts for typos, grammar, and flow."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Research"
+  short_description: "Investigate technical questions using primary sources"
+  default_prompt: "Use $research to investigate topics against primary sources."
+
+policy:
+  allow_implicit_invocation: true

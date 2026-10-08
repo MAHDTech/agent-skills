@@ -627,7 +627,6 @@ impl SkillLinter {
         }
     }
 
-    #[allow(clippy::needless_range_loop, clippy::too_many_lines)]
     fn check_cross_references(skills: &[Skill], report: &mut LintReport) {
         let mut catalog: HashMap<&str, &Skill> = HashMap::new();
         for skill in skills {
@@ -636,13 +635,11 @@ impl SkillLinter {
         }
 
         for source in skills {
-            // Archived skills are exempt as sources
-            if source.tree == SkillTree::Archive {
-                continue;
-            }
-
-            // Universal router is exempt as source
-            if source.name() == "skill-router" || source.dir_name == "skill-router" {
+            // Archived skills and universal router are exempt as sources
+            if source.tree == SkillTree::Archive
+                || source.name() == "skill-router"
+                || source.dir_name == "skill-router"
+            {
                 continue;
             }
 
@@ -661,116 +658,129 @@ impl SkillLinter {
                     continue;
                 }
 
-                // 1. Scan slash commands: /<identifier>
-                let char_indices: Vec<(usize, char)> = raw_line.char_indices().collect();
-                for i in 0..char_indices.len() {
-                    let (_byte_pos, c) = char_indices[i];
-                    if c == '/' {
-                        // Check preceding character boundary
-                        if i > 0 {
-                            let (_, prev_c) = char_indices[i - 1];
-                            if prev_c.is_ascii_alphanumeric()
-                                || prev_c == '_'
-                                || prev_c == '.'
-                                || prev_c == '/'
-                                || prev_c == '-'
-                            {
-                                continue;
-                            }
-                        }
+                Self::scan_slash_commands(raw_line, line_num, source, &catalog, report);
+                Self::scan_cross_reference_links(raw_line, line_num, source, &catalog, report);
+            }
+        }
+    }
 
-                        // Collect candidate kebab-case name
-                        let mut end = i + 1;
-                        while end < char_indices.len() {
-                            let (_, next_c) = char_indices[end];
-                            if next_c.is_ascii_lowercase()
-                                || next_c.is_ascii_digit()
-                                || next_c == '-'
-                            {
-                                end += 1;
-                            } else {
-                                break;
-                            }
-                        }
+    fn scan_slash_commands(
+        raw_line: &str,
+        line_num: usize,
+        source: &Skill,
+        catalog: &HashMap<&str, &Skill>,
+        report: &mut LintReport,
+    ) {
+        let char_indices: Vec<(usize, char)> = raw_line.char_indices().collect();
+        for i in 0..char_indices.len() {
+            let (_byte_pos, c) = char_indices[i];
+            if c != '/' {
+                continue;
+            }
 
-                        if end > i + 1 {
-                            let start_byte = char_indices[i + 1].0;
-                            let end_byte = if end < char_indices.len() {
-                                char_indices[end].0
-                            } else {
-                                raw_line.len()
-                            };
-                            let candidate_name = &raw_line[start_byte..end_byte];
-                            let clean_name = candidate_name.trim_end_matches('-');
-
-                            // Check succeeding character boundary
-                            if end < char_indices.len() {
-                                let (_, next_c) = char_indices[end];
-                                if next_c.is_ascii_alphanumeric()
-                                    || next_c == '_'
-                                    || next_c == '.'
-                                    || next_c == '/'
-                                {
-                                    continue;
-                                }
-                            }
-
-                            if let Some(&target) = catalog.get(clean_name) {
-                                Self::validate_cross_reference(
-                                    source, target, clean_name, line_num, report,
-                                );
-                            }
-                        }
-                    }
-                }
-
-                // 2. Scan Markdown relative links: [text](target)
-                let mut remaining = raw_line;
-                while let Some(open_bracket) = remaining.find('[') {
-                    let after_open = &remaining[open_bracket + 1..];
-                    if let Some(close_bracket) = after_open.find(']') {
-                        let after_close = &after_open[close_bracket + 1..];
-                        if after_close.starts_with('(') {
-                            if let Some(close_paren) = after_close.find(')') {
-                                let link_url = after_close[1..close_paren].trim();
-                                if !link_url.starts_with("http://")
-                                    && !link_url.starts_with("https://")
-                                    && !link_url.starts_with('#')
-                                    && !link_url.starts_with("mailto:")
-                                {
-                                    let clean_url = link_url
-                                        .split('#')
-                                        .next()
-                                        .unwrap_or(link_url)
-                                        .split('?')
-                                        .next()
-                                        .unwrap_or(link_url);
-                                    let path_obj = Path::new(clean_url);
-
-                                    // Check if link target is a skill file or contains a skill directory
-                                    for comp in path_obj.components() {
-                                        let name_str = comp.as_os_str().to_string_lossy();
-                                        let clean_name = name_str.as_ref();
-                                        if let Some(&target) = catalog.get(clean_name) {
-                                            if target.dir_name != source.dir_name
-                                                && target.name() != source.name()
-                                            {
-                                                Self::validate_cross_reference(
-                                                    source, target, clean_name, line_num, report,
-                                                );
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                remaining = &after_close[close_paren + 1..];
-                                continue;
-                            }
-                        }
-                    }
-                    remaining = after_open;
+            // Check preceding character boundary
+            if i > 0 {
+                let (_, prev_c) = char_indices[i - 1];
+                if prev_c.is_ascii_alphanumeric()
+                    || prev_c == '_'
+                    || prev_c == '.'
+                    || prev_c == '/'
+                    || prev_c == '-'
+                {
+                    continue;
                 }
             }
+
+            // Collect candidate kebab-case name
+            let mut end = i + 1;
+            while end < char_indices.len() {
+                let (_, next_c) = char_indices[end];
+                if next_c.is_ascii_lowercase() || next_c.is_ascii_digit() || next_c == '-' {
+                    end += 1;
+                } else {
+                    break;
+                }
+            }
+
+            if end <= i + 1 {
+                continue;
+            }
+
+            let start_byte = char_indices[i + 1].0;
+            let end_byte = if end < char_indices.len() {
+                char_indices[end].0
+            } else {
+                raw_line.len()
+            };
+            let candidate_name = &raw_line[start_byte..end_byte];
+            let clean_name = candidate_name.trim_end_matches('-');
+
+            // Check succeeding character boundary
+            if end < char_indices.len() {
+                let (_, next_c) = char_indices[end];
+                if next_c.is_ascii_alphanumeric() || next_c == '_' || next_c == '.' || next_c == '/'
+                {
+                    continue;
+                }
+            }
+
+            if let Some(&target) = catalog.get(clean_name) {
+                Self::validate_cross_reference(source, target, clean_name, line_num, report);
+            }
+        }
+    }
+
+    fn scan_cross_reference_links(
+        raw_line: &str,
+        line_num: usize,
+        source: &Skill,
+        catalog: &HashMap<&str, &Skill>,
+        report: &mut LintReport,
+    ) {
+        let mut remaining = raw_line;
+        while let Some(open_bracket) = remaining.find('[') {
+            let after_open = &remaining[open_bracket + 1..];
+            if let Some(close_bracket) = after_open.find(']') {
+                let after_close = &after_open[close_bracket + 1..];
+                if after_close.starts_with('(') {
+                    if let Some(close_paren) = after_close.find(')') {
+                        let link_url = after_close[1..close_paren].trim();
+                        if !link_url.starts_with("http://")
+                            && !link_url.starts_with("https://")
+                            && !link_url.starts_with('#')
+                            && !link_url.starts_with("mailto:")
+                        {
+                            let clean_url = link_url
+                                .split('#')
+                                .next()
+                                .unwrap_or(link_url)
+                                .split('?')
+                                .next()
+                                .unwrap_or(link_url);
+                            let path_obj = Path::new(clean_url);
+
+                            // Check if link target is a skill file or contains a skill directory
+                            for comp in path_obj.components() {
+                                let name_str = comp.as_os_str().to_string_lossy();
+                                let clean_name = name_str.as_ref();
+                                if let Some(&target) = catalog.get(clean_name) {
+                                    if target.dir_name != source.dir_name
+                                        && target.name() != source.name()
+                                    {
+                                        Self::validate_cross_reference(
+                                            source, target, clean_name, line_num, report,
+                                        );
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        remaining = &after_close[close_paren + 1..];
+                        continue;
+                    }
+                }
+            }
+            remaining = after_open;
         }
     }
 

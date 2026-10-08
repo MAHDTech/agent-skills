@@ -1,0 +1,7 @@
+interface:
+  display_name: "SpacetimeDB"
+  short_description: "Build real-time database modules and apps with SpacetimeDB"
+  default_prompt: "Use $spacetimedb to develop modules and real-time client apps."
+
+policy:
+  allow_implicit_invocation: true

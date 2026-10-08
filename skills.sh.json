@@ -7,6 +7,7 @@
       "description": "The core build, debug, and delivery loop.",
       "skills": [
         "acp",
+        "casita",
         "characterization-tests",
         "code-comments",
         "codebase-design",
@@ -116,6 +117,7 @@
       "skills": [
         "agent-guidelines",
         "antigravity",
+        "cargo-crap",
         "cargo-doc",
         "devenv",
         "herdr",
