@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutanix Files"
+  short_description: "Manage Nutanix Files shares, SMB, NFS, and smart tiering"
+  default_prompt: "Use $nutanix-files to configure and manage Nutanix Files shares."
+
+policy:
+  allow_implicit_invocation: true

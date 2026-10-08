@@ -1,0 +1,7 @@
+interface:
+  display_name: "WTF"
+  short_description: "Re-pitch the previous message in plain and direct language"
+  default_prompt: "Use $wtf to re-pitch the last response in simple terms."
+
+policy:
+  allow_implicit_invocation: false

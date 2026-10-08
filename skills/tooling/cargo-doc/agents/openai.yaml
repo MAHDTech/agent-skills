@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cargo Doc"
+  short_description: "Query and inspect Rust crate documentation and signatures"
+  default_prompt: "Use $cargo-doc to look up Rust documentation and types."
+
+policy:
+  allow_implicit_invocation: true

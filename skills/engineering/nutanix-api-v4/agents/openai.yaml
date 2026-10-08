@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutanix v4 API"
+  short_description: "Automate Nutanix Cloud Platform using v4 REST APIs and SDKs"
+  default_prompt: "Use $nutanix-api-v4 to build or automate with Nutanix v4 APIs."
+
+policy:
+  allow_implicit_invocation: true

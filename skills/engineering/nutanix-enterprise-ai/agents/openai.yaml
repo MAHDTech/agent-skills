@@ -1,0 +1,7 @@
+interface:
+  display_name: "Nutanix Enterprise AI"
+  short_description: "Deploy and manage Nutanix Enterprise AI inference endpoints"
+  default_prompt: "Use $nutanix-enterprise-ai to deploy or manage NAI endpoints."
+
+policy:
+  allow_implicit_invocation: true

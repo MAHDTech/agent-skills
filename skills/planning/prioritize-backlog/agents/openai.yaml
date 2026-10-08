@@ -1,0 +1,7 @@
+interface:
+  display_name: "Prioritize Backlog"
+  short_description: "Rank and sequence backlog items by value, cost, and risk"
+  default_prompt: "Use $prioritize-backlog to groom and prioritize backlog items."
+
+policy:
+  allow_implicit_invocation: true

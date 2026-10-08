@@ -1,0 +1,7 @@
+interface:
+  display_name: "xAI"
+  short_description: "Integrate xAI and Grok APIs and models into applications"
+  default_prompt: "Use $xai to integrate xAI and Grok models and APIs."
+
+policy:
+  allow_implicit_invocation: true

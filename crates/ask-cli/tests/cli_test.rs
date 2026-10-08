@@ -632,26 +632,6 @@ fn test_skills_action_error_handling() {
 
     Command::cargo_bin("ask")
         .unwrap()
-        .args(["skills", "--action", "install"])
-        .assert()
-        .failure()
-        .code(1)
-        .stderr(predicate::str::contains(
-            "Action 'install' requires a skill name argument; use 'ask skills install <name>' instead",
-        ));
-
-    Command::cargo_bin("ask")
-        .unwrap()
-        .args(["skills", "--action", "uninstall"])
-        .assert()
-        .failure()
-        .code(1)
-        .stderr(predicate::str::contains(
-            "Action 'uninstall' requires a skill name argument; use 'ask skills uninstall <name>' instead",
-        ));
-
-    Command::cargo_bin("ask")
-        .unwrap()
         .args(["skills", "--action", "unknown-action"])
         .assert()
         .failure()
@@ -672,4 +652,185 @@ fn test_dashboard_action_error_handling() {
         .stderr(predicate::str::contains(
             "Unknown dashboard action: 'unknown-action'",
         ));
+}
+
+#[test]
+fn test_action_bulk_install_uninstall_isolated() {
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    for name in ["first", "second"] {
+        let dir = repo.join("skills/engineering").join(name);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(
+            dir.join("SKILL.md"),
+            format!("---\nname: {name}\ndescription: Test skill\n---\n# Test\n"),
+        )
+        .unwrap();
+    }
+    let archived = repo.join("skills-archive/engineering/retired");
+    std::fs::create_dir_all(&archived).unwrap();
+    std::fs::write(
+        archived.join("SKILL.md"),
+        "---\nname: retired\ndescription: Retired\n---\n",
+    )
+    .unwrap();
+    let home = temp.path().join("home");
+    let config = home.join(".config");
+    let targets = [
+        home.join(".agents/skills"),
+        home.join(".cursor/skills"),
+        if cfg!(target_os = "macos") {
+            home.join("Library/Application Support/Claude/skills")
+        } else {
+            config.join("claude/skills")
+        },
+    ];
+    for target in &targets {
+        std::fs::create_dir_all(target.join("untracked")).unwrap();
+        std::fs::create_dir_all(target.join("first")).unwrap();
+        std::fs::write(target.join("first/SKILL.md"), "Old testing copy").unwrap();
+        std::fs::create_dir_all(target.join("retired")).unwrap();
+    }
+    for action in ["install", "install", "sync", "uninstall", "uninstall"] {
+        if action == "sync" {
+            for target in &targets {
+                let first = target.join("first");
+                if first.is_symlink() {
+                    std::fs::remove_file(&first).unwrap();
+                } else {
+                    std::fs::remove_dir_all(&first).unwrap();
+                }
+                std::fs::create_dir(&first).unwrap();
+                std::fs::write(first.join("SKILL.md"), "Untracked testing copy").unwrap();
+                std::fs::remove_file(target.join("installed-skills.json")).unwrap();
+            }
+        }
+        Command::cargo_bin("ask")
+            .unwrap()
+            .env("HOME", &home)
+            .env("XDG_CONFIG_HOME", &config)
+            .env("AGENT_SKILLS_HOME", &repo)
+            .env("SKILLS_SKIP_DASHBOARD", "1")
+            .env_remove("CI")
+            .env_remove("PRE_COMMIT")
+            .env_remove("SKILLS_REPO_ONLY")
+            .args(["skills", "--action", action])
+            .assert()
+            .success();
+        for target in &targets {
+            let installed = action != "uninstall";
+            assert_eq!(target.join("first/SKILL.md").exists(), installed);
+            assert_eq!(target.join("second/SKILL.md").exists(), installed);
+            assert_eq!(target.join("retired").exists(), action == "install");
+            if installed {
+                assert_eq!(
+                    std::fs::read(target.join("first/SKILL.md")).unwrap(),
+                    std::fs::read(repo.join("skills/engineering/first/SKILL.md")).unwrap()
+                );
+            }
+            assert!(target.join("untracked").is_dir());
+        }
+    }
+    assert!(repo.join("skills/engineering/first/SKILL.md").exists());
+}
+
+#[test]
+fn test_action_install_folder_and_invalid_folder() {
+    let temp = tempfile::tempdir().unwrap();
+    let source = temp.path().join("single");
+    let target = temp.path().join("target");
+    std::fs::create_dir_all(&source).unwrap();
+    std::fs::write(
+        source.join("SKILL.md"),
+        "---\nname: single\ndescription: Test skill\n---\n# Test\n",
+    )
+    .unwrap();
+    Command::cargo_bin("ask")
+        .unwrap()
+        .current_dir(temp.path())
+        .args([
+            "skills",
+            "--action",
+            "install",
+            "single",
+            "--target",
+            target.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    assert!(target.join("single/SKILL.md").exists());
+    let invalid = temp.path().join("invalid");
+    std::fs::create_dir(&invalid).unwrap();
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args([
+            "skills",
+            "--action",
+            "install",
+            invalid.to_str().unwrap(),
+            "--target",
+            target.to_str().unwrap(),
+        ])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("does not contain SKILL.md"));
+    Command::cargo_bin("ask")
+        .unwrap()
+        .args([
+            "skills",
+            "--action",
+            "uninstall",
+            "single",
+            "--target",
+            target.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    assert!(!target.join("single").exists());
+}
+
+#[test]
+fn test_action_rejects_ignored_arguments() {
+    for args in [
+        vec!["skills", "--action", "install", "--dry-run"],
+        vec!["skills", "--action", "sync", "unexpected"],
+        vec!["skills", "--action", "list", "sync"],
+    ] {
+        Command::cargo_bin("ask")
+            .unwrap()
+            .args(args)
+            .assert()
+            .failure();
+    }
+}
+
+#[test]
+fn test_bulk_uninstall_matches_repository_names_without_registry() {
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    let source = repo.join("skills/engineering/matching");
+    let target = temp.path().join("target");
+    std::fs::create_dir_all(&source).unwrap();
+    std::fs::write(
+        source.join("SKILL.md"),
+        "---\nname: matching\ndescription: Test\n---\n",
+    )
+    .unwrap();
+    std::fs::create_dir_all(target.join("matching")).unwrap();
+    std::fs::create_dir_all(target.join("unrelated")).unwrap();
+    Command::cargo_bin("ask")
+        .unwrap()
+        .env("AGENT_SKILLS_HOME", &repo)
+        .args([
+            "skills",
+            "--action",
+            "uninstall",
+            "--target",
+            target.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+    assert!(!target.join("matching").exists());
+    assert!(target.join("unrelated").exists());
+    assert!(source.join("SKILL.md").exists());
 }

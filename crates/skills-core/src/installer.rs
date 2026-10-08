@@ -1291,7 +1291,7 @@ impl Installer {
 
         // Verify that source contains SKILL.md
         let skill_md_path = source_path.join("SKILL.md");
-        if !skill_md_path.exists() {
+        if !skill_md_path.is_file() {
             return Err(InstallerError::InvalidSourcePath {
                 path: source_path.to_path_buf(),
                 reason: "Source directory does not contain SKILL.md".to_string(),
@@ -2708,5 +2708,27 @@ mod tests {
             PathValidator::ensure_within_boundary(Path::new("foo/bar"), Path::new(".")).is_ok()
         );
         assert!(PathValidator::ensure_within_boundary(Path::new("."), Path::new(".")).is_ok());
+    }
+
+    #[test]
+    fn test_try_recover_stale_lock_scenarios() {
+        let temp = TempDir::new().unwrap();
+        let lock_path = temp.path().join("stale_direct.lock");
+
+        // Scenario 1: Dead PID
+        fs::write(&lock_path, "pid=9999999\ntimestamp=2026-01-01T00:00:00Z\n").unwrap();
+        assert!(try_recover_stale_lock(&lock_path));
+        assert!(!lock_path.exists());
+
+        // Scenario 2: Active PID and fresh timestamp
+        let my_pid = std::process::id();
+        let now_ts = chrono::Utc::now().to_rfc3339();
+        fs::write(&lock_path, format!("pid={my_pid}\ntimestamp={now_ts}\n")).unwrap();
+        assert!(!try_recover_stale_lock(&lock_path));
+        assert!(lock_path.exists());
+
+        // Scenario 3: Non-existent lock file
+        let non_existent = temp.path().join("does_not_exist.lock");
+        assert!(!try_recover_stale_lock(&non_existent));
     }
 }

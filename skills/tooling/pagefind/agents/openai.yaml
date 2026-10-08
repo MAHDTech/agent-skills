@@ -1,0 +1,7 @@
+interface:
+  display_name: "Pagefind"
+  short_description: "Configure and index static website search with Pagefind"
+  default_prompt: "Use $pagefind to configure or build static site search."
+
+policy:
+  allow_implicit_invocation: true

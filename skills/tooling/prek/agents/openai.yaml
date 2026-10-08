@@ -1,0 +1,7 @@
+interface:
+  display_name: "Prek"
+  short_description: "Run and configure git pre-commit hooks using prek"
+  default_prompt: "Use $prek to run or configure git pre-commit hooks."
+
+policy:
+  allow_implicit_invocation: true

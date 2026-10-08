@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Build Context"
+  short_description: "Build high-signal review context for pull requests"
+  default_prompt: "Use $pr-build-context to analyze PR changes and build context."
+
+policy:
+  allow_implicit_invocation: true

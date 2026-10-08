@@ -1,0 +1,7 @@
+interface:
+  display_name: "To Spec"
+  short_description: "Convert conversation context into a product specification"
+  default_prompt: "Use $to-spec to generate a product specification from context."
+
+policy:
+  allow_implicit_invocation: false

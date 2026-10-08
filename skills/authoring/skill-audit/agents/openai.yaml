@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill Audit"
+  short_description: "Audit the agent skills collection for health and integrity"
+  default_prompt: "Use $skill-audit to health-check and audit the skills catalog."
+
+policy:
+  allow_implicit_invocation: true

@@ -207,3 +207,69 @@ async fn test_download_skill_resources_end_to_end() {
     let content = fs::read_to_string(&files[0].absolute_path).unwrap();
     assert_eq!(content, "# Mock Guide Content");
 }
+
+#[test]
+fn test_is_non_text_content_type() {
+    assert!(SkillDownloader::is_non_text_content_type("image/png"));
+    assert!(SkillDownloader::is_non_text_content_type("IMAGE/JPEG"));
+    assert!(SkillDownloader::is_non_text_content_type("audio/mp3"));
+    assert!(SkillDownloader::is_non_text_content_type("video/mp4"));
+    assert!(SkillDownloader::is_non_text_content_type("font/woff2"));
+    assert!(SkillDownloader::is_non_text_content_type("application/pdf"));
+    assert!(SkillDownloader::is_non_text_content_type("application/zip"));
+    assert!(SkillDownloader::is_non_text_content_type(
+        "application/octet-stream"
+    ));
+    assert!(SkillDownloader::is_non_text_content_type(
+        "application/x-tar"
+    ));
+    assert!(SkillDownloader::is_non_text_content_type(
+        "application/gzip"
+    ));
+
+    assert!(!SkillDownloader::is_non_text_content_type("text/plain"));
+    assert!(!SkillDownloader::is_non_text_content_type("text/markdown"));
+    assert!(!SkillDownloader::is_non_text_content_type("text/html"));
+    assert!(!SkillDownloader::is_non_text_content_type(
+        "application/json"
+    ));
+    assert!(!SkillDownloader::is_non_text_content_type(
+        "application/yaml"
+    ));
+}
+
+#[tokio::test]
+async fn test_download_skill_resources_empty_resources() {
+    let dir = tempdir().unwrap();
+    let skill_dir = dir.path().join("skills/engineering/empty-skill");
+    fs::create_dir_all(&skill_dir).unwrap();
+    let skill_path = skill_dir.join("SKILL.md");
+
+    let fm = SkillFrontmatter::builder()
+        .name("empty-skill")
+        .description("Empty resources test skill")
+        .resources(None)
+        .build();
+
+    let skill = Skill::builder()
+        .path(skill_path)
+        .dir_name("empty-skill".to_string())
+        .category(SkillCategory::Engineering)
+        .promoted(true)
+        .frontmatter(fm)
+        .content("# Content".to_string())
+        .raw("---\nname: empty-skill\n---".to_string())
+        .resources(Vec::new())
+        .build();
+
+    let downloader = SkillDownloader::new();
+    let files = downloader.download_skill_resources(&skill).await.unwrap();
+    assert!(files.is_empty());
+}
+
+#[tokio::test]
+async fn test_fetch_url_nonexistent_fails() {
+    let downloader = SkillDownloader::new();
+    let res = downloader.fetch_url("http://127.0.0.1:9/nonexistent").await;
+    assert!(res.is_err());
+}

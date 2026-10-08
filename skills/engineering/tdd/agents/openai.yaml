@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test-Driven Development"
+  short_description: "Apply red-green-refactor test-driven development"
+  default_prompt: "Use $tdd to build software using test-driven development."
+
+policy:
+  allow_implicit_invocation: true

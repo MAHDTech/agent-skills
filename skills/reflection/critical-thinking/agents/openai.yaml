@@ -1,0 +1,7 @@
+interface:
+  display_name: "Critical Thinking"
+  short_description: "Stress-test responses for hidden assumptions and logical gaps"
+  default_prompt: "Use $critical-thinking to analyze arguments and hidden risks."
+
+policy:
+  allow_implicit_invocation: true

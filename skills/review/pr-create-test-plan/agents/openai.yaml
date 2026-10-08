@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Create Test Plan"
+  short_description: "Generate manual test plans for pull request changes"
+  default_prompt: "Use $pr-create-test-plan to generate a test plan for PR changes."
+
+policy:
+  allow_implicit_invocation: true

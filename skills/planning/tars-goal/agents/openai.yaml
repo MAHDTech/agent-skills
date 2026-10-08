@@ -1,0 +1,7 @@
+interface:
+  display_name: "TARS Goal"
+  short_description: "Pursue a persistent goal until all requirements are verified"
+  default_prompt: "Use $tars-goal to establish and pursue a persistent goal."
+
+policy:
+  allow_implicit_invocation: false

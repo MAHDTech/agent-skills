@@ -1,0 +1,7 @@
+interface:
+  display_name: "RFC Review"
+  short_description: "Review RFCs for problem clarity, security, and quality"
+  default_prompt: "Use $rfc-review to review design proposals and RFC documents."
+
+policy:
+  allow_implicit_invocation: true

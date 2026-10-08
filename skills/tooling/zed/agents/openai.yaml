@@ -1,0 +1,7 @@
+interface:
+  display_name: "Zed"
+  short_description: "Manage Zed editor settings, keybindings, and LSP"
+  default_prompt: "Use $zed to configure Zed settings and keybindings."
+
+policy:
+  allow_implicit_invocation: true

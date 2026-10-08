@@ -1,0 +1,7 @@
+interface:
+  display_name: "Bevy Egui"
+  short_description: "Integrate egui immediate-mode GUIs into Bevy games"
+  default_prompt: "Use $bevy-egui to integrate egui interfaces into Bevy."
+
+policy:
+  allow_implicit_invocation: true

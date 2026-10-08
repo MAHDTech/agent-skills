@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill Router"
+  short_description: "Find and route to the best skill for any agent task"
+  default_prompt: "Use $skill-router to find the right skill for a given task."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Bevy Development"
+  short_description: "Build 2D and 3D games with the Bevy ECS engine in Rust"
+  default_prompt: "Use $bevy-development to build games with the Bevy engine."
+
+policy:
+  allow_implicit_invocation: true

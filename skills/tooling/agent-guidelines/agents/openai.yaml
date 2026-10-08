@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent Guidelines"
+  short_description: "Follow guidelines to reduce common AI agent coding errors"
+  default_prompt: "Use $agent-guidelines to adhere to agent coding standards."
+
+policy:
+  allow_implicit_invocation: true

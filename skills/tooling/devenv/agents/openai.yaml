@@ -1,0 +1,7 @@
+interface:
+  display_name: "Devenv"
+  short_description: "Manage environments and dependencies with devenv"
+  default_prompt: "Use $devenv to manage environment shells and dependencies."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Total Recall"
+  short_description: "Record an append-only TSV decision log for autonomous tasks"
+  default_prompt: "Use $total-recall to record decisions during autonomous work."
+
+policy:
+  allow_implicit_invocation: false

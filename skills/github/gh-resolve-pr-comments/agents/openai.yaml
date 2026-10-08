@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Resolve PR Comments"
+  short_description: "Triage and resolve review comments on pull requests"
+  default_prompt: "Use $gh-resolve-pr-comments to address review comments on a PR."
+
+policy:
+  allow_implicit_invocation: false

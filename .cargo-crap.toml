@@ -1,0 +1,15 @@
+# Threshold above which a function is flagged as crappy
+# Default is 30.0; use 15.0 for strict quality requirements
+threshold = 30.0
+
+# Weight for the try operator '?' (range: 0.0 to 1.0)
+# Prevents idiomatic error propagation from spiking complexity
+try-weight = 0.2
+
+# Show uncovered line ranges in reports for failing functions
+uncovered-hints = true
+
+# Additional file patterns to exclude from analysis
+exclude = [
+  "dashboard/**",
+]

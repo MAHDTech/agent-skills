@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill Creator"
+  short_description: "Create and refine agent skills with progressive disclosure"
+  default_prompt: "Use $skill-creator to create or update an agent skill."
+
+policy:
+  allow_implicit_invocation: true

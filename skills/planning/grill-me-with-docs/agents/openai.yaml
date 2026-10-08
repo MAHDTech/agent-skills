@@ -1,0 +1,7 @@
+interface:
+  display_name: "Grill Me with Docs"
+  short_description: "Interview plans while updating glossaries and recording ADRs"
+  default_prompt: "Use $grill-me-with-docs to interview designs and record ADRs."
+
+policy:
+  allow_implicit_invocation: true

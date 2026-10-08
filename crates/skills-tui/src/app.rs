@@ -317,138 +317,157 @@ impl App {
     ///
     /// Discards release events and unmapped keys, returning `false`.
     /// Returns `true` if the key event produced a state transition.
-    #[allow(clippy::too_many_lines)]
     pub fn handle_key_event(&mut self, key: KeyEvent) -> bool {
         if key.kind == KeyEventKind::Release {
             return false;
         }
 
         if self.search_active {
-            return match key.code {
-                KeyCode::Esc => {
-                    self.clear_search_filter();
-                    self.deactivate_search();
-                    true
-                }
-                KeyCode::Enter => {
-                    self.deactivate_search();
-                    true
-                }
-                KeyCode::Backspace => {
-                    self.pop_search_char();
-                    true
-                }
-                KeyCode::Char(c) => {
-                    self.push_search_char(c);
-                    true
-                }
-                KeyCode::Down => {
-                    self.select_next();
-                    true
-                }
-                KeyCode::Up => {
-                    self.select_prev();
-                    true
-                }
-                _ => false,
-            };
+            return self.handle_search_key(key.code);
         }
 
         if self.active_view == ActiveView::Runner && self.runner_input_active {
-            return match key.code {
-                KeyCode::Esc | KeyCode::Enter => {
-                    self.deactivate_runner_input();
-                    true
-                }
-                KeyCode::Backspace => {
-                    self.pop_runner_char();
-                    true
-                }
-                KeyCode::Char(c) => {
-                    self.push_runner_char(c);
-                    true
-                }
-                KeyCode::Tab => {
-                    self.select_runner_field_next();
-                    true
-                }
-                KeyCode::BackTab => {
-                    self.select_runner_field_prev();
-                    true
-                }
-                _ => false,
-            };
+            return self.handle_runner_input_key(key.code);
         }
 
-        if self.active_view == ActiveView::Linter {
-            match key.code {
-                KeyCode::Char('j') | KeyCode::Down => {
-                    self.select_linter_next();
-                    return true;
-                }
-                KeyCode::Char('k') | KeyCode::Up => {
-                    self.select_linter_prev();
-                    return true;
-                }
-                KeyCode::Enter => {
-                    self.jump_to_selected_linter_skill();
-                    return true;
-                }
-                KeyCode::Char('r') => {
-                    self.refresh_linter_diagnostics();
-                    return true;
-                }
-                _ => {}
+        if self.active_view == ActiveView::Linter && self.handle_linter_key(key.code) {
+            return true;
+        }
+
+        if self.active_view == ActiveView::Runner && self.handle_runner_key(key.code) {
+            return true;
+        }
+
+        self.handle_common_key(key.code)
+    }
+
+    fn handle_search_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Esc => {
+                self.clear_search_filter();
+                self.deactivate_search();
+                true
             }
-        }
-
-        if self.active_view == ActiveView::Runner {
-            match key.code {
-                KeyCode::Tab if !self.runner_placeholders().is_empty() => {
-                    self.select_runner_field_next();
-                    return true;
-                }
-                KeyCode::Down => {
-                    self.select_runner_field_next();
-                    return true;
-                }
-                KeyCode::BackTab if !self.runner_placeholders().is_empty() => {
-                    self.select_runner_field_prev();
-                    return true;
-                }
-                KeyCode::Up => {
-                    self.select_runner_field_prev();
-                    return true;
-                }
-                KeyCode::Enter | KeyCode::Char('i') => {
-                    self.activate_runner_input();
-                    return true;
-                }
-                KeyCode::Char('j') => {
-                    self.scroll_runner_down();
-                    return true;
-                }
-                KeyCode::Char('k') => {
-                    self.scroll_runner_up();
-                    return true;
-                }
-                KeyCode::Char('c') => {
-                    let _ = self.export_runner_prompt_clipboard();
-                    return true;
-                }
-                KeyCode::Char('e') => {
-                    let _ = self.export_runner_prompt_file(None);
-                    return true;
-                }
-                KeyCode::Char('r') => {
-                    self.reset_runner_params();
-                    return true;
-                }
-                _ => {}
+            KeyCode::Enter => {
+                self.deactivate_search();
+                true
             }
+            KeyCode::Backspace => {
+                self.pop_search_char();
+                true
+            }
+            KeyCode::Char(c) => {
+                self.push_search_char(c);
+                true
+            }
+            KeyCode::Down => {
+                self.select_next();
+                true
+            }
+            KeyCode::Up => {
+                self.select_prev();
+                true
+            }
+            _ => false,
         }
+    }
 
-        match key.code {
+    fn handle_runner_input_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Esc | KeyCode::Enter => {
+                self.deactivate_runner_input();
+                true
+            }
+            KeyCode::Backspace => {
+                self.pop_runner_char();
+                true
+            }
+            KeyCode::Char(c) => {
+                self.push_runner_char(c);
+                true
+            }
+            KeyCode::Tab => {
+                self.select_runner_field_next();
+                true
+            }
+            KeyCode::BackTab => {
+                self.select_runner_field_prev();
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn handle_linter_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.select_linter_next();
+                true
+            }
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.select_linter_prev();
+                true
+            }
+            KeyCode::Enter => {
+                self.jump_to_selected_linter_skill();
+                true
+            }
+            KeyCode::Char('r') => {
+                self.refresh_linter_diagnostics();
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn handle_runner_key(&mut self, code: KeyCode) -> bool {
+        match code {
+            KeyCode::Tab if !self.runner_placeholders().is_empty() => {
+                self.select_runner_field_next();
+                true
+            }
+            KeyCode::Down => {
+                self.select_runner_field_next();
+                true
+            }
+            KeyCode::BackTab if !self.runner_placeholders().is_empty() => {
+                self.select_runner_field_prev();
+                true
+            }
+            KeyCode::Up => {
+                self.select_runner_field_prev();
+                true
+            }
+            KeyCode::Enter | KeyCode::Char('i') => {
+                self.activate_runner_input();
+                true
+            }
+            KeyCode::Char('j') => {
+                self.scroll_runner_down();
+                true
+            }
+            KeyCode::Char('k') => {
+                self.scroll_runner_up();
+                true
+            }
+            KeyCode::Char('c') => {
+                let _ = self.export_runner_prompt_clipboard();
+                true
+            }
+            KeyCode::Char('e') => {
+                let _ = self.export_runner_prompt_file(None);
+                true
+            }
+            KeyCode::Char('r') => {
+                self.reset_runner_params();
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn handle_common_key(&mut self, code: KeyCode) -> bool {
+        match code {
             KeyCode::Tab => {
                 self.next_tab();
                 true

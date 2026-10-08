@@ -573,16 +573,40 @@ impl SkillSyncer {
 
                 if let Some(installed_skill) = registry.get(skill_id) {
                     let target_path = skills_dir.join(skill_id);
-                    let is_symlink = target_path.symlink_metadata().is_ok_and(|m| m.is_symlink())
-                        || installed_skill.mode == InstallMode::Symlink;
+                    let link_destination = fs::read_link(&target_path).ok().map(|path| {
+                        if path.is_absolute() {
+                            path
+                        } else {
+                            skills_dir.join(path)
+                        }
+                    });
+                    let managed_link = installed_skill.mode == InstallMode::Symlink
+                        && link_destination.as_ref().is_some_and(|path| {
+                            crate::installer::normalize_path(path)
+                                == crate::installer::normalize_path(&installed_skill.source_path)
+                        });
+                    let source_link = managed_link
+                        && target_path.canonicalize().ok() == source_path.canonicalize().ok();
+                    let stale_link = managed_link && !source_link;
+                    if stale_link {
+                        actions.push(SyncAction {
+                            skill_id: (*skill_id).clone(),
+                            target_env: target.clone(),
+                            kind: SyncActionKind::Update,
+                            source_version: Some(source_version),
+                            target_version: Some(installed_skill.version.clone()),
+                            source_checksum: Some(source_checksum),
+                            target_checksum: Some(installed_skill.checksum.clone()),
+                            reason: "Point managed symlink at the authoritative catalog"
+                                .to_string(),
+                        });
+                        continue;
+                    }
 
                     let integrity = self.installer.verify(skill_id, target)?;
-
-                    let is_tampered = match integrity {
-                        IntegrityStatus::MissingFile { .. } => true,
-                        IntegrityStatus::ChecksumMismatch { .. } => !is_symlink,
-                        IntegrityStatus::Valid | IntegrityStatus::ExtraFile { .. } => false,
-                    };
+                    let is_tampered = (installed_skill.mode == InstallMode::Symlink
+                        && !managed_link)
+                        || (!source_link && !matches!(integrity, IntegrityStatus::Valid));
 
                     if is_tampered {
                         actions.push(SyncAction {
@@ -668,7 +692,7 @@ impl SkillSyncer {
                     let target_exists =
                         target_path.exists() || target_path.symlink_metadata().is_ok();
                     let reason = if target_exists {
-                        "Untracked target directory exists on disk, requires adoption".to_string()
+                        "Untracked target exists on disk".to_string()
                     } else {
                         "Skill not installed in target environment".to_string()
                     };
@@ -676,7 +700,11 @@ impl SkillSyncer {
                     actions.push(SyncAction {
                         skill_id: (*skill_id).clone(),
                         target_env: target.clone(),
-                        kind: SyncActionKind::Install,
+                        kind: if target_exists {
+                            SyncActionKind::Conflict
+                        } else {
+                            SyncActionKind::Install
+                        },
                         source_version: Some(source_version),
                         target_version: None,
                         source_checksum: Some(source_checksum),
@@ -732,6 +760,15 @@ impl SkillSyncer {
             return Ok(SyncSummary::from_plan_dry_run(plan));
         }
 
+        if self.conflict_strategy == ConflictStrategy::PromptUser {
+            if let Some(action) = plan.conflicts().next() {
+                return Err(SyncError::UnresolvedConflict {
+                    skill_id: action.skill_id.clone(),
+                    target: action.target_env.clone(),
+                    reason: action.reason.clone(),
+                });
+            }
+        }
         let catalog_skills = self.discover_catalog_skills()?;
         let mut summary = SyncSummary::default();
 
