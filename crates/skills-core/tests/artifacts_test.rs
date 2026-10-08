@@ -823,6 +823,6 @@ fn test_markdown_transformations_archive_link_rewriting() {
     );
     assert_eq!(
         out,
-        "[Legacy Tool](@/skills/archive/engineering/legacy-tool/_index.md)"
+        "[Legacy Tool](@/skills-archive/engineering/legacy-tool/_index.md)"
     );
 }
