@@ -16,7 +16,7 @@ permissions:
 jobs:
   update:
     name: Update Devenv Dependencies
-    uses: tars-cloud/actions/.github/workflows/consumer-devenv-update.yaml@d074dde42c3d810959a57df78516e3eddb2fa8f7 # v3
+    uses: tars-cloud/actions/.github/workflows/consumer-devenv-update.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
     secrets:
       app-id: ${{ secrets.UPDATE_APP_ID || secrets.APP_ID }}
       app-private-key: ${{ secrets.UPDATE_APP_PRIVATE_KEY || secrets.APP_PRIVATE_KEY }}

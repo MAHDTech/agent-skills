@@ -26,7 +26,7 @@ concurrency:
 jobs:
   codeql:
     name: CodeQL Analysis
-    uses: tars-cloud/actions/.github/workflows/consumer-codeql.yaml@d074dde42c3d810959a57df78516e3eddb2fa8f7 # v3
+    uses: tars-cloud/actions/.github/workflows/consumer-codeql.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
     with:
       type: devenv
       timeout-minutes: 120
