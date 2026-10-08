@@ -531,3 +531,50 @@ fn test_sync_conflict_preflight_preserves_untracked_directory() {
     assert!(!h.agent_dir.join("aaa-new").exists());
     assert_eq!(fs::read(untracked.join("SKILL.md")).unwrap(), before);
 }
+
+#[test]
+fn test_sync_error_into_skill_error_all_variants() {
+    use skills_core::error::SkillError;
+    use skills_core::InstallerError;
+
+    let io_err = SyncError::Io {
+        path: PathBuf::from("/sync/io"),
+        source: std::io::Error::new(std::io::ErrorKind::Other, "io error"),
+    };
+    let skill_err: SkillError = io_err.into();
+    assert!(matches!(skill_err, SkillError::Io { .. }));
+
+    let inst_err = SyncError::Installer(InstallerError::SkillNotFound {
+        id: "missing".into(),
+    });
+    let skill_err: SkillError = inst_err.into();
+    assert!(matches!(skill_err, SkillError::NotFound { .. }));
+
+    let conflict_err = SyncError::UnresolvedConflict {
+        skill_id: "conflict-skill".into(),
+        target: TargetEnvironment::Cursor,
+        reason: "file conflict".into(),
+    };
+    let skill_err: SkillError = conflict_err.into();
+    assert!(matches!(
+        skill_err,
+        SkillError::FrontmatterValidation { .. }
+    ));
+
+    let unreachable_err = SyncError::TargetUnreachable(TargetEnvironment::ClaudeDesktop);
+    let skill_err: SkillError = unreachable_err.into();
+    assert!(matches!(
+        skill_err,
+        SkillError::FrontmatterValidation { .. }
+    ));
+
+    let catalog_err = SyncError::InvalidCatalog {
+        path: PathBuf::from("/invalid/catalog"),
+        reason: "corrupt".into(),
+    };
+    let skill_err: SkillError = catalog_err.into();
+    assert!(matches!(
+        skill_err,
+        SkillError::FrontmatterValidation { .. }
+    ));
+}

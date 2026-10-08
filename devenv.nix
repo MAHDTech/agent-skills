@@ -13,6 +13,7 @@ let
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [
     cargo-audit
+    cargo-edit
     cargo-deny
     cargo-llvm-cov
     cargo-nextest

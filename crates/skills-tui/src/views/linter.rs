@@ -339,3 +339,95 @@ fn severity_badge(severity: LintSeverity) -> Span<'static> {
         ),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_remediation_for_rule_all_variants() {
+        assert_eq!(
+            remediation_for_rule("frontmatter-required"),
+            "Add mandatory 'name' and 'description' fields to YAML frontmatter block in SKILL.md."
+        );
+        assert_eq!(
+            remediation_for_rule("frontmatter-syntax"),
+            "Fix invalid YAML syntax within frontmatter delimiters."
+        );
+        assert_eq!(
+            remediation_for_rule("frontmatter-limits"),
+            "Ensure skill name is 64 characters or fewer and description is concise."
+        );
+        assert_eq!(
+            remediation_for_rule("naming-kebab-case"),
+            "Rename skill directory and frontmatter name to lowercase alphanumeric words separated by hyphens."
+        );
+        assert_eq!(
+            remediation_for_rule("category-invalid"),
+            "Set skill category to a supported variant (e.g. engineering, tooling, review)."
+        );
+        assert_eq!(
+            remediation_for_rule("no-em-dashes"),
+            "Replace unicode em-dashes with standard hyphens, colons, or clean punctuation."
+        );
+        assert_eq!(
+            remediation_for_rule("broken-links"),
+            "Verify all relative markdown links target existing files on disk."
+        );
+        assert_eq!(
+            remediation_for_rule("duplicate-names"),
+            "Disambiguate duplicate skill names to maintain unique catalog routing."
+        );
+        assert_eq!(
+            remediation_for_rule("unsupported-target"),
+            "Update target agent compatibility tags in frontmatter metadata."
+        );
+        assert_eq!(
+            remediation_for_rule("unknown-custom-rule"),
+            "Inspect the source file at the indicated coordinates and address the diagnostic condition."
+        );
+    }
+
+    #[test]
+    fn test_format_location_variants() {
+        let issue_both = LintIssue {
+            file: PathBuf::from("test.md"),
+            line: Some(10),
+            column: Some(4),
+            rule: "no-em-dashes".into(),
+            severity: LintSeverity::Error,
+            message: "msg".into(),
+        };
+        assert_eq!(format_location(&issue_both), "L10:4");
+
+        let issue_line_only = LintIssue {
+            file: PathBuf::from("test.md"),
+            line: Some(15),
+            column: None,
+            rule: "no-em-dashes".into(),
+            severity: LintSeverity::Warning,
+            message: "msg".into(),
+        };
+        assert_eq!(format_location(&issue_line_only), "L15");
+
+        let issue_none = LintIssue {
+            file: PathBuf::from("test.md"),
+            line: None,
+            column: None,
+            rule: "no-em-dashes".into(),
+            severity: LintSeverity::Error,
+            message: "msg".into(),
+        };
+        assert_eq!(format_location(&issue_none), "-");
+    }
+
+    #[test]
+    fn test_severity_badge_variants() {
+        let err_span = severity_badge(LintSeverity::Error);
+        assert_eq!(err_span.content, "[ ERROR ]");
+
+        let warn_span = severity_badge(LintSeverity::Warning);
+        assert_eq!(warn_span.content, "[ WARN  ]");
+    }
+}

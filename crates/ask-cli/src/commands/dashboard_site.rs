@@ -355,13 +355,8 @@ pub(crate) async fn run_lint() -> Result<(), CliError> {
     Ok(())
 }
 
-/// Spawns live development server with Tailwind watch and Zola serve.
-pub(crate) async fn run_serve(port: u16) -> Result<(), CliError> {
-    let root = resolve_root()?;
-    build_site(&root, None, true)?;
-
-    let port_str = port.to_string();
-
+/// Spawns the Tailwind CSS watcher subprocess.
+pub(crate) fn spawn_tailwind(root: &Path) -> Result<tokio::process::Child, CliError> {
     let mut tailwind_cmd = tokio::process::Command::new("tailwindcss");
     tailwind_cmd
         .args([
@@ -371,41 +366,48 @@ pub(crate) async fn run_serve(port: u16) -> Result<(), CliError> {
             "dashboard/static/build/css/generated.css",
             "--watch",
         ])
-        .current_dir(&root);
+        .current_dir(root);
 
-    let mut tailwind_child = match tailwind_cmd.spawn() {
-        Ok(c) => c,
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+    tailwind_cmd.spawn().map_err(|err| {
+        if err.kind() == std::io::ErrorKind::NotFound {
             eprintln!("{}", format_tool_not_found_error("tailwindcss", "serve"));
-            return Err(CliError::Io(err));
         }
-        Err(err) => return Err(CliError::Io(err)),
-    };
+        CliError::Io(err)
+    })
+}
 
+/// Spawns the Zola development server subprocess.
+pub(crate) fn spawn_zola(root: &Path, port: &str) -> Result<tokio::process::Child, CliError> {
     let mut zola_cmd = tokio::process::Command::new("zola");
     zola_cmd
-        .args(["--root", "dashboard", "serve", "-p", &port_str])
-        .current_dir(&root);
+        .args(["--root", "dashboard", "serve", "-p", port])
+        .current_dir(root);
 
-    let zola_child = match zola_cmd.spawn() {
-        Ok(c) => c,
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
-            let _ = tailwind_child.kill().await;
+    zola_cmd.spawn().map_err(|err| {
+        if err.kind() == std::io::ErrorKind::NotFound {
             eprintln!("{}", format_tool_not_found_error("zola", "serve"));
-            return Err(CliError::Io(err));
         }
+        CliError::Io(err)
+    })
+}
+
+/// Spawns live development server with Tailwind watch and Zola serve.
+pub(crate) async fn run_serve(port: u16) -> Result<(), CliError> {
+    let root = resolve_root()?;
+    build_site(&root, None, true)?;
+
+    let mut tailwind_child = spawn_tailwind(&root)?;
+    let port_str = port.to_string();
+    let zola_child = match spawn_zola(&root, &port_str) {
+        Ok(c) => c,
         Err(err) => {
             let _ = tailwind_child.kill().await;
-            return Err(CliError::Io(err));
+            return Err(err);
         }
     };
 
     println!("Serving dashboard at http://127.0.0.1:{port} with live reload...");
-
-    drop(tailwind_cmd);
-    drop(zola_cmd);
-    let res = serve_event_loop(&root, tailwind_child, zola_child).await;
-    res
+    serve_event_loop(&root, tailwind_child, zola_child).await
 }
 
 #[cfg(unix)]
@@ -494,6 +496,23 @@ pub(crate) fn snapshot_watch_dirs(root: &Path) -> HashMap<PathBuf, SystemTime> {
     snapshot
 }
 
+/// Checks whether a filesystem entry should be skipped during dashboard watch snapshotting.
+pub(crate) fn is_ignored_snapshot_entry(name: &str, path: &Path, root: &Path) -> bool {
+    const IGNORED_NAMES: &[&str] = &["node_modules", "public", "skill_dates.toml"];
+    if name.starts_with('.') || IGNORED_NAMES.contains(&name) {
+        return true;
+    }
+
+    if let Ok(rel) = path.strip_prefix(root) {
+        let rel_str = rel.to_string_lossy().replace('\\', "/");
+        if rel_str.starts_with("dashboard/content/skills") || rel_str.contains("static/pagefind") {
+            return true;
+        }
+    }
+
+    false
+}
+
 pub(crate) fn collect_snapshot_recursive(
     dir: &Path,
     root: &Path,
@@ -507,21 +526,8 @@ pub(crate) fn collect_snapshot_recursive(
         let path = entry.path();
         let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
-        if name.starts_with('.')
-            || name == "node_modules"
-            || name == "public"
-            || name == "skill_dates.toml"
-        {
+        if is_ignored_snapshot_entry(name, &path, root) {
             continue;
-        }
-
-        if let Ok(rel) = path.strip_prefix(root) {
-            let rel_str = rel.to_string_lossy().replace('\\', "/");
-            if rel_str.starts_with("dashboard/content/skills")
-                || rel_str.contains("static/pagefind")
-            {
-                continue;
-            }
         }
 
         if path.is_dir() {
@@ -700,5 +706,87 @@ mod tests {
         assert!(drifted.contains(&"MM dashboard/content/both.md"));
         assert!(!drifted.contains(&"M  dashboard/content/staged.md"));
         assert!(!drifted.contains(&"A  dashboard/content/staged_new.md"));
+    }
+
+    #[test]
+    fn test_is_ignored_snapshot_entry() {
+        let root = Path::new("/mock/repo");
+
+        assert!(is_ignored_snapshot_entry(".git", &root.join(".git"), root));
+        assert!(is_ignored_snapshot_entry(
+            ".hidden",
+            &root.join(".hidden"),
+            root
+        ));
+        assert!(is_ignored_snapshot_entry(
+            "node_modules",
+            &root.join("node_modules"),
+            root
+        ));
+        assert!(is_ignored_snapshot_entry(
+            "public",
+            &root.join("public"),
+            root
+        ));
+        assert!(is_ignored_snapshot_entry(
+            "skill_dates.toml",
+            &root.join("skill_dates.toml"),
+            root
+        ));
+
+        assert!(is_ignored_snapshot_entry(
+            "file.md",
+            &root.join("dashboard/content/skills/engineering/test.md"),
+            root
+        ));
+        assert!(is_ignored_snapshot_entry(
+            "pagefind.js",
+            &root.join("dashboard/static/pagefind/pagefind.js"),
+            root
+        ));
+
+        assert!(!is_ignored_snapshot_entry(
+            "SKILL.md",
+            &root.join("skills/engineering/my-skill/SKILL.md"),
+            root
+        ));
+        assert!(!is_ignored_snapshot_entry(
+            "index.html",
+            &root.join("dashboard/templates/index.html"),
+            root
+        ));
+    }
+
+    #[test]
+    fn test_collect_snapshot_recursive() {
+        let temp = tempdir().expect("failed to create temp dir");
+        let root = temp.path();
+
+        let skills_dir = root.join("skills/engineering/sample");
+        std::fs::create_dir_all(&skills_dir).unwrap();
+        let valid_file = skills_dir.join("SKILL.md");
+        std::fs::write(&valid_file, "# Sample").unwrap();
+
+        // Ignored dot directory
+        let dot_dir = root.join(".git");
+        std::fs::create_dir_all(&dot_dir).unwrap();
+        std::fs::write(dot_dir.join("config"), "git config").unwrap();
+
+        // Ignored node_modules
+        let node_dir = root.join("node_modules");
+        std::fs::create_dir_all(&node_dir).unwrap();
+        std::fs::write(node_dir.join("package.json"), "{}").unwrap();
+
+        let mut snapshot = HashMap::new();
+        collect_snapshot_recursive(root, root, &mut snapshot);
+
+        assert!(snapshot.contains_key(&valid_file));
+        assert!(!snapshot.contains_key(&dot_dir.join("config")));
+        assert!(!snapshot.contains_key(&node_dir.join("package.json")));
+
+        // Non-existent directory handling
+        let mut empty_snapshot = HashMap::new();
+        collect_snapshot_recursive(&root.join("nonexistent"), root, &mut empty_snapshot);
+        assert!(empty_snapshot.is_empty());
     }
 }

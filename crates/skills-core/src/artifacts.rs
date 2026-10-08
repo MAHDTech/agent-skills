@@ -550,51 +550,15 @@ impl ArtifactsEngine {
 
                 // Process sibling markdown files
                 if skill_src_dir.is_dir() {
-                    let mut siblings = Vec::new();
-                    if let Ok(entries) = fs::read_dir(&skill_src_dir) {
-                        for entry in entries.flatten() {
-                            let path = entry.path();
-                            if path.is_file() {
-                                if let Some(fname) = path.file_name().and_then(|n| n.to_str()) {
-                                    if fname.ends_with(".md")
-                                        && !fname.eq_ignore_ascii_case("SKILL.md")
-                                    {
-                                        siblings.push(fname.to_string());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    siblings.sort();
-
-                    for file in siblings {
-                        let sib_path = skill_src_dir.join(&file);
-                        let raw = fs::read_to_string(&sib_path)
-                            .map_err(|e| SkillError::io(&sib_path, e))?;
-                        let normalized = normalize_crlf(&raw);
-                        let stripped = strip_legacy_raw_wrapper(&normalized);
-                        let body = rewrite_skill_links(
-                            &stripped,
-                            &content_base,
-                            &skill_src_dir,
-                            &skills_root,
-                            Some(&archive_root),
-                        );
-                        let sib_mermaid = contains_mermaid(&body);
-                        let safe_sib_body = escape_zola_shortcodes(&body);
-                        let sib_title = file.strip_suffix(".md").unwrap_or(&file);
-
-                        let dest_sib = out_dir.join(&file);
-                        let sib_content = format!(
-                            "+++\ntitle = {}\n[extra]\nskill = false\ncategory = {}\nmermaid = {}\nskill_name = {}\n+++\n\n{}\n",
-                            to_toml_string(sib_title),
-                            to_toml_string(category.as_str()),
-                            sib_mermaid,
-                            to_toml_string(&s.dir_name),
-                            safe_sib_body
-                        );
-                        atomic_write(&dest_sib, &sib_content)?;
-                    }
+                    let sibling_ctx = SiblingDocsContext {
+                        category: category.as_str(),
+                        skill_name: &s.dir_name,
+                        content_base: &content_base,
+                        skills_root: &skills_root,
+                        archive_root: Some(&archive_root),
+                        extra_meta: "",
+                    };
+                    write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
 
                     // Mirror resources if present
                     let resources_src = skill_src_dir.join("resources");
@@ -758,54 +722,21 @@ impl ArtifactsEngine {
 
                     // Sibling files for archived skill
                     if skill_src_dir.is_dir() {
-                        let mut siblings = Vec::new();
-                        if let Ok(entries) = fs::read_dir(&skill_src_dir) {
-                            for entry in entries.flatten() {
-                                let path = entry.path();
-                                if path.is_file() {
-                                    if let Some(fname) = path.file_name().and_then(|n| n.to_str()) {
-                                        if fname.ends_with(".md")
-                                            && !fname.eq_ignore_ascii_case("SKILL.md")
-                                        {
-                                            siblings.push(fname.to_string());
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        siblings.sort();
-
-                        for file in siblings {
-                            let sib_path = skill_src_dir.join(&file);
-                            let raw = fs::read_to_string(&sib_path)
-                                .map_err(|e| SkillError::io(&sib_path, e))?;
-                            let normalized = normalize_crlf(&raw);
-                            let stripped = strip_legacy_raw_wrapper(&normalized);
-                            let body = rewrite_skill_links(
-                                &stripped,
-                                &content_base,
-                                &skill_src_dir,
-                                &skills_root,
-                                Some(&archive_root),
-                            );
-                            let sib_mermaid = contains_mermaid(&body);
-                            let safe_sib_body = escape_zola_shortcodes(&body);
-                            let sib_title = file.strip_suffix(".md").unwrap_or(&file);
-
-                            let dest_sib = out_dir.join(&file);
-                            let sib_content = format!(
-                                "+++\ntitle = {}\n[extra]\nskill = false\ncategory = {}\nmermaid = {}\nskill_name = {}\narchived = {}\n{}source_url = {}\n+++\n\n{}\n",
-                                to_toml_string(sib_title),
-                                to_toml_string(category.as_str()),
-                                sib_mermaid,
-                                to_toml_string(&s.dir_name),
-                                to_toml_string(archived_date),
-                                replaced_by_toml,
-                                to_toml_string(&source_url),
-                                safe_sib_body
-                            );
-                            atomic_write(&dest_sib, &sib_content)?;
-                        }
+                        let archive_extra = format!(
+                            "archived = {}\n{}source_url = {}\n",
+                            to_toml_string(archived_date),
+                            replaced_by_toml,
+                            to_toml_string(&source_url)
+                        );
+                        let sibling_ctx = SiblingDocsContext {
+                            category: category.as_str(),
+                            skill_name: &s.dir_name,
+                            content_base: &content_base,
+                            skills_root: &skills_root,
+                            archive_root: Some(&archive_root),
+                            extra_meta: &archive_extra,
+                        };
+                        write_sibling_docs(&skill_src_dir, &out_dir, &sibling_ctx)?;
 
                         // Mirror resources with archive metadata
                         let resources_src = skill_src_dir.join("resources");
@@ -857,6 +788,70 @@ impl ArtifactsEngine {
             }
         }
     }
+}
+
+/// Context for rendering sibling documentation markdown files alongside a skill.
+struct SiblingDocsContext<'a> {
+    category: &'a str,
+    skill_name: &'a str,
+    content_base: &'a str,
+    skills_root: &'a Path,
+    archive_root: Option<&'a Path>,
+    extra_meta: &'a str,
+}
+
+fn write_sibling_docs(
+    skill_src_dir: &Path,
+    out_dir: &Path,
+    ctx: &SiblingDocsContext<'_>,
+) -> Result<()> {
+    if !skill_src_dir.is_dir() {
+        return Ok(());
+    }
+    let mut siblings = Vec::new();
+    if let Ok(entries) = fs::read_dir(skill_src_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(fname) = path.file_name().and_then(|n| n.to_str()) {
+                    if fname.ends_with(".md") && !fname.eq_ignore_ascii_case("SKILL.md") {
+                        siblings.push(fname.to_string());
+                    }
+                }
+            }
+        }
+    }
+    siblings.sort();
+
+    for file in siblings {
+        let sib_path = skill_src_dir.join(&file);
+        let raw = fs::read_to_string(&sib_path).map_err(|e| SkillError::io(&sib_path, e))?;
+        let normalized = normalize_crlf(&raw);
+        let stripped = strip_legacy_raw_wrapper(&normalized);
+        let body = rewrite_skill_links(
+            &stripped,
+            ctx.content_base,
+            skill_src_dir,
+            ctx.skills_root,
+            ctx.archive_root,
+        );
+        let sib_mermaid = contains_mermaid(&body);
+        let safe_sib_body = escape_zola_shortcodes(&body);
+        let sib_title = file.strip_suffix(".md").unwrap_or(&file);
+
+        let dest_sib = out_dir.join(&file);
+        let sib_content = format!(
+            "+++\ntitle = {}\n[extra]\nskill = false\ncategory = {}\nmermaid = {}\nskill_name = {}\n{}+++\n\n{}\n",
+            to_toml_string(sib_title),
+            to_toml_string(ctx.category),
+            sib_mermaid,
+            to_toml_string(ctx.skill_name),
+            ctx.extra_meta,
+            safe_sib_body
+        );
+        atomic_write(&dest_sib, &sib_content)?;
+    }
+    Ok(())
 }
 
 /// Strips legacy `{% raw %}` outer wrapper blocks when present.
@@ -1070,6 +1065,55 @@ fn is_valid_shortcode_ident(s: &str) -> bool {
     chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
+fn rewrite_single_link_target(
+    raw_target: &str,
+    content_base: &str,
+    src_dir: &Path,
+    canonical_skills: Option<&Path>,
+    canonical_archive: Option<&Path>,
+) -> Option<String> {
+    let (rel_path, anchor) = if let Some(hash_pos) = raw_target.find('#') {
+        (&raw_target[..hash_pos], Some(&raw_target[hash_pos..]))
+    } else {
+        (raw_target, None)
+    };
+
+    if !rel_path.ends_with(".md") {
+        return None;
+    }
+
+    let target_full_path = src_dir.join(rel_path);
+    if !target_full_path.exists() {
+        return None;
+    }
+
+    let canonical_target = target_full_path.canonicalize().ok()?;
+    let is_valid_tree = |root: Option<&Path>| -> Option<bool> {
+        let r = root?;
+        let rel = canonical_target.strip_prefix(r).ok()?;
+        let cat = rel.iter().next().and_then(|c| c.to_str()).unwrap_or("");
+        Some(cat != "in-progress")
+    };
+
+    let eligible = is_valid_tree(canonical_skills).or_else(|| is_valid_tree(canonical_archive))?;
+    if !eligible {
+        return None;
+    }
+
+    let combined = format!("{content_base}/{rel_path}");
+    let normalized = posix_normalize(&combined);
+    let zola_path = if normalized.ends_with("/SKILL.md") {
+        format!("{}/_index.md", &normalized[..normalized.len() - 9])
+    } else if normalized == "SKILL.md" {
+        "_index.md".to_string()
+    } else {
+        normalized
+    };
+
+    let anchor_str = anchor.unwrap_or("");
+    Some(format!("@/{zola_path}{anchor_str}"))
+}
+
 /// Rewrites relative `.md` links pointing to existing files into Zola internal links.
 #[must_use]
 pub fn rewrite_skill_links(
@@ -1167,63 +1211,17 @@ pub fn rewrite_skill_links(
 
         if let Some(end_offset) = link_end {
             let raw_target = &after_target_open[..end_offset];
-            let (rel_path, anchor) = if let Some(hash_pos) = raw_target.find('#') {
-                (&raw_target[..hash_pos], Some(&raw_target[hash_pos..]))
+            if let Some(rewritten) = rewrite_single_link_target(
+                raw_target,
+                content_base,
+                src_dir,
+                canonical_skills.as_deref(),
+                canonical_archive.as_deref(),
+            ) {
+                output.push_str(&rewritten);
             } else {
-                (raw_target, None)
-            };
-
-            if rel_path.ends_with(".md") {
-                let target_full_path = src_dir.join(rel_path);
-                if target_full_path.exists() {
-                    if let Ok(canonical_target) = target_full_path.canonicalize() {
-                        let mut in_tree = false;
-                        let mut is_lifecycle = false;
-
-                        if let Some(sr) = &canonical_skills {
-                            if let Ok(rel) = canonical_target.strip_prefix(sr) {
-                                in_tree = true;
-                                let cat = rel.iter().next().and_then(|c| c.to_str()).unwrap_or("");
-                                if cat == "in-progress" {
-                                    is_lifecycle = true;
-                                }
-                            }
-                        }
-
-                        if !in_tree {
-                            if let Some(ar) = &canonical_archive {
-                                if let Ok(rel) = canonical_target.strip_prefix(ar) {
-                                    in_tree = true;
-                                    let cat =
-                                        rel.iter().next().and_then(|c| c.to_str()).unwrap_or("");
-                                    if cat == "in-progress" {
-                                        is_lifecycle = true;
-                                    }
-                                }
-                            }
-                        }
-
-                        if in_tree && !is_lifecycle {
-                            let combined = format!("{content_base}/{rel_path}");
-                            let normalized = posix_normalize(&combined);
-                            let zola_path = if normalized.ends_with("/SKILL.md") {
-                                format!("{}/_index.md", &normalized[..normalized.len() - 9])
-                            } else if normalized == "SKILL.md" {
-                                "_index.md".to_string()
-                            } else {
-                                normalized
-                            };
-
-                            let anchor_str = anchor.unwrap_or("");
-                            output.push_str(&format!("@/{zola_path}{anchor_str}"));
-                            search_cursor = target_start + end_offset;
-                            continue;
-                        }
-                    }
-                }
+                output.push_str(raw_target);
             }
-
-            output.push_str(raw_target);
             search_cursor = target_start + end_offset;
         } else {
             search_cursor = target_start;
@@ -1239,6 +1237,70 @@ pub fn rewrite_skill_links(
     }
 
     restored
+}
+
+fn infer_roots_from_src(src: &Path) -> (PathBuf, PathBuf) {
+    let mut skills_root = PathBuf::from("skills");
+    let mut archive_root = PathBuf::from("skills-archive");
+    let mut current = src;
+    while let Some(parent) = current.parent() {
+        if parent.ends_with("skills") {
+            skills_root = parent.to_path_buf();
+            if let Some(ws) = parent.parent() {
+                archive_root = ws.join("skills-archive");
+            }
+            break;
+        } else if parent.ends_with("skills-archive") {
+            archive_root = parent.to_path_buf();
+            if let Some(ws) = parent.parent() {
+                skills_root = ws.join("skills");
+            }
+            break;
+        }
+        current = parent;
+    }
+    (skills_root, archive_root)
+}
+
+fn resolve_resource_file_type(
+    entry: &fs::DirEntry,
+    fallback_dir: &Path,
+) -> Result<Option<(PathBuf, PathBuf, bool, bool)>> {
+    let src_path = entry.path();
+    let file_type = entry
+        .file_type()
+        .map_err(|e| SkillError::io(&src_path, e))?;
+    let mut real_src_path = src_path.clone();
+    let mut link_src_dir = fallback_dir.to_path_buf();
+    let mut is_dir = file_type.is_dir();
+    let mut is_file = file_type.is_file();
+
+    if file_type.is_symlink() {
+        match fs::canonicalize(&src_path) {
+            Ok(canonical) => match fs::metadata(&canonical) {
+                Ok(meta) => {
+                    is_dir = meta.is_dir();
+                    is_file = meta.is_file();
+                    if is_file {
+                        if let Some(p) = canonical.parent() {
+                            link_src_dir = p.to_path_buf();
+                        }
+                    }
+                    real_src_path = canonical;
+                }
+                Err(err) => {
+                    eprintln!("Warning: Broken symlink {src_path:?}: {err}");
+                    return Ok(None);
+                }
+            },
+            Err(err) => {
+                eprintln!("Warning: Broken symlink {src_path:?}: {err}");
+                return Ok(None);
+            }
+        }
+    }
+
+    Ok(Some((real_src_path, link_src_dir, is_dir, is_file)))
 }
 
 /// Recursively mirrors skill resource assets into dashboard directory.
@@ -1260,26 +1322,7 @@ pub fn sync_resources(
     let index_marker = dest.join("_index.md");
     atomic_write(&index_marker, "+++\nrender = false\n+++\n")?;
 
-    // Infer skills_root and archive_root from src hierarchy
-    let mut skills_root = PathBuf::from("skills");
-    let mut archive_root = PathBuf::from("skills-archive");
-    let mut current = src;
-    while let Some(parent) = current.parent() {
-        if parent.ends_with("skills") {
-            skills_root = parent.to_path_buf();
-            if let Some(ws) = parent.parent() {
-                archive_root = ws.join("skills-archive");
-            }
-            break;
-        } else if parent.ends_with("skills-archive") {
-            archive_root = parent.to_path_buf();
-            if let Some(ws) = parent.parent() {
-                skills_root = ws.join("skills");
-            }
-            break;
-        }
-        current = parent;
-    }
+    let (skills_root, archive_root) = infer_roots_from_src(src);
 
     let entries = fs::read_dir(src).map_err(|e| SkillError::io(src, e))?;
     for entry in entries.flatten() {
@@ -1288,41 +1331,12 @@ pub fn sync_resources(
             continue;
         }
 
-        let src_path = entry.path();
         let dest_path = dest.join(&file_name);
-
-        let file_type = entry
-            .file_type()
-            .map_err(|e| SkillError::io(&src_path, e))?;
-        let mut real_src_path = src_path.clone();
-        let mut link_src_dir = src.to_path_buf();
-        let mut is_dir = file_type.is_dir();
-        let mut is_file = file_type.is_file();
-
-        if file_type.is_symlink() {
-            match fs::canonicalize(&src_path) {
-                Ok(canonical) => match fs::metadata(&canonical) {
-                    Ok(meta) => {
-                        is_dir = meta.is_dir();
-                        is_file = meta.is_file();
-                        if is_file {
-                            if let Some(p) = canonical.parent() {
-                                link_src_dir = p.to_path_buf();
-                            }
-                        }
-                        real_src_path = canonical;
-                    }
-                    Err(err) => {
-                        eprintln!("Warning: Broken symlink {src_path:?}: {err}");
-                        continue;
-                    }
-                },
-                Err(err) => {
-                    eprintln!("Warning: Broken symlink {src_path:?}: {err}");
-                    continue;
-                }
-            }
-        }
+        let Some((real_src_path, link_src_dir, is_dir, is_file)) =
+            resolve_resource_file_type(&entry, src)?
+        else {
+            continue;
+        };
 
         if is_dir {
             let next_content_base = format!("{content_base}/{file_name}");

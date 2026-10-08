@@ -669,3 +669,160 @@ fn test_environment_flags_respected() {
         .unwrap();
     assert!(staged.is_empty());
 }
+
+#[test]
+fn test_dashboard_live_skill_with_siblings_and_mermaid() {
+    let harness = ArtifactsTestHarness::new();
+    let skill_dir = harness.create_live_skill(
+        "engineering",
+        "diagram-skill",
+        "Diagram skill desc",
+        "```mermaid\ngraph TD;\nA-->B;\n```\nContent with mermaid.",
+    );
+    fs::write(
+        skill_dir.join("guide.md"),
+        "# Sibling Guide\nThis is a sibling guide.\n",
+    )
+    .unwrap();
+
+    let engine = ArtifactsEngine::new(&harness.workspace_root);
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    let updated = engine.generate_dashboard_content(&live, &[]).unwrap();
+    assert!(updated);
+
+    let skill_index = harness
+        .workspace_root
+        .join("dashboard/content/skills/engineering/diagram-skill/_index.md");
+    assert!(skill_index.is_file());
+    let skill_content = fs::read_to_string(&skill_index).unwrap();
+    assert!(skill_content.contains("mermaid = true"));
+    assert!(skill_content.contains("skill = true"));
+
+    let sibling_file = harness
+        .workspace_root
+        .join("dashboard/content/skills/engineering/diagram-skill/guide.md");
+    assert!(sibling_file.is_file());
+    let sib_content = fs::read_to_string(&sibling_file).unwrap();
+    assert!(sib_content.contains("skill = false"));
+    assert!(sib_content.contains("skill_name = \"diagram-skill\""));
+    assert!(sib_content.contains("Sibling Guide"));
+}
+
+#[test]
+fn test_dashboard_content_with_category_and_skill_filter() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_live_skill("engineering", "eng-one", "Desc", "Body");
+    harness.create_live_skill("engineering", "eng-two", "Desc", "Body");
+    harness.create_live_skill("planning", "plan-one", "Desc", "Body");
+
+    let skills = SkillParser::discover_skills(&harness.workspace_root).unwrap();
+    let live: Vec<_> = skills.into_iter().filter(|s| s.tree.is_live()).collect();
+
+    // Test with category filter
+    let cat_options = ArtifactsOptions {
+        category_filter: Some("engineering".to_string()),
+        ..Default::default()
+    };
+    let engine_cat = ArtifactsEngine::with_options(&harness.workspace_root, cat_options);
+    let updated = engine_cat.generate_dashboard_content(&live, &[]).unwrap();
+    assert!(updated);
+
+    assert!(harness
+        .workspace_root
+        .join("dashboard/content/skills/engineering/eng-one/_index.md")
+        .exists());
+    assert!(!harness
+        .workspace_root
+        .join("dashboard/content/skills/planning/plan-one/_index.md")
+        .exists());
+
+    // Test with skill filter
+    let skill_options = ArtifactsOptions {
+        skill_filter: Some("eng-two".to_string()),
+        ..Default::default()
+    };
+    let engine_skill = ArtifactsEngine::with_options(&harness.workspace_root, skill_options);
+    let updated_skill = engine_skill.generate_dashboard_content(&live, &[]).unwrap();
+    assert!(updated_skill);
+
+    assert!(harness
+        .workspace_root
+        .join("dashboard/content/skills/engineering/eng-two/_index.md")
+        .exists());
+}
+
+#[test]
+fn test_sync_resources_archived_metadata() {
+    let harness = ArtifactsTestHarness::new();
+    let skill_res = harness
+        .workspace_root
+        .join("skills-archive/engineering/old-skill/resources");
+    fs::create_dir_all(skill_res.join("manual")).unwrap();
+    fs::write(
+        skill_res.join("manual/ref.md"),
+        "# Reference\nReference body.\n",
+    )
+    .unwrap();
+
+    let dest = harness
+        .workspace_root
+        .join("dashboard/content/skills/archive/engineering/old-skill/resources");
+    let meta = Some((
+        "2024-05-01",
+        Some("new-skill"),
+        "https://github.com/MAHDTech/agent-skills",
+    ));
+    let result = sync_resources(
+        &skill_res,
+        &dest,
+        "skills/archive/engineering/old-skill/resources",
+        "engineering",
+        "old-skill",
+        true,
+        meta,
+    );
+    assert!(result.is_ok());
+
+    let ref_file = dest.join("manual/ref.md");
+    assert!(ref_file.is_file());
+    let ref_content = fs::read_to_string(&ref_file).unwrap();
+    assert!(ref_content.contains("archived = \"2024-05-01\""));
+    assert!(ref_content.contains("replaced_by = \"new-skill\""));
+    assert!(ref_content.contains("source_url = \"https://github.com/MAHDTech/agent-skills\""));
+    assert!(ref_content.contains("skill = false"));
+}
+
+#[test]
+fn test_markdown_transformations_archive_link_rewriting() {
+    let harness = ArtifactsTestHarness::new();
+    harness.create_archived_skill(
+        "engineering",
+        "legacy-tool",
+        "Legacy",
+        "2024-01-01",
+        None,
+        "Legacy content",
+    );
+
+    let source_dir = harness
+        .workspace_root
+        .join("skills/engineering/modern-tool");
+    fs::create_dir_all(&source_dir).unwrap();
+    let skills_root = harness.workspace_root.join("skills");
+    let archive_root = harness.workspace_root.join("skills-archive");
+
+    let input = "[Legacy Tool](../../../skills-archive/engineering/legacy-tool/SKILL.md)";
+    let out = rewrite_skill_links(
+        input,
+        "skills/engineering/modern-tool",
+        &source_dir,
+        &skills_root,
+        Some(&archive_root),
+    );
+    assert_eq!(
+        out,
+        "[Legacy Tool](@/skills/archive/engineering/legacy-tool/_index.md)"
+    );
+}
