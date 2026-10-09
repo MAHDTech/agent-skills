@@ -473,7 +473,6 @@ async fn run_sync(dry_run: bool) -> Result<(), CliError> {
     } else {
         root.clone()
     };
-
     let repo_only = !dry_run
         && (std::env::var("SKILLS_REPO_ONLY").is_ok()
             || std::env::var("PRE_COMMIT").is_ok()
