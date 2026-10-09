@@ -35,10 +35,15 @@ dashboard/static/build/
 dashboard/static/pagefind/
 dashboard/skill_dates.toml
 
-# Whitelist TARS config
+# TARS Cloud allow list
 !.tars/
 !.tars/config.yaml
 
-# Blacklist TARS scratch
+# TARS Cloud block list
 .tars/scratch/
+.tars/issues/
+.tars/goals/
+
+# AI Agents
+.agents/teamwork/
 
