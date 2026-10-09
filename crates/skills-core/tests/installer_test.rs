@@ -596,6 +596,7 @@ fn test_skill_installer_convenience_wrapper() {
 // -----------------------------------------------------------------------------
 
 #[test]
+#[allow(clippy::similar_names)]
 fn test_installer_error_into_skill_error_all_variants() {
     use skills_core::error::SkillError;
 
@@ -651,10 +652,7 @@ fn test_installer_error_into_skill_error_all_variants() {
 
     let fallback_err = InstallerError::EnvironmentNotResolvable(TargetEnvironment::Cursor);
     let skill_err: SkillError = fallback_err.into();
-    assert!(matches!(
-        skill_err,
-        SkillError::FrontmatterValidation { .. }
-    ));
+    assert!(matches!(skill_err, SkillError::TargetUnreachable { .. }));
 }
 
 // -----------------------------------------------------------------------------

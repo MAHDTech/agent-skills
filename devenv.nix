@@ -8,7 +8,9 @@ let
   isNative = !config.container.isBuilding;
 
   # Packages are installed native and in containers.
-  packages = [ ];
+  packages = [
+    pkgs.gh
+  ];
 
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [

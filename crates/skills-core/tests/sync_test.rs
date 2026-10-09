@@ -539,7 +539,7 @@ fn test_sync_error_into_skill_error_all_variants() {
 
     let io_err = SyncError::Io {
         path: PathBuf::from("/sync/io"),
-        source: std::io::Error::new(std::io::ErrorKind::Other, "io error"),
+        source: std::io::Error::other("io error"),
     };
     let skill_err: SkillError = io_err.into();
     assert!(matches!(skill_err, SkillError::Io { .. }));
@@ -556,17 +556,11 @@ fn test_sync_error_into_skill_error_all_variants() {
         reason: "file conflict".into(),
     };
     let skill_err: SkillError = conflict_err.into();
-    assert!(matches!(
-        skill_err,
-        SkillError::FrontmatterValidation { .. }
-    ));
+    assert!(matches!(skill_err, SkillError::SyncConflict { .. }));
 
     let unreachable_err = SyncError::TargetUnreachable(TargetEnvironment::ClaudeDesktop);
     let skill_err: SkillError = unreachable_err.into();
-    assert!(matches!(
-        skill_err,
-        SkillError::FrontmatterValidation { .. }
-    ));
+    assert!(matches!(skill_err, SkillError::TargetUnreachable { .. }));
 
     let catalog_err = SyncError::InvalidCatalog {
         path: PathBuf::from("/invalid/catalog"),
