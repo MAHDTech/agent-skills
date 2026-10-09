@@ -1,3 +1,4 @@
+#![allow(clippy::too_many_lines, clippy::needless_pass_by_value)]
 //! Main entry point for the `ask` CLI binary.
 
 pub mod cli;
