@@ -176,7 +176,6 @@ in
         enable = true;
         excludes = [
           "dashboard/content/.*\\.md$"
-          "skills/tooling/opencode-acp/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"
         ];

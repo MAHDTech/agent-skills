@@ -1,7 +1,7 @@
 interface:
-  display_name: "Archive Skill"
+  display_name: "Skill Archive"
   short_description: "Retire and archive skills cleanly without dangling links"
-  default_prompt: "Use $archive-skill to retire and move a skill to the archive."
+  default_prompt: "Use $skill-archive to retire and move a skill to the archive."
 
 policy:
   allow_implicit_invocation: false

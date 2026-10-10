@@ -16,20 +16,19 @@ You don't remember every skill, so ask.
 
 This is a map of the whole collection: a **main flow** that most delivery work travels, a few **on-ramps** that feed onto it, and the standalone skills grouped by what they do. Each entry has a one-line _reach for this when…_ so you can jump straight to the fit.
 
-_This index must be kept in sync - when a skill is added, renamed, or removed, update this file._ The `/skill-creator` and `/archive-skill` skills reference this maintenance rule; `/skill-audit` checks it.
+_This index must be kept in sync - when a skill is added, renamed, or removed, update this file._ The `/skill-creator` and `/skill-archive` skills reference this maintenance rule; `/skill-audit` checks it.
 
 ## The main flow: idea → ship
 
 The route most work travels - you have an idea and want it built:
 
 ```text
-/grilling  →  /to-spec  →  /to-tickets  →  /implement (drives /tdd)  →  /code-review  →  ship via /gh-create-pr
+/grilling  →  /to-spec  →  /to-tickets  →  /tdd  →  /code-review  →  ship via /gh-create-pr
 ```
 
 - `/grilling` - reach for this when a plan or design needs pressure-testing first; it interviews you one question at a time, walking every branch of the decision tree.
 - `/to-spec` - reach for this when a settled conversation should become a spec (PRD) on the tracker: synthesis, no interview.
 - `/to-tickets` - reach for this when a spec or plan should be split into tracer-bullet tickets, each declaring its blocking edges.
-- `/implement` - reach for this when a spec or ticket is ready to build; it drives `/tdd` internally, one red-green slice at a time.
 - `/tdd` - reach for this when you want a behaviour built test-first, red-green-refactor, without a full spec.
 - `/code-review` - reach for this when you want the diff since a fixed point reviewed on two axes, Standards and Spec.
 
@@ -41,12 +40,13 @@ Two vocabulary layers the flow leans on - reach for them directly when the _word
 
 - `/codebase-design` - reach for this when shaping a module's interface or deciding where a seam goes; the deep-module vocabulary.
 - `/domain-modeling` - reach for this when the domain's terms are fuzzy or overloaded; it pins the ubiquitous language in a `CONTEXT.md` glossary and records ADRs.
+- `/code-comments` - reach for this when writing new code, editing existing files, or auditing code comments to keep comments concise and high-signal.
 
 ## On-ramps
 
 A starting situation that generates work, then merges onto the main flow:
 
-- `/grill-me-with-docs` - reach for this when tackling an ambiguous problem from scratch; it runs a relentless decision interview while maintaining a `CONTEXT.md` glossary and capturing ADRs.
+- `/grilling` (with docs) - reach for this when tackling an ambiguous problem from scratch; run with `--with-docs` to interview while maintaining a `CONTEXT.md` glossary and capturing ADRs.
 - `/diagnosing-bugs` - reach for this when something's broken, flaky, or slow; it builds a red-capable feedback loop before hypothesising, then fixes with a regression test.
 - `/gh-triage` - reach for this when the GitHub backlog piles up and issues or external PRs need turning into agent-ready briefs.
 - `/wayfinder` - reach for this when the work is too big for one session and the way to the destination isn't visible yet.
@@ -83,6 +83,7 @@ Not new features - working on code that already exists:
 - `/scope-sweep` - reach for this as a final breadth pass before calling a scope done, to catch missed items, edge cases, and risks.
 - `/critical-thinking` - reach for this when you want your own last response analysed for flaws, biases, and unstated assumptions.
 - `/wtf` - reach for this when your last message did not land, to re-pitch it in plain language rather than explain it again.
+- `/total-recall` - reach for this when you want an append-only TSV decision trail recorded during long-running or autonomous work.
 
 ## Reviewing deeper
 
@@ -113,6 +114,7 @@ Beyond `/code-review` on the main flow:
 ## Cloud, infrastructure, and AI models
 
 - `/nutanix-api-v4` - reach for this when developing, integrating, or troubleshooting with Nutanix v4 REST APIs or SDKs.
+- `/nutanix-enterprise-ai` - reach for this when deploying, configuring, serving, or troubleshooting LLMs and MCP servers with Nutanix Enterprise AI (NAI v2.8).
 - `/nutanix-files` - reach for this when managing Nutanix Files, SMB/NFS file shares, Smart Tiering, or file server APIs.
 - `/nutanix-kubernetes-platform` - reach for this when operating, deploying, upgrading, or troubleshooting Nutanix Kubernetes Platform (NKP).
 - `/nutanix-objects` - reach for this when managing Nutanix Objects S3 storage, bucket policies, replication, or REST APIs.
@@ -128,7 +130,7 @@ Beyond `/code-review` on the main flow:
 
 - `/skill-creator` - reach for this when creating or editing a skill in this repo: naming, placement, frontmatter, and the lint/sync workflow.
 - `/skill-audit` - reach for this to health-check the whole collection: cross-references, categorisation, duplicates, retirement candidates, and gaps.
-- `/archive-skill` - reach for this when retiring a skill: move it to `skills-archive/<category>/`, mark it archived, repoint references, and re-run lint/sync.
+- `/skill-archive` - reach for this when retiring a skill: move it to `skills-archive/<category>/`, mark it archived, repoint references, and re-run lint/sync.
 - `/skill-router` - this map; reach for it when you can't remember which skill fits.
 
 ## Tooling
@@ -138,6 +140,7 @@ Beyond `/code-review` on the main flow:
 - `/devenv` - reach for this when a repo uses devenv for its shell and dependencies.
 - `/prek` - reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
 - `/opencode` - reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
+- `/herdr` - reach for this when controlling Herdr terminal multiplexer, managing workspaces, tabs, and panes, or coordinating coding agents.
 - [/acp](@/skills/engineering/acp/_index.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
 - [/mcp](@/skills/engineering/mcp/_index.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
 - `/opencode-acp` - reach for this when controlling OpenCode over the Agent Client Protocol.

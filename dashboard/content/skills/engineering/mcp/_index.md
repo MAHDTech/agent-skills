@@ -268,7 +268,7 @@ Resources provide read-only contextual information to the client.
 
 Resources are identified by unique URIs:
 
-- `file:///path/to/project/log.txt`
+- `file://<project-root>/log.txt`
 - `postgres://db/schema/users`
 - `custom-service://items/123`
 

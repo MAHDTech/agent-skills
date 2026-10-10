@@ -15,9 +15,10 @@ mermaid = false
 Patterns for building high-performance, modular games with Bevy - the data-driven ECS
 game engine built in Rust.
 
-**Targets Bevy 0.19** (latest stable). Bevy moves fast and breaks APIs between releases;
-if a project pins an older version, verify against that version's docs before applying
-these snippets. The migration cheat sheet below covers the churn since ~0.14.
+**Targets Bevy 0.19** (stable). Bevy moves fast and breaks APIs between releases;
+if a project pins an older version or is upgrading to Bevy 0.20 (available on crates.io),
+verify against official migration guides before applying these snippets.
+The migration cheat sheet below covers the churn since ~0.14.
 
 ## When to Use This Skill
 

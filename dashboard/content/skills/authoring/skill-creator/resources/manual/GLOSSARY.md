@@ -9,7 +9,7 @@ skill_name = "skill-creator"
 
 # Glossary - Authoring a Skill
 
-The domain model for what makes a skill great in this repo. A skill exists to wrangle determinism out of a stochastic system; the root virtue is **Predictability**, and every term below is a lever on it. This is the disclosed reference for [`SKILL.md`](../SKILL.md).
+The domain model for what makes a skill great in this repo. A skill exists to wrangle determinism out of a stochastic system; the root virtue is **Predictability**, and every term below is a lever on it. This is the disclosed reference for [`SKILL.md`](@/skills/authoring/skill-creator/_index.md).
 
 The terms are grouped by axis: **Repo Conventions** (where a skill lives and how it is named), **Invocation** (how a skill is reached), **Information Hierarchy** (how its content is arranged), **Steering** (how the agent's runtime behaviour is shaped), and **Pruning** (how it is kept lean). Each **failure mode** lives beside the lever that cures it, tagged _failure mode_.
 
@@ -27,25 +27,25 @@ Where a skill lives, and how it is named and framed in this repo.
 
 ### Category
 
-The topic bucket a skill lives in - one of `engineering`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Set by the directory (`skills/<category>/<name>/`), never by a frontmatter key. A skill's category decides its section in the generated index.
+The topic bucket a skill lives in - one of `authoring`, `engineering`, `game-development`, `github`, `planning`, `reflection`, `review`, `tooling`, `writing`. Set by the directory (`skills/<category>/<name>/`), never by a frontmatter key. A skill's category decides its section in the generated index.
 
 _Avoid:_ tag, type, kind, group
 
 ### Lifecycle Bucket
 
-A directory outside the topic tree that holds skills not ready for or retired from **promotion**: `in-progress/` for drafts, `deprecated/` for retired skills. A skill moves between a lifecycle bucket and a **category** to change its promotion state.
+A directory outside the topic tree that holds skills not ready for **promotion**: `in-progress/` holds drafts. Retired skills leave `skills/` entirely for the top-level archive, `skills-archive/<category>/<name>/`. A skill moves between a lifecycle bucket and a **category** to change its promotion state.
 
 _Avoid:_ folder, stage, status
 
 ### Promotion
 
-The state of a skill appearing in the generated README and index, earned by living under one of the eight **category** buckets. Skills in a **lifecycle bucket** (`in-progress/`, `deprecated/`) are deliberately excluded. Move a skill into a category to promote it; move it to `deprecated/` to retire it.
+The state of a skill appearing in the generated README, dashboard, and index, earned by living under one of the nine **category** buckets. Skills in a **lifecycle bucket** (`in-progress/`) or in the top-level archive (`skills-archive/`) are excluded from active installation. Move a skill into a category to promote it; move it to `skills-archive/` via `/skill-archive` to retire it.
 
 _Avoid:_ publishing, listing, inclusion
 
 ### Canonical Frontmatter
 
-The YAML header a skill in this repo is allowed to carry: `name` and `description` always, plus the earned optional keys (`disable-model-invocation`, `argument-hint`, `context`/`agent`, `metadata`). It excludes the legacy `custom:` block and the `triggers:`/`category:`/`type:` keys - **Category** comes from the directory and triggers live in the **description**.
+The YAML header a skill in this repo is allowed to carry: `name` and `description` always, plus the earned optional keys (`disable-model-invocation`, `argument-hint`, `context`/`agent`, `metadata`, `resources`). It excludes the legacy `custom:` block and the `triggers:`/`category:`/`type:` keys - **Category** comes from the directory and triggers live in the **description**.
 
 _Avoid:_ header, metadata block, yaml
 

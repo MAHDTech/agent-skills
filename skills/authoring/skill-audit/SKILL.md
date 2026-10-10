@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-description: Periodically audit the whole skill collection for health - validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /archive-skill to retire.
+description: Periodically audit the whole skill collection for health - validate each skill's frontmatter, clarity, and category, verify every cross-reference resolves, and surface duplicates, conflicts, retirement candidates, and missing-skill gaps. Use when you want to audit or health-check the skills, spring-clean the collection, confirm the router and cross-references are accurate, or find skills to merge, split, retire, or create. Hands findings to /skill-creator to fix or create and /skill-archive to retire.
 metadata:
   group: authoring
 ---
@@ -15,8 +15,8 @@ The tree is the **single source of truth**; the generated README, `agents/AGENTS
 
 Two mechanical gates come first - they are cheap and catch drift a read-through would miss:
 
-1. `devenv --no-tui shell -- skills --action lint` - frontmatter, naming, placement. Record every error; these are findings.
-2. `devenv --no-tui shell -- skills --action sync`, then check `git status`. A diff means the generated artifacts had drifted from the tree - the drift is itself a finding.
+1. `devenv --no-tui shell -- ask skills lint` - frontmatter, naming, placement. Record every error; these are findings.
+2. `devenv --no-tui shell -- ask skills sync`, then check `git status`. A diff means the generated artifacts had drifted from the tree - the drift is itself a finding.
 
 ## The audit
 
@@ -35,9 +35,9 @@ Walk the whole collection. Each pass carries an exhaustive bound - every skill, 
 
 4. **Collection-level review.** Across the whole set, look for:
    - **Duplication or conflict** - two skills covering the same **branch**, or giving contradictory guidance. Recommend a merge or a sharper boundary between them.
-   - **Retirement candidates** - a skill superseded, stale, or that no realistic task would reach. Route to `/archive-skill`.
+   - **Retirement candidates** - a skill superseded, stale, or that no realistic task would reach. Route to `/skill-archive`.
    - **Gaps** - a recurring task with no skill to serve it. Route to `/skill-creator`.
-5. **Report.** Emit one findings list. Each finding names the skill(s) it touches, the problem, and a recommended action - edit or create via `/skill-creator`, retire via `/archive-skill`, fix a reference in place.
+5. **Report.** Emit one findings list. Each finding names the skill(s) it touches, the problem, and a recommended action - edit or create via `/skill-creator`, retire via `/skill-archive`, fix a reference in place.
 
 ## Per-skill checklist (reference)
 

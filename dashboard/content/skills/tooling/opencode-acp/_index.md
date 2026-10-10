@@ -19,8 +19,8 @@ Control OpenCode directly via the Agent Client Protocol (ACP).
 ## Metadata
 
 - For ACP Protocol Docs (for Agents/LLMs): [Introduction](@/skills/tooling/opencode-acp/resources/auto/get-started-introduction.md) and [Protocol Overview](@/skills/tooling/opencode-acp/resources/auto/protocol-v1-overview.md)
-- GitHub Repo: https://github.com/bjesuiter/opencode-acp-skill
-- If you have issues with this skill, please open an issue ticket here: https://github.com/bjesuiter/opencode-acp-skill/issues
+- GitHub Repo: [bjesuiter/opencode-acp-skill](https://github.com/bjesuiter/opencode-acp-skill)
+- Issue Tracker: [bjesuiter/opencode-acp-skill issues](https://github.com/bjesuiter/opencode-acp-skill/issues)
 
 ## Quick Reference
 
@@ -36,7 +36,7 @@ Control OpenCode directly via the Agent Client Protocol (ACP).
 
 ## Starting OpenCode
 
-```
+```bash
 bash(
   command: "opencode acp --cwd /path/to/your/project",
   background: true,
@@ -161,7 +161,7 @@ Per OpenCode instance, track:
 
 ## Example: Complete Interaction
 
-```
+```text
 1. bash(command: "opencode acp --cwd <project-dir>", background: true, workdir: "<project-dir>")
    -> processSessionId: "bg_42"
 
@@ -188,13 +188,13 @@ Resume a previous OpenCode session by letting the user choose from available ses
 
 ### Step 1: List Available Sessions
 
-```
+```bash
 bash(command: "opencode session list", workdir: "/path/to/project")
 ```
 
 Example output:
 
-```
+```text
 ID                                  Updated              Messages
 ses_451cd8ae0ffegNQsh59nuM3VVy      2026-01-11 15:30     12
 ses_451a89e63ffea2TQIpnDGtJBkS      2026-01-10 09:15     5
@@ -205,7 +205,7 @@ ses_4518e90d0ffeJIpOFI3t3Jd23Q      2026-01-09 14:22     8
 
 Present the list to the user and ask which session to resume:
 
-```
+```text
 "Which session would you like to resume?
 
 1. ses_451cd8ae... (12 messages, updated 2026-01-11)
@@ -221,7 +221,7 @@ Once user responds (e.g., "1", "the first one", or "ses_451cd8ae..."):
 
 1. **Start OpenCode ACP**:
 
-   ```
+   ```bash
    bash(command: "opencode acp --cwd /path/to/project", background: true, workdir: "/path/to/project")
    ```
 
@@ -232,6 +232,7 @@ Once user responds (e.g., "1", "the first one", or "ses_451cd8ae..."):
    ```
 
 3. **Load the session**:
+
    ```json
    {
      "jsonrpc": "2.0",
@@ -251,7 +252,7 @@ On load, OpenCode streams the full conversation history back to you.
 
 ### Resume Workflow Summary
 
-```
+```python
 function resumeSession(workdir):
     # List available sessions
     output = bash("opencode session list", workdir: workdir)
@@ -289,7 +290,7 @@ OpenCode auto-updates when restarted. Use this workflow to check and trigger upd
 
 ### Step 1: Check Current Version
 
-```
+```bash
 bash(command: "opencode --version")
 ```
 
@@ -299,7 +300,7 @@ Extract the version number (e.g., `1.1.13`).
 
 ### Step 2: Check Latest Version
 
-```
+```text
 webfetch(url: "https://github.com/sst/opencode/releases/latest", format: "text")
 ```
 
@@ -314,14 +315,14 @@ If latest version > current version:
 
 1. **Stop all running OpenCode processes**:
 
-   ```
+   ```text
    process.list()  # Find all "opencode acp" processes
    process.kill(sessionId) # For each running instance
    ```
 
 2. **Restart instances** (OpenCode auto-downloads new binary on start):
 
-   ```
+   ```bash
    bash(command: "opencode acp --cwd /path/to/project", background: true, workdir: "/path/to/project")
    ```
 
@@ -329,7 +330,7 @@ If latest version > current version:
 
 ### Step 4: Verify Update
 
-```
+```bash
 bash(command: "opencode --version")
 ```
 
@@ -340,7 +341,7 @@ If version still doesn't match latest:
 
 ### Update Workflow Summary
 
-```
+```python
 function updateOpenCode():
     current = bash("opencode --version")  # e.g., "1.1.13"
 
@@ -367,7 +368,7 @@ function updateOpenCode():
         notify("OpenCode is up to date: " + current)
 ```
 
-### Important Notes
+### Update Notes
 
 - **Sessions persist**: `opencodeSessionId` survives restarts - use `session/load` to recover
 - **Auto-update**: OpenCode downloads new binary automatically on restart
