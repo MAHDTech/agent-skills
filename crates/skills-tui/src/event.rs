@@ -6,7 +6,7 @@ use crossterm::event::{Event as CrosstermEvent, EventStream, KeyEvent, KeyEventK
 use futures::StreamExt;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::task::JoinHandle;
-use tokio::time::{interval, MissedTickBehavior};
+use tokio::time::{MissedTickBehavior, interval};
 
 /// Channel error types and re-exports.
 pub mod mpsc {

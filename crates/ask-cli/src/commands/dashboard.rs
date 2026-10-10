@@ -7,7 +7,7 @@ use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, CellAlignment, Table};
 
 use crate::cli::{DashboardArgs, DashboardCommands, OutputFormat};
-use crate::commands::{resolve_root, CliError};
+use crate::commands::{CliError, resolve_root};
 use skills_core::dashboard::DashboardEngine;
 use skills_core::error::SkillError;
 

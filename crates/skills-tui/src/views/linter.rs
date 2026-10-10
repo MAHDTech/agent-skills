@@ -1,10 +1,10 @@
 //! Linter view: diagnostic table, severity badges, remediation guidance, and workspace health card.
 
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Gauge, Paragraph, Row, Table, Wrap};
-use ratatui::Frame;
 use skills_core::models::{LintIssue, LintSeverity};
 
 use crate::app::App;
@@ -308,10 +308,10 @@ pub fn remediation_for_rule(rule: &str) -> &'static str {
         "duplicate-names" => {
             "Disambiguate duplicate skill names to maintain unique catalog routing."
         }
-        "unsupported-target" => {
-            "Update target agent compatibility tags in frontmatter metadata."
+        "unsupported-target" => "Update target agent compatibility tags in frontmatter metadata.",
+        _ => {
+            "Inspect the source file at the indicated coordinates and address the diagnostic condition."
         }
-        _ => "Inspect the source file at the indicated coordinates and address the diagnostic condition.",
     }
 }
 

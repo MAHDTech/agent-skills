@@ -54,10 +54,10 @@ impl SkillLinter {
         self.check_links(skill, &mut report);
         Self::check_code_blocks(skill, &mut report);
 
-        if self.check_resources {
-            if let Some(parent) = skill.path.parent() {
-                self.check_resources_layout(parent, &skill.path, &mut report);
-            }
+        if self.check_resources
+            && let Some(parent) = skill.path.parent()
+        {
+            self.check_resources_layout(parent, &skill.path, &mut report);
         }
 
         report
@@ -324,16 +324,16 @@ impl SkillLinter {
             }
 
             // Check relative links if disk checking is enabled
-            if self.check_relative_links {
-                if let Some(parent) = skill.path.parent() {
-                    let base_dir = if let Some(ref base) = self.base_path {
-                        base.join(parent)
-                    } else {
-                        parent.to_path_buf()
-                    };
+            if self.check_relative_links
+                && let Some(parent) = skill.path.parent()
+            {
+                let base_dir = if let Some(ref base) = self.base_path {
+                    base.join(parent)
+                } else {
+                    parent.to_path_buf()
+                };
 
-                    Self::scan_relative_links(line, line_num, &skill.path, &base_dir, report);
-                }
+                Self::scan_relative_links(line, line_num, &skill.path, &base_dir, report);
             }
         }
     }
@@ -351,23 +351,24 @@ impl SkillLinter {
             let after_bracket = &remaining[start_bracket + 1..];
             if let Some(close_bracket) = after_bracket.find(']') {
                 let after_close = &after_bracket[close_bracket + 1..];
-                if after_close.starts_with('(') {
-                    if let Some(close_paren) = after_close.find(')') {
-                        let link_target = after_close[1..close_paren].trim();
+                if after_close.starts_with('(')
+                    && let Some(close_paren) = after_close.find(')')
+                {
+                    let link_target = after_close[1..close_paren].trim();
 
-                        if !link_target.is_empty()
-                            && !link_target.starts_with("http://")
-                            && !link_target.starts_with("https://")
-                            && !link_target.starts_with("mailto:")
-                            && !link_target.starts_with('#')
-                            && !link_target.starts_with('/')
-                            && !link_target.starts_with("@/")
-                        {
-                            let clean_target = link_target.split('#').next().unwrap_or(link_target);
-                            if !clean_target.is_empty() {
-                                let target_path = base_dir.join(clean_target);
-                                if !target_path.exists() {
-                                    report.add(
+                    if !link_target.is_empty()
+                        && !link_target.starts_with("http://")
+                        && !link_target.starts_with("https://")
+                        && !link_target.starts_with("mailto:")
+                        && !link_target.starts_with('#')
+                        && !link_target.starts_with('/')
+                        && !link_target.starts_with("@/")
+                    {
+                        let clean_target = link_target.split('#').next().unwrap_or(link_target);
+                        if !clean_target.is_empty() {
+                            let target_path = base_dir.join(clean_target);
+                            if !target_path.exists() {
+                                report.add(
                                         LintIssue::builder()
                                             .file(skill_file.to_path_buf())
                                             .line(Some(line_num))
@@ -378,13 +379,12 @@ impl SkillLinter {
                                             .severity(LintSeverity::Error)
                                             .build(),
                                     );
-                                }
                             }
                         }
-
-                        remaining = &after_close[close_paren + 1..];
-                        continue;
                     }
+
+                    remaining = &after_close[close_paren + 1..];
+                    continue;
                 }
             }
             remaining = after_bracket;
@@ -507,10 +507,8 @@ impl SkillLinter {
                 let is_manual = rel_path
                     .parent()
                     .is_some_and(|p| p.components().any(|c| c.as_os_str() == "manual"));
-                if is_manual {
-                    if let Ok(content) = fs::read_to_string(entry.path()) {
-                        Self::check_em_dashes(&content, entry.path(), report);
-                    }
+                if is_manual && let Ok(content) = fs::read_to_string(entry.path()) {
+                    Self::check_em_dashes(&content, entry.path(), report);
                 }
             }
         }
@@ -742,42 +740,41 @@ impl SkillLinter {
             let after_open = &remaining[open_bracket + 1..];
             if let Some(close_bracket) = after_open.find(']') {
                 let after_close = &after_open[close_bracket + 1..];
-                if after_close.starts_with('(') {
-                    if let Some(close_paren) = after_close.find(')') {
-                        let link_url = after_close[1..close_paren].trim();
-                        if !link_url.starts_with("http://")
-                            && !link_url.starts_with("https://")
-                            && !link_url.starts_with('#')
-                            && !link_url.starts_with("mailto:")
-                        {
-                            let clean_url = link_url
-                                .split('#')
-                                .next()
-                                .unwrap_or(link_url)
-                                .split('?')
-                                .next()
-                                .unwrap_or(link_url);
-                            let path_obj = Path::new(clean_url);
+                if after_close.starts_with('(')
+                    && let Some(close_paren) = after_close.find(')')
+                {
+                    let link_url = after_close[1..close_paren].trim();
+                    if !link_url.starts_with("http://")
+                        && !link_url.starts_with("https://")
+                        && !link_url.starts_with('#')
+                        && !link_url.starts_with("mailto:")
+                    {
+                        let clean_url = link_url
+                            .split('#')
+                            .next()
+                            .unwrap_or(link_url)
+                            .split('?')
+                            .next()
+                            .unwrap_or(link_url);
+                        let path_obj = Path::new(clean_url);
 
-                            // Check if link target is a skill file or contains a skill directory
-                            for comp in path_obj.components() {
-                                let name_str = comp.as_os_str().to_string_lossy();
-                                let clean_name = name_str.as_ref();
-                                if let Some(&target) = catalog.get(clean_name) {
-                                    if target.dir_name != source.dir_name
-                                        && target.name() != source.name()
-                                    {
-                                        Self::validate_cross_reference(
-                                            source, target, clean_name, line_num, report,
-                                        );
-                                        break;
-                                    }
-                                }
+                        // Check if link target is a skill file or contains a skill directory
+                        for comp in path_obj.components() {
+                            let name_str = comp.as_os_str().to_string_lossy();
+                            let clean_name = name_str.as_ref();
+                            if let Some(&target) = catalog.get(clean_name)
+                                && target.dir_name != source.dir_name
+                                && target.name() != source.name()
+                            {
+                                Self::validate_cross_reference(
+                                    source, target, clean_name, line_num, report,
+                                );
+                                break;
                             }
                         }
-                        remaining = &after_close[close_paren + 1..];
-                        continue;
                     }
+                    remaining = &after_close[close_paren + 1..];
+                    continue;
                 }
             }
             remaining = after_open;

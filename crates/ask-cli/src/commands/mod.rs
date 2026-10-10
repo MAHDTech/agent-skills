@@ -49,12 +49,11 @@ pub fn resolve_root_from(start_dir: &Path, env_home: Option<&str>) -> PathBuf {
             return ancestor.to_path_buf();
         }
         let cargo_path = ancestor.join("Cargo.toml");
-        if cargo_path.is_file() {
-            if let Ok(manifest) = std::fs::read_to_string(&cargo_path) {
-                if manifest.contains("[workspace]") {
-                    return ancestor.to_path_buf();
-                }
-            }
+        if cargo_path.is_file()
+            && let Ok(manifest) = std::fs::read_to_string(&cargo_path)
+            && manifest.contains("[workspace]")
+        {
+            return ancestor.to_path_buf();
         }
     }
 

@@ -141,11 +141,13 @@ fn test_full_skill_domain_model() {
 fn test_skills_manifest_serialization() {
     let manifest = SkillsManifest::builder()
         .not_grouped(Some("bottom".to_string()))
-        .groupings(vec![SkillGrouping::builder()
-            .title("Engineering")
-            .description("The core build loop.")
-            .skills(vec!["acp".to_string(), "tdd".to_string()])
-            .build()])
+        .groupings(vec![
+            SkillGrouping::builder()
+                .title("Engineering")
+                .description("The core build loop.")
+                .skills(vec!["acp".to_string(), "tdd".to_string()])
+                .build(),
+        ])
         .build();
 
     let json_str = serde_json::to_string_pretty(&manifest).unwrap();
@@ -210,17 +212,20 @@ fn test_sync_options_and_result() {
 fn test_skill_error_formatting_and_chaining() {
     let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "file not found");
     let err = SkillError::io(PathBuf::from("skills/engineering/foo/SKILL.md"), io_err);
-    assert!(err
-        .to_string()
-        .contains("I/O error at 'skills/engineering/foo/SKILL.md'"));
+    assert!(
+        err.to_string()
+            .contains("I/O error at 'skills/engineering/foo/SKILL.md'")
+    );
 
     let val_err = SkillError::validation(
         PathBuf::from("skills/engineering/bad/SKILL.md"),
         "Missing mandatory field 'description'",
     );
-    assert!(val_err
-        .to_string()
-        .contains("Missing mandatory field 'description'"));
+    assert!(
+        val_err
+            .to_string()
+            .contains("Missing mandatory field 'description'")
+    );
 
     let lock_err = SkillError::LockTimeout {
         path: PathBuf::from("skills.json.lock"),

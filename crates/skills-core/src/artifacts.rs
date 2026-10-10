@@ -256,17 +256,16 @@ impl ArtifactsEngine {
         let docs_dir = self.workspace_root.join("docs");
 
         let mut docs_list = Vec::new();
-        if docs_dir.is_dir() {
-            if let Ok(entries) = fs::read_dir(&docs_dir) {
-                for entry in entries.flatten() {
-                    let path = entry.path();
-                    if path.is_file() {
-                        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                            if name.ends_with(".md") {
-                                docs_list.push(name.to_string());
-                            }
-                        }
-                    }
+        if docs_dir.is_dir()
+            && let Ok(entries) = fs::read_dir(&docs_dir)
+        {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.is_file()
+                    && let Some(name) = path.file_name().and_then(|n| n.to_str())
+                    && name.ends_with(".md")
+                {
+                    docs_list.push(name.to_string());
                 }
             }
         }
@@ -324,6 +323,24 @@ impl ArtifactsEngine {
             Working on my _skill issues_.\n\n\
             ![skill issues](./docs/images/skill-issues.png)\n\n\
             These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.\n\n\
+            ## Status\n\n\
+            [![CI][badge-ci]][workflow-ci]\n\
+            [![Cargo CRAP CI][badge-crap-ci]][workflow-crap]\n\
+            [![Release Automation][badge-release]][workflow-release]\n\
+            [![Dashboard Deployment][badge-deploy]][workflow-deploy]\n\
+            [![SecOps][badge-secops]][workflow-secops]\n\
+            [![License][badge-license]](LICENSE)\n\n\
+            [badge-ci]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/ci.yaml?branch=trunk&event=push&label=CI&style=flat-square\n\
+            [workflow-ci]: https://github.com/MAHDTech/agent-skills/actions/workflows/ci.yaml\n\
+            [badge-crap-ci]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/cargo-crap.yaml?branch=trunk&event=push&label=Cargo%20CRAP%20CI&style=flat-square\n\
+            [workflow-crap]: https://github.com/MAHDTech/agent-skills/actions/workflows/cargo-crap.yaml\n\
+            [badge-release]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/release.yaml?branch=trunk&event=push&label=Release%20Automation&style=flat-square\n\
+            [workflow-release]: https://github.com/MAHDTech/agent-skills/actions/workflows/release.yaml\n\
+            [badge-deploy]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/deploy.yaml?branch=trunk&event=push&label=Dashboard&style=flat-square\n\
+            [workflow-deploy]: https://github.com/MAHDTech/agent-skills/actions/workflows/deploy.yaml\n\
+            [badge-secops]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/secops.yaml?branch=trunk&label=SecOps&style=flat-square\n\
+            [workflow-secops]: https://github.com/MAHDTech/agent-skills/actions/workflows/secops.yaml\n\
+            [badge-license]: https://img.shields.io/github/license/MAHDTech/agent-skills?style=flat-square\n\n\
             ## Install\n\n\
             ```bash\n\
             # Using npm\n\
@@ -865,12 +882,12 @@ fn write_sibling_docs(
     if let Ok(entries) = fs::read_dir(skill_src_dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_file() {
-                if let Some(fname) = path.file_name().and_then(|n| n.to_str()) {
-                    if fname.ends_with(".md") && !fname.eq_ignore_ascii_case("SKILL.md") {
-                        siblings.push(fname.to_string());
-                    }
-                }
+            if path.is_file()
+                && let Some(fname) = path.file_name().and_then(|n| n.to_str())
+                && fname.ends_with(".md")
+                && !fname.eq_ignore_ascii_case("SKILL.md")
+            {
+                siblings.push(fname.to_string());
             }
         }
     }
@@ -911,25 +928,25 @@ fn write_sibling_docs(
 #[must_use]
 pub fn strip_legacy_raw_wrapper(content: &str) -> String {
     let trimmed = content.trim();
-    if let Some(stripped_start) = trimmed.strip_prefix("{% raw %}") {
-        if stripped_start.starts_with('\n') || stripped_start.starts_with("\r\n") {
-            let inner_candidate = if stripped_start.starts_with("\r\n") {
-                &stripped_start[2..]
+    if let Some(stripped_start) = trimmed.strip_prefix("{% raw %}")
+        && (stripped_start.starts_with('\n') || stripped_start.starts_with("\r\n"))
+    {
+        let inner_candidate = if stripped_start.starts_with("\r\n") {
+            &stripped_start[2..]
+        } else {
+            &stripped_start[1..]
+        };
+        if let Some(inner) = inner_candidate.strip_suffix("{% endraw %}")
+            && (inner.ends_with('\n') || inner.ends_with("\r\n"))
+        {
+            let final_inner = if inner.ends_with("\r\n") {
+                &inner[..inner.len() - 2]
+            } else if inner.ends_with('\n') {
+                &inner[..inner.len() - 1]
             } else {
-                &stripped_start[1..]
+                inner
             };
-            if let Some(inner) = inner_candidate.strip_suffix("{% endraw %}") {
-                if inner.ends_with('\n') || inner.ends_with("\r\n") {
-                    let final_inner = if inner.ends_with("\r\n") {
-                        &inner[..inner.len() - 2]
-                    } else if inner.ends_with('\n') {
-                        &inner[..inner.len() - 1]
-                    } else {
-                        inner
-                    };
-                    return final_inner.to_string();
-                }
-            }
+            return final_inner.to_string();
         }
     }
     content.to_string()
@@ -1334,10 +1351,8 @@ fn resolve_resource_file_type(
                 Ok(meta) => {
                     is_dir = meta.is_dir();
                     is_file = meta.is_file();
-                    if is_file {
-                        if let Some(p) = canonical.parent() {
-                            link_src_dir = p.to_path_buf();
-                        }
+                    if is_file && let Some(p) = canonical.parent() {
+                        link_src_dir = p.to_path_buf();
                     }
                     real_src_path = canonical;
                 }
@@ -1535,15 +1550,15 @@ fn should_include_skill(
     if category_filter.is_none() && skill_filter.is_none() {
         return true;
     }
-    if let Some(cat) = category_filter {
-        if skill.category.as_str() != cat {
-            return false;
-        }
+    if let Some(cat) = category_filter
+        && skill.category.as_str() != cat
+    {
+        return false;
     }
-    if let Some(name) = skill_filter {
-        if !matches_skill_filter(skill, name) {
-            return false;
-        }
+    if let Some(name) = skill_filter
+        && !matches_skill_filter(skill, name)
+    {
+        return false;
     }
     true
 }
@@ -1631,7 +1646,9 @@ mod tests {
         fs::write(&hyphen_file, "hyphen file content").unwrap();
 
         let engine = ArtifactsEngine::new(workspace);
-        let staged = engine.stage_files(&[hyphen_file.clone()]).unwrap();
+        let staged = engine
+            .stage_files(std::slice::from_ref(&hyphen_file))
+            .unwrap();
         assert_eq!(staged, vec![hyphen_file]);
 
         let status_output = Command::new("git")
@@ -1669,7 +1686,9 @@ mod tests {
         fs::write(&normal_file, "normal file content").unwrap();
 
         let engine = ArtifactsEngine::new(workspace);
-        let staged = engine.stage_files(&[normal_file.clone()]).unwrap();
+        let staged = engine
+            .stage_files(std::slice::from_ref(&normal_file))
+            .unwrap();
         assert_eq!(staged, vec![normal_file]);
 
         let status_output = Command::new("git")

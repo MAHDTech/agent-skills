@@ -185,14 +185,18 @@ fn test_lint_absolute_and_relative_links() {
         .build();
     let report = linter.lint_skill(&skill);
 
-    assert!(report
-        .issues
-        .iter()
-        .any(|i| i.rule == "no-absolute-file-links"));
-    assert!(report
-        .issues
-        .iter()
-        .any(|i| i.rule == "broken-relative-links"));
+    assert!(
+        report
+            .issues
+            .iter()
+            .any(|i| i.rule == "no-absolute-file-links")
+    );
+    assert!(
+        report
+            .issues
+            .iter()
+            .any(|i| i.rule == "broken-relative-links")
+    );
 }
 
 #[test]
