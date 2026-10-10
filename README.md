@@ -8,6 +8,27 @@ Working on my _skill issues_.
 
 These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.
 
+## Status
+
+[![CI][badge-ci]][workflow-ci]
+[![Cargo CRAP CI][badge-crap-ci]][workflow-crap]
+[![Release Automation][badge-release]][workflow-release]
+[![Dashboard Deployment][badge-deploy]][workflow-deploy]
+[![SecOps][badge-secops]][workflow-secops]
+[![License][badge-license]](LICENSE)
+
+[badge-ci]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/ci.yaml?branch=trunk&event=push&label=CI&style=flat-square
+[workflow-ci]: https://github.com/MAHDTech/agent-skills/actions/workflows/ci.yaml
+[badge-crap-ci]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/cargo-crap.yaml?branch=trunk&event=push&label=Cargo%20CRAP%20CI&style=flat-square
+[workflow-crap]: https://github.com/MAHDTech/agent-skills/actions/workflows/cargo-crap.yaml
+[badge-release]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/release.yaml?branch=trunk&event=push&label=Release%20Automation&style=flat-square
+[workflow-release]: https://github.com/MAHDTech/agent-skills/actions/workflows/release.yaml
+[badge-deploy]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/deploy.yaml?branch=trunk&event=push&label=Dashboard&style=flat-square
+[workflow-deploy]: https://github.com/MAHDTech/agent-skills/actions/workflows/deploy.yaml
+[badge-secops]: https://img.shields.io/github/actions/workflow/status/MAHDTech/agent-skills/secops.yaml?branch=trunk&label=SecOps&style=flat-square
+[workflow-secops]: https://github.com/MAHDTech/agent-skills/actions/workflows/secops.yaml
+[badge-license]: https://img.shields.io/github/license/MAHDTech/agent-skills?style=flat-square
+
 ## Install
 
 ```bash

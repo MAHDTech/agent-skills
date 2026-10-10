@@ -5,8 +5,8 @@ use std::path::PathBuf;
 use tempfile::TempDir;
 
 use skills_core::{
-    escape_zola_shortcodes, rewrite_skill_links, strip_legacy_raw_wrapper, sync_resources,
-    ArtifactsEngine, ArtifactsOptions, SkillParser,
+    ArtifactsEngine, ArtifactsOptions, SkillParser, escape_zola_shortcodes, rewrite_skill_links,
+    strip_legacy_raw_wrapper, sync_resources,
 };
 
 /// Test harness providing an isolated mock workspace directory structure.
@@ -188,6 +188,8 @@ fn test_readme_contains_badges_install_docs_and_catalog() {
     let output = fs::read_to_string(&readme_file).unwrap();
 
     assert!(output.contains("https://skills.sh/b/MAHDTech/agent-skills"));
+    assert!(output.contains("## Status"));
+    assert!(output.contains("[![CI][badge-ci]][workflow-ci]"));
     assert!(output.contains("npx skills add MAHDTech/agent-skills"));
     assert!(output.contains("bunx skills add MAHDTech/agent-skills"));
     assert!(output.contains("[architecture](docs/architecture.md)"));
@@ -579,15 +581,19 @@ fn test_resource_mirroring_and_suppression() {
     // Root and child directories must have _index.md with render = false
     let root_index = dest.join("_index.md");
     assert!(root_index.is_file());
-    assert!(fs::read_to_string(&root_index)
-        .unwrap()
-        .contains("render = false"));
+    assert!(
+        fs::read_to_string(&root_index)
+            .unwrap()
+            .contains("render = false")
+    );
 
     let child_index = dest.join("manual/_index.md");
     assert!(child_index.is_file());
-    assert!(fs::read_to_string(&child_index)
-        .unwrap()
-        .contains("render = false"));
+    assert!(
+        fs::read_to_string(&child_index)
+            .unwrap()
+            .contains("render = false")
+    );
 
     // Plain files copied verbatim
     let copied_json = dest.join("manual/data.json");
@@ -616,34 +622,51 @@ fn test_resource_mirroring_and_suppression() {
 }
 
 #[test]
+#[allow(unsafe_code)]
 #[allow(warnings)]
 fn test_environment_flags_respected() {
     let harness = ArtifactsTestHarness::new();
     harness.create_live_skill("engineering", "skill-env", "Env desc", "Env body");
 
     // Test SKILLS_SKIP_DASHBOARD env flag
-    std::env::set_var("SKILLS_SKIP_DASHBOARD", "1");
+    unsafe {
+        std::env::set_var("SKILLS_SKIP_DASHBOARD", "1");
+    }
     let engine = ArtifactsEngine::from_env(&harness.workspace_root);
     assert!(engine.options().skip_dashboard);
-    std::env::remove_var("SKILLS_SKIP_DASHBOARD");
+    unsafe {
+        std::env::remove_var("SKILLS_SKIP_DASHBOARD");
+    }
 
     // Test SKILLS_NO_STAGE env flag
-    std::env::set_var("SKILLS_NO_STAGE", "1");
+    unsafe {
+        std::env::set_var("SKILLS_NO_STAGE", "1");
+    }
     let engine = ArtifactsEngine::from_env(&harness.workspace_root);
     assert!(engine.options().no_stage);
-    std::env::remove_var("SKILLS_NO_STAGE");
+    unsafe {
+        std::env::remove_var("SKILLS_NO_STAGE");
+    }
 
     // Test SKILLS_REPO_ONLY env flag
-    std::env::set_var("SKILLS_REPO_ONLY", "1");
+    unsafe {
+        std::env::set_var("SKILLS_REPO_ONLY", "1");
+    }
     let engine = ArtifactsEngine::from_env(&harness.workspace_root);
     assert!(engine.options().repo_only);
-    std::env::remove_var("SKILLS_REPO_ONLY");
+    unsafe {
+        std::env::remove_var("SKILLS_REPO_ONLY");
+    }
 
     // Test CI env flag
-    std::env::set_var("CI", "1");
+    unsafe {
+        std::env::set_var("CI", "1");
+    }
     let engine = ArtifactsEngine::from_env(&harness.workspace_root);
     assert!(engine.options().repo_only);
-    std::env::remove_var("CI");
+    unsafe {
+        std::env::remove_var("CI");
+    }
 
     // Behavioral test: skip_dashboard skips generating dashboard content
     let skip_options = ArtifactsOptions {
@@ -653,10 +676,12 @@ fn test_environment_flags_respected() {
     let engine_skip = ArtifactsEngine::with_options(&harness.workspace_root, skip_options);
     let generated = engine_skip.generate_dashboard_content(&[], &[]).unwrap();
     assert!(!generated);
-    assert!(!harness
-        .workspace_root
-        .join("dashboard/content/skills/engineering")
-        .exists());
+    assert!(
+        !harness
+            .workspace_root
+            .join("dashboard/content/skills/engineering")
+            .exists()
+    );
 
     // Behavioral test: no_stage skips git staging
     let no_stage_options = ArtifactsOptions {
@@ -729,14 +754,18 @@ fn test_dashboard_content_with_category_and_skill_filter() {
     let updated = engine_cat.generate_dashboard_content(&live, &[]).unwrap();
     assert!(updated);
 
-    assert!(harness
-        .workspace_root
-        .join("dashboard/content/skills/engineering/eng-one/_index.md")
-        .exists());
-    assert!(!harness
-        .workspace_root
-        .join("dashboard/content/skills/planning/plan-one/_index.md")
-        .exists());
+    assert!(
+        harness
+            .workspace_root
+            .join("dashboard/content/skills/engineering/eng-one/_index.md")
+            .exists()
+    );
+    assert!(
+        !harness
+            .workspace_root
+            .join("dashboard/content/skills/planning/plan-one/_index.md")
+            .exists()
+    );
 
     // Test with skill filter
     let skill_options = ArtifactsOptions {
@@ -747,10 +776,12 @@ fn test_dashboard_content_with_category_and_skill_filter() {
     let updated_skill = engine_skill.generate_dashboard_content(&live, &[]).unwrap();
     assert!(updated_skill);
 
-    assert!(harness
-        .workspace_root
-        .join("dashboard/content/skills/engineering/eng-two/_index.md")
-        .exists());
+    assert!(
+        harness
+            .workspace_root
+            .join("dashboard/content/skills/engineering/eng-two/_index.md")
+            .exists()
+    );
 }
 
 #[test]

@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 use std::fmt::Write as _;
-use std::io::{stdout, Stdout, Write};
+use std::io::{Stdout, Write, stdout};
 use std::panic::{set_hook, take_hook};
 use std::path::{Path, PathBuf};
 
@@ -11,10 +11,10 @@ use crossterm::cursor::Show;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture, KeyCode, KeyEvent, KeyEventKind};
 use crossterm::execute;
 use crossterm::terminal::{
-    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
-use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
+use ratatui::backend::CrosstermBackend;
 use skills_core::dashboard::DashboardSummary;
 use skills_core::lint::SkillLinter;
 use skills_core::models::{LintIssue, Skill};
@@ -774,10 +774,10 @@ impl App {
     /// Removes the last character from the currently focused parameter value buffer.
     pub fn pop_runner_char(&mut self) {
         let placeholders = self.runner_placeholders();
-        if let Some(p) = placeholders.get(self.runner_selected_field) {
-            if let Some(entry) = self.runner_params.get_mut(&p.name) {
-                entry.pop();
-            }
+        if let Some(p) = placeholders.get(self.runner_selected_field)
+            && let Some(entry) = self.runner_params.get_mut(&p.name)
+        {
+            entry.pop();
         }
     }
 

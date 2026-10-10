@@ -118,9 +118,11 @@ Detailed point.
     assert_eq!(sections[1].level, 2);
     assert_eq!(sections[1].title, "Rules");
     assert!(sections[1].content.contains("Rule 1: Never guess."));
-    assert!(sections[1]
-        .content
-        .contains("# This is a comment inside a code block"));
+    assert!(
+        sections[1]
+            .content
+            .contains("# This is a comment inside a code block")
+    );
 
     assert_eq!(sections[2].level, 2);
     assert_eq!(sections[2].title, "Context");
@@ -284,8 +286,10 @@ description: Emojis and multi-byte characters 🚀 💡.
         "Emojis and multi-byte characters 🚀 💡."
     );
     assert_eq!(parsed.title(), Some("🚀 Unicode Skill (日本語, 🎯)"));
-    assert!(parsed
-        .rules()
-        .unwrap()
-        .contains("ルール 1: 正確に実行すること。"));
+    assert!(
+        parsed
+            .rules()
+            .unwrap()
+            .contains("ルール 1: 正確に実行すること。")
+    );
 }

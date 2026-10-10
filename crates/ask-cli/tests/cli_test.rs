@@ -47,7 +47,7 @@ fn test_cli_version_flag() {
             .success()
             .code(0)
             .stdout(predicate::str::contains("ask"))
-            .stdout(predicate::str::contains("0.1.0"))
+            .stdout(predicate::str::contains(env!("CARGO_PKG_VERSION")))
             .stderr(predicate::str::is_empty());
     }
 }
@@ -540,8 +540,7 @@ fn test_skills_lint_fix() {
     let temp = tempfile::tempdir().unwrap();
     let skill_dir = temp.path().join("fixable-skill");
     std::fs::create_dir_all(&skill_dir).unwrap();
-    let content_with_em_dash =
-        "---\nname: fixable-skill\ndescription: A valid description\n---\n# Content \u{2014} with em dash\n";
+    let content_with_em_dash = "---\nname: fixable-skill\ndescription: A valid description\n---\n# Content \u{2014} with em dash\n";
     let skill_file = skill_dir.join("SKILL.md");
     std::fs::write(&skill_file, content_with_em_dash).unwrap();
 

@@ -1,10 +1,10 @@
 //! Layout geometry and active view rendering pipeline.
 
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
-use ratatui::Frame;
 
 use crate::app::{ActiveView, App};
 

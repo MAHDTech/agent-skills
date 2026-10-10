@@ -534,8 +534,8 @@ fn test_sync_conflict_preflight_preserves_untracked_directory() {
 
 #[test]
 fn test_sync_error_into_skill_error_all_variants() {
-    use skills_core::error::SkillError;
     use skills_core::InstallerError;
+    use skills_core::error::SkillError;
 
     let io_err = SyncError::Io {
         path: PathBuf::from("/sync/io"),

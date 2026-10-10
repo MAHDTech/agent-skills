@@ -551,7 +551,9 @@ pub enum InstallerError {
     #[error("Path traversal detected: {path:?} escapes bounded root {boundary:?}")]
     PathTraversal { path: PathBuf, boundary: PathBuf },
 
-    #[error("Invalid skill ID '{id}': must contain only alphanumeric ASCII, hyphens, and underscores (1-64 chars)")]
+    #[error(
+        "Invalid skill ID '{id}': must contain only alphanumeric ASCII, hyphens, and underscores (1-64 chars)"
+    )]
     InvalidSkillId { id: String },
 
     #[error("Skill '{id}' is already installed at {existing_path:?}. Use force=true to overwrite")]
@@ -592,7 +594,9 @@ pub enum InstallerError {
     #[error("Symlink creation failed: developer mode / unprivileged symlinks not available: {0}")]
     WindowsSymlinkPrivilegeRequired(String),
 
-    #[error("Atomic directory swap failed from {staging:?} to {target:?}: {reason}. Rollback status: {rollback_status}")]
+    #[error(
+        "Atomic directory swap failed from {staging:?} to {target:?}: {reason}. Rollback status: {rollback_status}"
+    )]
     AtomicSwapFailed {
         staging: PathBuf,
         target: PathBuf,
@@ -993,15 +997,15 @@ pub(crate) fn try_recover_stale_lock(lock_path: &Path) -> bool {
         for line in content.lines() {
             if let Some(pid_str) = line.strip_prefix("pid=") {
                 pid_opt = pid_str.trim().parse().ok();
-            } else if let Some(ts_str) = line.strip_prefix("timestamp=") {
-                if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(ts_str.trim()) {
-                    let now = chrono::Utc::now();
-                    if let Ok(duration) = now
-                        .signed_duration_since(dt.with_timezone(&chrono::Utc))
-                        .to_std()
-                    {
-                        ts_secs_opt = Some(duration.as_secs());
-                    }
+            } else if let Some(ts_str) = line.strip_prefix("timestamp=")
+                && let Ok(dt) = chrono::DateTime::parse_from_rfc3339(ts_str.trim())
+            {
+                let now = chrono::Utc::now();
+                if let Ok(duration) = now
+                    .signed_duration_since(dt.with_timezone(&chrono::Utc))
+                    .to_std()
+                {
+                    ts_secs_opt = Some(duration.as_secs());
                 }
             }
         }
@@ -1091,11 +1095,11 @@ impl<'a> AtomicSwapCoordinator<'a> {
                     source: e,
                 })?;
 
-                if is_symlink(&backup_dest) {
-                    if let Ok(link_target) = fs::read_link(&backup_dest) {
-                        let meta_file = backup_dest.with_extension("symlink_info");
-                        let _ = fs::write(&meta_file, link_target.to_string_lossy().as_bytes());
-                    }
+                if is_symlink(&backup_dest)
+                    && let Ok(link_target) = fs::read_link(&backup_dest)
+                {
+                    let meta_file = backup_dest.with_extension("symlink_info");
+                    let _ = fs::write(&meta_file, link_target.to_string_lossy().as_bytes());
                 }
 
                 temp_backup = Some((backup_dest, true));
@@ -1674,14 +1678,14 @@ impl Installer {
                 .into_iter()
                 .flatten()
             {
-                if e.file_type().is_file() {
-                    if let Ok(rel) = e.path().strip_prefix(&skill.target_path) {
-                        let rel_str = rel.to_string_lossy().replace('\\', "/");
-                        if !expected_files.contains_key(&rel_str)
-                            && !is_excluded(&rel_str, &default_exclude_patterns())
-                        {
-                            return Ok(IntegrityStatus::ExtraFile { path: rel_str });
-                        }
+                if e.file_type().is_file()
+                    && let Ok(rel) = e.path().strip_prefix(&skill.target_path)
+                {
+                    let rel_str = rel.to_string_lossy().replace('\\', "/");
+                    if !expected_files.contains_key(&rel_str)
+                        && !is_excluded(&rel_str, &default_exclude_patterns())
+                    {
+                        return Ok(IntegrityStatus::ExtraFile { path: rel_str });
                     }
                 }
             }
@@ -2214,15 +2218,15 @@ pub fn is_excluded(rel_path: &str, exclude_patterns: &[String]) -> bool {
         if pattern == normalized {
             return true;
         }
-        if let Some(prefix) = pattern.strip_suffix("/**") {
-            if normalized == prefix || normalized.starts_with(&format!("{prefix}/")) {
-                return true;
-            }
+        if let Some(prefix) = pattern.strip_suffix("/**")
+            && (normalized == prefix || normalized.starts_with(&format!("{prefix}/")))
+        {
+            return true;
         }
-        if let Some(suffix) = pattern.strip_prefix('*') {
-            if normalized.ends_with(suffix) {
-                return true;
-            }
+        if let Some(suffix) = pattern.strip_prefix('*')
+            && normalized.ends_with(suffix)
+        {
+            return true;
         }
         for component in normalized.split('/') {
             if component == pattern {
@@ -2251,22 +2255,20 @@ pub fn generate_nonce() -> String {
 /// Extracts skill ID, name, and version from a skill source directory containing `SKILL.md`.
 fn extract_skill_metadata(source_dir: &Path) -> (String, String, String) {
     let skill_md = source_dir.join("SKILL.md");
-    if skill_md.exists() {
-        if let Ok(content) = fs::read_to_string(&skill_md) {
-            if let Ok((yaml_str, _)) = crate::parser::SkillParser::extract_frontmatter(&content) {
-                if let Ok(fm) = serde_yaml::from_str::<crate::models::SkillFrontmatter>(yaml_str) {
-                    let id = fm.name.clone();
-                    let name = fm.name;
-                    let version = fm
-                        .metadata
-                        .as_ref()
-                        .and_then(|m| m.get("version"))
-                        .cloned()
-                        .unwrap_or_else(|| "0.1.0".to_string());
-                    return (id, name, version);
-                }
-            }
-        }
+    if skill_md.exists()
+        && let Ok(content) = fs::read_to_string(&skill_md)
+        && let Ok((yaml_str, _)) = crate::parser::SkillParser::extract_frontmatter(&content)
+        && let Ok(fm) = serde_yaml::from_str::<crate::models::SkillFrontmatter>(yaml_str)
+    {
+        let id = fm.name.clone();
+        let name = fm.name;
+        let version = fm
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("version"))
+            .cloned()
+            .unwrap_or_else(|| "0.1.0".to_string());
+        return (id, name, version);
     }
 
     let fallback_name = source_dir.file_name().map_or_else(
@@ -2657,11 +2659,13 @@ mod tests {
         let installed_dir = root.join("installed/sym-internal-skill");
         let installed_link = installed_dir.join("resources/auto/link_to_guide.txt");
 
-        assert!(installed_link
-            .symlink_metadata()
-            .unwrap()
-            .file_type()
-            .is_symlink());
+        assert!(
+            installed_link
+                .symlink_metadata()
+                .unwrap()
+                .file_type()
+                .is_symlink()
+        );
         let raw_link = fs::read_link(&installed_link).unwrap();
         assert_eq!(raw_link, internal_target_rel);
 
@@ -2746,11 +2750,10 @@ mod tests {
             PathValidator::ensure_within_boundary(Path::new("etc/passwd"), Path::new("/var")),
             Err(InstallerError::PathTraversal { .. })
         ));
-        assert!(PathValidator::ensure_within_boundary(
-            Path::new("skills/pkg"),
-            Path::new("skills")
-        )
-        .is_ok());
+        assert!(
+            PathValidator::ensure_within_boundary(Path::new("skills/pkg"), Path::new("skills"))
+                .is_ok()
+        );
         assert!(
             PathValidator::ensure_within_boundary(Path::new("foo/bar"), Path::new(".")).is_ok()
         );

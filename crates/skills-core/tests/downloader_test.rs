@@ -264,7 +264,7 @@ async fn test_download_skill_resources_empty_resources() {
 
     let downloader = SkillDownloader::new();
     let files = downloader.download_skill_resources(&skill).await.unwrap();
-    assert!(files.is_empty());
+    assert_eq!(files, [] as [skills_core::ResourceFile; 0]);
 }
 
 #[tokio::test]

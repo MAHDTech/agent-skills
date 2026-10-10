@@ -7,7 +7,7 @@ pub mod app;
 pub mod event;
 pub mod ui;
 
-pub use app::{init_terminal, install_panic_hook, restore_terminal, ActiveView, App};
+pub use app::{ActiveView, App, init_terminal, install_panic_hook, restore_terminal};
 pub use event::{Event, EventHandler};
 pub use ui::draw;
 

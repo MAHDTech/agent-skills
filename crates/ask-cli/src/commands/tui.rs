@@ -1,16 +1,16 @@
 //! Command handler for the `ask tui` subcommand.
 
-use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
+use ratatui::backend::CrosstermBackend;
 use std::io::Stdout;
 use std::time::Duration;
 
 use crate::cli::TuiArgs;
-use crate::commands::{resolve_root, CliError};
+use crate::commands::{CliError, resolve_root};
 use skills_core::dashboard::DashboardEngine;
 use skills_core::error::SkillError;
 use skills_core::parser::SkillParser;
-use skills_tui::app::{init_terminal, restore_terminal, ActiveView, App};
+use skills_tui::app::{ActiveView, App, init_terminal, restore_terminal};
 use skills_tui::event::{Event, EventHandler};
 use skills_tui::ui::draw;
 
@@ -32,10 +32,10 @@ pub async fn run(args: TuiArgs) -> Result<(), CliError> {
 
     let mut app = App::with_skills(skills).with_summary(summary);
 
-    if let Some(ref view_name) = args.start_view {
-        if let Some(view) = parse_active_view(view_name) {
-            app.set_tab(view);
-        }
+    if let Some(ref view_name) = args.start_view
+        && let Some(view) = parse_active_view(view_name)
+    {
+        app.set_tab(view);
     }
 
     let tick_rate = Duration::from_millis(args.tick_rate.unwrap_or(250));

@@ -1,10 +1,10 @@
 //! Execution Runner view: parameter input form, live prompt preview, validation status, and exports.
 
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
-use ratatui::Frame;
 use skills_core::models::Skill;
 use skills_core::parser::TemplatePlaceholder;
 
