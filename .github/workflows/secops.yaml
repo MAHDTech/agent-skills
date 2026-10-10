@@ -1,0 +1,47 @@
+---
+name: SecOps
+
+on:
+  push:
+    branches:
+      - trunk
+      - main
+  pull_request:
+    branches:
+      - trunk
+      - main
+  schedule:
+    - cron: "17 3 * * 0"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+concurrency:
+  group: secops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------
+  # Trivy Scan
+  # -------------------------------------------------
+  trivy:
+    name: Trivy Scan
+    uses: tars-cloud/actions/.github/workflows/consumer-trivy.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+    with:
+      timeout-minutes: 60
+      config-file: auto
+
+  # -------------------------------------------------
+  # CodeQL Analysis
+  # -------------------------------------------------
+  codeql:
+    name: CodeQL Analysis
+    uses: tars-cloud/actions/.github/workflows/consumer-codeql.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+    with:
+      type: devenv
+      timeout-minutes: 120
+      languages: '["actions", "rust"]'
+      config-file: auto

@@ -28,12 +28,26 @@ jobs:
     name: Prepare Release PR
     needs: candidate
     if: needs.candidate.outputs.prepare-ready == 'true'
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-prepare.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
-    with:
-      commit-sha: ${{ github.sha }}
-    secrets:
-      app-id: ${{ secrets.CI_APP_ID || secrets.APP_ID }}
-      app-private-key: ${{ secrets.CI_APP_PRIVATE_KEY || secrets.APP_PRIVATE_KEY }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    steps:
+      - id: checkout
+        name: Check Out the Exact Consumer Commit and Release History
+        uses: tars-cloud/actions/composite/setup-consumer/scripts/checkout@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - id: release
+        name: Prepare the Rust Release
+        uses: tars-cloud/actions/composite/release-rust@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+        with:
+          command: prepare
+          commit-sha: ${{ github.sha }}
+          github-token: ${{ github.token }}
 
   artifacts:
     name: Describe Release Artifacts
