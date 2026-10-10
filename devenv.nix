@@ -118,6 +118,7 @@ in
       "^node_modules/"
       "/resources/"
       "^\\.cache/"
+      "CHANGELOG.md"
     ];
     hooks = {
       action-validator.enable = true;
