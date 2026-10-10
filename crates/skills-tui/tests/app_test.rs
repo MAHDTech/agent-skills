@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
-use ratatui::backend::TestBackend;
 use ratatui::Terminal;
+use ratatui::backend::TestBackend;
 use skills_core::dashboard::{DashboardSummary, HealthScore, TargetDistribution};
 use skills_core::installer::TargetEnvironment;
 use skills_core::models::{LintIssue, LintSeverity, Skill, SkillCategory, SkillFrontmatter};
@@ -106,10 +106,10 @@ fn create_mock_summary() -> DashboardSummary {
 fn test_app_default_initialization() {
     let app = App::new();
     assert_eq!(app.active_view, ActiveView::Explorer);
-    assert!(app.skills.is_empty());
+    assert_eq!(app.skills, [] as [skills_core::Skill; 0]);
     assert!(app.summary.is_none());
-    assert!(app.search_filter.is_empty());
-    assert!(app.notifications.is_empty());
+    assert_eq!(app.search_filter, "");
+    assert_eq!(app.notifications, [] as [std::string::String; 0]);
     assert!(app.running);
     assert_eq!(app.selected_index, 0);
     assert!(app.is_running());
@@ -445,10 +445,11 @@ fn test_linter_selection_jump_success() {
     assert_eq!(app.active_view, ActiveView::Inspector);
     assert_eq!(app.selected_index, 1);
     assert_eq!(app.selected_skill().map(Skill::name), Some("skill-b"));
-    assert!(app
-        .latest_notification()
-        .unwrap_or_default()
-        .contains("Jumped to skill-b from diagnostic frontmatter-required"));
+    assert!(
+        app.latest_notification()
+            .unwrap_or_default()
+            .contains("Jumped to skill-b from diagnostic frontmatter-required")
+    );
 }
 
 #[test]
@@ -474,10 +475,11 @@ fn test_linter_selection_jump_unmatched_path() {
     // Dispatches Enter - should fail jump gracefully
     assert!(app.handle_key_event(KeyEvent::from(KeyCode::Enter)));
     assert_eq!(app.active_view, ActiveView::Linter);
-    assert!(app
-        .latest_notification()
-        .unwrap_or_default()
-        .contains("No matching skill found for diagnostic"));
+    assert!(
+        app.latest_notification()
+            .unwrap_or_default()
+            .contains("No matching skill found for diagnostic")
+    );
 }
 
 #[test]
@@ -491,10 +493,11 @@ fn test_linter_refresh_diagnostics() {
     app.set_tab(ActiveView::Linter);
 
     assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('r'))));
-    assert!(app
-        .latest_notification()
-        .unwrap_or_default()
-        .contains("Diagnostics refreshed"));
+    assert!(
+        app.latest_notification()
+            .unwrap_or_default()
+            .contains("Diagnostics refreshed")
+    );
 }
 
 #[test]
@@ -615,10 +618,11 @@ fn test_runner_validation_status() {
     // Reset parameters
     assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('r'))));
     assert!(app.validate_runner_params().is_err());
-    assert!(app
-        .latest_notification()
-        .unwrap_or_default()
-        .contains("Parameters reset to defaults"));
+    assert!(
+        app.latest_notification()
+            .unwrap_or_default()
+            .contains("Parameters reset to defaults")
+    );
 }
 
 #[test]
@@ -642,10 +646,11 @@ fn test_runner_export_actions() {
     // Clipboard export
     let clip_res = app.export_runner_prompt_clipboard();
     assert!(clip_res.is_ok());
-    assert!(app
-        .latest_notification()
-        .unwrap_or_default()
-        .contains("Prompt copied to clipboard via OSC 52"));
+    assert!(
+        app.latest_notification()
+            .unwrap_or_default()
+            .contains("Prompt copied to clipboard via OSC 52")
+    );
 
     // Key event triggers 'c', 'e'
     assert!(app.handle_key_event(KeyEvent::from(KeyCode::Char('c'))));

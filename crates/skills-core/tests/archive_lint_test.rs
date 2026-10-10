@@ -87,9 +87,11 @@ fn test_archive_missing_metadata_archived() {
         .find(|i| i.rule == "archived-metadata")
         .expect("archived-metadata error expected");
     assert_eq!(issue.severity, LintSeverity::Error);
-    assert!(issue
-        .message
-        .contains("Archived skill must declare 'metadata.archived'"));
+    assert!(
+        issue
+            .message
+            .contains("Archived skill must declare 'metadata.archived'")
+    );
 }
 
 #[test]
@@ -162,9 +164,11 @@ fn test_live_skill_with_archived_metadata() {
         .find(|i| i.rule == "archived-metadata")
         .expect("archived-metadata error expected");
     assert_eq!(issue.severity, LintSeverity::Error);
-    assert!(issue
-        .message
-        .contains("Live skill must not declare 'metadata.archived'"));
+    assert!(
+        issue
+            .message
+            .contains("Live skill must not declare 'metadata.archived'")
+    );
 }
 
 #[test]
@@ -259,9 +263,11 @@ fn test_archived_replaced_by_archived() {
         .find(|i| i.rule == "archived-replaced-by")
         .expect("archived-replaced-by error expected");
     assert_eq!(issue.severity, LintSeverity::Error);
-    assert!(issue
-        .message
-        .contains("replaces with archived skill 'target-tool'"));
+    assert!(
+        issue
+            .message
+            .contains("replaces with archived skill 'target-tool'")
+    );
 }
 
 #[test]
@@ -299,9 +305,11 @@ fn test_archived_replaced_by_unpromoted() {
         .find(|i| i.rule == "archived-replaced-by")
         .expect("archived-replaced-by error expected");
     assert_eq!(issue.severity, LintSeverity::Error);
-    assert!(issue
-        .message
-        .contains("replaces with unpromoted skill 'draft-tool'"));
+    assert!(
+        issue
+            .message
+            .contains("replaces with unpromoted skill 'draft-tool'")
+    );
 }
 
 #[test]
@@ -485,9 +493,11 @@ fn test_cross_ref_forbidden_to_archived() {
         .find(|i| i.rule == "cross-reference-group")
         .expect("cross-reference-group error expected");
     assert_eq!(issue.severity, LintSeverity::Error);
-    assert!(issue
-        .message
-        .contains("Forbidden cross-reference to archived skill 'old-archived-tool'"));
+    assert!(
+        issue
+            .message
+            .contains("Forbidden cross-reference to archived skill 'old-archived-tool'")
+    );
 }
 
 #[test]

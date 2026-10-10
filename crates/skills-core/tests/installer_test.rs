@@ -151,11 +151,13 @@ fn test_install_symlink_mode_and_live_updates() {
     assert_eq!(res.installed_mode, InstallMode::Symlink);
 
     let target_dir = root.join("installed/sym-skill");
-    assert!(target_dir
-        .symlink_metadata()
-        .unwrap()
-        .file_type()
-        .is_symlink());
+    assert!(
+        target_dir
+            .symlink_metadata()
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
 
     // Live update test: add a file in source, verify visible at destination
     fs::write(source.join("new_file.txt"), "live update content\n").unwrap();
