@@ -16,9 +16,9 @@ use thiserror::Error;
 
 use crate::error::SkillError;
 use crate::installer::{
-    collect_file_entries, compute_dir_checksum, default_exclude_patterns, is_excluded,
-    timestamp_now_iso, InstallMode, InstallOptions, InstalledSkill, Installer, InstallerError,
-    IntegrityStatus, PathValidator, TargetEnvironment, UninstallOptions,
+    InstallMode, InstallOptions, InstalledSkill, Installer, InstallerError, IntegrityStatus,
+    PathValidator, TargetEnvironment, UninstallOptions, collect_file_entries, compute_dir_checksum,
+    default_exclude_patterns, is_excluded, timestamp_now_iso,
 };
 use crate::models::SkillFrontmatter;
 use crate::parser::SkillParser;
@@ -333,40 +333,38 @@ pub(crate) fn compare_versions(src: &str, tgt: &str) -> Ordering {
 /// Extracts skill ID, human name, and version from a skill source directory.
 pub(crate) fn extract_skill_info(source_dir: &Path) -> (String, String, String) {
     let skill_md = source_dir.join("SKILL.md");
-    if skill_md.exists() {
-        if let Ok(content) = fs::read_to_string(&skill_md) {
-            if let Ok((yaml_str, _)) = SkillParser::extract_frontmatter(&content) {
-                if let Ok(fm) = serde_yaml::from_str::<SkillFrontmatter>(yaml_str) {
-                    let id = if fm.name.is_empty() {
-                        source_dir.file_name().map_or_else(
-                            || "unnamed-skill".to_string(),
-                            |n| n.to_string_lossy().to_string(),
-                        )
-                    } else {
-                        fm.name.clone()
-                    };
-                    let name = if fm.name.is_empty() {
-                        id.clone()
-                    } else {
-                        fm.name
-                    };
-                    let version = fm
-                        .metadata
-                        .as_ref()
-                        .and_then(|m| m.get("version"))
-                        .cloned()
-                        .or_else(|| {
-                            fm.extra.get("version").and_then(|v| match v {
-                                serde_yaml::Value::String(s) => Some(s.clone()),
-                                serde_yaml::Value::Number(n) => Some(n.to_string()),
-                                _ => None,
-                            })
-                        })
-                        .unwrap_or_else(|| "0.1.0".to_string());
-                    return (id, name, version);
-                }
-            }
-        }
+    if skill_md.exists()
+        && let Ok(content) = fs::read_to_string(&skill_md)
+        && let Ok((yaml_str, _)) = SkillParser::extract_frontmatter(&content)
+        && let Ok(fm) = serde_yaml::from_str::<SkillFrontmatter>(yaml_str)
+    {
+        let id = if fm.name.is_empty() {
+            source_dir.file_name().map_or_else(
+                || "unnamed-skill".to_string(),
+                |n| n.to_string_lossy().to_string(),
+            )
+        } else {
+            fm.name.clone()
+        };
+        let name = if fm.name.is_empty() {
+            id.clone()
+        } else {
+            fm.name
+        };
+        let version = fm
+            .metadata
+            .as_ref()
+            .and_then(|m| m.get("version"))
+            .cloned()
+            .or_else(|| {
+                fm.extra.get("version").and_then(|v| match v {
+                    serde_yaml::Value::String(s) => Some(s.clone()),
+                    serde_yaml::Value::Number(n) => Some(n.to_string()),
+                    _ => None,
+                })
+            })
+            .unwrap_or_else(|| "0.1.0".to_string());
+        return (id, name, version);
     }
 
     let fallback = source_dir.file_name().map_or_else(
@@ -760,14 +758,14 @@ impl SkillSyncer {
             return Ok(SyncSummary::from_plan_dry_run(plan));
         }
 
-        if self.conflict_strategy == ConflictStrategy::PromptUser {
-            if let Some(action) = plan.conflicts().next() {
-                return Err(SyncError::UnresolvedConflict {
-                    skill_id: action.skill_id.clone(),
-                    target: action.target_env.clone(),
-                    reason: action.reason.clone(),
-                });
-            }
+        if self.conflict_strategy == ConflictStrategy::PromptUser
+            && let Some(action) = plan.conflicts().next()
+        {
+            return Err(SyncError::UnresolvedConflict {
+                skill_id: action.skill_id.clone(),
+                target: action.target_env.clone(),
+                reason: action.reason.clone(),
+            });
         }
         let catalog_skills = self.discover_catalog_skills()?;
         let mut summary = SyncSummary::default();

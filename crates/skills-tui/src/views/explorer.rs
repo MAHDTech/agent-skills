@@ -1,10 +1,10 @@
 //! Skill Explorer view: interactive catalog table, search input, and status badges.
 
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Paragraph, Row, Table};
-use ratatui::Frame;
 use skills_core::models::Skill;
 
 use crate::app::App;
@@ -201,12 +201,12 @@ pub fn format_status_badges(skill: &Skill) -> Line<'static> {
 /// Extracts version metadata from frontmatter metadata or extra attributes.
 #[must_use]
 pub fn extract_version(skill: &Skill) -> String {
-    if let Some(meta) = &skill.frontmatter.metadata {
-        if let Some(v) = meta.get("version") {
-            let trimmed = v.trim();
-            if !trimmed.is_empty() {
-                return trimmed.to_string();
-            }
+    if let Some(meta) = &skill.frontmatter.metadata
+        && let Some(v) = meta.get("version")
+    {
+        let trimmed = v.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
         }
     }
 
@@ -229,21 +229,21 @@ pub fn extract_version(skill: &Skill) -> String {
 /// Extracts author metadata from frontmatter metadata or extra attributes.
 #[must_use]
 pub fn extract_author(skill: &Skill) -> String {
-    if let Some(meta) = &skill.frontmatter.metadata {
-        if let Some(a) = meta.get("author") {
-            let trimmed = a.trim();
-            if !trimmed.is_empty() {
-                return trimmed.to_string();
-            }
+    if let Some(meta) = &skill.frontmatter.metadata
+        && let Some(a) = meta.get("author")
+    {
+        let trimmed = a.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
         }
     }
 
-    if let Some(val) = skill.frontmatter.extra.get("author") {
-        if let Some(s) = val.as_str() {
-            let trimmed = s.trim();
-            if !trimmed.is_empty() {
-                return trimmed.to_string();
-            }
+    if let Some(val) = skill.frontmatter.extra.get("author")
+        && let Some(s) = val.as_str()
+    {
+        let trimmed = s.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
         }
     }
 
@@ -255,8 +255,8 @@ mod tests {
     use std::collections::HashMap;
     use std::path::PathBuf;
 
-    use ratatui::backend::TestBackend;
     use ratatui::Terminal;
+    use ratatui::backend::TestBackend;
     use skills_core::models::{Skill, SkillCategory, SkillFrontmatter, SkillTree};
 
     use super::*;

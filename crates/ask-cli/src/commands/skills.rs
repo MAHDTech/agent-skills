@@ -8,7 +8,7 @@ use comfy_table::presets::UTF8_FULL;
 use comfy_table::{Attribute, Cell, Table};
 
 use crate::cli::{OutputFormat, SkillsArgs, SkillsCommands};
-use crate::commands::{resolve_root, CliError};
+use crate::commands::{CliError, resolve_root};
 use skills_core::artifacts::ArtifactsEngine;
 use skills_core::downloader::SkillDownloader;
 use skills_core::error::SkillError;
@@ -361,15 +361,15 @@ fn collect_markdown_files(path: &Path, files: &mut Vec<PathBuf>) {
         if path.extension().and_then(|s| s.to_str()) == Some("md") {
             files.push(path.to_path_buf());
         }
-    } else if path.is_dir() {
-        if let Ok(entries) = std::fs::read_dir(path) {
-            for entry in entries.flatten() {
-                let entry_path = entry.path();
-                if entry_path.is_dir() {
-                    collect_markdown_files(&entry_path, files);
-                } else if entry_path.extension().and_then(|s| s.to_str()) == Some("md") {
-                    files.push(entry_path);
-                }
+    } else if path.is_dir()
+        && let Ok(entries) = std::fs::read_dir(path)
+    {
+        for entry in entries.flatten() {
+            let entry_path = entry.path();
+            if entry_path.is_dir() {
+                collect_markdown_files(&entry_path, files);
+            } else if entry_path.extension().and_then(|s| s.to_str()) == Some("md") {
+                files.push(entry_path);
             }
         }
     }
@@ -401,14 +401,14 @@ async fn run_lint(path: Option<&Path>, fix: bool, format: OutputFormat) -> Resul
         let mut files_modified = 0;
 
         for file in files_to_scan {
-            if let Ok(content) = std::fs::read_to_string(&file) {
-                if content.contains('\u{2014}') {
-                    let count = content.matches('\u{2014}').count();
-                    let sanitized = content.replace('\u{2014}', "-");
-                    if std::fs::write(&file, sanitized).is_ok() {
-                        total_fixes += count;
-                        files_modified += 1;
-                    }
+            if let Ok(content) = std::fs::read_to_string(&file)
+                && content.contains('\u{2014}')
+            {
+                let count = content.matches('\u{2014}').count();
+                let sanitized = content.replace('\u{2014}', "-");
+                if std::fs::write(&file, sanitized).is_ok() {
+                    total_fixes += count;
+                    files_modified += 1;
                 }
             }
         }

@@ -1,6 +1,6 @@
 //! Remote skill downloader, registry client, resource sanitizer, and directory manager.
 
-use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, USER_AGENT};
+use reqwest::header::{ACCEPT, HeaderMap, HeaderValue, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
@@ -286,10 +286,10 @@ impl SkillDownloader {
     /// Strips Jina Reader metadata header preambles.
     #[must_use]
     pub fn strip_reader_metadata(content: &str) -> &str {
-        if content.starts_with("Title:") {
-            if let Some(idx) = content.find("\nMarkdown Content:\n") {
-                return content[idx + "\nMarkdown Content:\n".len()..].trim_start();
-            }
+        if content.starts_with("Title:")
+            && let Some(idx) = content.find("\nMarkdown Content:\n")
+        {
+            return content[idx + "\nMarkdown Content:\n".len()..].trim_start();
         }
         content
     }
@@ -463,51 +463,51 @@ impl SkillDownloader {
                 let after = &trimmed[start_bracket + 1..];
                 if let Some(close_bracket) = after.find(']') {
                     let after_close = &after[close_bracket + 1..];
-                    if after_close.starts_with('(') {
-                        if let Some(close_paren) = after_close.find(')') {
-                            let raw_link = after_close[1..close_paren].trim();
-                            let clean_link = raw_link
-                                .trim_matches('<')
-                                .trim_matches('>')
-                                .trim_matches('"')
-                                .trim_matches('\'');
+                    if after_close.starts_with('(')
+                        && let Some(close_paren) = after_close.find(')')
+                    {
+                        let raw_link = after_close[1..close_paren].trim();
+                        let clean_link = raw_link
+                            .trim_matches('<')
+                            .trim_matches('>')
+                            .trim_matches('"')
+                            .trim_matches('\'');
 
-                            if !clean_link.is_empty() && !Self::is_non_text_url(clean_link) {
-                                let resolved = if clean_link.starts_with("http://")
-                                    || clean_link.starts_with("https://")
-                                {
-                                    clean_link.to_string()
-                                } else if clean_link.starts_with('/') {
-                                    let origin = base_url
-                                        .split("://")
-                                        .nth(1)
-                                        .unwrap_or(base_url)
-                                        .split('/')
-                                        .next()
-                                        .unwrap_or("");
-                                    let scheme = if base_url.starts_with("http://") {
-                                        "http://"
-                                    } else {
-                                        "https://"
-                                    };
-                                    format!("{scheme}{origin}{clean_link}")
+                        if !clean_link.is_empty() && !Self::is_non_text_url(clean_link) {
+                            let resolved = if clean_link.starts_with("http://")
+                                || clean_link.starts_with("https://")
+                            {
+                                clean_link.to_string()
+                            } else if clean_link.starts_with('/') {
+                                let origin = base_url
+                                    .split("://")
+                                    .nth(1)
+                                    .unwrap_or(base_url)
+                                    .split('/')
+                                    .next()
+                                    .unwrap_or("");
+                                let scheme = if base_url.starts_with("http://") {
+                                    "http://"
                                 } else {
-                                    let url_parts = base_url.split('/').collect::<Vec<_>>();
-                                    let parent = if url_parts.len() > 1 {
-                                        url_parts[..url_parts.len() - 1].join("/")
-                                    } else {
-                                        base_url.to_string()
-                                    };
-                                    format!("{parent}/{clean_link}")
+                                    "https://"
                                 };
+                                format!("{scheme}{origin}{clean_link}")
+                            } else {
+                                let url_parts = base_url.split('/').collect::<Vec<_>>();
+                                let parent = if url_parts.len() > 1 {
+                                    url_parts[..url_parts.len() - 1].join("/")
+                                } else {
+                                    base_url.to_string()
+                                };
+                                format!("{parent}/{clean_link}")
+                            };
 
-                                let link_domain = Self::get_domain_prefix(&resolved);
-                                if link_domain == base_domain
-                                    && resolved != base_url
-                                    && !links.contains(&resolved)
-                                {
-                                    links.push(resolved);
-                                }
+                            let link_domain = Self::get_domain_prefix(&resolved);
+                            if link_domain == base_domain
+                                && resolved != base_url
+                                && !links.contains(&resolved)
+                            {
+                                links.push(resolved);
                             }
                         }
                     }

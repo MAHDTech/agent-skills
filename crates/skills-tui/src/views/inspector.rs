@@ -1,10 +1,10 @@
 //! Skill Inspector view: metadata inspection, agent target badges, template parameters, and markdown preview.
 
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Paragraph, Row, Table};
-use ratatui::Frame;
 use skills_core::models::Skill;
 use skills_core::parser::SkillParser;
 
@@ -217,10 +217,10 @@ pub fn is_target_supported(skill: &Skill, target_id: &str) -> bool {
         return false;
     }
 
-    if let Some(meta) = &skill.frontmatter.metadata {
-        if let Some(targets) = meta.get("targets") {
-            return targets.contains(target_id);
-        }
+    if let Some(meta) = &skill.frontmatter.metadata
+        && let Some(targets) = meta.get("targets")
+    {
+        return targets.contains(target_id);
     }
 
     if let Some(extra_val) = skill.frontmatter.extra.get("targets") {
@@ -345,8 +345,8 @@ mod tests {
     use std::collections::HashMap;
     use std::path::PathBuf;
 
-    use ratatui::backend::TestBackend;
     use ratatui::Terminal;
+    use ratatui::backend::TestBackend;
     use skills_core::models::{Skill, SkillCategory, SkillFrontmatter, SkillTree};
 
     use super::*;

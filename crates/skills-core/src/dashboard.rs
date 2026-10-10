@@ -547,10 +547,11 @@ fn issue_matches_skill(issue: &LintIssue, skill: &Skill) -> bool {
     if issue.file == skill.path {
         return true;
     }
-    if let Some(parent) = skill.path.parent() {
-        if !parent.as_os_str().is_empty() && issue.file.starts_with(parent) {
-            return true;
-        }
+    if let Some(parent) = skill.path.parent()
+        && !parent.as_os_str().is_empty()
+        && issue.file.starts_with(parent)
+    {
+        return true;
     }
     issue.file.ends_with(&skill.path)
 }

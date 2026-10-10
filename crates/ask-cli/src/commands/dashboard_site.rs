@@ -10,7 +10,7 @@ use skills_core::artifacts::{ArtifactsEngine, ArtifactsOptions};
 use skills_core::error::SkillError;
 use tokio::time::interval;
 
-use crate::commands::{resolve_root, CliError};
+use crate::commands::{CliError, resolve_root};
 
 /// Formats actionable diagnostic text when an external CLI binary is missing.
 pub(crate) fn format_tool_not_found_error(tool: &str, action_context: &str) -> String {
@@ -170,10 +170,10 @@ pub(crate) fn write_skill_dates(root: &Path) -> Result<(), CliError> {
 /// Cleans development Pagefind cache and target output directory with retry backoff.
 pub(crate) fn clean_output_dir(root: &Path, output_dir: &Path) {
     let dev_pagefind = root.join("dashboard/static/pagefind");
-    if dev_pagefind.exists() {
-        if let Err(err) = std::fs::remove_dir_all(&dev_pagefind) {
-            tracing::warn!("Failed to clean dev pagefind directory: {err}");
-        }
+    if dev_pagefind.exists()
+        && let Err(err) = std::fs::remove_dir_all(&dev_pagefind)
+    {
+        tracing::warn!("Failed to clean dev pagefind directory: {err}");
     }
 
     if !output_dir.exists() {
@@ -461,13 +461,12 @@ pub(crate) async fn serve_event_loop(
                     pending_debounce = Some(tokio::time::Instant::now() + Duration::from_millis(300));
                 }
 
-                if let Some(deadline) = pending_debounce {
-                    if tokio::time::Instant::now() >= deadline {
+                if let Some(deadline) = pending_debounce
+                    && tokio::time::Instant::now() >= deadline {
                         pending_debounce = None;
                         println!("Content changed. Rebuilding search indexes...");
                         rebuild_search_indexes(root);
                     }
-                }
             }
         }
     }
@@ -532,10 +531,10 @@ pub(crate) fn collect_snapshot_recursive(
 
         if path.is_dir() {
             collect_snapshot_recursive(&path, root, map);
-        } else if let Ok(meta) = path.metadata() {
-            if let Ok(mtime) = meta.modified() {
-                map.insert(path, mtime);
-            }
+        } else if let Ok(meta) = path.metadata()
+            && let Ok(mtime) = meta.modified()
+        {
+            map.insert(path, mtime);
         }
     }
 }
