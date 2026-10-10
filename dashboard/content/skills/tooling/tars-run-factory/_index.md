@@ -20,7 +20,7 @@ You start machine runs, read their state, route their directives, and stop the l
 ## Invocation
 
 ```text
-/tars-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]
+/tars-run-factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) [--auto] [--installation-receipt PATH] [--merge] [--cycles N] [--runtime-minutes N] [--audit] [--triage]
 ```
 
 - `workspace_root`: Canonical path to target customer repository. Required.
@@ -30,6 +30,8 @@ You start machine runs, read their state, route their directives, and stop the l
   - `--issue N`: Run single issue N.
   - `--issues N,N`: Run ordered issue list in sequence.
 - Optional flags:
+  - `--auto`: Autonomous shift mode (supervisor manages probe, installation binding, and cycles internally until complete or gated).
+  - `--installation-receipt PATH`: Optional path to an installation receipt JSON (otherwise auto-resolved from binary and git).
   - `--merge`: Enable automated landing for approved green PRs (default off; PRs stay open for human review).
   - `--cycles N`: Maximum factory cycles before stopping (default 10).
   - `--runtime-minutes N`: Maximum shift wall time, up to 480 minutes / 8 hours (default 480).
@@ -37,7 +39,6 @@ You start machine runs, read their state, route their directives, and stop the l
   - `--state-dir DIR`: External directory for ledger, reports, and locks (defaults to `<workspace_parent>/tars-factory/<repo-name>`).
   - `--audit`: Execute codebase audit at shift start (only valid with `--all`).
   - `--triage`: Execute backlog triage at shift start (only valid with `--all`; parks at human approval).
-  - `--auto`: Autonomous shift mode (supervisor manages probe, installation, and cycles internally until complete or gated).
 
 The foreman session running `/tars-run-factory` must be started in a directory outside `<workspace_root>` (such as the platform workspace or an admin shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `tars-agy factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Furthermore, running `agy` inside `<workspace_root>` restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/tars-factory/`.
 
@@ -73,7 +74,7 @@ Execute all checks in order; unresolved failure stops the shift:
 For one-shot execution environments (Claude Code, OpenAI Codex, Grok-build) and unattended batch runs, pass `--auto`:
 
 ```bash
-tars-agy factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N]
+tars-agy factory <workspace_root> (--all | --epic N | --issue N | --issues N,N) --auto [--merge] [--cycles N] [--runtime-minutes N] [--installation-receipt PATH]
 ```
 
 In autonomous mode:
