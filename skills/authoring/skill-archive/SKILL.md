@@ -1,16 +1,11 @@
-+++
-title = "archive-skill"
-description = "Retire a skill cleanly - move its directory from skills/<category>/ into skills-archive/<category>/, mark it archived in frontmatter with what replaced it, purge or redirect every inbound /skill-name reference (the router included), then re-run lint and sync. Use when you want to archive, deprecate, retire, remove, replace, or merge away a skill, or a /skill-audit flagged one for retirement. Covers when to archive vs delete vs merge and how to avoid dangling references. Cross-references /skill-creator and /skill-router."
-sort_by = "title"
-template = "skill.html"
-[extra]
-skill = true
-category = "authoring"
-mermaid = false
-+++
+---
+name: skill-archive
+description: Retire a skill cleanly - move its directory from skills/<category>/ into skills-archive/<category>/, mark it archived in frontmatter with what replaced it, purge or redirect every inbound /skill-name reference (the router included), then re-run lint and sync. Use when you want to archive, deprecate, retire, remove, replace, or merge away a skill, or a /skill-audit flagged one for retirement. Covers when to archive vs delete vs merge and how to avoid dangling references. Cross-references /skill-creator and /skill-router.
+metadata:
+  group: authoring
+---
 
-
-# Archive Skill
+# Skill Archive
 
 Retire a skill without deleting it and without leaving a **dangling reference** behind. The collection has two trees with the same shape:
 
@@ -19,7 +14,7 @@ skills/<category>/<name>/SKILL.md            in use: installed, listed, routed t
 skills-archive/<category>/<name>/SKILL.md    retired: readable on the dashboard, never installed
 ```
 
-Moving a skill across is what retires it. Nothing under `skills-archive/` is installed by `skills --action install`, offered by `npx skills add MAHDTech/agent-skills`, or listed in the README, `agents/AGENTS.md`, or `skills.sh.json`. It stays on the dashboard, marked as archived, so consumers can still read it and fetch it from the repository by hand. A `sync` after the move removes any local links the skill had.
+Moving a skill across is what retires it. Nothing under `skills-archive/` is installed by `ask skills install`, offered by `npx skills add MAHDTech/agent-skills`, or listed in the README, `agents/AGENTS.md`, or `skills.sh.json`. It stays on the dashboard, marked as archived, so consumers can still read it and fetch it from the repository by hand. A `sync` after the move removes any local links the skill had.
 
 If a replacement is taking over, create it first with `/skill-creator`; archive only once the replacement exists.
 
@@ -63,7 +58,7 @@ Three ways a skill leaves the live set:
    - **Router** (`skills/authoring/skill-router/SKILL.md`) - remove the retired skill's entry. If a replacement took over its slot, the replacement's entry already covers it.
    - **Any other live skill** that referenced `/<name>` - a mention now pointing at an archived skill is a dangling reference; send it to the replacement or drop it. Skills are self-contained by default, so dropping the sentence is usually right.
 
-4. **Regenerate the derived artifacts.** `devenv --no-tui shell -- skills --action lint`, then `devenv --no-tui shell -- skills --action sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree, removes the local links for the archived skill, and stages what it changed; commit that.
+4. **Regenerate the derived artifacts.** `devenv --no-tui shell -- ask skills lint`, then `devenv --no-tui shell -- ask skills sync`. Sync rebuilds the README, `agents/AGENTS.md`, `skills.sh.json`, and the dashboard from the tree, removes the local links for the archived skill, and stages what it changed; commit that.
 
 ## Avoiding dangling references
 
@@ -76,4 +71,3 @@ An archived skill comes back the same way it left: `git mv skills-archive/<categ
 ## Done when
 
 The skill lives under `skills-archive/<category>/<name>/`, its frontmatter carries `metadata.archived` (and `replaced-by` when a successor exists), no live skill (the router included) still references `/<name>`, lint passes, and a second `sync` leaves no further diff.
-

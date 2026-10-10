@@ -14,7 +14,6 @@
         "diagnosing-bugs",
         "domain-modeling",
         "egui",
-        "implement",
         "mcp",
         "nutanix-api-v4",
         "nutanix-enterprise-ai",
@@ -44,7 +43,6 @@
       "description": "Turn ideas into specs, tickets, and multi-session plans.",
       "skills": [
         "estimate-work",
-        "grill-me-with-docs",
         "grilling",
         "handoff",
         "prioritize-backlog",
@@ -105,7 +103,7 @@
       "title": "Authoring",
       "description": "Create and maintain the skills themselves.",
       "skills": [
-        "archive-skill",
+        "skill-archive",
         "skill-audit",
         "skill-creator",
         "skill-router"

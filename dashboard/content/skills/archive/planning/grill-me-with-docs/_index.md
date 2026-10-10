@@ -1,11 +1,17 @@
----
-name: grill-me-with-docs
-description: Relentlessly interview the user to stress-test a problem, architecture, or design from scratch, while actively maintaining a domain glossary (CONTEXT.md) and recording major architectural decisions as ADRs. Use when starting a new initiative, tackling ambiguous domain problems, or when the user asks to grill with docs or ADRs.
-metadata:
-  group: planning-pipeline
-  source: mattpocock/skills
-  license: MIT
----
++++
+title = "grill-me-with-docs"
+description = "Relentlessly interview the user to stress-test a problem, architecture, or design from scratch, while actively maintaining a domain glossary (CONTEXT.md) and recording major architectural decisions as ADRs. Use when starting a new initiative, tackling ambiguous domain problems, or when the user asks to grill with docs or ADRs."
+sort_by = "title"
+template = "skill.html"
+[extra]
+skill = true
+category = "planning"
+mermaid = false
+archived = "2026-10-10"
+replaced_by = "grilling"
+source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/planning/grill-me-with-docs"
++++
+
 
 # Grill Me with Docs
 
@@ -68,3 +74,4 @@ The session finishes when:
 - **To Technical Spec:** Run `/to-spec` to synthesize the settled architecture into an issue or PRD.
 - **To Backlog Decomposition:** Run `/to-tickets` to break the decisions down into atomic, dependency-mapped tickets.
 - **Pure Interview:** If no glossary or ADR documentation is needed, reach for `/grilling`.
+

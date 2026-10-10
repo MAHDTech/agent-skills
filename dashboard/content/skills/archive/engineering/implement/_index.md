@@ -1,11 +1,17 @@
----
-name: implement
-description: Implement a piece of work based on a spec or set of tickets.
-disable-model-invocation: true
-metadata:
-  source: mattpocock/skills
-  license: MIT
----
++++
+title = "implement"
+description = "Implement a piece of work based on a spec or set of tickets."
+sort_by = "title"
+template = "skill.html"
+[extra]
+skill = true
+category = "engineering"
+mermaid = false
+archived = "2026-10-10"
+replaced_by = "agent-guidelines"
+source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/engineering/implement"
++++
+
 
 # Implement
 
@@ -21,3 +27,4 @@ Implement the work described in the spec or tickets, then verify and land it. Th
 Keep each step honest: don't skip Verify or Review, and don't commit over failing checks.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
+

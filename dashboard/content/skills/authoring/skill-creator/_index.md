@@ -27,7 +27,7 @@ skills/<category>/<name>/SKILL.md
 - **`<category>`** is one of the nine topic buckets: `engineering`, `game-development`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Category comes from the directory - never from a frontmatter key.
 - One **lifecycle bucket** sits inside the tree: `in-progress/` holds drafts. Retired skills leave `skills/` entirely for the top-level **archive**, `skills-archive/<category>/<name>/`, which keeps the original category.
 
-**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README, index, and installer. A skill in `in-progress/` is deliberately excluded - move it into a topic bucket to promote it. To retire one, use `/archive-skill`, which moves it to `skills-archive/` where it stays readable on the dashboard but is never installed.
+**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README, index, and installer. A skill in `in-progress/` is deliberately excluded - move it into a topic bucket to promote it. To retire one, use `/skill-archive`, which moves it to `skills-archive/` where it stays readable on the dashboard but is never installed.
 
 ## Naming
 
@@ -35,7 +35,7 @@ The name is prefix-free kebab-case, and it must equal the directory basename (`s
 
 - **Verb-first for an action** the skill performs (`sculpt-code`, `git-resolve-conflicts`); **a noun for a body of knowledge** it holds (`tdd`, `agent-guidelines`).
 - **Keep only a genuine subject scope** as a prefix - `gh-` for GitHub API work, `git-` for git operations. These name a real tool the skill acts on; a project or subsystem name is a genuine scope too (`acme-` for skills that only make sense inside the Acme tool, so `acme-deploy` is correct). Drop taxonomy prefixes like `cmd-`, `brain-`, or `sys-`; the category directory already carries that signal.
-- 1–64 characters, and it must not contain "anthropic" or "claude".
+- 1 to 64 characters matching `^[a-z0-9]+(-[a-z0-9]+)*$`, and it must not contain "anthropic" or "claude".
 
 ## Canonical frontmatter
 
@@ -48,13 +48,13 @@ description: What the skill does AND when to reach for it, in the user's own wor
 ---
 ```
 
-`name` matches the directory. `description` is **model-facing** and does the invocation work (see below). Optional keys, each added only when earned:
+`name` matches the directory (1 to 64 characters). `description` is **model-facing** and does the invocation work (1 to 1024 characters, see below). Optional keys, each added only when earned:
 
 - **`disable-model-invocation: true`** - makes the skill **user-invoked** (see below).
 - **`argument-hint`** - a short usage hint for a skill that takes an argument.
 - **`context: fork`** with **`agent: <type>`** (used together, e.g. `agent: general-purpose`) - runs the skill as a subagent in its own context, so a long or noisy run does not silt up the caller's window.
-- **`metadata:`** - a flat string→string map for provenance and grouping. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`). Use `group: <group-name>` to declare membership in a cohesive cross-reference group (standard groups: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, `tars`). Skills are self-contained by default; cross-references via `/skill-name` mentions or relative markdown links are only permitted between skills in the same group (`skill-router` is exempt).
-- **`resources:`** - a YAML **list** of source URLs. It is functional, not decorative: `skills --action download-resources` reads it (see `bin/skills/downloader.ts`) to (re)fetch the vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and many reference skills rely on it. Keep it intact; never strip it.
+- **`metadata:`** - a flat string→string map for provenance and grouping. Use `source` and `license` on any skill adapted from an outside project (as this one carries `source: mattpocock/skills`, `license: MIT`). Use `group: <group-name>` to declare membership in a cohesive cross-reference group (standard groups: `authoring`, `github`, `planning-pipeline`, `review`, `opencode`, `tars`, `nutanix`). Skills are self-contained by default; cross-references via `/skill-name` mentions or relative markdown links are only permitted between skills in the same group (`skill-router` is exempt).
+- **`resources:`** - a YAML **list** of source URLs. It is functional, not decorative: `ask skills download-resources` reads it (implemented in `crates/skills-core/src/downloader.rs`) to (re)fetch vendored docs into the skill's `resources/auto/` directory (see the structure rule below), and reference skills rely on it. Keep it intact; never strip it.
 
 That is the complete allowed set, so the frontmatter stays small. Distinct from the above are the **legacy** keys `custom:`, `triggers:`, `category:`, and `type:` - forbidden. Earlier skills carry them mid-migration; a new or edited skill drops them, putting triggers into the `description` prose and taking the category from the directory. Do not confuse these forbidden legacy keys with the real, functional `resources:` and `metadata:` keys above.
 
@@ -62,19 +62,30 @@ That is the complete allowed set, so the frontmatter stays small. Distinct from 
 
 One axis splits every skill - who can reach it:
 
-- A **model-invoked** skill keeps its **description**, so the agent can fire it autonomously _and_ other skills can reach it (you can still type its name too). It pays a permanent **context load**: the description sits in the window every turn. Mechanics: omit `disable-model-invocation`, and write a description with rich trigger phrasing ("Use when the user wants…, mentions…, asks for…").
+- A **model-invoked** skill keeps its **description**, so the agent can fire it autonomously _and_ other skills can reach it (you can still type its name too). It pays a permanent **context load**: the description sits in the window every turn. Mechanics: omit `disable-model-invocation`, and write a description with rich trigger phrasing ("Use when the user wants..., mentions..., asks for...").
 - A **user-invoked** skill strips the description from the agent's reach: only you, typing its name, can invoke it - and no other skill can. Zero context load, but it spends **cognitive load**: _you_ are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`, and make the `description` a human-facing one-line summary with the trigger lists stripped.
 
-Choose model-invocation only when the agent must reach the skill on its own, or another skill must. The test is _could the agent usefully reach for this by itself?_ - reuse is a reason to extract a skill, not the test for whether it is model-invoked. If it only ever fires by hand, make it user-invoked and pay no context load.
+Choose model-invocation only when the agent must reach the skill on its own, or another skill must. Set `disable-model-invocation: true` when a skill meets any of these operational criteria:
+
+1. **High blast-radius or destructive actions**: operations such as deleting branches, wiping worktrees, or resetting databases.
+2. **Coarse multi-phase pipelines**: heavy orchestration workflows that require explicit human initiation and oversight.
+3. **Interactive interview protocols**: question-and-answer interrogation flows (such as interactive design interviews).
+4. **Meta-catalogs and indexes**: reference maps and router indexes (such as `/skill-router`).
 
 ## Writing the description
 
 A model-invoked **description** does two jobs: state what the skill is, and list the **branches** that should trigger it. Every word adds context load, so prune it harder than the body.
 
+Follow the canonical 3-part description pattern:
+
+```yaml
+description: [1. Capability verb phrase]. Use when [2. Explicit triggers, symptoms, user keywords]. Do not use for [3. Negative boundary / disambiguation]; use /sibling-skill instead.
+```
+
 - **Front-load the skill's leading word** - the description is where it does its invocation work.
 - **One trigger per branch.** Synonyms that rename a single branch are **duplication** - collapse them and keep only genuinely distinct branches.
-- **Cut identity already stated in the body.** Keep the description to triggers plus any "when another skill needs…" reach clause.
-- **No em-dashes.** Never use em-dashes (Unicode U+2014) in skill names, frontmatter descriptions, or skill bodies; use standard hyphens (`-`), colons, commas, or restructure sentences.
+- **Cut identity already stated in the body.** Keep the description to triggers plus any "when another skill needs..." reach clause.
+- **No em-dashes.** Never use em-dashes (Unicode U+2014) in skill names, frontmatter descriptions, or skill bodies; use standard hyphens (`-`), colons, commas, or restructure sentences. `ask skills lint --fix` can automatically sanitize em-dashes.
 
 ## Structure and progressive disclosure
 
@@ -96,7 +107,13 @@ skills/<category>/<name>/
     manual/         # hand-authored scripts, docs, references, and static files
 ```
 
-Never place a file directly in `resources/`: every resource lives under `auto/` (managed by `download-resources`, safe to wipe and reproduce) or `manual/` (yours, tooling never touches it). `skills --action lint` enforces this, and `clean-resources` deletes only `auto/`.
+Never place a file directly in `resources/`: every resource lives under `auto/` (managed by `ask skills download-resources`, safe to wipe and reproduce) or `manual/` (yours, tooling never touches it). `ask skills lint` enforces this, and `ask skills clean-resources` deletes only `auto/`.
+
+**Markdown and Linking Rules**:
+
+- **Code fence language tags (MD040)**: Never use bare triple backticks. Always declare a language tag (` ```bash `, ` ```json `, ` ```text `, ` ```rust `).
+- **Blank lines around fences (MD031)**: Every code block must be preceded and followed by a blank line, including when nested inside lists.
+- **No absolute file links**: Never use `file:///` URLs referencing local paths. Always use relative repository paths (e.g. `../../review/code-review/SKILL.md`).
 
 **Branching** is the disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A pointer's _wording_, not its target, decides when and how reliably the agent follows it - a must-have behind a weak pointer is a variance bug, so sharpen the wording before pulling material back inline.
 
@@ -165,17 +182,33 @@ Diagnose a misbehaving skill against these:
 - **Sprawl** - a skill simply too long, even when every line is live and unique. The cure is the ladder: disclose reference behind pointers, and split by branch or sequence so each path carries only what it needs.
 - **No-op** - a line the model already obeys by default, so you pay load to say nothing. The test: does it change behaviour versus the default? A weak leading word (_be thorough_) is a no-op; the fix is a stronger word (_relentless_), not a different technique.
 - **Negation** - steering by prohibition, which drags the forbidden behaviour into context and makes it _more_ available. Prompt the positive.
+- **Trigger ambiguity** - overly broad descriptions triggering on unrelated queries, or overly narrow descriptions that fail natural user prompts.
+- **Host leakage** - baking host-specific tools, internal agent built-ins, or absolute paths into general skills.
+- **Verification absence** - omitting runnable test or lint commands in completion criteria.
+
+| Failure Mode             | Bad Pattern (Anti-Pattern)                                       | Good Pattern (Remedy)                                                                                                                                                                                                                    |
+| :----------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Premature Completion** | "Make sure all files are properly formatted."                    | "Run `cargo fmt --check` and verify exit code is 0 before proceeding."                                                                                                                                                                   |
+| **Negation**             | "Do not use unwrap() or leave errors unhandled."                 | "Handle every Result branch explicitly using `match` or `?`."                                                                                                                                                                            |
+| **No-Op**                | "Be thorough and pay close attention to detail."                 | "Inspect every caller across the workspace with search tools before changing the signature."                                                                                                                                             |
+| **Duplication**          | Defining the same review checklist in three different sub-steps. | Extract the checklist into `resources/manual/CHECKLIST.md` and link via a context pointer.                                                                                                                                               |
+| **Sediment**             | Leaving references to deprecated tools or dead directories.      | Audit every line against current tooling; delete stale references aggressively.                                                                                                                                                          |
+| **Trigger Ambiguity**    | `description: Helps with tests.`                                 | `description: Write test-first unit and integration tests using red-green-refactor. Use when building a new feature test-first or fixing a bug with regression tests. Do not use for legacy untested code; use /characterization-tests.` |
+| **Host Leakage**         | "Run the OpenCode subagent tool with argument X."                | "Delegate the subtask to your agent's subagent mechanism."                                                                                                                                                                               |
+| **Verification Absence** | "Finish the task and notify the user."                           | "Run `devenv --no-tui test` and `ask skills lint`; confirm zero failures before reporting."                                                                                                                                              |
 
 Prune sentence by sentence: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive - most prose that fails should go, not be rewritten.
 
 ## After adding or renaming a skill
 
-Regenerate the derived artifacts and the router:
+Regenerate derived artifacts, verify conventions, and update the router:
 
 1. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and `policy`.
-2. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, and placement.
-3. `devenv --no-tui shell -- ask dashboard build` - regenerate the README, `agents/AGENTS.md`, and the Zola dashboard.
-4. Update the `/skill-router` index so the new or renamed skill is reachable.
+2. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, placement, links, and formatting (run with `--fix` to sanitize em-dashes).
+3. `devenv --no-tui shell -- ask skills sync` - update machine target symlinks and synchronize repository catalogs.
+4. `devenv --no-tui shell -- ask dashboard build` - compile markdown, generate search indexes, and update dashboard artifacts.
+5. Update the `/skill-router` index so the new or renamed skill is reachable.
+6. `devenv --no-tui shell -- prek run --all-files` - run git pre-commit hooks (managed via `prek`, never standalone `pre-commit`).
 
 Done when lint passes, sync leaves no further diff, and the router names the skill.
 

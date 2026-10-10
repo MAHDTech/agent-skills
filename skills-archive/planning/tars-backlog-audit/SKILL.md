@@ -42,7 +42,7 @@ Equip each subagent with:
 - **Role**: `Audit-<MODULE_NAME>` (substitute a short, alphanumeric descriptor of the audited module)
 - **Prompt**:
 
-  ````text
+  ```text
   You are auditing the following codebase module: <MODULE_PATH_OR_GLOB>
 
   Deeply analyze it for:
@@ -62,17 +62,14 @@ Equip each subagent with:
     - **Symbol**: <REQUIRED - the enclosing function, method, constant, type, or exported name,
       e.g. verifyBashPermission or ALLOWED_KEYS_BY_KIND. If the finding is genuinely file-level
       (a missing config key, an absent test file), say so explicitly instead of inventing one.>
-    - **Snippet**:
-      ```<language>
-      <exact code snippet from the file - copy it verbatim, do not paraphrase>
-      ```
+    - **Snippet**: Exact code snippet from the file (copy verbatim into a fenced code block with language identifier, do not paraphrase).
     - **Lines**: <OPTIONAL hint, e.g. 42-55. PERISHABLE - any landed change reorders the file and
       invalidates it. Never make it the only way to locate the finding.>
     - **Description**: <Detailed explanation of the issue, what standard/spec it violates, and how to fix it. Refer to the symbol by name in this prose, not to a line number.>
 
   The symbol and the snippet are the durable anchors: they survive the file moving. The line
   range does not, so it is a convenience only.
-  ````
+  ```
 
 ### 3. Synthesis & Ticket Generation (Hub Only)
 
