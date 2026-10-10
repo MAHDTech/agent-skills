@@ -20,7 +20,6 @@ skills/                       # Skill directories grouped by category
       resources/              # Optional skill-specific resources (documentation, assets, scripts, etc.)
   in-progress/                # Lifecycle bucket for work in progress
   deprecated/                 # Lifecycle bucket for retired skills
-.github/actions/              # Composite actions for CI/CD
 .github/workflows/            # GitHub Actions pipelines
 ```
 

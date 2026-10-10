@@ -191,6 +191,7 @@ savoia
 scannability
 scqa
 sculpt
+secops
 secretspec
 serde
 sess
