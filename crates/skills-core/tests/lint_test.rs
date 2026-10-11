@@ -337,3 +337,88 @@ fn test_lint_file_and_repository_end_to_end() {
     assert!(!repo_report.has_errors());
     assert_eq!(repo_report.error_count(), 0);
 }
+
+#[test]
+fn test_lint_anti_slop_frontmatter() {
+    let linter = SkillLinter::new();
+
+    let prefix_slop = build_test_skill(
+        "skills/engineering/slop-skill/SKILL.md",
+        "slop-skill",
+        SkillCategory::Engineering,
+        "slop-skill",
+        "This skill provides comprehensive guidance for writing code.",
+        "# Slop Skill\n\nClean body.",
+    );
+    let rep = linter.lint_skill(&prefix_slop);
+    assert!(rep.has_errors());
+    assert!(rep.issues.iter().any(|i| i.rule == "frontmatter-slop"));
+
+    let word_slop = build_test_skill(
+        "skills/engineering/slop-word/SKILL.md",
+        "slop-word",
+        SkillCategory::Engineering,
+        "slop-word",
+        "Build systems and delve into internals.",
+        "# Slop Word\n\nClean body.",
+    );
+    let rep = linter.lint_skill(&word_slop);
+    assert!(rep.has_errors());
+    assert!(rep.issues.iter().any(|i| i.rule == "frontmatter-slop"));
+}
+
+#[test]
+fn test_lint_anti_slop_headings() {
+    let linter = SkillLinter::new();
+
+    let bold_heading = build_test_skill(
+        "skills/engineering/bold-heading/SKILL.md",
+        "bold-heading",
+        SkillCategory::Engineering,
+        "bold-heading",
+        "Process data without errors.",
+        "# Bold Heading\n\n### 1. **Phase 1: Initial Discovery**\n\nSome body text.",
+    );
+    let rep = linter.lint_skill(&bold_heading);
+    assert!(rep.has_errors());
+    let heading_issue = rep
+        .issues
+        .iter()
+        .find(|i| i.rule == "heading-formatting")
+        .expect("heading-formatting issue should be triggered");
+    assert_eq!(heading_issue.severity, LintSeverity::Error);
+}
+
+#[test]
+fn test_lint_anti_slop_content() {
+    let linter = SkillLinter::new();
+
+    let slop_body = build_test_skill(
+        "skills/engineering/slop-body/SKILL.md",
+        "slop-body",
+        SkillCategory::Engineering,
+        "slop-body",
+        "Perform routine deployments safely.",
+        "# Deployments\n\nUtilize the deployment tool to seamlessly roll out updates.",
+    );
+    let rep = linter.lint_skill(&slop_body);
+    assert!(rep.has_errors());
+    let issues: Vec<_> = rep
+        .issues
+        .iter()
+        .filter(|i| i.rule == "no-slop-content")
+        .collect();
+    assert_eq!(issues.len(), 2); // 'utilize' and 'seamlessly'
+
+    // unslop skill itself is exempt from content-slop check
+    let unslop_skill = build_test_skill(
+        "skills/writing/unslop/SKILL.md",
+        "unslop",
+        SkillCategory::Writing,
+        "unslop",
+        "Cut AI tells, tropes, puffery, and boilerplate from any writing and add human voice.",
+        "# Unslop\n\n1. Prefer 'use' over 'utilize'. Seamlessly is an AI tell.\n",
+    );
+    let rep = linter.lint_skill(&unslop_skill);
+    assert!(!rep.issues.iter().any(|i| i.rule == "no-slop-content"));
+}
