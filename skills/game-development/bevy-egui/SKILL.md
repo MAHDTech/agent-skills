@@ -1,6 +1,6 @@
 ---
 name: bevy-egui
-description: Expert guidance for integrating egui immediate-mode GUIs into Bevy 0.19 using bevy_egui 0.40-0.42 - plugin setup, EguiPrimaryContextPass scheduling, EguiContexts, input absorption, viewport cameras, Bevy image textures, and inspector integration. Use when adding UI to Bevy games, creating debug overlays or HUDs, preventing click-through into game entities, or rendering egui to textures.
+description: Integrate egui immediate-mode GUIs into Bevy 0.19 using bevy_egui 0.40-0.42 - plugin setup, EguiPrimaryContextPass scheduling, EguiContexts, input absorption, viewport cameras, Bevy image textures, and inspector integration. Use when adding UI to Bevy games, creating debug overlays or HUDs, preventing click-through into game entities, or rendering egui to textures.
 resources:
   - https://raw.githubusercontent.com/vladbat00/bevy_egui/master/README.md
 ---

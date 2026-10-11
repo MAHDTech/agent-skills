@@ -40,7 +40,7 @@ You start machine runs, read their state, route their directives, and stop the l
   - `--audit`: Execute codebase audit at shift start (only valid with `--all`).
   - `--triage`: Execute backlog triage at shift start (only valid with `--all`; parks at human approval).
 
-The foreman session running `/tars-run-factory` must be started in a directory outside `<workspace_root>` (such as the platform workspace or an admin shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `tars-agy factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Furthermore, running `agy` inside `<workspace_root>` restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/tars-factory/`.
+The foreman session running `/tars-run-factory` must be started in a directory outside `<workspace_root>` (such as the platform workspace or an admin shell), never inside `<workspace_root>`. If an `agy` session is active inside `<workspace_root>`, `tars-agy factory` scans Linux `/proc` and aborts immediately (`workspace has existing agy processes: <pid>`) to enforce single-agy workspace ownership. Running `agy` inside `<workspace_root>` also restricts the agent security boundary to that repository, preventing inspection of `<workspace_parent>/tars-factory/`.
 
 ## Hard Rules
 

@@ -1,6 +1,6 @@
 ---
 name: casita
-description: Expert guidance for Casita, the verified content-addressed repository for immutable object graphs, source code, and build artifacts. Use when working with the casita CLI, Rust API (casita::Repository), content-addressed storage, BLAKE3 blob deduplication, canonical directory graphs, roots and retention policies, garbage collection, repository sync, Casitar archives, or importing filesystem, tar, Git, and OCI artifacts.
+description: Operate Casita, the verified content-addressed repository for immutable object graphs, source code, and build artifacts. Use when working with the casita CLI, Rust API (casita::Repository), content-addressed storage, BLAKE3 blob deduplication, canonical directory graphs, roots and retention policies, garbage collection, repository sync, Casitar archives, or importing filesystem, tar, Git, and OCI artifacts.
 resources:
   - https://casita.rs/llms.txt
 ---
