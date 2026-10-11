@@ -47,7 +47,7 @@ jobs:
         with:
           command: prepare
           commit-sha: ${{ github.sha }}
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.AGENT_SKILLS_TOKEN || github.token }}
 
   artifacts:
     name: Describe Release Artifacts
