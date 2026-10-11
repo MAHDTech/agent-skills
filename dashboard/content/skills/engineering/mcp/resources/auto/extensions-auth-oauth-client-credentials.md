@@ -409,7 +409,7 @@ The official MCP SDKs provide built-in support for client credentials authentica
   Support for this extension varies by client. Extensions are opt-in and never active by default.
 </Note>
 
-Check the [client matrix](https://modelcontextprotocol.io/extensions/client-matrix) for current implementation status across MCP clients.
+Check the [client matrix](/extensions/client-matrix) for current implementation status across MCP clients.
 
 ## Related resources
 
@@ -430,3 +430,5 @@ Check the [client matrix](https://modelcontextprotocol.io/extensions/client-matr
     JWT assertion format specification
   </Card>
 </CardGroup>
+
+

@@ -15,14 +15,14 @@ skill_name = "mcp"
 
 > Template for MCP Working Group and Interest Group charters.
 
-Every MCP Working Group and Interest Group must maintain a charter document following this structure. Charters are stored at `docs/community/working-groups/\<group-name\>.mdx` or `docs/community/interest-groups/\<group-name\>.mdx` in the [modelcontextprotocol repository](https://github.com/modelcontextprotocol/modelcontextprotocol) and added to `docs/docs.json`.
+Every MCP Working Group and Interest Group must maintain a charter document following this structure. Charters are stored at `docs/community/working-groups/<group-name>.mdx` or `docs/community/interest-groups/<group-name>.mdx` in the [modelcontextprotocol repository](https://github.com/modelcontextprotocol/modelcontextprotocol) and added to `docs/docs.json`.
 
-The charter captures information specific to your group. Governance rules — leadership requirements, decision-making process, meeting requirements, escalation paths — are defined in the [Working and Interest Groups](https://modelcontextprotocol.io/community/working-interest-groups) documentation and apply automatically. Do not repeat them here.
+The charter captures information specific to your group. Governance rules — leadership requirements, decision-making process, meeting requirements, escalation paths — are defined in the [Working and Interest Groups](/community/working-interest-groups) documentation and apply automatically. Do not repeat them here.
 
 Sections marked **(WG only)** are required for Working Groups and optional for Interest Groups.
 
 \<Note\>
-  Copy the markdown below into `docs/community/working-groups/\<group-name\>.mdx` (or `interest-groups/` for an IG) and replace the placeholder text.
+  Copy the markdown below into `docs/community/working-groups/<group-name>.mdx` (or `interest-groups/` for an IG) and replace the placeholder text.
 </Note>
 
 ***
@@ -165,3 +165,5 @@ IGs may optionally list current discussion topics or planned outputs here.
 **Interest Group:**
 
 > The Enterprise IG explores the challenges of deploying MCP in enterprise environments, gathering use cases and requirements to inform future specification work.
+
+

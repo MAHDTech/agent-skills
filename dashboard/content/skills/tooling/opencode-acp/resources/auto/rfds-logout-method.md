@@ -221,3 +221,6 @@ The RFD intentionally does not mandate a specific behavior to allow flexibility.
 * 2026-05-21: RFD marked as Completed; `logout` is stabilized
 * 2026-05-17: Moved to Preview.
 * 2026-02-02: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

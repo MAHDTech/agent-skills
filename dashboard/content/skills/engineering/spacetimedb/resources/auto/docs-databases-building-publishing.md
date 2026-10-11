@@ -7,125 +7,80 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-This guide covers how to build and publish your SpacetimeDB module.
-
-## Building Modules
-
-Before you can publish a module to SpacetimeDB, you need to build it for
-the appropriate runtime:
-
-- **Rust and C#** modules compile to WebAssembly (WASM)
-- **TypeScript** modules bundle for V8 JavaScript engine
-
-Navigate to your module directory (typically `spacetimedb/` within your
-project) and run:
-
-``` codeBlockStandalone_LlrK
-spacetime build
-```
-
-This compiles your module and validates its structure.
-
-tip
-
-If you're publishing your module, you don't need to run
-`spacetime build` separately - `spacetime publish` will automatically
-build your module if needed.
-
-For all build options, see the [`spacetime build` CLI
-reference](https://spacetimedb.com/docs/cli-reference#spacetime-build).
-
-## Publishing Modules
-
-Once you've built your module, you can publish it to create a new
-database or update an existing one.
-
-### Prerequisites
-
-Before publishing, authenticate with SpacetimeDB:
-
-``` codeBlockStandalone_LlrK
-spacetime login
-```
-
-This opens a browser window for authentication. Once complete, your
-credentials are saved locally.
-
-### Publishing a New Database
-
-To publish your module and create a new database:
-
-``` codeBlockStandalone_LlrK
-spacetime publish <DATABASE_NAME>
-```
-
-This command:
-
-1.  Builds your module (if not already built)
-2.  Creates a new database with the specified name
-3.  Uploads and installs your module
-4.  Runs the `init` lifecycle reducer (if defined)
-5.  Starts accepting client connections
-
-After publishing, SpacetimeDB outputs your database identity. **Save
-this identity** - you'll need it for administrative tasks.
-
-### Updating an Existing Database
-
-To update a module that's already published:
-
-``` codeBlockStandalone_LlrK
-spacetime publish <DATABASE_NAME>
-```
-
-SpacetimeDB will:
-
-1.  Build your module
-2.  Attempt to automatically migrate the schema
-3.  Swap in the new module atomically
-4.  Maintain active client connections
-
-#### Breaking Changes
-
-If your update includes breaking changes that cannot be automatically
-migrated:
-
-``` codeBlockStandalone_LlrK
-spacetime publish --break-clients <DATABASE_NAME>
-```
-
-⚠️ **Warning:** This will break existing clients that haven't been
-updated to match your new schema.
-
-If this publish is a major upgrade from 1.x to 2.0, read [1.x to 2.0
-Upgrade Notes](https://spacetimedb.com/docs/upgrade) first.
-
-#### Clearing Data
-
-To completely reset your database and delete all data:
-
-``` codeBlockStandalone_LlrK
-spacetime publish <DATABASE_NAME> --delete-data
-```
-
-⚠️ **Warning:** This permanently deletes all data in your database!
-
-### Publishing Options
-
-For all available publishing options and flags, see the
-[`spacetime publish` CLI
-reference](https://spacetimedb.com/docs/cli-reference#spacetime-publish).
-
-## Next Steps
-
-After publishing:
-
-- Learn about [connecting a client](https://spacetimedb.com/docs/clients) to your database
-- Learn about [Tables](https://spacetimedb.com/docs/tables),
-  [Reducers](https://spacetimedb.com/docs/functions/reducers), and
-  [Procedures](https://spacetimedb.com/docs/functions/procedures)
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/databases/spacetime-publish" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">spacetime publish | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/databases/building-publishing"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="spacetime publish | SpacetimeDB docs"><meta data-rh="true" name="description" content="This guide covers how to build and publish your SpacetimeDB module."><meta data-rh="true" property="og:description" content="This guide covers how to build and publish your SpacetimeDB module."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/databases/building-publishing"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/building-publishing" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/building-publishing" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Databases","item":"https://spacetimedb.com/docs/databases"},{"@type":"ListItem","position":2,"name":"spacetime publish","item":"https://spacetimedb.com/docs/databases/building-publishing"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/databases/building-publishing">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/databases/building-publishing">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/databases/building-publishing">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Collapse sidebar category &#x27;Databases&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/transactions-atomicity"><span title="Transactions and Atomicity" class="linkLabel_UvDg">Transactions and Atomicity</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/developing"><span title="spacetime dev" class="linkLabel_UvDg">spacetime dev</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/databases/building-publishing"><span title="spacetime publish" class="linkLabel_UvDg">spacetime publish</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/cheat-sheet"><span title="Cheat Sheet" class="linkLabel_UvDg">Cheat Sheet</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/databases/automatic-migrations"><span title="Migrations" class="categoryLinkLabel_HATI">Migrations</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/submodules"><span title="Submodules" class="linkLabel_UvDg">Submodules</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/databases"><span>Databases</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">spacetime publish</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\><code>spacetime publish</code></h1></header>
+<p>This guide covers how to build and publish your SpacetimeDB module.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="building-modules">Building Modules<a href="#building-modules" class="hash-link" aria-label="Direct link to Building Modules" title="Direct link to Building Modules" translate="no">​</a></h2>
+<p>Before you can publish a module to SpacetimeDB, you need to build it for the appropriate runtime:</p>
+\<ul\>
+<li class=""><strong>Rust and C#</strong> modules compile to WebAssembly (WASM)</li>
+<li class=""><strong>TypeScript</strong> modules bundle for V8 JavaScript engine</li>
+</ul>
+<p>Navigate to your module directory (typically <code>spacetimedb/</code> within your project) and run:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> build</span></span></code></pre>
+<p>This compiles your module and validates its structure.</p>
+<div class="theme-admonition theme-admonition-tip admonition_Ph9R alert alert--success"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_STxx"><p>If you&#x27;re publishing your module, you don&#x27;t need to run <code>spacetime build</code> separately - <code>spacetime publish</code> will automatically build your module if needed.</p></div></div>
+<p>For all build options, see the <a class="" href="/docs/cli-reference#spacetime-build"><code>spacetime build</code> CLI reference</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="publishing-modules">Publishing Modules<a href="#publishing-modules" class="hash-link" aria-label="Direct link to Publishing Modules" title="Direct link to Publishing Modules" translate="no">​</a></h2>
+<p>Once you&#x27;ve built your module, you can publish it to create a new database or update an existing one.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h3>
+<p>Before publishing, authenticate with SpacetimeDB:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span></span></code></pre>
+<p>This opens a browser window for authentication. Once complete, your credentials are saved locally.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="publishing-a-new-database">Publishing a New Database<a href="#publishing-a-new-database" class="hash-link" aria-label="Direct link to Publishing a New Database" title="Direct link to Publishing a New Database" translate="no">​</a></h3>
+<p>To publish your module and create a new database:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre>
+<p>This command:</p>
+\<ol\>
+<li class="">Builds your module (if not already built)</li>
+<li class="">Creates a new database with the specified name</li>
+<li class="">Uploads and installs your module</li>
+<li class="">Runs the <code>init</code> lifecycle reducer (if defined)</li>
+<li class="">Starts accepting client connections</li>
+</ol>
+<p>After publishing, SpacetimeDB outputs your database identity. <strong>Save this identity</strong> - you&#x27;ll need it for administrative tasks.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="updating-an-existing-database">Updating an Existing Database<a href="#updating-an-existing-database" class="hash-link" aria-label="Direct link to Updating an Existing Database" title="Direct link to Updating an Existing Database" translate="no">​</a></h3>
+<p>To update a module that&#x27;s already published:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre>
+<p>SpacetimeDB will:</p>
+\<ol\>
+<li class="">Build your module</li>
+<li class="">Attempt to automatically migrate the schema</li>
+<li class="">Swap in the new module atomically</li>
+<li class="">Maintain active client connections</li>
+</ol>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="breaking-changes">Breaking Changes<a href="#breaking-changes" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h4>
+<p>If your update includes breaking changes that cannot be automatically migrated:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#BD93F9"> --break-clients</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre>
+<p>⚠️ <strong>Warning:</strong> This will break existing clients that haven&#x27;t been updated to match your new schema.</p>
+<p>If this publish is a major upgrade from 1.x to 2.0, read <a class="" href="/docs/upgrade">1.x to 2.0 Upgrade Notes</a> first.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="clearing-data">Clearing Data<a href="#clearing-data" class="hash-link" aria-label="Direct link to Clearing Data" title="Direct link to Clearing Data" translate="no">​</a></h4>
+<p>To completely reset your database and delete all data:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#BD93F9"> --delete-data</span></span></code></pre>
+<p>⚠️ <strong>Warning:</strong> This permanently deletes all data in your database!</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="publishing-options">Publishing Options<a href="#publishing-options" class="hash-link" aria-label="Direct link to Publishing Options" title="Direct link to Publishing Options" translate="no">​</a></h3>
+<p>For all available publishing options and flags, see the <a class="" href="/docs/cli-reference#spacetime-publish"><code>spacetime publish</code> CLI reference</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+<p>After publishing:</p>
+\<ul\>
+<li class="">Learn about <a class="" href="/docs/clients">connecting a client</a> to your database</li>
+<li class="">Learn about <a class="" href="/docs/tables">Tables</a>, <a class="" href="/docs/functions/reducers">Reducers</a>, and <a class="" href="/docs/functions/procedures">Procedures</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00100-databases/00300-spacetime-publish.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/databases/developing"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">spacetime dev</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/databases/cheat-sheet"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Cheat Sheet</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#building-modules" class="table-of-contents__link toc-highlight">Building Modules</a></li>\<li\><a href="#publishing-modules" class="table-of-contents__link toc-highlight">Publishing Modules</a>\<ul\>\<li\><a href="#prerequisites" class="table-of-contents__link toc-highlight">Prerequisites</a></li>\<li\><a href="#publishing-a-new-database" class="table-of-contents__link toc-highlight">Publishing a New Database</a></li>\<li\><a href="#updating-an-existing-database" class="table-of-contents__link toc-highlight">Updating an Existing Database</a></li>\<li\><a href="#publishing-options" class="table-of-contents__link toc-highlight">Publishing Options</a></li></ul></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

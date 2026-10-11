@@ -27,7 +27,7 @@ Each resource is uniquely identified by a
   `io.modelcontextprotocol/clientInfo`, and
   `io.modelcontextprotocol/clientCapabilities`). Every request **MUST** include
   the required `_meta` fields; see
-  [`_meta`](https://modelcontextprotocol.io/specification/2026-07-28/basic/index#meta).
+  [`_meta`](/specification/2026-07-28/basic/index#meta).
 </Note>
 
 ## User Interaction Model
@@ -72,7 +72,7 @@ The capability supports two optional features:
 
 Servers may advertise either feature independently, together or neither.
 
-Serves that support neither `listChanged` or `subscribe` may omit it:
+Servers that support neither `listChanged` nor `subscribe` may omit it:
 
 ```json theme={null}
 {
@@ -96,7 +96,7 @@ per-request input, not connection state.
 ### Listing Resources
 
 To discover available resources, clients send a `resources/list` request. This operation
-supports [pagination](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/pagination) and [caching](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/caching).
+supports [pagination](/specification/2026-07-28/server/utilities/pagination) and [caching](/specification/2026-07-28/server/utilities/caching).
 
 **Request:**
 
@@ -145,7 +145,7 @@ supports [pagination](https://modelcontextprotocol.io/specification/2026-07-28/s
 ### Reading Resources
 
 To retrieve resource contents, clients send a `resources/read` request. This operation
-supports [caching](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/caching).
+supports [caching](/specification/2026-07-28/server/utilities/caching).
 
 **Request:**
 
@@ -185,7 +185,7 @@ Servers **MAY** return multiple resource contents in response to a single
 `resources/read` request. For example, a server could return the contents of
 several files when a directory resource is read.
 
-Servers **MAY** also respond to `resources/read` with an [`InputRequiredResult`](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr#inputrequiredresult) to indicate that additional input is needed before the resource can be read. This follows the [multi round-trip requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr#multi-round-trip-requests) mechanism. When retrying the request, clients include `inputResponses` and, if provided by the server, `requestState` in the request parameters.
+Servers **MAY** also respond to `resources/read` with an [`InputRequiredResult`](/specification/2026-07-28/basic/patterns/mrtr#inputrequiredresult) to indicate that additional input is needed before the resource can be read. This follows the [multi round-trip requests](/specification/2026-07-28/basic/patterns/mrtr#multi-round-trip-requests) mechanism. When retrying the request, clients include `inputResponses` and, if provided by the server, `requestState` in the request parameters.
 
 Alternatively, if the scheme of `uri` is `https://`, clients may fetch the resource directly from the web. See the [Common URI Schemes section](#https%3A%2F%2F) for more information.
 
@@ -193,8 +193,8 @@ Alternatively, if the scheme of `uri` is `https://`, clients may fetch the resou
 
 Resource templates allow servers to expose parameterized resources using
 [URI templates](https://datatracker.ietf.org/doc/html/rfc6570). Arguments may be
-auto-completed through [the completion API](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/completion).
-This operation supports [pagination](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/pagination) and [caching](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/caching).
+auto-completed through [the completion API](/specification/2026-07-28/server/utilities/completion).
+This operation supports [pagination](/specification/2026-07-28/server/utilities/pagination) and [caching](/specification/2026-07-28/server/utilities/caching).
 
 **Request:**
 
@@ -445,3 +445,5 @@ Example error:
 4. Resource permissions **SHOULD** be checked before operations
 5. Servers **MUST** sanitize file paths to prevent directory traversal attacks
    when serving `file://` resources
+
+

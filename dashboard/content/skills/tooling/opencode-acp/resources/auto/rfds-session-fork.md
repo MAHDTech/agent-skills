@@ -109,3 +109,6 @@ None. This proposal is inspired by the abilities exposed in Claude Agent SDK. It
 * 2025-11-17: Mentioned capabilities format, updated FAQ.
 * 2025-11-20: Added request format and updated capabilities format.
 * 2025-12-10: Adjust fork options to align with `session/load`.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

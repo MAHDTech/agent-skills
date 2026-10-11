@@ -12,7 +12,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-searchbox\>
+# <pagefind-searchbox>
 
 
 An all-in-one search component combining input, results dropdown, and keyboard navigation. Results appear in a floating dropdown below the input and load their full data only when scrolled into view using the Intersection Observer API.
@@ -54,7 +54,7 @@ By default, the searchbox listens for `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) 
 <pagefind-searchbox hide-shortcut></pagefind-searchbox>
 ```
 
-The `shortcut` attribute accepts the same syntax as [`<pagefind-modal-trigger>`](https://pagefind.app/docs/components/modal-trigger/#customizing-the-shortcut).
+The `shortcut` attribute accepts the same syntax as [`<pagefind-modal-trigger>`](/docs/components/modal-trigger/#customizing-the-shortcut).
 
 ## Keyboard Navigation
 
@@ -99,7 +99,7 @@ The full templating syntax can be seen in the [adequate-little-templates](https:
 | `meta.title` | Page title |
 | `meta.url` | Page URL |
 | `meta.*` | Any custom metadata |
-| `excerpt` | Search excerpt with `<mark>` highlighting (use `{{+ excerpt +}}`) |
+| `excerpt` | Search excerpt with `\<mark\>` highlighting (use `{{+ excerpt +}}`) |
 | `url` | Fallback URL |
 | `sub_results` | Array of matching sections (when `show-sub-results` is set) |
 | `options.show_sub_results` | Whether `show-sub-results` is set on the searchbox |
@@ -156,3 +156,5 @@ The searchbox implements the [ARIA combobox](https://www.w3.org/WAI/ARIA/apg/pat
 - The root element of your template must have `role="option"` or `role="group"`
 - Without sub-results, your template root is the `<a role="option">` itself
 - With sub-results, your template root is a `role="group"` element wrapping the main result and its sub-results together, with each navigable item as a `role="option"` child (as shown in the full template above)
+
+

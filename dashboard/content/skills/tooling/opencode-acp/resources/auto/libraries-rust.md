@@ -46,3 +46,6 @@ You can read the full documentation for the `agent-client-protocol` crate on
 
 The `agent-client-protocol` crate powers the integration with external agents in
 the [Zed](https://zed.dev) editor.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

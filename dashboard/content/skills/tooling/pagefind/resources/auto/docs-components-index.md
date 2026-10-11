@@ -57,21 +57,23 @@ Components with the same `instance` value share state. Components with different
 
 These components provide complete, ready-to-use search interfaces:
 
-- **[Modal](https://pagefind.app/docs/components/modal/)** — A dialog search with keyboard navigation. Supports custom inner structure
-- **[Modal Trigger](https://pagefind.app/docs/components/modal-trigger/)** — A button that opens the modal
-- **[Searchbox](https://pagefind.app/docs/components/searchbox/)** — A compact dropdown search
+- **[Modal](/docs/components/modal/)** — A dialog search with keyboard navigation. Supports custom inner structure
+- **[Modal Trigger](/docs/components/modal-trigger/)** — A button that opens the modal
+- **[Searchbox](/docs/components/searchbox/)** — A compact dropdown search
 
 ### Building Blocks
 
 These components can be composed together for custom layouts:
 
-- **[Input](https://pagefind.app/docs/components/input/)** — The search text field
-- **[Results](https://pagefind.app/docs/components/results/)** — The list of search results
-- **[Summary](https://pagefind.app/docs/components/summary/)** — Shows result count and search status
-- **[Keyboard Hints](https://pagefind.app/docs/components/keyboard-hints/)** — Shows contextual keyboard shortcuts
-- **[Filter Dropdown](https://pagefind.app/docs/components/filter-dropdown/)** — A dropdown to filter by a specific facet
-- **[Filter Pane](https://pagefind.app/docs/components/filter-pane/)** — A sidebar-style filter panel with checkboxes
+- **[Input](/docs/components/input/)** — The search text field
+- **[Results](/docs/components/results/)** — The list of search results
+- **[Summary](/docs/components/summary/)** — Shows result count and search status
+- **[Keyboard Hints](/docs/components/keyboard-hints/)** — Shows contextual keyboard shortcuts
+- **[Filter Dropdown](/docs/components/filter-dropdown/)** — A dropdown to filter by a specific facet
+- **[Filter Pane](/docs/components/filter-pane/)** — A sidebar-style filter panel with checkboxes
 
 ### Configuration
 
-- **[Config](https://pagefind.app/docs/components/config/)** — Set options for the Component UI, or for Pagefind itself
+- **[Config](/docs/components/config/)** — Set options for the Component UI, or for Pagefind itself
+
+

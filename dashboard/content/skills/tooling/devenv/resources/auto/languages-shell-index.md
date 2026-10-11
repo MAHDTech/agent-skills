@@ -1,0 +1,72 @@
++++
+title = "languages-shell-index"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+# shell
+
+## Options
+
+### languages.shell.enable
+
+Whether to enable tools for shell development.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+false
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/shell.nix>
+
+### languages.shell.lsp.enable
+
+Whether to enable Shell Language Server.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+true
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/shell.nix>
+
+### languages.shell.lsp.package
+
+The Shell language server package to use.
+
+*Type:* package
+
+*Default:*
+
+```nix
+pkgs.bash-language-server
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/shell.nix>

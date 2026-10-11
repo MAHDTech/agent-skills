@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                         |
-| ------------- | ----------------------------------------------------------------------------- |
-| **SEP**       | 414                                                                           |
-| **Title**     | Document OpenTelemetry Trace Context Propagation Conventions                  |
-| **Status**    | Final                                                                         |
-| **Type**      | Standards Track                                                               |
-| **Created**   | 2025-04-25                                                                    |
-| **Author(s)** | Adrian Cole ([@codefromthecrypt](https://github.com/codefromthecrypt))        |
-| **Sponsor**   | Marcelo Trylesinski ([@Kludex](https://github.com/Kludex))                    |
-| **PR**        | [#414](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/414) |
+| Field | Value |
+| - | - |
+| **SEP** | 414 |
+| **Title** | Document OpenTelemetry Trace Context Propagation Conventions |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-04-25 |
+| **Author(s)** | Adrian Cole ([@codefromthecrypt](https://github.com/codefromthecrypt)) |
+| **Sponsor** | Marcelo Trylesinski ([@Kludex](https://github.com/Kludex)) |
+| **PR** | [#414](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/414) |
 
 ***
 
@@ -133,3 +133,5 @@ Existing implementations using this pattern:
 * [Envoy AI Gateway](https://github.com/envoyproxy/ai-gateway/blob/6331b54aef81dd6c8d3d184acc4e2cb8167cea2a/internal/tracing/tracingapi/mcp.go)
 * [Logfire](https://github.com/pydantic/logfire/blob/09232402fd7e268c667db59d1e9f890ed30f7850/logfire/_internal/integrations/mcp.py#L149-L162)
 * [ToolHive](https://github.com/stacklok/toolhive/issues/3399)
+
+

@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                         |
-| ------------- | ----------------------------------------------------------------------------- |
-| **SEP**       | 986                                                                           |
-| **Title**     | Specify Format for Tool Names                                                 |
-| **Status**    | Final                                                                         |
-| **Type**      | Standards Track                                                               |
-| **Created**   | 2025-07-16                                                                    |
-| **Author(s)** | kentcdodds                                                                    |
-| **Sponsor**   | None                                                                          |
-| **PR**        | [#986](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/986) |
+| Field | Value |
+| - | - |
+| **SEP** | 986 |
+| **Title** | Specify Format for Tool Names |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-16 |
+| **Author(s)** | kentcdodds |
+| **Sponsor** | None |
+| **PR** | [#986](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/986) |
 
 ***
 
@@ -92,3 +92,5 @@ A reference implementation can be provided by updating the MCP core library to e
 ## Security Implications
 
 None. Standardizing tool name format does not introduce new security risks.
+
+

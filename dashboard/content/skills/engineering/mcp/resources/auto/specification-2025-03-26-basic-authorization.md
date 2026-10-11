@@ -169,11 +169,11 @@ For servers that do not implement OAuth 2.0 Authorization Server Metadata, clien
 **MUST** use the following default endpoint paths relative to the [authorization base
 URL](#authorization-base-url):
 
-| Endpoint               | Default Path | Description                          |
-| ---------------------- | ------------ | ------------------------------------ |
-| Authorization Endpoint | /authorize   | Used for authorization requests      |
-| Token Endpoint         | /token       | Used for token exchange & refresh    |
-| Registration Endpoint  | /register    | Used for dynamic client registration |
+| Endpoint | Default Path | Description |
+| - | - | - |
+| Authorization Endpoint | /authorize | Used for authorization requests |
+| Token Endpoint | /token | Used for token exchange & refresh |
+| Registration Endpoint | /register | Used for dynamic client registration |
 
 For example, with an MCP server hosted at `https://api.example.com/v1/mcp`, the default
 endpoints would be:
@@ -317,11 +317,11 @@ The following security requirements **MUST** be implemented:
 
 Servers **MUST** return appropriate HTTP status codes for authorization errors:
 
-| Status Code | Description  | Usage                                      |
-| ----------- | ------------ | ------------------------------------------ |
-| 401         | Unauthorized | Authorization required or token invalid    |
-| 403         | Forbidden    | Invalid scopes or insufficient permissions |
-| 400         | Bad Request  | Malformed authorization request            |
+| Status Code | Description | Usage |
+| - | - | - |
+| 401 | Unauthorized | Authorization required or token invalid |
+| 403 | Forbidden | Invalid scopes or insufficient permissions |
+| 400 | Bad Request | Malformed authorization request |
 
 ### Implementation Requirements
 
@@ -415,3 +415,5 @@ Since clients do not know the set of MCP servers in advance, we strongly recomme
 implementation of dynamic client registration. This allows applications to automatically
 register with the MCP server, and removes the need for users to obtain client ids
 manually.
+
+

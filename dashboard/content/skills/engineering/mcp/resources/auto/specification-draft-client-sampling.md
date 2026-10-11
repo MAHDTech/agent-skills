@@ -19,12 +19,12 @@ skill_name = "mcp"
   **Deprecated**: The Sampling feature is deprecated as of protocol version
   `2026-07-28`
   ([SEP-2577](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2577)).
-  Under the [feature lifecycle policy](https://modelcontextprotocol.io/community/feature-lifecycle), it remains
+  Under the [feature lifecycle policy](/community/feature-lifecycle), it remains
   in the specification for at least twelve months after this revision's release
   before it becomes eligible for removal. New implementations **SHOULD NOT**
   adopt it; existing implementations **SHOULD** migrate to integrating directly
   with LLM provider APIs. See the [deprecated features
-  registry](https://modelcontextprotocol.io/specification/draft/deprecated).
+  registry](/specification/draft/deprecated).
 </Warning>
 
 The Model Context Protocol (MCP) provides a standardized way for servers to request LLM
@@ -108,13 +108,13 @@ Clients that support sampling **MUST** declare the `sampling` capability in
 \<Note\>
   The `includeContext` parameter values `"thisServer"` and `"allServers"` are
   deprecated under the [feature lifecycle
-  policy](https://modelcontextprotocol.io/community/feature-lifecycle#deprecating-a-feature)
+  policy](/community/feature-lifecycle#deprecating-a-feature)
   ([SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596));
   they will be removed no later than the Sampling feature itself. Servers
   **SHOULD** avoid using these values (e.g. can just omit `includeContext` since
   it defaults to `"none"`), and **SHOULD NOT** use them unless the client
   declares `sampling.context` capability. See the [deprecated features
-  registry](https://modelcontextprotocol.io/specification/draft/deprecated).
+  registry](/specification/draft/deprecated).
 </Note>
 
 ## Protocol Messages
@@ -123,7 +123,7 @@ Clients that support sampling **MUST** declare the `sampling` capability in
 
 To request a language model generation during the processing of a client request, servers send an `InputRequiredResult` containing a `sampling/createMessage` request:
 
-**Input request (delivered inside [`InputRequiredResult.inputRequests`](https://modelcontextprotocol.io/specification/draft/basic/patterns/mrtr#inputrequests)):**
+**Input request (delivered inside [`InputRequiredResult.inputRequests`](/specification/draft/basic/patterns/mrtr#inputrequests)):**
 
 ```json theme={null}
 {
@@ -688,3 +688,5 @@ When tools are used in sampling, additional security considerations apply:
 
 6. Servers **MUST** ensure that when replying to a `stopReason: "toolUse"`, each `ToolUseContent` item is responded to with a `ToolResultContent` item with a matching `toolUseId`, and that the user message contains only tool results (no other content types)
 7. Both parties **SHOULD** implement iteration limits for tool loops
+
+

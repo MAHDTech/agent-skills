@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1034                                                                            |
-| **Title**     | Support default values for all primitive types in elicitation schemas           |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-07-22                                                                      |
-| **Author(s)** | Tapan Chugh (chugh.tapan[@gmail](https://github.com/gmail).com)                 |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1034](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1034) |
+| Field | Value |
+| - | - |
+| **SEP** | 1034 |
+| **Title** | Support default values for all primitive types in elicitation schemas |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-22 |
+| **Author(s)** | Tapan Chugh (chugh.tapan[@gmail](https://github.com/gmail).com) |
+| **Sponsor** | None |
+| **PR** | [#1034](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1034) |
 
 ***
 
@@ -181,3 +181,5 @@ No new security concerns:
 1. **No Sensitive Data**: The existing guidance against requesting sensitive information still applies
 2. **Client Control**: Clients retain full control over what data is sent to servers
 3. **User Visibility**: Default values are visible to users who can modify them before submission
+
+

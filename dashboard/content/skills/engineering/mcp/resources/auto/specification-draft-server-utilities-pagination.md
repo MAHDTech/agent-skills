@@ -29,7 +29,7 @@ data sets.
   `io.modelcontextprotocol/clientInfo`, and
   `io.modelcontextprotocol/clientCapabilities`). Every request **MUST** include
   the required `_meta` fields; see
-  [`_meta`](https://modelcontextprotocol.io/specification/draft/basic/index#meta).
+  [`_meta`](/specification/draft/basic/index#meta).
 </Note>
 
 ## Pagination Model
@@ -120,3 +120,5 @@ The following MCP operations support pagination:
 ## Error Handling
 
 Invalid cursors **SHOULD** result in an error with code -32602 (Invalid params).
+
+

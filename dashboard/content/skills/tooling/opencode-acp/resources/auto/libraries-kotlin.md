@@ -37,3 +37,6 @@ dependencies {
 ```
 
 The [sample](https://github.com/agentclientprotocol/kotlin-sdk/tree/master/samples/kotlin-acp-client-sample) demonstrates how to implement both sides of the protocol.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1730                                                                            |
-| **Title**     | SDKs Tiering System                                                             |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-10-29                                                                      |
-| **Author(s)** | Inna Harper, Felix Weinberger                                                   |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1730](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1730) |
+| Field | Value |
+| - | - |
+| **SEP** | 1730 |
+| **Title** | SDKs Tiering System |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-10-29 |
+| **Author(s)** | Inna Harper, Felix Weinberger |
+| **Sponsor** | None |
+| **PR** | [#1730](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1730) |
 
 ***
 
@@ -152,12 +152,12 @@ sequenceDiagram
 
 ### Requirements matrix
 
-| Feature                                           | SDK A   | SDK B    | SDK C  |
-| :------------------------------------------------ | :------ | :------- | :----- |
-| **Protocol Features support (Conformance tests)** | 85%     | 60%%     | 100%   |
-| **GitHub support stats**                          | 10 days | 100 days | 5 days |
-| **Documentation (self reported)**                 | Good    | Minimal  | Good   |
-| **Tier (computed from above)**                    | Tier 2  | Tier 3   | Tier 1 |
+| Feature | SDK A | SDK B | SDK C |
+| :- | :- | :- | :- |
+| **Protocol Features support (Conformance tests)** | 85% | 60%% | 100% |
+| **GitHub support stats** | 10 days | 100 days | 5 days |
+| **Documentation (self reported)** | Good | Minimal | Good |
+| **Tier (computed from above)** | Tier 2 | Tier 3 | Tier 1 |
 
 ## Rationale
 
@@ -285,3 +285,5 @@ The most straightforward approach is to have an Example Server for each SDK, sim
 Given well defined spec for the server and SDK documentation, it should be easy to implement it with the help of any coding agent. We want to check it into each SDKs repo as it will serve as an example for server implementers.
 
 Once each SDK has an Everything server, we will run the Conformance Test Client against it.
+
+

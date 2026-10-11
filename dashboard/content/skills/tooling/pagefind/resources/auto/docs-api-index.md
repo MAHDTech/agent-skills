@@ -49,7 +49,7 @@ pagefind.init();
 
 Calls to `pagefind.options` may also be made after initialization, however passing in settings such as `bundlePath` after initialization will have no impact.
 
-See all available options in [Configuring the Pagefind search in the browser](https://pagefind.app/docs/search-config/).
+See all available options in [Configuring the Pagefind search in the browser](/docs/search-config/).
 
 ## Searching
 
@@ -73,7 +73,7 @@ This will return an object with the following structure:
 
 At this point you will have access to the number of search results, and a unique ID for each result. Also see [Debounced search](#debounced-search) below for an alternative API.
 
-> Note that the prefix `en` in `en_6fceec9` matches the `lang` attribute of your `html` element. If `lang` is not set, the prefix defaults to `unknown`. See [Multilingual Search](https://pagefind.app/docs/multilingual/) for more details.
+> Note that the prefix `en` in `en_6fceec9` matches the `lang` attribute of your `html` element. If `lang` is not set, the prefix defaults to `unknown`. See [Multilingual Search](/docs/multilingual/) for more details.
 
 ## Loading a result
 
@@ -214,11 +214,11 @@ const search = await pagefind.search("static", {
 });
 ```
 
-See [Filtering using the Pagefind JavaScript API](https://pagefind.app/docs/js-api-filtering/) for more details and functionality.
+See [Filtering using the Pagefind JavaScript API](/docs/js-api-filtering/) for more details and functionality.
 
 ## Sorting results
 
-If pages on your site have been tagged with [sort attributes](https://pagefind.app/docs/sorts/), a `sort` object can be provided to Pagefind when searching:
+If pages on your site have been tagged with [sort attributes](/docs/sorts/), a `sort` object can be provided to Pagefind when searching:
 
 ```js
 const search = await pagefind.search("static", {
@@ -228,7 +228,7 @@ const search = await pagefind.search("static", {
 });
 ```
 
-See [Sorting using the Pagefind JavaScript API](https://pagefind.app/docs/js-api-sorting/) for more details and functionality.
+See [Sorting using the Pagefind JavaScript API](/docs/js-api-sorting/) for more details and functionality.
 
 ## Re-initializing the search API
 
@@ -255,3 +255,5 @@ await pagefind.search( /* ... */ );
 Calling `pagefind.destroy()` will unload the active Pagefind, and also forget anything that was passed through `pagefind.options()`, resetting to the blank state after the script was first imported.
 
 After being destroyed, initializing Pagefind will look again at the active language, and use any new options you might pass in.
+
+

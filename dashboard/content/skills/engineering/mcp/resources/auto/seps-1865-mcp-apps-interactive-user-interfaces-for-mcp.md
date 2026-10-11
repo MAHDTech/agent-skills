@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **SEP**       | 1865                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| **Title**     | MCP Apps - Interactive User Interfaces for MCP                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| **Status**    | Final                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Type**      | Extensions Track                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Created**   | 2025-11-21                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Field | Value |
+| - | - |
+| **SEP** | 1865 |
+| **Title** | MCP Apps - Interactive User Interfaces for MCP |
+| **Status** | Final |
+| **Type** | Extensions Track |
+| **Created** | 2025-11-21 |
 | **Author(s)** | Ido Salomon ([@idosal](https://github.com/idosal)), Liad Yosef ([@liadyosef](https://github.com/liadyosef)), Olivier Chafik ([@olivierchafik](https://github.com/olivierchafik)), Jerome Swannack ([@jeromeswannack](https://github.com/jeromeswannack)), Jonathan Hefner ([@jonathanhefner](https://github.com/jonathanhefner)), Anton Pidkuiko ([@antonpidkuiko](https://github.com/antonpidkuiko)), Nick Cooper ([@nickcooper](https://github.com/nickcooper)), Bryan Ashley ([@bryanashley](https://github.com/bryanashley)), Alexi Christakis ([@alexichristakis](https://github.com/alexichristakis)) |
-| **Sponsor**   | None (seeking sponsor)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| **PR**        | [#1865](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1865)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Sponsor** | None (seeking sponsor) |
+| **PR** | [#1865](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1865) |
 
 ***
 
@@ -182,3 +182,5 @@ A full threat model analysis and mitigations are available in the
   in this spec.
 * [ext-apps](https://github.com/modelcontextprotocol/ext-apps) repository contains a prototype
   implementation by Olivier Chafik.
+
+

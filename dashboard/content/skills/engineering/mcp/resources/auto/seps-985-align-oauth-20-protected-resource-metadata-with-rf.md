@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                         |
-| ------------- | ----------------------------------------------------------------------------- |
-| **SEP**       | 985                                                                           |
-| **Title**     | Align OAuth 2.0 Protected Resource Metadata with RFC 9728                     |
-| **Status**    | Final                                                                         |
-| **Type**      | Standards Track                                                               |
-| **Created**   | 2025-07-16                                                                    |
-| **Author(s)** | sunishsheth2009                                                               |
-| **Sponsor**   | None                                                                          |
-| **PR**        | [#985](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/985) |
+| Field | Value |
+| - | - |
+| **SEP** | 985 |
+| **Title** | Align OAuth 2.0 Protected Resource Metadata with RFC 9728 |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-16 |
+| **Author(s)** | sunishsheth2009 |
+| **Sponsor** | None |
+| **PR** | [#985](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/985) |
 
 ***
 
@@ -134,3 +134,5 @@ This proposal is fully backward-compatible.
 It retains support for the WWW-Authenticate header (already in the spec) and introduces a fallback mechanism using the .well-known metadata path, which is already defined in MCP as a MUST-support location.
 
 Clients that already support metadata probing benefit from improved interoperability. Servers are not required to emit the WWW-Authenticate header if it is infeasible, but doing so is still encouraged to reduce client complexity and enable future extensibility.
+
+

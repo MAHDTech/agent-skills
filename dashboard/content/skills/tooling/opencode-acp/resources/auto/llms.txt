@@ -51,52 +51,54 @@
 - [Rust](https://agentclientprotocol.com/libraries/rust.md): Rust library for the Agent Client Protocol
 - [TypeScript](https://agentclientprotocol.com/libraries/typescript.md): TypeScript library for the Agent Client Protocol
 - [Community](https://agentclientprotocol.com/libraries/community.md): Community managed libraries for the Agent Client Protocol
+- [Testing](https://agentclientprotocol.com/libraries/testing.md): Check an agent implementation against the Agent Client Protocol
 - [Requests for Dialog (RFDs)](https://agentclientprotocol.com/rfds/about.md): Our process for introducing changes to the protocol
 - [RFD Updates](https://agentclientprotocol.com/rfds/updates.md): Lifecycle updates for ACP Requests for Dialog
 - [Forking of existing sessions](https://agentclientprotocol.com/rfds/session-fork.md)
 - [Agent Extensions via ACP Proxies](https://agentclientprotocol.com/rfds/proxy-chains.md)
-- [MCP-over-ACP: MCP Transport via ACP Channels](https://agentclientprotocol.com/rfds/mcp-over-acp.md)
-- [End-Turn Token Usage](https://agentclientprotocol.com/rfds/end-turn-token-usage.md)
+- [MCP-over-ACP: Stateless MCP Requests over ACP](https://agentclientprotocol.com/rfds/mcp-over-acp.md)
 - [Represent deleted files in diff](https://agentclientprotocol.com/rfds/diff-delete.md)
-- [Next Edit Suggestions](https://agentclientprotocol.com/rfds/next-edit-suggestions.md)
 - [Configurable LLM Providers](https://agentclientprotocol.com/rfds/custom-llm-endpoint.md)
 - [Plan Operations Support](https://agentclientprotocol.com/rfds/plan-operations.md)
-- [Tool Call Name](https://agentclientprotocol.com/rfds/tool-call-name.md)
+- [End-Turn Token Usage](https://agentclientprotocol.com/rfds/end-turn-token-usage.md)
 - [Agent Authentication State Query](https://agentclientprotocol.com/rfds/get-auth-state.md)
-- [Session Compaction](https://agentclientprotocol.com/rfds/session-compaction.md)
-- [Session Notices](https://agentclientprotocol.com/rfds/session-notices.md)
+- [Subagent Sessions](https://agentclientprotocol.com/rfds/subagents.md): RFD for exposing agent-created subagents as restricted ACP sessions
 - [Streamable HTTP & WebSocket Transport](https://agentclientprotocol.com/rfds/streamable-http-websocket-transport.md)
 - [ACP v2 Proposal](https://agentclientprotocol.com/rfds/v2/overview.md)
 - [v2 Prompt Lifecycle](https://agentclientprotocol.com/rfds/v2/prompt.md)
 - [v2 Enum Variant Extension](https://agentclientprotocol.com/rfds/v2/enum-variant-extension.md)
-- [v2 Required Session Methods](https://agentclientprotocol.com/rfds/v2/required-session-methods.md)
-- [v2 Session Resume Replay](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md)
 - [v2 Client Filesystem and Terminal Execution Surface](https://agentclientprotocol.com/rfds/v2/client-filesystem-terminal-capabilities.md)
-- [v2 Terminal Output](https://agentclientprotocol.com/rfds/v2/terminal-output.md)
 - [v2 Plan Variants](https://agentclientprotocol.com/rfds/v2/plan-variants.md)
 - [v2 Tool Call Updates](https://agentclientprotocol.com/rfds/v2/tool-call-updates.md)
-- [v2 Diff File States](https://agentclientprotocol.com/rfds/v2/diff-file-states.md)
-- [v2 Permission Requests](https://agentclientprotocol.com/rfds/v2/permission-requests.md)
 - [v2 Message Updates and Chunks](https://agentclientprotocol.com/rfds/v2/message-updates.md)
-- [Terminal Authentication](https://agentclientprotocol.com/rfds/auth-methods.md)
+- [v2 Permission Requests](https://agentclientprotocol.com/rfds/v2/permission-requests.md)
+- [v2 Required Session Methods](https://agentclientprotocol.com/rfds/v2/required-session-methods.md)
+- [v2 Session Resume Replay](https://agentclientprotocol.com/rfds/v2/session-resume-replay.md)
+- [v2 Diff File States](https://agentclientprotocol.com/rfds/v2/diff-file-states.md)
+- [v2 Terminal Output](https://agentclientprotocol.com/rfds/v2/terminal-output.md)
+- [Next Edit Suggestions](https://agentclientprotocol.com/rfds/next-edit-suggestions.md)
 - [Introduce RFD Process](https://agentclientprotocol.com/rfds/introduce-rfd-process.md)
 - [Session Config Options](https://agentclientprotocol.com/rfds/session-config-options.md)
-- [ACP Agent Registry](https://agentclientprotocol.com/rfds/acp-agent-registry.md)
 - [Session Info Update](https://agentclientprotocol.com/rfds/session-info-update.md)
 - [Session List](https://agentclientprotocol.com/rfds/session-list.md)
+- [ACP Agent Registry](https://agentclientprotocol.com/rfds/acp-agent-registry.md)
 - [Resuming of existing sessions](https://agentclientprotocol.com/rfds/session-resume.md)
 - [Closing active sessions](https://agentclientprotocol.com/rfds/session-close.md)
 - [Logout Method](https://agentclientprotocol.com/rfds/logout-method.md)
 - [Additional Workspace Roots for Session Lifecycle Requests](https://agentclientprotocol.com/rfds/additional-directories.md)
 - [Meta Field Propagation Conventions](https://agentclientprotocol.com/rfds/meta-propagation.md)
-- [Message ID](https://agentclientprotocol.com/rfds/message-id.md)
-- [Session Context Size and Cost](https://agentclientprotocol.com/rfds/session-usage.md)
 - [Session Delete](https://agentclientprotocol.com/rfds/session-delete.md)
+- [Session Context Size and Cost](https://agentclientprotocol.com/rfds/session-usage.md)
+- [Message ID](https://agentclientprotocol.com/rfds/message-id.md)
 - [Model Config Option Category](https://agentclientprotocol.com/rfds/model-config-category.md)
 - [Rust SDK based on SACP](https://agentclientprotocol.com/rfds/rust-sdk-v1.md)
 - [Request Cancellation Mechanism](https://agentclientprotocol.com/rfds/request-cancellation.md)
 - [Boolean Config Option Type](https://agentclientprotocol.com/rfds/boolean-config-option.md)
 - [Elicitation: Structured User Input](https://agentclientprotocol.com/rfds/elicitation.md)
+- [Terminal Authentication](https://agentclientprotocol.com/rfds/auth-methods.md)
+- [Tool Call Name](https://agentclientprotocol.com/rfds/tool-call-name.md)
+- [Session Compaction](https://agentclientprotocol.com/rfds/session-compaction.md)
+- [Session Notices](https://agentclientprotocol.com/rfds/session-notices.md)
 - [Contributor Communication](https://agentclientprotocol.com/community/communication.md): Communication methods for Agent Client Protocol contributors
 - [Code of Conduct](https://agentclientprotocol.com/community/code-of-conduct.md)
 - [Governance](https://agentclientprotocol.com/community/governance.md): How the ACP project is governed
@@ -104,6 +106,7 @@
 - [Contributing](https://agentclientprotocol.com/community/contributing.md): How to participate in the development of ACP
 - [Publications](https://agentclientprotocol.com/publications.md): ACP publications, talks, presentations, and videos
 - [Updates](https://agentclientprotocol.com/updates.md): Updates and announcements about the Agent Client Protocol
+- [Tool Call Names are stabilized](https://agentclientprotocol.com/announcements/tool-call-name-stabilized.md): Optional programmatic tool-call names are now part of the stable ACP protocol surfaces.
 - [Elicitation is stabilized](https://agentclientprotocol.com/announcements/elicitation-stabilized.md): Announcement that structured elicitation is now part of the stable ACP protocol.
 - [ACP v2 is available in Draft](https://agentclientprotocol.com/announcements/acp-v2-draft.md): The ACP v2 protocol documentation and schema are published in draft form for review and testing.
 - [Boolean Config Options are stabilized](https://agentclientprotocol.com/announcements/boolean-config-option-stabilized.md): Announcement that boolean session configuration options are now part of the stable ACP protocol.
@@ -126,6 +129,5 @@
 - [Implementation information for agents and clients](https://agentclientprotocol.com/announcements/implementation-information.md): Protocol update introducing optional implementation metadata during initialization.
 - [Brand](https://agentclientprotocol.com/brand.md): Assets for the Agent Client Protocol brand.
 
-## OpenAPI Specs
 
-- [openapi](https://agentclientprotocol.com/api-reference/openapi.json)
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -58,7 +58,7 @@ the Agent **MUST** support these baseline session methods:
 * `session/update`
 
 The v2 schema should remove the optional `session.list`, `session.resume`, and
-`session.close` capability fields. The [Session Resume Replay](@/skills/engineering/acp/resources/auto/rfds-v2-session-resume-replay.md)
+`session.close` capability fields. The [Session Resume Replay](./session-resume-replay.mdx)
 RFD removes `session/load` from v2 and folds history replay into
 `session/resume`.
 
@@ -114,3 +114,6 @@ separate storage-management operation, not part of the minimal lifecycle needed.
 ## Revision history
 
 * 2026-07-02: Initial draft.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

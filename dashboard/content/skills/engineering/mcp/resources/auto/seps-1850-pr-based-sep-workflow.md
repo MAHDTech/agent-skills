@@ -29,21 +29,21 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **SEP**       | 1850                                                                                                               |
-| **Title**     | PR-Based SEP Workflow                                                                                              |
-| **Status**    | Final                                                                                                              |
-| **Type**      | Process                                                                                                            |
-| **Created**   | 2025-11-20                                                                                                         |
-| **Accepted**  | 2025-11-28, 8 Yes, 0 No, 0 Absent per vote in Discord.                                                             |
+| Field | Value |
+| - | - |
+| **SEP** | 1850 |
+| **Title** | PR-Based SEP Workflow |
+| **Status** | Final |
+| **Type** | Process |
+| **Created** | 2025-11-20 |
+| **Accepted** | 2025-11-28, 8 Yes, 0 No, 0 Absent per vote in Discord. |
 | **Author(s)** | Nick Cooper ([@nickcoai](https://github.com/nickcoai)), David Soria Parra ([@davidsp](https://github.com/davidsp)) |
-| **Sponsor**   | David Soria Parra ([@davidsp](https://github.com/davidsp))                                                         |
-| **PR**        | [#1850](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1850)                                    |
+| **Sponsor** | David Soria Parra ([@davidsp](https://github.com/davidsp)) |
+| **PR** | [#1850](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1850) |
 
 ***
 
@@ -221,3 +221,5 @@ No new security considerations beyond the standard code review process for pull 
 # Vote
 
 This SEP was accepted unanimously by the MCP Core Maintainers with a vote of 8 yes's, 0 no's and 0 absent votes on Friday December 28th, 2025 in a Discord poll.
+
+

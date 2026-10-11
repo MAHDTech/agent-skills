@@ -19,7 +19,7 @@ Author(s): [nikomatsakis](https://github.com/nikomatsakis)
 
 > What are you proposing to change?
 
-Replace the current ACP Rust SDK with a new implementation based on SACP (Symposium ACP). The new SDK provides a component-based architecture with builder patterns, explicit message ordering guarantees, and first-class support for [Proxy Chains](@/skills/engineering/acp/resources/auto/rfds-proxy-chains.md) and [MCP-over-ACP](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md).
+Replace the current ACP Rust SDK with a new implementation based on SACP (Symposium ACP). The new SDK provides a component-based architecture with builder patterns, explicit message ordering guarantees, and first-class support for [Proxy Chains](./proxy-chains) and [MCP-over-ACP](./mcp-over-acp).
 
 ## Status quo
 
@@ -27,11 +27,11 @@ Replace the current ACP Rust SDK with a new implementation based on SACP (Sympos
 
 The current `agent-client-protocol` crate has a straightforward design with trait-based callbacks for common ACP methods and well-typed requests and responses. It's convenient for simple purposes but quickly becomes awkward when attempting more complex designs.
 
-Two examples that we found pushed the limits of the design are the *conductor* (from the [proxy chains](@/skills/engineering/acp/resources/auto/rfds-proxy-chains.md) RFD) and the [patchwork-rs](https://patchwork-lang.github.io/patchwork-rs/) project:
+Two examples that we found pushed the limits of the design are the *conductor* (from the [proxy chains](./proxy-chains) RFD) and the [patchwork-rs](https://patchwork-lang.github.io/patchwork-rs/) project:
 
 The Conductor is an orchestrator that routes messages between proxies, agents, and MCP servers. It must adapt messages as they flow through the system and maintain the correct ordering.
 
-Patchwork is a programmatic interface for working with agents. It allows Rust programs to run prompts that provide custom tools (implemented using [MCP-over-ACP](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md)) and messages:
+Patchwork is a programmatic interface for working with agents. It allows Rust programs to run prompts that provide custom tools (implemented using [MCP-over-ACP](./mcp-over-acp)) and messages:
 
 ```rust theme={null}
 let mut results = Vec::new();
@@ -91,7 +91,7 @@ In the current SDK, every incoming request or notification results is handled in
 
 ### Limitation: Confusing naming and 1:1 assumption
 
-`AgentSideConnection` is ambiguous - does this represent the agent, or the connection *to* an agent? What's more, the SDK currently assumes that each connection has a single peer, but [proxies](@/skills/engineering/acp/resources/auto/rfds-proxy-chains.md) may wish to send/receive messages from multiple peers (client or agent). This was a constant source of confusion in early versions of the conductor and frequently required the author to get out a pencil and paper and work things out very carefully.
+`AgentSideConnection` is ambiguous - does this represent the agent, or the connection *to* an agent? What's more, the SDK currently assumes that each connection has a single peer, but [proxies](./proxy-chains) may wish to send/receive messages from multiple peers (client or agent). This was a constant source of confusion in early versions of the conductor and frequently required the author to get out a pencil and paper and work things out very carefully.
 
 **Goal:** Use directional naming like `ClientToAgent` that makes relationships explicit: "I am the client, the remote peer is an agent." Enable multiple peers.
 
@@ -133,34 +133,34 @@ connection.run_until(async |cx| {
 
 We propose to adopt the design and implementation from [`sacp`](https://github.com/symposium-dev/symposium-acp/) (developed as part of the [Symposium project](https://symposium.dev)) as the foundation for `agent-client-protocol` v1.0. The `sacp` crates will be imported into this repository and renamed:
 
-| Current             | New name                             |
-| ------------------- | ------------------------------------ |
-| `sacp`              | `agent-client-protocol` (v1.0)       |
-| `sacp-derive`       | `agent-client-protocol-derive`       |
-| `sacp-tokio`        | `agent-client-protocol-tokio`        |
-| `sacp-rmcp`         | `agent-client-protocol-rmcp`         |
-| `sacp-conductor`    | `agent-client-protocol-conductor`    |
-| `sacp-test`         | `agent-client-protocol-test`         |
-| `sacp-tee`          | `agent-client-protocol-tee`          |
+| Current | New name |
+| - | - |
+| `sacp` | `agent-client-protocol` (v1.0) |
+| `sacp-derive` | `agent-client-protocol-derive` |
+| `sacp-tokio` | `agent-client-protocol-tokio` |
+| `sacp-rmcp` | `agent-client-protocol-rmcp` |
+| `sacp-conductor` | `agent-client-protocol-conductor` |
+| `sacp-test` | `agent-client-protocol-test` |
+| `sacp-tee` | `agent-client-protocol-tee` |
 | `sacp-trace-viewer` | `agent-client-protocol-trace-viewer` |
 
 The `sacp` crates will then be deprecated in favor of the `agent-client-protocol` family. The new SDK addresses the limitations above through a builder-based API with explicit connection semantics.
 
 The following table summarizes the key API concepts and which goals they address:
 
-| API Concept                                                                         | Goals Addressed                           |
-| ----------------------------------------------------------------------------------- | ----------------------------------------- |
-| [Link types](#link-types-and-directional-naming) (`ClientToAgent`, `AgentToClient`) | Confusing naming, 1:1 assumption          |
-| [`Component` trait + `connect_to`](#the-component-trait-and-connect_to)             | Awkward to connect components             |
-| [Connection context (`cx`)](#sending-messages)                                      | Handlers can't send messages              |
-| [`on_receive_*` handlers](#handling-messages) with closure types                    | Fixed set of handlers                     |
-| [`serve` / `run_until`](#running-connections-serve-and-run_until)                   | Executor independence, starvation freedom |
-| [Session builders + dynamic handlers](#session-builders-and-mcp-servers)            | Handlers must be same across sessions     |
-| [Ordering guarantees + `spawn`](#controlling-ordering)                              | No ordering guarantees                    |
+| API Concept | Goals Addressed |
+| - | - |
+| [Link types](#link-types-and-directional-naming) (`ClientToAgent`, `AgentToClient`) | Confusing naming, 1:1 assumption |
+| [`Component` trait + `connect_to`](#the-component-trait-and-connect_to) | Awkward to connect components |
+| [Connection context (`cx`)](#sending-messages) | Handlers can't send messages |
+| [`on_receive_*` handlers](#handling-messages) with closure types | Fixed set of handlers |
+| [`serve` / `run_until`](#running-connections-serve-and-run_until) | Executor independence, starvation freedom |
+| [Session builders + dynamic handlers](#session-builders-and-mcp-servers) | Handlers must be same across sessions |
+| [Ordering guarantees + `spawn`](#controlling-ordering) | No ordering guarantees |
 
 We have validated the design by implementing a number of use cases:
 
-* **sacp-conductor** (to be renamed **agent-client-protocol-conductor**) - implementation of the conductor from the [proxy chains](@/skills/engineering/acp/resources/auto/rfds-proxy-chains.md) RFD
+* **sacp-conductor** (to be renamed **agent-client-protocol-conductor**) - implementation of the conductor from the [proxy chains](./proxy-chains) RFD
 * [Patchwork](https://patchwork-lang.github.io/patchwork-rs/) - programmatic agent orchestration
 * **elizacp** - agent implementing the classic ELIZA program
 * **agent-client-protocol-tee** - proxy that logs messages before forwarding
@@ -199,7 +199,7 @@ Most types in the SDK are parameterized by the link type. This helps document th
 
 #### The `Component` trait and `connect_to`
 
-The `connect_to` method connects your builder to the other side. The argument can be anything that implements the `Component<Link>` trait, which abstracts over anything that can communicate via JSON-RPC:
+The `connect_to` method connects your builder to the other side. The argument can be anything that implements the `Component\<Link\>` trait, which abstracts over anything that can communicate via JSON-RPC:
 
 ```rust theme={null}
 // Connect to an agent over stdio
@@ -909,7 +909,7 @@ We would like to try and adapt these ideas to other languages. It would be good 
 
 ### How does this relate to the Proxy Chains and MCP-over-ACP RFDs?
 
-This expanded SDK design is motivated by working through the use cases enabled by [proxy chains](@/skills/engineering/acp/resources/auto/rfds-proxy-chains.md) and [MCP-over-ACP](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md).
+This expanded SDK design is motivated by working through the use cases enabled by [proxy chains](./proxy-chains) and [MCP-over-ACP](./mcp-over-acp).
 
 ### How well-tested is this design?
 
@@ -919,7 +919,7 @@ The design has been used for a wide range of projects but the majority were writ
 
 Not currently. The derive macros only support structs with a single method name. For enums that group related messages (e.g., all session-related requests), you would need to implement the traits manually.
 
-This is a potential future enhancement - enum derives could dispatch to different methods per variant, which would be useful for `MessageCx<Req, Notif>` typed handlers. For now, use the untyped `MessageCx` with `MatchMessage` for this pattern.
+This is a potential future enhancement - enum derives could dispatch to different methods per variant, which would be useful for `MessageCx\<Req, Notif\>` typed handlers. For now, use the untyped `MessageCx` with `MatchMessage` for this pattern.
 
 ### What changes are needed before stabilizing?
 
@@ -930,3 +930,6 @@ The Rust SDK has been stabilized as `agent-client-protocol` v1.0.0, so no RFD-bl
 * 2026-06-25: Moved to Completed after the Rust SDK and TypeScript SDK reached v1.0.0.
 * 2026-05-12: Moved to Preview after the initial crate import was upstreamed to agentclientprotocol/rust-sdk.
 * Initial draft based on working implementation in symposium-acp repository.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

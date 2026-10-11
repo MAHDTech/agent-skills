@@ -29,26 +29,26 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1686                                                                            |
-| **Title**     | Tasks                                                                           |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-10-20                                                                      |
-| **Author(s)** | Surbhi Bansal, Luca Chang                                                       |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1686](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1686) |
+| Field | Value |
+| - | - |
+| **SEP** | 1686 |
+| **Title** | Tasks |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-10-20 |
+| **Author(s)** | Surbhi Bansal, Luca Chang |
+| **Sponsor** | None |
+| **PR** | [#1686](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1686) |
 
 ***
 
 ## Abstract
 
-> This SEP is preserved as a historical record of the experimental tasks feature shipped in the `2025-11-25` specification. The code examples below are non-normative pseudocode written against the v1 SDKs. The draft specification moves tasks out of the core protocol and into the `io.modelcontextprotocol/tasks` extension ([SEP-2663](@/skills/engineering/mcp/resources/auto/seps-2663-tasks-extension.md)).
+> This SEP is preserved as a historical record of the experimental tasks feature shipped in the `2025-11-25` specification. The code examples below are non-normative pseudocode written against the v1 SDKs. The draft specification moves tasks out of the core protocol and into the `io.modelcontextprotocol/tasks` extension ([SEP-2663](./2663-tasks-extension.md)).
 
 This SEP improves support for task-based workflows in the Model Context Protocol (MCP). It introduces both the **task primitive** and the associated **task ID**, which can be used to query the state and results of a task, up to a server-defined duration after the task has completed. This primitive is designed to augment other requests (such as tool calls) to enable call-now, fetch-later execution patterns across all requests for servers that support this primitive.
 
@@ -1044,8 +1044,8 @@ For example, a complex analysis task might spawn several subtasks for data gathe
 
 This hierarchical model would support sophisticated server-controlled workflows while maintaining the client's ability to monitor and retrieve results at any level of the task tree.
 
-<details>
-  <summary>Example nested task flow</summary>
+\<details\>
+  \<summary\>Example nested task flow</summary>
 
   ```mermaid theme={null}
   sequenceDiagram
@@ -1121,3 +1121,5 @@ This hierarchical model would support sophisticated server-controlled workflows 
 
   The existing task metadata and status lifecycle are designed to be forward-compatible with these extensions.
 </details>
+
+

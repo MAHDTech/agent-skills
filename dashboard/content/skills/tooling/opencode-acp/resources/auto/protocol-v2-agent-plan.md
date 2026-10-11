@@ -17,7 +17,7 @@ skill_name = "opencode-acp"
 
 Plans are execution strategies for complex tasks that require multiple steps.
 
-Agents may share plans with Clients through [`session/update`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
+Agents may share plans with Clients through [`session/update`](/protocol/v2/prompt-lifecycle#3-agent-reports-output) notifications, providing real-time visibility into their thinking and progress.
 
 `plan_update` carries a `plan` object with a `type` discriminator and a required `planId` so Clients can track multiple plans independently.
 
@@ -120,3 +120,6 @@ For item-based plans, the Agent **MUST** send a complete list of all plan entrie
 ### Dynamic Planning
 
 Plans can evolve during execution. The Agent **MAY** add, remove, or modify plan entries as it discovers new requirements or completes tasks, allowing it to adapt based on what it learns.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

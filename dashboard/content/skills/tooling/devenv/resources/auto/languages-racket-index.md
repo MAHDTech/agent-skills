@@ -1,0 +1,50 @@
++++
+title = "languages-racket-index"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+# racket
+
+## Options
+
+### languages.racket.enable
+
+Whether to enable tools for Racket development.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+false
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/racket.nix>
+
+### languages.racket.package
+
+The Racket package to use.
+
+*Type:* package
+
+*Default:*
+
+```nix
+pkgs.racket-minimal
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/racket.nix>

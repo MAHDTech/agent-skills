@@ -138,3 +138,6 @@ enforcement ladder](https://github.com/mozilla/diversity).
 
 For answers to common questions about this code of conduct, see [the Contributor Covenant FAQ](https://www.contributor-covenant.org/faq).
 For translations, see [Contributor Covenant Translations](https://www.contributor-covenant.org/translations).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

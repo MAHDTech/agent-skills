@@ -136,3 +136,5 @@ The `locations` key can be cross referenced with the list of `anchors` to determ
 The `content` key can be split on whitespace, and the `locations` will index into this content at the correct positions. This allows you to slice the content for each region of the page if you choose, and to generate a highlighted excerpt using that sliced content.
 
 Also available is the `weighted_locations` list, which can be used to further prioritise sections of the page if they contain higher value words.
+
+

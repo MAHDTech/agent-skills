@@ -37,7 +37,7 @@ npx pagefind@v1.1.1 --site "public"
 
 Running Pagefind via npx will always download the `pagefind_extended` release, which includes specialized support for indexing Chinese and Japanese pages.
 
-> Pagefind's npm package can also be imported and controlled from a script. See the [Node API documentation](https://pagefind.app/docs/node-api/) for details.
+> Pagefind's npm package can also be imported and controlled from a script. See the [Node API documentation](/docs/node-api/) for details.
 
 ## Running via Python
 
@@ -63,7 +63,7 @@ To install the smaller standard release, run:
 python3 -m pip install 'pagefind[bin]'
 ```
 
-> Pagefind's Python package can also be imported and controlled from a script. See the [Python API documentation](https://pagefind.app/docs/py-api/) for details.
+> Pagefind's Python package can also be imported and controlled from a script. See the [Python API documentation](/docs/py-api/) for details.
 
 ## Downloading a precompiled binary
 
@@ -92,3 +92,5 @@ To build and install the extended version of Pagefind:
 cargo install pagefind --features extended
 pagefind --site "public"
 ```
+
+

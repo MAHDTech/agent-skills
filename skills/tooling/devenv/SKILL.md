@@ -105,5 +105,5 @@ Devenv integrates with SecretSpec, a tool that manages secret resolution and aud
 
 ## References
 
-- [Devenv Documentation](resources/auto/devenv-getting-started-c7c653ca.md)
+- [Devenv Documentation](resources/auto/getting-started-index.md)
 - [Devenv MCP Server](https://mcp.devenv.sh) (Online-Only)

@@ -1,0 +1,72 @@
++++
+title = "languages-jsonnet-index"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "devenv"
++++
+
+# jsonnet
+
+## Options
+
+### languages.jsonnet.enable
+
+Whether to enable tools for jsonnet development.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+false
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/jsonnet.nix>
+
+### languages.jsonnet.lsp.enable
+
+Whether to enable Jsonnet Language Server.
+
+*Type:* boolean
+
+*Default:*
+
+```nix
+true
+```
+
+*Example:*
+
+```nix
+true
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/jsonnet.nix>
+
+### languages.jsonnet.lsp.package
+
+The Jsonnet language server package to use.
+
+*Type:* package
+
+*Default:*
+
+```nix
+pkgs.jsonnet-language-server
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/jsonnet.nix>

@@ -17,7 +17,7 @@ skill_name = "mcp"
 
 In this tutorial, you'll learn how to build an LLM-powered chatbot client that connects to MCP servers.
 
-Before you begin, it helps to have gone through our [Build an MCP Server](https://modelcontextprotocol.io/docs/2025-06-18/develop/build-server) tutorial so you can understand how clients and servers communicate.
+Before you begin, it helps to have gone through our [Build an MCP Server](/docs/2025-06-18/develop/build-server) tutorial so you can understand how clients and servers communicate.
 
 \<Tabs\>
   <Tab title="Python">
@@ -2521,3 +2521,5 @@ Before you begin, it helps to have gone through our [Build an MCP Server](https:
     Check out our gallery of official MCP servers and implementations
   </Card>
 </CardGroup>
+
+

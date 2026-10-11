@@ -15,11 +15,63 @@ skill_name = "acp"
 
 > How prompts, state updates, and completion fit together
 
-A prompt starts or contributes to foreground work in a session. The [Agent](https://agentclientprotocol.com/protocol/v2/overview#agent) may continue that work until it reports `idle`, including across multiple model exchanges and tool invocations.
+A prompt starts or contributes to foreground work in a session. The [Agent](/protocol/v2/overview#agent) may continue that work until it reports `idle`, including across multiple model exchanges and tool invocations.
 
-`session/prompt` only lasts until the Agent accepts the prompt. The Agent reports the accepted user message, running state, output, and completion through `session/update` notifications.
+`session/prompt` lasts until the Agent inserts the user message into the ACP conversation. This is what acceptance means for a prompt. The response returns that message's `messageId`; the Agent reports its content and placement, foreground state, output, and completion through `session/update` notifications.
 
-Before sending prompts, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v2/initialization) phase and [session setup](https://agentclientprotocol.com/protocol/v2/session-setup).
+Before sending prompts, Clients **MUST** first complete the [initialization](/protocol/v2/initialization) phase and [session setup](/protocol/v2/session-setup).
+
+## Session Updates
+
+Agents send `session/update` notifications to report streamed content, tool activity, and changes to session state. The `sessionUpdate` field inside `params.update` identifies the variant:
+
+| `sessionUpdate` value | Description |
+| - | - |
+| `user_message_chunk` | A streamed chunk of a user message. |
+| `user_message` | Creates or updates a user message identified by `messageId`. |
+| `agent_message_chunk` | A streamed chunk of the Agent's response. |
+| `agent_message` | Creates or updates an Agent message identified by `messageId`. |
+| `agent_thought_chunk` | A streamed chunk of the Agent's reasoning. |
+| `agent_thought` | Creates or updates an Agent reasoning message identified by `messageId`. |
+| `state_update` | A change to the Agent's [foreground work state](#session-states). |
+| `tool_call_content_chunk` | Appends a [content chunk to a tool call](/protocol/v2/tool-calls#streaming-content). |
+| `tool_call_update` | Creates or updates a [tool call](/protocol/v2/tool-calls#reporting). |
+| `terminal_update` | Creates or updates an [Agent-owned terminal](/protocol/v2/tool-calls#display-only-terminals). |
+| `terminal_output_chunk` | Appends output bytes to an [Agent-owned terminal](/protocol/v2/tool-calls#display-only-terminals). |
+| `plan_update` | Creates or updates the [content of a plan](/protocol/v2/agent-plan) identified by ID. |
+| `available_commands_update` | The set of [available slash commands](/protocol/v2/slash-commands) is ready or has changed. |
+| `config_option_update` | The session's [configuration options](/protocol/v2/session-config-options#from-the-agent) have changed. |
+| `session_info_update` | [Session metadata](/protocol/v2/session-list#updating-session-metadata), such as the title or last update time, has changed. |
+| `usage_update` | The session's [context window usage and cumulative cost](#session-usage-updates). |
+| `notice` | A live [user-facing notice](#session-notices) that is not part of session history. |
+| `compaction_update` | Creates or updates a [context compaction](#session-compaction). |
+| `compaction_summary_chunk` | Appends content to a [compaction's retained summary](#session-compaction). |
+
+This is the complete set of standard variants defined in the current [`SessionUpdate` schema](/protocol/v2/schema#sessionupdate), which describes each payload in detail. The walkthrough below illustrates common uses of these updates.
+
+The protocol also supports [custom and future variants](/protocol/v2/extensibility#enum-and-tagged-union-variants). Clients that do not understand an update should preserve its raw payload when storing, replaying, proxying, or forwarding session history, and otherwise ignore it or display it generically.
+
+Live-only [notices](#session-notices) **SHOULD NOT** be replayed, even when
+preserved as unknown updates.
+
+Session updates are not limited to prompt-driven foreground work. For example, Agents may advertise commands after creating a session, and background activity may emit updates while the Agent is [idle](#session-states).
+
+### Entity IDs
+
+Messages, tool calls, terminals, and plans are entities that the Agent creates and then updates by ID across multiple session updates. An entity is identified by its type together with its ID, not by its ID alone:
+
+| Entity type | Session updates | ID field |
+| - | - | - |
+| User message | `user_message`, `user_message_chunk` | `messageId` |
+| Agent message | `agent_message`, `agent_message_chunk` | `messageId` |
+| Agent thought | `agent_thought`, `agent_thought_chunk` | `messageId` |
+| Tool call | `tool_call_update`, `tool_call_content_chunk` | `toolCallId` |
+| Terminal | `terminal_update`, `terminal_output_chunk` | `terminalId` |
+| Plan | `plan_update` | `planId` |
+
+An ID is unique among entities of the same type within a session, not across all entity types, so the same string can identify one entity of each type. User messages, Agent messages, and Agent thoughts are separate types even though they share the `messageId` field. For example, an Agent may report a thought and a response derived from the same model output with the same `messageId`; they remain two distinct entities.
+
+The Agent **MUST NOT** reuse an ID for a different entity of the same type within a session. Clients **MUST** key entities by both type and ID. An update applies only to the entity of its own type: an `agent_thought` whose `messageId` matches an existing Agent message creates or updates a thought and leaves the message unchanged. Likewise, a field that references an entity identifies an entity of one specific type; for example, the `messageId` returned by `session/prompt` identifies a user message.
 
 ## Prompt Lifecycle
 
@@ -36,13 +88,14 @@ sequenceDiagram
 
     Note left of Client: User sends message
     Client->>Agent: session/prompt (user message)
-    Agent-->>Client: session/prompt response ({})
+    Note right of Agent: Insert user message
+    Agent-->>Client: "session/prompt response (messageId)"
     Agent->>Client: session/update (user_message)
     Agent->>Client: session/update (state_update: running)
 
     loop While foreground work is in progress
         Note right of Agent: LLM responds with<br/>content/tool calls
-        Agent->>Client: session/update (plan)
+        Agent->>Client: session/update (plan_update)
         Agent->>Client: session/update (agent_message)
 
         opt Tool calls requested
@@ -66,6 +119,11 @@ sequenceDiagram
           Client->>Agent: session/cancel
           Note right of Agent: Abort operations
           Agent->>Client: session/update (state_update: idle, stopReason: cancelled)
+      end
+
+      opt Work fails after insertion
+          Note right of Agent: Stop work
+          Agent->>Client: session/update (state_update: idle, stopReason: error)
       end
     end
 
@@ -103,13 +161,13 @@ The Client sends a user message with `session/prompt`:
 ```
 
 <ParamField path="sessionId" type="SessionId">
-  The [ID](https://agentclientprotocol.com/protocol/v2/session-setup#session-id) of the session to send this message to.
+  The [ID](/protocol/v2/session-setup#session-id) of the session to send this message to.
 </ParamField>
 
 <ParamField path="prompt" type="ContentBlock[]">
   The contents of the user message, e.g. text, images, files, etc.
 
-  Clients **MUST** restrict types of content according to the [Prompt Capabilities](https://agentclientprotocol.com/protocol/v2/initialization#prompt-capabilities) established during [initialization](https://agentclientprotocol.com/protocol/v2/initialization).
+  Clients **MUST** restrict types of content according to the [Prompt Capabilities](/protocol/v2/initialization#prompt-capabilities) established during [initialization](/protocol/v2/initialization).
 
   <Card icon="comments" horizontal href="/protocol/v2/content">
     Learn more about Content
@@ -118,17 +176,26 @@ The Client sends a user message with `session/prompt`:
 
 ### 2. Prompt Accepted
 
-Upon receiving a prompt request, the Agent **MUST** respond once it has accepted the prompt. The response body is empty because completion is reported through `state_update` notifications, not through the `session/prompt` response:
+**Acceptance means insertion**, not receipt, queueing, or processing completion. The Agent **MUST** respond successfully once it has inserted the user message into the ACP conversation, without waiting for foreground work to finish. It **MUST NOT** send a successful response merely because it has received the input or assigned an ID. Requests rejected before insertion use a JSON-RPC error response. Once the user message is inserted, the Agent **MUST NOT** report a later failure as an error response, even if it has not sent the response yet: it responds successfully and reports the failure as described in [Failures](#failures). This includes [request cancellation](/protocol/v2/cancellation): once the message is inserted, the Agent answers `session/prompt` with its `messageId` rather than a `-32800` error, and foreground work is stopped with [`session/cancel`](#cancellation) or ends with a stop reason.
+
+The response contains the inserted user message's agent-generated `messageId`:
 
 ```json theme={null}
 {
   "jsonrpc": "2.0",
   "id": 2,
-  "result": {}
+  "result": {
+    "messageId": "msg_user_8f7a1"
+  }
 }
 ```
 
-After accepting the prompt, the Agent **MUST** report where the user message was inserted in session history. It can send either a `user_message` update with the full `content` array or streamed `user_message_chunk` updates. This update is the source of truth for the agent-owned `messageId`.
+<ResponseField name="messageId" type="MessageId" required>
+  The opaque ID of the inserted user message. This field is a required, non-null
+  string; omission and explicit `null` are invalid.
+</ResponseField>
+
+The Agent **MUST** also report the inserted user message through a `user_message` update with the full `content` array or streamed `user_message_chunk` updates. All updates for that message **MUST** use the returned `messageId`. The response and updates describe the same insertion, but Clients **MUST** tolerate the updates arriving before or after the response.
 
 ```json theme={null}
 {
@@ -149,6 +216,12 @@ After accepting the prompt, the Agent **MUST** report where the user message was
   }
 }
 ```
+
+The Client uses the JSON-RPC response ID to identify its submission, then associates it with `(sessionId, messageId)`. If the message update arrived first, the Client reconciles with that existing message rather than creating a duplicate. Agents **MUST** assign distinct message IDs to distinct inserted submissions, even if their content is identical; Clients must not infer the association from content or arrival order.
+
+Insertion is not a promise of durable storage or model consumption. Every inserted input, including a locally handled command, is reported live, but Agents are not required to persist it or retain it for any minimum period. If the message is retained and replayed, the Agent **MUST** use the same ID. See [Resuming Sessions](/protocol/v2/session-setup#resuming-sessions).
+
+A successful prompt response is not an `idle` signal. Session work and notifications continue independently of the completed prompt request. If the response is lost, the submission's outcome remains uncertain: replay may omit live-only or discarded messages, and a retry can create another submission.
 
 ### 3. Agent Reports Output
 
@@ -314,6 +387,204 @@ If the model requested tool calls, these are also reported immediately:
 }
 ```
 
+#### Session Notices
+
+No Client capability is required in v2. Clients that do not implement `notice`
+may preserve it through the [unknown-update
+fallback](/protocol/v2/extensibility#enum-and-tagged-union-variants) and
+ignore it or present it generically; this does not give it replay semantics.
+
+At any point while a session exists, including outside prompt processing, the
+Agent **MAY** send a live user-facing notice:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "method": "session/update",
+  "params": {
+    "sessionId": "sess_abc123def456",
+    "update": {
+      "sessionUpdate": "notice",
+      "severity": "warning",
+      "title": "MCP server unavailable",
+      "description": "Continuing without it."
+    }
+  }
+}
+```
+
+`severity` is required and non-null and initially supports `info`, `warning`,
+and `error`.
+It is an open string enum: values beginning with `_` are reserved for
+implementation-specific extensions, while other unknown values are reserved
+for future ACP severities. Clients preserve unknown values and use a generic
+notice presentation without inferring additional behavior from them.
+
+`title` is required, non-null, non-empty plain text suitable for a compact
+presentation. `description` is optional, nullable plain text with supporting
+detail; omission and `null` both mean no description. `_meta` is an optional,
+nullable object scoped to this event; omission and `null` both mean no event
+metadata. Unlike compaction patch fields, these fields do not update or clear
+an earlier notice.
+
+Clients may ignore them, and Agents must behave as though a
+notice may not have been received, displayed, or seen. A notice must not carry
+information required for protocol correctness, authorization, user action,
+task completion, or fatal-error reporting.
+
+Clients own presentation and dismissal. They may use a toast, banner, inline
+status region, notification center, or another accessible surface, and may
+coalesce repeated notices. Severity is only a presentation hint; even `error`
+does not fail a request, stop foreground work, change session state, or imply a
+prompt stop reason. Dismissal is local and produces no acknowledgement or
+removal event.
+
+Notices have no ID or Agent-managed lifecycle. Each occurrence is an
+independent live event, not conversation history, and **SHOULD NOT** be included
+in session replay. If a condition remains relevant after reconnecting, the
+Agent may emit a new notice.
+
+#### Session Compaction
+
+No Client capability is required in v2.
+
+The Agent **MAY** report context compaction as one persistent, ID-addressed
+timeline entity. A single `compaction_update` with `status: "completed"` is
+sufficient; reporting progress is optional. Summary content is also optional.
+It may be sent all at once in the `summary` field or streamed using
+`compaction_summary_chunk` for the same `compactionId`.
+
+For example, an Agent can report that compaction has started:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "method": "session/update",
+  "params": {
+    "sessionId": "sess_abc123def456",
+    "update": {
+      "sessionUpdate": "compaction_update",
+      "compactionId": "cmp_001",
+      "status": "in_progress"
+    }
+  }
+}
+```
+
+`compactionId` and `status` are required and non-null on every
+`compaction_update`. The ID is an opaque, Agent-owned string, unique within the
+session, and **MUST NOT** be reused for another compaction.
+
+Clients initialize a first-seen compaction ID with status `in_progress` and unset
+optional fields, then apply the notification.
+
+The first notification fixes the entity's timeline position in receive
+order: it follows previously received timeline content and precedes content
+first received later. Later updates and chunks for an ID-addressed entity patch
+it in place; they do not move or split it around the compaction.
+
+| `status` | Meaning |
+| - | - |
+| `in_progress` | Compaction has started and has not finished. |
+| `completed` | Compaction finished successfully. |
+| `failed` | Compaction finished unsuccessfully. |
+| `cancelled` | Compaction was cancelled before it finished. |
+
+The Agent **MUST** report a terminal status when a reported compaction ends.
+
+`status` is an open string enum. Values beginning with `_` are reserved for
+implementation-specific extensions; other unknown values are reserved for
+future ACP statuses. Clients preserve unknown strings and present a generic
+state without inferring lifecycle or control behavior.
+
+If the retained summary is available incrementally, the Agent may append one
+[content block](/protocol/v2/content) at a time:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "method": "session/update",
+  "params": {
+    "sessionId": "sess_abc123def456",
+    "update": {
+      "sessionUpdate": "compaction_summary_chunk",
+      "compactionId": "cmp_001",
+      "content": {
+        "type": "text",
+        "text": "## Retained context\n\n"
+      }
+    }
+  }
+}
+```
+
+`compactionId` and `content` are required and non-null on each chunk.
+Chunk `_meta` is optional and nullable, is scoped to that chunk, and has no
+patch semantics: omission and `null` both mean no chunk metadata.
+
+An update may omit `summary` to retain the streamed content. A
+non-streaming Agent can instead supply the complete summary, and a streaming
+Agent can use the same field as an authoritative replacement of content received
+so far:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "method": "session/update",
+  "params": {
+    "sessionId": "sess_abc123def456",
+    "update": {
+      "sessionUpdate": "compaction_update",
+      "compactionId": "cmp_001",
+      "status": "completed",
+      "summary": [
+        {
+          "type": "text",
+          "text": "## Retained context\n\nThe user is updating the ACP schema."
+        }
+      ]
+    }
+  }
+}
+```
+
+The following `compaction_update` fields are optional, nullable patches:
+
+| Field | Type | Meaning |
+| - | - | - |
+| `summary` | `ContentBlock[]` | The unencrypted, user-displayable summary content produced or retained by compaction. |
+| `error` | `string` | A human-readable error description. |
+| `_meta` | `object` | Extensible metadata for the compaction entity. |
+
+For each patch field, omission leaves the stored value unchanged, `null` clears
+it, and a concrete value replaces it. On a first-seen ID, omission and `null`
+both start with no value. `summary: []` also clears the summary.
+
+Clients apply updates and chunks in receive order for each ID. Chunks append
+to the current summary; a concrete `summary` replaces all previously
+accumulated content, and any subsequent chunks append to that replacement.
+`summary: null` or `summary: []` clears accumulated content, including partial
+output before failure or cancellation.
+
+The summary is not the Agent's complete replacement history or generic status
+text such as "Compaction completed". It should faithfully represent the
+retained, user-displayable summary without internal prompt framing or hidden
+instructions. Text blocks may contain Markdown. Agents should omit it when no
+unencrypted summary is available or when disclosure would reveal context that
+was not otherwise user-visible.
+
+During [history replay](/protocol/v2/session-setup#resuming-sessions),
+compaction updates and summary chunks follow the same semantics as live delivery.
+
+Replay does not implicitly reset omitted patch fields. Agents use replacement
+or clearing summary patches as needed to avoid duplicating content the Client
+already holds.
+
+Compaction does not instruct the Client to discard earlier conversation
+history; collapsing it is a local presentation choice. It also does not replace
+[`usage_update`](#session-usage-updates), which reports current context-window
+utilization and cost rather than a compaction boundary.
+
 #### Session Usage Updates
 
 The Agent **MAY** also report current session context and cumulative cost state with a `usage_update`:
@@ -412,7 +683,7 @@ Clients append each `tool_call_content_chunk` to the current content for that `t
 
 Display-only terminal bytes use `terminal_output_chunk`, not
 `tool_call_content_chunk`. See [Display-only
-Terminals](https://agentclientprotocol.com/protocol/v2/tool-calls#display-only-terminals) for their
+Terminals](/protocol/v2/tool-calls#display-only-terminals) for their
 per-terminal byte ordering and snapshot semantics.
 
 While tools execute on the Agent, they **MAY** leverage Client capabilities negotiated during initialization.
@@ -474,7 +745,53 @@ When an Agent stops foreground work, it must specify the corresponding `StopReas
 
 <ResponseField name="cancelled">The Client cancels active work</ResponseField>
 
+<ResponseField name="error">
+  Foreground work ended because something failed. See [Failures](#failures).
+</ResponseField>
+
 Custom or future stop reasons can be used when Clients can display a generic stopped state. Custom stop reasons **MUST** begin with `_`; unknown non-underscore stop reasons are reserved for future ACP variants.
+
+## Failures
+
+When foreground work ends because something failed, the corresponding stop reason is `error`. For work started by a prompt, this covers failures after the user message was inserted; earlier failures are an error response to `session/prompt`. This stop reason carries the failure in an `error` field beside `stopReason`, which the Agent **SHOULD** include:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "method": "session/update",
+  "params": {
+    "sessionId": "sess_abc123def456",
+    "update": {
+      "sessionUpdate": "state_update",
+      "state": "idle",
+      "stopReason": "error",
+      "error": {
+        "code": -32000,
+        "message": "Authentication required"
+      }
+    }
+  }
+}
+```
+
+<ResponseField name="error" type="Error">
+  The failure that ended foreground work, as a JSON-RPC error object with
+  required `code` and `message` and optional `data`. Optional and nullable:
+  omission and `null` both mean the Agent supplied no failure details.
+</ResponseField>
+
+`error` belongs to the `error` stop reason; beside any other stop reason it is an unknown field. Clients may show `message` to the user and can handle `code` as they would for an error response: for example, `-32000` (authentication required) can prompt the user to authenticate before sending another prompt.
+
+Before reporting the failure, the Agent **SHOULD** give each tool call that the failed work left unfinished a terminal status, using `failed` for calls that did not complete. A failure does not undo the insertion or any side effects the work already had, such as tools that ran. Sending the prompt again submits a new message.
+
+The `error` stop reason is only for failures that end foreground work:
+
+* A failure before the user message is inserted is a JSON-RPC error response to `session/prompt`.
+* A failure the Agent recovers from while work continues, such as a retried model request or a failed tool call, is reported with a [notice](#session-notices) or a tool call whose status is `failed`, and does not change the state.
+* Errors raised while aborting cancelled work are reported with the `cancelled` stop reason, as described in [Cancellation](#cancellation).
+* A failure in background activity while the Agent is `idle` is not a stop reason, since no foreground work ended.
+
+Clients detect a lost connection or an exited Agent process themselves; no update can report them.
 
 ## Session States
 
@@ -519,7 +836,7 @@ After all ongoing operations have been successfully aborted and pending updates 
 
   Clients often display unrecognized errors from the Agent to the user, which would be undesirable for cancellations as they aren't considered errors.
 
-  Agents **MUST** catch these errors and report the semantically meaningful `cancelled` stop reason on a `state_update` notification, so that Clients can reliably confirm the cancellation.
+  Agents **MUST** catch these errors and report the semantically meaningful `cancelled` stop reason, not `error`, on a `state_update` notification, so that Clients can reliably confirm the cancellation.
 </Warning>
 
 The Agent **MAY** send `session/update` notifications with content or tool call updates after receiving the `session/cancel` notification, but it **MUST** ensure that it does so before sending the idle `state_update` session update that reports cancellation.
@@ -529,3 +846,6 @@ The Client **SHOULD** still accept tool call updates received after sending `ses
 ***
 
 After the Agent reports `idle`, the Client may send another `session/prompt` to continue the conversation, building on the established session context.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

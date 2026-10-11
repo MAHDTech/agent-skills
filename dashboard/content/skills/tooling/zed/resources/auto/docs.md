@@ -7,7 +7,7 @@ mermaid = false
 skill_name = "zed"
 +++
 
-> For the complete documentation index and Markdown links, see [llms.txt](https://zed.dev/docs/llms.txt).
+> For the complete documentation index and Markdown links, see [llms.txt](/docs/llms.txt).
 
 # Getting Started
 
@@ -33,7 +33,7 @@ zed ~/projects/my-app
 
 Or use `Cmd+O` (macOS) / `Ctrl+O` (Linux/Windows) to open a folder from within Zed.
 
-By default, new projects open in your current window's threads sidebar. To open in a new window instead, use `zed -n ~/projects/my-app` or press `Cmd+Enter` when selecting from Open Recent. See [Windows & Projects](https://zed.dev/windows-and-projects.md) for more details.
+By default, new projects open in your current window's threads sidebar. To open in a new window instead, use `zed -n ~/projects/my-app` or press `Cmd+Enter` when selecting from Open Recent. See [Windows & Projects](./windows-and-projects.md) for more details.
 
 ### 2. Learn the Essential Commands
 
@@ -46,11 +46,11 @@ By default, new projects open in your current window's threads sidebar. To open 
 | Toggle terminal | `` Ctrl+` ``  | `` Ctrl+` ``   |
 | Open settings   | `Cmd+,`       | `Ctrl+,`       |
 
-The command palette (`Cmd+Shift+P`) is your gateway to every action in Zed. If you forget a shortcut, search for it there.
+The [command palette](./command-palette.md) (`Cmd+Shift+P`) is your gateway to every action in Zed. If you forget a shortcut, search for it there.
 
 ### Panel Layout
 
-Use **Panel Layout > Agentic** from the user menu in the title bar (or the <code class="hljs">workspace: use agentic layout</code> action) when you want the Agent Panel and Threads Sidebar next to each other on the left. Use **Panel Layout > Classic** (or <code class="hljs">workspace: use classic layout</code>) to restore the editor-oriented layout.
+Use **Panel Layout > Agentic** from the user menu in the title bar (or the <code class="hljs">workspace: use agentic layout</code> action) when you want the [Agent Panel](./ai/agent-panel.md) and Threads Sidebar next to each other on the left. Use **Panel Layout > Classic** (or <code class="hljs">workspace: use classic layout</code>) to restore the editor-oriented layout.
 
 ### 3. Configure Your Editor
 
@@ -59,7 +59,7 @@ Open the Settings Editor with `Cmd+,` (macOS) or `Ctrl+,` (Linux/Windows). Searc
 Common first changes:
 
 - **Theme**: Press `Cmd+K Cmd+T` (macOS) or `Ctrl+K Ctrl+T` (Linux/Windows) to open the theme selector
-- **Font**: Search for `buffer_font_family` in Settings
+- **Font**: Search for [`buffer_font_family`](./reference/all-settings.md#buffer-font-family) in Settings
 - **Format on save**: Search for `format_on_save` and set to `on`
 
 ### 4. Set Up Your Language
@@ -70,28 +70,28 @@ Zed includes built-in support for many languages. For others, install the extens
 2. Search for your language
 3. Click Install
 
-See [Languages](https://zed.dev/languages.md) for language-specific setup instructions.
+See [Languages](./languages.md) for language-specific setup instructions.
 
 ### 5. Try AI Features
 
 Zed includes built-in AI assistance. Open the Agent Panel with `Cmd+Shift+A` (macOS) or `Ctrl+Shift+A` (Linux/Windows) to start a conversation, or use `Cmd+Enter` (macOS) / `Ctrl+Enter` (Linux/Windows) for inline assistance.
 
-See [AI Overview](https://zed.dev/ai/overview.md) to configure providers and learn what's possible.
+See [AI Overview](./ai/overview.md) to configure providers and learn what's possible.
 
 ## Coming from Another Editor?
 
 We have dedicated guides for switching from other editors:
 
-- [VS Code](https://zed.dev/migrate/vs-code.md) — Import settings, map keybindings, find equivalent features
-- [IntelliJ IDEA](https://zed.dev/migrate/intellij.md) — Adapt to Zed's approach to navigation and refactoring
-- [PyCharm](https://zed.dev/migrate/pycharm.md) — Set up Python development in Zed
-- [WebStorm](https://zed.dev/migrate/webstorm.md) — Configure JavaScript/TypeScript workflows
-- [RustRover](https://zed.dev/migrate/rustrover.md) — Rust development in Zed
+- [VS Code](./migrate/vs-code.md) — Import settings, map keybindings, find equivalent features
+- [IntelliJ IDEA](./migrate/intellij.md) — Adapt to Zed's approach to navigation and refactoring
+- [PyCharm](./migrate/pycharm.md) — Set up Python development in Zed
+- [WebStorm](./migrate/webstorm.md) — Configure JavaScript/TypeScript workflows
+- [RustRover](./migrate/rustrover.md) — Rust development in Zed
 
 You can also enable familiar keybindings:
 
-- **Vim**: Enable `vim_mode` in settings. See [Vim Mode](https://zed.dev/vim.md).
-- **Helix**: Enable `helix_mode` in settings. See [Helix Mode](https://zed.dev/helix.md).
+- **Vim**: Enable `vim_mode` in settings. See [Vim Mode](./vim.md).
+- **Helix**: Enable `helix_mode` in settings. See [Helix Mode](./helix.md).
 
 ## Join the Community
 
@@ -100,3 +100,5 @@ Zed is open source. Join us on GitHub or in Discord to contribute code, report b
 - [Discord](https://discord.com/invite/zedindustries)
 - [GitHub Discussions](https://github.com/zed-industries/zed/discussions)
 - [Zed Reddit](https://www.reddit.com/r/ZedEditor)
+
+

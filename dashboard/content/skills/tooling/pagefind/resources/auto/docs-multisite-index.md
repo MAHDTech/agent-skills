@@ -175,4 +175,6 @@ Due to index merging happening in the browser, your additional search indexes mu
 
 ### Merging multiple languages
 
-Merged indexes will be searched using the WebAssembly module from your main instance. This means that merging an index from another language will use the language support from your main Pagefind instance.
+Merged indexes will be searched using the WebAssembly module from your main instance. This means that merging an index from another language will use the language support from your main Pagefind instance. 
+
+

@@ -7,1742 +7,1150 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-Need help with the tutorial? [Join our Discord
-server](https://discord.gg/spacetimedb)!
-
-This progressive tutorial is continued from [part
-2](https://spacetimedb.com/docs/tutorials/unity/part-2).
-
-### Spawning Food
-
-- C#
-- Rust
-- C++
-
-Let's start by spawning food into the map. The first thing we need to do
-is create a new, special reducer called the `Init` reducer. SpacetimeDB
-calls the `Init` reducer automatically when you first publish your
-module, and also after any time you run with `publish --delete-data`. It
-gives you an opportunity to initialize the state of your database before
-any clients connect.
-
-Add this new reducer above our `Connect` reducer.
-
-``` codeBlockStandalone_LlrK
-// Note the `ReducerKind.Init` parameter passed to the reducer macro.
-// That indicates to SpacetimeDB that it should be called
-// once upon database creation.
-[Reducer(ReducerKind.Init)]
-public static void Init(ReducerContext ctx)
-{
-    Log.Info($"Initializing...");
-    ctx.Db.config.Insert(new Config { world_size = 1000 });
-}
-```
-
-This reducer also demonstrates how to insert new rows into a table. Here
-we are adding a single `Config` row to the `config` table with the
-`Insert` function.
-
-Now that we've ensured that our database always has a valid `world_size`
-let's spawn some food into the map. Add the following code to the end of
-the `Module` class.
-
-``` codeBlockStandalone_LlrK
-const int FOOD_MASS_MIN = 2;
-const int FOOD_MASS_MAX = 4;
-const int TARGET_FOOD_COUNT = 600;
-
-public static float MassToRadius(int mass) => MathF.Sqrt(mass);
-
-[Reducer]
-public static void SpawnFood(ReducerContext ctx)
-{
-    if (ctx.Db.player.Count == 0) //Are there no players yet?
-    {
-        return;
-    }
-
-    var worldSize = (ctx.Db.config.id.Find(0) ?? throw new Exception("Config not found")).world_size;
-    var rng = ctx.Rng;
-    var foodCount = ctx.Db.food.Count;
-    while (foodCount < TARGET_FOOD_COUNT)
-    {
-        var foodMass = rng.Range(FOOD_MASS_MIN, FOOD_MASS_MAX);
-        var foodRadius = MassToRadius(foodMass);
-        var x = rng.Range(foodRadius, worldSize - foodRadius);
-        var y = rng.Range(foodRadius, worldSize - foodRadius);
-        var entity = ctx.Db.entity.Insert(new Entity
-        {
-            position = new DbVector2(x, y),
-            mass = foodMass,
-        });
-        ctx.Db.food.Insert(new Food
-        {
-            entity_id = entity.entity_id,
-        });
-        foodCount++;
-        Log.Info($"Spawned food! {entity.entity_id}");
-    }
-}
-
-public static float Range(this Random rng, float min, float max) => rng.NextSingle() * (max - min) + min;
-
-public static int Range(this Random rng, int min, int max) => (int)rng.NextInt64(min, max);
-```
-
-In this reducer, we are using the `world_size` we configured along with
-the `ReducerContext`'s random number generator `.Rng` function to place
-600 food uniformly randomly throughout the map. We've also chosen the
-`mass` of the food to be a random number between 2 and 4 inclusive.
-
-We also added two helper functions so we can get a random range as
-either a `int` or a `float`.
-
-Let's start by spawning food into the map. The first thing we need to do
-is create a new, special reducer called the `init` reducer. SpacetimeDB
-calls the `init` reducer automatically when you first publish your
-module, and also after any time you run with `publish --delete-data`. It
-gives you an opportunity to initialize the state of your database before
-any clients connect.
-
-Add this new reducer above our `connect` reducer.
-
-``` codeBlockStandalone_LlrK
-// Note the `init` parameter passed to the reducer macro.
-// That indicates to SpacetimeDB that it should be called
-// once upon database creation.
-#[spacetimedb::reducer(init)]
-pub fn init(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Initializing...");
-    ctx.db.config().try_insert(Config {
-        id: 0,
-        world_size: 1000,
-    })?;
-    Ok(())
-}
-```
-
-This reducer also demonstrates how to insert new rows into a table. Here
-we are adding a single `Config` row to the `config` table with the
-`try_insert` function. `try_insert` returns an error if inserting the
-row into the table would violate any constraints, like unique
-constraints, on the table. You can also use `insert` which panics on
-constraint violations if you know for sure that you will not violate any
-constraints.
-
-Now that we've ensured that our database always has a valid `world_size`
-let's spawn some food into the map. Add the following code to the end of
-the file.
-
-``` codeBlockStandalone_LlrK
-const FOOD_MASS_MIN: i32 = 2;
-const FOOD_MASS_MAX: i32 = 4;
-const TARGET_FOOD_COUNT: usize = 600;
-
-fn mass_to_radius(mass: i32) -> f32 {
-    (mass as f32).sqrt()
-}
-
-#[spacetimedb::reducer]
-pub fn spawn_food(ctx: &ReducerContext) -> Result<(), String> {
-    if ctx.db.player().count() == 0 {
-        // Are there no logged in players? Skip food spawn.
-        return Ok(());
-    }
-
-    let world_size = ctx
-        .db
-        .config()
-        .id()
-        .find(0)
-        .ok_or("Config not found")?
-        .world_size;
-
-    let mut rng = ctx.rng();
-    let mut food_count = ctx.db.food().count();
-    while food_count < TARGET_FOOD_COUNT as u64 {
-        let food_mass = rng.gen_range(FOOD_MASS_MIN..FOOD_MASS_MAX);
-        let food_radius = mass_to_radius(food_mass);
-        let x = rng.gen_range(food_radius..world_size as f32 - food_radius);
-        let y = rng.gen_range(food_radius..world_size as f32 - food_radius);
-        let entity = ctx.db.entity().try_insert(Entity {
-            entity_id: 0,
-            position: DbVector2 { x, y },
-            mass: food_mass,
-        })?;
-        ctx.db.food().try_insert(Food {
-            entity_id: entity.entity_id,
-        })?;
-        food_count += 1;
-        log::info!("Spawned food! {}", entity.entity_id);
-    }
-
-    Ok(())
-}
-```
-
-In this reducer, we are using the `world_size` we configured along with
-the `ReducerContext`'s random number generator `.rng()` function to
-place 600 food uniformly randomly throughout the map. We've also chosen
-the `mass` of the food to be a random number between 2 and 4 inclusive.
-
-Let's start by spawning food into the map. The first thing we need to do
-is create a new, special reducer called the `SPACETIMEDB_INIT` reducer.
-SpacetimeDB calls the `SPACETIMEDB_INIT` reducer automatically when you
-first publish your module, and also after any time you run with
-`publish --delete-data`. It gives you an opportunity to initialize the
-state of your database before any clients connect.
-
-Add this new reducer above our `connect` reducer.
-
-``` codeBlockStandalone_LlrK
-// Note the SPACETIMEDB_INIT macro.
-// This indicates to SpacetimeDB that it should be called
-// once upon database creation.
-SPACETIMEDB_INIT(init, ReducerContext ctx) {
-    LOG_INFO("Initializing...");
-    ctx.db[config].insert(Config{0, 1000});
-    return Ok();
-}
-```
-
-This reducer also demonstrates how to insert new rows into a table. Here
-we are adding a single `Config` row to the `config` table with the
-`insert` function.
-
-Now that we've ensured that our database always has a valid `world_size`
-let's spawn some food into the map. Add the following code to the end of
-the file.
-
-``` codeBlockStandalone_LlrK
-const int32_t FOOD_MASS_MIN = 2;
-const int32_t FOOD_MASS_MAX = 4;
-const size_t TARGET_FOOD_COUNT = 600;
-
-float mass_to_radius(int32_t mass) {
-    return std::sqrt(static_cast<float>(mass));
-}
-
-SPACETIMEDB_REDUCER(spawn_food, ReducerContext ctx) {
-    // Check if there are any players logged in
-    bool has_players = false;
-    for (const auto& _ : ctx.db[player]) {
-        has_players = true;
-        break;
-    }
-    if (!has_players) {
-        // Are there no logged in players? Skip food spawn.
-        return Ok();
-    }
-
-    auto config_opt = ctx.db[config_id].find(0);
-    if (!config_opt.has_value()) {
-        return Err("Config not found");
-    }
-    int64_t world_size = config_opt.value().world_size;
-
-    auto& rng = ctx.rng();
-    
-    // Count current food
-    uint64_t food_count = 0;
-    for (const auto& _ : ctx.db[food]) {
-        food_count++;
-    }
-    
-    while (food_count < TARGET_FOOD_COUNT) {
-        int32_t food_mass = rng.gen_range(FOOD_MASS_MIN, FOOD_MASS_MAX);
-        float food_radius = mass_to_radius(food_mass);
-        float x = rng.gen_range(food_radius, static_cast<float>(world_size) - food_radius);
-        float y = rng.gen_range(food_radius, static_cast<float>(world_size) - food_radius);
-        
-        auto inserted_entity = ctx.db[entity].insert(Entity{0, {x, y}, food_mass});
-        ctx.db[food].insert(Food{inserted_entity.entity_id});
-        
-        food_count += 1;
-        LOG_INFO("Spawned food! " + std::to_string(inserted_entity.entity_id));
-    }
-
-    return Ok();
-}
-```
-
-In this reducer, we are using the `world_size` we configured along with
-the `ReducerContext`'s random number generator `.rng()` function to
-place 600 food uniformly randomly throughout the map. We've also chosen
-the `mass` of the food to be a random number between 2 and 4 inclusive.
-
-Although, we've written the reducer to spawn food, no food will actually
-be spawned until we call the function while players are logged in. This
-raises the question, who should call this function and when?
-
-We would like for this function to be called periodically to "top up"
-the amount of food on the map so that it never falls very far below our
-target amount of food. SpacetimeDB has built in functionality for
-exactly this. With SpacetimeDB you can schedule your module to call
-itself in the future or repeatedly with reducers.
-
-- C#
-- Rust
-- C++
-
-In order to schedule a reducer to be called we have to create a new
-table which specifies when and how a reducer should be called. Add this
-new table to the top of the `Module` class.
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "spawn_food_timer", Scheduled = nameof(SpawnFood), ScheduledAt = nameof(scheduled_at))]
-public partial struct SpawnFoodTimer
-{
-    [PrimaryKey, AutoInc]
-    public ulong scheduled_id;
-    public ScheduleAt scheduled_at;
-}
-```
-
-Note the `Scheduled = nameof(SpawnFood)` parameter in the table macro.
-This tells SpacetimeDB that the rows in this table specify a schedule
-for when the `SpawnFood` reducer should be called. Each schedule table
-requires a `scheduled_id` and a `scheduled_at` field so that SpacetimeDB
-can call your reducer, however you can also add your own fields to these
-rows as well.
-
-In order to schedule a reducer to be called we have to create a new
-table which specifies when and how a reducer should be called. Add this
-new table to the top of the file, below your imports.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = spawn_food_timer, scheduled(spawn_food))]
-pub struct SpawnFoodTimer {
-    #[primary_key]
-    #[auto_inc]
-    scheduled_id: u64,
-    scheduled_at: spacetimedb::ScheduleAt,
-}
-```
-
-Note the `scheduled(spawn_food)` parameter in the table macro. This
-tells SpacetimeDB that the rows in this table specify a schedule for
-when the `spawn_food` reducer should be called. Each schedule table
-requires a `scheduled_id` and a `scheduled_at` field so that SpacetimeDB
-can call your reducer, however you can also add your own fields to these
-rows as well.
-
-In order to schedule a reducer to be called we have to create a new
-table which specifies when and how a reducer should be called. Add this
-new table to the top of the file, below the Player table.
-
-``` codeBlockStandalone_LlrK
-struct SpawnFoodTimer {
-    uint64_t scheduled_id;
-    ScheduleAt scheduled_at;
-};
-SPACETIMEDB_STRUCT(SpawnFoodTimer, scheduled_id, scheduled_at);
-SPACETIMEDB_TABLE(SpawnFoodTimer, spawn_food_timer, Private);
-FIELD_PrimaryKeyAutoInc(spawn_food_timer, scheduled_id);
-SPACETIMEDB_SCHEDULE(spawn_food_timer, 1, spawn_food);
-```
-
-Note the `SPACETIMEDB_SCHEDULE(spawn_food_timer, 1, spawn_food)` call.
-This tells SpacetimeDB that the rows in this table specify a schedule
-for when the `spawn_food` reducer should be called. The second parameter
-`1` is the 0-based column index of the `scheduled_at` field. Each
-schedule table requires a `scheduled_id` and a `scheduled_at` field so
-that SpacetimeDB can call your reducer, however you can also add your
-own fields to these rows as well.
-
-You can create, delete, or change a schedule by inserting, deleting, or
-updating rows in this table.
-
-- C#
-- Rust
-- C++
-
-You will see an error telling you that the `SpawnFood` reducer needs to
-take two arguments, but currently only takes one. This is because the
-schedule row must be passed in to all scheduled reducers. Modify your
-`SpawnFood` reducer to take the scheduled row as an argument.
-
-``` codeBlockStandalone_LlrK
-[Reducer]
-public static void SpawnFood(ReducerContext ctx, SpawnFoodTimer _timer)
-{
-    // ...
-}
-```
-
-You will see an error telling you that the `spawn_food` reducer needs to
-take two arguments, but currently only takes one. This is because the
-schedule row must be passed in to all scheduled reducers. Modify your
-`spawn_food` reducer to take the scheduled row as an argument.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer]
-pub fn spawn_food(ctx: &ReducerContext, _timer: SpawnFoodTimer) -> Result<(), String> {
-    // ...
-}
-```
-
-You will see an error telling you that the `spawn_food` reducer needs to
-take two arguments, but currently only takes one. This is because the
-schedule row must be passed in to all scheduled reducers. Modify your
-`spawn_food` reducer to take the scheduled row as an argument.
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_REDUCER(spawn_food, ReducerContext ctx, SpawnFoodTimer _timer) {
-    // ...
-}
-```
-
-In our case we aren't interested in the data on the row, so we name the
-argument `_timer`.
-
-- C#
-- Rust
-- C++
-
-Let's modify our `Init` reducer to schedule our `SpawnFood` reducer to
-be called every 500 milliseconds.
-
-``` codeBlockStandalone_LlrK
-[Reducer(ReducerKind.Init)]
-public static void Init(ReducerContext ctx)
-{
-    Log.Info($"Initializing...");
-    ctx.Db.config.Insert(new Config { world_size = 1000 });
-    ctx.Db.spawn_food_timer.Insert(new SpawnFoodTimer
-    {
-        scheduled_at = new ScheduleAt.Interval(TimeSpan.FromMilliseconds(500))
-    });
-}
-```
-
-note
-
-You can use `ScheduleAt.Interval` to schedule a reducer call at an
-interval like we're doing here. SpacetimeDB will continue to call the
-reducer at this interval until you remove the row. You can also use
-`new ScheduleAt.Time(...)` to schedule a reducer once at a specific
-time. SpacetimeDB will remove that row automatically after the reducer
-has been called.
-
-Let's modify our `init` reducer to schedule our `spawn_food` reducer to
-be called every 500 milliseconds.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer(init)]
-pub fn init(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Initializing...");
-    ctx.db.config().try_insert(Config {
-        id: 0,
-        world_size: 1000,
-    })?;
-    ctx.db.spawn_food_timer().try_insert(SpawnFoodTimer {
-        scheduled_id: 0,
-        scheduled_at: ScheduleAt::Interval(Duration::from_millis(500).into()),
-    })?;
-    Ok(())
-}
-```
-
-note
-
-You can use `ScheduleAt::Interval` to schedule a reducer call at an
-interval like we're doing here. SpacetimeDB will continue to call the
-reducer at this interval until you remove the row. You can also use
-`ScheduleAt::Time()` to specify a specific time at which to call a
-reducer once. SpacetimeDB will remove that row automatically after the
-reducer has been called.
-
-Let's modify our `SPACETIMEDB_INIT` reducer to schedule our `spawn_food`
-reducer to be called every 500 milliseconds.
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_INIT(init, ReducerContext ctx) {
-    LOG_INFO("Initializing...");
-    ctx.db[config].insert(Config{
-        0,
-        1000,
-    });
-    ctx.db[spawn_food_timer].insert(SpawnFoodTimer{
-        0,
-        ScheduleAt(TimeDuration::from_millis(500)),
-    });
-    return Ok();
-}
-```
-
-note
-
-You can use `ScheduleAt(TimeDuration::from_millis(...))` to schedule a
-reducer call at an interval like we're doing here. SpacetimeDB will
-continue to call the reducer at this interval until you remove the row.
-You can also use `ScheduleAt(Timestamp::from_millis_since_epoch(...))`
-to specify a specific time at which to call a reducer once. SpacetimeDB
-will remove that row automatically after the reducer has been called.
-
-### Logging Players In
-
-Let's continue building out our server module by modifying it to log in
-a player when they connect to the database, or to create a new player if
-they've never connected before.
-
-Let's add a second table to our `Player` struct. Modify the `Player`
-struct by adding this above the struct:
-
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "logged_out_player")]
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = logged_out_player)]
-```
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_TABLE(Player, logged_out_player, Private);
-```
-
-Your struct should now look like this:
-
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "player", Public = true)]
-[Table(Accessor = "logged_out_player")]
-public partial struct Player
-{
-    [PrimaryKey]
-    public Identity identity;
-    [Unique, AutoInc]
-    public int player_id;
-    public string name;
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = player, public)]
-#[spacetimedb::table(accessor = logged_out_player)]
-#[derive(Debug, Clone)]
-pub struct Player {
-    #[primary_key]
-    identity: Identity,
-    #[unique]
-    #[auto_inc]
-    player_id: i32,
-    name: String,
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct Player {
-    Identity identity;
-    int32_t player_id;
-    std::string name;
-};
-SPACETIMEDB_STRUCT(Player, identity, player_id, name);
-SPACETIMEDB_TABLE(Player, player, Public);
-SPACETIMEDB_TABLE(Player, logged_out_player, Private);
-FIELD_PrimaryKey(player, identity);
-FIELD_UniqueAutoInc(player, player_id);
-FIELD_PrimaryKey(logged_out_player, identity);
-FIELD_UniqueAutoInc(logged_out_player, player_id);
-```
-
-note
-
-In C++, since we're creating two separate tables from the same struct,
-we need to apply the field constraints (`FIELD_PrimaryKey` and
-`FIELD_UniqueAutoInc`) to both `player` and `logged_out_player`
-independently. Each table maintains its own indexes and constraints.
-
-This creates an additional tabled called `logged_out_player` whose rows
-share the same `Player` type as in the `player` table.
-
-note
-
-IMPORTANT! Note that this new table is not marked `public`. This means
-that it can only be accessed by the database owner (which is almost
-always the database creator). In order to prevent any unintended data
-access, all SpacetimeDB tables are private by default.
-
-If your client isn't syncing rows from the server, check that your table
-is not accidentally marked private.
-
-- C#
-- Rust
-- C++
-
-Next, modify your `Connect` reducer and add a new `Disconnect` reducer
-below it:
-
-``` codeBlockStandalone_LlrK
-[Reducer(ReducerKind.ClientConnected)]
-public static void Connect(ReducerContext ctx)
-{
-    var player = ctx.Db.logged_out_player.identity.Find(ctx.Sender);
-    if (player != null)
-    {
-        ctx.Db.player.Insert(player.Value);
-        ctx.Db.logged_out_player.identity.Delete(player.Value.identity);
-    }
-    else
-    {
-        ctx.Db.player.Insert(new Player
-        {
-            identity = ctx.Sender,
-            name = "",
-        });
-    }
-}
-
-[Reducer(ReducerKind.ClientDisconnected)]
-public static void Disconnect(ReducerContext ctx)
-{
-    var player = ctx.Db.player.identity.Find(ctx.Sender) ?? throw new Exception("Player not found");
-    ctx.Db.logged_out_player.Insert(player);
-    ctx.Db.player.identity.Delete(player.identity);
-}
-```
-
-Next, modify your `connect` reducer and add a new `disconnect` reducer
-below it:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer(client_connected)]
-pub fn connect(ctx: &ReducerContext) -> Result<(), String> {
-    if let Some(player) = ctx.db.logged_out_player().identity().find(&ctx.sender()) {
-        ctx.db.player().insert(player.clone());
-        ctx.db
-            .logged_out_player()
-            .identity()
-            .delete(&player.identity);
-    } else {
-        ctx.db.player().try_insert(Player {
-            identity: ctx.sender(),
-            player_id: 0,
-            name: String::new(),
-        })?;
-    }
-    Ok(())
-}
-
-#[spacetimedb::reducer(client_disconnected)]
-pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
-    let player = ctx
-        .db
-        .player()
-        .identity()
-        .find(&ctx.sender())
-        .ok_or("Player not found")?;
-    let player_id = player.player_id;
-    ctx.db.logged_out_player().insert(player);
-    ctx.db.player().identity().delete(&ctx.sender());
-
-    Ok(())
-}
-```
-
-Next, modify your `connect` reducer and add a new `disconnect` reducer
-below it:
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_CLIENT_CONNECTED(connect, ReducerContext ctx) {
-    // Check if this player was previously logged out
-    auto logged_out_player_opt = ctx.db[logged_out_player_identity].find(ctx.sender());
-    if (logged_out_player_opt.has_value()) {
-        // Move player from logged_out_player to player table
-        ctx.db[player].insert(logged_out_player_opt.value());
-        ctx.db[logged_out_player_identity].delete_by_key(logged_out_player_opt.value().identity);
-    } else {
-        // New player - create and insert into player table
-        ctx.db[player].insert(Player{ctx.sender(), 0, ""});
-    }
-    return Ok();
-}
-
-SPACETIMEDB_CLIENT_DISCONNECTED(disconnect, ReducerContext ctx) {
-    // Find the player in the player table
-    auto player_opt = ctx.db[player_identity].find(ctx.sender());
-    if (!player_opt.has_value()) {
-        return Err("Player not found");
-    }
-    
-    Player player = player_opt.value();
-    
-    // Move player from player to logged_out_player table
-    ctx.db[logged_out_player].insert(player);
-    ctx.db[player_identity].delete_by_key(player.identity);
-    
-    return Ok();
-}
-```
-
-Now when a client connects, if the player corresponding to the client is
-in the `logged_out_player` table, we will move them into the `player`
-table, thus indicating that they are logged in and connected. For any
-new unrecognized client connects we will create a `Player` and insert it
-into the `player` table.
-
-When a player disconnects, we will transfer their player row from the
-`player` table to the `logged_out_player` table to indicate they're
-offline.
-
-note
-
-Note that we could have added a `logged_in` boolean to the `Player` type
-to indicate whether the player is logged in. There's nothing incorrect
-about that approach, however for several reasons we recommend this two
-table approach:
-
-- We can iterate over all logged in players without any `if` statements
-  or branching
-- The `Player` type now uses less program memory improving cache
-  efficiency
-- We can easily check whether a player is logged in, based on whether
-  their row exists in the `player` table
-
-This approach is more generally referred to as [existence based
-processing](https://www.dataorienteddesign.com/dodmain/node4.html) and
-it is a common technique in data-oriented design.
-
-### Spawning Player Circles
-
-Now that we've got our food spawning and our players set up, let's
-create a match and spawn player circle entities into it. The first thing
-we should do before spawning a player into a match is give them a name.
-
-- C#
-- Rust
-- C++
-
-Add the following to the end of the `Module` class.
-
-``` codeBlockStandalone_LlrK
-const int START_PLAYER_MASS = 15;
-
-[Reducer]
-public static void EnterGame(ReducerContext ctx, string name)
-{
-    Log.Info($"Creating player with name {name}");
-    var player = ctx.Db.player.identity.Find(ctx.Sender) ?? throw new Exception("Player not found");
-    player.name = name;
-    ctx.Db.player.identity.Update(player);
-    SpawnPlayerInitialCircle(ctx, player.player_id);
-}
-
-public static Entity SpawnPlayerInitialCircle(ReducerContext ctx, int playerId)
-{
-    var rng = ctx.Rng;
-    var worldSize = (ctx.Db.config.id.Find(0) ?? throw new Exception("Config not found")).world_size;
-    var playerStartRadius = MassToRadius(START_PLAYER_MASS);
-    var x = rng.Range(playerStartRadius, worldSize - playerStartRadius);
-    var y = rng.Range(playerStartRadius, worldSize - playerStartRadius);
-    return SpawnCircleAt(
-        ctx,
-        playerId,
-        START_PLAYER_MASS,
-        new DbVector2(x, y),
-        ctx.Timestamp
-    );
-}
-
-public static Entity SpawnCircleAt(ReducerContext ctx, int playerId, int mass, DbVector2 position, Timestamp timestamp)
-{
-    var entity = ctx.Db.entity.Insert(new Entity
-    {
-        position = position,
-        mass = mass,
-    });
-
-    ctx.Db.circle.Insert(new Circle
-    {
-        entity_id = entity.entity_id,
-        player_id = playerId,
-        direction = new DbVector2(0, 1),
-        speed = 0f,
-        last_split_time = timestamp,
-    });
-    return entity;
-}
-```
-
-The `EnterGame` reducer takes one argument, the player's `name`. We can
-use this name to display as a label for the player in the match, by
-storing the name on the player's row. We are also spawning some circles
-for the player to control now that they are entering the game. To do
-this, we choose a random position within the bounds of the arena and
-create a new entity and corresponding circle row.
-
-Let's also modify our `Disconnect` reducer to remove the circles from
-the arena when the player disconnects from the database server.
-
-``` codeBlockStandalone_LlrK
-[Reducer(ReducerKind.ClientDisconnected)]
-public static void Disconnect(ReducerContext ctx)
-{
-    var player = ctx.Db.player.identity.Find(ctx.Sender) ?? throw new Exception("Player not found");
-    // Remove any circles from the arena
-    foreach (var circle in ctx.Db.circle.player_id.Filter(player.player_id))
-    {
-        var entity = ctx.Db.entity.entity_id.Find(circle.entity_id) ?? throw new Exception("Could not find circle");
-        ctx.Db.entity.entity_id.Delete(entity.entity_id);
-        ctx.Db.circle.entity_id.Delete(entity.entity_id);
-    }
-    ctx.Db.logged_out_player.Insert(player);
-    ctx.Db.player.identity.Delete(player.identity);
-}
-```
-
-Add the following to the bottom of your file.
-
-``` codeBlockStandalone_LlrK
-const START_PLAYER_MASS: i32 = 15;
-
-#[spacetimedb::reducer]
-pub fn enter_game(ctx: &ReducerContext, name: String) -> Result<(), String> {
-    log::info!("Creating player with name {}", name);
-    let mut player: Player = ctx.db.player().identity().find(ctx.sender()).ok_or("")?;
-    let player_id = player.player_id;
-    player.name = name;
-    ctx.db.player().identity().update(player);
-    spawn_player_initial_circle(ctx, player_id)?;
-
-    Ok(())
-}
-
-fn spawn_player_initial_circle(ctx: &ReducerContext, player_id: i32) -> Result<Entity, String> {
-    let mut rng = ctx.rng();
-    let world_size = ctx
-        .db
-        .config()
-        .id()
-        .find(&0)
-        .ok_or("Config not found")?
-        .world_size;
-    let player_start_radius = mass_to_radius(START_PLAYER_MASS);
-    let x = rng.gen_range(player_start_radius..(world_size as f32 - player_start_radius));
-    let y = rng.gen_range(player_start_radius..(world_size as f32 - player_start_radius));
-    spawn_circle_at(
-        ctx,
-        player_id,
-        START_PLAYER_MASS,
-        DbVector2 { x, y },
-        ctx.timestamp,
-    )
-}
-
-fn spawn_circle_at(
-    ctx: &ReducerContext,
-    player_id: i32,
-    mass: i32,
-    position: DbVector2,
-    timestamp: Timestamp,
-) -> Result<Entity, String> {
-    let entity = ctx.db.entity().try_insert(Entity {
-        entity_id: 0,
-        position,
-        mass,
-    })?;
-
-    ctx.db.circle().try_insert(Circle {
-        entity_id: entity.entity_id,
-        player_id,
-        direction: DbVector2 { x: 0.0, y: 1.0 },
-        speed: 0.0,
-        last_split_time: timestamp,
-    })?;
-    Ok(entity)
-}
-```
-
-The `enter_game` reducer takes one argument, the player's `name`. We can
-use this name to display as a label for the player in the match, by
-storing the name on the player's row. We are also spawning some circles
-for the player to control now that they are entering the game. To do
-this, we choose a random position within the bounds of the arena and
-create a new entity and corresponding circle row.
-
-Let's also modify our `disconnect` reducer to remove the circles from
-the arena when the player disconnects from the database server.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer(client_disconnected)]
-pub fn disconnect(ctx: &ReducerContext) -> Result<(), String> {
-    let player = ctx
-        .db
-        .player()
-        .identity()
-        .find(&ctx.sender())
-        .ok_or("Player not found")?;
-    let player_id = player.player_id;
-    ctx.db.logged_out_player().insert(player);
-    ctx.db.player().identity().delete(&ctx.sender());
-
-    // Remove any circles from the arena
-    for circle in ctx.db.circle().player_id().filter(&player_id) {
-        ctx.db.entity().entity_id().delete(&circle.entity_id);
-        ctx.db.circle().entity_id().delete(&circle.entity_id);
-    }
-
-    Ok(())
-}
-```
-
-Add the following to the bottom of your file.
-
-``` codeBlockStandalone_LlrK
-const int32_t START_PLAYER_MASS = 15;
-
-// Helper function to spawn a circle at a specific location
-Entity spawn_circle_at(ReducerContext& ctx, int32_t player_id, int32_t mass, DbVector2 position, Timestamp timestamp) {
-    auto inserted_entity = ctx.db[entity].insert(Entity{0, position, mass});
-    
-    ctx.db[circle].insert(Circle{
-        inserted_entity.entity_id,
-        player_id,
-        DbVector2{0.0f, 1.0f},  // direction
-        0.0f,                    // speed
-        timestamp                // last_split_time
-    });
-    
-    return inserted_entity;
-}
-
-// Helper function to spawn a player's initial circle
-Entity spawn_player_initial_circle(ReducerContext& ctx, int32_t player_id) {
-    auto config_opt = ctx.db[config_id].find(0);
-    if (!config_opt.has_value()) {
-        // This shouldn't happen, but handle it gracefully
-        return Entity{0, {0.0f, 0.0f}, 0};
-    }
-    int64_t world_size = config_opt.value().world_size;
-    
-    auto& rng = ctx.rng();
-    float player_start_radius = mass_to_radius(START_PLAYER_MASS);
-    float x = rng.gen_range(player_start_radius, static_cast<float>(world_size) - player_start_radius);
-    float y = rng.gen_range(player_start_radius, static_cast<float>(world_size) - player_start_radius);
-    
-    return spawn_circle_at(ctx, player_id, START_PLAYER_MASS, DbVector2{x, y}, ctx.timestamp);
-}
-
-SPACETIMEDB_REDUCER(enter_game, ReducerContext ctx, std::string name) {
-    LOG_INFO("Creating player with name " + name);
-    
-    // Find the player
-    auto player_opt = ctx.db[player_identity].find(ctx.sender());
-    if (!player_opt.has_value()) {
-        return Err("Player not found");
-    }
-    
-    // Update the player's name
-    Player updated_player = player_opt.value();
-    int32_t player_id = updated_player.player_id;
-    updated_player.name = name;
-    ctx.db[player_identity].update(updated_player);
-    
-    // Spawn initial circle for the player
-    spawn_player_initial_circle(ctx, player_id);
-    
-    return Ok();
-}
-```
-
-The `enter_game` reducer takes one argument, the player's `name`. We can
-use this name to display as a label for the player in the match, by
-storing the name on the player's row. We are also spawning some circles
-for the player to control now that they are entering the game. To do
-this, we choose a random position within the bounds of the arena and
-create a new entity and corresponding circle row.
-
-Let's also modify our `disconnect` reducer to remove the circles from
-the arena when the player disconnects from the database server.
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_CLIENT_DISCONNECTED(disconnect, ReducerContext ctx) {
-    // Find the player in the player table
-    auto player_opt = ctx.db[player_identity].find(ctx.sender());
-    if (!player_opt.has_value()) {
-        return Err("Player not found");
-    }
-    
-    Player player = player_opt.value();
-    int32_t player_id = player.player_id;
-    
-    // Move player from player to logged_out_player table
-    ctx.db[logged_out_player].insert(player);
-    ctx.db[player_identity].delete_by_key(player.identity);
-    
-    // Remove any circles from the arena
-    for (const Circle& circle : ctx.db[circle_player_id]) {
-        if (circle.player_id == player_id) {
-            ctx.db[entity_entity_id].delete_by_key(circle.entity_id);
-            ctx.db[circle_entity_id].delete_by_key(circle.entity_id);
-        }
-    }
-    
-    return Ok();
-}
-```
-
-Finally, publish the new module to SpacetimeDB with this command:
-
-``` codeBlockStandalone_LlrK
-spacetime publish --server local blackholio --delete-data
-```
-
-Deleting the data is optional in this case, but in case you've been
-messing around with the module we can just start fresh.
-
-### Creating the Arena
-
-Now that we've set up our server logic to spawn food and players, let's
-continue developing our Unity client to display what we have so far.
-
-Start by adding `SetupArena` and `CreateBorderCube` methods to your
-`GameManager` class:
-
-``` codeBlockStandalone_LlrK
-private void SetupArena(float worldSize)
-{
-    CreateBorderCube(new Vector2(worldSize / 2.0f, worldSize + borderThickness / 2),
-        new Vector2(worldSize + borderThickness * 2.0f, borderThickness)); //North
-    CreateBorderCube(new Vector2(worldSize / 2.0f, -borderThickness / 2),
-        new Vector2(worldSize + borderThickness * 2.0f, borderThickness)); //South
-    CreateBorderCube(new Vector2(worldSize + borderThickness / 2, worldSize / 2.0f),
-        new Vector2(borderThickness, worldSize + borderThickness * 2.0f)); //East
-    CreateBorderCube(new Vector2(-borderThickness / 2, worldSize / 2.0f),
-        new Vector2(borderThickness, worldSize + borderThickness * 2.0f)); //West
-}
-
-private void CreateBorderCube(Vector2 position, Vector2 scale)
-{
-    var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-    cube.name = "Border";
-    cube.transform.localScale = new Vector3(scale.x, scale.y, 1);
-    cube.transform.position = new Vector3(position.x, position.y, 1);
-    cube.GetComponent<MeshRenderer>().material = borderMaterial;
-}
-```
-
-In your `HandleSubscriptionApplied` let's now call `SetupArena` method.
-Modify your `HandleSubscriptionApplied` method as in the below.
-
-``` codeBlockStandalone_LlrK
-private void HandleSubscriptionApplied(SubscriptionEventContext ctx)
-{
-    Debug.Log("Subscription applied!");
-    OnSubscriptionApplied?.Invoke();
-
-    // Once we have the initial subscription sync'd to the client cache
-    // Get the world size from the config table and set up the arena
-    var worldSize = Conn.Db.Config.Id.Find(0).WorldSize;
-    SetupArena(worldSize);
-}
-```
-
-The `OnApplied` callback will be called after the server synchronizes
-the initial state of your tables with your client. Once the sync has
-happened, we can look up the world size from the `config` table and use
-it to set up our arena.
-
-In the scene view, select the `GameManager` object. Click on the
-`Border Material` property and choose `Sprites-Default`.
-
-### Creating GameObjects
-
-Now that we have our arena all set up, we need to take the row data that
-SpacetimeDB syncs with our client and use it to create and draw
-`GameObject`s on the screen.
-
-Let's start by making some controller scripts for each of the game
-objects we'd like to have in our scene. In the project window,
-right-click and select `Create > C# Script`. Name the new script
-`PlayerController.cs`. Repeat that process for `CircleController.cs` and
-`FoodController.cs`. We'll modify the contents of these files later.
-
-Now let's make some prefabs for our game objects. In the scene hierarchy
-window, create a new `GameObject` by right-clicking and selecting:
-
-``` prism-code
-2D Object > Sprites > Circle
-```
-
-Rename the new game object in the scene to `CirclePrefab`. Next in the
-`Inspector` window click the `Add Component` button and add the
-`Circle Controller` script component that we just created. Finally drag
-the object into the `Project` folder. Once the prefab file is created,
-delete the `CirclePrefab` object from the scene. We'll use this prefab
-to draw the circles that a player controls.
-
-Next repeat that same process for the `FoodPrefab` and `Food Controller`
-component.
-
-In the `Project` view, double click the `CirclePrefab` to bring it up in
-the scene view. Right-click anywhere in the hierarchy and navigate to:
-
-``` prism-code
-3d Object > Text - Text Mesh Pro
-```
-
-This will add a label to the circle prefab. You may need to import
-"TextMeshPro Essential Resources" into Unity in order to add the
-TextMeshPro element. Your logs will say "\[TMP Essential Resources\]
-have been imported." if it has worked correctly. Don't forget to set the
-transform position of the label to `Pos X: 0, Pos Y: 0, Pos Z: 0`. You
-should also change the font size to 5 or something close to that
-according to your preference and set the alignment to `Center` and
-`Middle`.
-
-Finally we need to make the `PlayerPrefab`. In the hierarchy window,
-create a new `GameObject` by right-clicking and selecting:
-
-``` prism-code
-Create Empty
-```
-
-Rename the game object to `PlayerPrefab`. Next in the `Inspector` window
-click the `Add Component` button and add the `Player Controller` script
-component that we just created. Next drag the object into the `Project`
-folder. Once the prefab file is created, delete the `PlayerPrefab`
-object from the scene.
-
-#### EntityController
-
-Let's also create an `EntityController` script which will serve as a
-base class for both our `CircleController` and `FoodController` classes
-since both `Circle`s and `Food` are entities.
-
-Create a new file called `EntityController.cs` and replace its contents
-with:
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB.Types;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine;
-
-public abstract class EntityController : MonoBehaviour
-{
-    const float LERP_DURATION_SEC = 0.1f;
-
-    private static readonly int ShaderColorProperty = Shader.PropertyToID("_Color");
-
-    [DoNotSerialize] public int EntityId;
-
-    protected float LerpTime;
-    protected Vector3 LerpStartPosition;
-    protected Vector3 LerpTargetPosition;
-    protected Vector3 TargetScale;
-
-    protected virtual void Spawn(int entityId)
-    {
-        EntityId = entityId;
-
-        var entity = GameManager.Conn.Db.Entity.EntityId.Find(entityId);
-        LerpStartPosition = LerpTargetPosition = transform.position = (Vector2)entity.Position;
-        transform.localScale = Vector3.one;
-        TargetScale = MassToScale(entity.Mass);
-    }
-
-    public void SetColor(Color color)
-    {
-        GetComponent<SpriteRenderer>().material.SetColor(ShaderColorProperty, color);
-    }
-
-    public virtual void OnEntityUpdated(Entity newVal)
-    {
-        LerpTime = 0.0f;
-        LerpStartPosition = transform.position;
-        LerpTargetPosition = (Vector2)newVal.Position;
-        TargetScale = MassToScale(newVal.Mass);
-    }
-
-    public virtual void OnDelete(EventContext context)
-    {
-        Destroy(gameObject);
-    }
-
-    public virtual void Update()
-    {
-        // Interpolate position and scale
-        LerpTime = Mathf.Min(LerpTime + Time.deltaTime, LERP_DURATION_SEC);
-        transform.position = Vector3.Lerp(LerpStartPosition, LerpTargetPosition, LerpTime / LERP_DURATION_SEC);
-        transform.localScale = Vector3.Lerp(transform.localScale, TargetScale, Time.deltaTime * 8);
-    }
-
-    public static Vector3 MassToScale(int mass)
-    {
-        var diameter = MassToDiameter(mass);
-        return new Vector3(diameter, diameter, 1);
-    }
-
-    public static float MassToRadius(int mass) => Mathf.Sqrt(mass);
-    public static float MassToDiameter(int mass) => MassToRadius(mass) * 2;
-}
-```
-
-The `EntityController` script just provides some helper functions and
-basic functionality to manage our game objects based on entity updates.
-
-> One notable feature is that we linearly interpolate (lerp) between the
-> position where the server says the entity is, and where we actually
-> draw it. This is a common technique which provides for smoother
-> movement.
->
-> If you're interested in learning more checkout [this
-> demo](https://gabrielgambetta.com/client-side-prediction-live-demo.html)
-> from Gabriel Gambetta.
-
-At this point you'll have a compilation error because we can't yet
-convert from `SpacetimeDB.Types.DbVector2` to `UnityEngine.Vector2`. To
-fix this, let's also create a new `Extensions.cs` script and replace the
-contents with:
-
-``` codeBlockStandalone_LlrK
-using UnityEngine;
-
-namespace SpacetimeDB.Types
-{
-    public partial class DbVector2
-    {
-        public static implicit operator Vector2(DbVector2 vec)
-        {
-            return new Vector2(vec.X, vec.Y);
-        }
-
-        public static implicit operator DbVector2(Vector2 vec)
-        {
-            return new DbVector2(vec.x, vec.y);
-        }
-    }
-}
-```
-
-This just allows us to implicitly convert between our `DbVector2` type
-and the Unity `Vector2` type.
-
-#### CircleController
-
-Now open the `CircleController` script and modify the contents of the
-`CircleController` script to be:
-
-``` codeBlockStandalone_LlrK
-using System;
-using System.Collections.Generic;
-using SpacetimeDB;
-using SpacetimeDB.Types;
-using UnityEngine;
-
-public class CircleController : EntityController
-{
-    private static Color[] ColorPalette = {
-        //Yellow
-        new Color32(175, 159, 49, 255),
-        new Color32(175, 116, 49, 255),
-
-        //Purple
-        new Color32(112, 47, 252, 255),
-        new Color32(51, 91, 252, 255),
-
-        //Red
-        new Color32(176, 54, 54, 255),
-        new Color32(176, 109, 54, 255),
-        new Color32(141, 43, 99, 255),
-
-        //Blue
-        new Color32(2, 188, 250, 255),
-        new Color32(7, 50, 251, 255),
-        new Color32(2, 28, 146, 255),
-    };
-
-    private PlayerController Owner { get; set; }
-
-    public void Spawn(Circle circle, PlayerController owner)
-    {
-        base.Spawn(circle.EntityId);
-        SetColor(ColorPalette[circle.PlayerId % ColorPalette.Length]);
-
-        Owner = owner;
-        GetComponentInChildren<TMPro.TextMeshPro>().text = owner.Username;
-    }
-
-    public override void OnDelete(EventContext context)
-    {
-        base.OnDelete(context);
-        Owner.OnCircleDeleted(this);
-    }
-}
-```
-
-At the top, we're just defining some possible colors for our circle.
-We've also created a spawn function which takes a `Circle` (same type
-that's in our `circle` table) and a `PlayerController` which sets the
-color based on the circle's player ID, as well as setting the text of
-the Cricle to be the player's username.
-
-Note that the `CircleController` inherits from the `EntityController`,
-not `MonoBehavior`.
-
-#### FoodController
-
-Next open the `FoodController.cs` file and replace the contents with:
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB.Types;
-using UnityEngine;
-
-public class FoodController : EntityController
-{
-    private static readonly Color[] ColorPalette = 
-    {
-        new Color32(119, 252, 173, 255),
-        new Color32(76, 250, 146, 255),
-        new Color32(35, 246, 120, 255),
-
-        new Color32(119, 251, 201, 255),
-        new Color32(76, 249, 184, 255),
-        new Color32(35, 245, 165, 255),
-    };
-
-    public void Spawn(Food food)
-    {
-        base.Spawn(food.EntityId);
-        SetColor(ColorPalette[EntityId % ColorPalette.Length]);
-    }
-}
-```
-
-#### PlayerController
-
-Open the `PlayerController` script and modify the contents of the
-`PlayerController` script to be:
-
-``` codeBlockStandalone_LlrK
-using System.Collections.Generic;
-using System.Linq;
-using SpacetimeDB;
-using SpacetimeDB.Types;
-using UnityEngine;
-
-public class PlayerController : MonoBehaviour
-{
-    const int SEND_UPDATES_PER_SEC = 20;
-    const float SEND_UPDATES_FREQUENCY = 1f / SEND_UPDATES_PER_SEC;
-
-    public static PlayerController Local { get; private set; }
-
-    private int PlayerId;
-    private float LastMovementSendTimestamp;
-    private Vector2? LockInputPosition;
-    private List<CircleController> OwnedCircles = new List<CircleController>();
-
-    public string Username => GameManager.Conn.Db.Player.PlayerId.Find(PlayerId).Name;
-    public int NumberOfOwnedCircles => OwnedCircles.Count;
-    public bool IsLocalPlayer => this == Local;
-
-    public void Initialize(Player player)
-    {
-        PlayerId = player.PlayerId;
-        if (player.Identity == GameManager.LocalIdentity)
-        {
-            Local = this;
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // If we have any circles, destroy them
-        foreach (var circle in OwnedCircles)
-        {
-            if (circle != null)
-            {
-                Destroy(circle.gameObject);
-            }
-        }
-        OwnedCircles.Clear();
-    }
-
-    public void OnCircleSpawned(CircleController circle)
-    {
-        OwnedCircles.Add(circle);
-    }
-
-    public void OnCircleDeleted(CircleController deletedCircle)
-    {
-        // This means we got eaten
-        if (OwnedCircles.Remove(deletedCircle) && IsLocalPlayer && OwnedCircles.Count == 0)
-        {
-            // DeathScreen.Instance.SetVisible(true);
-        }
-    }
-
-    public int TotalMass()
-    {
-        return (int)OwnedCircles
-            .Select(circle => GameManager.Conn.Db.Entity.EntityId.Find(circle.EntityId))
-            .Sum(e => e?.Mass ?? 0); //If this entity is being deleted on the same frame that we're moving, we can have a null entity here.
-    }
-
-    public Vector2? CenterOfMass()
-    {
-        if (OwnedCircles.Count == 0)
-        {
-            return null;
-        }
-
-        Vector2 totalPos = Vector2.zero;
-        float totalMass = 0;
-        foreach (var circle in OwnedCircles)
-        {
-            var entity = GameManager.Conn.Db.Entity.EntityId.Find(circle.EntityId);
-            var position = circle.transform.position;
-            totalPos += (Vector2)position * entity.Mass;
-            totalMass += entity.Mass;
-        }
-
-        return totalPos / totalMass;
-    }
-
-    private void OnGUI()
-    {
-        if (!IsLocalPlayer || !GameManager.IsConnected())
-        {
-            return;
-        }
-
-        GUI.Label(new Rect(0, 0, 100, 50), $"Total Mass: {TotalMass()}");
-    }
-
-    //Automated testing members
-    private bool testInputEnabled;
-    private Vector2 testInput;
-
-    public void SetTestInput(Vector2 input) => testInput = input;
-    public void EnableTestInput() => testInputEnabled = true;
-}
-```
-
-Let's also add a new `PrefabManager.cs` script which we can use as a
-factory for creating prefabs. Replace the contents of the file with:
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB.Types;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PrefabManager : MonoBehaviour
-{
-    private static PrefabManager Instance;
-
-    public CircleController CirclePrefab;
-    public FoodController FoodPrefab;
-    public PlayerController PlayerPrefab;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
-
-    public static CircleController SpawnCircle(Circle circle, PlayerController owner)
-    {
-        var entityController = Instantiate(Instance.CirclePrefab);
-        entityController.name = $"Circle - {circle.EntityId}";
-        entityController.Spawn(circle, owner);
-        owner.OnCircleSpawned(entityController);
-        return entityController;
-    }
-
-    public static FoodController SpawnFood(Food food)
-    {
-        var entityController = Instantiate(Instance.FoodPrefab);
-        entityController.name = $"Food - {food.EntityId}";
-        entityController.Spawn(food);
-        return entityController;
-    }
-
-    public static PlayerController SpawnPlayer(Player player)
-    {
-        var playerController = Instantiate(Instance.PlayerPrefab);
-        playerController.name = $"PlayerController - {player.Name}";
-        playerController.Initialize(player);
-        return playerController;
-    }
-}
-```
-
-In the scene hierarchy, select the `GameManager` object and add the
-`Prefab Manager` script as a component to the `GameManager` object. Drag
-the corresponding `CirclePrefab`, `FoodPrefab`, and `PlayerPrefab`
-prefabs we created earlier from the project view into their respective
-slots in the `Prefab Manager`. Save the scene.
-
-### Hooking up the Data
-
-We've now prepared our Unity project so that we can hook up the data
-from our tables to the Unity game objects and have them drawn on the
-screen.
-
-Add a couple dictionaries at the top of your `GameManager` class which
-we'll use to hold onto the game objects we create for our scene. Add
-these two lines just below your `DbConnection` like so:
-
-``` codeBlockStandalone_LlrK
-public static DbConnection Conn { get; private set; }
-
-public static Dictionary<int, EntityController> Entities = new Dictionary<int, EntityController>();
-public static Dictionary<int, PlayerController> Players = new Dictionary<int, PlayerController>();
-```
-
-Next lets add some callbacks when rows change in the database. Modify
-the `HandleConnect` method as below.
-
-``` codeBlockStandalone_LlrK
-void HandleConnect(DbConnection conn, Identity identity, string token)
-{
-    Debug.Log("Connected.");
-    // Only the WebGL player has the browser WebSocket header limitation.
-    // The Unity Editor uses the normal desktop transport even when the
-    // selected build target is WebGL, so keep the normal behavior there.
-#if UNITY_WEBGL && !UNITY_EDITOR
-    if (AuthToken.Token == "")
-    {
-        // No token was supplied to the connection, so this is the
-        // long-lived server-issued token for the new identity. Save it.
-        // If a token already exists, this connect may have used a
-        // short-lived WebSocket token, which should not overwrite it.
-        AuthToken.SaveToken(token);
-    }
-#else
-    AuthToken.SaveToken(token);
-#endif
-    LocalIdentity = identity;
-
-    conn.Db.Circle.OnInsert += CircleOnInsert;
-    conn.Db.Entity.OnUpdate += EntityOnUpdate;
-    conn.Db.Entity.OnDelete += EntityOnDelete;
-    conn.Db.Food.OnInsert += FoodOnInsert;
-    conn.Db.Player.OnInsert += PlayerOnInsert;
-    conn.Db.Player.OnDelete += PlayerOnDelete;
-
-    OnConnected?.Invoke();
-
-    // Request all tables
-    Conn.SubscriptionBuilder()
-        .OnApplied(HandleSubscriptionApplied)
-        .SubscribeToAllTables();
-}
-```
-
-Keep the same WebGL guard from Part 2 here as well. On Unity WebGL, a
-reconnect can surface a short-lived WebSocket token in `HandleConnect`,
-so you should not overwrite an already-saved long-lived server-issued
-token.
-
-Next add the following implementations for those callbacks to the
-`GameManager` class.
-
-``` codeBlockStandalone_LlrK
-private static void CircleOnInsert(EventContext context, Circle insertedValue)
-{
-    var player = GetOrCreatePlayer(insertedValue.PlayerId);
-    var entityController = PrefabManager.SpawnCircle(insertedValue, player);
-    Entities.Add(insertedValue.EntityId, entityController);
-}
-
-private static void EntityOnUpdate(EventContext context, Entity oldEntity, Entity newEntity)
-{
-    if (!Entities.TryGetValue(newEntity.EntityId, out var entityController))
-    {
-        return;
-    }
-    entityController.OnEntityUpdated(newEntity);
-}
-
-private static void EntityOnDelete(EventContext context, Entity oldEntity)
-{
-    if (Entities.Remove(oldEntity.EntityId, out var entityController))
-    {
-        entityController.OnDelete(context);
-    }
-}
-
-private static void FoodOnInsert(EventContext context, Food insertedValue)
-{
-    var entityController = PrefabManager.SpawnFood(insertedValue);
-    Entities.Add(insertedValue.EntityId, entityController);
-}
-
-private static void PlayerOnInsert(EventContext context, Player insertedPlayer)
-{
-    GetOrCreatePlayer(insertedPlayer.PlayerId);
-}
-
-private static void PlayerOnDelete(EventContext context, Player deletedvalue)
-{
-    if (Players.Remove(deletedvalue.PlayerId, out var playerController))
-    {
-        GameObject.Destroy(playerController.gameObject);
-    }
-}
-
-private static PlayerController GetOrCreatePlayer(int playerId)
-{
-    if (!Players.TryGetValue(playerId, out var playerController))
-    {
-        var player = Conn.Db.Player.PlayerId.Find(playerId);
-        playerController = PrefabManager.SpawnPlayer(player);
-        Players.Add(playerId, playerController);
-    }
-
-    return playerController;
-}
-```
-
-### Camera Controller
-
-One of the last steps is to create a camera controller to make sure the
-camera moves around with the player. Create a script called
-`CameraController.cs` and add it to your project. Replace the contents
-of the file with this:
-
-``` codeBlockStandalone_LlrK
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class CameraController : MonoBehaviour
-{
-    public static float WorldSize = 0.0f;
-
-    private void LateUpdate()
-    {
-        var arenaCenterTransform = new Vector3(WorldSize / 2, WorldSize / 2, -10.0f);
-        if (PlayerController.Local == null || !GameManager.IsConnected())
-        {
-            // Set the camera to be in middle of the arena if we are not connected or
-            // there is no local player
-            transform.position = arenaCenterTransform;
-            return;
-        }
-
-        var centerOfMass = PlayerController.Local.CenterOfMass();
-        if (centerOfMass.HasValue)
-        {
-            // Set the camera to be the center of mass of the local player
-            // if the local player has one
-            transform.position = new Vector3
-            {
-                x = centerOfMass.Value.x,
-                y = centerOfMass.Value.y,
-                z = transform.position.z
-            };
-        } else {
-            transform.position = arenaCenterTransform;
-        }
-
-        float targetCameraSize = CalculateCameraSize(PlayerController.Local);
-        Camera.main.orthographicSize = Mathf.Lerp(Camera.main.orthographicSize, targetCameraSize, Time.deltaTime * 2);
-    }
-
-    private float CalculateCameraSize(PlayerController player)
-    {
-        return 50f + //Base size
-            Mathf.Min(50, player.TotalMass() / 5) + //Increase camera size with mass
-            Mathf.Min(player.NumberOfOwnedCircles - 1, 1) * 30; //Zoom out when player splits
-    }
-}
-```
-
-Add the `CameraController` as a component to the `Main Camera` object in
-the scene.
-
-Lastly modify the `GameManager.SetupArena` method to set the `WorldSize`
-on the `CameraController`.
-
-``` codeBlockStandalone_LlrK
-private void SetupArena(float worldSize)
-{
-    CreateBorderCube(new Vector2(worldSize / 2.0f, worldSize + borderThickness / 2),
-        new Vector2(worldSize + borderThickness * 2.0f, borderThickness)); //North
-    CreateBorderCube(new Vector2(worldSize / 2.0f, -borderThickness / 2),
-        new Vector2(worldSize + borderThickness * 2.0f, borderThickness)); //South
-    CreateBorderCube(new Vector2(worldSize + borderThickness / 2, worldSize / 2.0f),
-        new Vector2(borderThickness, worldSize + borderThickness * 2.0f)); //East
-    CreateBorderCube(new Vector2(-borderThickness / 2, worldSize / 2.0f),
-        new Vector2(borderThickness, worldSize + borderThickness * 2.0f)); //West
-
-    // Set the world size for the camera controller
-    CameraController.WorldSize = worldSize;
-}
-```
-
-### Entering the Game
-
-At this point, you may need to regenerate your bindings the following
-command from the `blackholio-server/spacetimedb` directory.
-
-``` codeBlockStandalone_LlrK
-spacetime generate --lang csharp --out-dir ../../Assets/module_bindings
-```
-
-The last step is to call the `enter_game` reducer on the server, passing
-in a username for our player, which will spawn a circle for our player.
-For the sake of simplicity, let's call the `enter_game` reducer from the
-`HandleSubscriptionApplied` callback with the name "3Blave".
-
-``` codeBlockStandalone_LlrK
-private void HandleSubscriptionApplied(SubscriptionEventContext ctx)
-{
-    Debug.Log("Subscription applied!");
-    OnSubscriptionApplied?.Invoke();
-
-    // Once we have the initial subscription sync'd to the client cache
-    // Get the world size from the config table and set up the arena
-    var worldSize = Conn.Db.Config.Id.Find(0).WorldSize;
-    SetupArena(worldSize);
-
-    // Call enter game with the player name 3Blave
-    ctx.Reducers.EnterGame("3Blave");
-}
-```
-
-### Trying it out
-
-At this point, after publishing our module we can press the play button
-to see the fruits of our labor! You should be able to see your player's
-circle, with its username label, surrounded by food.
-
-![Player on
-screen](https://spacetimedb.com/docs/assets/images/part-3-player-on-screen-2e752a62db574760fbdc41c9fa52992b.png)
-
-### Troubleshooting
-
-- If you get an error when running the generate command, make sure you
-  have an empty subfolder in your Unity project Assets folder called
-  `module_bindings`
-
-- If you get an error in your Unity console when starting the game,
-  double check that you have published your module and you have the
-  correct database name specified in your `GameManager`.
-
-### Next Steps
-
-It's pretty cool to see our player in game surrounded by food, but
-there's a problem! We can't move yet. In the next part, we'll explore
-how to get your player moving and interacting with food and other
-objects.
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-intro/tutorials/unity-tutorial/part-3" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">3 - Gameplay | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tutorials/unity/part-3"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="3 - Gameplay | SpacetimeDB docs"><meta data-rh="true" name="description" content="Need help with the tutorial? Join our Discord server!"><meta data-rh="true" property="og:description" content="Need help with the tutorial? Join our Discord server!"><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tutorials/unity/part-3"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/unity/part-3" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/unity/part-3" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tutorials","item":"https://spacetimedb.com/docs/tutorials/chat-app"},{"@type":"ListItem","position":2,"name":"Unity Tutorial","item":"https://spacetimedb.com/docs/tutorials/unity"},{"@type":"ListItem","position":3,"name":"3 - Gameplay","item":"https://spacetimedb.com/docs/tutorials/unity/part-3"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tutorials/unity/part-3">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tutorials/unity/part-3">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tutorials/unity/part-3">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Collapse sidebar category &#x27;Tutorials&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/chat-app"><span title="Chat App Tutorial" class="linkLabel_UvDg">Chat App Tutorial</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/tutorials/unity"><span title="Unity Tutorial" class="categoryLinkLabel_HATI">Unity Tutorial</span></a><button aria-label="Collapse sidebar category &#x27;Unity Tutorial&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-1"><span title="1 - Setup" class="linkLabel_UvDg">1 - Setup</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-2"><span title="2 - Connecting to SpacetimeDB" class="linkLabel_UvDg">2 - Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tutorials/unity/part-3"><span title="3 - Gameplay" class="linkLabel_UvDg">3 - Gameplay</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-4"><span title="4 - Moving and Colliding" class="linkLabel_UvDg">4 - Moving and Colliding</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/unreal"><span title="Unreal Tutorial" class="categoryLinkLabel_HATI">Unreal Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Unreal Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/godot"><span title="Godot Tutorial" class="categoryLinkLabel_HATI">Godot Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Godot Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/chat-app"><span>Tutorials</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/unity"><span>Unity Tutorial</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">3 - Gameplay</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>3 - Gameplay</h1></header><p>Need help with the tutorial? <a href="https://discord.gg/spacetimedb" target="_blank" rel="noopener noreferrer" class="">Join our Discord server</a>!</p>
+<p>This progressive tutorial is continued from <a class="" href="/docs/tutorials/unity/part-2">part 2</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="spawning-food">Spawning Food<a href="#spawning-food" class="hash-link" aria-label="Direct link to Spawning Food" title="Direct link to Spawning Food" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s start by spawning food into the map. The first thing we need to do is create a new, special reducer called the <code>Init</code> reducer. SpacetimeDB calls the <code>Init</code> reducer automatically when you first publish your module, and also after any time you run with <code>publish --delete-data</code>. It gives you an opportunity to initialize the state of your database before any clients connect.</p><p>Add this new reducer above our <code>Connect</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Note the `ReducerKind.Init` parameter passed to the reducer macro.</span></span>
+<span class="line"><span style="color:#6272A4">// That indicates to SpacetimeDB that it should be called</span></span>
+<span class="line"><span style="color:#6272A4">// once upon database creation.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.Init)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Init</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.config.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> { world_size </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 1000</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This reducer also demonstrates how to insert new rows into a table. Here we are adding a single <code>Config</code> row to the <code>config</code> table with the <code>Insert</code> function.</p><p>Now that we&#x27;ve ensured that our database always has a valid <code>world_size</code> let&#x27;s spawn some food into the map. Add the following code to the end of the <code>Module</code> class.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> FOOD_MASS_MIN </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> FOOD_MASS_MAX </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 4</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> TARGET_FOOD_COUNT </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 600</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> MathF.</span><span style="color:#50FA7B">Sqrt</span><span style="color:#F8F8F2">(mass);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SpawnFood</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.Db.player.Count </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">) </span><span style="color:#6272A4">//Are there no players yet?</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (ctx.Db.config.id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)).world_size;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Rng;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> foodCount </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.food.Count;</span></span>
+<span class="line"><span style="color:#FF79C6">    while</span><span style="color:#F8F8F2"> (foodCount </span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2"> TARGET_FOOD_COUNT)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> foodMass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">Range</span><span style="color:#F8F8F2">(FOOD_MASS_MIN, FOOD_MASS_MAX);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> foodRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(foodMass);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">Range</span><span style="color:#F8F8F2">(foodRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> foodRadius);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">Range</span><span style="color:#F8F8F2">(foodRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> foodRadius);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.entity.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Entity</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            position </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(x, y),</span></span>
+<span class="line"><span style="color:#F8F8F2">            mass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> foodMass,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.food.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Food</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            entity_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> entity.entity_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">        foodCount</span><span style="color:#FF79C6">++</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Spawned food! </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">entity</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">entity_id</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">this</span><span style="color:#8BE9FD;font-style:italic"> Random</span><span style="color:#FFB86C;font-style:italic"> rng</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> min</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> max</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">NextSingle</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> (max </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> min) </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> min;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> int</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">this</span><span style="color:#8BE9FD;font-style:italic"> Random</span><span style="color:#FFB86C;font-style:italic"> rng</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> min</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> max</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">)rng.</span><span style="color:#50FA7B">NextInt64</span><span style="color:#F8F8F2">(min, max);</span></span></code></pre><p>In this reducer, we are using the <code>world_size</code> we configured along with the <code>ReducerContext</code>&#x27;s random number generator <code>.Rng</code> function to place 600 food uniformly randomly throughout the map. We&#x27;ve also chosen the <code>mass</code> of the food to be a random number between 2 and 4 inclusive.</p><p>We also added two helper functions so we can get a random range as either a <code>int</code> or a <code>float</code>.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>Let&#x27;s start by spawning food into the map. The first thing we need to do is create a new, special reducer called the <code>init</code> reducer. SpacetimeDB calls the <code>init</code> reducer automatically when you first publish your module, and also after any time you run with <code>publish --delete-data</code>. It gives you an opportunity to initialize the state of your database before any clients connect.</p><p>Add this new reducer above our <code>connect</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Note the `init` parameter passed to the reducer macro.</span></span>
+<span class="line"><span style="color:#6272A4">// That indicates to SpacetimeDB that it should be called</span></span>
+<span class="line"><span style="color:#6272A4">// once upon database creation.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(init)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> init</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Initializing..."</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        world_size</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 1000</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This reducer also demonstrates how to insert new rows into a table. Here we are adding a single <code>Config</code> row to the <code>config</code> table with the <code>try_insert</code> function. <code>try_insert</code> returns an error if inserting the row into the table would violate any constraints, like unique constraints, on the table. You can also use <code>insert</code> which panics on constraint violations if you know for sure that you will not violate any constraints.</p><p>Now that we&#x27;ve ensured that our database always has a valid <code>world_size</code> let&#x27;s spawn some food into the map. Add the following code to the end of the file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> FOOD_MASS_MIN</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> FOOD_MASS_MAX</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 4</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> TARGET_FOOD_COUNT</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> usize</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 600</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(mass</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    (mass </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> spawn_food</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">        // Are there no logged in players? Skip food spawn.</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#8BE9FD;font-style:italic"> Ok</span><span style="color:#F8F8F2">(());</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Config not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> food_count </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">food</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    while</span><span style="color:#F8F8F2"> food_count </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> TARGET_FOOD_COUNT</span><span style="color:#FF79C6"> as</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> food_mass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">FOOD_MASS_MIN</span><span style="color:#FF79C6">..</span><span style="color:#BD93F9">FOOD_MASS_MAX</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> food_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(food_mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(food_radius</span><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> food_radius);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(food_radius</span><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> food_radius);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            entity_id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            position</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> { x, y },</span></span>
+<span class="line"><span style="color:#F8F8F2">            mass</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> food_mass,</span></span>
+<span class="line"><span style="color:#F8F8F2">        })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">food</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Food</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            entity_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        food_count </span><span style="color:#FF79C6">+=</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Spawned food! {}"</span><span style="color:#F8F8F2">, entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>In this reducer, we are using the <code>world_size</code> we configured along with the <code>ReducerContext</code>&#x27;s random number generator <code>.rng()</code> function to place 600 food uniformly randomly throughout the map. We&#x27;ve also chosen the <code>mass</code> of the food to be a random number between 2 and 4 inclusive.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s start by spawning food into the map. The first thing we need to do is create a new, special reducer called the <code>SPACETIMEDB_INIT</code> reducer. SpacetimeDB calls the <code>SPACETIMEDB_INIT</code> reducer automatically when you first publish your module, and also after any time you run with <code>publish --delete-data</code>. It gives you an opportunity to initialize the state of your database before any clients connect.</p><p>Add this new reducer above our <code>connect</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Note the SPACETIMEDB_INIT macro.</span></span>
+<span class="line"><span style="color:#6272A4">// This indicates to SpacetimeDB that it should be called</span></span>
+<span class="line"><span style="color:#6272A4">// once upon database creation.</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_INIT</span><span style="color:#F8F8F2">(init, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[config].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Config{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">});</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This reducer also demonstrates how to insert new rows into a table. Here we are adding a single <code>Config</code> row to the <code>config</code> table with the <code>insert</code> function.</p><p>Now that we&#x27;ve ensured that our database always has a valid <code>world_size</code> let&#x27;s spawn some food into the map. Add the following code to the end of the file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int32_t</span><span style="color:#F8F8F2"> FOOD_MASS_MIN </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int32_t</span><span style="color:#F8F8F2"> FOOD_MASS_MAX </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 4</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> size_t</span><span style="color:#F8F8F2"> TARGET_FOOD_COUNT </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 600</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">float</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int32_t</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(mass));</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(spawn_food, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Check if there are any players logged in</span></span>
+<span class="line"><span style="color:#FF79C6">    bool</span><span style="color:#F8F8F2"> has_players </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#F8F8F2"> _ : ctx.db[player]) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        has_players </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">        break</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">has_players) {</span></span>
+<span class="line"><span style="color:#6272A4">        // Are there no logged in players? Skip food spawn.</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> config_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[config_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">config_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    int64_t</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    auto&</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Count current food</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> food_count </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#F8F8F2"> _ : ctx.db[food]) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        food_count</span><span style="color:#FF79C6">++</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    while</span><span style="color:#F8F8F2"> (food_count </span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2"> TARGET_FOOD_COUNT) {</span></span>
+<span class="line"><span style="color:#FF79C6">        int32_t</span><span style="color:#F8F8F2"> food_mass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(FOOD_MASS_MIN, FOOD_MASS_MAX);</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> food_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(food_mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(food_radius, </span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> food_radius);</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(food_radius, </span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> food_radius);</span></span>
+<span class="line"><span style="color:#F8F8F2">        </span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> inserted_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[entity].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Entity{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, {x, y}, food_mass});</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[food].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Food{inserted_entity.entity_id});</span></span>
+<span class="line"><span style="color:#F8F8F2">        </span></span>
+<span class="line"><span style="color:#F8F8F2">        food_count </span><span style="color:#FF79C6">+=</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Spawned food! </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(inserted_entity.entity_id));</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>In this reducer, we are using the <code>world_size</code> we configured along with the <code>ReducerContext</code>&#x27;s random number generator <code>.rng()</code> function to place 600 food uniformly randomly throughout the map. We&#x27;ve also chosen the <code>mass</code> of the food to be a random number between 2 and 4 inclusive.</p></div></div></div>
+<p>Although, we&#x27;ve written the reducer to spawn food, no food will actually be spawned until we call the function while players are logged in. This raises the question, who should call this function and when?</p>
+<p>We would like for this function to be called periodically to "top up" the amount of food on the map so that it never falls very far below our target amount of food. SpacetimeDB has built in functionality for exactly this. With SpacetimeDB you can schedule your module to call itself in the future or repeatedly with reducers.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>In order to schedule a reducer to be called we have to create a new table which specifies when and how a reducer should be called. Add this new table to the top of the <code>Module</code> class.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spawn_food_timer</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Scheduled </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(SpawnFood), ScheduledAt </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(scheduled_at))]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> SpawnFoodTimer</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> scheduled_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2"> scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Note the <code>Scheduled = nameof(SpawnFood)</code> parameter in the table macro. This tells SpacetimeDB that the rows in this table specify a schedule for when the <code>SpawnFood</code> reducer should be called. Each schedule table requires a <code>scheduled_id</code> and a <code>scheduled_at</code> field so that SpacetimeDB can call your reducer, however you can also add your own fields to these rows as well.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>In order to schedule a reducer to be called we have to create a new table which specifies when and how a reducer should be called. Add this new table to the top of the file, below your imports.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spawn_food_timer, scheduled(spawn_food))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> SpawnFoodTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">ScheduleAt</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Note the <code>scheduled(spawn_food)</code> parameter in the table macro. This tells SpacetimeDB that the rows in this table specify a schedule for when the <code>spawn_food</code> reducer should be called. Each schedule table requires a <code>scheduled_id</code> and a <code>scheduled_at</code> field so that SpacetimeDB can call your reducer, however you can also add your own fields to these rows as well.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>In order to schedule a reducer to be called we have to create a new table which specifies when and how a reducer should be called. Add this new table to the top of the file, below the Player table.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> SpawnFoodTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> scheduled_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ScheduleAt scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(SpawnFoodTimer, scheduled_id, scheduled_at);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(SpawnFoodTimer, spawn_food_timer, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(spawn_food_timer, scheduled_id);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_SCHEDULE</span><span style="color:#F8F8F2">(spawn_food_timer, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, spawn_food);</span></span></code></pre><p>Note the <code>SPACETIMEDB_SCHEDULE(spawn_food_timer, 1, spawn_food)</code> call. This tells SpacetimeDB that the rows in this table specify a schedule for when the <code>spawn_food</code> reducer should be called. The second parameter <code>1</code> is the 0-based column index of the <code>scheduled_at</code> field. Each schedule table requires a <code>scheduled_id</code> and a <code>scheduled_at</code> field so that SpacetimeDB can call your reducer, however you can also add your own fields to these rows as well.</p></div></div></div>
+<p>You can create, delete, or change a schedule by inserting, deleting, or updating rows in this table.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>You will see an error telling you that the <code>SpawnFood</code> reducer needs to take two arguments, but currently only takes one. This is because the schedule row must be passed in to all scheduled reducers. Modify your <code>SpawnFood</code> reducer to take the scheduled row as an argument.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SpawnFood</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">SpawnFoodTimer</span><span style="color:#FFB86C;font-style:italic"> _timer</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // ...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>You will see an error telling you that the <code>spawn_food</code> reducer needs to take two arguments, but currently only takes one. This is because the schedule row must be passed in to all scheduled reducers. Modify your <code>spawn_food</code> reducer to take the scheduled row as an argument.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> spawn_food</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, _timer</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> SpawnFoodTimer</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // ...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>You will see an error telling you that the <code>spawn_food</code> reducer needs to take two arguments, but currently only takes one. This is because the schedule row must be passed in to all scheduled reducers. Modify your <code>spawn_food</code> reducer to take the scheduled row as an argument.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(spawn_food, ReducerContext ctx, SpawnFoodTimer _timer) {</span></span>
+<span class="line"><span style="color:#6272A4">    // ...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>In our case we aren&#x27;t interested in the data on the row, so we name the argument <code>_timer</code>.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s modify our <code>Init</code> reducer to schedule our <code>SpawnFood</code> reducer to be called every 500 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.Init)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Init</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.config.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> { world_size </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 1000</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.spawn_food_timer.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> SpawnFoodTimer</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        scheduled_at </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Interval</span><span style="color:#F8F8F2">(TimeSpan.</span><span style="color:#50FA7B">FromMilliseconds</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">500</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>You can use <code>ScheduleAt.Interval</code> to schedule a reducer call at an interval like we&#x27;re doing here. SpacetimeDB will continue to call the reducer at this interval until you remove the row. You can also use <code>new ScheduleAt.Time(...)</code> to schedule a reducer once at a specific time. SpacetimeDB will remove that row automatically after the reducer has been called.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI"><p>Let&#x27;s modify our <code>init</code> reducer to schedule our <code>spawn_food</code> reducer to be called every 500 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(init)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> init</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Initializing..."</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        world_size</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 1000</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">spawn_food_timer</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">SpawnFoodTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        scheduled_id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ScheduleAt</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Interval</span><span style="color:#F8F8F2">(Duration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">500</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into</span><span style="color:#F8F8F2">()),</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>You can use <code>ScheduleAt::Interval</code> to schedule a reducer call at an interval like we&#x27;re doing here. SpacetimeDB will continue to call the reducer at this interval until you remove the row. You can also use <code>ScheduleAt::Time()</code> to specify a specific time at which to call a reducer once. SpacetimeDB will remove that row automatically after the reducer has been called.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s modify our <code>SPACETIMEDB_INIT</code> reducer to schedule our <code>spawn_food</code> reducer to be called every 500 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_INIT</span><span style="color:#F8F8F2">(init, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[config].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Config{</span></span>
+<span class="line"><span style="color:#BD93F9">        0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#BD93F9">        1000</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[spawn_food_timer].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(SpawnFoodTimer{</span></span>
+<span class="line"><span style="color:#BD93F9">        0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#50FA7B">        ScheduleAt</span><span style="color:#F8F8F2">(TimeDuration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">500</span><span style="color:#F8F8F2">)),</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>You can use <code>ScheduleAt(TimeDuration::from_millis(...))</code> to schedule a reducer call at an interval like we&#x27;re doing here. SpacetimeDB will continue to call the reducer at this interval until you remove the row. You can also use <code>ScheduleAt(Timestamp::from_millis_since_epoch(...))</code> to specify a specific time at which to call a reducer once. SpacetimeDB will remove that row automatically after the reducer has been called.</p></div></div></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="logging-players-in">Logging Players In<a href="#logging-players-in" class="hash-link" aria-label="Direct link to Logging Players In" title="Direct link to Logging Players In" translate="no">​</a></h3>
+<p>Let&#x27;s continue building out our server module by modifying it to log in a player when they connect to the database, or to create a new player if they&#x27;ve never connected before.</p>
+<p>Let&#x27;s add a second table to our <code>Player</code> struct. Modify the <code>Player</code> struct by adding this above the struct:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">logged_out_player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> logged_out_player)]</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, logged_out_player, Private);</span></span></code></pre></div></div></div>
+<p>Your struct should now look like this:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">logged_out_player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> logged_out_player)]</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Clone</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, identity, player_id, name);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, logged_out_player, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(player, identity);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_UniqueAutoInc</span><span style="color:#F8F8F2">(player, player_id);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(logged_out_player, identity);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_UniqueAutoInc</span><span style="color:#F8F8F2">(logged_out_player, player_id);</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>In C++, since we&#x27;re creating two separate tables from the same struct, we need to apply the field constraints (<code>FIELD_PrimaryKey</code> and <code>FIELD_UniqueAutoInc</code>) to both <code>player</code> and <code>logged_out_player</code> independently. Each table maintains its own indexes and constraints.</p></div></div></div></div></div>
+<p>This creates an additional tabled called <code>logged_out_player</code> whose rows share the same <code>Player</code> type as in the <code>player</code> table.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>IMPORTANT! Note that this new table is not marked <code>public</code>. This means that it can only be accessed by the database owner (which is almost always the database creator). In order to prevent any unintended data access, all SpacetimeDB tables are private by default.</p><p>If your client isn&#x27;t syncing rows from the server, check that your table is not accidentally marked private.</p></div></div>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, modify your <code>Connect</code> reducer and add a new <code>Disconnect</code> reducer below it:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientConnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Connect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.logged_out_player.identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (player </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(player.Value);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.logged_out_player.identity.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(player.Value.identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    else</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            identity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">            name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> ""</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientDisconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Disconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.player.identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.logged_out_player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.player.identity.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(player.identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Next, modify your <code>connect</code> reducer and add a new <code>disconnect</code> reducer below it:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(client_connected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> connect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(player) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">            .</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">            .</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">            .</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            player_id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> String</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">new</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(client_disconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> disconnect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Player not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, modify your <code>connect</code> reducer and add a new <code>disconnect</code> reducer below it:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_CONNECTED</span><span style="color:#F8F8F2">(connect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Check if this player was previously logged out</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> logged_out_player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[logged_out_player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (logged_out_player_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#6272A4">        // Move player from logged_out_player to player table</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(logged_out_player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[logged_out_player_identity].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(logged_out_player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">        // New player - create and insert into player table</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Player{ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(), </span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">""</span><span style="color:#F8F8F2">});</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_DISCONNECTED</span><span style="color:#F8F8F2">(disconnect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the player in the player table</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    Player player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Move player from player to logged_out_player table</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[logged_out_player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[player_identity].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(player.identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>Now when a client connects, if the player corresponding to the client is in the <code>logged_out_player</code> table, we will move them into the <code>player</code> table, thus indicating that they are logged in and connected. For any new unrecognized client connects we will create a <code>Player</code> and insert it into the <code>player</code> table.</p>
+<p>When a player disconnects, we will transfer their player row from the <code>player</code> table to the <code>logged_out_player</code> table to indicate they&#x27;re offline.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>Note that we could have added a <code>logged_in</code> boolean to the <code>Player</code> type to indicate whether the player is logged in. There&#x27;s nothing incorrect about that approach, however for several reasons we recommend this two table approach:</p>\<ul\>
+<li class="">We can iterate over all logged in players without any <code>if</code> statements or branching</li>
+<li class="">The <code>Player</code> type now uses less program memory improving cache efficiency</li>
+<li class="">We can easily check whether a player is logged in, based on whether their row exists in the <code>player</code> table</li>
+</ul><p>This approach is more generally referred to as <a href="https://www.dataorienteddesign.com/dodmain/node4.html" target="_blank" rel="noopener noreferrer" class="">existence based processing</a> and it is a common technique in data-oriented design.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="spawning-player-circles">Spawning Player Circles<a href="#spawning-player-circles" class="hash-link" aria-label="Direct link to Spawning Player Circles" title="Direct link to Spawning Player Circles" translate="no">​</a></h3>
+<p>Now that we&#x27;ve got our food spawning and our players set up, let&#x27;s create a match and spawn player circle entities into it. The first thing we should do before spawning a player into a match is give them a name.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Add the following to the end of the <code>Module</code> class.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> START_PLAYER_MASS </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 15</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> EnterGame</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> name</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Creating player with name </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">name</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.player.identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    player.name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.player.identity.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#50FA7B">    SpawnPlayerInitialCircle</span><span style="color:#F8F8F2">(ctx, player.player_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#50FA7B"> SpawnPlayerInitialCircle</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> playerId</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Rng;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (ctx.Db.config.id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)).world_size;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> playerStartRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(START_PLAYER_MASS);</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">Range</span><span style="color:#F8F8F2">(playerStartRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> playerStartRadius);</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">Range</span><span style="color:#F8F8F2">(playerStartRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> playerStartRadius);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> SpawnCircleAt</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx,</span></span>
+<span class="line"><span style="color:#F8F8F2">        playerId,</span></span>
+<span class="line"><span style="color:#F8F8F2">        START_PLAYER_MASS,</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(x, y),</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">    );</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#50FA7B"> SpawnCircleAt</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> playerId</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> position</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#FFB86C;font-style:italic"> timestamp</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.entity.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Entity</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> position,</span></span>
+<span class="line"><span style="color:#F8F8F2">        mass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> mass,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.circle.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Circle</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        entity_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> entity.entity_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> playerId,</span></span>
+<span class="line"><span style="color:#F8F8F2">        direction </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">        speed </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0f</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        last_split_time </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> entity;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>EnterGame</code> reducer takes one argument, the player&#x27;s <code>name</code>. We can use this name to display as a label for the player in the match, by storing the name on the player&#x27;s row. We are also spawning some circles for the player to control now that they are entering the game. To do this, we choose a random position within the bounds of the arena and create a new entity and corresponding circle row.</p><p>Let&#x27;s also modify our <code>Disconnect</code> reducer to remove the circles from the arena when the player disconnects from the database server.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientDisconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Disconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.player.identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#6272A4">    // Remove any circles from the arena</span></span>
+<span class="line"><span style="color:#FF79C6">    foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.circle.player_id.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(player.player_id))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(circle.entity_id) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Could not find circle</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.circle.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.logged_out_player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.player.identity.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(player.identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Add the following to the bottom of your file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> START_PLAYER_MASS</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 15</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> enter_game</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Creating player with name {}"</span><span style="color:#F8F8F2">, name);</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> player</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">""</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#50FA7B">    spawn_player_initial_circle</span><span style="color:#F8F8F2">(ctx, player_id)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> spawn_player_initial_circle</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Config not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">world_size;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player_start_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">START_PLAYER_MASS</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(player_start_radius</span><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">(world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> player_start_radius));</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(player_start_radius</span><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">(world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> player_start_radius));</span></span>
+<span class="line"><span style="color:#50FA7B">    spawn_circle_at</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx,</span></span>
+<span class="line"><span style="color:#F8F8F2">        player_id,</span></span>
+<span class="line"><span style="color:#BD93F9">        START_PLAYER_MASS</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> { x, y },</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    )</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> spawn_circle_at</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mass</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    position</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    timestamp</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        entity_id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        position,</span></span>
+<span class="line"><span style="color:#F8F8F2">        mass,</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Circle</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        entity_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        player_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        direction</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> { x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0.0</span><span style="color:#F8F8F2">, y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 1.0</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">        speed</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0.0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        last_split_time</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(entity)</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>enter_game</code> reducer takes one argument, the player&#x27;s <code>name</code>. We can use this name to display as a label for the player in the match, by storing the name on the player&#x27;s row. We are also spawning some circles for the player to control now that they are entering the game. To do this, we choose a random position within the bounds of the arena and create a new entity and corresponding circle row.</p><p>Let&#x27;s also modify our <code>disconnect</code> reducer to remove the circles from the arena when the player disconnects from the database server.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(client_disconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> disconnect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Player not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Remove any circles from the arena</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">player_id) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Add the following to the bottom of your file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int32_t</span><span style="color:#F8F8F2"> START_PLAYER_MASS </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 15</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Helper function to spawn a circle at a specific location</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#50FA7B"> spawn_circle_at</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int32_t</span><span style="color:#FFB86C;font-style:italic"> player_id</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int32_t</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> position</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#FFB86C;font-style:italic"> timestamp</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> inserted_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[entity].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Entity{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, position, mass});</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[circle].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Circle{</span></span>
+<span class="line"><span style="color:#F8F8F2">        inserted_entity.entity_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        player_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        DbVector2{</span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">},</span><span style="color:#6272A4">  // direction</span></span>
+<span class="line"><span style="color:#BD93F9">        0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">,</span><span style="color:#6272A4">                    // speed</span></span>
+<span class="line"><span style="color:#F8F8F2">        timestamp</span><span style="color:#6272A4">                // last_split_time</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> inserted_entity;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Helper function to spawn a player&#x27;s initial circle</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#50FA7B"> spawn_player_initial_circle</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int32_t</span><span style="color:#FFB86C;font-style:italic"> player_id</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> config_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[config_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">config_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#6272A4">        // This shouldn&#x27;t happen, but handle it gracefully</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> Entity{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, {</span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">}, </span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    int64_t</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().world_size;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    auto&</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> player_start_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(START_PLAYER_MASS);</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(player_start_radius, </span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> player_start_radius);</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(player_start_radius, </span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> player_start_radius);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> spawn_circle_at</span><span style="color:#F8F8F2">(ctx, player_id, START_PLAYER_MASS, DbVector2{x, y}, ctx.timestamp);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(enter_game, ReducerContext ctx, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Creating player with name </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> name);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Find the player</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Update the player&#x27;s name</span></span>
+<span class="line"><span style="color:#F8F8F2">    Player updated_player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> updated_player.player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    updated_player.name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[player_identity].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(updated_player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Spawn initial circle for the player</span></span>
+<span class="line"><span style="color:#50FA7B">    spawn_player_initial_circle</span><span style="color:#F8F8F2">(ctx, player_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>enter_game</code> reducer takes one argument, the player&#x27;s <code>name</code>. We can use this name to display as a label for the player in the match, by storing the name on the player&#x27;s row. We are also spawning some circles for the player to control now that they are entering the game. To do this, we choose a random position within the bounds of the arena and create a new entity and corresponding circle row.</p><p>Let&#x27;s also modify our <code>disconnect</code> reducer to remove the circles from the arena when the player disconnects from the database server.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_DISCONNECTED</span><span style="color:#F8F8F2">(disconnect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the player in the player table</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    Player player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player.player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Move player from player to logged_out_player table</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[logged_out_player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[player_identity].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(player.identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Remove any circles from the arena</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> Circle</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> circle : ctx.db[circle_player_id]) {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (circle.player_id </span><span style="color:#FF79C6">==</span><span style="color:#F8F8F2"> player_id) {</span></span>
+<span class="line"><span style="color:#F8F8F2">            ctx.db[entity_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">            ctx.db[circle_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>Finally, publish the new module to SpacetimeDB with this command:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span><span style="color:#BD93F9"> --delete-data</span></span></code></pre>
+<p>Deleting the data is optional in this case, but in case you&#x27;ve been messing around with the module we can just start fresh.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="creating-the-arena">Creating the Arena<a href="#creating-the-arena" class="hash-link" aria-label="Direct link to Creating the Arena" title="Direct link to Creating the Arena" translate="no">​</a></h3>
+<p>Now that we&#x27;ve set up our server logic to spawn food and players, let&#x27;s continue developing our Unity client to display what we have so far.</p>
+<p>Start by adding <code>SetupArena</code> and <code>CreateBorderCube</code> methods to your <code>GameManager</code> class:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SetupArena</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> worldSize</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, borderThickness)); </span><span style="color:#6272A4">//North</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2">borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, borderThickness)); </span><span style="color:#6272A4">//South</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(borderThickness, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">)); </span><span style="color:#6272A4">//East</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2">borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(borderThickness, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">)); </span><span style="color:#6272A4">//West</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#FFB86C;font-style:italic"> position</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#FFB86C;font-style:italic"> scale</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> cube </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> GameObject.</span><span style="color:#50FA7B">CreatePrimitive</span><span style="color:#F8F8F2">(PrimitiveType.Cube);</span></span>
+<span class="line"><span style="color:#F8F8F2">    cube.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Border</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    cube.transform.localScale </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2">(scale.x, scale.y, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    cube.transform.position </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2">(position.x, position.y, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    cube.</span><span style="color:#50FA7B">GetComponent</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">MeshRenderer</span><span style="color:#F8F8F2">>().material </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> borderMaterial;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>In your <code>HandleSubscriptionApplied</code> let&#x27;s now call <code>SetupArena</code> method. Modify your <code>HandleSubscriptionApplied</code> method as in the below.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleSubscriptionApplied</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">SubscriptionEventContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Debug.</span><span style="color:#50FA7B">Log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Subscription applied!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    OnSubscriptionApplied</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Invoke</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Once we have the initial subscription sync&#x27;d to the client cache</span></span>
+<span class="line"><span style="color:#6272A4">    // Get the world size from the config table and set up the arena</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn.Db.Config.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">).WorldSize;</span></span>
+<span class="line"><span style="color:#50FA7B">    SetupArena</span><span style="color:#F8F8F2">(worldSize);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>OnApplied</code> callback will be called after the server synchronizes the initial state of your tables with your client. Once the sync has happened, we can look up the world size from the <code>config</code> table and use it to set up our arena.</p>
+<p>In the scene view, select the <code>GameManager</code> object. Click on the <code>Border Material</code> property and choose <code>Sprites-Default</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="creating-gameobjects">Creating GameObjects<a href="#creating-gameobjects" class="hash-link" aria-label="Direct link to Creating GameObjects" title="Direct link to Creating GameObjects" translate="no">​</a></h3>
+<p>Now that we have our arena all set up, we need to take the row data that SpacetimeDB syncs with our client and use it to create and draw <code>GameObject</code>s on the screen.</p>
+<p>Let&#x27;s start by making some controller scripts for each of the game objects we&#x27;d like to have in our scene. In the project window, right-click and select <code>Create > C# Script</code>. Name the new script <code>PlayerController.cs</code>. Repeat that process for <code>CircleController.cs</code> and <code>FoodController.cs</code>. We&#x27;ll modify the contents of these files later.</p>
+<p>Now let&#x27;s make some prefabs for our game objects. In the scene hierarchy window, create a new <code>GameObject</code> by right-clicking and selecting:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">2D Object > Sprites > Circle</span><br></span></code></pre></div></div>
+<p>Rename the new game object in the scene to <code>CirclePrefab</code>. Next in the <code>Inspector</code> window click the <code>Add Component</code> button and add the <code>Circle Controller</code> script component that we just created. Finally drag the object into the <code>Project</code> folder. Once the prefab file is created, delete the <code>CirclePrefab</code> object from the scene. We&#x27;ll use this prefab to draw the circles that a player controls.</p>
+<p>Next repeat that same process for the <code>FoodPrefab</code> and <code>Food Controller</code> component.</p>
+<p>In the <code>Project</code> view, double click the <code>CirclePrefab</code> to bring it up in the scene view. Right-click anywhere in the hierarchy and navigate to:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">3d Object > Text - Text Mesh Pro</span><br></span></code></pre></div></div>
+<p>This will add a label to the circle prefab. You may need to import "TextMeshPro Essential Resources" into Unity in order to add the TextMeshPro element. Your logs will say "[TMP Essential Resources] have been imported." if it has worked correctly. Don&#x27;t forget to set the transform position of the label to <code>Pos X: 0, Pos Y: 0, Pos Z: 0</code>. You should also change the font size to 5 or something close to that according to your preference and set the alignment to <code>Center</code> and <code>Middle</code>.</p>
+<p>Finally we need to make the <code>PlayerPrefab</code>. In the hierarchy window, create a new <code>GameObject</code> by right-clicking and selecting:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Create Empty</span><br></span></code></pre></div></div>
+<p>Rename the game object to <code>PlayerPrefab</code>. Next in the <code>Inspector</code> window click the <code>Add Component</code> button and add the <code>Player Controller</code> script component that we just created. Next drag the object into the <code>Project</code> folder. Once the prefab file is created, delete the <code>PlayerPrefab</code> object from the scene.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="entitycontroller">EntityController<a href="#entitycontroller" class="hash-link" aria-label="Direct link to EntityController" title="Direct link to EntityController" translate="no">​</a></h4>
+<p>Let&#x27;s also create an <code>EntityController</code> script which will serve as a base class for both our <code>CircleController</code> and <code>FoodController</code> classes since both <code>Circle</code>s and <code>Food</code> are entities.</p>
+<p>Create a new file called <code>EntityController.cs</code> and replace its contents with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Linq</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> Unity</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">VisualScripting</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> abstract</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> EntityController</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">MonoBehaviour</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> LERP_DURATION_SEC </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0.1f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> readonly</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> ShaderColorProperty </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Shader.</span><span style="color:#50FA7B">PropertyToID</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">_Color</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">DoNotSerialize</span><span style="color:#F8F8F2">] </span><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> EntityId;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    protected</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> LerpTime;</span></span>
+<span class="line"><span style="color:#FF79C6">    protected</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2"> LerpStartPosition;</span></span>
+<span class="line"><span style="color:#FF79C6">    protected</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2"> LerpTargetPosition;</span></span>
+<span class="line"><span style="color:#FF79C6">    protected</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2"> TargetScale;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    protected</span><span style="color:#FF79C6"> virtual</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Spawn</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> entityId</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        EntityId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> entityId;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> GameManager.Conn.Db.Entity.EntityId.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(entityId);</span></span>
+<span class="line"><span style="color:#F8F8F2">        LerpStartPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> LerpTargetPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> transform.position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#F8F8F2">)entity.Position;</span></span>
+<span class="line"><span style="color:#F8F8F2">        transform.localScale </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Vector3.one;</span></span>
+<span class="line"><span style="color:#F8F8F2">        TargetScale </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToScale</span><span style="color:#F8F8F2">(entity.Mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SetColor</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Color</span><span style="color:#FFB86C;font-style:italic"> color</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#50FA7B">        GetComponent</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">SpriteRenderer</span><span style="color:#F8F8F2">>().material.</span><span style="color:#50FA7B">SetColor</span><span style="color:#F8F8F2">(ShaderColorProperty, color);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> virtual</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnEntityUpdated</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> newVal</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        LerpTime </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0.0f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        LerpStartPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> transform.position;</span></span>
+<span class="line"><span style="color:#F8F8F2">        LerpTargetPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#F8F8F2">)newVal.Position;</span></span>
+<span class="line"><span style="color:#F8F8F2">        TargetScale </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToScale</span><span style="color:#F8F8F2">(newVal.Mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> virtual</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnDelete</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#50FA7B">        Destroy</span><span style="color:#F8F8F2">(gameObject);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> virtual</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Update</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Interpolate position and scale</span></span>
+<span class="line"><span style="color:#F8F8F2">        LerpTime </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Mathf.</span><span style="color:#50FA7B">Min</span><span style="color:#F8F8F2">(LerpTime </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> Time.deltaTime, LERP_DURATION_SEC);</span></span>
+<span class="line"><span style="color:#F8F8F2">        transform.position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Vector3.</span><span style="color:#50FA7B">Lerp</span><span style="color:#F8F8F2">(LerpStartPosition, LerpTargetPosition, LerpTime </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> LERP_DURATION_SEC);</span></span>
+<span class="line"><span style="color:#F8F8F2">        transform.localScale </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Vector3.</span><span style="color:#50FA7B">Lerp</span><span style="color:#F8F8F2">(transform.localScale, TargetScale, Time.deltaTime </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 8</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#50FA7B"> MassToScale</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> diameter </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToDiameter</span><span style="color:#F8F8F2">(mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2">(diameter, diameter, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> Mathf.</span><span style="color:#50FA7B">Sqrt</span><span style="color:#F8F8F2">(mass);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> MassToDiameter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(mass) </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>EntityController</code> script just provides some helper functions and basic functionality to manage our game objects based on entity updates.</p>
+<blockquote>
+<p>One notable feature is that we linearly interpolate (lerp) between the position where the server says the entity is, and where we actually draw it. This is a common technique which provides for smoother movement.</p>
+<p>If you&#x27;re interested in learning more checkout <a href="https://gabrielgambetta.com/client-side-prediction-live-demo.html" target="_blank" rel="noopener noreferrer" class="">this demo</a> from Gabriel Gambetta.</p>
+</blockquote>
+<p>At this point you&#x27;ll have a compilation error because we can&#x27;t yet convert from <code>SpacetimeDB.Types.DbVector2</code> to <code>UnityEngine.Vector2</code>. To fix this, let&#x27;s also create a new <code>Extensions.cs</code> script and replace the contents with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">namespace</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> DbVector2</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> implicit</span><span style="color:#FF79C6"> operator</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> vec</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(vec.X, vec.Y);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> implicit</span><span style="color:#FF79C6"> operator</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#FFB86C;font-style:italic"> vec</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(vec.x, vec.y);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>This just allows us to implicitly convert between our <code>DbVector2</code> type and the Unity <code>Vector2</code> type.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="circlecontroller">CircleController<a href="#circlecontroller" class="hash-link" aria-label="Direct link to CircleController" title="Direct link to CircleController" translate="no">​</a></h4>
+<p>Now open the <code>CircleController</code> script and modify the contents of the <code>CircleController</code> script to be:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> CircleController</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">EntityController</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Color</span><span style="color:#F8F8F2">[] ColorPalette </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">        //Yellow</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">175</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">159</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">49</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">175</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">116</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">49</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        //Purple</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">112</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">47</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">252</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">51</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">91</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">252</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        //Red</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">176</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">54</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">54</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">176</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">109</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">54</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">141</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">43</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">99</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        //Blue</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">188</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">250</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">7</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">251</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">28</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">146</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> PlayerController</span><span style="color:#F8F8F2"> Owner { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Spawn</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Circle</span><span style="color:#FFB86C;font-style:italic"> circle</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">PlayerController</span><span style="color:#FFB86C;font-style:italic"> owner</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        base</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Spawn</span><span style="color:#F8F8F2">(circle.EntityId);</span></span>
+<span class="line"><span style="color:#50FA7B">        SetColor</span><span style="color:#F8F8F2">(ColorPalette[circle.PlayerId </span><span style="color:#FF79C6">%</span><span style="color:#F8F8F2"> ColorPalette.Length]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">        Owner </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> owner;</span></span>
+<span class="line"><span style="color:#50FA7B">        GetComponentInChildren</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">TMPro</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">TextMeshPro</span><span style="color:#F8F8F2">>().text </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> owner.Username;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> override</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnDelete</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        base</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">OnDelete</span><span style="color:#F8F8F2">(context);</span></span>
+<span class="line"><span style="color:#F8F8F2">        Owner.</span><span style="color:#50FA7B">OnCircleDeleted</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>At the top, we&#x27;re just defining some possible colors for our circle. We&#x27;ve also created a spawn function which takes a <code>Circle</code> (same type that&#x27;s in our <code>circle</code> table) and a <code>PlayerController</code> which sets the color based on the circle&#x27;s player ID, as well as setting the text of the Cricle to be the player&#x27;s username.</p>
+<p>Note that the <code>CircleController</code> inherits from the <code>EntityController</code>, not <code>MonoBehavior</code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="foodcontroller">FoodController<a href="#foodcontroller" class="hash-link" aria-label="Direct link to FoodController" title="Direct link to FoodController" translate="no">​</a></h4>
+<p>Next open the <code>FoodController.cs</code> file and replace the contents with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> FoodController</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">EntityController</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> readonly</span><span style="color:#8BE9FD;font-style:italic"> Color</span><span style="color:#F8F8F2">[] ColorPalette </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> </span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">119</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">252</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">173</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">76</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">250</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">146</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">35</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">246</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">120</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">119</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">251</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">201</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">76</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">249</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">184</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Color32</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">35</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">245</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">165</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">255</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Spawn</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Food</span><span style="color:#FFB86C;font-style:italic"> food</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        base</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Spawn</span><span style="color:#F8F8F2">(food.EntityId);</span></span>
+<span class="line"><span style="color:#50FA7B">        SetColor</span><span style="color:#F8F8F2">(ColorPalette[EntityId </span><span style="color:#FF79C6">%</span><span style="color:#F8F8F2"> ColorPalette.Length]);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="playercontroller">PlayerController<a href="#playercontroller" class="hash-link" aria-label="Direct link to PlayerController" title="Direct link to PlayerController" translate="no">​</a></h4>
+<p>Open the <code>PlayerController</code> script and modify the contents of the <code>PlayerController</code> script to be:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Linq</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> PlayerController</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">MonoBehaviour</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> SEND_UPDATES_PER_SEC </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 20</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> SEND_UPDATES_FREQUENCY </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 1f</span><span style="color:#FF79C6"> /</span><span style="color:#F8F8F2"> SEND_UPDATES_PER_SEC;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> PlayerController</span><span style="color:#F8F8F2"> Local { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> set</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> PlayerId;</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> LastMovementSendTimestamp;</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">? LockInputPosition;</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">CircleController</span><span style="color:#F8F8F2">> OwnedCircles </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">CircleController</span><span style="color:#F8F8F2">>();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Username </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> GameManager.Conn.Db.Player.PlayerId.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(PlayerId).Name;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> NumberOfOwnedCircles </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> OwnedCircles.Count;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> bool</span><span style="color:#F8F8F2"> IsLocalPlayer </span><span style="color:#FF79C6">=></span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#FF79C6"> ==</span><span style="color:#F8F8F2"> Local;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Initialize</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#FFB86C;font-style:italic"> player</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        PlayerId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player.PlayerId;</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (player.Identity </span><span style="color:#FF79C6">==</span><span style="color:#F8F8F2"> GameManager.LocalIdentity)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Local </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnDestroy</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // If we have any circles, destroy them</span></span>
+<span class="line"><span style="color:#FF79C6">        foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> OwnedCircles)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (circle </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#50FA7B">                Destroy</span><span style="color:#F8F8F2">(circle.gameObject);</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        OwnedCircles.</span><span style="color:#50FA7B">Clear</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnCircleSpawned</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">CircleController</span><span style="color:#FFB86C;font-style:italic"> circle</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        OwnedCircles.</span><span style="color:#50FA7B">Add</span><span style="color:#F8F8F2">(circle);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnCircleDeleted</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">CircleController</span><span style="color:#FFB86C;font-style:italic"> deletedCircle</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // This means we got eaten</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (OwnedCircles.</span><span style="color:#50FA7B">Remove</span><span style="color:#F8F8F2">(deletedCircle) </span><span style="color:#FF79C6">&&</span><span style="color:#F8F8F2"> IsLocalPlayer </span><span style="color:#FF79C6">&&</span><span style="color:#F8F8F2"> OwnedCircles.Count </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#6272A4">            // DeathScreen.Instance.SetVisible(true);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#50FA7B"> TotalMass</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">)OwnedCircles</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">Select</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">circle</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> GameManager.Conn.Db.Entity.EntityId.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(circle.EntityId))</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">Sum</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">e</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> e</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.Mass </span><span style="color:#FF79C6">??</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">); </span><span style="color:#6272A4">//If this entity is being deleted on the same frame that we&#x27;re moving, we can have a null entity here.</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">? </span><span style="color:#50FA7B">CenterOfMass</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (OwnedCircles.Count </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Vector2</span><span style="color:#F8F8F2"> totalPos </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Vector2.zero;</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> totalMass </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">        foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> OwnedCircles)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> GameManager.Conn.Db.Entity.EntityId.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(circle.EntityId);</span></span>
+<span class="line"><span style="color:#FF79C6">            var</span><span style="color:#F8F8F2"> position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle.transform.position;</span></span>
+<span class="line"><span style="color:#F8F8F2">            totalPos </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> (</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#F8F8F2">)position </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> entity.Mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">            totalMass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity.Mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> totalPos </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> totalMass;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnGUI</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">IsLocalPlayer </span><span style="color:#FF79C6">||</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">GameManager.</span><span style="color:#50FA7B">IsConnected</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">        GUI.</span><span style="color:#50FA7B">Label</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Rect</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">100</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">), </span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Total Mass: </span><span style="color:#FF79C6">{</span><span style="color:#50FA7B">TotalMass</span><span style="color:#F1FA8C">()</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    //Automated testing members</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> bool</span><span style="color:#F8F8F2"> testInputEnabled;</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2"> testInput;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SetTestInput</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#FFB86C;font-style:italic"> input</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> testInput </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> input;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> EnableTestInput</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> testInputEnabled </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Let&#x27;s also add a new <code>PrefabManager.cs</code> script which we can use as a factory for creating prefabs. Replace the contents of the file with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> PrefabManager</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">MonoBehaviour</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> PrefabManager</span><span style="color:#F8F8F2"> Instance;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> CircleController</span><span style="color:#F8F8F2"> CirclePrefab;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> FoodController</span><span style="color:#F8F8F2"> FoodPrefab;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> PlayerController</span><span style="color:#F8F8F2"> PlayerPrefab;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Awake</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Instance </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> CircleController</span><span style="color:#50FA7B"> SpawnCircle</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Circle</span><span style="color:#FFB86C;font-style:italic"> circle</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">PlayerController</span><span style="color:#FFB86C;font-style:italic"> owner</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> entityController </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> Instantiate</span><span style="color:#F8F8F2">(Instance.CirclePrefab);</span></span>
+<span class="line"><span style="color:#F8F8F2">        entityController.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">Circle - </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">circle</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">EntityId</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        entityController.</span><span style="color:#50FA7B">Spawn</span><span style="color:#F8F8F2">(circle, owner);</span></span>
+<span class="line"><span style="color:#F8F8F2">        owner.</span><span style="color:#50FA7B">OnCircleSpawned</span><span style="color:#F8F8F2">(entityController);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> entityController;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> FoodController</span><span style="color:#50FA7B"> SpawnFood</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Food</span><span style="color:#FFB86C;font-style:italic"> food</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> entityController </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> Instantiate</span><span style="color:#F8F8F2">(Instance.FoodPrefab);</span></span>
+<span class="line"><span style="color:#F8F8F2">        entityController.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">Food - </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">food</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">EntityId</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        entityController.</span><span style="color:#50FA7B">Spawn</span><span style="color:#F8F8F2">(food);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> entityController;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> PlayerController</span><span style="color:#50FA7B"> SpawnPlayer</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#FFB86C;font-style:italic"> player</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> playerController </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> Instantiate</span><span style="color:#F8F8F2">(Instance.PlayerPrefab);</span></span>
+<span class="line"><span style="color:#F8F8F2">        playerController.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">PlayerController - </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">player</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        playerController.</span><span style="color:#50FA7B">Initialize</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> playerController;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>In the scene hierarchy, select the <code>GameManager</code> object and add the <code>Prefab Manager</code> script as a component to the <code>GameManager</code> object. Drag the corresponding <code>CirclePrefab</code>, <code>FoodPrefab</code>, and <code>PlayerPrefab</code> prefabs we created earlier from the project view into their respective slots in the <code>Prefab Manager</code>. Save the scene.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="hooking-up-the-data">Hooking up the Data<a href="#hooking-up-the-data" class="hash-link" aria-label="Direct link to Hooking up the Data" title="Direct link to Hooking up the Data" translate="no">​</a></h3>
+<p>We&#x27;ve now prepared our Unity project so that we can hook up the data from our tables to the Unity game objects and have them drawn on the screen.</p>
+<p>Add a couple dictionaries at the top of your <code>GameManager</code> class which we&#x27;ll use to hold onto the game objects we create for our scene. Add these two lines just below your <code>DbConnection</code> like so:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#F8F8F2"> DbConnection Conn { get; </span><span style="color:#8BE9FD;font-style:italic">private</span><span style="color:#F8F8F2"> set; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Dictionary</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">EntityController</span><span style="color:#F8F8F2">> Entities </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Dictionary</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">EntityController</span><span style="color:#F8F8F2">>();</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Dictionary</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">PlayerController</span><span style="color:#F8F8F2">> Players </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Dictionary</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">PlayerController</span><span style="color:#F8F8F2">>();</span></span></code></pre>
+<p>Next lets add some callbacks when rows change in the database. Modify the <code>HandleConnect</code> method as below.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> HandleConnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#FFB86C;font-style:italic"> conn</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#FFB86C;font-style:italic"> identity</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> token</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Debug.</span><span style="color:#50FA7B">Log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Connected.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#6272A4">    // Only the WebGL player has the browser WebSocket header limitation.</span></span>
+<span class="line"><span style="color:#6272A4">    // The Unity Editor uses the normal desktop transport even when the</span></span>
+<span class="line"><span style="color:#6272A4">    // selected build target is WebGL, so keep the normal behavior there.</span></span>
+<span class="line"><span style="color:#FF79C6">#if</span><span style="color:#F8F8F2"> UNITY_WEBGL </span><span style="color:#FF79C6">&&</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">UNITY_EDITOR</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (AuthToken.Token </span><span style="color:#FF79C6">==</span><span style="color:#E9F284"> ""</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // No token was supplied to the connection, so this is the</span></span>
+<span class="line"><span style="color:#6272A4">        // long-lived server-issued token for the new identity. Save it.</span></span>
+<span class="line"><span style="color:#6272A4">        // If a token already exists, this connect may have used a</span></span>
+<span class="line"><span style="color:#6272A4">        // short-lived WebSocket token, which should not overwrite it.</span></span>
+<span class="line"><span style="color:#F8F8F2">        AuthToken.</span><span style="color:#50FA7B">SaveToken</span><span style="color:#F8F8F2">(token);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">#else</span></span>
+<span class="line"><span style="color:#F8F8F2">    AuthToken.</span><span style="color:#50FA7B">SaveToken</span><span style="color:#F8F8F2">(token);</span></span>
+<span class="line"><span style="color:#FF79C6">#endif</span></span>
+<span class="line"><span style="color:#F8F8F2">    LocalIdentity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> identity;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Circle.OnInsert </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> CircleOnInsert;</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Entity.OnUpdate </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> EntityOnUpdate;</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Entity.OnDelete </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> EntityOnDelete;</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Food.OnInsert </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> FoodOnInsert;</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Player.OnInsert </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> PlayerOnInsert;</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.Db.Player.OnDelete </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> PlayerOnDelete;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    OnConnected</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Invoke</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Request all tables</span></span>
+<span class="line"><span style="color:#F8F8F2">    Conn.</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(HandleSubscriptionApplied)</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">SubscribeToAllTables</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Keep the same WebGL guard from Part 2 here as well. On Unity WebGL, a reconnect can surface a short-lived WebSocket token in <code>HandleConnect</code>, so you should not overwrite an already-saved long-lived server-issued token.</p>
+<p>Next add the following implementations for those callbacks to the <code>GameManager</code> class.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> CircleOnInsert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Circle</span><span style="color:#FFB86C;font-style:italic"> insertedValue</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> GetOrCreatePlayer</span><span style="color:#F8F8F2">(insertedValue.PlayerId);</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> entityController </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> PrefabManager.</span><span style="color:#50FA7B">SpawnCircle</span><span style="color:#F8F8F2">(insertedValue, player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    Entities.</span><span style="color:#50FA7B">Add</span><span style="color:#F8F8F2">(insertedValue.EntityId, entityController);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> EntityOnUpdate</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> oldEntity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> newEntity</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">Entities.</span><span style="color:#50FA7B">TryGetValue</span><span style="color:#F8F8F2">(newEntity.EntityId, </span><span style="color:#FF79C6">out</span><span style="color:#FF79C6"> var</span><span style="color:#F8F8F2"> entityController))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    entityController.</span><span style="color:#50FA7B">OnEntityUpdated</span><span style="color:#F8F8F2">(newEntity);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> EntityOnDelete</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> oldEntity</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (Entities.</span><span style="color:#50FA7B">Remove</span><span style="color:#F8F8F2">(oldEntity.EntityId, </span><span style="color:#FF79C6">out</span><span style="color:#FF79C6"> var</span><span style="color:#F8F8F2"> entityController))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        entityController.</span><span style="color:#50FA7B">OnDelete</span><span style="color:#F8F8F2">(context);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> FoodOnInsert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Food</span><span style="color:#FFB86C;font-style:italic"> insertedValue</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> entityController </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> PrefabManager.</span><span style="color:#50FA7B">SpawnFood</span><span style="color:#F8F8F2">(insertedValue);</span></span>
+<span class="line"><span style="color:#F8F8F2">    Entities.</span><span style="color:#50FA7B">Add</span><span style="color:#F8F8F2">(insertedValue.EntityId, entityController);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> PlayerOnInsert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#FFB86C;font-style:italic"> insertedPlayer</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    GetOrCreatePlayer</span><span style="color:#F8F8F2">(insertedPlayer.PlayerId);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> PlayerOnDelete</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#FFB86C;font-style:italic"> deletedvalue</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (Players.</span><span style="color:#50FA7B">Remove</span><span style="color:#F8F8F2">(deletedvalue.PlayerId, </span><span style="color:#FF79C6">out</span><span style="color:#FF79C6"> var</span><span style="color:#F8F8F2"> playerController))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        GameObject.</span><span style="color:#50FA7B">Destroy</span><span style="color:#F8F8F2">(playerController.gameObject);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> PlayerController</span><span style="color:#50FA7B"> GetOrCreatePlayer</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> playerId</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">Players.</span><span style="color:#50FA7B">TryGetValue</span><span style="color:#F8F8F2">(playerId, </span><span style="color:#FF79C6">out</span><span style="color:#FF79C6"> var</span><span style="color:#F8F8F2"> playerController))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn.Db.Player.PlayerId.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(playerId);</span></span>
+<span class="line"><span style="color:#F8F8F2">        playerController </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> PrefabManager.</span><span style="color:#50FA7B">SpawnPlayer</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">        Players.</span><span style="color:#50FA7B">Add</span><span style="color:#F8F8F2">(playerId, playerController);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> playerController;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="camera-controller">Camera Controller<a href="#camera-controller" class="hash-link" aria-label="Direct link to Camera Controller" title="Direct link to Camera Controller" translate="no">​</a></h3>
+<p>One of the last steps is to create a camera controller to make sure the camera moves around with the player. Create a script called <code>CameraController.cs</code> and add it to your project. Replace the contents of the file with this:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> UnityEngine</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> CameraController</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">MonoBehaviour</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> WorldSize </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0.0f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> LateUpdate</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> arenaCenterTransform </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span><span style="color:#F8F8F2">(WorldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, WorldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">-</span><span style="color:#BD93F9">10.0f</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (PlayerController.Local </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> null</span><span style="color:#FF79C6"> ||</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">GameManager.</span><span style="color:#50FA7B">IsConnected</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#6272A4">            // Set the camera to be in middle of the arena if we are not connected or</span></span>
+<span class="line"><span style="color:#6272A4">            // there is no local player</span></span>
+<span class="line"><span style="color:#F8F8F2">            transform.position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> arenaCenterTransform;</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> centerOfMass </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> PlayerController.Local.</span><span style="color:#50FA7B">CenterOfMass</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (centerOfMass.HasValue)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#6272A4">            // Set the camera to be the center of mass of the local player</span></span>
+<span class="line"><span style="color:#6272A4">            // if the local player has one</span></span>
+<span class="line"><span style="color:#F8F8F2">            transform.position </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector3</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#F8F8F2">                x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> centerOfMass.Value.x,</span></span>
+<span class="line"><span style="color:#F8F8F2">                y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> centerOfMass.Value.y,</span></span>
+<span class="line"><span style="color:#F8F8F2">                z </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> transform.position.z</span></span>
+<span class="line"><span style="color:#F8F8F2">            };</span></span>
+<span class="line"><span style="color:#F8F8F2">        } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            transform.position </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> arenaCenterTransform;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> targetCameraSize </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> CalculateCameraSize</span><span style="color:#F8F8F2">(PlayerController.Local);</span></span>
+<span class="line"><span style="color:#F8F8F2">        Camera.main.orthographicSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Mathf.</span><span style="color:#50FA7B">Lerp</span><span style="color:#F8F8F2">(Camera.main.orthographicSize, targetCameraSize, Time.deltaTime </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> CalculateCameraSize</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">PlayerController</span><span style="color:#FFB86C;font-style:italic"> player</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#BD93F9"> 50f</span><span style="color:#FF79C6"> +</span><span style="color:#6272A4"> //Base size</span></span>
+<span class="line"><span style="color:#F8F8F2">            Mathf.</span><span style="color:#50FA7B">Min</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">, player.</span><span style="color:#50FA7B">TotalMass</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 5</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">+</span><span style="color:#6272A4"> //Increase camera size with mass</span></span>
+<span class="line"><span style="color:#F8F8F2">            Mathf.</span><span style="color:#50FA7B">Min</span><span style="color:#F8F8F2">(player.NumberOfOwnedCircles </span><span style="color:#FF79C6">-</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 30</span><span style="color:#F8F8F2">; </span><span style="color:#6272A4">//Zoom out when player splits</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Add the <code>CameraController</code> as a component to the <code>Main Camera</code> object in the scene.</p>
+<p>Lastly modify the <code>GameManager.SetupArena</code> method to set the <code>WorldSize</code> on the <code>CameraController</code>.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SetupArena</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> worldSize</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, borderThickness)); </span><span style="color:#6272A4">//North</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2">borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">, borderThickness)); </span><span style="color:#6272A4">//South</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(borderThickness, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">)); </span><span style="color:#6272A4">//East</span></span>
+<span class="line"><span style="color:#50FA7B">    CreateBorderCube</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2">borderThickness </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">, worldSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span><span style="color:#F8F8F2">(borderThickness, worldSize </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> borderThickness </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9"> 2.0f</span><span style="color:#F8F8F2">)); </span><span style="color:#6272A4">//West</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Set the world size for the camera controller</span></span>
+<span class="line"><span style="color:#F8F8F2">    CameraController.WorldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> worldSize;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="entering-the-game">Entering the Game<a href="#entering-the-game" class="hash-link" aria-label="Direct link to Entering the Game" title="Direct link to Entering the Game" translate="no">​</a></h3>
+<p>At this point, you may need to regenerate your bindings the following command from the <code>blackholio-server/spacetimedb</code> directory.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> ../../Assets/module_bindings</span></span></code></pre>
+<p>The last step is to call the <code>enter_game</code> reducer on the server, passing in a username for our player, which will spawn a circle for our player. For the sake of simplicity, let&#x27;s call the <code>enter_game</code> reducer from the <code>HandleSubscriptionApplied</code> callback with the name "3Blave".</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleSubscriptionApplied</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">SubscriptionEventContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Debug.</span><span style="color:#50FA7B">Log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Subscription applied!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    OnSubscriptionApplied</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Invoke</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Once we have the initial subscription sync&#x27;d to the client cache</span></span>
+<span class="line"><span style="color:#6272A4">    // Get the world size from the config table and set up the arena</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn.Db.Config.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">).WorldSize;</span></span>
+<span class="line"><span style="color:#50FA7B">    SetupArena</span><span style="color:#F8F8F2">(worldSize);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Call enter game with the player name 3Blave</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Reducers.</span><span style="color:#50FA7B">EnterGame</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">3Blave</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="trying-it-out">Trying it out<a href="#trying-it-out" class="hash-link" aria-label="Direct link to Trying it out" title="Direct link to Trying it out" translate="no">​</a></h3>
+<p>At this point, after publishing our module we can press the play button to see the fruits of our labor! You should be able to see your player&#x27;s circle, with its username label, surrounded by food.</p>
+<p><img decoding="async" loading="lazy" alt="Player on screen" src="/docs/assets/images/part-3-player-on-screen-2e752a62db574760fbdc41c9fa52992b.png" width="2134" height="1110" class="img_sDl7"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting" translate="no">​</a></h3>
+\<ul\>
+<li class="">
+<p>If you get an error when running the generate command, make sure you have an empty subfolder in your Unity project Assets folder called <code>module_bindings</code></p>
+</li>
+<li class="">
+<p>If you get an error in your Unity console when starting the game, double check that you have published your module and you have the correct database name specified in your <code>GameManager</code>.</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h3>
+<p>It&#x27;s pretty cool to see our player in game surrounded by food, but there&#x27;s a problem! We can&#x27;t move yet. In the next part, we&#x27;ll explore how to get your player moving and interacting with food and other objects.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00100-intro/00300-tutorials/00300-unity-tutorial/00400-part-3.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tutorials/unity/part-2"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">2 - Connecting to SpacetimeDB</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tutorials/unity/part-4"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">4 - Moving and Colliding</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#spawning-food" class="table-of-contents__link toc-highlight">Spawning Food</a></li>\<li\><a href="#logging-players-in" class="table-of-contents__link toc-highlight">Logging Players In</a></li>\<li\><a href="#spawning-player-circles" class="table-of-contents__link toc-highlight">Spawning Player Circles</a></li>\<li\><a href="#creating-the-arena" class="table-of-contents__link toc-highlight">Creating the Arena</a></li>\<li\><a href="#creating-gameobjects" class="table-of-contents__link toc-highlight">Creating GameObjects</a></li>\<li\><a href="#hooking-up-the-data" class="table-of-contents__link toc-highlight">Hooking up the Data</a></li>\<li\><a href="#camera-controller" class="table-of-contents__link toc-highlight">Camera Controller</a></li>\<li\><a href="#entering-the-game" class="table-of-contents__link toc-highlight">Entering the Game</a></li>\<li\><a href="#trying-it-out" class="table-of-contents__link toc-highlight">Trying it out</a></li>\<li\><a href="#troubleshooting" class="table-of-contents__link toc-highlight">Troubleshooting</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

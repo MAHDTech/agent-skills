@@ -15,7 +15,7 @@ skill_name = "opencode-acp"
 
 > How all Agent Client Protocol connections begin
 
-The Initialization phase allows [Clients](https://agentclientprotocol.com/protocol/v1/overview#client) and [Agents](https://agentclientprotocol.com/protocol/v1/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
+The Initialization phase allows [Clients](/protocol/v1/overview#client) and [Agents](/protocol/v1/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
 
 <br />
 
@@ -121,7 +121,7 @@ Capabilities are high-level and are not attached to a specific base protocol con
 
 Capabilities may specify the availability of protocol methods, notifications, or a subset of their parameters. They may also signal behaviors of the Agent or Client implementation.
 
-Implementations can also [advertise custom capabilities](https://agentclientprotocol.com/protocol/v1/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
+Implementations can also [advertise custom capabilities](/protocol/v1/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
 
 ### Client Capabilities
 
@@ -190,17 +190,45 @@ The Client **SHOULD** specify whether it supports the following capabilities:
   Learn more about Session Config Options
 </Card>
 
+#### Session Compaction
+
+<ParamField path="session.compaction" type="CompactionCapabilities Object">
+  The Client supports ID-addressed `compaction_update` and
+  `compaction_summary_chunk` session updates, including their lifecycle,
+  placement, patch, and replay semantics. Omitted or `null` at either level
+  means unsupported. Supplying `{}` advertises the complete contract. Agents
+  must not send these updates to a v1 Client that does not advertise it.
+</ParamField>
+
+<Card icon="compress" horizontal href="/protocol/v1/prompt-turn#session-compaction">
+  Learn more about Session Compaction
+</Card>
+
+#### Session Notices
+
+<ParamField path="session.notices" type="NoticeCapabilities Object">
+  The Client can present live `notice` session updates to the user. This field
+  is optional and nullable. Omitting `session` or `notices`, or setting either
+  to `null`, means unsupported. Supplying `{}` advertises notice support. Agents
+  must not send notices without this capability and may instead use an agent
+  message when the information should still be surfaced to the user.
+</ParamField>
+
+<Card icon="message" horizontal href="/protocol/v1/prompt-turn#session-notices">
+  Learn more about Session Notices
+</Card>
+
 ### Agent Capabilities
 
 The Agent **SHOULD** specify whether it supports the following capabilities:
 
 <ResponseField name="loadSession" type="boolean" post={["default: false"]}>
-  The [`session/load`](https://agentclientprotocol.com/protocol/v1/session-setup#loading-sessions) method is
+  The [`session/load`](/protocol/v1/session-setup#loading-sessions) method is
   available.
 </ResponseField>
 
 <ResponseField name="promptCapabilities" type="PromptCapabilities Object">
-  Object indicating the different types of [content](https://agentclientprotocol.com/protocol/v1/content) that
+  Object indicating the different types of [content](/protocol/v1/content) that
   may be included in `session/prompt` requests.
 </ResponseField>
 
@@ -212,7 +240,7 @@ The Agent **SHOULD** specify whether it supports the following capabilities:
 
 As a baseline, all Agents **MUST** support `ContentBlock::Text` and `ContentBlock::ResourceLink` in `session/prompt` requests.
 
-Optionally, they **MAY** support richer types of [content](https://agentclientprotocol.com/protocol/v1/content) by specifying the following capabilities:
+Optionally, they **MAY** support richer types of [content](/protocol/v1/content) by specifying the following capabilities:
 
 <ResponseField name="image" type="boolean" post={["default: false"]}>
   The prompt may include `ContentBlock::Image`
@@ -241,7 +269,7 @@ Optionally, they **MAY** support richer types of [content](https://agentclientpr
 #### Authentication Capabilities
 
 <ResponseField name="logout" type="LogoutCapabilities Object">
-  The [`logout`](https://agentclientprotocol.com/protocol/v1/authentication#logging-out) method is available.
+  The [`logout`](/protocol/v1/authentication#logging-out) method is available.
 </ResponseField>
 
 <Card icon="shield-check" horizontal href="/protocol/v1/authentication">
@@ -255,7 +283,7 @@ As a baseline, all Agents **MUST** support `session/new`, `session/prompt`, `ses
 Optionally, they **MAY** support other session methods and notifications by specifying additional capabilities.
 
 <ResponseField name="delete" type="SessionDeleteCapabilities Object">
-  The [`session/delete`](https://agentclientprotocol.com/protocol/v1/session-delete) method is available.
+  The [`session/delete`](/protocol/v1/session-delete) method is available.
   Omitted or `null` both mean the Agent does not advertise support. Supplying an
   empty object means the Agent supports deleting sessions from `session/list`.
 </ResponseField>
@@ -290,10 +318,13 @@ Both Clients and Agents **SHOULD** provide information about their implementatio
   debugging or metrics purposes.
 </ParamField>
 
-\<Info\>
+<Info>
   Note: in future versions of the protocol, this information will be required.
 </Info>
 
 ***
 
-Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v1/session-setup) and begin the conversation with the Agent.
+Once the connection is initialized, you're ready to [create a session](/protocol/v1/session-setup) and begin the conversation with the Agent.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

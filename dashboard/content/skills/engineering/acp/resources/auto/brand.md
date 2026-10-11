@@ -36,3 +36,6 @@ We don't enforce the use of one version over the other, meaning you can choose t
 \<Frame\>
   <img src="https://mintcdn.com/zed-685ed6d6/0gwpXYa47bQsPCSW/assets/acp-docs-logo-mark.webp?fit=max&auto=format&n=0gwpXYa47bQsPCSW&q=85&s=3ab81fb3792f3c613bcecafec5da05cf" alt="Agentic Client Protocol Logomark" width="3840" height="2160" data-path="assets/acp-docs-logo-mark.webp" />
 </Frame>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

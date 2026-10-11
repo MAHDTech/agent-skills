@@ -7,289 +7,223 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-*SpacetimeDB* supports the [PostgreSQL wire protocol
-(PGWire)](https://www.postgresql.org/docs/current/protocol.html),
-enabling compatibility with PostgreSQL clients and tools.
-
-The PostgreSQL wire protocol is a network protocol used by PostgreSQL
-clients to communicate with compatible servers. It defines how messages
-are formatted and exchanged between client and server. The protocol is
-agnostic to the query dialect, meaning it can be used with different SQL
-engines and feature sets, in concrete, *SpacetimeDB*.
-
-This allows users to leverage the existing PostgreSQL ecosystem,
-including drivers, ORMs, IDEs, CLI tools, and GUI clients that support
-PostgreSQL.
-
-When using *PGWire* with *SpacetimeDB*, consider the following:
-
-## Feature Support
-
-SpacetimeDB is progressively adding PostgreSQL client compatibility.
-Some features are unsupported, partially implemented, or behave
-differently:
-
-- **Protocol Version**: Only *PGWire* protocol *version 3.0* is
-  supported, and only the *Simple Query Protocol*, and without
-  parameterized queries.
-- **SQL Features**: Only the subset of SQL features documented in the
-  [SQL documentation](https://spacetimedb.com/docs/reference/sql) are supported. Subscription
-  queries do not update in real time.
-- **Authentication**: SpacetimeDB does not implement database users or
-  roles. The connection string `user_name@database_name` ignores
-  `user_name`; only `database_name` is used. Authentication is based on
-  the *auth token* provided via the `password` field.
-- **SSL/TLS**: SSL is supported only for `SpacetimeDB Cloud` deployments
-  (without mutual TLS). Other deployments (such as
-  `SpacetimeDB Standalone`) do not support SSL/TLS connections.
-- **System Tables and Views**: SpacetimeDB provides its own system
-  tables (e.g., `SELECT * FROM st_table`) for introspection. These are
-  not PostgreSQL-compatible, so tools relying on PostgreSQL system
-  catalogs will not work.
-- **Port and Host**:
-  - In `SpacetimeDB Standalone` deployments, specify the port with
-    `spacetime start --pg-port <port>`. Without this flag, connections
-    using the PostgreSQL protocol are not enabled.
-  - In `SpacetimeDB Cloud` deployments, the port is always `5432`.
-- **Transactions**: User-defined transactions (`BEGIN TRANSACTION`,
-  `COMMIT`, etc.) are not supported. Each SQL statement executes in its
-  own transaction context. Client libraries should disable automatic
-  transaction handling.
-- **Special Data Types**: Some SpacetimeDB data types map to PostgreSQL
-  types as:
-  - Simple enums are displayed as `Enum`.
-  - Algebraic Data Types (ADTs) & records are displayed as `JSON`.
-  - `Duration` is displayed as `Interval`.
-  - `Identity`, `ConnectionId`, `U8`, `[U8]`, `Bytes` & `Hex` is
-    displayed as `Bytea`.
-
-## Connection Parameters
-
-To connect to SpacetimeDB using a PostgreSQL client, use the following
-parameters:
-
-- **Host**:
-  - `localhost` for `SpacetimeDB Standalone` deployments
-  - `maincloud.spacetimedb.com` for `SpacetimeDB Cloud` deployments
-- **Port**:
-  - `5432` for `SpacetimeDB Cloud`
-  - The value passed with `--pg-port` for `SpacetimeDB Standalone`
-- **Database**: The target SpacetimeDB database
-- **User**: Any string (ignored by SpacetimeDB)
-- **Password**: The `auth token`
-- **SSL Mode**: `require` (only for `SpacetimeDB Cloud`)
-
-### Auth Token
-
-warning
-
-The `auth token` is sensitive. Do not expose it in logs, version
-control, or insecure locations.
-
-SpacetimeDB uses the `password` field to pass the `auth token`. Obtain
-the token with:
-
-``` codeBlockStandalone_LlrK
-spacetime login show --token
-```
-
-To export the token to `PGPASSWORD`:
-
-*For bash*:
-
-``` codeBlockStandalone_LlrK
-export PGPASSWORD="$(spacetime login show --token | sed -n 's/^Your auth token.*is //p')"
-```
-
-*For PowerShell*:
-
-``` prism-code
-$env:PGPASSWORD = (spacetime login show --token | Select-String 'Your auth token.*is (.*)' | % { $_.Matches[0].Groups[1].Value })
-```
-
-### Enabling *PGWire* in SpacetimeDB Standalone
-
-*PGWire* is disabled by default when starting a `SpacetimeDB Standalone`
-server.
-
-To enable it, start the server with the `--pg-port` option:
-
-``` codeBlockStandalone_LlrK
-spacetime start --pg-port 5432 [ARGS]
-```
-
-## Examples
-
-In the following example, we assume you are using the `quickstart-chat`
-database created in the [Rust Module Quickstart](https://spacetimedb.com/docs/quickstarts/rust)
-or [C# Module Quickstart](https://spacetimedb.com/docs/quickstarts/c-sharp), and have set the
-`auth token` as shown above.
-
-### Using `psql`
-
-SpacetimeDB Standalone deployment:
-
-``` codeBlockStandalone_LlrK
-psql "host=localhost port=5432 user=any dbname=quickstart-chat"
-```
-
-SpacetimeDB Cloud deployment:
-
-``` codeBlockStandalone_LlrK
-psql "host=maincloud.spacetimedb.com port=5432 user=any dbname=quickstart-chat sslmode=require"
-```
-
-note
-
-Introspection commands such as `\dt` will not work, as SpacetimeDB does
-not support PostgreSQL schemas.
-
-Now for example:
-
-``` prism-code
-quickstart=> select * from message;
-                               sender                               |               sent               | text
---------------------------------------------------------------------+----------------------------------+-------
- \xc200da2d6ddb6c0beef0bbaafacffe5f0649c86b8d19411e3219066a6d0e5123 | 2025-09-29T22:29:14.271647+00:00 | hello
-(1 row)
-
-quickstart=> update message set text = 'world';
-updated: 1, server: 1.72ms
-
-quickstart=> select text from message;
- text
--------
- world
-(1 row)
-```
-
-### Using Python (`psycopg2`)
-
-``` codeBlockStandalone_LlrK
-import psycopg2
-import os
-
-conn = psycopg2.connect(
-    host="localhost",  # or "maincloud.spacetimedb.com" for SpacetimeDB Cloud
-    port=5432,
-    dbname="quickstart-chat",
-    user="any",
-    password=os.getenv("PGPASSWORD"),
-    sslmode="disable"  # use "require" for SpacetimeDB Cloud
-)
-conn.set_session(autocommit=True)  # disable transactions
-
-print("Running query:")
-with conn.cursor() as cur:
-    cur.execute("SELECT * FROM message;")
-    for row in cur.fetchall():
-        print(row)
-
-conn.close()
-print("Done.")
-```
-
-### Using Rust (`tokio-postgres` + `rustls`)
-
-We use the `tokio-postgres-rustls` because is stricter, so we can show
-how disables certificate verification.
-
-``` codeBlockStandalone_LlrK
-# Cargo.toml
-[dependencies]
-anyhow = "1.0.71"
-tokio-postgres = "0.7.14"
-tokio-postgres-rustls = "0.13.0"
-tokio = { version = "1.47.1", features = ["full"] }
-rustls = "0.23.32"
-```
-
-``` codeBlockStandalone_LlrK
-// main.rs
-use std::env;
-use std::sync::Arc;
-use rustls::client::danger::{ServerCertVerified, ServerCertVerifier};
-use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
-use rustls::{ClientConfig, Error, RootCertStore, SignatureScheme};
-use tokio_postgres_rustls::MakeRustlsConnect;
-
-#[derive(Debug)]
-struct NoVerifier;
-
-impl ServerCertVerifier for NoVerifier {
-    fn verify_server_cert(
-        &self,
-        _: &CertificateDer<'_>,
-        _: &[CertificateDer<'_>],
-        _: &ServerName<'_>,
-        _: &[u8],
-        _: UnixTime,
-    ) -> Result<ServerCertVerified, Error> {
-        Ok(ServerCertVerified::assertion())
-    }
-
-    fn verify_tls12_signature(
-        &self,
-        _: &[u8],
-        _: &CertificateDer<'_>,
-        _: &rustls::DigitallySignedStruct,
-    ) -> Result<rustls::client::danger::HandshakeSignatureValid, Error> {
-        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
-    }
-
-    fn verify_tls13_signature(
-        &self,
-        _: &[u8],
-        _: &CertificateDer<'_>,
-        _: &rustls::DigitallySignedStruct,
-    ) -> Result<rustls::client::danger::HandshakeSignatureValid, Error> {
-        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
-    }
-
-    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
-        vec![
-            SignatureScheme::ECDSA_NISTP384_SHA384,
-            SignatureScheme::ECDSA_NISTP256_SHA256,
-            SignatureScheme::RSA_PSS_SHA512,
-            SignatureScheme::RSA_PSS_SHA384,
-            SignatureScheme::RSA_PSS_SHA256,
-            SignatureScheme::ED25519,
-        ]
-    }
-}
-
-#[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
-    let password = env::var("PGPASSWORD").expect("PGPASSWORD not set");
-
-    let mut config = ClientConfig::builder()
-        .with_root_certificates(RootCertStore::empty())
-        .with_no_client_auth();
-
-    config.dangerous().set_certificate_verifier(Arc::new(NoVerifier));
-    let connector = MakeRustlsConnect::new(config);
-
-    let (client, connection) = tokio_postgres::connect(
-        // Note: use "maincloud.spacetimedb.com" and sslmode=require for SpacetimeDB Cloud
-        &format!(
-            "host=localhost port=5432 user=any sslmode=disable dbname=quickstart-chat password={password}"
-        ),
-        connector,
-    ).await?;
-
-    tokio::spawn(async move { connection.await.expect("connection error") });
-
-    println!("Running query:");
-    let rows = client.simple_query("SELECT * FROM message;").await?;
-    for row in rows {
-        println!("Row: {:?}", row);
-    }
-    println!("Done.");
-    Ok(())
-}
-```
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/how-to/pg-wire" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">PostgreSQL Wire Protocol (PGWire) | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/how-to/pg-wire"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="PostgreSQL Wire Protocol (PGWire) | SpacetimeDB docs"><meta data-rh="true" name="description" content="SpacetimeDB supports the PostgreSQL wire protocol (PGWire),"><meta data-rh="true" property="og:description" content="SpacetimeDB supports the PostgreSQL wire protocol (PGWire),"><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/how-to/pg-wire"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/how-to/pg-wire" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/how-to/pg-wire" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PostgreSQL Wire Protocol (PGWire)","item":"https://spacetimedb.com/docs/how-to/pg-wire"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/how-to/pg-wire">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/how-to/pg-wire">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/how-to/pg-wire">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/troubleshooting"><span title="Troubleshooting" class="linkLabel_UvDg">Troubleshooting</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/how-to/deploy/maincloud"><span title="Deploy" class="categoryLinkLabel_HATI">Deploy</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/how-to/pg-wire"><span title="PostgreSQL Wire Protocol (PGWire)" class="linkLabel_UvDg">PostgreSQL Wire Protocol (PGWire)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/logging"><span title="Logging" class="linkLabel_UvDg">Logging</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/rls"><span title="Row Level Security" class="linkLabel_UvDg">Row Level Security</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/reject-client-connections"><span title="Reject Client Connections" class="linkLabel_UvDg">Reject Client Connections</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/self-hosted-key-rotation"><span title="Azure Self-Hosted VMs + Key Rotation & Key Vault" class="linkLabel_UvDg">Azure Self-Hosted VMs + Key Rotation & Key Vault</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/migrating-from-convex"><span title="Migrating from Convex" class="linkLabel_UvDg">Migrating from Convex</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">How To</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">PostgreSQL Wire Protocol (PGWire)</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>PostgreSQL Wire Protocol (PGWire)</h1></header><p><em>SpacetimeDB</em> supports the <a href="https://www.postgresql.org/docs/current/protocol.html" target="_blank" rel="noopener noreferrer" class="">PostgreSQL wire protocol (PGWire)</a>,
+enabling compatibility with PostgreSQL clients and tools.</p>
+<p>The PostgreSQL wire protocol is a network protocol used by PostgreSQL clients to communicate with compatible servers. It
+defines how messages are formatted and exchanged between client and server. The protocol is agnostic to the query
+dialect,
+meaning it can be used with different SQL engines and feature sets, in concrete, <em>SpacetimeDB</em>.</p>
+<p>This allows users to leverage the existing PostgreSQL ecosystem, including drivers, ORMs, IDEs, CLI tools, and GUI
+clients that support PostgreSQL.</p>
+<p>When using <em>PGWire</em> with <em>SpacetimeDB</em>, consider the following:</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="feature-support">Feature Support<a href="#feature-support" class="hash-link" aria-label="Direct link to Feature Support" title="Direct link to Feature Support" translate="no">​</a></h2>
+<p>SpacetimeDB is progressively adding PostgreSQL client compatibility. Some features are unsupported, partially
+implemented, or behave differently:</p>
+\<ul\>
+<li class=""><strong>Protocol Version</strong>: Only <em>PGWire</em> protocol <em>version 3.0</em> is supported, and only the <em>Simple Query Protocol</em>, and
+without parameterized queries.</li>
+<li class=""><strong>SQL Features</strong>: Only the subset of SQL features documented in the <a class="" href="/docs/reference/sql">SQL documentation</a> are
+supported. Subscription queries do not update in real time.</li>
+<li class=""><strong>Authentication</strong>: SpacetimeDB does not implement database users or roles. The connection string
+<code>user_name@database_name</code> ignores <code>user_name</code>; only <code>database_name</code> is used. Authentication is based on the <em>auth
+token</em>
+provided via the <code>password</code> field.</li>
+<li class=""><strong>SSL/TLS</strong>: SSL is supported only for <code>SpacetimeDB Cloud</code> deployments (without mutual TLS). Other deployments (such
+as <code>SpacetimeDB Standalone</code>) do not support SSL/TLS connections.</li>
+<li class=""><strong>System Tables and Views</strong>: SpacetimeDB provides its own system tables (e.g., <code>SELECT * FROM st_table</code>) for
+introspection. These are not PostgreSQL-compatible, so tools relying on PostgreSQL system catalogs will not work.</li>
+<li class=""><strong>Port and Host</strong>:<!-- -->
+\<ul\>
+<li class="">In <code>SpacetimeDB Standalone</code> deployments, specify the port with <code>spacetime start --pg-port \<port\></code>. Without this
+flag, connections using the PostgreSQL protocol are not enabled.</li>
+<li class="">In <code>SpacetimeDB Cloud</code> deployments, the port is always <code>5432</code>.</li>
+</ul>
+</li>
+<li class=""><strong>Transactions</strong>: User-defined transactions (<code>BEGIN TRANSACTION</code>, <code>COMMIT</code>, etc.) are not supported. Each SQL
+statement executes in its own transaction context. Client libraries should disable automatic transaction handling.</li>
+<li class=""><strong>Special Data Types</strong>: Some SpacetimeDB data types map to PostgreSQL types as:<!-- -->
+\<ul\>
+<li class="">Simple enums are displayed as <code>Enum</code>.</li>
+<li class="">Algebraic Data Types (ADTs) & records are displayed as <code>JSON</code>.</li>
+<li class=""><code>Duration</code> is displayed as <code>Interval</code>.</li>
+<li class=""><code>Identity</code>, <code>ConnectionId</code>, <code>U8</code>, <code>[U8]</code>, <code>Bytes</code> & <code>Hex</code> is displayed as <code>Bytea</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="connection-parameters">Connection Parameters<a href="#connection-parameters" class="hash-link" aria-label="Direct link to Connection Parameters" title="Direct link to Connection Parameters" translate="no">​</a></h2>
+<p>To connect to SpacetimeDB using a PostgreSQL client, use the following parameters:</p>
+\<ul\>
+<li class=""><strong>Host</strong>:<!-- -->
+\<ul\>
+<li class=""><code>localhost</code> for <code>SpacetimeDB Standalone</code> deployments</li>
+<li class=""><code>maincloud.spacetimedb.com</code> for <code>SpacetimeDB Cloud</code> deployments</li>
+</ul>
+</li>
+<li class=""><strong>Port</strong>:<!-- -->
+\<ul\>
+<li class=""><code>5432</code> for <code>SpacetimeDB Cloud</code></li>
+<li class="">The value passed with <code>--pg-port</code> for <code>SpacetimeDB Standalone</code></li>
+</ul>
+</li>
+<li class=""><strong>Database</strong>: The target SpacetimeDB database</li>
+<li class=""><strong>User</strong>: Any string (ignored by SpacetimeDB)</li>
+<li class=""><strong>Password</strong>: The <code>auth token</code></li>
+<li class=""><strong>SSL Mode</strong>: <code>require</code> (only for <code>SpacetimeDB Cloud</code>)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="auth-token">Auth Token<a href="#auth-token" class="hash-link" aria-label="Direct link to Auth Token" title="Direct link to Auth Token" translate="no">​</a></h3>
+<div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The <code>auth token</code> is sensitive. Do not expose it in logs, version control, or insecure locations.</p></div></div>
+<p>SpacetimeDB uses the <code>password</code> field to pass the <code>auth token</code>. Obtain the token with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span><span style="color:#F1FA8C"> show</span><span style="color:#BD93F9"> --token</span></span></code></pre>
+<p>To export the token to <code>PGPASSWORD</code>:</p>
+<p><em>For bash</em>:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#BD93F9"> PGPASSWORD</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">$(</span><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login show </span><span style="color:#BD93F9">--token</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> sed</span><span style="color:#BD93F9"> -n</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">s/^Your auth token.*is //p</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">)</span><span style="color:#E9F284">"</span></span></code></pre>
+<p><em>For PowerShell</em>:</p>
+<div class="language-powershell codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-powershell codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">$env:PGPASSWORD = (spacetime login show --token | Select-String &#x27;Your auth token.*is (.*)&#x27; | % { $_.Matches[0].Groups[1].Value })</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="enabling-pgwire-in-spacetimedb-standalone">Enabling <em>PGWire</em> in SpacetimeDB Standalone<a href="#enabling-pgwire-in-spacetimedb-standalone" class="hash-link" aria-label="Direct link to enabling-pgwire-in-spacetimedb-standalone" title="Direct link to enabling-pgwire-in-spacetimedb-standalone" translate="no">​</a></h3>
+<p><em>PGWire</em> is disabled by default when starting a <code>SpacetimeDB Standalone</code> server.</p>
+<p>To enable it, start the server with the <code>--pg-port</code> option:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span><span style="color:#BD93F9"> --pg-port</span><span style="color:#BD93F9"> 5432</span><span style="color:#F8F8F2"> [ARGS]</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="examples">Examples<a href="#examples" class="hash-link" aria-label="Direct link to Examples" title="Direct link to Examples" translate="no">​</a></h2>
+<p>In the following example, we assume you are using the <code>quickstart-chat</code> database created in
+the <a class="" href="/docs/quickstarts/rust">Rust Module Quickstart</a> or <a class="" href="/docs/quickstarts/c-sharp">C# Module Quickstart</a>,
+and have set the <code>auth token</code> as shown above.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-psql">Using <code>psql</code><a href="#using-psql" class="hash-link" aria-label="Direct link to using-psql" title="Direct link to using-psql" translate="no">​</a></h3>
+<p>SpacetimeDB Standalone deployment:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">psql</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">host=localhost port=5432 user=any dbname=quickstart-chat</span><span style="color:#E9F284">"</span></span></code></pre>
+<p>SpacetimeDB Cloud deployment:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">psql</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">host=maincloud.spacetimedb.com port=5432 user=any dbname=quickstart-chat sslmode=require</span><span style="color:#E9F284">"</span></span></code></pre>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>Introspection commands such as <code>\dt</code> will not work, as SpacetimeDB does not support PostgreSQL schemas.</p></div></div>
+<p>Now for example:</p>
+<div class="language-psql codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-psql codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">quickstart=> select * from message;</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">                               sender                               |               sent               | text</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">--------------------------------------------------------------------+----------------------------------+-------</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"> \xc200da2d6ddb6c0beef0bbaafacffe5f0649c86b8d19411e3219066a6d0e5123 | 2025-09-29T22:29:14.271647+00:00 | hello</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">(1 row)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">quickstart=> update message set text = &#x27;world&#x27;;</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">updated: 1, server: 1.72ms</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">quickstart=> select text from message;</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"> text</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">-------</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"> world</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">(1 row)</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-python-psycopg2">Using Python (<code>psycopg2</code>)<a href="#using-python-psycopg2" class="hash-link" aria-label="Direct link to using-python-psycopg2" title="Direct link to using-python-psycopg2" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> psycopg2</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> os</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> psycopg2.connect(</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    host</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">localhost</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4"># or "maincloud.spacetimedb.com" for SpacetimeDB Cloud</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    port</span><span style="color:#FF79C6">=</span><span style="color:#BD93F9">5432</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    dbname</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">quickstart-chat</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    user</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">any</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    password</span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2">os.getenv(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PGPASSWORD</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    sslmode</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">disable</span><span style="color:#E9F284">"</span><span style="color:#6272A4">  # use "require" for SpacetimeDB Cloud</span></span>
+<span class="line"><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.set_session(</span><span style="color:#FFB86C;font-style:italic">autocommit</span><span style="color:#FF79C6">=</span><span style="color:#BD93F9">True</span><span style="color:#F8F8F2">)  </span><span style="color:#6272A4"># disable transactions</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD">print</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Running query:</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">with</span><span style="color:#F8F8F2"> conn.cursor() </span><span style="color:#FF79C6">as</span><span style="color:#F8F8F2"> cur:</span></span>
+<span class="line"><span style="color:#F8F8F2">    cur.execute(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">SELECT * FROM message;</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> row </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> cur.fetchall():</span></span>
+<span class="line"><span style="color:#8BE9FD">        print</span><span style="color:#F8F8F2">(row)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">conn.close()</span></span>
+<span class="line"><span style="color:#8BE9FD">print</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Done.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-rust-tokio-postgres--rustls">Using Rust (<code>tokio-postgres</code> + <code>rustls</code>)<a href="#using-rust-tokio-postgres--rustls" class="hash-link" aria-label="Direct link to using-rust-tokio-postgres--rustls" title="Direct link to using-rust-tokio-postgres--rustls" translate="no">​</a></h3>
+<p>We use the <code>tokio-postgres-rustls</code> because is stricter, so we can show how disables certificate verification.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># Cargo.toml</span></span>
+<span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">dependencies</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">anyhow</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">1.0.71</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">tokio-postgres</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">0.7.14</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">tokio-postgres-rustls</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">0.13.0</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">tokio</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> { </span><span style="color:#8BE9FD">version</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">1.47.1</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD">features</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> [</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">full</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">] }</span></span>
+<span class="line"><span style="color:#8BE9FD">rustls</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">0.23.32</span><span style="color:#E9F284">"</span></span></code></pre>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// main.rs</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">env;</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">sync</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Arc</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">client</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">danger</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">ServerCertVerified</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ServerCertVerifier</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">pki_types</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">CertificateDer</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ServerName</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">UnixTime</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">ClientConfig</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Error</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">RootCertStore</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">SignatureScheme</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> tokio_postgres_rustls</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">MakeRustlsConnect</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> NoVerifier</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#8BE9FD;font-style:italic"> ServerCertVerifier</span><span style="color:#FF79C6"> for</span><span style="color:#8BE9FD;font-style:italic"> NoVerifier</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> verify_server_cert</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6">        &</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">CertificateDer</span><span style="color:#F8F8F2"><&#x27;</span><span style="color:#8BE9FD;font-style:italic">_</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">CertificateDer</span><span style="color:#F8F8F2"><&#x27;</span><span style="color:#8BE9FD;font-style:italic">_</span><span style="color:#F8F8F2">>],</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ServerName</span><span style="color:#F8F8F2"><&#x27;</span><span style="color:#8BE9FD;font-style:italic">_</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">],</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> UnixTime</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    ) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">ServerCertVerified</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Error</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ServerCertVerified</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">assertion</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> verify_tls12_signature</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6">        &</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">],</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">CertificateDer</span><span style="color:#F8F8F2"><&#x27;</span><span style="color:#8BE9FD;font-style:italic">_</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">rustls</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">DigitallySignedStruct</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    ) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">client</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">danger</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">HandshakeSignatureValid</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Error</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">client</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">danger</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">HandshakeSignatureValid</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">assertion</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> verify_tls13_signature</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6">        &</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">],</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">CertificateDer</span><span style="color:#F8F8F2"><&#x27;</span><span style="color:#8BE9FD;font-style:italic">_</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">        _</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#F8F8F2">rustls</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">DigitallySignedStruct</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    ) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">client</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">danger</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">HandshakeSignatureValid</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Error</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(rustls</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">client</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">danger</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">HandshakeSignatureValid</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">assertion</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> supported_verify_schemes</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">SignatureScheme</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#50FA7B">        vec!</span><span style="color:#F8F8F2">[</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">ECDSA_NISTP384_SHA384</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">ECDSA_NISTP256_SHA256</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">RSA_PSS_SHA512</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">RSA_PSS_SHA384</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">RSA_PSS_SHA256</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            SignatureScheme</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">ED25519</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        ]</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[tokio</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">main]</span></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> main</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), anyhow</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Error</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> password </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> env</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">var</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"PGPASSWORD"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"PGPASSWORD not set"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> config </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> ClientConfig</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">with_root_certificates</span><span style="color:#F8F8F2">(RootCertStore</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">empty</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">with_no_client_auth</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    config</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">dangerous</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">set_certificate_verifier</span><span style="color:#F8F8F2">(Arc</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">new</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">NoVerifier</span><span style="color:#F8F8F2">));</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> connector </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> MakeRustlsConnect</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">new</span><span style="color:#F8F8F2">(config);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> (client, connection) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> tokio_postgres</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">connect</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#6272A4">        // Note: use "maincloud.spacetimedb.com" and sslmode=require for SpacetimeDB Cloud</span></span>
+<span class="line"><span style="color:#FF79C6">        &</span><span style="color:#50FA7B">format!</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F1FA8C">            "host=localhost port=5432 user=any sslmode=disable dbname=quickstart-chat password={password}"</span></span>
+<span class="line"><span style="color:#F8F8F2">        ),</span></span>
+<span class="line"><span style="color:#F8F8F2">        connector,</span></span>
+<span class="line"><span style="color:#F8F8F2">    )</span><span style="color:#FF79C6">.await?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    tokio</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">spawn</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> move</span><span style="color:#F8F8F2"> { connection</span><span style="color:#FF79C6">.await.</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"connection error"</span><span style="color:#F8F8F2">) });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">    println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Running query:"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> rows </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> client</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">simple_query</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"SELECT * FROM message;"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.await?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> row </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> rows {</span></span>
+<span class="line"><span style="color:#50FA7B">        println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Row: {:?}"</span><span style="color:#F8F8F2">, row);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#50FA7B">    println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Done."</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00100-how-to/00200-pg-wire.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/how-to/deploy/railway"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Railway</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/how-to/logging"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Logging</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#feature-support" class="table-of-contents__link toc-highlight">Feature Support</a></li>\<li\><a href="#connection-parameters" class="table-of-contents__link toc-highlight">Connection Parameters</a>\<ul\>\<li\><a href="#auth-token" class="table-of-contents__link toc-highlight">Auth Token</a></li>\<li\><a href="#enabling-pgwire-in-spacetimedb-standalone" class="table-of-contents__link toc-highlight">Enabling <em>PGWire</em> in SpacetimeDB Standalone</a></li></ul></li>\<li\><a href="#examples" class="table-of-contents__link toc-highlight">Examples</a>\<ul\>\<li\><a href="#using-psql" class="table-of-contents__link toc-highlight">Using <code>psql</code></a></li>\<li\><a href="#using-python-psycopg2" class="table-of-contents__link toc-highlight">Using Python (<code>psycopg2</code>)</a></li>\<li\><a href="#using-rust-tokio-postgres--rustls" class="table-of-contents__link toc-highlight">Using Rust (<code>tokio-postgres</code> + <code>rustls</code>)</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

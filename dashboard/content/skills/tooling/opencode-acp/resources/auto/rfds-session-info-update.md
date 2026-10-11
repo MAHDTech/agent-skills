@@ -380,3 +380,6 @@ The proposed notification-based approach:
 ## Revision history
 
 * **2025-11-28**: Initial draft proposal
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

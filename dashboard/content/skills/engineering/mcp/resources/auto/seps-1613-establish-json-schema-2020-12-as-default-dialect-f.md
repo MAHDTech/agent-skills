@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1613                                                                            |
-| **Title**     | Establish JSON Schema 2020-12 as Default Dialect for MCP                        |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-10-06                                                                      |
-| **Author(s)** | Ola Hungerford                                                                  |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1613](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1613) |
+| Field | Value |
+| - | - |
+| **SEP** | 1613 |
+| **Title** | Establish JSON Schema 2020-12 as Default Dialect for MCP |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-10-06 |
+| **Author(s)** | Ola Hungerford |
+| **Sponsor** | None |
+| **PR** | [#1613](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1613) |
 
 ***
 
@@ -209,3 +209,5 @@ Options:
 3. Leave as-is since it doesn't actually conflict with the spec?
 
 Personally I'd prefer (1) in the short term and then (2) as a follow-up.
+
+

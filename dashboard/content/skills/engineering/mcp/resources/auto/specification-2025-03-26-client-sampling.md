@@ -43,7 +43,7 @@ model.
 ## Capabilities
 
 Clients that support sampling **MUST** declare the `sampling` capability during
-[initialization](https://modelcontextprotocol.io/specification/2025-03-26/basic/lifecycle#initialization):
+[initialization](/specification/2025-03-26/basic/lifecycle#initialization):
 
 ```json theme={null}
 {
@@ -243,3 +243,5 @@ Example error:
 3. Clients **SHOULD** respect model preference hints
 4. Clients **SHOULD** implement rate limiting
 5. Both parties **MUST** handle sensitive data appropriately
+
+

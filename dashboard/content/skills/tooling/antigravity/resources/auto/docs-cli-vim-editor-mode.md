@@ -7,349 +7,755 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-Markdownkeyboard_arrow_down
-
-content_copyCopy Markdown
-
-open_in_newView Markdown
-
-# Vim editor mode
-
-Edit prompts with modal Vim keybindings instead of the default flat text
-editor.
-
-Vim editor mode replaces the editing model in every multi-line input
-surface of the CLI:
-
-| Surface | What you edit there |
-|:---|:---|
-| The prompt box | Your message to the agent, including multi-line prompts and slash commands. |
-| The comment editor in [`/diff`](https://antigravity.google/docs/cli/commands/diff) | Review comments you leave on a changed file. |
-| The comment editor in the artifact review panel | Feedback on a generated [artifact](https://antigravity.google/docs/cli/artifacts) before you accept it. |
-
-It also adds a `vim` tab to the help overlay and a mode badge to the
-[status line](https://antigravity.google/docs/cli/statusline).
-
-## Enable Vim editor mode
-
-Vim editor mode is off by default. Turn it on from the interactive
-settings panel or directly in `settings.json`.
-
-### Using the settings panel
-
-1.  Type `/settings` inside the prompt panel and press `Enter`.
-
-2.  Navigate to **Editor Mode** using `↑`/`↓`.
-
-3.  Press `Enter` to select `vim`.
-
-4.  Set **Editor Mode › Insert First** to choose which mode each prompt
-    starts in. Leave it `off` to start in Normal mode, or set it `on` to
-    start in Insert mode with a bare `Enter` that submits. See [Start in
-    Insert mode](#start-in-insert-mode).
-
-5.  Press `Esc` to save and close the editor.
-
-### Using `settings.json`
-
-Set `editorMode` in your configuration profile:
-
-``` astro-code
-{
-    "editorMode": "vim",
-    "vimInsertFirst": false
-}
-```
-
-The CLI loads this file from `~/.gemini/antigravity-cli/settings.json`
-at startup. `editorMode` accepts `"default"` and `"vim"`.
-`vimInsertFirst` controls which mode each new prompt starts in and
-applies only when `editorMode` is `"vim"`; see [Start in Insert
-mode](#start-in-insert-mode).
-
-> **Note:** `editorMode` is unrelated to the [`editor`
-> setting](https://antigravity.google/docs/cli/settings). `editor` picks the external program that
-> `Ctrl+G` launches, so setting `editor` to `"vim"` opens Vim in a
-> separate window and does nothing to the prompt. `editorMode` is the
-> one that controls modal editing inside the CLI prompt itself.
-
-## Switch between modes
-
-Vim editor mode starts in NORMAL. Press `i` to type, and `Esc` to return
-to NORMAL.
-
-| Command         | Action                                  | From mode      |
-|:----------------|:----------------------------------------|:---------------|
-| `Esc`, `Ctrl+C` | Enter NORMAL mode                       | INSERT, VISUAL |
-| `i`             | Insert before the cursor                | NORMAL         |
-| `I`             | Insert at the first non-blank character | NORMAL         |
-| `a`             | Insert after the cursor                 | NORMAL         |
-| `A`             | Insert at the end of the line           | NORMAL         |
-| `o`             | Open a line below and insert            | NORMAL         |
-| `O`             | Open a line above and insert            | NORMAL         |
-| `v`             | Start a character-wise selection        | NORMAL         |
-| `V`             | Start a line-wise selection             | NORMAL         |
-
-The status line reports the current mode:
-
-| Mode        | Badge          |
-|:------------|:---------------|
-| NORMAL      | none           |
-| INSERT      | `-- INSERT --` |
-| VISUAL      | `-- VISUAL --` |
-| VISUAL LINE | `-- V-LINE --` |
-
-An empty badge area means you are in NORMAL mode. If you run a [custom
-status line](#show-the-mode-in-a-custom-status-line), it replaces this
-badge unless you stack it with the default.
-
-> **Tip:** Press `?` in NORMAL mode to open the shortcuts overlay, or
-> run `/help` and select the `vim` tab for a full cheat sheet.
-
-## Submit your prompt
-
-Enter behaves differently in each mode, so you can compose multi-line
-prompts without accidental submits.
-
-| Context | `Enter` | `Ctrl+S` / `Ctrl+Enter` | `ZZ` |
-|:---|:---|:---|:---|
-| NORMAL mode | Submit | Submit | Submit |
-| INSERT mode | Insert a newline | Submit | — |
-| INSERT mode, insert-first on | Submit | Submit | — |
-
-`ZZ` submits from NORMAL and VISUAL mode, matching the muscle memory of
-writing and quitting a buffer.
-
-### Start in Insert mode
-
-Set `vimInsertFirst` when you want each new prompt to begin in INSERT
-mode with a bare `Enter` that submits. This keeps the default typing
-experience while leaving NORMAL mode one `Esc` away.
-
-``` astro-code
-{
-    "editorMode": "vim",
-    "vimInsertFirst": true
-}
-```
-
-The **Editor Mode › Insert First** option appears in `/settings` only
-when Editor Mode is set to `vim`. It has no effect in default mode.
-
-## Move the cursor
-
-All motions work on their own in NORMAL and VISUAL mode, and as targets
-for an operator.
-
-| Key | Motion |
-|:---|:---|
-| `h` `l` | Left, right |
-| `j` `k` | Down, up |
-| `0` `$` | Start of line, end of line |
-| `^` | First non-blank character on the line |
-| `w` `b` `e` | Next word, previous word, end of word |
-| `W` `B` `E` | Same, treating whitespace-delimited chunks as words |
-| `gg` `G` | Start of input, end of input |
-| `f{char}` `F{char}` | Jump onto the next or previous `{char}` |
-| `t{char}` `T{char}` | Stop one character short of the next or previous `{char}` |
-| `;` `,` | Repeat the last `f`/`F`/`t`/`T` forward, backward |
-
-## Edit text
-
-Editing commands fall into three groups: single keys that act
-immediately, operators that wait for a motion, and text objects that
-select a delimited region.
-
-### Single-key commands
-
-| Key       | Action                                                       |
-|:----------|:-------------------------------------------------------------|
-| `x`       | Delete the character under the cursor                        |
-| `r{char}` | Replace the character under the cursor with `{char}`         |
-| `D` `C`   | Delete or change from the cursor to the end of the line      |
-| `o` `O`   | Open a new line below or above and enter INSERT mode         |
-| `p` `P`   | Paste after or before the cursor                             |
-| `u` `U`   | Undo, redo. `Ctrl+R` does not redo; it opens artifact review |
-
-Commands take no count prefix, so `3dd` deletes one line. To act on
-several lines at once, select them with `V` and press the operator.
-There is also no `.` to repeat the last change.
-
-There is one unnamed register rather than the usual `"a`–`"z` set.
-Deletes fill it, so `x`, `D`, `C`, `d`, and `c` all leave text you can
-paste back with `p`.
-
-Paste is linewise-aware. Text yanked with `dd` or `yy` pastes onto a new
-line below (`p`) or above (`P`). Anything else pastes inline.
-
-### Operators and motions
-
-Combine an operator with any motion to act on the span it covers.
-
-| Operator | Action                                  | Word forms     | Whole line |
-|:---------|:----------------------------------------|:---------------|:-----------|
-| `d`      | Delete                                  | `dw` `de` `db` | `dd`       |
-| `c`      | Change (delete, then enter INSERT mode) | `cw` `ce` `cb` | `cc`       |
-| `y`      | Yank                                    | `yw` `ye` `yb` | `yy`       |
-
-``` astro-code
-dw     Delete to the start of the next word
-d$     Delete to the end of the line
-c^     Change back to the first non-blank character
-yG     Yank to the end of the input
-dfx    Delete forward through the next "x"
-```
-
-`cw` changes to the end of the current word, matching real Vim.
-
-### Text objects
-
-Pair an operator with `i` (inside) or `a` (around) and a delimiter.
-
-| Object              | Selects                                        |
-|:--------------------|:-----------------------------------------------|
-| `iw` `aw`           | A word, with or without surrounding whitespace |
-| `iW` `aW`           | A whitespace-delimited chunk                   |
-| `i"` `a"` `i'` `a'` | Text in single or double quotes                |
-| `i(` `a(` `i)` `a)` | Text in parentheses                            |
-| `i[` `a[` `i]` `a]` | Text in square brackets                        |
-| `i{` `a{` `i}` `a}` | Text in braces                                 |
-
-Backticks work the same way: pair `i` or `a` with a backtick to select
-inline code.
-
-``` astro-code
-ci"    Change the text inside the nearest quotes
-da(    Delete a parenthesized group, parentheses included
-yiw    Yank the word under the cursor
-```
-
-## Work with selections
-
-Press `v` or `V` to select, move with any motion, then apply a command.
-Press `v` or `V` again, or `Esc`, to leave.
-
-| Key       | Action on the selection                        |
-|:----------|:-----------------------------------------------|
-| `d` `x`   | Delete                                         |
-| `c`       | Change                                         |
-| `y`       | Yank                                           |
-| `r{char}` | Replace every selected character with `{char}` |
-| `~`       | Toggle case                                    |
-| `u` `U`   | Lowercase, uppercase                           |
-
-> **Note:** `~`, `u`, and `U` change case in VISUAL mode only. In NORMAL
-> mode, `u` and `U` are undo and redo.
-
-## Run slash and shell commands
-
-Press `/` or `!` in NORMAL mode. The CLI inserts the character and
-switches to INSERT mode, so slash commands and shell commands work
-without pressing `i` first.
-
-``` astro-code
-/settings     Open the settings panel from NORMAL mode
-!ls -la       Run a shell command from NORMAL mode
-```
-
-## Customize the submit and newline keys
-
-Three Vim actions are remappable in
-`~/.gemini/antigravity-cli/keybindings.json`. These are the defaults:
-
-``` astro-code
-{
-    "vim.insert.insert_newline": ["alt+enter", "ctrl+j", "enter", "shift+enter"],
-    "vim.insert.submit": ["ctrl+enter", "ctrl+s"],
-    "vim.normal.submit": ["ctrl+enter", "ctrl+s"]
-}
-```
-
-Motions, operators, and text objects are fixed and cannot be remapped.
-
-### Submit with Enter in NORMAL mode only
-
-This is the default. `Enter` submits from NORMAL mode and inserts a
-newline in INSERT mode, so you can type freely and submit with a single
-`Esc` `Enter`. No configuration is needed. Leave `vimInsertFirst` off:
-
-``` astro-code
-{
-    "editorMode": "vim",
-    "vimInsertFirst": false
-}
-```
-
-### Submit with Enter in INSERT mode too
-
-Move `enter` out of `vim.insert.insert_newline` and into
-`vim.insert.submit`. `Shift+Enter`, `Alt+Enter`, and `Ctrl+J` still
-insert newlines:
-
-``` astro-code
-{
-    "vim.insert.insert_newline": ["alt+enter", "ctrl+j", "shift+enter"],
-    "vim.insert.submit": ["ctrl+enter", "ctrl+s", "enter"]
-}
-```
-
-Setting `vimInsertFirst` to `true` achieves the same submit behavior
-without editing keybindings, but it also changes which mode each new
-prompt starts in.
-
-> **Warning:** `Enter` always submits in NORMAL mode. Remapping
-> `vim.normal.submit` adds keys; it never removes `Enter`.
-
-## Show the mode in a custom status line
-
-A [custom status line](https://antigravity.google/docs/cli/statusline) replaces the built-in one,
-and the mode badge goes with it. You have two ways to get the mode back.
-
-Keep the built-in line and stack your script underneath it:
-
-``` astro-code
-{
-    "statusLine": {
-        "type": "command",
-        "command": "~/.gemini/antigravity-cli/statusline.sh",
-        "stack_with_default": true
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-vdxcvpsm">\<head\>\<script\>
+  if (window.location.hostname === 'www.antigravity.google') {
+    window.location.replace(
+      `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
+  }
+</script><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>Vim editor mode - Antigravity CLI | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/cli/vim-editor-mode/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="Vim editor mode - Antigravity CLI | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/cli/vim-editor-mode/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Edit prompts with modal Vim keybindings instead of the default flat text editor."/><meta property="og:description" content="Edit prompts with modal Vim keybindings instead of the default flat text editor."/><meta name="twitter:title" content="Vim editor mode - Antigravity CLI | Google Antigravity Docs"/><meta name="twitter:description" content="Edit prompts with modal Vim keybindings instead of the default flat text editor."/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Vim editor mode - Antigravity CLI","description":"Edit prompts with modal Vim keybindings instead of the default flat text editor.","url":"https://antigravity.google/docs/cli/vim-editor-mode/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/cli/vim-editor-mode/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/home/"},{"@type":"ListItem","position":2,"name":"Antigravity CLI","item":"https://antigravity.google/docs/cli/overview/"},{"@type":"ListItem","position":3,"name":"Vim editor mode","item":"https://antigravity.google/docs/cli/vim-editor-mode/"}]}]}</script><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet">\<script\>
+  window.dataLayer = window.dataLayer || [];
+  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
+  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
+
+  function __agyDetectViewport() {
+    const width = Math.round(
+      window.innerWidth ||
+        (document.documentElement && document.documentElement.clientWidth) ||
+        1440
+    );
+    const height = Math.round(
+      window.innerHeight ||
+        (document.documentElement && document.documentElement.clientHeight) ||
+        900
+    );
+    const orientation = width >= height ? 'landscape' : 'portrait';
+    const minDim = Math.min(width, height);
+    const maxDim = Math.max(width, height);
+    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
+    const ua =
+      typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+
+    const hasSegments =
+      Boolean(
+        window.visualViewport &&
+          window.visualViewport.segments &&
+          window.visualViewport.segments.length > 1
+      ) ||
+      Boolean(
+        typeof navigator !== 'undefined' &&
+          navigator.devicePosture &&
+          navigator.devicePosture.type === 'folded'
+      ) ||
+      Boolean(
+        window.matchMedia &&
+          window.matchMedia(
+            '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
+          ).matches
+      );
+    const isFoldableUA =
+      /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(ua);
+    const isFoldableUnfolded =
+      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
+    const isFoldableCover =
+      (width >= 320 &&
+        width <= 368 &&
+        height >= 700 &&
+        height / width >= 2.0) ||
+      (height >= 320 &&
+        height <= 368 &&
+        width >= 700 &&
+        width / height >= 2.0);
+
+    const isIpad =
+      /ipad/i.test(ua) ||
+      (typeof navigator !== 'undefined' &&
+        navigator.maxTouchPoints > 0 &&
+        /macintosh/i.test(ua));
+    let os = 'unknown';
+    if (/iphone|ipod/i.test(ua)) os = 'iphone';
+    else if (isIpad) os = 'ipad';
+    else if (/googlebook|cros/i.test(ua)) os = 'googlebook';
+    else if (/android/i.test(ua)) os = 'android';
+    else if (/windows/i.test(ua)) os = 'windows';
+    else if (/macintosh|mac os x/i.test(ua)) os = 'mac';
+    else if (/linux/i.test(ua)) os = 'linux';
+
+    let viewportCategory = 'desktop';
+    if (
+      hasSegments ||
+      isFoldableUA ||
+      isFoldableUnfolded ||
+      isFoldableCover
+    ) {
+      viewportCategory = 'foldable';
+    } else if (width < 600) {
+      viewportCategory = 'mobile';
+    } else if (width <= 1024 || isIpad) {
+      viewportCategory = 'tablet';
     }
-}
-```
 
-Or render the mode yourself. When `editorMode` is `"vim"`, the JSON
-payload piped to your script carries a `vim` object:
+    return {
+      viewportCategory: viewportCategory,
+      formFactor: viewportCategory,
+      viewportWidth: width,
+      viewportHeight: height,
+      orientation: orientation,
+      operatingSystem: os,
+    };
+  }
 
-``` astro-code
-{
-    "vim": {
-        "mode": "INSERT"
+  function __agyRecordPageView() {
+    const currentPath = window.location.pathname || '/';
+    if (window.__agyLastPageViewPath === currentPath) return;
+
+    if (
+      window.agyAnalytics &&
+      typeof window.agyAnalytics.trackPageView === 'function'
+    ) {
+      window.agyAnalytics.trackPageView();
+      return;
     }
-}
-```
 
-`mode` is `NORMAL`, `INSERT`, `VISUAL`, or `VISUAL LINE`. The field is
-absent entirely when Vim editor mode is off, so a script can use its
-presence as the enablement check:
+    window.__agyLastPageViewPath = currentPath;
+    const vp = __agyDetectViewport();
+    const eventParams = {
+      pagePath: currentPath,
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+    };
+    if (document.title) {
+      eventParams.pageTitle = document.title;
+    }
+    if (document.referrer) {
+      eventParams.referrer = document.referrer;
+    }
+    try {
+      const sp = new URLSearchParams(window.location.search || '');
+      const utmSource = sp.get('utm_source');
+      const utmMedium = sp.get('utm_medium');
+      const utmCampaign = sp.get('utm_campaign');
+      const utmTerm = sp.get('utm_term');
+      const utmContent = sp.get('utm_content');
+      if (utmSource) {
+        eventParams.utm_source = utmSource;
+        eventParams.utmSource = utmSource;
+      }
+      if (utmMedium) {
+        eventParams.utm_medium = utmMedium;
+        eventParams.utmMedium = utmMedium;
+      }
+      if (utmCampaign) {
+        eventParams.utm_campaign = utmCampaign;
+        eventParams.utmCampaign = utmCampaign;
+      }
+      if (utmTerm) {
+        eventParams.utm_term = utmTerm;
+        eventParams.utmTerm = utmTerm;
+      }
+      if (utmContent) {
+        eventParams.utm_content = utmContent;
+        eventParams.utmContent = utmContent;
+      }
+    } catch (_err) {
+      // Ignore URLSearchParams errors
+    }
 
-``` astro-code
-#!/bin/bash
-input=$(cat)
-mode=$(echo "$input" | jq -r '.vim.mode // empty')
-[ -n "$mode" ] && printf -- '-- %s -- ' "$mode"
-echo "$input" | jq -r '.model.display_name'
-```
+    const entry = {
+      event: 'page_view',
+      pagePath: currentPath,
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+      eventParams: eventParams,
+    };
+    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
+    if (eventParams.referrer) entry.referrer = eventParams.referrer;
+    if (eventParams.utm_source) {
+      entry.utm_source = eventParams.utm_source;
+      entry.utmSource = eventParams.utmSource;
+    }
+    if (eventParams.utm_medium) {
+      entry.utm_medium = eventParams.utm_medium;
+      entry.utmMedium = eventParams.utmMedium;
+    }
+    if (eventParams.utm_campaign) {
+      entry.utm_campaign = eventParams.utm_campaign;
+      entry.utmCampaign = eventParams.utmCampaign;
+    }
+    if (eventParams.utm_term) {
+      entry.utm_term = eventParams.utm_term;
+      entry.utmTerm = eventParams.utmTerm;
+    }
+    if (eventParams.utm_content) {
+      entry.utm_content = eventParams.utm_content;
+      entry.utmContent = eventParams.utmContent;
+    }
 
-> **Note:** `vim.mode` reports `NORMAL`, unlike the built-in badge,
-> which renders nothing in that mode. A script that prints every mode
-> shows a `-- NORMAL --` badge the built-in line never displays.
+    window.dataLayer.push(entry);
+    window.dataLayer.push({ eventParams: undefined });
+  }
 
-## Next steps
+  __agyRecordPageView();
 
-- **[Settings, Rendering & Keybindings](https://antigravity.google/docs/cli/settings)**: Configure
-  the rest of your preferences and remap keys.
-- **[Status Line Customization](https://antigravity.google/docs/cli/statusline)**: Control what
-  the status line reports alongside the Vim mode badge.
-- **[CLI Reference](https://antigravity.google/docs/cli/reference)**: Look up every configuration
-  key and default keybinding.
+  window.glueCookieNotificationBarLoaded = function () {
+    if (window.__agyGtmLoaded) return;
+    window.__agyGtmLoaded = true;
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js',
+      });
+      const f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
+    __agyRecordPageView();
+  };
 
+  document.addEventListener('astro:page-load', function () {
+    __agyRecordPageView();
+  });
+</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.DQy9iQ8q.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.Bb-U7Th2.css">\<style\>@layer starlight.components{svg:where(.astro-n5k4ipy7){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
+.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
+</style><script type="module" src="/_astro/page.LAbJoB63.js"></script></head><body class="astro-vdxcvpsm"><a class="sl-skip-link astro-vxeigawq" href="#_top">Skip to content</a><div class="page sl-flex astro-gqpr5s5a"><header class="header astro-gqpr5s5a"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-clw6ags5"><img class="light:sl-hidden print:hidden astro-clw6ags5" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-clw6ags5" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-clw6ags5" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search class="astro-mtusqnhg astro-r5ar4xm7" data-translations="{"placeholder":"Search"}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-r5ar4xm7"><svg aria-hidden="true" class="astro-r5ar4xm7 astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-r5ar4xm7" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-r5ar4xm7" style="display: none;"><kbd class="astro-r5ar4xm7">Ctrl</kbd><kbd class="astro-r5ar4xm7">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-r5ar4xm7"><div class="dialog-frame sl-flex astro-r5ar4xm7"><button data-close-modal class="sl-flex md:sl-hidden astro-r5ar4xm7">Cancel</button><div class="search-container astro-r5ar4xm7"><div id="starlight__search" class="astro-r5ar4xm7"></div></div></div></dialog></site-search>\<script\>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.vTFUHulS.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">Dark</option><option value="light" class="astro-r2p65idu">Light</option><option value="auto" selected class="astro-r2p65idu">Auto</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/getting-started/" class="subnav-pill astro-mtusqnhg">Get Started</a><a href="/docs/features/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav></div></header><nav class="sidebar print:hidden astro-gqpr5s5a" aria-label="Main"><starlight-menu-button class="print:hidden astro-vvx7mffu"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-vvx7mffu"><svg aria-hidden="true" class="open-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-gqpr5s5a"><div class="sidebar-content sl-flex astro-gqpr5s5a"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="features" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="1egz4k8" class="astro-f5yvicm7"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">GET STARTED</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/home/" class="astro-ojxuodky"><span class="astro-ojxuodky">Home</span></a></li><li class="astro-ojxuodky"><a href="/docs/getting-started/" class="astro-ojxuodky"><span class="astro-ojxuodky">Getting started</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY 2.0</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/build-with-google/" class="astro-ojxuodky"><span class="astro-ojxuodky">Build with Google</span></a></li><li class="astro-ojxuodky"><a href="/docs/models/" class="astro-ojxuodky"><span class="astro-ojxuodky">Models</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/cli/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/install/" class="astro-ojxuodky"><span class="astro-ojxuodky">Installation and auth</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/tutorial/" class="astro-ojxuodky"><span class="astro-ojxuodky">Tutorial</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/using/" class="astro-ojxuodky"><span class="astro-ojxuodky">Using Antigravity CLI</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/features/" class="astro-ojxuodky"><span class="astro-ojxuodky">Features</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/best-practices/" class="astro-ojxuodky"><span class="astro-ojxuodky">Best practices</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/troubleshooting/" class="astro-ojxuodky"><span class="astro-ojxuodky">Troubleshooting</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/reference/" class="astro-ojxuodky"><span class="astro-ojxuodky">CLI reference</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY FOR IDES</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">Antigravity IDE</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">IDE extensions</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/extensions/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/vscode/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual Studio Code</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/visual-studio/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual Studio</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/jetbrains/" class="astro-ojxuodky"><span class="astro-ojxuodky">JetBrains</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/zed/" class="astro-ojxuodky"><span class="astro-ojxuodky">Zed</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/extensions/xcode/" class="astro-ojxuodky"><span class="astro-ojxuodky">Xcode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">RESOURCES</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/faq/" class="astro-ojxuodky"><span class="astro-ojxuodky">FAQ</span></a></li><li class="astro-ojxuodky"><a href="/docs/plans/" class="astro-ojxuodky"><span class="astro-ojxuodky">Plans and AI credits</span></a></li><li class="astro-ojxuodky"><a href="/docs/enterprise/" class="astro-ojxuodky"><span class="astro-ojxuodky">Enterprise overview</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Migrations</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/firebase-studio-migration/" class="astro-ojxuodky"><span class="astro-ojxuodky">Firebase Studio migration</span></a></li><li class="astro-ojxuodky"><a href="/docs/migration/workflows-to-skills/" class="astro-ojxuodky"><span class="astro-ojxuodky">Workflows to skills migration</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/gcli-migration/" class="astro-ojxuodky"><span class="astro-ojxuodky">GCLI migration</span></a></li></ul></details></li></ul></section></div><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/features/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/remote-control/" class="astro-ojxuodky"><span class="astro-ojxuodky">Remote Control</span></a></li><li class="astro-ojxuodky"><a href="/docs/marketplace/" class="astro-ojxuodky"><span class="astro-ojxuodky">Marketplace</span></a></li><li class="astro-ojxuodky"><a href="/docs/plugins/" class="astro-ojxuodky"><span class="astro-ojxuodky">Plugins</span></a></li><li class="astro-ojxuodky"><a href="/docs/sandbox/" class="astro-ojxuodky"><span class="astro-ojxuodky">Terminal sandbox</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/review-changes-editor/" class="astro-ojxuodky"><span class="astro-ojxuodky">Review changes</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Terminal</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/cli/modes/" class="astro-ojxuodky"><span class="astro-ojxuodky">Execution modes</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/headless/" class="astro-ojxuodky"><span class="astro-ojxuodky">Headless mode</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/statusline/" class="astro-ojxuodky"><span class="astro-ojxuodky">Status line customization</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/title/" class="astro-ojxuodky"><span class="astro-ojxuodky">Terminal title customization</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Browser</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/browser/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/browser-recordings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Browser recordings</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/allowlist-denylist/" class="astro-ojxuodky"><span class="astro-ojxuodky">Allowlist and denylist</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/separate-chrome-profile/" class="astro-ojxuodky"><span class="astro-ojxuodky">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Artifacts</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/artifacts/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/implementation-plan/" class="astro-ojxuodky"><span class="astro-ojxuodky">Implementation plan</span></a></li><li class="astro-ojxuodky"><a href="/docs/walkthrough/" class="astro-ojxuodky"><span class="astro-ojxuodky">Walkthrough</span></a></li><li class="astro-ojxuodky"><a href="/docs/screenshots/" class="astro-ojxuodky"><span class="astro-ojxuodky">Visual screenshots</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/artifacts/" class="astro-ojxuodky"><span class="astro-ojxuodky">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Projects</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/projects/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/prompting/" class="astro-ojxuodky"><span class="astro-ojxuodky">Prompting and interaction</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/conversations/" class="astro-ojxuodky"><span class="astro-ojxuodky">Managing conversations</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Permissions</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/permissions/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/credits/" class="astro-ojxuodky"><span class="astro-ojxuodky">AI credits</span></a></li></ul></details></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Editor features</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/ide/tab/" class="astro-ojxuodky"><span class="astro-ojxuodky">Tab completion</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/agent-side-panel/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent side panel</span></a></li><li class="astro-ojxuodky"><a href="/docs/agent/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/tools/" class="astro-ojxuodky"><span class="astro-ojxuodky">Task groups</span></a></li></ul></details></li><li class="astro-ojxuodky"><details open class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Settings</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="8"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/settings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/agent-settings/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent settings</span></a></li><li class="astro-ojxuodky"><a href="/docs/artifact-review/" class="astro-ojxuodky"><span class="astro-ojxuodky">Artifact review</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/vim-editor-mode/" aria-current="page" class="astro-ojxuodky"><span class="astro-ojxuodky">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/slash-commands/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview</span></a></li><li class="astro-ojxuodky"><a href="/docs/boost/" class="astro-ojxuodky"><span class="astro-ojxuodky">Boost (/boost)</span></a></li><li class="astro-ojxuodky"><a href="/docs/plan/" class="astro-ojxuodky"><span class="astro-ojxuodky">Plan (/plan)</span></a></li><li class="astro-ojxuodky"><a href="/docs/teamwork/" class="astro-ojxuodky"><span class="astro-ojxuodky">Teamwork (/teamwork-preview)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/agents/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agents (/agents)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/codesearch/" class="astro-ojxuodky"><span class="astro-ojxuodky">Code search (/codesearch)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/credits/" class="astro-ojxuodky"><span class="astro-ojxuodky">AI credits (/credits)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/diff/" class="astro-ojxuodky"><span class="astro-ojxuodky">Diff (/diff)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/permissions/" class="astro-ojxuodky"><span class="astro-ojxuodky">Permissions (/permissions)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/resume/" class="astro-ojxuodky"><span class="astro-ojxuodky">Resume (/resume)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/statusline/" class="astro-ojxuodky"><span class="astro-ojxuodky">Status line (/statusline)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/title/" class="astro-ojxuodky"><span class="astro-ojxuodky">Window title (/title)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/usage/" class="astro-ojxuodky"><span class="astro-ojxuodky">Model quotas (/usage)</span></a></li><li class="astro-ojxuodky"><a href="/docs/cli/commands/voice/" class="astro-ojxuodky"><span class="astro-ojxuodky">Voice dictation (/voice)</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/mcp/" class="astro-ojxuodky"><span class="astro-ojxuodky">MCP</span></a></li><li class="astro-ojxuodky"><details class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">Skills</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="9"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/skills/" class="astro-ojxuodky"><span class="astro-ojxuodky">Agent skills</span></a></li><li class="astro-ojxuodky"><a href="/docs/rules/" class="astro-ojxuodky"><span class="astro-ojxuodky">Rules</span></a></li><li class="astro-ojxuodky"><a href="/docs/ide/workflows/" class="astro-ojxuodky"><span class="astro-ojxuodky">IDE workflows</span></a></li></ul></details></li><li class="astro-ojxuodky"><a href="/docs/subagents/" class="astro-ojxuodky"><span class="astro-ojxuodky">Custom subagents</span></a></li><li class="astro-ojxuodky"><a href="/docs/hooks/" class="astro-ojxuodky"><span class="astro-ojxuodky">Lifecycle hooks</span></a></li><li class="astro-ojxuodky"><a href="/docs/sidecars/" class="astro-ojxuodky"><span class="astro-ojxuodky">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/docs/sdk/overview/" class="astro-ojxuodky"><span class="astro-ojxuodky">Overview and quickstart</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/local-models/" class="astro-ojxuodky"><span class="astro-ojxuodky">Local models</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/personas/" class="astro-ojxuodky"><span class="astro-ojxuodky">Personas</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/tools/" class="astro-ojxuodky"><span class="astro-ojxuodky">Tools and skills</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/mcp/" class="astro-ojxuodky"><span class="astro-ojxuodky">MCP</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/policies/" class="astro-ojxuodky"><span class="astro-ojxuodky">Policies</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/subagents/" class="astro-ojxuodky"><span class="astro-ojxuodky">Subagents</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/structured-output/" class="astro-ojxuodky"><span class="astro-ojxuodky">Structured output</span></a></li><li class="astro-ojxuodky"><a href="/docs/sdk/lifecycle/" class="astro-ojxuodky"><span class="astro-ojxuodky">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-b5gddk54"><div class="social-icons astro-b5gddk54"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">Dark</option><option value="light" class="astro-r2p65idu">Light</option><option value="auto" selected class="astro-r2p65idu">Auto</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></div></nav><div class="main-frame astro-gqpr5s5a"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-abfeecmu"><aside class="right-sidebar-container print:hidden astro-abfeecmu"><div class="right-sidebar astro-abfeecmu"><div class="lg:sl-hidden astro-q5mffni3"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
+             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
+             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
+             1.002 0 0 0 0-1.42Z
+            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#enable-vim-editor-mode" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Enable Vim editor mode</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#using-the-settings-panel" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Using the settings panel</span></a></li><li class="astro-sgnutmzh"><a href="#using-settingsjson" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Using settings.json</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#switch-between-modes" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Switch between modes</span></a></li><li class="astro-sgnutmzh"><a href="#submit-your-prompt" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Submit your prompt</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#start-in-insert-mode" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Start in insert mode</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#move-the-cursor" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Move the cursor</span></a></li><li class="astro-sgnutmzh"><a href="#edit-text" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Edit text</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#single-key-commands" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Single-key commands</span></a></li><li class="astro-sgnutmzh"><a href="#operators-and-motions" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Operators and motions</span></a></li><li class="astro-sgnutmzh"><a href="#text-objects" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Text objects</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#work-with-selections" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Work with selections</span></a></li><li class="astro-sgnutmzh"><a href="#run-slash-and-shell-commands" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Run slash and shell commands</span></a></li><li class="astro-sgnutmzh"><a href="#customize-the-submit-and-newline-keys" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Customize the submit and newline keys</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#submit-with-enter-in-normal-mode-only" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Submit with Enter in NORMAL mode only</span></a></li><li class="astro-sgnutmzh"><a href="#submit-with-enter-in-insert-mode-too" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Submit with Enter in INSERT mode too</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#show-the-mode-in-a-custom-status-line" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Show the mode in a custom status line</span></a></li><li class="astro-sgnutmzh"><a href="#next-steps" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Next steps</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){if(e===this._current)return;this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=this.querySelector(`details`);if(e){let t=()=>{e.open=!1};e.querySelectorAll(`a`).forEach(e=>{e.addEventListener(`click`,t)}),window.addEventListener(`click`,n=>{e.contains(n.target)||t()}),window.addEventListener(`keydown`,n=>{n.key===`Escape`&&e.open&&(t(),e.querySelector(`summary`)?.focus())})}let t=Array.from(this.querySelectorAll(`a`));if(!t.length)return;let n=[],r=new Map,i=document.getElementById(`_top`);if(i){let e=t.find(e=>e.hash===`#_top`);if(e){r.set(`_top`,e);let t=e.closest(`li`);t&&n.push({link:e,li:t,heading:i,tabpanel:null})}}t.forEach(e=>{let t=decodeURIComponent(e.hash.slice(1));if(!t||t===`_top`)return;let i=document.getElementById(t),a=e.closest(`li`);if(i&&a){r.set(t,e);let o=i.closest(`[role="tabpanel"]`);n.push({link:e,li:a,heading:i,tabpanel:o})}}),t.forEach(e=>{e.addEventListener(`click`,()=>{let t=decodeURIComponent(e.hash.slice(1));if(!t)return;let n=document.getElementById(t);if(n){let e=n.closest(`starlight-tabs [role="tabpanel"]`);if(e){let t=e.closest(`starlight-tabs`);if(t){let n=Array.from(t.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(e);n!==-1&&(t.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{s()}))}}}})});let a=!1,o=()=>{a=!1;let e=n.filter(e=>e.heading.id===`_top`||e.heading.offsetParent!==null&&(!e.tabpanel||!e.tabpanel.hasAttribute(`hidden`)&&!e.tabpanel.hidden&&e.tabpanel.offsetParent!==null));if(!e.length)return;let t=e[0];for(let n of e)if(n.heading.getBoundingClientRect().top<=130)t=n;else break;let i=r.get(t.heading.id);i&&(this.current=i)},s=()=>{n.forEach(e=>{if(!e.tabpanel){e.li.style.display=``;return}let t=e.tabpanel.hasAttribute(`hidden`)||e.tabpanel.hidden||e.tabpanel.offsetParent===null;e.li.style.display=t?`none`:``}),o()},c=document.querySelectorAll(`[role="tabpanel"]`);if(c.length>0){this._observer=new MutationObserver(()=>{s()}),c.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})});let e=e=>{let t=e.target;(t?.closest(`[role="tab"]`)||t?.closest(`.surface-tag-pill`)||t?.closest(`.tab-button`))&&requestAnimationFrame(()=>{s()})};document.addEventListener(`click`,e),this._cleanup.push(()=>{document.removeEventListener(`click`,e)})}this._onScroll=()=>{a||=(requestAnimationFrame(o),!0)},window.addEventListener(`scroll`,this._onScroll,{passive:!0}),s()}};customElements.get(`mobile-starlight-toc`)||customElements.define(`mobile-starlight-toc`,e);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-q5mffni3"><div class="sl-container astro-q5mffni3"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#enable-vim-editor-mode"><span>Enable Vim editor mode</span></a>\<ul\>\<li\><a href="#using-the-settings-panel"><span>Using the settings panel</span></a></li>\<li\><a href="#using-settingsjson"><span>Using settings.json</span></a></li></ul></li>\<li\><a href="#switch-between-modes"><span>Switch between modes</span></a></li>\<li\><a href="#submit-your-prompt"><span>Submit your prompt</span></a>\<ul\>\<li\><a href="#start-in-insert-mode"><span>Start in insert mode</span></a></li></ul></li>\<li\><a href="#move-the-cursor"><span>Move the cursor</span></a></li>\<li\><a href="#edit-text"><span>Edit text</span></a>\<ul\>\<li\><a href="#single-key-commands"><span>Single-key commands</span></a></li>\<li\><a href="#operators-and-motions"><span>Operators and motions</span></a></li>\<li\><a href="#text-objects"><span>Text objects</span></a></li></ul></li>\<li\><a href="#work-with-selections"><span>Work with selections</span></a></li>\<li\><a href="#run-slash-and-shell-commands"><span>Run slash and shell commands</span></a></li>\<li\><a href="#customize-the-submit-and-newline-keys"><span>Customize the submit and newline keys</span></a>\<ul\>\<li\><a href="#submit-with-enter-in-normal-mode-only"><span>Submit with Enter in NORMAL mode only</span></a></li>\<li\><a href="#submit-with-enter-in-insert-mode-too"><span>Submit with Enter in INSERT mode too</span></a></li></ul></li>\<li\><a href="#show-the-mode-in-a-custom-status-line"><span>Show the mode in a custom status line</span></a></li>\<li\><a href="#next-steps"><span>Next steps</span></a></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`);t.push({link:e,li:a,heading:i,tabpanel:o})}}),e.forEach(e=>{e.addEventListener(`click`,()=>{let t=decodeURIComponent(e.hash.slice(1));if(!t)return;let n=document.getElementById(t);if(n){let e=n.closest(`starlight-tabs [role="tabpanel"]`);if(e){let t=e.closest(`starlight-tabs`);if(t){let n=Array.from(t.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(e);n!==-1&&(t.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{o()}))}}}})});let i=!1,a=()=>{i=!1;let e=t.filter(e=>e.heading.id===`_top`||e.heading.offsetParent!==null&&(!e.tabpanel||!e.tabpanel.hasAttribute(`hidden`)&&!e.tabpanel.hidden&&e.tabpanel.offsetParent!==null));if(!e.length)return;let r=e[0];for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let a=n.get(r.heading.id);a&&(this.current=a)},o=()=>{t.forEach(e=>{if(!e.tabpanel){e.li.style.display=``;return}let t=e.tabpanel.hasAttribute(`hidden`)||e.tabpanel.hidden||e.tabpanel.offsetParent===null;e.li.style.display=t?`none`:``}),a()},s=document.querySelectorAll(`[role="tabpanel"]`);if(s.length>0){this._observer=new MutationObserver(()=>{o()}),s.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})});let e=e=>{let t=e.target;(t?.closest(`[role="tab"]`)||t?.closest(`.surface-tag-pill`)||t?.closest(`.tab-button`))&&requestAnimationFrame(()=>{o()})};document.addEventListener(`click`,e),this._cleanup.push(()=>{document.removeEventListener(`click`,e)})}this._onScroll=()=>{i||=(requestAnimationFrame(a),!0)},window.addEventListener(`scroll`,this._onScroll,{passive:!0}),o()}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-abfeecmu"><main data-pagefind-body class="astro-vdxcvpsm" lang="en" dir="ltr"><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="breadcrumbs-row astro-hkwnjoai"><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Features">Features</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Learn">Learn</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Settings">Settings</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="Vim editor mode">Vim editor mode</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/cli/vim-editor-mode/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div><script type="module">function e(){document.querySelectorAll(`.markdown-dropdown-wrapper`).forEach(e=>{let t=e.querySelector(`.markdown-trigger-btn, .button`),n=e.querySelector(`[data-md-menu]`),r=e.querySelector(`[data-copy-md]`),i=e.querySelector(`[data-view-md-link]`),a=`${(e.dataset.pathname||window.location.pathname).replace(/\/$/,``)}.md`;i&&(i.href=a),!(!t||!n)&&(t.addEventListener(`click`,e=>{e.stopPropagation(),n.hasAttribute(`hidden`)?(n.removeAttribute(`hidden`),t.setAttribute(`aria-expanded`,`true`)):(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),document.addEventListener(`click`,r=>{e.contains(r.target)||(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),r&&r.addEventListener(`click`,async e=>{e.stopPropagation();let i=r.querySelector(`.item-label`),o=i?.textContent||`Copy Markdown`;try{i&&(i.textContent=`Fetching...`);let e=await fetch(a);if(!e.ok)throw Error(`Failed to fetch markdown: ${e.status}`);let r=await e.text(),s=new DOMParser().parseFromString(r,`text/html`).querySelector(`pre`),c=s?s.textContent||``:r;await navigator.clipboard.writeText(c),i&&(i.textContent=`Copied!`,setTimeout(()=>{i.textContent=o,n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`)},1200))}catch(e){console.error(`Error copying markdown:`,e),i&&(i.textContent=`Error copying`),setTimeout(()=>{i&&(i.textContent=o)},2e3)}}))})}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,e):e(),document.addEventListener(`astro:page-load`,e);</script></div><div class="surface-chips-row not-content astro-hkwnjoai"><span class="surface-chips-label astro-hkwnjoai">Available on:</span><div class="surface-chips-list astro-hkwnjoai"><span class="surface-chip surface-chip-cli astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5" class="astro-hkwnjoai"></polyline><line x1="12" y1="19" x2="20" y2="19" class="astro-hkwnjoai"></line></svg><span class="astro-hkwnjoai">Antigravity CLI</span></span></div></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.DfB6sZL0.js"></script></div></div><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="vim-editor-mode">Vim editor mode</h1><a class="sl-anchor-link" href="#vim-editor-mode"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Vim editor mode”</span></a></div>
+<p>Edit prompts with modal Vim keybindings instead of the default flat text editor.</p>
+<p>Vim editor mode replaces the editing model in every multi-line input surface of the CLI:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Surface</th><th align="left">What you edit there</th></tr></thead>\<tbody\><tr><td align="left">The prompt box</td><td align="left">Your message to the agent, including multi-line prompts and slash commands.</td></tr><tr><td align="left">The comment editor in <a href="/docs/cli/commands/diff"><code dir="auto">/diff</code></a></td><td align="left">Review comments you leave on a changed file.</td></tr><tr><td align="left">The comment editor in the artifact review panel</td><td align="left">Feedback on a generated <a href="/docs/cli/artifacts">artifact</a> before you accept it.</td></tr></tbody></table>
+<p>It also adds a <code dir="auto">vim</code> tab to the help overlay and a mode badge to the <a href="/docs/cli/statusline">status line</a>.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="enable-vim-editor-mode">Enable Vim editor mode</h2><a class="sl-anchor-link" href="#enable-vim-editor-mode"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Enable Vim editor mode”</span></a></div>
+<p>Vim editor mode is off by default. Turn it on from the interactive settings panel or directly in <code dir="auto">settings.json</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="using-the-settings-panel">Using the settings panel</h3><a class="sl-anchor-link" href="#using-the-settings-panel"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Using the settings panel”</span></a></div>
+<p>To enable Vim editor mode in the settings panel, follow these steps:</p>
+\<ol\>
+\<li\>Type <code dir="auto">/settings</code> inside the prompt panel and press <code dir="auto">Enter</code>.</li>
+\<li\>Navigate to <strong>Editor Mode</strong> using <code dir="auto">↑</code>/<code dir="auto">↓</code>.</li>
+\<li\>Press <code dir="auto">Enter</code> to select <code dir="auto">vim</code>.</li>
+\<li\>Set <strong>Editor Mode</strong> > <strong>Insert First</strong> to choose which mode each prompt starts in. Leave it <code dir="auto">off</code> to start in Normal mode, or set it <code dir="auto">on</code> to start in Insert mode with a bare <code dir="auto">Enter</code> that submits. Refer to <a href="#start-in-insert-mode">Start in insert mode</a>.</li>
+\<li\>Press <code dir="auto">Esc</code> to save and close the editor.</li>
+</ol>
+<div class="sl-heading-wrapper level-h3"><h3 id="using-settingsjson">Using <code dir="auto">settings.json</code></h3><a class="sl-anchor-link" href="#using-settingsjson"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Using settings.json”</span></a></div>
+<p>Set <code dir="auto">editorMode</code> in your configuration profile:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "editorMode"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"vim"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vimInsertFirst"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>The CLI loads this file from <code dir="auto">~/.gemini/antigravity-cli/settings.json</code> at startup. <code dir="auto">editorMode</code> accepts <code dir="auto">"default"</code> and <code dir="auto">"vim"</code>. <code dir="auto">vimInsertFirst</code> controls which mode each new prompt starts in and applies only when <code dir="auto">editorMode</code> is <code dir="auto">"vim"</code>; refer to <a href="#start-in-insert-mode">Start in insert mode</a>.</p>
+<blockquote>
+<p><strong>Note:</strong> <code dir="auto">editorMode</code> is unrelated to the
+<a href="/docs/cli/settings"><code dir="auto">editor</code> setting</a>. <code dir="auto">editor</code> picks the external program
+that <code dir="auto">Ctrl+G</code> launches, so setting <code dir="auto">editor</code> to <code dir="auto">"vim"</code> opens Vim in a separate
+window and does nothing to the prompt. <code dir="auto">editorMode</code> is the one that controls
+modal editing inside the CLI prompt itself.</p>
+</blockquote>
+<div class="sl-heading-wrapper level-h2"><h2 id="switch-between-modes">Switch between modes</h2><a class="sl-anchor-link" href="#switch-between-modes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Switch between modes”</span></a></div>
+<p>Vim editor mode starts in NORMAL. Press <code dir="auto">i</code> to type, and <code dir="auto">Esc</code> to return to NORMAL.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Command</th><th align="left">Action</th><th align="left">From mode</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">Esc</code>, <code dir="auto">Ctrl+C</code></td><td align="left">Enter NORMAL mode</td><td align="left">INSERT, VISUAL</td></tr><tr><td align="left"><code dir="auto">i</code></td><td align="left">Insert before the cursor</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">I</code></td><td align="left">Insert at the first non-blank character</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">a</code></td><td align="left">Insert after the cursor</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">A</code></td><td align="left">Insert at the end of the line</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">o</code></td><td align="left">Open a line below and insert</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">O</code></td><td align="left">Open a line above and insert</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">v</code></td><td align="left">Start a character-wise selection</td><td align="left">NORMAL</td></tr><tr><td align="left"><code dir="auto">V</code></td><td align="left">Start a line-wise selection</td><td align="left">NORMAL</td></tr></tbody></table>
+<p>The status line reports the current mode:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Mode</th><th align="left">Badge</th></tr></thead>\<tbody\><tr><td align="left">NORMAL</td><td align="left">none</td></tr><tr><td align="left">INSERT</td><td align="left"><code dir="auto">-- INSERT --</code></td></tr><tr><td align="left">VISUAL</td><td align="left"><code dir="auto">-- VISUAL --</code></td></tr><tr><td align="left">VISUAL LINE</td><td align="left"><code dir="auto">-- V-LINE --</code></td></tr></tbody></table>
+<p>An empty badge area means you’re in NORMAL mode. If you run a <a href="#show-the-mode-in-a-custom-status-line">custom status line</a>, it replaces this badge unless you stack it with the default.</p>
+<blockquote>
+<p><strong>Tip:</strong> Press <code dir="auto">?</code> in NORMAL mode to open the shortcuts overlay, or run
+<code dir="auto">/help</code> and select the <code dir="auto">vim</code> tab for a full cheat sheet.</p>
+</blockquote>
+<div class="sl-heading-wrapper level-h2"><h2 id="submit-your-prompt">Submit your prompt</h2><a class="sl-anchor-link" href="#submit-your-prompt"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Submit your prompt”</span></a></div>
+<p>Enter behaves differently in each mode, so you can compose multi-line prompts without accidental submits.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Context</th><th align="left"><code dir="auto">Enter</code></th><th align="left"><code dir="auto">Ctrl+S</code> / <code dir="auto">Ctrl+Enter</code></th><th align="left"><code dir="auto">ZZ</code></th></tr></thead>\<tbody\><tr><td align="left">NORMAL mode</td><td align="left">Submit</td><td align="left">Submit</td><td align="left">Submit</td></tr><tr><td align="left">INSERT mode</td><td align="left">Insert a newline</td><td align="left">Submit</td><td align="left">—</td></tr><tr><td align="left">INSERT mode, insert-first on</td><td align="left">Submit</td><td align="left">Submit</td><td align="left">—</td></tr></tbody></table>
+<p><code dir="auto">ZZ</code> submits from NORMAL and VISUAL mode, matching the muscle memory of writing and quitting a buffer.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="start-in-insert-mode">Start in insert mode</h3><a class="sl-anchor-link" href="#start-in-insert-mode"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Start in insert mode”</span></a></div>
+<p>Set <code dir="auto">vimInsertFirst</code> when you want each new prompt to begin in INSERT mode with a bare <code dir="auto">Enter</code> that submits. This keeps the default typing experience while leaving NORMAL mode one <code dir="auto">Esc</code> away.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "editorMode"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"vim"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vimInsertFirst"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>The <strong>Editor Mode</strong> > <strong>Insert First</strong> option appears in <code dir="auto">/settings</code> only when <strong>Editor Mode</strong> is set to <code dir="auto">vim</code>. It has no effect in default mode.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="move-the-cursor">Move the cursor</h2><a class="sl-anchor-link" href="#move-the-cursor"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Move the cursor”</span></a></div>
+<p>All motions work on their own in NORMAL and VISUAL mode, and as targets for an operator.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Key</th><th align="left">Motion</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">h</code> <code dir="auto">l</code></td><td align="left">Left, right</td></tr><tr><td align="left"><code dir="auto">j</code> <code dir="auto">k</code></td><td align="left">Down, up</td></tr><tr><td align="left"><code dir="auto">0</code> <code dir="auto">$</code></td><td align="left">Start of line, end of line</td></tr><tr><td align="left"><code dir="auto">^</code></td><td align="left">First non-blank character on the line</td></tr><tr><td align="left"><code dir="auto">w</code> <code dir="auto">b</code> <code dir="auto">e</code></td><td align="left">Next word, previous word, end of word</td></tr><tr><td align="left"><code dir="auto">W</code> <code dir="auto">B</code> <code dir="auto">E</code></td><td align="left">Same, treating whitespace-delimited chunks as words</td></tr><tr><td align="left"><code dir="auto">gg</code> <code dir="auto">G</code></td><td align="left">Start of input, end of input</td></tr><tr><td align="left"><code dir="auto">f{char}</code> <code dir="auto">F{char}</code></td><td align="left">Jump onto the next or previous <code dir="auto">{char}</code></td></tr><tr><td align="left"><code dir="auto">t{char}</code> <code dir="auto">T{char}</code></td><td align="left">Stop one character short of the next or previous <code dir="auto">{char}</code></td></tr><tr><td align="left"><code dir="auto">;</code> <code dir="auto">,</code></td><td align="left">Repeat the last <code dir="auto">f</code>/<code dir="auto">F</code>/<code dir="auto">t</code>/<code dir="auto">T</code> forward, backward</td></tr></tbody></table>
+<div class="sl-heading-wrapper level-h2"><h2 id="edit-text">Edit text</h2><a class="sl-anchor-link" href="#edit-text"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Edit text”</span></a></div>
+<p>Editing commands fall into three groups: single keys that act immediately, operators that wait for a motion, and text objects that select a delimited region.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="single-key-commands">Single-key commands</h3><a class="sl-anchor-link" href="#single-key-commands"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Single-key commands”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Key</th><th align="left">Action</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">x</code></td><td align="left">Delete the character under the cursor</td></tr><tr><td align="left"><code dir="auto">r{char}</code></td><td align="left">Replace the character under the cursor with <code dir="auto">{char}</code></td></tr><tr><td align="left"><code dir="auto">D</code> <code dir="auto">C</code></td><td align="left">Delete or change from the cursor to the end of the line</td></tr><tr><td align="left"><code dir="auto">o</code> <code dir="auto">O</code></td><td align="left">Open a new line below or above and enter INSERT mode</td></tr><tr><td align="left"><code dir="auto">p</code> <code dir="auto">P</code></td><td align="left">Paste after or before the cursor</td></tr><tr><td align="left"><code dir="auto">u</code> <code dir="auto">U</code></td><td align="left">Undo, redo. <code dir="auto">Ctrl+R</code> does not redo; it opens artifact review</td></tr></tbody></table>
+<p>Commands take no count prefix, so <code dir="auto">3dd</code> deletes one line. To act on several lines at once, select them with <code dir="auto">V</code> and press the operator. There is also no <code dir="auto">.</code> to repeat the last change.</p>
+<p>There is one unnamed register rather than the usual <code dir="auto">"a</code>–<code dir="auto">"z</code> set. Deletes fill it, so <code dir="auto">x</code>, <code dir="auto">D</code>, <code dir="auto">C</code>, <code dir="auto">d</code>, and <code dir="auto">c</code> all leave text you can paste back with <code dir="auto">p</code>.</p>
+<p>Paste is linewise-aware. Text yanked with <code dir="auto">dd</code> or <code dir="auto">yy</code> pastes onto a new line below (<code dir="auto">p</code>) or above (<code dir="auto">P</code>). Anything else pastes inline.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="operators-and-motions">Operators and motions</h3><a class="sl-anchor-link" href="#operators-and-motions"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Operators and motions”</span></a></div>
+<p>Combine an operator with any motion to act on the span it covers.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Operator</th><th align="left">Action</th><th align="left">Word forms</th><th align="left">Whole line</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">d</code></td><td align="left">Delete</td><td align="left"><code dir="auto">dw</code> <code dir="auto">de</code> <code dir="auto">db</code></td><td align="left"><code dir="auto">dd</code></td></tr><tr><td align="left"><code dir="auto">c</code></td><td align="left">Change (delete, then enter INSERT mode)</td><td align="left"><code dir="auto">cw</code> <code dir="auto">ce</code> <code dir="auto">cb</code></td><td align="left"><code dir="auto">cc</code></td></tr><tr><td align="left"><code dir="auto">y</code></td><td align="left">Yank</td><td align="left"><code dir="auto">yw</code> <code dir="auto">ye</code> <code dir="auto">yb</code></td><td align="left"><code dir="auto">yy</code></td></tr></tbody></table>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>dw     Delete to the start of the next word</span></span>
+<span class="line"><span>d$     Delete to the end of the line</span></span>
+<span class="line"><span>c^     Change back to the first non-blank character</span></span>
+<span class="line"><span>yG     Yank to the end of the input</span></span>
+<span class="line"><span>dfx    Delete forward through the next "x"</span></span></code></pre>
+<p><code dir="auto">cw</code> changes to the end of the current word, matching real Vim.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="text-objects">Text objects</h3><a class="sl-anchor-link" href="#text-objects"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Text objects”</span></a></div>
+<p>Pair an operator with <code dir="auto">i</code> (inside) or <code dir="auto">a</code> (around) and a delimiter.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Object</th><th align="left">Selects</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">iw</code> <code dir="auto">aw</code></td><td align="left">A word, with or without surrounding whitespace</td></tr><tr><td align="left"><code dir="auto">iW</code> <code dir="auto">aW</code></td><td align="left">A whitespace-delimited chunk</td></tr><tr><td align="left"><code dir="auto">i"</code> <code dir="auto">a"</code> <code dir="auto">i'</code> <code dir="auto">a'</code></td><td align="left">Text in single or double quotes</td></tr><tr><td align="left"><code dir="auto">i(</code> <code dir="auto">a(</code> <code dir="auto">i)</code> <code dir="auto">a)</code></td><td align="left">Text in parentheses</td></tr><tr><td align="left"><code dir="auto">i[</code> <code dir="auto">a[</code> <code dir="auto">i]</code> <code dir="auto">a]</code></td><td align="left">Text in square brackets</td></tr><tr><td align="left"><code dir="auto">i{</code> <code dir="auto">a{</code> <code dir="auto">i}</code> <code dir="auto">a}</code></td><td align="left">Text in braces</td></tr></tbody></table>
+<p>Backticks work the same way: pair <code dir="auto">i</code> or <code dir="auto">a</code> with a backtick to select inline code.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>ci"    Change the text inside the nearest quotes</span></span>
+<span class="line"><span>da(    Delete a parenthesized group, parentheses included</span></span>
+<span class="line"><span>yiw    Yank the word under the cursor</span></span></code></pre>
+<div class="sl-heading-wrapper level-h2"><h2 id="work-with-selections">Work with selections</h2><a class="sl-anchor-link" href="#work-with-selections"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Work with selections”</span></a></div>
+<p>Press <code dir="auto">v</code> or <code dir="auto">V</code> to select, move with any motion, then apply a command. Press <code dir="auto">v</code> or <code dir="auto">V</code> again, or <code dir="auto">Esc</code>, to leave.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Key</th><th align="left">Action on the selection</th></tr></thead>\<tbody\><tr><td align="left"><code dir="auto">d</code> <code dir="auto">x</code></td><td align="left">Delete</td></tr><tr><td align="left"><code dir="auto">c</code></td><td align="left">Change</td></tr><tr><td align="left"><code dir="auto">y</code></td><td align="left">Yank</td></tr><tr><td align="left"><code dir="auto">r{char}</code></td><td align="left">Replace every selected character with <code dir="auto">{char}</code></td></tr><tr><td align="left"><code dir="auto">~</code></td><td align="left">Toggle case</td></tr><tr><td align="left"><code dir="auto">u</code> <code dir="auto">U</code></td><td align="left">Lowercase, uppercase</td></tr></tbody></table>
+<blockquote>
+<p><strong>Note:</strong> <code dir="auto">~</code>, <code dir="auto">u</code>, and <code dir="auto">U</code> change case in VISUAL mode only. In NORMAL mode,
+<code dir="auto">u</code> and <code dir="auto">U</code> are undo and redo.</p>
+</blockquote>
+<div class="sl-heading-wrapper level-h2"><h2 id="run-slash-and-shell-commands">Run slash and shell commands</h2><a class="sl-anchor-link" href="#run-slash-and-shell-commands"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Run slash and shell commands”</span></a></div>
+<p>Press <code dir="auto">/</code> or <code dir="auto">!</code> in NORMAL mode. The CLI inserts the character and switches to INSERT mode, so slash commands and shell commands work without pressing <code dir="auto">i</code> first.</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>/settings     Open the settings panel from NORMAL mode</span></span>
+<span class="line"><span>!ls -la       Run a shell command from NORMAL mode</span></span></code></pre>
+<div class="sl-heading-wrapper level-h2"><h2 id="customize-the-submit-and-newline-keys">Customize the submit and newline keys</h2><a class="sl-anchor-link" href="#customize-the-submit-and-newline-keys"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Customize the submit and newline keys”</span></a></div>
+<p>Three Vim actions are remappable in <code dir="auto">~/.gemini/antigravity-cli/keybindings.json</code>. These are the defaults:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim.insert.insert_newline"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"alt+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+j"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"shift+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim.insert.submit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+s"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim.normal.submit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+s"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>Motions, operators, and text objects are fixed and can’t be remapped.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="submit-with-enter-in-normal-mode-only">Submit with Enter in NORMAL mode only</h3><a class="sl-anchor-link" href="#submit-with-enter-in-normal-mode-only"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Submit with Enter in NORMAL mode only”</span></a></div>
+<p>This is the default. <code dir="auto">Enter</code> submits from NORMAL mode and inserts a newline in INSERT mode, so you can type freely and submit with a single <code dir="auto">Esc</code> <code dir="auto">Enter</code>. No configuration is needed. Leave <code dir="auto">vimInsertFirst</code> off:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "editorMode"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"vim"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vimInsertFirst"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">false</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<div class="sl-heading-wrapper level-h3"><h3 id="submit-with-enter-in-insert-mode-too">Submit with Enter in INSERT mode too</h3><a class="sl-anchor-link" href="#submit-with-enter-in-insert-mode-too"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Submit with Enter in INSERT mode too”</span></a></div>
+<p>Move <code dir="auto">enter</code> out of <code dir="auto">vim.insert.insert_newline</code> and into <code dir="auto">vim.insert.submit</code>. <code dir="auto">Shift+Enter</code>, <code dir="auto">Alt+Enter</code>, and <code dir="auto">Ctrl+J</code> still insert newlines:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim.insert.insert_newline"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"alt+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+j"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"shift+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim.insert.submit"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: [</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"ctrl+s"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"enter"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>Setting <code dir="auto">vimInsertFirst</code> to <code dir="auto">true</code> achieves the same submit behavior without editing keybindings, but it also changes which mode each new prompt starts in.</p>
+<blockquote>
+<p><strong>Warning:</strong> <code dir="auto">Enter</code> always submits in NORMAL mode. Remapping
+<code dir="auto">vim.normal.submit</code> adds keys; it never removes <code dir="auto">Enter</code>.</p>
+</blockquote>
+<div class="sl-heading-wrapper level-h2"><h2 id="show-the-mode-in-a-custom-status-line">Show the mode in a custom status line</h2><a class="sl-anchor-link" href="#show-the-mode-in-a-custom-status-line"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Show the mode in a custom status line”</span></a></div>
+<p>A <a href="/docs/cli/statusline">custom status line</a> replaces the built-in one, and the mode badge goes with it. You have two ways to get the mode back.</p>
+<p>Keep the built-in line and stack your script underneath it:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "statusLine"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "type"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"command"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "command"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"~/.gemini/antigravity-cli/statusline.sh"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "stack_with_default"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p>Or render the mode yourself. When <code dir="auto">editorMode</code> is <code dir="auto">"vim"</code>, the JSON payload piped to your script carries a <code dir="auto">vim</code> object:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "vim"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">        "mode"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#032F62;--shiki-dark:#9ECBFF">"INSERT"</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+<p><code dir="auto">mode</code> is <code dir="auto">NORMAL</code>, <code dir="auto">INSERT</code>, <code dir="auto">VISUAL</code>, or <code dir="auto">VISUAL LINE</code>. The field is absent entirely when Vim editor mode is off, so a script can use its presence as the enablement check:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">input</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">cat</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">mode</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$input</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> jq</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '.vim.mode // empty'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">[ </span><span style="color:#D73A49;--shiki-dark:#F97583">-n</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$mode</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ] &#x26;&#x26; </span><span style="color:#005CC5;--shiki-dark:#79B8FF">printf</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '-- %s -- '</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$mode</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$input</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> jq</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -r</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '.model.display_name'</span></span></code></pre>
+<blockquote>
+<p><strong>Note:</strong> <code dir="auto">vim.mode</code> reports <code dir="auto">NORMAL</code>, unlike the built-in badge, which
+renders nothing in that mode. A script that prints every mode shows a
+<code dir="auto">-- NORMAL --</code> badge the built-in line never displays.</p>
+</blockquote>
+<div class="sl-heading-wrapper level-h2"><h2 id="next-steps">Next steps</h2><a class="sl-anchor-link" href="#next-steps"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Next steps”</span></a></div>
+<p>Explore the following guides to further customize your editing experience:</p>
+\<ul\>
+\<li\><strong><a href="/docs/cli/settings">Settings, rendering, and keybindings</a></strong>: Configure the rest of your preferences and remap keys.</li>
+\<li\><strong><a href="/docs/cli/statusline">Status line customization</a></strong>: Control what the status line reports alongside the Vim mode badge.</li>
+\<li\><strong><a href="/docs/cli/reference">CLI reference</a></strong>: Look up every configuration key and default keybinding.</li>
+</ul></div><footer class="sl-flex docs-footer astro-4mgpquaz"><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-jgq3vlii" dir="ltr"><a href="/docs/artifact-review/" rel="prev" class="astro-jgq3vlii"><svg aria-hidden="true" class="astro-jgq3vlii astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-jgq3vlii">Previous<br class="astro-jgq3vlii"><span class="link-title astro-jgq3vlii">Artifact review</span></span></a><a href="/docs/slash-commands/" rel="next" class="astro-jgq3vlii"><svg aria-hidden="true" class="astro-jgq3vlii astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-jgq3vlii">Next<br class="astro-jgq3vlii"><span class="link-title astro-jgq3vlii">Overview</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav></footer></div></div></main></div></div></div></div></body></html>

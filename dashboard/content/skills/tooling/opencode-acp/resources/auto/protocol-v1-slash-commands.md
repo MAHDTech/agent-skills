@@ -15,7 +15,7 @@ skill_name = "opencode-acp"
 
 > Advertise available slash commands to clients
 
-Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](https://agentclientprotocol.com/protocol/v1/prompt-turn) requests where the Client includes the command text in the prompt.
+Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](/protocol/v1/prompt-turn) requests where the Client includes the command text in the prompt.
 
 ## Advertising commands
 
@@ -106,3 +106,6 @@ Commands are included as regular user messages in prompt requests:
 ```
 
 The Agent recognizes the command prefix and processes it accordingly. Commands may be accompanied by any other user message content types (images, audio, etc.) in the same prompt array.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -15,11 +15,47 @@ skill_name = "acp"
 
 > Advertise available slash commands to clients
 
-Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle) requests where the Client includes the command text in the prompt.
+Agents can advertise a set of slash commands that users can invoke. These commands provide quick access to specific agent capabilities and workflows. Commands are run as part of regular [prompt](/protocol/v2/prompt-lifecycle) requests where the Client includes the command text in the prompt.
 
 ## Advertising commands
 
-After creating a session, the Agent **MAY** send a list of available commands via the `available_commands_update` session notification:
+### Initial commands
+
+The Agent **MAY** include `availableCommands` in the `session/new` and `session/resume` responses, alongside `configOptions` when supported. This lets the Client display commands as soon as [session setup](/protocol/v2/session-setup#initial-session-state) completes, without requiring an `available_commands_update` notification before the `session/new` response.
+
+For example, a `session/new` response can advertise a command with text input:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "sessionId": "sess_abc123def456",
+    "availableCommands": [
+      {
+        "name": "web",
+        "description": "Search the web for information",
+        "input": {
+          "type": "text",
+          "hint": "query to search for"
+        }
+      }
+    ]
+  }
+}
+```
+
+<ResponseField name="availableCommands" type="AvailableCommand[]">
+  Optional initial list of commands available in this session. Omission or `[]`
+  means no initial commands are advertised. Empty lists are omitted when
+  serializing setup responses.
+</ResponseField>
+
+`null` is not a valid outbound value for this field. Consistent with v2's tolerant deserialization rules, receivers treat `null` or a malformed non-array value like omission and skip invalid command items within an array.
+
+### Notifications
+
+After session setup, the Agent **MAY** announce commands that were not included in the response, or update the list, via the `available_commands_update` session notification:
 
 ```json theme={null}
 {
@@ -56,9 +92,7 @@ After creating a session, the Agent **MAY** send a list of available commands vi
 }
 ```
 
-<ResponseField name="availableCommands" type="AvailableCommand[]">
-  The list of commands available in this session
-</ResponseField>
+The notification's `availableCommands` array is the complete replacement list, not a delta. An empty array clears all advertised commands.
 
 ### AvailableCommand
 
@@ -86,7 +120,7 @@ Command input specifications can add custom or future `type` values. Custom inpu
 
 ## Dynamic updates
 
-The Agent can update the list of available commands at any time during a session by sending another `available_commands_update` notification. This allows commands to be added based on context, removed when no longer relevant, or modified with updated descriptions.
+The Agent can update the list of available commands at any time during a session by sending another `available_commands_update` notification. Each notification replaces the list previously advertised in a setup response or notification, including `[]` to clear it. This allows commands to be added based on context, removed when no longer relevant, or modified with updated descriptions.
 
 ## Running commands
 
@@ -110,3 +144,10 @@ Commands are included as regular user messages in prompt requests:
 ```
 
 The Agent recognizes the command prefix and processes it accordingly. Commands may be accompanied by any other user message content types (images, audio, etc.) in the same prompt array.
+
+The same [prompt insertion contract](/protocol/v2/prompt-lifecycle#2-prompt-accepted) applies to commands: the successful response returns the inserted user message's `messageId`, and the Agent reports that message through a `user_message` update or `user_message_chunk` updates with the same ID.
+
+If a command is handled locally and the runtime does not record it, the adapter inserts a live-only user message into the ACP conversation. It need not wait for a runtime insertion event or keep a permanent transcript entry. If the command is retained and replayed later, it uses the same message ID and is not executed again.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

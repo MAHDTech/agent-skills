@@ -100,3 +100,6 @@ transport messages and can change which later messages are valid.
 Agents and clients **MAY** implement additional custom transport mechanisms to suit their specific needs. The protocol is transport-agnostic and can be implemented over any communication channel that supports bidirectional message exchange.
 
 Implementers who choose to support custom transports **MUST** ensure they preserve the JSON-RPC message format and lifecycle requirements defined by ACP. Custom transports **SHOULD** document their specific connection establishment and message exchange patterns to aid interoperability.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

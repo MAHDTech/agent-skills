@@ -24,7 +24,7 @@ skill_name = "mcp"
 The Financial Services Interest Group brings together stakeholders from regulated financial
 institutions to identify where MCP needs to adapt for compliance, auditability, and risk-controlled
 deployment. It gathers use cases and requirements from the financial sector, develops and validates
-domain-specific extensions, and scopes problems with broad applicability into [SEPs](https://modelcontextprotocol.io/community/sep-guidelines)
+domain-specific extensions, and scopes problems with broad applicability into [SEPs](/community/sep-guidelines)
 or Working Groups so that innovations proven in regulated environments can benefit the wider MCP
 ecosystem.
 
@@ -57,12 +57,12 @@ ecosystem.
 ### Out of Scope
 
 * **Competitively sensitive or non-public business information**: pricing, costs, margins, customer
-  lists, market segmentation, and competitive strategy, per the [MCP Antitrust Policy](https://modelcontextprotocol.io/community/antitrust)
+  lists, market segmentation, and competitive strategy, per the [MCP Antitrust Policy](/community/antitrust)
 * **General security threat modeling**: MCP-wide attack-surface analysis belongs to the
-  [Security IG](https://modelcontextprotocol.io/community/interest-groups/security). This group provides financial-sector requirements as
+  [Security IG](/community/interest-groups/security). This group provides financial-sector requirements as
   input and consumes its threat models
 * **Authorization protocol mechanics**: OAuth flows, scopes, client registration, and token handling
-  belong to the [Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth)
+  belong to the [Authorization IG](/community/interest-groups/auth)
 * **Product-specific compliance guides**: step-by-step configuration for an individual host
   application, cloud platform, or institution is documentation for that product rather than protocol
   work
@@ -70,62 +70,65 @@ ecosystem.
 
 ### Related Groups
 
-* **[Security IG](https://modelcontextprotocol.io/community/interest-groups/security)**: attestation, auditability, and guardrails are
+* **[Security IG](/community/interest-groups/security)**: attestation, auditability, and guardrails are
   shared concerns; the FSIG supplies regulated-deployment requirements and consumes the IG's threat
   models
-* **[Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth)**: identity and access control for sensitive
+* **[Authorization IG](/community/interest-groups/auth)**: identity and access control for sensitive
   financial data sit at the boundary between the two groups
-* **[Tool Annotations IG](https://modelcontextprotocol.io/community/interest-groups/tool-annotations)**: trust and sensitivity annotations
+* **[Tool Annotations IG](/community/interest-groups/tool-annotations)**: trust and sensitivity annotations
   are directly relevant to financial tool exposure; the FSIG provides requirements as input
-* **[Interceptors WG](https://modelcontextprotocol.io/community/working-groups/interceptors)**: interceptors are a primary enforcement point
+* **[Interceptors WG](/community/working-groups/interceptors)**: interceptors are a primary enforcement point
   for the policy and guardrail requirements surfaced here
-* **[Registry WG](https://modelcontextprotocol.io/community/working-groups/registry)**: server provenance and publishing metadata intersect
+* **[Registry WG](/community/working-groups/registry)**: server provenance and publishing metadata intersect
   with financial supply-chain and admission concerns
 
 ## Leadership
 
-| Role        | Name                     | Organization | GitHub                                 | Term    |
-| ----------- | ------------------------ | ------------ | -------------------------------------- | ------- |
-| Facilitator | Sambhav Kothari          | Bloomberg    | [@sambhav](https://github.com/sambhav) | Initial |
-| Facilitator | Peder Holdgaard Pedersen | Saxo Bank    | [@PederHP](https://github.com/PederHP) | Initial |
+| Role | Name | Organization | GitHub | Term |
+| - | - | - | - | - |
+| Facilitator | Sambhav Kothari | Bloomberg | [@sambhav](https://github.com/sambhav) | Initial |
+| Facilitator | Peder Holdgaard Pedersen | Saxo Bank | [@PederHP](https://github.com/PederHP) | Initial |
 
 ## Membership
 
-| Name       | Organization | GitHub                               | Discord | Level       |
-| ---------- | ------------ | ------------------------------------ | ------- | ----------- |
-| Xin Fu     | Bloomberg    | [@imfing](https://github.com/imfing) | *TBD*   | Participant |
-| Kengo Arao | Bloomberg    | [@KengoA](https://github.com/KengoA) | *TBD*   | Participant |
+| Name | Organization | GitHub | Discord | Level |
+| - | - | - | - | - |
+| Xin Fu | Bloomberg | [@imfing](https://github.com/imfing) | *TBD* | Participant |
+| Kengo Arao | Bloomberg | [@KengoA](https://github.com/KengoA) | *TBD* | Participant |
+| King Yew Choo | True Primary | [@kychooo](https://github.com/kychooo) | kychooo | Participant |
 
 Open to anyone. Join the `#financial-services-ig` channel on the
-[MCP Contributors Discord](https://modelcontextprotocol.io/community/communication#discord). Calls are open and no approval is
+[MCP Contributors Discord](/community/communication#discord). Calls are open and no approval is
 required to attend or contribute. The group especially welcomes contributors from regulated
 institutions who can bring real-world deployment constraints and help drive proposals forward.
 
 ## Operations
 
-| Meeting         | Frequency     | Duration | Purpose                                                   |
-| --------------- | ------------- | -------- | --------------------------------------------------------- |
-| Working Session | Every 2 weeks | 60 min   | Use-case review, extension and proposal work, SEP scoping |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
+| Working Session | Every 2 weeks | 60 min | Use-case review, extension and proposal work, SEP scoping |
 
 Meetings are held 16:00–17:00 London (BST/GMT). An agenda is shared in `#financial-services-ig`
 ahead of each call, and notes with decisions and action items are published afterwards.
 
-Discord: [#financial-services-ig](https://discord.gg/NzkBHsrGf)
+Discord: [#financial-services-ig](https://discord.gg/6CSzBmMkjX)
 
 ## Discussion Topics
 
 The following items form the IG's current agenda. This list is not exhaustive and will evolve as the
 group identifies new areas of interest.
 
-| Item | Name                                                                          | Status | Champion |
-| ---- | ----------------------------------------------------------------------------- | ------ | -------- |
-| —    | Regulatory audit & attestation: portable, verifiable event/claim models       | Open   | —        |
-| —    | Data lineage & citation: provenance, consent metadata, source attribution     | Open   | —        |
-| —    | Guardrails & security: verification frameworks and cryptographic attestations | Open   | —        |
-| —    | Policy enforcement: declarative policies for tool usage and data handling     | Open   | —        |
+| Item | Name | Status | Champion |
+| - | - | - | - |
+| — | Regulatory audit & attestation: portable, verifiable event/claim models | Open | — |
+| — | Data lineage & citation: provenance, consent metadata, source attribution | Open | — |
+| — | Guardrails & security: verification frameworks and cryptographic attestations | Open | — |
+| — | Policy enforcement: declarative policies for tool usage and data handling | Open | — |
 
 ## Changelog
 
-| Date       | Change          |
-| ---------- | --------------- |
+| Date | Change |
+| - | - |
 | 2026-06-25 | Initial charter |
+
+

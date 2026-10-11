@@ -55,7 +55,7 @@ Agents are programs that use generative AI to autonomously modify code. They typ
 ### Baseline Methods
 
 <ResponseField name="initialize" post={[<a href="/protocol/v1/schema#initialize">Schema</a>]}>
-  [Negotiate versions and exchange capabilities.](https://agentclientprotocol.com/protocol/v1/initialization).
+  [Negotiate versions and exchange capabilities.](/protocol/v1/initialization).
 </ResponseField>
 
 <ResponseField name="authenticate" post={[<a href="/protocol/v1/schema#authenticate">Schema</a>]}>
@@ -64,34 +64,34 @@ Agents are programs that use generative AI to autonomously modify code. They typ
 
 <ResponseField name="session/new" post={[<a href="/protocol/v1/schema#session%2Fnew">Schema</a>]}>
   [Create a new conversation
-  session](https://agentclientprotocol.com/protocol/v1/session-setup#creating-a-session).
+  session](/protocol/v1/session-setup#creating-a-session).
 </ResponseField>
 
 <ResponseField name="session/prompt" post={[<a href="/protocol/v1/schema#session%2Fprompt">Schema</a>]}>
-  [Send user prompts](https://agentclientprotocol.com/protocol/v1/prompt-turn#1-user-message) to the Agent.
+  [Send user prompts](/protocol/v1/prompt-turn#1-user-message) to the Agent.
 </ResponseField>
 
 ### Optional Methods
 
 <ResponseField name="session/load" post={[<a href="/protocol/v1/schema#session%2Fload">Schema</a>]}>
-  [Load an existing session](https://agentclientprotocol.com/protocol/v1/session-setup#loading-sessions)
+  [Load an existing session](/protocol/v1/session-setup#loading-sessions)
   (requires `loadSession` capability).
 </ResponseField>
 
 <ResponseField name="logout" post={[<a href="/protocol/v1/schema#logout">Schema</a>]}>
-  [End the current authenticated state](https://agentclientprotocol.com/protocol/v1/authentication#logging-out)
+  [End the current authenticated state](/protocol/v1/authentication#logging-out)
   (requires `agentCapabilities.auth.logout` capability).
 </ResponseField>
 
 <ResponseField name="session/set_mode" post={[<a href="/protocol/v1/schema#session%2Fset-mode">Schema</a>]}>
   [Switch between agent operating
-  modes](https://agentclientprotocol.com/protocol/v1/session-modes#setting-the-current-mode).
+  modes](/protocol/v1/session-modes#setting-the-current-mode).
 </ResponseField>
 
 ### Notifications
 
 <ResponseField name="session/cancel" post={[<a href="/protocol/v1/schema#session%2Fcancel">Schema</a>]}>
-  [Cancel ongoing operations](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation) (no
+  [Cancel ongoing operations](/protocol/v1/prompt-turn#cancellation) (no
   response expected).
 </ResponseField>
 
@@ -102,24 +102,24 @@ Clients provide the interface between users and agents. They are typically code 
 ### Baseline Methods
 
 <ResponseField name="session/request_permission" post={[<a href="/protocol/v1/schema#session%2Frequest_permission">Schema</a>]}>
-  [Request user authorization](https://agentclientprotocol.com/protocol/v1/tool-calls#requesting-permission)
+  [Request user authorization](/protocol/v1/tool-calls#requesting-permission)
   for tool calls.
 </ResponseField>
 
 ### Optional Methods
 
 <ResponseField name="fs/read_text_file" post={[<a href="/protocol/v1/schema#fs%2Fread_text_file">Schema</a>]}>
-  [Read file contents](https://agentclientprotocol.com/protocol/v1/file-system#reading-files) (requires
+  [Read file contents](/protocol/v1/file-system#reading-files) (requires
   `fs.readTextFile` capability).
 </ResponseField>
 
 <ResponseField name="fs/write_text_file" post={[<a href="/protocol/v1/schema#fs%2Fwrite_text_file">Schema</a>]}>
-  [Write file contents](https://agentclientprotocol.com/protocol/v1/file-system#writing-files) (requires
+  [Write file contents](/protocol/v1/file-system#writing-files) (requires
   `fs.writeTextFile` capability).
 </ResponseField>
 
 <ResponseField name="terminal/create" post={[<a href="/protocol/v1/schema#terminal%2Fcreate">Schema</a>]}>
-  [Create a new terminal](https://agentclientprotocol.com/protocol/v1/terminals) (requires `terminal`
+  [Create a new terminal](/protocol/v1/terminals) (requires `terminal`
   capability).
 </ResponseField>
 
@@ -140,7 +140,7 @@ Clients provide the interface between users and agents. They are typically code 
 </ResponseField>
 
 <ResponseField name="elicitation/create" post={[<a href="/protocol/v1/schema#elicitation%2Fcreate">Schema</a>]}>
-  [Request structured information from the user](https://agentclientprotocol.com/protocol/v1/elicitation)
+  [Request structured information from the user](/protocol/v1/elicitation)
   (requires the matching `elicitation` mode capability).
 </ResponseField>
 
@@ -148,17 +148,20 @@ Clients provide the interface between users and agents. They are typically code 
 
 <ResponseField name="elicitation/complete" post={[<a href="/protocol/v1/schema#elicitation%2Fcomplete">Schema</a>]}>
   [Report completion of an out-of-band URL
-  interaction](https://agentclientprotocol.com/protocol/v1/elicitation#url-completion) (no response expected).
+  interaction](/protocol/v1/elicitation#url-completion) (no response expected).
 </ResponseField>
 
 <ResponseField name="session/update" post={[<a href="/protocol/v1/schema#session%2Fupdate">Schema</a>]}>
-  [Send session updates](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) to
-  inform the Client of changes (no response expected). This includes: - [Message
-  chunks](https://agentclientprotocol.com/protocol/v1/content) (agent, user, thought) - [Tool calls and
-  updates](https://agentclientprotocol.com/protocol/v1/tool-calls) - [Plans](https://agentclientprotocol.com/protocol/v1/agent-plan) -
-  [Available commands updates](https://agentclientprotocol.com/protocol/v1/slash-commands#advertising-commands)
+  [Send session updates](/protocol/v1/prompt-turn#3-agent-reports-output) to
+  inform the Client of changes (no response expected). This includes:
 
-  * [Mode changes](https://agentclientprotocol.com/protocol/v1/session-modes#from-the-agent)
+  * [Message chunks](/protocol/v1/content) (agent, user, thought)
+  * [Tool calls and updates](/protocol/v1/tool-calls)
+  * [Plans](/protocol/v1/agent-plan)
+  * [Available commands updates](/protocol/v1/slash-commands#advertising-commands)
+  * [Mode changes](/protocol/v1/session-modes#from-the-agent)
+  * [User-facing notices](/protocol/v1/prompt-turn#session-notices)
+  * [Context compactions](/protocol/v1/prompt-turn#session-compaction)
 </ResponseField>
 
 ## Argument requirements
@@ -186,11 +189,15 @@ The protocol provides built-in mechanisms for adding custom functionality while 
 * Create custom methods by prefixing their name with underscore (`_`)
 * Advertise custom capabilities during initialization
 
-Learn about [protocol extensibility](https://agentclientprotocol.com/protocol/v1/extensibility) to understand how to use these mechanisms.
+Learn about [protocol extensibility](/protocol/v1/extensibility) to understand how to use these mechanisms.
 
 ## Next Steps
 
-* Learn about [Initialization](https://agentclientprotocol.com/protocol/v1/initialization) to understand version and capability negotiation
-* Understand [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup) for creating and loading sessions
-* Review the [Prompt Turn](https://agentclientprotocol.com/protocol/v1/prompt-turn) lifecycle
-* Explore [Extensibility](https://agentclientprotocol.com/protocol/v1/extensibility) to add custom features
+* Learn about [Initialization](/protocol/v1/initialization) to understand version and capability negotiation
+* Understand [Session Setup](/protocol/v1/session-setup) for creating and loading sessions
+* Review the [Prompt Turn](/protocol/v1/prompt-turn) lifecycle
+* Explore [Extensibility](/protocol/v1/extensibility) to add custom features
+* Check your agent implementation with the [Test Compatibility Kit](/libraries/testing)
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

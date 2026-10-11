@@ -130,13 +130,13 @@ updates) where partial progress is meaningful. Status messages report progress.
 
 ## Task lifecycle
 
-| Status           | Meaning                                                                    |
-| ---------------- | -------------------------------------------------------------------------- |
-| `working`        | The operation is in progress.                                              |
-| `input_required` | The server needs client input before continuing. See `inputRequests`.      |
-| `completed`      | The operation finished. The `result` field contains the final output.      |
-| `failed`         | A JSON-RPC error occurred during execution. The `error` field has details. |
-| `cancelled`      | The operation was cancelled (not always honored).                          |
+| Status | Meaning |
+| - | - |
+| `working` | The operation is in progress. |
+| `input_required` | The server needs client input before continuing. See `inputRequests`. |
+| `completed` | The operation finished. The `result` field contains the final output. |
+| `failed` | A JSON-RPC error occurred during execution. The `error` field has details. |
+| `cancelled` | The operation was cancelled (not always honored). |
 
 `completed`, `failed`, and `cancelled` are terminal — once reached, the task's
 state does not change.
@@ -258,13 +258,15 @@ To return tasks from your server:
 ## Client support
 
 \<Note\>
-  MCP Tasks is an extension to the [core MCP specification](https://modelcontextprotocol.io/specification/latest). Host
+  MCP Tasks is an extension to the [core MCP specification](/specification/latest). Host
   support varies by client.
 </Note>
 
-See the [client matrix](https://modelcontextprotocol.io/extensions/client-matrix) for extension support across
+See the [client matrix](/extensions/client-matrix) for extension support across
 clients. Task support requires explicit opt-in from both client and server.
 
 ## Specification
 
-The Tasks extension is specified in the [ext-tasks repository](https://github.com/modelcontextprotocol/ext-tasks). It uses the standard MCP [extension negotiation](https://modelcontextprotocol.io/extensions/overview#negotiation) mechanism: clients declare support in the `extensions` field of the `io.modelcontextprotocol/clientCapabilities` they send in each request's `_meta`, and servers advertise theirs in the capabilities returned by [`server/discover`](https://modelcontextprotocol.io/specification/draft/server/discover).
+The Tasks extension is specified in the [ext-tasks repository](https://github.com/modelcontextprotocol/ext-tasks). It uses the standard MCP [extension negotiation](/extensions/overview#negotiation) mechanism: clients declare support in the `extensions` field of the `io.modelcontextprotocol/clientCapabilities` they send in each request's `_meta`, and servers advertise theirs in the capabilities returned by [`server/discover`](/specification/draft/server/discover).
+
+

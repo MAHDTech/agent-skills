@@ -81,7 +81,9 @@ Add a `messageId` field to `AgentMessageChunk`, `UserMessageChunk`, and `AgentTh
 
 ### Proposed Structure
 
-The `session/prompt` request and response do not include a message ID. Clients do not create protocol message IDs. If the Agent emits the accepted user message through `session/update`, it generates and attaches the appropriate message ID to that user message.
+This RFD does not add a message ID to the `session/prompt` request or response. Clients do not create protocol message IDs. If the Agent emits the accepted user message through `session/update`, it generates and attaches the appropriate message ID to that user message.
+
+The follow-up [v2 Prompt Lifecycle RFD](./v2/prompt.mdx#change-the-sessionprompt-response) explores returning that agent-generated `messageId` in the successful prompt response, while leaving the request unchanged. In that proposal, acceptance means insertion: the response acknowledges that the user message has been inserted, without waiting for turn completion. Session updates report the same insertion's content and placement.
 
 If the Agent sends `user_message_chunk` updates (e.g., during `session/load`), it uses the user message ID:
 
@@ -185,7 +187,7 @@ Example future editing capability:
 
 2. **Update Rust SDK** (`rust/client.rs` and `rust/agent.rs`):
    * Add a dedicated `MessageId` newtype
-   * Add `message_id: Option<MessageId>` field to the v1 `ContentChunk` struct
+   * Add `message_id: Option\<MessageId\>` field to the v1 `ContentChunk` struct
    * Add `message_id: MessageId` field to the v2 `ContentChunk` struct
    * Update serialization to include `messageId` in JSON output when present for v1 and always for v2
 
@@ -238,6 +240,8 @@ The field is **required in v2**, where breaking protocol changes are allowed. v2
    * Requires agreement on uniqueness across clients and agents
    * Conflicts with the Agent's role as owner of the session history
 
+This alternative concerned client-generated IDs being used as canonical message IDs. The [v2 Prompt Lifecycle RFD](./v2/prompt.mdx#correlate-prompts-with-accepted-user-messages) instead explores returning the agent-owned `messageId` for correlation. It retains a separate [client-generated correlation token](./v2/prompt.mdx#client-generated-correlation-token) as an alternative for recovering a submission's identity after a lost response, without letting the client choose canonical message IDs.
+
 The proposed approach with `messageId` is:
 
 * **Simple** - Just one new field with clear semantics
@@ -281,6 +285,8 @@ When a session is loaded via `session/load`, the Agent may:
 
 The protocol doesn't require message IDs to be stable across session loads, though Agents MAY choose to make them stable if their implementation supports it.
 
+The follow-up [v2 Prompt Lifecycle RFD](./v2/prompt.mdx#correlation-and-replay) proposes matching IDs on the prompt response and live user-message updates, without requiring the Agent to persist the message or retain it for any minimum period. If the Agent retains and replays that message within the session, it must use the returned ID so the client can recognize it, including after reconnecting or restarting. Live-only or discarded messages need not appear in later replay. That proposal does not change v1's replay rules.
+
 ### Does this apply to other session updates like tool calls or plan updates?
 
 This RFD addresses `agent_message_chunk`, `user_message_chunk`, and `agent_thought_chunk` updates.
@@ -300,3 +306,6 @@ Future RFDs may propose extending `messageId` to other update types if use cases
 * **2026-02-17**: Added "Message ID Acknowledgment" section to clarify that presence/absence of `userMessageId` in response indicates whether the Agent recorded the ID; clarified that UUID format is MUST (not SHOULD) since both sides generate IDs; renamed response field to `userMessageId` for clarity (request keeps `messageId`)
 * **2026-01-29**: Updated to allow both clients and agents to generate message IDs using UUID format
 * **2025-11-09**: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

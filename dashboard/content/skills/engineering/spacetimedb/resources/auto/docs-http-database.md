@@ -7,526 +7,287 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-The HTTP endpoints in `/v1/database` allow clients to interact with
-Spacetime databases in a variety of ways, including retrieving
-information, creating and deleting databases, invoking reducers and
-evaluating SQL queries. These APIs are intended primarily for
-management, debugging and interactive developer use, and have not been
-optimized for performance to the same extent as the WebSocket API used
-by [the SpacetimeDB client SDKs](https://spacetimedb.com/docs/clients).
-
-## At a glance
-
-| Route | Description |
-|----|----|
-| [`POST /v1/database`](#post-v1database) | Publish a new database given its module code. |
-| [`PUT /v1/database/:name_or_identity`](#put-v1databasename_or_identity) | Publish to a database given its module code. |
-| [`GET /v1/database/:name_or_identity`](#get-v1databasename_or_identity) | Get a JSON description of a database. |
-| [`DELETE /v1/database/:name_or_identity`](#delete-v1databasename_or_identity) | Delete a database. |
-| [`GET /v1/database/:name_or_identity/names`](#get-v1databasename_or_identitynames) | Get the names this database can be identified by. |
-| [`POST /v1/database/:name_or_identity/names`](#post-v1databasename_or_identitynames) | Add a new name for this database. |
-| [`PUT /v1/database/:name_or_identity/names`](#put-v1databasename_or_identitynames) | Set the list of names for this database. |
-| [`GET /v1/database/:name_or_identity/identity`](#get-v1databasename_or_identityidentity) | Get the identity of a database. |
-| [`GET /v1/database/:name_or_identity/subscribe`](#get-v1databasename_or_identitysubscribe) | Begin a WebSocket connection. |
-| [`POST /v1/database/:name_or_identity/call/:reducer`](#post-v1databasename_or_identitycallreducer) | Invoke a reducer OR procedure in a database. |
-| [`GET /v1/database/:name_or_identity/schema`](#get-v1databasename_or_identityschema) | Get the schema for a database. |
-| [`GET /v1/database/:name_or_identity/logs`](#get-v1databasename_or_identitylogs) | Retrieve logs from a database. |
-| [`POST /v1/database/:name_or_identity/sql`](#post-v1databasename_or_identitysql) | Run a SQL query against a database. |
-| [`ANY /v1/database/:name_or_identity/route/{*path}`](#any-v1databasename_or_identityroutepath) | Access database-defined HTTP APIs. |
-
-## `POST /v1/database`
-
-Publish a new database with no name.
-
-Accessible through the CLI as `spacetime publish`.
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-If no `Authorization` header is provided, a new anonymous identity will
-be created and will own the new database. This is generally not what you
-want.
-
-#### Data
-
-A WebAssembly module in the [binary
-format](https://webassembly.github.io/spec/core/binary/index.html).
-
-#### Returns
-
-If the database was successfully published, returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "Success": {
-    "database_identity": string,
-    "op": "created" | "updated"
-} }
-```
-
-## `PUT /v1/database/:name_or_identity`
-
-Publish to a database with the specified name or identity. If the name
-does not exist, creates a new database.
-
-Accessible through the CLI as `spacetime publish`.
-
-#### Query Parameters
-
-| Name | Value |
-|----|----|
-| `clear` | A boolean; whether to clear any existing data when updating an existing database. |
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-If no `Authorization` header is provided, a new anonymous identity will
-be created. When updating an existing database, the token must
-correspond to the database's owner, or the request will be rejected.
-
-#### Data
-
-A WebAssembly module in the [binary
-format](https://webassembly.github.io/spec/core/binary/index.html).
-
-#### Returns
-
-If the database was successfully published, returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "Success": {
-    "domain": null | string,
-    "database_identity": string,
-    "op": "created" | "updated"
-} }
-```
-
-If a database with the given name exists, but the identity provided in
-the `Authorization` header does not have permission to edit it, returns
-`401 UNAUTHORIZED` along with JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "PermissionDenied": {
-    "name": string
-} }
-```
-
-## `GET /v1/database/:name_or_identity`
-
-Get a database's identity, owner identity, host type, number of replicas
-and a hash of its WASM module.
-
-#### Returns
-
-Returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{
-    "database_identity": string,
-    "owner_identity": string,
-    "host_type": "wasm",
-    "initial_program": string
-}
-```
-
-| Field | Type | Meaning |
-|----|----|----|
-| `"database_identity"` | String | The Spacetime identity of the database. |
-| `"owner_identity"` | String | The Spacetime identity of the database's owner. |
-| `"host_type"` | String | The module host type; currently always `"wasm"`. |
-| `"initial_program"` | String | Hash of the WASM module with which the database was initialized. |
-
-## `DELETE /v1/database/:name_or_identity`
-
-Delete a database.
-
-Accessible through the CLI as `spacetime delete <identity>`.
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-Deleting a database requires ownership. If no `Authorization` header is
-provided, the request will be treated as anonymous and will be rejected.
-
-## `GET /v1/database/:name_or_identity/names`
-
-Get the names this database can be identified by.
-
-#### Returns
-
-Returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "names": array<string> }
-```
-
-where `<names>` is a JSON array of strings, each of which is a name
-which refers to the database.
-
-## `POST /v1/database/:name_or_identity/names`
-
-Add a new name for this database.
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-If no `Authorization` header is provided, the request will be treated as
-anonymous.
-
-#### Data
-
-Takes as the request body a string containing the new name of the
-database.
-
-#### Returns
-
-If the name was successfully set, returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "Success": {
-    "domain": string,
-    "database_result": string
-} }
-```
-
-If the new name already exists but the identity provided in the
-`Authorization` header does not have permission to edit it, returns JSON
-in the form:
-
-``` codeBlockStandalone_LlrK
-{ "PermissionDenied": {
-    "domain": string
-} }
-```
-
-## `PUT /v1/database/:name_or_identity/names`
-
-Set the list of names for this database.
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-Setting names requires ownership of the database. If no `Authorization`
-header is provided, the request will be treated as anonymous and will be
-rejected.
-
-#### Data
-
-Takes as the request body a list of names, as a JSON array of strings.
-
-#### Returns
-
-If the name was successfully set, returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "Success": null }
-```
-
-If any of the new names already exist but the identity provided in the
-`Authorization` header does not have permission to edit it, returns
-`401 UNAUTHORIZED` along with JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{ "PermissionDenied": null }
-```
-
-## `GET /v1/database/:name_or_identity/identity`
-
-Get the identity of a database.
-
-#### Returns
-
-Returns a hex string of the specified database's identity.
-
-## `GET /v1/database/:name_or_identity/subscribe`
-
-Begin a WebSocket connection with a database.
-
-#### Required Headers
-
-For more information about WebSocket headers, see [RFC
-6455](https://datatracker.ietf.org/doc/html/rfc6455).
-
-| Name | Value |
-|----|----|
-| `Sec-WebSocket-Protocol` | `v1.bsatn.spacetimedb` or `v1.json.spacetimedb` |
-| `Connection` | `Upgrade` |
-| `Upgrade` | `websocket` |
-| `Sec-WebSocket-Version` | `13` |
-| `Sec-WebSocket-Key` | A 16-byte value, generated randomly by the client, encoded as Base64. |
-
-The SpacetimeDB binary WebSocket protocol, `v1.bsatn.spacetimedb`,
-encodes messages as well as reducer and row data using
-[BSATN](https://spacetimedb.com/docs/bsatn). Its messages are defined
-[here](https://github.com/clockworklabs/SpacetimeDB/blob/master/crates/client-api-messages/src/websocket.rs).
-
-The SpacetimeDB text WebSocket protocol, `v1.json.spacetimedb`, encodes
-messages according to the [SATS-JSON format](https://spacetimedb.com/docs/sats-json).
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-## `POST /v1/database/:name_or_identity/call/:reducer`
-
-Invoke a reducer in a database.
-
-#### Path parameters
-
-| Name       | Value                                 |
-|------------|---------------------------------------|
-| `:reducer` | The name of the reducer OR procedure. |
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-If no `Authorization` header is provided, the request will be treated as
-anonymous. The caller's identity is passed to the reducer via its
-`ReducerContext`, and the module may accept or reject the call based on
-that identity.
-
-#### Data
-
-A JSON array of arguments to the reducer.
-
-## `GET /v1/database/:name_or_identity/schema`
-
-Get a schema for a database.
-
-Accessible through the CLI as `spacetime describe <name_or_identity>`.
-
-#### Query Parameters
-
-| Name      | Value                                            |
-|-----------|--------------------------------------------------|
-| `version` | The version of `RawModuleDef` to return, e.g. 9. |
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-No authorization is required to fetch a database's schema. If an
-`Authorization` header is provided, the response will include
-`spacetime-identity` and `spacetime-identity-token` headers echoing the
-caller's identity. If omitted, a new anonymous identity will be
-allocated for this purpose.
-
-#### Returns
-
-Returns a `RawModuleDef` in JSON form.
-
-Example response from `/schema?version=9` for the default module
-generated by `spacetime init`
-
-``` codeBlockStandalone_LlrK
-{
-  "typespace": {
-    "types": [
-      {
-        "Product": {
-          "elements": [
-            {
-              "name": {
-                "some": "name"
-              },
-              "algebraic_type": {
-                "String": []
-              }
-            }
-          ]
-        }
-      }
-    ]
-  },
-  "tables": [
-    {
-      "name": "person",
-      "product_type_ref": 0,
-      "primary_key": [],
-      "indexes": [],
-      "constraints": [],
-      "sequences": [],
-      "schedule": {
-        "none": []
-      },
-      "table_type": {
-        "User": []
-      },
-      "table_access": {
-        "Private": []
-      }
-    }
-  ],
-  "reducers": [
-    {
-      "name": "add",
-      "params": {
-        "elements": [
-          {
-            "name": {
-              "some": "name"
-            },
-            "algebraic_type": {
-              "String": []
-            }
-          }
-        ]
-      },
-      "lifecycle": {
-        "none": []
-      }
-    },
-    {
-      "name": "identity_connected",
-      "params": {
-        "elements": []
-      },
-      "lifecycle": {
-        "some": {
-          "OnConnect": []
-        }
-      }
-    },
-    {
-      "name": "identity_disconnected",
-      "params": {
-        "elements": []
-      },
-      "lifecycle": {
-        "some": {
-          "OnDisconnect": []
-        }
-      }
-    },
-    {
-      "name": "init",
-      "params": {
-        "elements": []
-      },
-      "lifecycle": {
-        "some": {
-          "Init": []
-        }
-      }
-    },
-    {
-      "name": "say_hello",
-      "params": {
-        "elements": []
-      },
-      "lifecycle": {
-        "none": []
-      }
-    }
-  ],
-  "types": [
-    {
-      "name": {
-        "scope": [],
-        "name": "Person"
-      },
-      "ty": 0,
-      "custom_ordering": true
-    }
-  ],
-  "misc_exports": [],
-  "row_level_security": []
-}
-```
-
-## `GET /v1/database/:name_or_identity/logs`
-
-Retrieve logs from a database.
-
-Accessible through the CLI as `spacetime logs <name_or_identity>`.
-
-#### Query Parameters
-
-| Name | Value |
-|----|----|
-| `num_lines` | Number of most-recent log lines to retrieve. |
-| `follow` | A boolean; whether to continue receiving new logs via a stream. |
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-Viewing logs requires ownership of the database. If no `Authorization`
-header is provided, the request will be treated as anonymous and will be
-rejected.
-
-#### Returns
-
-Text, or streaming text if `follow` is supplied, containing log lines.
-
-## `POST /v1/database/:name_or_identity/sql`
-
-Run a SQL query against a database.
-
-Accessible through the CLI as
-`spacetime sql \<name_or_identity\> <query>`.
-
-#### Optional Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [as Bearer auth](https://spacetimedb.com/docs/http/authorization#authorization-headers). |
-
-If no `Authorization` header is provided, the request will be treated as
-anonymous and will only have access to public tables. The caller's
-identity is used to enforce row-level security policies.
-
-#### Data
-
-SQL queries, separated by `;`.
-
-#### Returns
-
-Returns a JSON array of statement results, each of which takes the form:
-
-``` codeBlockStandalone_LlrK
-{
-    "schema": ProductType,
-    "rows": array
-}
-```
-
-The `schema` will be a [JSON-encoded `ProductType`](https://spacetimedb.com/docs/sats-json)
-describing the type of the returned rows.
-
-The `rows` will be an array of [JSON-encoded
-`ProductValue`s](https://spacetimedb.com/docs/sats-json), each of which conforms to the
-`schema`.
-
-## `ANY /v1/database/:name_or_identity/route/{*path}`
-
-Access routes defined by a database using [HTTP
-handlers](https://spacetimedb.com/docs/functions/http-handlers).
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/reference/http-api/database" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">/v1/database | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/http/database"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="/v1/database | SpacetimeDB docs"><meta data-rh="true" name="description" content="The HTTP endpoints in /v1/database allow clients to interact with Spacetime databases in a variety of ways, including retrieving information, creating and deleting databases, invoking reducers and evaluating SQL queries. These APIs are intended primarily for management, debugging and interactive developer use, and have not been optimized for performance to the same extent as the WebSocket API used by the SpacetimeDB client SDKs."><meta data-rh="true" property="og:description" content="The HTTP endpoints in /v1/database allow clients to interact with Spacetime databases in a variety of ways, including retrieving information, creating and deleting databases, invoking reducers and evaluating SQL queries. These APIs are intended primarily for management, debugging and interactive developer use, and have not been optimized for performance to the same extent as the WebSocket API used by the SpacetimeDB client SDKs."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/http/database"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/http/database" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/http/database" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"/v1/database","item":"https://spacetimedb.com/docs/http/database"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/http/database">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/http/database">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/http/database">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/cli-reference"><span title="CLI Reference" class="categoryLinkLabel_HATI">CLI Reference</span></a><button aria-label="Expand sidebar category &#x27;CLI Reference&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/resources/mcp"><span title="MCP Reference" class="linkLabel_UvDg">MCP Reference</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/http/authorization"><span title="HTTP API" class="categoryLinkLabel_HATI">HTTP API</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/http/authorization"><span title="Authorization" class="linkLabel_UvDg">Authorization</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/http/identity"><span title="/v1/identity" class="linkLabel_UvDg">/v1/identity</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/http/database"><span title="/v1/database" class="linkLabel_UvDg">/v1/database</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/webassembly-abi"><span title="Internals" class="categoryLinkLabel_HATI">Internals</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/reference/sql"><span title="SQL Reference" class="linkLabel_UvDg">SQL Reference</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">References</span></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">HTTP API</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">/v1/database</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\><code>/v1/database</code></h1></header>
+<p>The HTTP endpoints in <code>/v1/database</code> allow clients to interact with Spacetime databases in a variety of ways, including retrieving information, creating and deleting databases, invoking reducers and evaluating SQL queries. These APIs are intended primarily for management, debugging and interactive developer use, and have not been optimized for performance to the same extent as the WebSocket API used by <a class="" href="/docs/clients">the SpacetimeDB client SDKs</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="at-a-glance">At a glance<a href="#at-a-glance" class="hash-link" aria-label="Direct link to At a glance" title="Direct link to At a glance" translate="no">​</a></h2>
+<table><thead><tr><th>Route</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#post-v1database" class=""><code>POST /v1/database</code></a></td><td>Publish a new database given its module code.</td></tr><tr><td><a href="#put-v1databasename_or_identity" class=""><code>PUT /v1/database/:name_or_identity</code></a></td><td>Publish to a database given its module code.</td></tr><tr><td><a href="#get-v1databasename_or_identity" class=""><code>GET /v1/database/:name_or_identity</code></a></td><td>Get a JSON description of a database.</td></tr><tr><td><a href="#delete-v1databasename_or_identity" class=""><code>DELETE /v1/database/:name_or_identity</code></a></td><td>Delete a database.</td></tr><tr><td><a href="#get-v1databasename_or_identitynames" class=""><code>GET /v1/database/:name_or_identity/names</code></a></td><td>Get the names this database can be identified by.</td></tr><tr><td><a href="#post-v1databasename_or_identitynames" class=""><code>POST /v1/database/:name_or_identity/names</code></a></td><td>Add a new name for this database.</td></tr><tr><td><a href="#put-v1databasename_or_identitynames" class=""><code>PUT /v1/database/:name_or_identity/names</code></a></td><td>Set the list of names for this database.</td></tr><tr><td><a href="#get-v1databasename_or_identityidentity" class=""><code>GET /v1/database/:name_or_identity/identity</code></a></td><td>Get the identity of a database.</td></tr><tr><td><a href="#get-v1databasename_or_identitysubscribe" class=""><code>GET /v1/database/:name_or_identity/subscribe</code></a></td><td>Begin a WebSocket connection.</td></tr><tr><td><a href="#post-v1databasename_or_identitycallreducer" class=""><code>POST /v1/database/:name_or_identity/call/:reducer</code></a></td><td>Invoke a reducer OR procedure in a database.</td></tr><tr><td><a href="#get-v1databasename_or_identityschema" class=""><code>GET /v1/database/:name_or_identity/schema</code></a></td><td>Get the schema for a database.</td></tr><tr><td><a href="#get-v1databasename_or_identitylogs" class=""><code>GET /v1/database/:name_or_identity/logs</code></a></td><td>Retrieve logs from a database.</td></tr><tr><td><a href="#post-v1databasename_or_identitysql" class=""><code>POST /v1/database/:name_or_identity/sql</code></a></td><td>Run a SQL query against a database.</td></tr><tr><td><a href="#any-v1databasename_or_identityroutepath" class=""><code>ANY /v1/database/:name_or_identity/route/{*path}</code></a></td><td>Access database-defined HTTP APIs.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1database"><code>POST /v1/database</code><a href="#post-v1database" class="hash-link" aria-label="Direct link to post-v1database" title="Direct link to post-v1database" translate="no">​</a></h2>
+<p>Publish a new database with no name.</p>
+<p>Accessible through the CLI as <code>spacetime publish</code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers">Optional Headers<a href="#optional-headers" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>If no <code>Authorization</code> header is provided, a new anonymous identity will be created and will own the new database. This is generally not what you want.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data">Data<a href="#data" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>A WebAssembly module in the <a href="https://webassembly.github.io/spec/core/binary/index.html" target="_blank" rel="noopener noreferrer" class="">binary format</a>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns">Returns<a href="#returns" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>If the database was successfully published, returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Success</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">database_identity</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">op</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">created</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> |</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">updated</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">} }</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="put-v1databasename_or_identity"><code>PUT /v1/database/:name_or_identity</code><a href="#put-v1databasename_or_identity" class="hash-link" aria-label="Direct link to put-v1databasename_or_identity" title="Direct link to put-v1databasename_or_identity" translate="no">​</a></h2>
+<p>Publish to a database with the specified name or identity. If the name does not exist, creates a new database.</p>
+<p>Accessible through the CLI as <code>spacetime publish</code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="query-parameters">Query Parameters<a href="#query-parameters" class="hash-link" aria-label="Direct link to Query Parameters" title="Direct link to Query Parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>clear</code></td><td>A boolean; whether to clear any existing data when updating an existing database.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-1">Optional Headers<a href="#optional-headers-1" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>If no <code>Authorization</code> header is provided, a new anonymous identity will be created. When updating an existing database, the token must correspond to the database&#x27;s owner, or the request will be rejected.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data-1">Data<a href="#data-1" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>A WebAssembly module in the <a href="https://webassembly.github.io/spec/core/binary/index.html" target="_blank" rel="noopener noreferrer" class="">binary format</a>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-1">Returns<a href="#returns-1" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>If the database was successfully published, returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Success</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">domain</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> null</span><span style="color:#FF79C6"> |</span><span style="color:#F8F8F2"> string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">database_identity</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">op</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">created</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> |</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">updated</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">} }</span></span></code></pre>
+<p>If a database with the given name exists, but the identity provided in the <code>Authorization</code> header does not have permission to edit it, returns <code>401 UNAUTHORIZED</code> along with JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PermissionDenied</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">name</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string</span></span>
+<span class="line"><span style="color:#F8F8F2">} }</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identity"><code>GET /v1/database/:name_or_identity</code><a href="#get-v1databasename_or_identity" class="hash-link" aria-label="Direct link to get-v1databasename_or_identity" title="Direct link to get-v1databasename_or_identity" translate="no">​</a></h2>
+<p>Get a database&#x27;s identity, owner identity, host type, number of replicas and a hash of its WASM module.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-2">Returns<a href="#returns-2" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">database_identity</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">owner_identity</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">host_type</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">wasm</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">initial_program</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<table><thead><tr><th>Field</th><th>Type</th><th>Meaning</th></tr></thead>\<tbody\><tr><td><code>"database_identity"</code></td><td>String</td><td>The Spacetime identity of the database.</td></tr><tr><td><code>"owner_identity"</code></td><td>String</td><td>The Spacetime identity of the database&#x27;s owner.</td></tr><tr><td><code>"host_type"</code></td><td>String</td><td>The module host type; currently always <code>"wasm"</code>.</td></tr><tr><td><code>"initial_program"</code></td><td>String</td><td>Hash of the WASM module with which the database was initialized.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="delete-v1databasename_or_identity"><code>DELETE /v1/database/:name_or_identity</code><a href="#delete-v1databasename_or_identity" class="hash-link" aria-label="Direct link to delete-v1databasename_or_identity" title="Direct link to delete-v1databasename_or_identity" translate="no">​</a></h2>
+<p>Delete a database.</p>
+<p>Accessible through the CLI as <code>spacetime delete <identity></code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-2">Optional Headers<a href="#optional-headers-2" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>Deleting a database requires ownership. If no <code>Authorization</code> header is provided, the request will be treated as anonymous and will be rejected.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identitynames"><code>GET /v1/database/:name_or_identity/names</code><a href="#get-v1databasename_or_identitynames" class="hash-link" aria-label="Direct link to get-v1databasename_or_identitynames" title="Direct link to get-v1databasename_or_identitynames" translate="no">​</a></h2>
+<p>Get the names this database can be identified by.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-3">Returns<a href="#returns-3" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">names</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: array</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">string</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> }</span></span></code></pre>
+<p>where <code>\<names\></code> is a JSON array of strings, each of which is a name which refers to the database.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1databasename_or_identitynames"><code>POST /v1/database/:name_or_identity/names</code><a href="#post-v1databasename_or_identitynames" class="hash-link" aria-label="Direct link to post-v1databasename_or_identitynames" title="Direct link to post-v1databasename_or_identitynames" translate="no">​</a></h2>
+<p>Add a new name for this database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-3">Optional Headers<a href="#optional-headers-3" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>If no <code>Authorization</code> header is provided, the request will be treated as anonymous.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data-2">Data<a href="#data-2" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>Takes as the request body a string containing the new name of the database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-4">Returns<a href="#returns-4" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>If the name was successfully set, returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Success</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">domain</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">database_result</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string</span></span>
+<span class="line"><span style="color:#F8F8F2">} }</span></span></code></pre>
+<p>If the new name already exists but the identity provided in the <code>Authorization</code> header does not have permission to edit it, returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PermissionDenied</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">domain</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> string</span></span>
+<span class="line"><span style="color:#F8F8F2">} }</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="put-v1databasename_or_identitynames"><code>PUT /v1/database/:name_or_identity/names</code><a href="#put-v1databasename_or_identitynames" class="hash-link" aria-label="Direct link to put-v1databasename_or_identitynames" title="Direct link to put-v1databasename_or_identitynames" translate="no">​</a></h2>
+<p>Set the list of names for this database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-4">Optional Headers<a href="#optional-headers-4" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>Setting names requires ownership of the database. If no <code>Authorization</code> header is provided, the request will be treated as anonymous and will be rejected.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data-3">Data<a href="#data-3" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>Takes as the request body a list of names, as a JSON array of strings.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-5">Returns<a href="#returns-5" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>If the name was successfully set, returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Success</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: </span><span style="color:#BD93F9">null</span><span style="color:#F8F8F2"> }</span></span></code></pre>
+<p>If any of the new names already exist but the identity provided in the <code>Authorization</code> header does not have permission to edit it, returns <code>401 UNAUTHORIZED</code> along with JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{ </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PermissionDenied</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: </span><span style="color:#BD93F9">null</span><span style="color:#F8F8F2"> }</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identityidentity"><code>GET /v1/database/:name_or_identity/identity</code><a href="#get-v1databasename_or_identityidentity" class="hash-link" aria-label="Direct link to get-v1databasename_or_identityidentity" title="Direct link to get-v1databasename_or_identityidentity" translate="no">​</a></h2>
+<p>Get the identity of a database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-6">Returns<a href="#returns-6" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns a hex string of the specified database&#x27;s identity.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identitysubscribe"><code>GET /v1/database/:name_or_identity/subscribe</code><a href="#get-v1databasename_or_identitysubscribe" class="hash-link" aria-label="Direct link to get-v1databasename_or_identitysubscribe" title="Direct link to get-v1databasename_or_identitysubscribe" translate="no">​</a></h2>
+<p>Begin a WebSocket connection with a database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="required-headers">Required Headers<a href="#required-headers" class="hash-link" aria-label="Direct link to Required Headers" title="Direct link to Required Headers" translate="no">​</a></h4>
+<p>For more information about WebSocket headers, see <a href="https://datatracker.ietf.org/doc/html/rfc6455" target="_blank" rel="noopener noreferrer" class="">RFC 6455</a>.</p>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Sec-WebSocket-Protocol</code></td><td><code>v1.bsatn.spacetimedb</code> or <code>v1.json.spacetimedb</code></td></tr><tr><td><code>Connection</code></td><td><code>Upgrade</code></td></tr><tr><td><code>Upgrade</code></td><td><code>websocket</code></td></tr><tr><td><code>Sec-WebSocket-Version</code></td><td><code>13</code></td></tr><tr><td><code>Sec-WebSocket-Key</code></td><td>A 16-byte value, generated randomly by the client, encoded as Base64.</td></tr></tbody></table>
+<p>The SpacetimeDB binary WebSocket protocol, <code>v1.bsatn.spacetimedb</code>, encodes messages as well as reducer and row data using <a class="" href="/docs/bsatn">BSATN</a>.
+Its messages are defined <a href="https://github.com/clockworklabs/SpacetimeDB/blob/master/crates/client-api-messages/src/websocket.rs" target="_blank" rel="noopener noreferrer" class="">here</a>.</p>
+<p>The SpacetimeDB text WebSocket protocol, <code>v1.json.spacetimedb</code>, encodes messages according to the <a class="" href="/docs/sats-json">SATS-JSON format</a>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-5">Optional Headers<a href="#optional-headers-5" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1databasename_or_identitycallreducer"><code>POST /v1/database/:name_or_identity/call/:reducer</code><a href="#post-v1databasename_or_identitycallreducer" class="hash-link" aria-label="Direct link to post-v1databasename_or_identitycallreducer" title="Direct link to post-v1databasename_or_identitycallreducer" translate="no">​</a></h2>
+<p>Invoke a reducer in a database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="path-parameters">Path parameters<a href="#path-parameters" class="hash-link" aria-label="Direct link to Path parameters" title="Direct link to Path parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>:reducer</code></td><td>The name of the reducer OR procedure.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-6">Optional Headers<a href="#optional-headers-6" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>If no <code>Authorization</code> header is provided, the request will be treated as anonymous. The caller&#x27;s identity is passed to the reducer via its <code>ReducerContext</code>, and the module may accept or reject the call based on that identity.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data-4">Data<a href="#data-4" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>A JSON array of arguments to the reducer.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identityschema"><code>GET /v1/database/:name_or_identity/schema</code><a href="#get-v1databasename_or_identityschema" class="hash-link" aria-label="Direct link to get-v1databasename_or_identityschema" title="Direct link to get-v1databasename_or_identityschema" translate="no">​</a></h2>
+<p>Get a schema for a database.</p>
+<p>Accessible through the CLI as <code>spacetime describe \<name_or_identity\></code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="query-parameters-1">Query Parameters<a href="#query-parameters-1" class="hash-link" aria-label="Direct link to Query Parameters" title="Direct link to Query Parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>version</code></td><td>The version of <code>RawModuleDef</code> to return, e.g. 9.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-7">Optional Headers<a href="#optional-headers-7" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>No authorization is required to fetch a database&#x27;s schema. If an <code>Authorization</code> header is provided, the response will include <code>spacetime-identity</code> and <code>spacetime-identity-token</code> headers echoing the caller&#x27;s identity. If omitted, a new anonymous identity will be allocated for this purpose.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-7">Returns<a href="#returns-7" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns a <code>RawModuleDef</code> in JSON form.</p>
+<details class="details_zn32 alert alert--info details_cBNX" data-collapsed="true">\<summary\>Example response from <code>/schema?version=9</code> for the default module generated by <code>spacetime init</code></summary><div><div class="collapsibleContent_BQP8"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">typespace</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">    "</span><span style="color:#8BE9FD">types</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">      {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">Product</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">          "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#8BE9FE">              "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">                "</span><span style="color:#8BE9FD">some</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">name</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">              },</span></span>
+<span class="line"><span style="color:#8BE9FE">              "</span><span style="color:#8BE9FD">algebraic_type</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">                "</span><span style="color:#8BE9FD">String</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">              }</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">          ]</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    ]</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">tables</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">person</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">product_type_ref</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">primary_key</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">indexes</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">constraints</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">sequences</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">schedule</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">none</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">table_type</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">User</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">table_access</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">Private</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">  ],</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">reducers</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">add</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">params</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">          {</span></span>
+<span class="line"><span style="color:#8BE9FE">            "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">              "</span><span style="color:#8BE9FD">some</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">name</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">            },</span></span>
+<span class="line"><span style="color:#8BE9FE">            "</span><span style="color:#8BE9FD">algebraic_type</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">              "</span><span style="color:#8BE9FD">String</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">          }</span></span>
+<span class="line"><span style="color:#F8F8F2">        ]</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">lifecycle</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">none</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">identity_connected</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">params</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">lifecycle</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">some</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">          "</span><span style="color:#8BE9FD">OnConnect</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">identity_disconnected</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">params</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">lifecycle</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">some</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">          "</span><span style="color:#8BE9FD">OnDisconnect</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">init</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">params</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">lifecycle</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">some</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">          "</span><span style="color:#8BE9FD">Init</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">say_hello</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">params</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">elements</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">lifecycle</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">none</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">      }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">  ],</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">types</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">scope</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">        "</span><span style="color:#8BE9FD">name</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Person</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">ty</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FE">      "</span><span style="color:#8BE9FD">custom_ordering</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">  ],</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">misc_exports</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [],</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">row_level_security</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> []</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></details>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1databasename_or_identitylogs"><code>GET /v1/database/:name_or_identity/logs</code><a href="#get-v1databasename_or_identitylogs" class="hash-link" aria-label="Direct link to get-v1databasename_or_identitylogs" title="Direct link to get-v1databasename_or_identitylogs" translate="no">​</a></h2>
+<p>Retrieve logs from a database.</p>
+<p>Accessible through the CLI as <code>spacetime logs \<name_or_identity\></code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="query-parameters-2">Query Parameters<a href="#query-parameters-2" class="hash-link" aria-label="Direct link to Query Parameters" title="Direct link to Query Parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>num_lines</code></td><td>Number of most-recent log lines to retrieve.</td></tr><tr><td><code>follow</code></td><td>A boolean; whether to continue receiving new logs via a stream.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-8">Optional Headers<a href="#optional-headers-8" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>Viewing logs requires ownership of the database. If no <code>Authorization</code> header is provided, the request will be treated as anonymous and will be rejected.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-8">Returns<a href="#returns-8" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Text, or streaming text if <code>follow</code> is supplied, containing log lines.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1databasename_or_identitysql"><code>POST /v1/database/:name_or_identity/sql</code><a href="#post-v1databasename_or_identitysql" class="hash-link" aria-label="Direct link to post-v1databasename_or_identitysql" title="Direct link to post-v1databasename_or_identitysql" translate="no">​</a></h2>
+<p>Run a SQL query against a database.</p>
+<p>Accessible through the CLI as <code>spacetime sql \<name_or_identity\> \<query\></code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="optional-headers-9">Optional Headers<a href="#optional-headers-9" class="hash-link" aria-label="Direct link to Optional Headers" title="Direct link to Optional Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization#authorization-headers">as Bearer auth</a>.</td></tr></tbody></table>
+<p>If no <code>Authorization</code> header is provided, the request will be treated as anonymous and will only have access to public tables. The caller&#x27;s identity is used to enforce row-level security policies.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="data-5">Data<a href="#data-5" class="hash-link" aria-label="Direct link to Data" title="Direct link to Data" translate="no">​</a></h4>
+<p>SQL queries, separated by <code>;</code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-9">Returns<a href="#returns-9" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns a JSON array of statement results, each of which takes the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">schema</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: ProductType,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">rows</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: array</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>schema</code> will be a <a class="" href="/docs/sats-json">JSON-encoded <code>ProductType</code></a> describing the type of the returned rows.</p>
+<p>The <code>rows</code> will be an array of <a class="" href="/docs/sats-json">JSON-encoded <code>ProductValue</code>s</a>, each of which conforms to the <code>schema</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="any-v1databasename_or_identityroutepath"><code>ANY /v1/database/:name_or_identity/route/{*path}</code><a href="#any-v1databasename_or_identityroutepath" class="hash-link" aria-label="Direct link to any-v1databasename_or_identityroutepath" title="Direct link to any-v1databasename_or_identityroutepath" translate="no">​</a></h2>
+<p>Access routes defined by a database using <a class="" href="/docs/functions/http-handlers">HTTP handlers</a>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00200-reference/00200-http-api/00300-database.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/http/identity"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">/v1/identity</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/webassembly-abi"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Module ABI Reference</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#at-a-glance" class="table-of-contents__link toc-highlight">At a glance</a></li>\<li\><a href="#post-v1database" class="table-of-contents__link toc-highlight"><code>POST /v1/database</code></a></li>\<li\><a href="#put-v1databasename_or_identity" class="table-of-contents__link toc-highlight"><code>PUT /v1/database/:name_or_identity</code></a></li>\<li\><a href="#get-v1databasename_or_identity" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity</code></a></li>\<li\><a href="#delete-v1databasename_or_identity" class="table-of-contents__link toc-highlight"><code>DELETE /v1/database/:name_or_identity</code></a></li>\<li\><a href="#get-v1databasename_or_identitynames" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity/names</code></a></li>\<li\><a href="#post-v1databasename_or_identitynames" class="table-of-contents__link toc-highlight"><code>POST /v1/database/:name_or_identity/names</code></a></li>\<li\><a href="#put-v1databasename_or_identitynames" class="table-of-contents__link toc-highlight"><code>PUT /v1/database/:name_or_identity/names</code></a></li>\<li\><a href="#get-v1databasename_or_identityidentity" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity/identity</code></a></li>\<li\><a href="#get-v1databasename_or_identitysubscribe" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity/subscribe</code></a></li>\<li\><a href="#post-v1databasename_or_identitycallreducer" class="table-of-contents__link toc-highlight"><code>POST /v1/database/:name_or_identity/call/:reducer</code></a></li>\<li\><a href="#get-v1databasename_or_identityschema" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity/schema</code></a></li>\<li\><a href="#get-v1databasename_or_identitylogs" class="table-of-contents__link toc-highlight"><code>GET /v1/database/:name_or_identity/logs</code></a></li>\<li\><a href="#post-v1databasename_or_identitysql" class="table-of-contents__link toc-highlight"><code>POST /v1/database/:name_or_identity/sql</code></a></li>\<li\><a href="#any-v1databasename_or_identityroutepath" class="table-of-contents__link toc-highlight"><code>ANY /v1/database/:name_or_identity/route/{*path}</code></a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>
