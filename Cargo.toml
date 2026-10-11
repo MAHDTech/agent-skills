@@ -8,7 +8,7 @@ members = [
 default-members = ["crates/ask-cli"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.50"
 edition = "2024"
 rust-version = "1.85.0"
 authors = ["MAHDTech"]
@@ -19,8 +19,8 @@ readme = "README.md"
 
 [workspace.dependencies]
 # Internal workspace crates
-skills-core = { path = "crates/skills-core", version = "0.1.0" }
-skills-tui = { path = "crates/skills-tui", version = "0.1.0" }
+skills-core = { path = "crates/skills-core", version = "0.1.50" }
+skills-tui = { path = "crates/skills-tui", version = "0.1.50" }
 
 # Serialization and data models
 serde = { version = "1.0.210", features = ["derive"] }
