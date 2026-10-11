@@ -1,6 +1,6 @@
 ---
 name: zola
-description: Expert reference and development guidelines for the Zola static site generator. Use when the user asks to modify, build, serve, or customize Zola sites, themes, templates, shortcodes, or Zola configuration files (such as config.toml).
+description: Reference and development guidelines for the Zola static site generator. Use when the user asks to modify, build, serve, or customize Zola sites, themes, templates, shortcodes, or Zola configuration files (such as config.toml).
 resources:
   - https://www.getzola.org/documentation/
 ---

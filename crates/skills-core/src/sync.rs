@@ -221,7 +221,7 @@ impl SyncSummary {
     }
 }
 
-/// Comprehensive error taxonomy for skill synchronization failures.
+/// Error taxonomy for skill synchronization failures.
 #[derive(Debug, Error)]
 pub enum SyncError {
     #[error("I/O error at {path:?}: {source}")]

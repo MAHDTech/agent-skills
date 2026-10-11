@@ -8,10 +8,10 @@ resources:
 
 # Devenv Integration
 
-When working in a repository that utilizes `devenv`, you must strictly adhere to the following rules for environment consistency:
+When working in a repository that uses `devenv`, you must strictly adhere to the following rules for environment consistency:
 
 - **Devenv is Mandatory:** For projects containing a `devenv.nix` and/or `devenv.yaml` file, strict use of `devenv` for dependency and shell environment management is required.
-- **DO NOT Run Bare Commands:** ALL standard CLI operations MUST run via the devenv shell. Furthermore, you must **always** provide a reason for the execution via the `SECRETSPEC_REASON` environment variable to satisfy SecretSpec's audit logging for AI agents. To do this use:
+- **DO NOT Run Bare Commands:** ALL standard CLI operations MUST run via the devenv shell. You must **always** provide a reason for the execution via the `SECRETSPEC_REASON` environment variable to satisfy SecretSpec's audit logging for AI agents. To do this use:
 
 ```bash
 SECRETSPEC_REASON="<reason>" devenv --no-tui shell -- <command>
@@ -62,7 +62,7 @@ Other skills must **not** restate these flags. If a project has `devenv.nix` or 
 > - **DO NOT add `pkgs.pre-commit` or `pre-commit` package/input to `devenv.nix`.** If a hook runner package is needed, use `pkgs.prek` or `git-hooks.git-hooks`.
 > - ALWAYS use `prek` to run or manage pre-commit hooks (e.g., `prek run -a`).
 
-Devenv gives us the ability to run tests and linters seamlessly. The project-level hooks are run via `prek` (see the prek skill).
+Devenv runs tests and linters directly. The project-level hooks are run via `prek` (see the prek skill).
 - `SECRETSPEC_REASON="running tests" devenv --no-tui test`: This triggers all pre-commit hooks (managed by `prek`) and other defined tests and is **mandatory** as part of testing. Prefer the non-interactive prefix from **Non-Interactive Agent and CI Invocations** when an agent or gate runs this.
 
 **Verification Hook Run (ALL Repositories):**

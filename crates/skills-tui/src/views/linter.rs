@@ -309,6 +309,15 @@ pub fn remediation_for_rule(rule: &str) -> &'static str {
             "Disambiguate duplicate skill names to maintain unique catalog routing."
         }
         "unsupported-target" => "Update target agent compatibility tags in frontmatter metadata.",
+        "frontmatter-slop" => {
+            "Remove AI puffery, clichés, or filler phrases from frontmatter description and start with an active capability verb."
+        }
+        "heading-formatting" => {
+            "Remove bold markup ('**' or '__') from headings and use sentence case."
+        }
+        "no-slop-content" => {
+            "Replace AI crutch words and corporate boilerplate with plain, direct operational instructions."
+        }
         _ => {
             "Inspect the source file at the indicated coordinates and address the diagnostic condition."
         }
@@ -382,6 +391,18 @@ mod tests {
         assert_eq!(
             remediation_for_rule("unsupported-target"),
             "Update target agent compatibility tags in frontmatter metadata."
+        );
+        assert_eq!(
+            remediation_for_rule("frontmatter-slop"),
+            "Remove AI puffery, clichés, or filler phrases from frontmatter description and start with an active capability verb."
+        );
+        assert_eq!(
+            remediation_for_rule("heading-formatting"),
+            "Remove bold markup ('**' or '__') from headings and use sentence case."
+        );
+        assert_eq!(
+            remediation_for_rule("no-slop-content"),
+            "Replace AI crutch words and corporate boilerplate with plain, direct operational instructions."
         );
         assert_eq!(
             remediation_for_rule("unknown-custom-rule"),

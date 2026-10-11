@@ -232,7 +232,7 @@ pub struct SkillFileEntry {
     pub permissions_mode: Option<u32>,
 }
 
-/// Comprehensive lifecycle metadata record for an installed skill.
+/// Lifecycle metadata record for an installed skill.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
 pub struct InstalledSkill {
     /// Unique identifier / sanitized slug for the skill (e.g. "rust-analyzer-helper").
@@ -248,7 +248,7 @@ pub struct InstalledSkill {
     pub source_path: PathBuf,
     /// Final absolute target installation path where files reside.
     pub target_path: PathBuf,
-    /// Effective installation mode utilized (Symlink or Copy).
+    /// Effective installation mode used (Symlink or Copy).
     pub mode: InstallMode,
     /// ISO-8601 UTC timestamp recording when the skill was first installed.
     #[builder(setter(into))]
@@ -538,7 +538,7 @@ pub enum IntegrityStatus {
 // Installer Errors
 // -----------------------------------------------------------------------------
 
-/// Comprehensive error taxonomy for skill installation and lifecycle management.
+/// Error taxonomy for skill installation and lifecycle management.
 #[derive(Error, Debug)]
 pub enum InstallerError {
     #[error("I/O error at {path:?}: {source}")]

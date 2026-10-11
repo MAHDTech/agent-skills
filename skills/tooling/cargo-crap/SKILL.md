@@ -55,7 +55,7 @@ CRAP(m) = comp(m)^2 * (1 - cov(m)/100)^3 + comp(m)
 
 Standard `cargo test` is not sufficient for CRAP analysis. While `cargo test` executes test binaries and reports pass/fail outcomes, it does not instrument compiled machine code or produce line-level execution trace files.
 
-`cargo-llvm-cov` is a mandatory coverage engine prerequisite. It leverages LLVM source-based code coverage flags (`-C instrument-coverage`) to generate standardized LCOV trace files (`lcov.info`) that `cargo-crap` ingests alongside Rust abstract syntax trees (ASTs).
+`cargo-llvm-cov` is a mandatory coverage engine prerequisite. It uses LLVM source-based code coverage flags (`-C instrument-coverage`) to generate standardized LCOV trace files (`lcov.info`) that `cargo-crap` ingests alongside Rust abstract syntax trees (ASTs).
 
 ### Pinning in Cargo.toml
 
