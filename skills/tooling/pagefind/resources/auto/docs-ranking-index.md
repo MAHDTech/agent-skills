@@ -12,7 +12,7 @@ A good example is sites with a mix of long and short pages, where the long pages
 
 Ranking parameters are configured within the `ranking` option passed to Pagefind, which can optionally contain any or all of the available parameters.
 
-> Ranking can be explored for your content via the [Pagefind playground](https://pagefind.app/docs/playground/).
+> Ranking can be explored for your content via the [Pagefind playground](/docs/playground/).
 
 ## Configuring ranking parameters
 
@@ -58,7 +58,7 @@ await pagefind.options({
 
 `termFrequency` changes the ranking balance between frequency of the term relative to document length, versus weighted term count.
 
-As an example, if we were querying `search` in the sentence **"Pagefind is a search tool that can search websites"**, the term frequency of `search` is 0.22 (2 / 9 words), while the weighted term count of `search` is 2. This latter number would also include any [content with custom weights](https://pagefind.app/docs/weighting/).
+As an example, if we were querying `search` in the sentence **"Pagefind is a search tool that can search websites"**, the term frequency of `search` is 0.22 (2 / 9 words), while the weighted term count of `search` is 2. This latter number would also include any [content with custom weights](/docs/weighting/).
 
 - The maximum value is `1.0`, where term frequency fully applies and is the main ranking factor.
 - The minimum value is `0.0`, where term frequency does not apply, and pages are ranked based on the raw sum of words and weights.
@@ -137,7 +137,7 @@ When searching with diacritics normalized (the default behavior), this parameter
 - At `1.0`, searching for "café" will boost pages containing "café" by 100% over pages containing "cafe", and vice versa.
 - The minimum value is `0.0`, which treats all diacritic variants equally.
 
-This parameter has no effect when [`exactDiacritics`](https://pagefind.app/docs/search-config/#exact-diacritics) is set to `true`, as non-matching diacritic variants will not appear in results at all.
+This parameter has no effect when [`exactDiacritics`](/docs/search-config/#exact-diacritics) is set to `true`, as non-matching diacritic variants will not appear in results at all.
 
 ## Configuring Metadata Weights
 
@@ -183,3 +183,4 @@ await pagefind.options({
 +    }
 });
 ```
+

@@ -17,16 +17,16 @@ We'll build a server that exposes two tools: `get_alerts` and `get_forecast`. Th
 </Frame>
 
 \<Note\>
-  Servers can connect to any client. We've chosen Claude for Desktop here for simplicity, but we also have a guide on [building your own client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client).
+  Servers can connect to any client. We've chosen Claude for Desktop here for simplicity, but we also have a guide on [building your own client](/docs/2025-11-25/develop/build-client).
 </Note>
 
 ### Core MCP Concepts
 
 MCP servers can provide three main types of capabilities:
 
-1. **[Resources](https://modelcontextprotocol.io/docs/2025-11-25/learn/server-concepts#resources)**: File-like data that can be read by clients (like API responses or file contents)
-2. **[Tools](https://modelcontextprotocol.io/docs/2025-11-25/learn/server-concepts#tools)**: Functions that can be called by the LLM (with user approval)
-3. **[Prompts](https://modelcontextprotocol.io/docs/2025-11-25/learn/server-concepts#prompts)**: Pre-written templates that help users accomplish specific tasks
+1. **[Resources](/docs/2025-11-25/learn/server-concepts#resources)**: File-like data that can be read by clients (like API responses or file contents)
+2. **[Tools](/docs/2025-11-25/learn/server-concepts#tools)**: Functions that can be called by the LLM (with user approval)
+3. **[Prompts](/docs/2025-11-25/learn/server-concepts#prompts)**: Pre-written templates that help users accomplish specific tasks
 
 This tutorial will primarily focus on tools.
 
@@ -262,7 +262,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version
@@ -732,7 +732,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version
@@ -1074,7 +1074,7 @@ This tutorial will primarily focus on tools.
 
     When you start your client application, the auto-configuration will automatically create MCP clients from the claude\_desktop\_config.json.
 
-    For more information, see the [MCP Client Boot Starters](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-client-docs.html) reference documentation.
+    For more information, see the [MCP Client Boot Starters](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html) reference documentation.
 
     ## More Java MCP Server examples
 
@@ -1387,7 +1387,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version
@@ -1650,7 +1650,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version
@@ -1950,7 +1950,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version here.](https://claude.ai/download) If you already have Claude for Desktop, **make sure it's updated to the latest version.**
@@ -2374,7 +2374,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version here.](https://claude.ai/download) If you already have Claude for Desktop, **make sure it's updated to the latest version.**
@@ -2602,7 +2602,7 @@ This tutorial will primarily focus on tools.
     Next, let's add our helper functions for querying and formatting the data from the National Weather Service API:
 
     ```go theme={null}
-    func makeNWSRequest[T any](https://modelcontextprotocol.io/docs/2025-11-25/develop/ctx%20context.Context,%20url%20string) (*T, error) {
+    func makeNWSRequest[T any](ctx context.Context, url string) (*T, error) {
     	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
     	if err != nil {
     		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -2669,7 +2669,7 @@ This tutorial will primarily focus on tools.
     ) {
     	// Get points data
     	pointsURL := fmt.Sprintf("%s/points/%f,%f", NWSAPIBase, input.Latitude, input.Longitude)
-    	pointsData, err := makeNWSRequest[PointsResponse](https://modelcontextprotocol.io/docs/2025-11-25/develop/ctx,%20pointsURL)
+    	pointsData, err := makeNWSRequest[PointsResponse](ctx, pointsURL)
     	if err != nil {
     		return &mcp.CallToolResult{
     			Content: []mcp.Content{
@@ -2688,7 +2688,7 @@ This tutorial will primarily focus on tools.
     		}, nil, nil
     	}
 
-    	forecastData, err := makeNWSRequest[ForecastResponse](https://modelcontextprotocol.io/docs/2025-11-25/develop/ctx,%20forecastURL)
+    	forecastData, err := makeNWSRequest[ForecastResponse](ctx, forecastURL)
     	if err != nil {
     		return &mcp.CallToolResult{
     			Content: []mcp.Content{
@@ -2729,7 +2729,7 @@ This tutorial will primarily focus on tools.
     	stateCode := strings.ToUpper(input.State)
     	alertsURL := fmt.Sprintf("%s/alerts/active/area/%s", NWSAPIBase, stateCode)
 
-    	alertsData, err := makeNWSRequest[AlertsResponse](https://modelcontextprotocol.io/docs/2025-11-25/develop/ctx,%20alertsURL)
+    	alertsData, err := makeNWSRequest[AlertsResponse](ctx, alertsURL)
     	if err != nil {
     		return &mcp.CallToolResult{
     			Content: []mcp.Content{
@@ -2807,7 +2807,7 @@ This tutorial will primarily focus on tools.
     ## Testing your server with Claude for Desktop
 
     \<Note\>
-      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](https://modelcontextprotocol.io/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
+      Claude for Desktop is not yet available on Linux. Linux users can proceed to the [Building a client](/docs/2025-11-25/develop/build-client) tutorial to build an MCP client that connects to the server we just built.
     </Note>
 
     First, make sure you have Claude for Desktop installed. [You can install the latest version here.](https://claude.ai/download) If you already have Claude for Desktop, **make sure it's updated to the latest version.**
@@ -2952,7 +2952,7 @@ When you ask a question:
 
     **None of this is working. What do I do?**
 
-    Please refer to our [debugging guide](https://modelcontextprotocol.io/docs/2025-11-25/tools/debugging) for better debugging tools and more detailed guidance.
+    Please refer to our [debugging guide](/docs/2025-11-25/tools/debugging) for better debugging tools and more detailed guidance.
   </Accordion>
 
   <Accordion title="Weather API Issues">
@@ -2977,7 +2977,7 @@ When you ask a question:
 </AccordionGroup>
 
 \<Note\>
-  For more advanced troubleshooting, check out our guide on [Debugging MCP](https://modelcontextprotocol.io/docs/2025-11-25/tools/debugging)
+  For more advanced troubleshooting, check out our guide on [Debugging MCP](/docs/2025-11-25/tools/debugging)
 </Note>
 
 ## Next steps
@@ -2999,3 +2999,4 @@ When you ask a question:
     Use agent skills to guide AI coding assistants through server design
   </Card>
 </CardGroup>
+

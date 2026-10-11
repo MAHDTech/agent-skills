@@ -8,7 +8,7 @@
 
 You can create your own components that integrate with the Pagefind Component UI system. Custom components can listen to search events, trigger searches, and coordinate with the built-in components.
 
-Before deciding to build a custom component, though, do check out how much you can customize the official components. For example, the [modal component](https://pagefind.app/docs/components/modal/) can have its internal structure replaced, and both the [results component](https://pagefind.app/docs/components/results/) and the [searchbox component](https://pagefind.app/docs/components/searchbox/) can be supplied custom templates for each result.
+Before deciding to build a custom component, though, do check out how much you can customize the official components. For example, the [modal component](/docs/components/modal/) can have its internal structure replaced, and both the [results component](/docs/components/results/) and the [searchbox component](/docs/components/searchbox/) can be supplied custom templates for each result.
 
 ## Basic Structure
 
@@ -353,3 +353,5 @@ Trigger the Pagefind bundle to load before the user searches:
 ```javascript
 await instance.triggerLoad();
 ```
+
+

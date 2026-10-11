@@ -87,3 +87,6 @@ When to use:
 
 1. Contact lead and/or core maintainers, or [hi@zed.dev](mailto:hi@zed.dev) directly.
 2. Follow responsible disclosure guidelines.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

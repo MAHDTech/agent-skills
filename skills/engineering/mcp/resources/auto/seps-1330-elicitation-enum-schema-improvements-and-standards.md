@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1330                                                                            |
-| **Title**     | Elicitation Enum Schema Improvements and Standards Compliance                   |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-08-11                                                                      |
-| **Author(s)** | chughtapan                                                                      |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1330](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1330) |
+| Field | Value |
+| - | - |
+| **SEP** | 1330 |
+| **Title** | Elicitation Enum Schema Improvements and Standards Compliance |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-08-11 |
+| **Author(s)** | chughtapan |
+| **Sponsor** | None |
+| **PR** | [#1330](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1330) |
 
 ***
 
@@ -198,8 +198,8 @@ export interface ElicitResult extends Result {
   "title": "Color Selection",
   "description": "Choose your favorite color",
   "enum": ["#FF0000", "#00FF00", "#0000FF"],
-  “enumNames”: ["Red", "Green", "Blue"],
-  "default": "Green"
+  "enumNames": ["Red", "Green", "Blue"],
+  "default": "#00FF00"
 }
 ```
 
@@ -447,3 +447,4 @@ This is our proposal for the replacement of the current `EnumSchema` in the spec
   }
 }
 ```
+

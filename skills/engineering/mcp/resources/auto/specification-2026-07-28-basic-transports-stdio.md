@@ -27,7 +27,7 @@ depends on them except the process lifecycle. The wire format (one
 newline-delimited JSON-RPC message per line over a reliable bidirectional
 byte stream) works unchanged over Unix domain sockets, TCP connections, or
 any similar channel.
-[Custom transports](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports#custom-transports)
+[Custom transports](/specification/2026-07-28/basic/transports#custom-transports)
 built on such streams **SHOULD** reuse this framing and the message rules on
 this page; only the subprocess-specific aspects (launch, `stderr`, shutdown
 by closing the stream, process restart) need channel-specific equivalents.
@@ -161,3 +161,4 @@ and a compatibility matrix for implementors.
 [unsupported-version]: /specification/2026-07-28/schema#unsupportedprotocolversionerror
 
 [lifecycle-compat]: /specification/2026-07-28/basic/versioning#backward-compatibility-with-initialization-based-versions
+

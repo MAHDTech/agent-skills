@@ -26,3 +26,6 @@ bridges, and dual-agent/client demos under
 Browse the full documentation—including the quickstart, contrib helpers, and API
 reference—at
 [agentclientprotocol.github.io/python-sdk](https://agentclientprotocol.github.io/python-sdk/).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

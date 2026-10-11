@@ -1,155 +1,114 @@
-Version: 2.0.0
-
-On this page
-
-warning
-
-SpacetimeAuth is currently in beta, some features may not be available
-yet or may change in the future. You might encounter bugs or issues
-while using the service. Please report any problems you encounter to
-help us improve SpacetimeAuth.
-
-SpacetimeAuth projects can be configured to suit your application's
-needs. This guide will walk you through the various configuration
-options available in the SpacetimeAuth dashboard and through various
-common use cases like setting up third-party identity providers.
-
-## Managing Clients
-
-Clients represent applications that will use SpacetimeAuth for
-authentication. Each client has its own set of settings, including
-redirect URIs, post logout URIs, and name.
-
-You can manage clients by navigating to the "Clients" tab in your
-SpacetimeAuth project dashboard. ![Clients
-tab](https://spacetimedb.com/docs/assets/images/clients-tab-66a024eae01821e3b93753ccafd7b370.png)
-Every project comes with a default client that you can use to get
-started. You can also create additional clients by clicking the "Create
-Client" button.
-
-The majority of projects will only need a single client to authenticate
-users to their SpacetimeDB module. You may want to create multiple
-clients if you have multiple applications (e.g. a sidecar, admin panel,
-etc.) and want to use different authentication flows or settings for
-each application.
-
-When creating or editing a client, you can configure the following
-settings:
-
-- **Name**: The name of the client (e.g. "My Web App").
-- **Redirect URIs**: The URIs to which SpacetimeAuth allows to redirect
-  the user after a successful login. These must match the URIs used in
-  your application.
-- **Post Logout Redirect URIs**: The URIs to which SpacetimeAuth allows
-  to redirect the user after a logout. These must match the URIs used in
-  your application.
-
-danger
-
-Remember to keep your client secret secure, **never** expose it in
-client-side code or public repositories. You can freely share the client
-ID as it is not sensitive information. Client secrets are only used
-during the `client_credentials` flow, allowing you to get a token with
-no user context (the `sub` claim will be set to the client ID).\`
-
-![Edit
-client](https://spacetimedb.com/docs/assets/images/edit-client-12da40c73d3a8a51a0eff06a787f4218.png)
-
-### Scopes and Claims
-
-Scopes are not yet editable and are currently limited to `openid`,
-`profile`, and `email`. These scopes are sufficient for most
-applications, as they provide all the necessary information about the
-authenticated user. Here are the claims (i.e, user information available
-in the ID token) provided by each scope:
-
-| Scope | Claims |
-|----|----|
-| openid (required) | `sub` (unique user identifier) |
-| profile | `name`, `family_name`, `given_name`, `middle_name`, `nickname`, `preferred_username`, `picture`, `website`, `gender`, `birthdate`, `zoneinfo`, `locale`, `updated_at` |
-| email | `email`, `email_verified` |
-
-You can request all or a subset of these scopes when initiating the
-authentication flow in your application.
-
-### Redirect URIs
-
-Redirect URIs are a critical part of the OAuth2 and OpenID Connect
-flows. They ensure that after a user authenticates, they are redirected
-back to a trusted location in your application.
-
-When configuring redirect URIs for your client, ensure that they match
-the URIs used in your application. This includes the scheme (http or
-https), domain, port (if applicable), and path. For example, if your
-application is hosted at `https://myapp.com` and you initiate the
-authentication flow from `https://myapp.com/login`, you might set the
-redirect URI to `https://myapp.com/callback`.
-
-To find the correct redirect URIs for your application, refer to the
-documentation of the authentication library you are using or check out
-our integration guides with various frameworks.
-
-## Setting Up Third-Party Identity Providers
-
-SpacetimeAuth supports multiple third-party identity providers, allowing
-users to authenticate using their existing accounts. Supported providers
-include:
-
-- Google
-- GitHub
-- Discord
-- Twitch
-- Kick
-- More providers will be added in the future
-
-User's information from third-party identity providers is mapped to the
-standard OpenID Connect claims used by SpacetimeAuth. This ensures a
-consistent user experience regardless of the identity provider used. For
-example the username claim is mapped to the standard
-`preferred_username` claim.
-
-You can manage identity providers by navigating to the "Identity
-Providers" tab in your SpacetimeAuth project dashboard.
-
-![Identity Providers
-tab](https://spacetimedb.com/docs/assets/images/identity-providers-f9e9a3061f340a64fa8cad0774310318.png)
-
-Since SpacetimeAuth acts as a client for the external identity provider,
-you need to provide the client ID and client secret obtained from the
-provider's developer console in order to enable the provider. You must
-also configure the redirect URI in the provider's developer console to
-point to SpacetimeAuth (see below). You can also choose to enable or
-disable the provider. After entering the required information, click
-"Save" and the provider will be available on the login page of your
-application.
-
-Here are guides to help you create the required OAuth application
-(sometimes called an OAuth App or OAuth Client):
-
-- [Google](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#get_your_google_api_client_id)
-- [GitHub](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
-- [Discord](https://discord.com/developers/docs/quick-start/getting-started#step-1-creating-an-app)
-- [Twitch](https://dev.twitch.tv/docs/authentication/register-app/)
-- [Kick](https://docs.kick.com/getting-started/kick-apps-setup)
-
-Here are the redirect URIs you need to configure for each enabled
-provider:
-
-| Provider | Redirect URI |
-|----|----|
-| Google | `https://auth.spacetimedb.com/interactions/federated/callback/google` |
-| GitHub | `https://auth.spacetimedb.com/interactions/federated/callback/github` |
-| Discord | `https://auth.spacetimedb.com/interactions/federated/callback/discord` |
-| Twitch | `https://auth.spacetimedb.com/interactions/federated/callback/twitch` |
-| Kick | `https://auth.spacetimedb.com/interactions/federated/callback/kick` |
-
-## Next Steps
-
-Now that you have created and configured a SpacetimeAuth project, you
-can start integrating it into your application. Before writing code, we
-recommend verifying your setup with a quick test.
-
-- [Test your configuration with OIDC
-  Debugger](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/testing)
-- [React integration
-  guide](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/react-integration)
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/authentication/spacetimeauth/configuring-a-project" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Configuring your project | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Configuring your project | SpacetimeDB docs"><meta data-rh="true" name="description" content="SpacetimeAuth is currently in beta, some features may not be available yet or may change in the future. You might encounter bugs or issues while using the service. Please report any problems you encounter to help us improve SpacetimeAuth."><meta data-rh="true" property="og:description" content="SpacetimeAuth is currently in beta, some features may not be available yet or may change in the future. You might encounter bugs or issues while using the service. Please report any problems you encounter to help us improve SpacetimeAuth."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Authentication","item":"https://spacetimedb.com/docs/core-concepts/authentication"},{"@type":"ListItem","position":2,"name":"SpacetimeAuth","item":"https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/"},{"@type":"ListItem","position":3,"name":"Configuring your project","item":"https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/configuring-a-project"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/core-concepts/authentication/spacetimeauth/configuring-a-project">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/core-concepts/authentication/spacetimeauth/configuring-a-project">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/core-concepts/authentication/spacetimeauth/configuring-a-project">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Collapse sidebar category &#x27;Authentication&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/"><span title="SpacetimeAuth" class="categoryLinkLabel_HATI">SpacetimeAuth</span></a><button aria-label="Collapse sidebar category &#x27;SpacetimeAuth&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/creating-a-project"><span title="Creating a project" class="linkLabel_UvDg">Creating a project</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/configuring-a-project"><span title="Configuring your project" class="linkLabel_UvDg">Configuring your project</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/testing"><span title="Testing" class="linkLabel_UvDg">Testing</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/react-integration"><span title="React Integration" class="linkLabel_UvDg">React Integration</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/spacetimeauth/steam"><span title="Steam Session Ticket Authentication" class="linkLabel_UvDg">Steam Session Ticket Authentication</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/Auth0"><span title="Auth0" class="linkLabel_UvDg">Auth0</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/Clerk"><span title="Clerk" class="linkLabel_UvDg">Clerk</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/BetterAuth"><span title="Better Auth" class="linkLabel_UvDg">Better Auth</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/core-concepts/authentication/usage"><span title="Using Auth Claims" class="linkLabel_UvDg">Using Auth Claims</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/core-concepts/authentication"><span>Authentication</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/core-concepts/authentication/spacetimeauth/"><span>SpacetimeAuth</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Configuring your project</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Configuring your project</h1></header><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>SpacetimeAuth is currently in beta, some features may not be available yet or may change in the future. You might encounter bugs or issues while using the service. Please report any problems you encounter to help us improve SpacetimeAuth.</p></div></div>
+<p>SpacetimeAuth projects can be configured to suit your application&#x27;s needs.
+This guide will walk you through the various configuration options available in the
+SpacetimeAuth dashboard and through various common use cases like setting up
+third-party identity providers.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="managing-clients">Managing Clients<a href="#managing-clients" class="hash-link" aria-label="Direct link to Managing Clients" title="Direct link to Managing Clients" translate="no">​</a></h2>
+<p>Clients represent applications that will use SpacetimeAuth for authentication.
+Each client has its own set of settings, including redirect URIs,
+post logout URIs, and name.</p>
+<p>You can manage clients by navigating to the "Clients" tab in your
+SpacetimeAuth project dashboard.
+<img decoding="async" loading="lazy" alt="Clients tab" src="/docs/assets/images/clients-tab-66a024eae01821e3b93753ccafd7b370.png" width="2558" height="1350" class="img_sDl7">
+Every project comes with a default client that you can use to get started.
+You can also create additional clients by clicking the "Create Client" button.</p>
+<p>The majority of projects will only need a single client to authenticate users to
+their SpacetimeDB module. You may want to create multiple clients if you have
+multiple applications (e.g. a sidecar, admin panel, etc.) and want to use different
+authentication flows or settings for each application.</p>
+<p>When creating or editing a client, you can configure the following settings:</p>
+\<ul\>
+<li class=""><strong>Name</strong>: The name of the client (e.g. "My Web App").</li>
+<li class=""><strong>Redirect URIs</strong>: The URIs to which SpacetimeAuth allows to redirect
+the user after a successful login. These must match the URIs used in your application.</li>
+<li class=""><strong>Post Logout Redirect URIs</strong>: The URIs to which SpacetimeAuth allows to redirect
+the user after a logout. These must match the URIs used in your application.</li>
+</ul>
+<div class="theme-admonition theme-admonition-danger admonition_Ph9R alert alert--danger"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>danger</div><div class="admonitionContent_STxx"><p>Remember to keep your client secret secure, <strong>never</strong> expose it in client-side code or public repositories. You can freely share the client ID as it is not sensitive information. Client secrets are only used during the <code>client_credentials</code> flow, allowing you to get a token with no user context (the <code>sub</code> claim will be set to the client ID).`</p></div></div>
+<p><img decoding="async" loading="lazy" alt="Edit client" src="/docs/assets/images/edit-client-12da40c73d3a8a51a0eff06a787f4218.png" width="2558" height="1350" class="img_sDl7"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="scopes-and-claims">Scopes and Claims<a href="#scopes-and-claims" class="hash-link" aria-label="Direct link to Scopes and Claims" title="Direct link to Scopes and Claims" translate="no">​</a></h3>
+<p>Scopes are not yet editable and are currently limited to <code>openid</code>, <code>profile</code>,
+and <code>email</code>. These scopes are sufficient for most applications, as they provide
+all the necessary information about the authenticated user.
+Here are the claims (i.e, user information available in the ID token) provided by
+each scope:</p>
+<table><thead><tr><th>Scope</th><th>Claims</th></tr></thead>\<tbody\><tr><td>openid (required)</td><td><code>sub</code> (unique user identifier)</td></tr><tr><td>profile</td><td><code>name</code>, <code>family_name</code>, <code>given_name</code>, <code>middle_name</code>, <code>nickname</code>, <code>preferred_username</code>, <code>picture</code>, <code>website</code>, <code>gender</code>, <code>birthdate</code>, <code>zoneinfo</code>, <code>locale</code>, <code>updated_at</code></td></tr><tr><td>email</td><td><code>email</code>, <code>email_verified</code></td></tr></tbody></table>
+<p>You can request all or a subset of these scopes when initiating the
+authentication flow in your application.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="redirect-uris">Redirect URIs<a href="#redirect-uris" class="hash-link" aria-label="Direct link to Redirect URIs" title="Direct link to Redirect URIs" translate="no">​</a></h3>
+<p>Redirect URIs are a critical part of the OAuth2 and OpenID Connect flows.
+They ensure that after a user authenticates, they are redirected back to a
+trusted location in your application.</p>
+<p>When configuring redirect URIs for your client, ensure that they match the URIs
+used in your application. This includes the scheme (http or https), domain,
+port (if applicable), and path.
+For example, if your application is hosted at <code>https://myapp.com</code> and you
+initiate the authentication flow from <code>https://myapp.com/login</code>, you might
+set the redirect URI to <code>https://myapp.com/callback</code>.</p>
+<p>To find the correct redirect URIs for your application, refer to the
+documentation of the authentication library you are using or check out our
+integration guides with various frameworks.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="setting-up-third-party-identity-providers">Setting Up Third-Party Identity Providers<a href="#setting-up-third-party-identity-providers" class="hash-link" aria-label="Direct link to Setting Up Third-Party Identity Providers" title="Direct link to Setting Up Third-Party Identity Providers" translate="no">​</a></h2>
+<p>SpacetimeAuth supports multiple third-party identity providers, allowing users to
+authenticate using their existing accounts. Supported providers include:</p>
+\<ul\>
+<li class="">Google</li>
+<li class="">GitHub</li>
+<li class="">Discord</li>
+<li class="">Twitch</li>
+<li class="">Kick</li>
+<li class="">More providers will be added in the future</li>
+</ul>
+<p>User&#x27;s information from third-party identity providers is mapped to the standard
+OpenID Connect claims used by SpacetimeAuth. This ensures a consistent user
+experience regardless of the identity provider used.
+For example the username claim is mapped to the standard <code>preferred_username</code> claim.</p>
+<p>You can manage identity providers by navigating to the "Identity Providers" tab
+in your SpacetimeAuth project dashboard.</p>
+<p><img decoding="async" loading="lazy" alt="Identity Providers tab" src="/docs/assets/images/identity-providers-f9e9a3061f340a64fa8cad0774310318.png" width="2558" height="1345" class="img_sDl7"></p>
+<p>Since SpacetimeAuth acts as a client for the external identity provider,
+you need to provide the client ID and client secret obtained
+from the provider&#x27;s developer console in order to enable the provider.
+You must also configure the redirect URI in the provider&#x27;s developer console to
+point to SpacetimeAuth (see below).
+You can also choose to enable or disable the provider.
+After entering the required information, click "Save" and the provider will be
+available on the login page of your application.</p>
+<p>Here are guides to help you create the required OAuth application (sometimes
+called an OAuth App or OAuth Client):</p>
+\<ul\>
+<li class=""><a href="https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid#get_your_google_api_client_id" target="_blank" rel="noopener noreferrer" class="">Google</a></li>
+<li class=""><a href="https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app" target="_blank" rel="noopener noreferrer" class="">GitHub</a></li>
+<li class=""><a href="https://discord.com/developers/docs/quick-start/getting-started#step-1-creating-an-app" target="_blank" rel="noopener noreferrer" class="">Discord</a></li>
+<li class=""><a href="https://dev.twitch.tv/docs/authentication/register-app/" target="_blank" rel="noopener noreferrer" class="">Twitch</a></li>
+<li class=""><a href="https://docs.kick.com/getting-started/kick-apps-setup" target="_blank" rel="noopener noreferrer" class="">Kick</a></li>
+</ul>
+<p>Here are the redirect URIs you need to configure for each enabled provider:</p>
+<table><thead><tr><th>Provider</th><th>Redirect URI</th></tr></thead>\<tbody\><tr><td>Google</td><td><code>https://auth.spacetimedb.com/interactions/federated/callback/google</code></td></tr><tr><td>GitHub</td><td><code>https://auth.spacetimedb.com/interactions/federated/callback/github</code></td></tr><tr><td>Discord</td><td><code>https://auth.spacetimedb.com/interactions/federated/callback/discord</code></td></tr><tr><td>Twitch</td><td><code>https://auth.spacetimedb.com/interactions/federated/callback/twitch</code></td></tr><tr><td>Kick</td><td><code>https://auth.spacetimedb.com/interactions/federated/callback/kick</code></td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+<p>Now that you have created and configured a SpacetimeAuth project, you can
+start integrating it into your application. Before writing code, we recommend
+verifying your setup with a quick test.</p>
+\<ul\>
+<li class=""><a class="" href="/docs/core-concepts/authentication/spacetimeauth/testing">Test your configuration with OIDC Debugger</a></li>
+<li class=""><a class="" href="/docs/core-concepts/authentication/spacetimeauth/react-integration">React integration guide</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00500-authentication/00100-spacetimeauth/00300-configuring-a-project.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/core-concepts/authentication/spacetimeauth/creating-a-project"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Creating a project</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/core-concepts/authentication/spacetimeauth/testing"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Testing</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#managing-clients" class="table-of-contents__link toc-highlight">Managing Clients</a>\<ul\>\<li\><a href="#scopes-and-claims" class="table-of-contents__link toc-highlight">Scopes and Claims</a></li>\<li\><a href="#redirect-uris" class="table-of-contents__link toc-highlight">Redirect URIs</a></li></ul></li>\<li\><a href="#setting-up-third-party-identity-providers" class="table-of-contents__link toc-highlight">Setting Up Third-Party Identity Providers</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

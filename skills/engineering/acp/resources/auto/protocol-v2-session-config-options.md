@@ -10,7 +10,7 @@ Agents can provide an arbitrary list of configuration options for a session, all
 
 ## Initial State
 
-During [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup) the Agent **MAY** return a list of configuration options and their current values:
+During [Session Setup](/protocol/v2/session-setup) the Agent **MAY** return a list of configuration options and their current values:
 
 ```json theme={null}
 {
@@ -104,9 +104,10 @@ During [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup
   ID. For `boolean` options this is a boolean.
 </ResponseField>
 
-<ResponseField name="options" type="ConfigOptionValue[]">
+<ResponseField name="options" type="ConfigOptionValue[] | ConfigOptionGroup[]">
   The available values for a `select` option. Required when `type` is `"select"`
-  and omitted when `type` is `"boolean"`.
+  and omitted when `type` is `"boolean"`. This is either a flat array of values
+  or an array of groups; values and groups are not mixed in the same array.
 </ResponseField>
 
 ### ConfigOptionValue
@@ -122,6 +123,31 @@ During [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup
 <ResponseField name="description" type="string">
   Optional description of what this value does
 </ResponseField>
+
+### Grouped Select Options
+
+Select options may be grouped under labeled headers. Each
+`ConfigOptionGroup` requires `groupId`, `name`, and an `options` array containing
+the same `ConfigOptionValue` objects used by flat selects. A group's `_meta` is
+optional; value descriptions and `_meta` remain optional as described above.
+
+```json theme={null}
+{
+  "options": [
+    {
+      "groupId": "recommended",
+      "name": "Recommended",
+      "options": [
+        {
+          "value": "model-1",
+          "name": "Model 1",
+          "description": "Fast for everyday tasks"
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### Boolean Config Options
 
@@ -148,12 +174,12 @@ Each config option **MAY** include a `category` field. Categories are semantic m
 
 Category names beginning with `_` are free for custom use (e.g., `_my_custom_category`). Category names that do not begin with `_` are reserved for the ACP spec.
 
-| Category        | Description                                                              |
-| --------------- | ------------------------------------------------------------------------ |
-| `mode`          | Session mode selector                                                    |
-| `model`         | Model selector                                                           |
-| `model_config`  | Model-related parameter, such as context size or speed/quality trade-off |
-| `thought_level` | Thought/reasoning level selector                                         |
+| Category | Description |
+| - | - |
+| `mode` | Session mode selector |
+| `model` | Model selector |
+| `model_config` | Model-related parameter, such as context size or speed/quality trade-off |
+| `thought_level` | Thought/reasoning level selector |
 
 Clients **SHOULD** render `model_config` options near the `model` selector, such as in the same popover or panel. No capability negotiation is required for category values.
 
@@ -344,3 +370,6 @@ This notification also contains the complete configuration state. Common reasons
 * Switching modes after completing a planning phase
 * Falling back to a different model due to rate limits or errors
 * Adjusting available options based on context discovered during execution
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

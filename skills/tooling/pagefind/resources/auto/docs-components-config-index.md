@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-config\>
+# <pagefind-config>
 
 
 Declaratively configure a Pagefind instance. Optionally include this on the page to set options like bundle path.
@@ -26,7 +26,7 @@ Declaratively configure a Pagefind instance. Optionally include this on the page
 | `instance` | string | `"default"` | Instance name to configure |
 | `preload` | boolean | `false` | Load Pagefind immediately instead of on first search |
 | `faceted` | boolean | `false` | Enable faceted search mode |
-| `highlight-param` | string | — | Add the search term as a query parameter under this key for use with the [highlight script](https://pagefind.app/docs/highlighting/) |
+| `highlight-param` | string | — | Add the search term as a query parameter under this key for use with the [highlight script](/docs/highlighting/) |
 | `exact-diacritics` | boolean | `false` | Treat diacritics as distinct characters instead of normalizing them |
 | `meta-cache-tag` | string | — | Replace the default cache-busting timestamp with a fixed string for offline/PWA support |
 | `no-worker` | boolean | `false` | Force Pagefind to run on the main thread instead of a web worker |
@@ -121,4 +121,5 @@ For complex configuration, use JavaScript instead of the `<pagefind-config>` ele
 
 Either place this on the page as shown, or compile it into your existing JavaScript bundle.
 
-See [Pagefind Search Config](https://pagefind.app/docs/search-config/) for all available options.
+See [Pagefind Search Config](/docs/search-config/) for all available options.
+

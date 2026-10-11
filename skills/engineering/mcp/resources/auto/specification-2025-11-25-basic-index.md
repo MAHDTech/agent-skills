@@ -32,7 +32,7 @@ these types of messages:
 
 ### Requests
 
-[Requests](https://modelcontextprotocol.io/specification/2025-11-25/schema#jsonrpcrequest) are sent from the client to the server or vice versa, to initiate an operation.
+[Requests](/specification/2025-11-25/schema#jsonrpcrequest) are sent from the client to the server or vice versa, to initiate an operation.
 
 ```typescript theme={null}
 {
@@ -56,7 +56,7 @@ Responses are sent in reply to requests, containing either the result or error o
 
 #### Result Responses
 
-[Result responses](https://modelcontextprotocol.io/specification/2025-11-25/schema#jsonrpcresultresponse) are sent when the operation completes successfully.
+[Result responses](/specification/2025-11-25/schema#jsonrpcresultresponse) are sent when the operation completes successfully.
 
 ```typescript theme={null}
 {
@@ -74,7 +74,7 @@ Responses are sent in reply to requests, containing either the result or error o
 
 #### Error Responses
 
-[Error responses](https://modelcontextprotocol.io/specification/2025-11-25/schema#jsonrpcerrorresponse) are sent when the operation fails or encounters an error.
+[Error responses](/specification/2025-11-25/schema#jsonrpcerrorresponse) are sent when the operation fails or encounters an error.
 
 ```typescript theme={null}
 {
@@ -94,7 +94,7 @@ Responses are sent in reply to requests, containing either the result or error o
 
 ### Notifications
 
-[Notifications](https://modelcontextprotocol.io/specification/2025-11-25/schema#jsonrpcnotification) are sent from the client to the server or vice versa, as a one-way message.
+[Notifications](/specification/2025-11-25/schema#jsonrpcnotification) are sent from the client to the server or vice versa, as a one-way message.
 The receiver **MUST NOT** send a response.
 
 ```typescript theme={null}
@@ -111,7 +111,7 @@ The receiver **MUST NOT** send a response.
 
 ## Auth
 
-MCP provides an [Authorization](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization) framework for use with HTTP.
+MCP provides an [Authorization](/specification/2025-11-25/basic/authorization) framework for use with HTTP.
 Implementations using an HTTP-based transport **SHOULD** conform to this specification,
 whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
 and instead retrieve credentials from the environment.
@@ -267,3 +267,4 @@ Icons can be attached to:
 * `Resource`: Visual indicator for different resource types
 
 Multiple icons can be provided to support different display contexts and resolutions. Clients should select the most appropriate icon based on their UI requirements.
+

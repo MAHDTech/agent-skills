@@ -89,11 +89,11 @@ reported metadata.
 The field is optional and nullable in every shape where it appears, but the
 effect of `null` follows each protocol version's existing update model:
 
-| Carrier             | Omitted                            | `null`                                                     | String value                       |
-| ------------------- | ---------------------------------- | ---------------------------------------------------------- | ---------------------------------- |
-| v1 `ToolCall`       | No name is provided                | Equivalent to omission                                     | Records the tool name              |
+| Carrier | Omitted | `null` | String value |
+| - | - | - | - |
+| v1 `ToolCall` | No name is provided | Equivalent to omission | Records the tool name |
 | v1 `ToolCallUpdate` | Leaves the existing name unchanged | Equivalent to omission; leaves the existing name unchanged | Sets or replaces the existing name |
-| v2 `ToolCallUpdate` | Leaves the existing name unchanged | Explicitly clears the existing name                        | Sets or replaces the existing name |
+| v2 `ToolCallUpdate` | Leaves the existing name unchanged | Explicitly clears the existing name | Sets or replaces the existing name |
 
 ACP v1 cannot explicitly clear a previously supplied tool name. For a new v2
 `toolCallId`, omission and `null` both result in a tool call with no name.
@@ -119,14 +119,15 @@ consistently in detailed views, permission UI, logs, and debugging tools.
 
 > Tell me more about your implementation. What is your detailed implementation plan?
 
-1. Add optional `name` fields to v1 `ToolCall` and `ToolCallUpdateFields` behind
-   the `unstable_tool_call_name` Rust feature.
-2. Add an optional three-state `name` patch field to v2 `ToolCallUpdate` behind
-   the same feature.
-3. Document how cross-version adapters preserve the field and why the v2 clear
-   operation is not representable in v1.
-4. Regenerate the draft schemas and generated schema documentation.
-5. Update the hand-written draft tool-call documentation and examples.
+The optional `name` field is implemented in the stable v1 and v2 schema
+baselines and SDK types. v1 includes it on `ToolCall` and
+`ToolCallUpdateFields`; v2 includes it as a three-state patch on
+`ToolCallUpdate`. The protocol guides document the version-specific update and
+cross-version conversion semantics.
+
+ACP v2 as a whole remains behind its existing `unstable_protocol_v2` Rust
+feature while the v2 protocol is in Draft. Stabilizing this field does not
+stabilize the rest of v2.
 
 ### Compatibility and conversion
 
@@ -188,3 +189,9 @@ call and inconsistent with MCP and function-call naming.
 ## Revision history
 
 * 2026-07-21: Initial draft.
+* 2026-09-14: Moved to Preview.
+* 2026-09-17: Moved to Completed and stabilized the v1 and v2 schema and SDK
+  surfaces.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

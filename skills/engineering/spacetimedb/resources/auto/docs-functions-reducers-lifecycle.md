@@ -1,356 +1,291 @@
-Version: 2.0.0
-
-On this page
-
-Special reducers handle system events during the database lifecycle.
-
-## Init Reducer
-
-Runs once when the module is first published or when the database is
-cleared.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const init = spacetimedb.init((ctx) => {
-  console.log('Database initializing...');
-  
-  // Set up default data
-  if (ctx.db.settings.count() === 0n) {
-    ctx.db.settings.insert({
-      key: 'welcome_message',
-      value: 'Hello, SpacetimeDB!'
-    });
-  }
-});
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Reducer(ReducerKind.Init)]
-public static void Init(ReducerContext ctx)
-{
-    Log.Info("Database initializing...");
-    
-    // Set up default data
-    if (ctx.Db.Settings.Count == 0)
-    {
-        ctx.Db.Settings.Insert(new Settings
-        {
-            Key = "welcome_message",
-            Value = "Hello, SpacetimeDB!"
-        });
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[reducer(init)]
-pub fn init(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Database initializing...");
-    
-    // Set up default data
-    if ctx.db.settings().count() == 0 {
-        ctx.db.settings().try_insert(Settings {
-            key: "welcome_message".to_string(),
-            value: "Hello, SpacetimeDB!".to_string(),
-        })?;
-    }
-    
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct Settings {
-    std::string key;
-    std::string value;
-};
-SPACETIMEDB_STRUCT(Settings, key, value);
-SPACETIMEDB_TABLE(Settings, settings, Private);
-FIELD_Unique(settings, key);
-
-SPACETIMEDB_INIT(init, ReducerContext ctx) {
-    LOG_INFO("Database initializing...");
-    
-    // Set up default data
-    if (ctx.db[settings].count() == 0) {
-        ctx.db[settings].insert(Settings{
-            "welcome_message",
-            "Hello, SpacetimeDB!"
-        });
-    }
-    
-    return Ok();
-}
-```
-
-The `init` reducer:
-
-- Cannot take arguments beyond `ReducerContext`
-- Runs when publishing with `spacetime publish`
-- Runs when clearing with `spacetime publish -c`
-- Failure prevents publishing or clearing
-
-Module Owner
-
-In the `init` reducer, `ctx.sender()` is the **module owner** — the
-identity of the user who published the database. This is the only place
-where the owner identity is automatically provided, so if you need to
-reference it later (e.g. for authorization), store it in a table during
-`init`:
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-const config = table({ name: 'config' }, {
-  ownerIdentity: t.identity().primaryKey(),
-});
-
-export const init = spacetimedb.init((ctx) => {
-  ctx.db.config.insert({ ownerIdentity: ctx.sender });
-});
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "Config")]
-public partial struct Config
-{
-    [SpacetimeDB.PrimaryKey]
-    public Identity OwnerIdentity;
-}
-
-[SpacetimeDB.Reducer(ReducerKind.Init)]
-public static void Init(ReducerContext ctx)
-{
-    ctx.Db.Config.Insert(new Config { OwnerIdentity = ctx.Sender });
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[table(accessor = config)]
-pub struct Config {
-    #[primary_key]
-    pub owner_identity: Identity,
-}
-
-#[reducer(init)]
-pub fn init(ctx: &ReducerContext) -> Result<(), String> {
-    ctx.db.config().try_insert(Config {
-        owner_identity: ctx.sender(),
-    })?;
-    Ok(())
-}
-```
-
-You can then check `ctx.sender()` against the stored owner identity in
-other reducers to restrict admin-only operations.
-
-## Client Connected
-
-Runs when a client establishes a connection.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const onConnect = spacetimedb.clientConnected((ctx) => {
-  console.log(`Client connected: ${ctx.sender}`);
-  
-  // ctx.connectionId is guaranteed to be defined
-  const connId = ctx.connectionId!;
-  
-  // Initialize client session
-  ctx.db.sessions.insert({
-    connection_id: connId,
-    identity: ctx.sender,
-    connected_at: ctx.timestamp
-  });
-});
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
-public static void OnConnect(ReducerContext ctx)
-{
-    Log.Info($"Client connected: {ctx.Sender}");
-    
-    // ctx.ConnectionId is guaranteed to be non-null
-    var connId = ctx.ConnectionId!.Value;
-    
-    // Initialize client session
-    ctx.Db.Session.Insert(new Session
-    {
-        ConnectionId = connId,
-        Identity = ctx.Sender,
-        ConnectedAt = ctx.Timestamp
-    });
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[reducer(client_connected)]
-pub fn on_connect(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Client connected: {}", ctx.sender());
-    
-    // ctx.connection_id() is guaranteed to be Some(...)
-    let conn_id = ctx.connection_id().unwrap();
-    
-    // Initialize client session
-    ctx.db.sessions().try_insert(Session {
-        connection_id: conn_id,
-        identity: ctx.sender(),
-        connected_at: ctx.timestamp,
-    })?;
-    
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct Session {
-    ConnectionId connection_id;
-    Identity identity;
-    Timestamp connected_at;
-};
-SPACETIMEDB_STRUCT(Session, connection_id, identity, connected_at);
-SPACETIMEDB_TABLE(Session, sessions, Private);
-FIELD_PrimaryKey(sessions, connection_id);
-
-SPACETIMEDB_CLIENT_CONNECTED(on_connect, ReducerContext ctx) {
-    LOG_INFO("Client connected: " + ctx.sender().to_string());
-    
-    // ctx.connection_id is guaranteed to be present
-    auto conn_id = ctx.connection_id.value();
-    
-    // Initialize client session
-    ctx.db[sessions].insert(Session{
-        conn_id,
-        ctx.sender(),
-        ctx.timestamp
-    });
-    
-    return Ok();
-}
-```
-
-The `client_connected` reducer:
-
-- Cannot take arguments beyond `ReducerContext`
-- `ctx.connection_id()` is guaranteed to be present
-- Failure disconnects the client
-- Runs for each distinct connection (WebSocket, HTTP call)
-
-## Client Disconnected
-
-Runs when a client connection terminates.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const onDisconnect = spacetimedb.clientDisconnected((ctx) => {
-  console.log(`Client disconnected: ${ctx.sender}`);
-  
-  // ctx.connectionId is guaranteed to be defined
-  const connId = ctx.connectionId!;
-  
-  // Clean up client session
-  ctx.db.sessions.connection_id.delete(connId);
-});
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]
-public static void OnDisconnect(ReducerContext ctx)
-{
-    Log.Info($"Client disconnected: {ctx.Sender}");
-    
-    // ctx.ConnectionId is guaranteed to be non-null
-    var connId = ctx.ConnectionId!.Value;
-    
-    // Clean up client session
-    ctx.Db.Session.ConnectionId.Delete(connId);
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[reducer(client_disconnected)]
-pub fn on_disconnect(ctx: &ReducerContext) -> Result<(), String> {
-    log::info!("Client disconnected: {}", ctx.sender());
-    
-    // ctx.connection_id() is guaranteed to be Some(...)
-    let conn_id = ctx.connection_id().unwrap();
-    
-    // Clean up client session
-    ctx.db.sessions().connection_id().delete(&conn_id);
-    
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct Session {
-    ConnectionId connection_id;
-    Identity identity;
-    Timestamp connected_at;
-};
-SPACETIMEDB_STRUCT(Session, connection_id, identity, connected_at);
-SPACETIMEDB_TABLE(Session, sessions, Private);
-FIELD_PrimaryKey(sessions, connection_id);
-
-SPACETIMEDB_CLIENT_DISCONNECTED(on_disconnect, ReducerContext ctx) {
-    LOG_INFO("Client disconnected: " + ctx.sender().to_string());
-    
-    // ctx.connection_id is guaranteed to be present
-    auto conn_id = ctx.connection_id.value();
-    
-    // Clean up client session
-    ctx.db[sessions_connection_id].delete_by_key(conn_id);
-    
-    return Ok();
-}
-```
-
-The `client_disconnected` reducer:
-
-- Cannot take arguments beyond `ReducerContext`
-- `ctx.connection_id()` is guaranteed to be present
-- Failure is logged but doesn't prevent disconnection
-- Runs when connection ends (close, timeout, error)
-
-## Scheduled Reducers
-
-Reducers can be triggered at specific times using schedule tables. See
-[Schedule Tables](https://spacetimedb.com/docs/tables/schedule-tables) for details on:
-
-- Defining schedule tables
-- Triggering reducers at specific timestamps
-- Running reducers periodically
-- Canceling scheduled executions
-
-Scheduled Reducer Context
-
-Scheduled reducer calls originate from SpacetimeDB itself, not from a
-client. Therefore:
-
-- `ctx.sender()` will be the module's own identity
-- The connection ID will be absent (`null` in TypeScript, `null` in C#,
-  `None` in Rust, and `std::nullopt` in C++)
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/functions/reducers/lifecycle" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Lifecycle Reducers | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/functions/reducers/lifecycle"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Lifecycle Reducers | SpacetimeDB docs"><meta data-rh="true" name="description" content="Special reducers handle system events during the database lifecycle."><meta data-rh="true" property="og:description" content="Special reducers handle system events during the database lifecycle."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/functions/reducers/lifecycle"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/reducers/lifecycle" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/reducers/lifecycle" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Functions","item":"https://spacetimedb.com/docs/functions"},{"@type":"ListItem","position":2,"name":"Reducers","item":"https://spacetimedb.com/docs/functions/reducers"},{"@type":"ListItem","position":3,"name":"Lifecycle Reducers","item":"https://spacetimedb.com/docs/functions/reducers/lifecycle"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/functions/reducers/lifecycle">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/functions/reducers/lifecycle">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/functions/reducers/lifecycle">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Collapse sidebar category &#x27;Functions&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/functions/reducers"><span title="Reducers" class="categoryLinkLabel_HATI">Reducers</span></a><button aria-label="Collapse sidebar category &#x27;Reducers&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/reducers/reducer-context"><span title="Reducer Context" class="linkLabel_UvDg">Reducer Context</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/functions/reducers/lifecycle"><span title="Lifecycle Reducers" class="linkLabel_UvDg">Lifecycle Reducers</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/reducers/error-handling"><span title="Error Handling" class="linkLabel_UvDg">Error Handling</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/procedures"><span title="Procedures" class="linkLabel_UvDg">Procedures</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/views"><span title="Views" class="linkLabel_UvDg">Views</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/http-handlers"><span title="HTTP Handlers" class="linkLabel_UvDg">HTTP Handlers</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/functions"><span>Functions</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/functions/reducers"><span>Reducers</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Lifecycle Reducers</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Lifecycle Reducers</h1></header><p>Special reducers handle system events during the database lifecycle.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="init-reducer">Init Reducer<a href="#init-reducer" class="hash-link" aria-label="Direct link to Init Reducer" title="Direct link to Init Reducer" translate="no">​</a></h2>
+<p>Runs once when the module is first published or when the database is cleared.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> init </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">init</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Database initializing...</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // Set up default data</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (ctx.db.settings.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">===</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db.settings.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">      key</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">welcome_message</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      value</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">Hello, SpacetimeDB!</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.Init)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Init</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Database initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Set up default data</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.Db.Settings.Count </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.Settings.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Settings</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Key </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">welcome_message</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Value </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Hello, SpacetimeDB!</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[reducer(init)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> init</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Database initializing..."</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Set up default data</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">settings</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">settings</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Settings</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            key</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "welcome_message"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            value</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "Hello, SpacetimeDB!"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Settings</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string key;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string value;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Settings, key, value);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Settings, settings, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Unique</span><span style="color:#F8F8F2">(settings, key);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_INIT</span><span style="color:#F8F8F2">(init, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Database initializing...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Set up default data</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.db[settings].</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[settings].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Settings{</span></span>
+<span class="line"><span style="color:#E9F284">            "</span><span style="color:#F1FA8C">welcome_message</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#E9F284">            "</span><span style="color:#F1FA8C">Hello, SpacetimeDB!</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>The <code>init</code> reducer:</p>
+\<ul\>
+<li class="">Cannot take arguments beyond <code>ReducerContext</code></li>
+<li class="">Runs when publishing with <code>spacetime publish</code></li>
+<li class="">Runs when clearing with <code>spacetime publish -c</code></li>
+<li class="">Failure prevents publishing or clearing</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_Ph9R alert alert--success"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Module Owner</div><div class="admonitionContent_STxx"><p>In the <code>init</code> reducer, <code>ctx.sender()</code> is the <strong>module owner</strong> — the identity of the user who published the database. This is the only place where the owner identity is automatically provided, so if you need to reference it later (e.g. for authorization), store it in a table during <code>init</code>:</p><div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> config </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">config</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> }, {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ownerIdentity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> init </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">init</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.config.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ ownerIdentity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.sender });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Config</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Config</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> OwnerIdentity;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.Init)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Init</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Config.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> { OwnerIdentity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> owner_identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer(init)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> init</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        owner_identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div><p>You can then check <code>ctx.sender()</code> against the stored owner identity in other reducers to restrict admin-only operations.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="client-connected">Client Connected<a href="#client-connected" class="hash-link" aria-label="Direct link to Client Connected" title="Direct link to Client Connected" translate="no">​</a></h2>
+<p>Runs when a client establishes a connection.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> onConnect </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">clientConnected</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Client connected: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">ctx.sender</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // TypeScript exposes this as ConnectionId | null, so guard it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> connId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.connectionId;</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (connId </span><span style="color:#FF79C6">===</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // Initialize client session</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.sessions.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">    connectionId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> connId,</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">    connectedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientConnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnConnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Client connected: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ctx</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Sender</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.ConnectionId is nullable in the API; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.ConnectionId </span><span style="color:#FF79C6">is</span><span style="color:#FF79C6"> not</span><span style="color:#F8F8F2"> { } connId)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Initialize client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Session.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Session</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ConnectionId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> connId,</span></span>
+<span class="line"><span style="color:#F8F8F2">        Identity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">        ConnectedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[reducer(client_connected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> on_connect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Client connected: {}"</span><span style="color:#F8F8F2">, ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.connection_id() returns Option\<ConnectionId\>; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> conn_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">connection_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"client connection ID missing"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Initialize client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sessions</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Session</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        connection_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> conn_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        connected_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Session</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ConnectionId connection_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp connected_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Session, connection_id, identity, connected_at);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Session, sessions, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(sessions, connection_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_CONNECTED</span><span style="color:#F8F8F2">(on_connect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Client connected: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.connection_id is optional; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">ctx.connection_id.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> conn_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.connection_id.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Initialize client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[sessions].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Session{</span></span>
+<span class="line"><span style="color:#F8F8F2">        conn_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>The <code>client_connected</code> reducer:</p>
+\<ul\>
+<li class="">Cannot take arguments beyond <code>ReducerContext</code></li>
+<li class="">Receives the connection ID for the connection being opened. The API exposes
+it as nullable or optional, so guard or unwrap it before use.</li>
+<li class="">Failure disconnects the client</li>
+<li class="">Runs for each distinct connection (WebSocket, HTTP call)</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="client-disconnected">Client Disconnected<a href="#client-disconnected" class="hash-link" aria-label="Direct link to Client Disconnected" title="Direct link to Client Disconnected" translate="no">​</a></h2>
+<p>Runs when a client connection terminates.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> onDisconnect </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">clientDisconnected</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Client disconnected: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">ctx.sender</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // TypeScript exposes this as ConnectionId | null, so guard it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> connId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.connectionId;</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (connId </span><span style="color:#FF79C6">===</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // Clean up client session</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.sessions.connectionId.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(connId);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientDisconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> OnDisconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Client disconnected: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ctx</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Sender</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.ConnectionId is nullable in the API; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.ConnectionId </span><span style="color:#FF79C6">is</span><span style="color:#FF79C6"> not</span><span style="color:#F8F8F2"> { } connId)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Clean up client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Session.ConnectionId.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(connId);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[reducer(client_disconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> on_disconnect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Client disconnected: {}"</span><span style="color:#F8F8F2">, ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.connection_id() returns Option\<ConnectionId\>; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> conn_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">connection_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"client connection ID missing"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Clean up client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sessions</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">connection_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">conn_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Session</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ConnectionId connection_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp connected_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Session, connection_id, identity, connected_at);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Session, sessions, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(sessions, connection_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_DISCONNECTED</span><span style="color:#F8F8F2">(on_disconnect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Client disconnected: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.connection_id is optional; unwrap it before use.</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">ctx.connection_id.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">client connection ID missing</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> conn_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.connection_id.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Clean up client session</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[sessions_connection_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(conn_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>The <code>client_disconnected</code> reducer:</p>
+\<ul\>
+<li class="">Cannot take arguments beyond <code>ReducerContext</code></li>
+<li class="">Receives the connection ID for the connection being closed. The API exposes
+it as nullable or optional, so guard or unwrap it before use.</li>
+<li class="">Failure is logged but doesn&#x27;t prevent disconnection</li>
+<li class="">Runs when connection ends (close, timeout, error)</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="scheduled-reducers">Scheduled Reducers<a href="#scheduled-reducers" class="hash-link" aria-label="Direct link to Scheduled Reducers" title="Direct link to Scheduled Reducers" translate="no">​</a></h2>
+<p>Reducers can be triggered at specific times using schedule tables. See <a class="" href="/docs/tables/schedule-tables">Schedule Tables</a> for details on:</p>
+\<ul\>
+<li class="">Defining schedule tables</li>
+<li class="">Triggering reducers at specific timestamps</li>
+<li class="">Running reducers periodically</li>
+<li class="">Canceling scheduled executions</li>
+</ul>
+<div class="theme-admonition theme-admonition-info admonition_Ph9R alert alert--info"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Scheduled Reducer Context</div><div class="admonitionContent_STxx"><p>Scheduled reducer calls originate from SpacetimeDB itself, not from a client. Therefore:</p>\<ul\>
+<li class=""><code>ctx.sender()</code> will be the module&#x27;s own identity</li>
+<li class="">The connection ID will be absent (<code>null</code> in TypeScript, <code>null</code> in C#, <code>None</code> in Rust, and <code>std::nullopt</code> in C++)</li>
+</ul></div></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00200-functions/00300-reducers/00500-lifecycle.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/functions/reducers/reducer-context"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Reducer Context</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/functions/reducers/error-handling"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Error Handling</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#init-reducer" class="table-of-contents__link toc-highlight">Init Reducer</a></li>\<li\><a href="#client-connected" class="table-of-contents__link toc-highlight">Client Connected</a></li>\<li\><a href="#client-disconnected" class="table-of-contents__link toc-highlight">Client Disconnected</a></li>\<li\><a href="#scheduled-reducers" class="table-of-contents__link toc-highlight">Scheduled Reducers</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

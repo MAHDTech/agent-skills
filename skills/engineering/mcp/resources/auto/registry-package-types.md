@@ -154,7 +154,7 @@ Cargo packages use `"registryType": "cargo"` in `server.json`. For example:
 
 ### Runtime Model
 
-Cargo's runtime model differs from npm/PyPI/NuGet. `cargo install <crate>` places the compiled binary on PATH at `~/.cargo/bin`, after which MCP clients invoke it directly by name. There is no per-invocation runner equivalent to `npx` (npm), `uvx` (PyPI), or `dnx` (NuGet, .NET 10 SDK Preview 6+) — install is one-time, execution is by binary name. The Cargo example above intentionally omits `runtimeHint` for this reason.
+Cargo's runtime model differs from npm/PyPI/NuGet. `cargo install \<crate\>` places the compiled binary on PATH at `~/.cargo/bin`, after which MCP clients invoke it directly by name. There is no per-invocation runner equivalent to `npx` (npm), `uvx` (PyPI), or `dnx` (NuGet, .NET 10 SDK Preview 6+) — install is one-time, execution is by binary name. The Cargo example above intentionally omits `runtimeHint` for this reason.
 
 Rust MCP authors have two first-class distribution paths:
 
@@ -255,3 +255,4 @@ openssl dgst -sha256 image-processor.mcpb
 ```
 
 The MCP Registry does not validate this hash; however, MCP clients **do** validate the hash before installation to ensure file integrity. Downstream registries may also implement their own validation.
+

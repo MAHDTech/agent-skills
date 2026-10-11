@@ -10,9 +10,9 @@ Content blocks represent displayable information that flows through the Agent Cl
 
 Content blocks appear in:
 
-* User prompts sent via [`session/prompt`](https://agentclientprotocol.com/protocol/v1/prompt-turn#1-user-message)
-* Language model output streamed through [`session/update`](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) notifications
-* Progress updates and results from [tool calls](https://agentclientprotocol.com/protocol/v1/tool-calls)
+* User prompts sent via [`session/prompt`](/protocol/v1/prompt-turn#1-user-message)
+* Language model output streamed through [`session/update`](/protocol/v1/prompt-turn#3-agent-reports-output) notifications
+* Progress updates and results from [tool calls](/protocol/v1/tool-calls)
 
 ## Content Types
 
@@ -55,7 +55,7 @@ Images can be included for visual context or analysis.
 ```
 
 <Icon icon="asterisk" size="14" /> Requires the `image` [prompt
-capability](https://agentclientprotocol.com/protocol/v1/initialization#prompt-capabilities) when included in
+capability](/protocol/v1/initialization#prompt-capabilities) when included in
 prompts.
 
 <ParamField path="data" type="string" required>
@@ -88,7 +88,7 @@ Audio data for transcription or analysis.
 ```
 
 <Icon icon="asterisk" size="14" /> Requires the `audio` [prompt
-capability](https://agentclientprotocol.com/protocol/v1/initialization#prompt-capabilities) when included in
+capability](/protocol/v1/initialization#prompt-capabilities) when included in
 prompts.
 
 <ParamField path="data" type="string" required>
@@ -124,7 +124,7 @@ This is the preferred way to include context in prompts, such as when using @-me
 By embedding the content directly in the request, Clients can include context from sources that the Agent may not have direct access to.
 
 <Icon icon="asterisk" size="14" /> Requires the `embeddedContext` [prompt
-capability](https://agentclientprotocol.com/protocol/v1/initialization#prompt-capabilities) when included in
+capability](/protocol/v1/initialization#prompt-capabilities) when included in
 prompts.
 
 <ParamField path="resource" type="EmbeddedResourceResource" required>
@@ -206,3 +206,6 @@ References to resources that the Agent can access.
   Optional metadata about how the content should be used or displayed. [Learn
   more](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations).
 </ParamField>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

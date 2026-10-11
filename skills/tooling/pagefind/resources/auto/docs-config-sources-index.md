@@ -37,3 +37,4 @@ Pagefind can be passed CLI flags directly.
 ```bash
 npx pagefind --site public --output-subdir pagefind
 ```
+

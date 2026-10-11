@@ -7,7 +7,7 @@
 > Authenticating with agents and logging out
 
 ACP authentication is negotiated during
-[initialization](https://agentclientprotocol.com/protocol/v2/initialization). Agents advertise available
+[initialization](/protocol/v2/initialization). Agents advertise available
 authentication methods in `authMethods`. A non-empty list makes `auth/login`
 and `auth/logout` available, while each authentication method type defines
 whether the Client invokes `auth/login`.
@@ -74,7 +74,12 @@ authentication-related extensions, not the availability of the baseline
         "type": "agent",
         "description": "Sign in using the agent's login flow"
       }
-    ]
+    ],
+    "info": {
+      "name": "my-agent",
+      "title": "My Agent",
+      "version": "1.0.0"
+    }
   }
 }
 ```
@@ -136,6 +141,11 @@ during initialization with `capabilities.auth.terminal`:
       "auth": {
         "terminal": {}
       }
+    },
+    "info": {
+      "name": "my-client",
+      "title": "My Client",
+      "version": "1.0.0"
     }
   }
 }
@@ -146,9 +156,9 @@ advertise support. Supplying `{}` means the Client can reproduce the configured
 Agent invocation in an interactive terminal. An Agent may advertise a
 `terminal` method only when this capability is present.
 
-See the [schema](https://agentclientprotocol.com/protocol/v2/schema#authmethod) for the full
+See the [schema](/protocol/v2/schema#authmethod) for the full
 `AuthMethod` definitions and the [Terminal Authentication
-RFD](https://agentclientprotocol.com/rfds/auth-methods) for the design.
+RFD](/rfds/auth-methods) for the design.
 
 ## Agent-handled authentication
 
@@ -246,3 +256,6 @@ The protocol does not guarantee what happens to already-running sessions after
 Clients **SHOULD** be prepared for active session operations to fail with
 authentication-related errors after logout and should prompt the user to
 authenticate again when appropriate.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

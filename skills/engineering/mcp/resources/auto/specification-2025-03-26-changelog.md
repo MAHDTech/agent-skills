@@ -5,15 +5,15 @@
 # Key Changes
 
 This document lists changes made to the Model Context Protocol (MCP) specification since
-the previous revision, [2024-11-05](https://modelcontextprotocol.io/specification/2024-11-05).
+the previous revision, [2024-11-05](/specification/2024-11-05).
 
 ## Major changes
 
-1. Added a comprehensive **[authorization framework](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization)**
+1. Added a comprehensive **[authorization framework](/specification/2025-03-26/basic/authorization)**
    based on OAuth 2.1 (PR
    [#133](https://github.com/modelcontextprotocol/specification/pull/133))
 2. Replaced the previous HTTP+SSE transport with a more flexible **[Streamable HTTP
-   transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http)** (PR
+   transport](/specification/2025-03-26/basic/transports#streamable-http)** (PR
    [#206](https://github.com/modelcontextprotocol/specification/pull/206))
 3. Added support for JSON-RPC **[batching](https://www.jsonrpc.org/specification#batch)**
    (PR [#228](https://github.com/modelcontextprotocol/specification/pull/228))
@@ -36,3 +36,4 @@ for more details.
 
 For a complete list of all changes that have been made since the last protocol revision,
 [see GitHub](https://github.com/modelcontextprotocol/specification/compare/2024-11-05...2025-03-26).
+

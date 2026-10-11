@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-filter-dropdown\>
+# <pagefind-filter-dropdown>
 
 
 A dropdown selector for a single filter.
@@ -51,10 +51,11 @@ When you type characters while the dropdown is open:
 
 ## Faceted Search Mode
 
-For catalog-style interfaces where users browse by filters without requiring a search term, enable faceted mode via [`<pagefind-config>`](https://pagefind.app/docs/components/config/):
+For catalog-style interfaces where users browse by filters without requiring a search term, enable faceted mode via [`<pagefind-config>`](/docs/components/config/):
 
 ```html
 <pagefind-config faceted preload></pagefind-config>
 ```
 
-In faceted mode, all results are shown initially and update immediately when filters are changed. See the [config component documentation](https://pagefind.app/docs/components/config/#faceted-search-mode) for details.
+In faceted mode, all results are shown initially and update immediately when filters are changed. See the [config component documentation](/docs/components/config/#faceted-search-mode) for details.
+

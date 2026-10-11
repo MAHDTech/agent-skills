@@ -1,462 +1,288 @@
-Version: 2.0.0
-
-On this page
-
-Every reducer receives a special context parameter as its first
-argument. This context provides read-write access to the database,
-information about the caller, and additional utilities like random
-number generation.
-
-The reducer context is required for accessing tables, executing database
-operations, and retrieving metadata about the current reducer
-invocation.
-
-## Accessing the Database
-
-The primary purpose of the reducer context is to provide access to the
-module's database tables.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { schema, table, t } from 'spacetimedb/server';
-
-const user = table(
-  { name: 'user', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    name: t.string(),
-  }
-);
-
-const spacetimedb = schema({ user });
-export default spacetimedb;
-
-export const create_user = spacetimedb.reducer({ name: t.string() }, (ctx, { name }) => {
-  ctx.db.user.insert({ id: 0n, name });
-});
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table]
-    public partial struct User
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong id;
-        public string name;
-    }
-
-    [SpacetimeDB.Reducer]
-    public static void CreateUser(ReducerContext ctx, string name)
-    {
-        ctx.Db.User.Insert(new User { id = 0, name = name });
-    }
-}
-```
-
-C# table accessors
-
-Table accessors use PascalCase: `ctx.Db.User`, `ctx.Db.Player`. The
-codegen derives these from table names.
-
-Required for Reducers
-
-Every reducer that uses `ctx.db.*.insert()`, `.iter()`, `.get_by_id()`,
-etc. **must** include `Table` in its imports:
-`use spacetimedb::{..., Table};` Without it you get:
-`no method named 'insert' found`.
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{table, reducer, ReducerContext, Table};
-
-#[table(accessor = user)]
-pub struct User {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    name: String,
-}
-
-#[reducer]
-fn create_user(ctx: &ReducerContext, name: String) {
-    ctx.db.user().insert(User { id: 0, name });
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct User {
-    uint64_t id;
-    std::string name;
-};
-SPACETIMEDB_STRUCT(User, id, name);
-SPACETIMEDB_TABLE(User, user, Public);
-FIELD_PrimaryKeyAutoInc(user, id);
-
-SPACETIMEDB_REDUCER(create_user, ReducerContext ctx, std::string name) {
-    ctx.db[user].insert(User{0, name});
-    return Ok();
-}
-```
-
-## Caller Information
-
-The context provides information about who invoked the reducer and when.
-
-### Sender Identity
-
-Every reducer invocation has an associated caller identity.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { schema, table, t } from 'spacetimedb/server';
-
-const player = table(
-  { name: 'player', public: true },
-  {
-    identity: t.identity().primaryKey(),
-    name: t.string(),
-    score: t.u32(),
-  }
-);
-
-const spacetimedb = schema({ player });
-export default spacetimedb;
-
-export const update_score = spacetimedb.reducer({ newScore: t.u32() }, (ctx, { newScore }) => {
-  // Get the caller's identity
-  const caller = ctx.sender;
-  
-  // Find and update their player record
-  const existingPlayer = ctx.db.player.identity.find(caller);
-  if (existingPlayer) {
-    ctx.db.player.identity.update({
-      ...existingPlayer,
-      score: newScore,
-    });
-  }
-});
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table]
-    public partial struct Player
-    {
-        [SpacetimeDB.PrimaryKey]
-        public Identity Identity;
-        public string Name;
-        public uint Score;
-    }
-
-    [SpacetimeDB.Reducer]
-    public static void UpdateScore(ReducerContext ctx, uint newScore)
-    {
-        // Get the caller's identity
-        Identity caller = ctx.Sender;
-        
-        // Find and update their player record
-        if (ctx.Db.Player.Identity.Find(caller) is Player player)
-        {
-            player.Score = newScore;
-            ctx.Db.Player.Identity.Update(player);
-        }
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{table, reducer, ReducerContext, Identity, Table};
-
-#[table(accessor = player)]
-pub struct Player {
-    #[primary_key]
-    identity: Identity,
-    name: String,
-    score: u32,
-}
-
-#[reducer]
-fn update_score(ctx: &ReducerContext, new_score: u32) {
-    // Get the caller's identity
-    let caller = ctx.sender();
-    
-    // Find and update their player record
-    if let Some(mut player) = ctx.db.player().identity().find(caller) {
-        player.score = new_score;
-        ctx.db.player().identity().update(player);
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct Player {
-    Identity identity;
-    std::string name;
-    uint32_t score;
-};
-SPACETIMEDB_STRUCT(Player, identity, name, score);
-SPACETIMEDB_TABLE(Player, player, Public);
-FIELD_PrimaryKey(player, identity);
-
-SPACETIMEDB_REDUCER(update_score, ReducerContext ctx, uint32_t new_score) {
-    // Get the caller's identity
-    auto caller = ctx.sender();
-    
-    // Find and update their player record
-    if (auto player = ctx.db[player_identity].find(caller)) {
-        player->score = new_score;
-        ctx.db[player_identity].update(*player);
-    }
-    return Ok();
-}
-```
-
-### Connection ID
-
-The connection ID identifies the specific client connection that invoked
-the reducer. This is useful for tracking sessions or implementing
-per-connection state.
-
-note
-
-The connection ID may be absent for reducers invoked by the system (such
-as scheduled reducers or lifecycle reducers) or when called via the CLI
-without specifying a connection. In TypeScript modules,
-`ctx.connectionId` is `ConnectionId | null`.
-
-### Timestamp
-
-The timestamp indicates when the reducer was invoked. This value is
-consistent throughout the reducer execution and is useful for
-timestamping events or implementing time-based logic.
-
-## Random Number Generation
-
-The context provides access to a random number generator that is
-deterministic and reproducible. This ensures that reducer execution is
-consistent across all nodes in a distributed system.
-
-warning
-
-Never use external random number generators (like `Random` in C# without
-using the context). These are non-deterministic and will cause different
-nodes to produce different results, breaking consensus.
-
-Use the context-provided random API for any reducer logic that needs
-random values:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-const fraction = ctx.random();                         // [0.0, 1.0)
-const roll = ctx.random.integerInRange(1, 6);          // inclusive
-const bytes = ctx.random.fill(new Uint8Array(16));
-```
-
-``` codeBlockStandalone_LlrK
-double fraction = ctx.Rng.NextDouble();  // [0.0, 1.0)
-int roll = ctx.Rng.Next(1, 7);           // [1, 7)
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::rand::Rng;
-
-let value: u32 = ctx.random();
-let roll: u32 = ctx.rng().gen_range(1..=6);
-```
-
-``` codeBlockStandalone_LlrK
-auto& rng = ctx.rng();
-int32_t roll = rng.gen_range(1, 6);  // inclusive
-```
-
-## Module Identity
-
-The context provides access to the module's own identity, which is
-useful when a reducer needs to refer to the database itself.
-
-Scheduled reducers and procedures are private by default in SpacetimeDB
-2.x, so you do not need to compare the sender against the module
-identity to prevent ordinary clients from calling them directly. If you
-need both a scheduled function and a client-callable entry point, keep
-the scheduled function private and define a separate public reducer that
-wraps the shared logic.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { schema, table, t } from 'spacetimedb/server';
-
-const scheduledTask = table(
-  { name: 'scheduled_task' },
-  {
-    taskId: t.u64().primaryKey().autoInc(),
-    scheduledAt: t.scheduleAt(),
-    message: t.string(),
-  }
-);
-
-const spacetimedb = schema({ scheduledTask });
-export default spacetimedb;
-
-export const sendReminder = spacetimedb.reducer(
-  { onSchedule: scheduledTask },
-  { arg: scheduledTask.rowType },
-  (_ctx, { arg }) => {
-    console.log(`Reminder: ${arg.message}`);
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "ScheduledTask", Scheduled = nameof(SendReminder), ScheduledAt = nameof(ScheduledAt))]
-    public partial struct ScheduledTask
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong TaskId;
-        public ScheduleAt ScheduledAt;
-        public string Message;
-    }
-
-    [SpacetimeDB.Reducer]
-    public static void SendReminder(ReducerContext _ctx, ScheduledTask task)
-    {
-        Log.Info($"Reminder: {task.Message}");
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{table, reducer, ReducerContext, ScheduleAt};
-
-#[table(accessor = scheduled_task, scheduled(send_reminder))]
-pub struct ScheduledTask {
-    #[primary_key]
-    #[auto_inc]
-    task_id: u64,
-    scheduled_at: ScheduleAt,
-    message: String,
-}
-
-#[reducer]
-fn send_reminder(_ctx: &ReducerContext, task: ScheduledTask) {
-    spacetimedb::log::info!("Reminder: {}", task.message);
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct ScheduledTask {
-    uint64_t task_id;
-    ScheduleAt scheduled_at;
-    std::string message;
-};
-SPACETIMEDB_STRUCT(ScheduledTask, task_id, scheduled_at, message);
-SPACETIMEDB_TABLE(ScheduledTask, scheduled_task, Private);
-FIELD_PrimaryKeyAutoInc(scheduled_task, task_id);
-
-// Register the table for scheduling (column 1 = scheduled_at field, 0-based index)
-SPACETIMEDB_SCHEDULE(scheduled_task, 1, send_reminder);
-
-SPACETIMEDB_REDUCER(send_reminder, ReducerContext _ctx, ScheduledTask task) {
-    LOG_INFO("Reminder: " + task.message);
-    return Ok();
-}
-```
-
-## Context Properties Reference
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-| Property | Type | Description |
-|----|----|----|
-| `db` | `DbView` | Access to the module's database tables |
-| `sender` | `Identity` | Identity of the caller |
-| `senderAuth` | `AuthCtx` | Authorization context for the caller (includes JWT claims and internal call detection) |
-| `connectionId` | `ConnectionId | null` | Connection ID of the caller, if available |
-| `timestamp` | `Timestamp` | Time when the reducer was invoked |
-| `random` | `Random` | Random number generator (deterministic, seeded by SpacetimeDB) |
-
-| Property | Type | Description |
-|----|----|----|
-| `Db` | `DbView` | Access to the module's database tables |
-| `Sender` | `Identity` | Identity of the caller |
-| `SenderAuth` | `AuthCtx` | Authorization context for the caller (includes JWT claims and internal call detection) |
-| `ConnectionId` | `ConnectionId?` | Connection ID of the caller, if available |
-| `Timestamp` | `Timestamp` | Time when the reducer was invoked |
-| `Rng` | `Random` | Random number generator |
-| `DatabaseIdentity` | `Identity` | The module's identity |
-
-| Property | Type | Description |
-|----|----|----|
-| `db` | `Local` | Access to the module's database tables |
-| `sender` | `Identity` | Identity of the caller |
-| `connection_id` | `Option<ConnectionId>` | Connection ID of the caller, if available |
-| `timestamp` | `Timestamp` | Time when the reducer was invoked |
-
-**Methods:**
-
-- `database_identity() -> Identity` - Get the module's identity
-- `rng() -> &StdbRng` - Get the random number generator
-- `random\<T\>() -> T` - Generate a single random value
-- `sender_auth() -> &AuthCtx` - Get authorization context for the caller
-  (includes JWT claims and internal call detection)
-
-| Property | Type | Description |
-|----|----|----|
-| `db[table]` | `Table<T>` | Access to a specific table's operations |
-| `sender` | `Identity` | Identity of the caller |
-| `timestamp` | `Timestamp` | Time when the reducer was invoked |
-| `connection_id` | `std::optional<ConnectionId>` | Connection ID of the caller, if available |
-
-**Methods:**
-
-- `database_identity() -> Identity` - Get the module's identity
-- `rng() -> StdbRng&` - Get the random number generator (deterministic
-  and reproducible)
-- `sender_auth() -> const AuthCtx&` - Get authorization context for the
-  caller (includes JWT claims and internal call detection)
-
-note
-
-C++ uses the `std::optional` type for the `connection_id` to represent
-values that may not be present. The `rng()` method returns a
-deterministic random number generator that is seeded consistently across
-all nodes.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/functions/reducers/reducer-context" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Reducer Context | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/functions/reducers/reducer-context"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Reducer Context | SpacetimeDB docs"><meta data-rh="true" name="description" content="Every reducer receives a special context parameter as its first argument. This context provides read-write access to the database, information about the caller, and additional utilities like random number generation."><meta data-rh="true" property="og:description" content="Every reducer receives a special context parameter as its first argument. This context provides read-write access to the database, information about the caller, and additional utilities like random number generation."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/functions/reducers/reducer-context"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/reducers/reducer-context" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/reducers/reducer-context" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Functions","item":"https://spacetimedb.com/docs/functions"},{"@type":"ListItem","position":2,"name":"Reducers","item":"https://spacetimedb.com/docs/functions/reducers"},{"@type":"ListItem","position":3,"name":"Reducer Context","item":"https://spacetimedb.com/docs/functions/reducers/reducer-context"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/functions/reducers/reducer-context">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/functions/reducers/reducer-context">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/functions/reducers/reducer-context">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Collapse sidebar category &#x27;Functions&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/functions/reducers"><span title="Reducers" class="categoryLinkLabel_HATI">Reducers</span></a><button aria-label="Collapse sidebar category &#x27;Reducers&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/functions/reducers/reducer-context"><span title="Reducer Context" class="linkLabel_UvDg">Reducer Context</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/reducers/lifecycle"><span title="Lifecycle Reducers" class="linkLabel_UvDg">Lifecycle Reducers</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/reducers/error-handling"><span title="Error Handling" class="linkLabel_UvDg">Error Handling</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/procedures"><span title="Procedures" class="linkLabel_UvDg">Procedures</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/views"><span title="Views" class="linkLabel_UvDg">Views</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/http-handlers"><span title="HTTP Handlers" class="linkLabel_UvDg">HTTP Handlers</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/functions"><span>Functions</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/functions/reducers"><span>Reducers</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Reducer Context</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Reducer Context</h1></header><p>Every reducer receives a special context parameter as its first argument. This context provides read-write access to the database, information about the caller, and additional utilities like random number generation.</p>
+<p>The reducer context is required for accessing tables, executing database operations, and retrieving metadata about the current reducer invocation.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="accessing-the-database">Accessing the Database<a href="#accessing-the-database" class="hash-link" aria-label="Direct link to Accessing the Database" title="Direct link to Accessing the Database" translate="no">​</a></h2>
+<p>The primary purpose of the reducer context is to provide access to the module&#x27;s database tables.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ user });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> createUser </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">name</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.user.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">, name });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> CreateUser</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> name</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.User.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> { id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> name });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>C# table accessors</div><div class="admonitionContent_STxx"><p>Table accessors use PascalCase: <code>ctx.Db.User</code>, <code>ctx.Db.Player</code>. The codegen derives these from table names.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Required for Reducers</div><div class="admonitionContent_STxx"><p>Every reducer that uses <code>ctx.db.*.insert()</code>, <code>.iter()</code>, <code>.get_by_id()</code>, etc. <strong>must</strong> include <code>Table</code> in its imports:
+<code>use spacetimedb::{..., Table};</code>
+Without it you get: <code>no method named &#x27;insert&#x27; found</code>.</p></div></div><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{table, reducer, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> create_user</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">User</span><span style="color:#F8F8F2"> { id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, name });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(User, id, name);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(User, user, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(user, id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(create_user, ReducerContext ctx, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[user].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(User{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, name});</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="caller-information">Caller Information<a href="#caller-information" class="hash-link" aria-label="Direct link to Caller Information" title="Direct link to Caller Information" translate="no">​</a></h2>
+<p>The context provides information about who invoked the reducer and when.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="sender-identity">Sender Identity<a href="#sender-identity" class="hash-link" aria-label="Direct link to Sender Identity" title="Direct link to Sender Identity" translate="no">​</a></h3>
+<p>Every reducer invocation has an associated caller identity.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    score</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ player });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> updateScore </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ newScore</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">newScore</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // Get the caller&#x27;s identity</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> caller </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.sender;</span></span>
+<span class="line"><span style="color:#F8F8F2">  </span></span>
+<span class="line"><span style="color:#6272A4">  // Find and update their player record</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> existingPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.identity.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(caller);</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (existingPlayer) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db.player.identity.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#FF79C6">      ...</span><span style="color:#F8F8F2">existingPlayer,</span></span>
+<span class="line"><span style="color:#F8F8F2">      score</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> newScore,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Identity;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Score;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UpdateScore</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> newScore</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Get the caller&#x27;s identity</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Identity</span><span style="color:#F8F8F2"> caller </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender;</span></span>
+<span class="line"><span style="color:#F8F8F2">        </span></span>
+<span class="line"><span style="color:#6272A4">        // Find and update their player record</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (ctx.Db.Player.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(caller) </span><span style="color:#FF79C6">is</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> player)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            player.Score </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> newScore;</span></span>
+<span class="line"><span style="color:#F8F8F2">            ctx.Db.Player.Identity.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{table, reducer, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    score</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> update_score</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, new_score</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Get the caller&#x27;s identity</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> caller </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Find and update their player record</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">mut</span><span style="color:#F8F8F2"> player) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(caller) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">score </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_score;</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> score;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, identity, name, score);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(player, identity);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(update_score, ReducerContext ctx, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2"> new_score) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Get the caller&#x27;s identity</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> caller </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Find and update their player record</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(caller)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        player</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">score </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_score;</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[player_identity].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">player);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connection-id">Connection ID<a href="#connection-id" class="hash-link" aria-label="Direct link to Connection ID" title="Direct link to Connection ID" translate="no">​</a></h3>
+<p>The connection ID identifies the specific client connection that invoked the reducer. This is useful for tracking sessions or implementing per-connection state.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>The connection ID is present only when the reducer invocation is associated with a client connection. Reducers invoked by <code>init</code>, scheduled reducers, and some CLI or internal calls may not have one. Client-connected and client-disconnected reducers receive the connection ID for the connection being opened or closed.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="timestamp">Timestamp<a href="#timestamp" class="hash-link" aria-label="Direct link to Timestamp" title="Direct link to Timestamp" translate="no">​</a></h3>
+<p>The timestamp indicates when the reducer was invoked. This value is consistent throughout the reducer execution and is useful for timestamping events or implementing time-based logic.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="random-number-generation">Random Number Generation<a href="#random-number-generation" class="hash-link" aria-label="Direct link to Random Number Generation" title="Direct link to Random Number Generation" translate="no">​</a></h2>
+<p>The context provides access to a random number generator that is deterministic and reproducible. This ensures that reducer execution is consistent across all nodes in a distributed system.</p>
+<div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>Never use external random number generators (like <code>Random</code> in C# without using the context). These are non-deterministic and will cause different nodes to produce different results, breaking consensus.</p></div></div>
+<p>Use the context-provided random API for any reducer logic that needs random values:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> fraction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">random</span><span style="color:#F8F8F2">();                         </span><span style="color:#6272A4">// [0.0, 1.0)</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> roll </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.random.</span><span style="color:#50FA7B">integerInRange</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">6</span><span style="color:#F8F8F2">);          </span><span style="color:#6272A4">// inclusive</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> bytes </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.random.</span><span style="color:#50FA7B">fill</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6;font-weight:bold">new</span><span style="color:#50FA7B"> Uint8Array</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">16</span><span style="color:#F8F8F2">));</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">double</span><span style="color:#F8F8F2"> fraction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Rng.</span><span style="color:#50FA7B">NextDouble</span><span style="color:#F8F8F2">();  </span><span style="color:#6272A4">// [0.0, 1.0)</span></span>
+<span class="line"><span style="color:#FF79C6">int</span><span style="color:#F8F8F2"> roll </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Rng.</span><span style="color:#50FA7B">Next</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">7</span><span style="color:#F8F8F2">);           </span><span style="color:#6272A4">// [1, 7)</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">rand</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Rng</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> value</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">random</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> roll</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#FF79C6">..=</span><span style="color:#BD93F9">6</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">auto&</span><span style="color:#F8F8F2"> rng </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2"> roll </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> rng.</span><span style="color:#50FA7B">gen_range</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">6</span><span style="color:#F8F8F2">);</span><span style="color:#6272A4">  // inclusive</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="module-identity">Module Identity<a href="#module-identity" class="hash-link" aria-label="Direct link to Module Identity" title="Direct link to Module Identity" translate="no">​</a></h2>
+<p>The context provides access to the module&#x27;s own identity, which is useful when a reducer needs to refer to the database itself.</p>
+<p>Scheduled reducers and procedures are private by default in SpacetimeDB 2.x, so you do not need to compare the sender against the module identity to prevent ordinary clients from calling them directly. If you need both a scheduled function and a client-callable entry point, keep the scheduled function private and define a separate public reducer that wraps the shared logic.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> scheduledTask </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">scheduled_task</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    taskId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduledAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">scheduleAt</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    message</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ scheduledTask });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> sendReminder </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { onSchedule</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> scheduledTask },</span></span>
+<span class="line"><span style="color:#F8F8F2">  { arg</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> scheduledTask.rowType },</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">_ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">arg</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Reminder: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">arg.message</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">ScheduledTask</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Scheduled </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(SendReminder), ScheduledAt </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(ScheduledAt))]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> ScheduledTask</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> TaskId;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2"> ScheduledAt;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Message;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SendReminder</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> _ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ScheduledTask</span><span style="color:#FFB86C;font-style:italic"> task</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Reminder: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">task</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Message</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{table, reducer, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ScheduleAt</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> scheduled_task, scheduled(send_reminder))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> ScheduledTask</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    task_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    message</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> send_reminder</span><span style="color:#F8F8F2">(_ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, task</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> ScheduledTask</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Reminder: {}"</span><span style="color:#F8F8F2">, task</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">message);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> ScheduledTask</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> task_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ScheduleAt scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string message;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(ScheduledTask, task_id, scheduled_at, message);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(ScheduledTask, scheduled_task, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(scheduled_task, task_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Register the table for scheduling (column 1 = scheduled_at field, 0-based index)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_SCHEDULE</span><span style="color:#F8F8F2">(scheduled_task, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, send_reminder);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(send_reminder, ReducerContext _ctx, ScheduledTask task) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Reminder: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> task.message);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="context-properties-reference">Context Properties Reference<a href="#context-properties-reference" class="hash-link" aria-label="Direct link to Context Properties Reference" title="Direct link to Context Properties Reference" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>db</code></td><td><code>DbView</code></td><td>Access to the module&#x27;s database tables</td></tr><tr><td><code>sender</code></td><td><code>Identity</code></td><td>Identity of the caller</td></tr><tr><td><code>senderAuth</code></td><td><code>AuthCtx</code></td><td>Authorization context for the caller (includes JWT claims and internal call detection)</td></tr><tr><td><code>connectionId</code></td><td><code>ConnectionId | null</code></td><td>Connection ID of the caller, if available</td></tr><tr><td><code>timestamp</code></td><td><code>Timestamp</code></td><td>Time when the reducer was invoked</td></tr><tr><td><code>random</code></td><td><code>Random</code></td><td>Random number generator (deterministic, seeded by SpacetimeDB)</td></tr></tbody></table></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>Db</code></td><td><code>DbView</code></td><td>Access to the module&#x27;s database tables</td></tr><tr><td><code>Sender</code></td><td><code>Identity</code></td><td>Identity of the caller</td></tr><tr><td><code>SenderAuth</code></td><td><code>AuthCtx</code></td><td>Authorization context for the caller (includes JWT claims and internal call detection)</td></tr><tr><td><code>ConnectionId</code></td><td><code>ConnectionId?</code></td><td>Connection ID of the caller, if available</td></tr><tr><td><code>Timestamp</code></td><td><code>Timestamp</code></td><td>Time when the reducer was invoked</td></tr><tr><td><code>Rng</code></td><td><code>Random</code></td><td>Random number generator</td></tr><tr><td><code>DatabaseIdentity</code></td><td><code>Identity</code></td><td>The module&#x27;s identity</td></tr></tbody></table></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>db</code></td><td><code>Local</code></td><td>Access to the module&#x27;s database tables</td></tr><tr><td><code>sender</code></td><td><code>Identity</code></td><td>Identity of the caller</td></tr><tr><td><code>connection_id</code></td><td><code>Option\<ConnectionId\></code></td><td>Connection ID of the caller, if available</td></tr><tr><td><code>timestamp</code></td><td><code>Timestamp</code></td><td>Time when the reducer was invoked</td></tr></tbody></table><p><strong>Methods:</strong></p>\<ul\>
+<li class=""><code>database_identity() -> Identity</code> - Get the module&#x27;s identity</li>
+<li class=""><code>rng() -> &StdbRng</code> - Get the random number generator</li>
+<li class=""><code>random\<T\>() -> T</code> - Generate a single random value</li>
+<li class=""><code>sender_auth() -> &AuthCtx</code> - Get authorization context for the caller (includes JWT claims and internal call detection)</li>
+</ul></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><table><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>db[table]</code></td><td><code>Table\<T\></code></td><td>Access to a specific table&#x27;s operations</td></tr><tr><td><code>sender</code></td><td><code>Identity</code></td><td>Identity of the caller</td></tr><tr><td><code>timestamp</code></td><td><code>Timestamp</code></td><td>Time when the reducer was invoked</td></tr><tr><td><code>connection_id</code></td><td><code>std::optional\<ConnectionId\></code></td><td>Connection ID of the caller, if available</td></tr></tbody></table><p><strong>Methods:</strong></p>\<ul\>
+<li class=""><code>database_identity() -> Identity</code> - Get the module&#x27;s identity</li>
+<li class=""><code>rng() -> StdbRng&</code> - Get the random number generator (deterministic and reproducible)</li>
+<li class=""><code>sender_auth() -> const AuthCtx&</code> - Get authorization context for the caller (includes JWT claims and internal call detection)</li>
+</ul><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>C++ uses the <code>std::optional</code> type for the <code>connection_id</code> to represent values that may not be present. The <code>rng()</code> method returns a deterministic random number generator that is seeded consistently across all nodes.</p></div></div></div></div></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00200-functions/00300-reducers/00400-reducer-context.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/functions/reducers"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Overview</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/functions/reducers/lifecycle"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Lifecycle Reducers</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#accessing-the-database" class="table-of-contents__link toc-highlight">Accessing the Database</a></li>\<li\><a href="#caller-information" class="table-of-contents__link toc-highlight">Caller Information</a>\<ul\>\<li\><a href="#sender-identity" class="table-of-contents__link toc-highlight">Sender Identity</a></li>\<li\><a href="#connection-id" class="table-of-contents__link toc-highlight">Connection ID</a></li>\<li\><a href="#timestamp" class="table-of-contents__link toc-highlight">Timestamp</a></li></ul></li>\<li\><a href="#random-number-generation" class="table-of-contents__link toc-highlight">Random Number Generation</a></li>\<li\><a href="#module-identity" class="table-of-contents__link toc-highlight">Module Identity</a></li>\<li\><a href="#context-properties-reference" class="table-of-contents__link toc-highlight">Context Properties Reference</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

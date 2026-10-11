@@ -1,924 +1,678 @@
-Version: 2.0.0
-
-On this page
-
-Quick reference for SpacetimeDB module syntax across Rust, C#,
-TypeScript, and C++.
-
-## Project Setup
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang typescript --project-path my-project my-project
-cd my-project
-spacetime login
-spacetime publish <DATABASE_NAME>
-```
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang csharp --project-path my-project my-project
-cd my-project
-spacetime login
-spacetime publish <DATABASE_NAME>
-```
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang rust --project-path my-project my-project
-cd my-project
-spacetime login
-spacetime publish <DATABASE_NAME>
-```
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang cpp --project-path my-project my-project
-cd my-project
-spacetime login
-spacetime publish <DATABASE_NAME>
-```
-
-## Tables
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-// Basic table
-const player = table(
-  { name: 'player', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    username: t.string().unique(),
-    score: t.i32().index('btree'),
-  }
-);
-
-// Multi-column index
-const score = table(
-  {
-    name: 'score',
-    indexes: [{
-      accessor: 'idx',
-      algorithm: 'btree',
-      columns: ['player_id', 'level'],
-    }],
-  },
-  {
-    player_id: t.u64(),
-    level: t.u32(),
-  }
-);
-
-// Custom types
-const status = t.enum('Status', ['Active', 'Inactive']);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-// Basic table
-[SpacetimeDB.Table(Accessor = "Player", Public = true)]
-public partial struct Player
-{
-    [SpacetimeDB.PrimaryKey]
-    [SpacetimeDB.AutoInc]
-    public ulong Id;
-    
-    [SpacetimeDB.Unique]
-    public string Username;
-    
-    [SpacetimeDB.Index.BTree]
-    public int Score;
-}
-
-// Multi-column index (use new[] for attribute params — collection expressions invalid in attributes)
-[SpacetimeDB.Table(Accessor = "Score")]
-[SpacetimeDB.Index.BTree(Accessor = "idx", Columns = new[] { "PlayerId", "Level" })]
-public partial struct Score
-{
-    public ulong PlayerId;
-    public uint Level;
-}
-
-// Sum types: TaggedEnum with partial record (not partial class)
-[SpacetimeDB.Type]
-public partial record Status : TaggedEnum<(Unit Active, Unit Inactive)> { }
-```
-
-Table access
-
-Table accessors use **snake_case**. Use `ctx.db.player()` not
-`ctx.db.Player`.
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{table, SpacetimeType};
-
-// Basic table
-#[table(accessor = player, public)]
-pub struct Player {
-    #[primary_key]
-    #[auto_inc]
-    pub id: u64,
-    #[unique]
-    pub username: String,
-    #[index(btree)]
-    pub score: i32,
-}
-
-// Multi-column index
-#[table(accessor = score, index(accessor = idx, btree(columns = [player_id, level])))]
-pub struct Score {
-    pub player_id: u64,
-    pub level: u32,
-}
-
-// Custom types (product types need #[derive(SpacetimeType)])
-#[derive(SpacetimeType)]
-pub enum Status {
-    Active,
-    Inactive,
-}
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-// Basic table
-struct Player {
-  uint64_t id;
-  std::string username;
-  int32_t score;
-};
-SPACETIMEDB_STRUCT(Player, id, username, score);
-SPACETIMEDB_TABLE(Player, player, Public);
-FIELD_PrimaryKeyAutoInc(player, id);
-FIELD_Unique(player, username);
-FIELD_Index(player, score);
-
-// Multi-column index
-struct Score {
-  uint64_t player_id;
-  uint32_t level;
-};
-SPACETIMEDB_STRUCT(Score, player_id, level);
-SPACETIMEDB_TABLE(Score, score, Private);
-// Named multi-column btree index on (player_id, level)
-FIELD_NamedMultiColumnIndex(score, idx, player_id, level);
-
-// Custom types (enums)
-// Note: 'Status' conflicts with a built-in SDK type; use a distinct name
-SPACETIMEDB_ENUM(PlayerStatus, Active, Inactive);
-```
-
-## Reducers
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { schema } from 'spacetimedb/server';
-
-const spacetimedb = schema({ player });
-export default spacetimedb;
-
-// Basic reducer
-export const create_player = spacetimedb.reducer({ username: t.string() }, (ctx, { username }) => {
-  ctx.db.player.insert({ id: 0n, username, score: 0 });
-});
-
-// With error handling
-export const update_score = spacetimedb.reducer({ id: t.u64(), points: t.i32() }, (ctx, { id, points }) => {
-  const player = ctx.db.player.id.find(id);
-  if (!player) throw new Error('Player not found');
-  player.score += points;
-  ctx.db.player.id.update(player);
-});
-
-// Query examples
-const player = ctx.db.player.id.find(123n);           // Find by primary key
-const players = ctx.db.player.username.find('Alice'); // Find by unique index
-const players = ctx.db.player.score.filter(100);      // Filter by BTree index
-const all = ctx.db.player.iter();                     // Iterate all
-ctx.db.player.id.delete(123n);                        // Delete by primary key
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-// Basic reducer
-[SpacetimeDB.Reducer]
-public static void CreatePlayer(ReducerContext ctx, string username)
-{
-    ctx.Db.Player.Insert(new Player { Id = 0, Username = username, Score = 0 });
-}
-
-// With error handling
-[SpacetimeDB.Reducer]
-public static void UpdateScore(ReducerContext ctx, ulong id, int points)
-{
-    var player = ctx.Db.Player.Id.Find(id) 
-        ?? throw new Exception("Player not found");
-    player.Score += points;
-    ctx.Db.Player.Id.Update(player);
-}
-
-// Query examples
-var player = ctx.Db.Player.Id.Find(123);           // Find by primary key
-var player = ctx.Db.Player.Username.Find("Alice"); // Find by unique index
-var players = ctx.Db.Player.Score.Filter(100);     // Filter by BTree index
-var all = ctx.Db.Player.Iter();                    // Iterate all
-ctx.Db.Player.Id.Delete(123);                      // Delete by primary key
-```
-
-Required for Reducers
-
-Include `Table` in imports when using `ctx.db.*.insert()`, `.iter()`,
-`.get_by_id()`, etc. Without it: `no method named 'insert' found`. Use
-`use spacetimedb::{..., Table};`
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{reducer, ReducerContext, Table};
-
-// Basic reducer
-#[reducer]
-pub fn create_player(ctx: &ReducerContext, username: String) {
-    ctx.db.player().insert(Player { id: 0, username, score: 0 });
-}
-
-// With error handling
-#[reducer]
-pub fn update_score(ctx: &ReducerContext, id: u64, points: i32) -> Result<(), String> {
-    let mut player = ctx.db.player().id().find(id)
-        .ok_or("Player not found")?;
-    player.score += points;
-    ctx.db.player().id().update(player);
-    Ok(())
-}
-
-// Query examples
-let player = ctx.db.player().id().find(123);           // Find by primary key
-let player = ctx.db.player().username().find("Alice"); // Find by unique index
-let players = ctx.db.player().score().filter(100)      // Filter by BTree index
-let all = ctx.db.player().iter();                      // Iterate all
-ctx.db.player().id().delete(123);                      // Delete by primary key
-```
-
-``` codeBlockStandalone_LlrK
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-// Basic reducer
-SPACETIMEDB_REDUCER(create_player, ReducerContext ctx, std::string username) {
-  ctx.db[player].insert(Player{0, username, 0});
-  return Ok();
-}
-
-// With error handling
-SPACETIMEDB_REDUCER(update_score, ReducerContext ctx, uint64_t id, int32_t points) {
-  auto player_opt = ctx.db[player_id].find(id);
-  if (!player_opt) {
-    return Err("Player not found");
-  }
-  Player updated = *player_opt;
-  updated.score += points;
-  ctx.db[player_id].update(updated);
-  return Ok();
-}
-
-// Query examples
-auto player = ctx.db[player_id].find((uint64_t)123);            // Find by primary key
-auto player_by_name = ctx.db[player_username].find(std::string("Alice")); // Find by unique index
-auto players_by_score = ctx.db[player_score].filter((int32_t)100); // Filter by BTree index.
-for (const auto& p : ctx.db[player]) { /* iterate all */ }      // Iterate all
-ctx.db[player_id].delete_by_key((uint64_t)123);                 // Delete by primary key
-```
-
-## Lifecycle Reducers
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const init = spacetimedb.init(ctx => { /* ... */ });
-
-export const onConnect = spacetimedb.clientConnected(ctx => { /* ... */ });
-
-export const onDisconnect = spacetimedb.clientDisconnected(ctx => { /* ... */ });
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Reducer(ReducerKind.Init)]
-public static void Init(ReducerContext ctx) { /* ... */ }
-
-[SpacetimeDB.Reducer(ReducerKind.ClientConnected)]
-public static void ClientConnect(ReducerContext ctx) { /* ... */ }
-
-[SpacetimeDB.Reducer(ReducerKind.ClientDisconnected)]
-public static void ClientDisconnect(ReducerContext ctx) { /* ... */ }
-```
-
-``` codeBlockStandalone_LlrK
-#[reducer(init)]
-pub fn init(ctx: &ReducerContext) { /* ... */ }
-
-#[reducer(client_connected)]
-pub fn on_connect(ctx: &ReducerContext) { /* ... */ }
-
-#[reducer(client_disconnected)]
-pub fn on_disconnect(ctx: &ReducerContext) { /* ... */ }
-```
-
-``` codeBlockStandalone_LlrK
-using namespace SpacetimeDB;
-
-SPACETIMEDB_INIT(init, ReducerContext ctx) { /* ... */ }
-
-SPACETIMEDB_CLIENT_CONNECTED(on_connect, ReducerContext ctx) { /* ... */ }
-
-SPACETIMEDB_CLIENT_DISCONNECTED(on_disconnect, ReducerContext ctx) { /* ... */ }
-```
-
-## Schedule Tables
-
-TypeScript: ScheduleAt import
-
-`ScheduleAt` is imported from `'spacetimedb'`, **not** from
-`'spacetimedb/server'`. Use: `import { ScheduleAt } from 'spacetimedb';`
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-const reminder = table(
-  { name: 'reminder' },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    message: t.string(),
-    scheduled_at: t.scheduleAt(),
-  }
-);
-
-// `onSchedule` binds the reducer to the schedule table
-export const send_reminder = spacetimedb.reducer(
-  { onSchedule: reminder },
-  { arg: reminder.rowType },
-  (ctx, { arg }) => {
-    console.log(`Reminder: ${arg.message}`);
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Scheduled = "SendReminder", ScheduledAt = "ScheduledAt")]
-public partial struct Reminder
-{
-    [SpacetimeDB.PrimaryKey]
-    [SpacetimeDB.AutoInc]
-    public ulong Id;
-    public string Message;
-    public ScheduleAt ScheduledAt;
-}
-
-[SpacetimeDB.Reducer]
-public static void SendReminder(ReducerContext ctx, Reminder reminder)
-{
-    Log.Info($"Reminder: {reminder.Message}");
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[table(accessor = reminder, scheduled(send_reminder))]
-pub struct Reminder {
-    #[primary_key]
-    #[auto_inc]
-    pub id: u64,
-    pub message: String,
-    pub scheduled_at: ScheduleAt,
-}
-
-#[reducer]
-pub fn send_reminder(ctx: &ReducerContext, reminder: Reminder) {
-    log::info!("Reminder: {}", reminder.message);
-}
-
-// To schedule: Duration::from_millis(50).into() for ScheduleAt
-```
-
-``` codeBlockStandalone_LlrK
-struct Reminder {
-    uint64_t id;
-    std::string message;
-    ScheduleAt scheduled_at;
-};
-SPACETIMEDB_STRUCT(Reminder, id, message, scheduled_at)
-SPACETIMEDB_TABLE(Reminder, reminder, Private)
-FIELD_PrimaryKeyAutoInc(reminder, id)
-
-SPACETIMEDB_SCHEDULE(reminder, 2, send_reminder)
-
-SPACETIMEDB_REDUCER(send_reminder, ReducerContext ctx, Reminder reminder) {
-    LOG_INFO("Reminder: " + reminder.message);
-    return Ok();
-}
-```
-
-## Procedures
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const fetch_data = spacetimedb.procedure(
-  { url: t.string() },
-  t.string(),
-  (ctx, { url }) => {
-    const response = ctx.http.fetch(url);
-    const data = response.text();
-    
-    ctx.withTx(ctx => {
-      ctx.db.cache.insert({ data });
-    });
-    
-    return data;
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-// Add #pragma warning disable STDB_UNSTABLE at file top
-
-[SpacetimeDB.Procedure]
-public static string FetchData(ProcedureContext ctx, string url)
-{
-    var result = ctx.Http.Get(url);
-    if (result is Result<HttpResponse, HttpError>.OkR(var response))
-    {
-        var data = response.Body.ToStringUtf8Lossy();
-        ctx.WithTx(txCtx =>
-        {
-            txCtx.Db.Cache.Insert(new Cache { Data = data });
-            return 0;
-        });
-        return data;
-    }
-    return "";
-}
-```
-
-``` codeBlockStandalone_LlrK
-// In Cargo.toml: spacetimedb = { version = "1.*", features = ["unstable"] }
-use spacetimedb::Table;
-
-#[spacetimedb::procedure]
-fn fetch_data(ctx: &mut ProcedureContext, url: String) -> String {
-    match ctx.http.get(&url) {
-        Ok(response) => {
-            let body = response.body().to_string_lossy();
-            ctx.with_tx(|ctx| {
-                ctx.db.cache().insert(Cache { data: body.clone() });
-            });
-            body
-        }
-        Err(error) => {
-            log::error!("HTTP request failed: {error:?}");
-            String::new()
-        }
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-// SPACETIMEDB_UNSTABLE_FEATURES is necessary to access Http + Transactions in C++ Procedures
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-// Cache table for fetched data
-struct Cache {
-    std::string data;
-};
-SPACETIMEDB_STRUCT(Cache, data)
-SPACETIMEDB_TABLE(Cache, cache, Private)
-
-SPACETIMEDB_PROCEDURE(std::string, fetch_data, ProcedureContext ctx, std::string url) {
-    // Fetch from HTTP (outside transaction)
-    auto response = ctx.http.get(url);
-    if (!response.is_ok()) {
-        LOG_ERROR("HTTP request failed");
-        return std::string("");
-    }
-    
-    std::string body = response.value().body.to_string_utf8_lossy();
-    
-    // Insert into cache with transaction
-    ctx.with_tx([&body](https://spacetimedb.com/docs/databases/TxContext&%20tx) {
-        tx.db[cache].insert(Cache{body});
-    });
-    
-    return body;
-}
-```
-
-## Views
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-// Return single row
-export const my_player = spacetimedb.view({ name: 'my_player', public: true }, t.option(player.rowType), ctx => {
-  return ctx.db.player.identity.find(ctx.sender);
-});
-
-// Return potentially multiple rows
-export const top_players = spacetimedb.view({ name: 'top_players', public: true }, t.array(player.rowType), ctx => {
-  return ctx.db.player.score.filter(1000);
-});
-
-// Procedural view with update callbacks.
-// The returned row type has exactly one `.primaryKey()` column.
-export const top_players_with_updates = spacetimedb.view({ name: 'top_players_with_updates', public: true }, t.array(player.rowType), ctx => {
-  return ctx.db.player.score.filter(1000);
-});
-
-// Perform a generic filter using the query builder.
-// Equivalent to `SELECT * FROM player WHERE score < 1000`.
-export const bottom_players = spacetimedb.view({ name: 'bottom_players', public: true }, t.array(player.rowType), ctx => {
-  return ctx.from.player.where(p => p.score.lt(1000))
-});
-
-// Count rows in a table.
-export const player_count = spacetimedb.anonymousView({ name: 'player_count', public: true }, t.array(t.row('PlayerCount', {
-  count: t.u64(),
-})), ctx => {
-  return [{ count: ctx.db.player.count() }];
-});
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-// Return single row
-[SpacetimeDB.View(Accessor = "MyPlayer", Public = true)]
-public static Player? MyPlayer(ViewContext ctx)
-{
-    return ctx.Db.Player.Identity.Find(ctx.Sender);
-}
-
-// Return potentially multiple rows
-[SpacetimeDB.View(Accessor = "TopPlayers", Public = true)]
-public static IEnumerable<Player> TopPlayers(ViewContext ctx)
-{
-    return ctx.Db.Player.Score.Filter(1000);
-}
-
-// Procedural view with update callbacks.
-[SpacetimeDB.View(Accessor = "TopPlayersWithUpdates", Public = true, PrimaryKey = "Id")]
-public static IEnumerable<Player> TopPlayersWithUpdates(ViewContext ctx)
-{
-    return ctx.Db.Player.Score.Filter(1000);
-}
-
-// Perform a generic filter using the query builder.
-// Equivalent to `SELECT * FROM player WHERE score < 1000`.
-[SpacetimeDB.View(Accessor = "BottomPlayers", Public = true)]
-public static IQuery<Player> BottomPlayers(ViewContext ctx)
-{
-    return ctx.From.Player().Where(p => p.Score.Lt(1000));
-}
-
-// Count rows in a table.
-[SpacetimeDB.Type]
-public partial struct PlayerCount
-{
-    public ulong Count;
-}
-
-[SpacetimeDB.View(Accessor = "PlayerCount", Public = true)]
-public static List<PlayerCount> PlayerCountView(AnonymousViewContext ctx)
-{
-    return new List<PlayerCount> { new PlayerCount { Count = ctx.Db.Player.Count } };
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{view, AnonymousViewContext, Query, SpacetimeType, ViewContext};
-
-// Return single row
-#[view(accessor = my_player, public)]
-fn my_player(ctx: &ViewContext) -> Option<Player> {
-    ctx.db.player().identity().find(ctx.sender())
-}
-
-// Return multiple rows
-#[view(accessor = top_players, public)]
-fn top_players(ctx: &ViewContext) -> Vec<Player> {
-    ctx.db.player().score().filter(1000).collect()
-}
-
-// Procedural view with update callbacks.
-#[view(accessor = top_players_with_updates, public, primary_key = id)]
-fn top_players_with_updates(ctx: &ViewContext) -> Vec<Player> {
-    ctx.db.player().score().filter(1000).collect()
-}
-
-// Perform a generic filter using the query builder.
-// Equivalent to `SELECT * FROM player WHERE score < 1000`.
-#[view(accessor = bottom_players, public)]
-fn bottom_players(ctx: &ViewContext) -> impl Query<Player> {
-    ctx.from.player().r#where(|p| p.score.lt(1000))
-}
-
-#[derive(SpacetimeType)]
-struct PlayerCount {
-    count: u64,
-}
-
-// Count rows in a table.
-#[view(accessor = player_count, public)]
-fn player_count(ctx: &AnonymousViewContext) -> Vec<PlayerCount> {
-    vec![PlayerCount {
-        count: ctx.db.player().count(),
-    }]
-}
-```
-
-``` codeBlockStandalone_LlrK
-using namespace SpacetimeDB;
-
-// Return single row using unique indexed field
-SPACETIMEDB_VIEW(std::optional<Player>, my_player, Public, ViewContext ctx) {
-    return ctx.db[player_identity].find(ctx.sender());
-}
-
-// Return multiple rows using indexed field
-SPACETIMEDB_VIEW(std::vector<Player>, top_players, Public, ViewContext ctx) {
-    return ctx.db[player_score].filter(range_from(int32_t(1000))).collect();
-}
-
-// Procedural view with update callbacks.
-SPACETIMEDB_VIEW(std::vector<Player>, top_players_with_updates, Public, ViewContext ctx) {
-    return ctx.db[player_score].filter(range_from(int32_t(1000))).collect();
-}
-VIEW_PrimaryKey(top_players_with_updates, id)
-
-// Perform a generic filter using the query builder.
-// Equivalent to `SELECT * FROM player WHERE score < 1000`.
-SPACETIMEDB_VIEW(Query<Player>, bottom_players, Public, ViewContext ctx) {
-    return ctx.from[player].where([](https://spacetimedb.com/docs/databases/const%20auto&%20p) {
-        return p.score.lt(int32_t(1000));
-    });
-}
-
-struct PlayerCount {
-    uint64_t count;
-};
-SPACETIMEDB_STRUCT(PlayerCount, count)
-
-// Count rows in a table.
-SPACETIMEDB_VIEW(std::optional<PlayerCount>, player_count, Public, AnonymousViewContext ctx) {
-    return std::optional<PlayerCount>(PlayerCount{ctx.db[player].count()});
-}
-```
-
-## Context Properties
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-ctx.db                  // Database access
-ctx.sender              // Identity of caller
-ctx.connectionId        // ConnectionId | null
-ctx.timestamp           // Timestamp
-ctx.databaseIdentity    // Module's identity
-```
-
-``` codeBlockStandalone_LlrK
-ctx.Db                  // Database access
-ctx.Sender              // Identity of caller
-ctx.ConnectionId        // ConnectionId?
-ctx.Timestamp           // Timestamp
-ctx.DatabaseIdentity    // Module's identity
-ctx.Rng                 // Random number generator
-```
-
-``` codeBlockStandalone_LlrK
-ctx.db                  // Database access
-ctx.sender()            // Identity of caller
-ctx.connection_id()     // Option<ConnectionId>
-ctx.timestamp           // Timestamp
-ctx.database_identity() // Module's identity
-ctx.rng()               // Random number generator
-```
-
-``` codeBlockStandalone_LlrK
-ctx.db                  // Database access (Table accessor)
-ctx.sender()            // Identity of caller (Identity type)
-ctx.connection_id       // std::optional<ConnectionId>
-ctx.timestamp           // Timestamp of current transaction (Timestamp type)
-ctx.database_identity() // Module's own identity (Identity type)
-ctx.rng()               // Random number generator (for seeded randomness)
-```
-
-## Logging
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-console.error(`Error: ${msg}`);
-console.warn(`Warning: ${msg}`);
-console.log(`Info: ${msg}`);
-console.debug(`Debug: ${msg}`);
-```
-
-``` codeBlockStandalone_LlrK
-Log.Error($"Error: {msg}");
-Log.Warn($"Warning: {msg}");
-Log.Info($"Info: {msg}");
-Log.Debug($"Debug: {msg}");
-```
-
-``` codeBlockStandalone_LlrK
-log::error!("Error: {}", msg);
-log::warn!("Warning: {}", msg);
-log::info!("Info: {}", msg);
-log::debug!("Debug: {}", msg);
-```
-
-``` codeBlockStandalone_LlrK
-LOG_ERROR("Error: " + msg);
-LOG_WARN("Warning: " + msg);
-LOG_INFO("Info: " + msg);
-LOG_DEBUG("Debug: " + msg);
-```
-
-## Common Mistakes
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-1.  **ScheduleAt import** — Import `ScheduleAt` from `'spacetimedb'`,
-    not `'spacetimedb/server'`.
-2.  **Schema-first** — Create `const spacetimedb = schema({...})` before
-    reducers/init/clientConnected.
-3.  **`schema()` shape** — Use `schema({ table })` or
-    `schema({ a, b })`, not `schema(table)` or `schema(a, b)`.
-4.  **Reducer naming** — Reducer names come from exports:
-    `export const doThing = spacetimedb.reducer(...)`. Do not pass a
-    string name.
-5.  **No `ReducerContext` import** — Use the `ctx` parameter; do not
-    import `ReducerContext`.
-6.  **Export rules** — Only export schema, reducers, init,
-    clientConnected, clientDisconnected, views. Keep helpers local.
-7.  **Use `spacetimedb/server`** — For modules, use `spacetimedb/server`
-    (builder API), not `spacetimedb-sdk` (client decorators).
-8.  **`t.object` not `t.struct`** — Use `t.object('Name', {...})` for
-    product types.
-9.  **`autoInc` not `autoIncrement`** — Use `.autoInc()` on column
-    builders.
-10. **Row fields are camelCase** — Generated client row fields convert
-    snake_case column names: `trip_id` → `row.tripId`.
-11. **Await reducer calls** — Client reducer calls return
-    `Promise<void>` that rejects with `SenderError` on failure; `await`
-    or `.catch()` them.
-12. **Throw `SenderError` in reducers** — A plain `Error` surfaces as an
-    internal error, not a reducer error.
-
-*See Rust tab for module-specific tips.*
-
-1.  **Missing Table import** — Add `use spacetimedb::Table` when using
-    `insert`, `iter`, `get_by_id`, or `update`.
-2.  **Wrong table access** — Use `ctx.db.user()` not `ctx.db.User`
-    (accessor is snake_case).
-3.  **Wrong scheduled table syntax** — Use
-    `#[table(..., scheduled(reducer_name))]` (reducer name in
-    parentheses). Not `schedule(reducer = ..., column = ...)` or
-    `scheduled = tick`.
-4.  **Missing `pub` on fields** — Struct and enum fields in tables must
-    be `pub`.
-5.  **Wrong reducer attribute** — Use `#[reducer]` or
-    `#[spacetimedb::reducer]`, not `#[spacetime::reducer]`.
-6.  **Product types** — Structs used in table columns need
-    `#[derive(SpacetimeType)]`.
-
-*See Rust tab for module-specific tips.*
-
-## Common CLI Commands
-
-``` codeBlockStandalone_LlrK
-# Development
-spacetime start                          # Start local server
-spacetime dev                            # Interactive development mode
-spacetime login                          # Authenticate
-
-# Module management
-spacetime build                          # Build module
-spacetime publish <NAME>                 # Publish module
-spacetime publish <NAME> --delete-data         # Reset database
-spacetime delete <NAME>                  # Delete database
-
-# Database operations
-spacetime logs <NAME>                    # View logs
-spacetime logs --follow <NAME>           # Stream logs
-spacetime sql <NAME> "SELECT * FROM t"   # Run SQL query
-spacetime describe <NAME> --json         # Show schema
-spacetime call <NAME> reducer arg1 arg2  # Call reducer
-
-# Code generation
-spacetime generate --lang rust --out-dir src/module_bindings --module-path spacetimedb
-spacetime generate --lang csharp --out-dir module_bindings --module-path spacetimedb
-spacetime generate --lang typescript --out-dir src/module_bindings --module-path spacetimedb
-```
-
-## Common Types
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-// Type builders
-t.bool(), t.string(), t.f32(), t.f64()
-t.i8(), t.i16(), t.i32(), t.i64(), t.i128()
-t.u8(), t.u16(), t.u32(), t.u64(), t.u128()
-
-// Collections
-t.option(T), t.array(T)
-
-// SpacetimeDB types
-t.identity(), t.connectionId(), t.timestamp(), t.timeDuration(), t.scheduleAt()
-
-// Structured types
-t.object('Name', { field: t.type() })
-t.enum('Name', ['Variant1', 'Variant2'])
-```
-
-``` codeBlockStandalone_LlrK
-// Primitives
-bool, string, float, double
-sbyte, short, int, long, SpacetimeDB.I128
-byte, ushort, uint, ulong, SpacetimeDB.U128
-
-// Collections
-T?, List<T>
-
-// SpacetimeDB types
-Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt
-```
-
-``` codeBlockStandalone_LlrK
-// Primitives
-bool, String, f32, f64
-i8, i16, i32, i64, i128
-u8, u16, u32, u64, u128
-
-// Collections
-Option<T>, Vec<T>
-
-// SpacetimeDB types
-Identity, ConnectionId, Timestamp, Duration, ScheduleAt
-```
-
-``` codeBlockStandalone_LlrK
-// Primitives
-bool, std::string, float, double
-int8_t, int16_t, int32_t, int64_t
-uint8_t, uint16_t, uint32_t, uint64_t
-
-// Large integers (SpacetimeDB types)
-SpacetimeDB::i128, SpacetimeDB::u128
-SpacetimeDB::i256, SpacetimeDB::u256
-
-// Collections
-std::optional<T>, std::vector<T>
-
-// SpacetimeDB types
-Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt
-```
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/databases/cheat-sheet" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Cheat Sheet | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/databases/cheat-sheet"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Cheat Sheet | SpacetimeDB docs"><meta data-rh="true" name="description" content="Quick reference for SpacetimeDB module syntax across Rust, C#, TypeScript, and C++."><meta data-rh="true" property="og:description" content="Quick reference for SpacetimeDB module syntax across Rust, C#, TypeScript, and C++."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/databases/cheat-sheet"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/cheat-sheet" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/cheat-sheet" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Databases","item":"https://spacetimedb.com/docs/databases"},{"@type":"ListItem","position":2,"name":"Cheat Sheet","item":"https://spacetimedb.com/docs/databases/cheat-sheet"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/databases/cheat-sheet">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/databases/cheat-sheet">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/databases/cheat-sheet">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Collapse sidebar category &#x27;Databases&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/transactions-atomicity"><span title="Transactions and Atomicity" class="linkLabel_UvDg">Transactions and Atomicity</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/developing"><span title="spacetime dev" class="linkLabel_UvDg">spacetime dev</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/building-publishing"><span title="spacetime publish" class="linkLabel_UvDg">spacetime publish</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/databases/cheat-sheet"><span title="Cheat Sheet" class="linkLabel_UvDg">Cheat Sheet</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/databases/automatic-migrations"><span title="Migrations" class="categoryLinkLabel_HATI">Migrations</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/submodules"><span title="Submodules" class="linkLabel_UvDg">Submodules</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/databases"><span>Databases</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Cheat Sheet</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Cheat Sheet</h1></header><p>Quick reference for SpacetimeDB module syntax across Rust, C#, TypeScript, and C++.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="project-setup">Project Setup<a href="#project-setup" class="hash-link" aria-label="Direct link to Project Setup" title="Direct link to Project Setup" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> typescript</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> rust</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> cpp</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">DATABASE_NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="tables">Tables<a href="#tables" class="hash-link" aria-label="Direct link to Tables" title="Direct link to Tables" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic table</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">unique</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    score</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">i32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Multi-column index</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">score</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    indexes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [{</span></span>
+<span class="line"><span style="color:#F8F8F2">      accessor</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">idx</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      algorithm</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      columns</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">playerId</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">level</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">],</span></span>
+<span class="line"><span style="color:#F8F8F2">    }],</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    playerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    level</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Custom types</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> status </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">enum</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Status</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, [</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Active</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Inactive</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">]);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic table</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Username;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> Score;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Multi-column index (use new[] for attribute params — collection expressions invalid in attributes)</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Score</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Idx</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Columns </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#F8F8F2">[] { </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PlayerId</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Level</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> })]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> PlayerId;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Level;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Sum types: TaggedEnum with partial record (not partial class)</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> Status</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">TaggedEnum</span><span style="color:#F8F8F2"><(</span><span style="color:#8BE9FD;font-style:italic">Unit</span><span style="color:#F8F8F2"> Active, </span><span style="color:#8BE9FD;font-style:italic">Unit</span><span style="color:#F8F8F2"> Inactive)> { }</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-tip admonition_Ph9R alert alert--success"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Table access</div><div class="admonitionContent_STxx"><p>Table accessors use <strong>snake_case</strong>. Use <code>ctx.db.player()</code> not <code>ctx.db.Player</code>.</p></div></div><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{table, </span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic table</span></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> username</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> score</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Multi-column index</span></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> score, index(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> idx, btree(columns </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> [player_id, level])))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> level</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Custom types (product types need #[derive(SpacetimeType)])</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> enum</span><span style="color:#8BE9FD;font-style:italic"> Status</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Active</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Inactive</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic table</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">  std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string username;</span></span>
+<span class="line"><span style="color:#FF79C6">  int32_t</span><span style="color:#F8F8F2"> score;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, id, username, score);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(player, id);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Unique</span><span style="color:#F8F8F2">(player, username);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(player, score);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Multi-column index</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#FF79C6">  uint32_t</span><span style="color:#F8F8F2"> level;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Score, player_id, level);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Score, score, Private);</span></span>
+<span class="line"><span style="color:#6272A4">// Named multi-column btree index on (player_id, level)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_NamedMultiColumnIndex</span><span style="color:#F8F8F2">(score, idx, player_id, level);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Custom types (enums)</span></span>
+<span class="line"><span style="color:#6272A4">// Note: &#x27;Status&#x27; conflicts with a built-in SDK type; use a distinct name</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_ENUM</span><span style="color:#F8F8F2">(PlayerStatus, Active, Inactive);</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="reducers">Reducers<a href="#reducers" class="hash-link" aria-label="Direct link to Reducers" title="Direct link to Reducers" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ player });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic reducer</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> createPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">username</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.player.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">, username, score</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// With error handling</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> updateScore </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(), points</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">i32</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">id</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">points</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.id.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(id);</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player) </span><span style="color:#FF79C6">throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  player.score </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> points;</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.player.id.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Query examples</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.id.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">);           </span><span style="color:#6272A4">// Find by primary key</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> players </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.username.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">); </span><span style="color:#6272A4">// Find by unique index</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> players </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.score.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">100</span><span style="color:#F8F8F2">);      </span><span style="color:#6272A4">// Filter by BTree index</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> all </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.player.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">();                     </span><span style="color:#6272A4">// Iterate all</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.db.player.id.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">);                        </span><span style="color:#6272A4">// Delete by primary key</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic reducer</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> CreatePlayer</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> username</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { Id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, Username </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> username, Score </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// With error handling</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UpdateScore</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">ulong</span><span style="color:#FFB86C;font-style:italic"> id</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> points</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(id) </span></span>
+<span class="line"><span style="color:#FF79C6">        ??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    player.Score </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> points;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Player.Id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Query examples</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);           </span><span style="color:#6272A4">// Find by primary key</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.Username.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">); </span><span style="color:#6272A4">// Find by unique index</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> players </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.Score.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">100</span><span style="color:#F8F8F2">);     </span><span style="color:#6272A4">// Filter by BTree index</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> all </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">();                    </span><span style="color:#6272A4">// Iterate all</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Db.Player.Id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);                      </span><span style="color:#6272A4">// Delete by primary key</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Required for Reducers</div><div class="admonitionContent_STxx"><p>Include <code>Table</code> in imports when using <code>ctx.db.*.insert()</code>, <code>.iter()</code>, <code>.get_by_id()</code>, etc. Without it: <code>no method named &#x27;insert&#x27; found</code>. Use <code>use spacetimedb::{..., Table};</code></p></div></div><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{reducer, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic reducer</span></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> create_player</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, username</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2"> { id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, username, score</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// With error handling</span></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> update_score</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">, points</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(id)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Player not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">score </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> points;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(player);</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Query examples</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);           </span><span style="color:#6272A4">// Find by primary key</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">username</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Alice"</span><span style="color:#F8F8F2">); </span><span style="color:#6272A4">// Find by unique index</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> players </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">100</span><span style="color:#F8F8F2">)      </span><span style="color:#6272A4">// Filter by BTree index</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> all </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">();                      </span><span style="color:#6272A4">// Iterate all</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);                      </span><span style="color:#6272A4">// Delete by primary key</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Basic reducer</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(create_player, ReducerContext ctx, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string username) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Player{</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">, username, </span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">});</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// With error handling</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(update_score, ReducerContext ctx, </span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2"> id, </span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2"> points) {</span></span>
+<span class="line"><span style="color:#FF79C6">  auto</span><span style="color:#F8F8F2"> player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(id);</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player_opt) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">  Player updated </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> *</span><span style="color:#F8F8F2">player_opt;</span></span>
+<span class="line"><span style="color:#F8F8F2">  updated.score </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> points;</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[player_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(updated);</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Query examples</span></span>
+<span class="line"><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">((</span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2">)</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);</span><span style="color:#6272A4">            // Find by primary key</span></span>
+<span class="line"><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> player_by_name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_username].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">));</span><span style="color:#6272A4"> // Find by unique index</span></span>
+<span class="line"><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> players_by_score </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_score].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">((</span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2">)</span><span style="color:#BD93F9">100</span><span style="color:#F8F8F2">);</span><span style="color:#6272A4"> // Filter by BTree index.</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#F8F8F2"> p : ctx.db[player]) {</span><span style="color:#6272A4"> /* iterate all */</span><span style="color:#F8F8F2"> }</span><span style="color:#6272A4">      // Iterate all</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.db[player_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">((</span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2">)</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);</span><span style="color:#6272A4">                 // Delete by primary key</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="lifecycle-reducers">Lifecycle Reducers<a href="#lifecycle-reducers" class="hash-link" aria-label="Direct link to Lifecycle Reducers" title="Direct link to Lifecycle Reducers" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> init </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">init</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> onConnect </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">clientConnected</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> onDisconnect </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">clientDisconnected</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.Init)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Init</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientConnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> ClientConnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientDisconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> ClientDisconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[reducer(init)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> init</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer(client_connected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> on_connect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer(client_disconnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> on_disconnect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_INIT</span><span style="color:#F8F8F2">(init, ReducerContext ctx) {</span><span style="color:#6272A4"> /* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_CONNECTED</span><span style="color:#F8F8F2">(on_connect, ReducerContext ctx) {</span><span style="color:#6272A4"> /* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_DISCONNECTED</span><span style="color:#F8F8F2">(on_disconnect, ReducerContext ctx) {</span><span style="color:#6272A4"> /* ... */</span><span style="color:#F8F8F2"> }</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="schedule-tables">Schedule Tables<a href="#schedule-tables" class="hash-link" aria-label="Direct link to Schedule Tables" title="Direct link to Schedule Tables" translate="no">​</a></h2>
+<div class="theme-admonition theme-admonition-important admonition_Ph9R alert alert--info"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>TypeScript: ScheduleAt import</div><div class="admonitionContent_STxx"><p><code>ScheduleAt</code> is imported from <code>&#x27;spacetimedb&#x27;</code>, <strong>not</strong> from <code>&#x27;spacetimedb/server&#x27;</code>. Use: <code>import { ScheduleAt } from &#x27;spacetimedb&#x27;;</code></p></div></div>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> reminder </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">reminder</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    message</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduledAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">scheduleAt</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// `onSchedule` binds the reducer to the schedule table</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> sendReminder </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { onSchedule</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> reminder },</span></span>
+<span class="line"><span style="color:#F8F8F2">  { arg</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> reminder.rowType },</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">arg</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Reminder: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">arg.message</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Scheduled </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">SendReminder</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, ScheduledAt </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">ScheduledAt</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Reminder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Message;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2"> ScheduledAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SendReminder</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Reminder</span><span style="color:#FFB86C;font-style:italic"> reminder</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Reminder: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">reminder</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Message</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> reminder, scheduled(send_reminder))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Reminder</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> message</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> send_reminder</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, reminder</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Reminder</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Reminder: {}"</span><span style="color:#F8F8F2">, reminder</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">message);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// To schedule: Duration::from_millis(50).into() for ScheduleAt</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Reminder</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string message;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ScheduleAt scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Reminder, id, message, scheduled_at)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Reminder, reminder, Private)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(reminder, id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_SCHEDULE</span><span style="color:#F8F8F2">(reminder, </span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, send_reminder)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(send_reminder, ReducerContext ctx, Reminder reminder) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Reminder: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> reminder.message);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="procedures">Procedures<a href="#procedures" class="hash-link" aria-label="Direct link to Procedures" title="Direct link to Procedures" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> fetchData </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { url</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">url</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">      ctx.db.cache.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ data });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> data;</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Add #pragma warning disable STDB_UNSTABLE at file top</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> string</span><span style="color:#50FA7B"> FetchData</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> url</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Get</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result </span><span style="color:#FF79C6">is</span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpResponse</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">HttpError</span><span style="color:#F8F8F2">>.</span><span style="color:#8BE9FD;font-style:italic">OkR</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> response))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.Body.</span><span style="color:#50FA7B">ToStringUtf8Lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.Cache.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Cache</span><span style="color:#F8F8F2"> { Data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> data });</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> data;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#E9F284"> ""</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// In Cargo.toml: spacetimedb = { version = "1.*", features = ["unstable"] }</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> fetch_data</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    match</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">url) {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(response) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">            let</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">body</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">            ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">                ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">cache</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Cache</span><span style="color:#F8F8F2"> { data</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> body</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">() });</span></span>
+<span class="line"><span style="color:#F8F8F2">            });</span></span>
+<span class="line"><span style="color:#F8F8F2">            body</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Err</span><span style="color:#F8F8F2">(error) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">error!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"HTTP request failed: {error:?}"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            String</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">new</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// SPACETIMEDB_UNSTABLE_FEATURES is necessary to access Http + Transactions in C++ Procedures</span></span>
+<span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Cache table for fetched data</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Cache</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string data;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Cache, data)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Cache, cache, Private)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string, fetch_data, ProcedureContext ctx, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string url) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Fetch from HTTP (outside transaction)</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">response.</span><span style="color:#50FA7B">is_ok</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">HTTP request failed</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">""</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().body.</span><span style="color:#50FA7B">to_string_utf8_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Insert into cache with transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">([</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic">body</span><span style="color:#F8F8F2">](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx.db[cache].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Cache{body});</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> body;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="views">Views<a href="#views" class="hash-link" aria-label="Direct link to Views" title="Direct link to Views" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Return single row</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> myPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">my_player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, t.</span><span style="color:#50FA7B">option</span><span style="color:#F8F8F2">(player.rowType), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> ctx.db.player.identity.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.sender);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return potentially multiple rows</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> topPlayers </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">top_players</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(player.rowType), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> ctx.db.player.score.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Procedural view with update callbacks.</span></span>
+<span class="line"><span style="color:#6272A4">// The returned row type has exactly one `.primaryKey()` column.</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> topPlayersWithUpdates </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">top_players_with_updates</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(player.rowType), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> ctx.db.player.score.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Perform a generic filter using the query builder.</span></span>
+<span class="line"><span style="color:#6272A4">// Equivalent to `SELECT * FROM player WHERE score < 1000`.</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> bottomPlayers </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">bottom_players</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(player.rowType), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> ctx.from.player.</span><span style="color:#50FA7B">where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> p.score.</span><span style="color:#50FA7B">lt</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Count rows in a table.</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> playerCount </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">anonymousView</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player_count</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">row</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">PlayerCount</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">  count</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">})), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> [{ count</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.db.player.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">() }];</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return single row</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">MyPlayer</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2">? </span><span style="color:#50FA7B">MyPlayer</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.Db.Player.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return potentially multiple rows</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">TopPlayers</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> IEnumerable</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">TopPlayers</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.Db.Player.Score.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Procedural view with update callbacks.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">TopPlayersWithUpdates</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">, PrimaryKey </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Id</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> IEnumerable</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">TopPlayersWithUpdates</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.Db.Player.Score.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Perform a generic filter using the query builder.</span></span>
+<span class="line"><span style="color:#6272A4">// Equivalent to `SELECT * FROM player WHERE score < 1000`.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">BottomPlayers</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> IQuery</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">BottomPlayers</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.From.</span><span style="color:#50FA7B">Player</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> p.Score.</span><span style="color:#50FA7B">Lt</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">));</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Count rows in a table.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> PlayerCount</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Count;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">PlayerCount</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">PlayerCount</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">PlayerCountView</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">AnonymousViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">PlayerCount</span><span style="color:#F8F8F2">> { </span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> PlayerCount</span><span style="color:#F8F8F2"> { Count </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Player.Count } };</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{view, </span><span style="color:#8BE9FD;font-style:italic">AnonymousViewContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Query</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return single row</span></span>
+<span class="line"><span style="color:#F8F8F2">#[view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> my_player, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> my_player</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Option</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return multiple rows</span></span>
+<span class="line"><span style="color:#F8F8F2">#[view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> top_players, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> top_players</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Procedural view with update callbacks.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> top_players_with_updates, public, primary_key </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> id)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> top_players_with_updates</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Perform a generic filter using the query builder.</span></span>
+<span class="line"><span style="color:#6272A4">// Equivalent to `SELECT * FROM player WHERE score < 1000`.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> bottom_players, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> bottom_players</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#FF79C6"> impl</span><span style="color:#8BE9FD;font-style:italic"> Query</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">from</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">r#where</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">p</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> p</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">score</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">lt</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> PlayerCount</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    count</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Count rows in a table.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player_count, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> player_count</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">AnonymousViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">PlayerCount</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#50FA7B">    vec!</span><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">PlayerCount</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        count</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    }]</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return single row using unique indexed field</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">optional</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Player</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, my_player, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Return multiple rows using indexed field</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Player</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, top_players, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.db[player_score].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">range_from</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">))).</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Procedural view with update callbacks.</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Player</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, top_players_with_updates, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.db[player_score].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">range_from</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">))).</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"><span style="color:#50FA7B">VIEW_PrimaryKey</span><span style="color:#F8F8F2">(top_players_with_updates, id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Perform a generic filter using the query builder.</span></span>
+<span class="line"><span style="color:#6272A4">// Equivalent to `SELECT * FROM player WHERE score < 1000`.</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(Query</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Player</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, bottom_players, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.from[player].</span><span style="color:#50FA7B">where</span><span style="color:#F8F8F2">([](</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#FFB86C;font-style:italic"> p</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> p.score.</span><span style="color:#50FA7B">lt</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000</span><span style="color:#F8F8F2">));</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> PlayerCount</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> count;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(PlayerCount, count)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Count rows in a table.</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">optional</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">PlayerCount</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, player_count, Public, AnonymousViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">optional</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">PlayerCount</span><span style="color:#F8F8F2">>(PlayerCount{ctx.db[player].</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">()});</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="context-properties">Context Properties<a href="#context-properties" class="hash-link" aria-label="Direct link to Context Properties" title="Direct link to Context Properties" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.db                  </span><span style="color:#6272A4">// Database access</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.sender              </span><span style="color:#6272A4">// Identity of caller</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.connectionId        </span><span style="color:#6272A4">// ConnectionId | null</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.timestamp           </span><span style="color:#6272A4">// Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.databaseIdentity    </span><span style="color:#6272A4">// Module&#x27;s identity</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.Db                  </span><span style="color:#6272A4">// Database access</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Sender              </span><span style="color:#6272A4">// Identity of caller</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.ConnectionId        </span><span style="color:#6272A4">// ConnectionId?</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Timestamp           </span><span style="color:#6272A4">// Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.DatabaseIdentity    </span><span style="color:#6272A4">// Module&#x27;s identity</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Rng                 </span><span style="color:#6272A4">// Random number generator</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db                  </span><span style="color:#6272A4">// Database access</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()            </span><span style="color:#6272A4">// Identity of caller</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">connection_id</span><span style="color:#F8F8F2">()     </span><span style="color:#6272A4">// Option\<ConnectionId\></span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp           </span><span style="color:#6272A4">// Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">database_identity</span><span style="color:#F8F8F2">() </span><span style="color:#6272A4">// Module&#x27;s identity</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">()               </span><span style="color:#6272A4">// Random number generator</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.db</span><span style="color:#6272A4">                  // Database access (Table accessor)</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()</span><span style="color:#6272A4">            // Identity of caller (Identity type)</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.connection_id</span><span style="color:#6272A4">       // std::optional\<ConnectionId\></span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.timestamp</span><span style="color:#6272A4">           // Timestamp of current transaction (Timestamp type)</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.</span><span style="color:#50FA7B">database_identity</span><span style="color:#F8F8F2">()</span><span style="color:#6272A4"> // Module&#x27;s own identity (Identity type)</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.</span><span style="color:#50FA7B">rng</span><span style="color:#F8F8F2">()</span><span style="color:#6272A4">               // Random number generator (for seeded randomness)</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="logging">Logging<a href="#logging" class="hash-link" aria-label="Direct link to Logging" title="Direct link to Logging" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Error: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">warn</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Warning: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Info: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">debug</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Debug: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">Log.</span><span style="color:#50FA7B">Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Error: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">Log.</span><span style="color:#50FA7B">Warn</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Warning: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Info: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">Log.</span><span style="color:#50FA7B">Debug</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Debug: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">msg</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">error!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Error: {}"</span><span style="color:#F8F8F2">, msg);</span></span>
+<span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">warn!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Warning: {}"</span><span style="color:#F8F8F2">, msg);</span></span>
+<span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Info: {}"</span><span style="color:#F8F8F2">, msg);</span></span>
+<span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">debug!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Debug: {}"</span><span style="color:#F8F8F2">, msg);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Error: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> msg);</span></span>
+<span class="line"><span style="color:#50FA7B">LOG_WARN</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Warning: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> msg);</span></span>
+<span class="line"><span style="color:#50FA7B">LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Info: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> msg);</span></span>
+<span class="line"><span style="color:#50FA7B">LOG_DEBUG</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Debug: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> msg);</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="common-mistakes">Common Mistakes<a href="#common-mistakes" class="hash-link" aria-label="Direct link to Common Mistakes" title="Direct link to Common Mistakes" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI">\<ol\>
+<li class=""><strong>ScheduleAt import</strong> — Import <code>ScheduleAt</code> from <code>&#x27;spacetimedb&#x27;</code>, not <code>&#x27;spacetimedb/server&#x27;</code>.</li>
+<li class=""><strong>Schema-first</strong> — Create <code>const spacetimedb = schema({...})</code> before reducers/init/clientConnected.</li>
+<li class=""><strong><code>schema()</code> shape</strong> — Use <code>schema({ table })</code> or <code>schema({ a, b })</code>, not <code>schema(table)</code> or <code>schema(a, b)</code>.</li>
+<li class=""><strong>Reducer naming</strong> — Reducer names come from exports: <code>export const doThing = spacetimedb.reducer(...)</code>. Do not pass a string name.</li>
+<li class=""><strong>No <code>ReducerContext</code> import</strong> — Use the <code>ctx</code> parameter; do not import <code>ReducerContext</code>.</li>
+<li class=""><strong>Export rules</strong> — Only export schema, reducers, init, clientConnected, clientDisconnected, views. Keep helpers local.</li>
+<li class=""><strong>Use <code>spacetimedb/server</code></strong> — For modules, use <code>spacetimedb/server</code> (builder API), not <code>spacetimedb-sdk</code> (client decorators).</li>
+<li class=""><strong><code>t.object</code> not <code>t.struct</code></strong> — Use <code>t.object(&#x27;Name&#x27;, {...})</code> for product types.</li>
+<li class=""><strong><code>autoInc</code> not <code>autoIncrement</code></strong> — Use <code>.autoInc()</code> on column builders.</li>
+<li class=""><strong>Row fields are camelCase</strong> — Generated client row fields convert snake_case column names: <code>trip_id</code> → <code>row.tripId</code>.</li>
+<li class=""><strong>Await reducer calls</strong> — Client reducer calls return <code>Promise\<void\></code> that rejects with <code>SenderError</code> on failure; <code>await</code> or <code>.catch()</code> them.</li>
+<li class=""><strong>Throw <code>SenderError</code> in reducers</strong> — A plain <code>Error</code> surfaces as an internal error, not a reducer error.</li>
+</ol></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p><em>See Rust tab for module-specific tips.</em></p></div><div role="tabpanel" class="tabItem_w6aI" hidden="">\<ol\>
+<li class=""><strong>Missing Table import</strong> — Add <code>use spacetimedb::Table</code> when using <code>insert</code>, <code>iter</code>, <code>get_by_id</code>, or <code>update</code>.</li>
+<li class=""><strong>Wrong table access</strong> — Use <code>ctx.db.user()</code> not <code>ctx.db.User</code> (accessor is snake_case).</li>
+<li class=""><strong>Wrong scheduled table syntax</strong> — Use <code>#[table(..., scheduled(reducer_name))]</code> (reducer name in parentheses). Not <code>schedule(reducer = ..., column = ...)</code> or <code>scheduled = tick</code>.</li>
+<li class=""><strong>Missing <code>pub</code> on fields</strong> — Struct and enum fields in tables must be <code>pub</code>.</li>
+<li class=""><strong>Wrong reducer attribute</strong> — Use <code>#[reducer]</code> or <code>#[spacetimedb::reducer]</code>, not <code>#[spacetime::reducer]</code>.</li>
+<li class=""><strong>Product types</strong> — Structs used in table columns need <code>#[derive(SpacetimeType)]</code>.</li>
+</ol></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p><em>See Rust tab for module-specific tips.</em></p></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="common-cli-commands">Common CLI Commands<a href="#common-cli-commands" class="hash-link" aria-label="Direct link to Common CLI Commands" title="Direct link to Common CLI Commands" translate="no">​</a></h2>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># Development</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span><span style="color:#6272A4">                          # Start local server</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> dev</span><span style="color:#6272A4">                            # Interactive development mode</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> login</span><span style="color:#6272A4">                          # Authenticate</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Module management</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> build</span><span style="color:#6272A4">                          # Build module</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#6272A4">                 # Publish module</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#BD93F9"> --delete-data</span><span style="color:#6272A4">         # Reset database</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> delete</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#6272A4">                  # Delete database</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Database operations</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#6272A4">                    # View logs</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --follow</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#6272A4">           # Stream logs</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> sql</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">SELECT * FROM t</span><span style="color:#E9F284">"</span><span style="color:#6272A4">   # Run SQL query</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> describe</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#BD93F9"> --json</span><span style="color:#6272A4">         # Show schema</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#FF79C6"> <</span><span style="color:#F1FA8C">NAM</span><span style="color:#F8F8F2">E</span><span style="color:#FF79C6">></span><span style="color:#F1FA8C"> reducer</span><span style="color:#F1FA8C"> arg1</span><span style="color:#F1FA8C"> arg2</span><span style="color:#6272A4">  # Call reducer</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Code generation</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> rust</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> src/module_bindings</span><span style="color:#BD93F9"> --module-path</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> module_bindings</span><span style="color:#BD93F9"> --module-path</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> typescript</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> src/module_bindings</span><span style="color:#BD93F9"> --module-path</span><span style="color:#F1FA8C"> spacetimedb</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="common-types">Common Types<a href="#common-types" class="hash-link" aria-label="Direct link to Common Types" title="Direct link to Common Types" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Type builders</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">bool</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">f32</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">f64</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">i8</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">i16</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">i32</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">i64</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">i128</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">u16</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">u128</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Collections</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">option</span><span style="color:#F8F8F2">(T), t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(T)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// SpacetimeDB types</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">connectionId</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">timeDuration</span><span style="color:#F8F8F2">(), t.</span><span style="color:#50FA7B">scheduleAt</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Structured types</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">object</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Name</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, { field</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">type</span><span style="color:#F8F8F2">() })</span></span>
+<span class="line"><span style="color:#F8F8F2">t.</span><span style="color:#50FA7B">enum</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Name</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, [</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Variant1</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Variant2</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">])</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Primitives</span></span>
+<span class="line"><span style="color:#FF79C6">bool</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">double</span></span>
+<span class="line"><span style="color:#FF79C6">sbyte</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">short</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">long</span><span style="color:#F8F8F2">, SpacetimeDB.I128</span></span>
+<span class="line"><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">ushort</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">ulong</span><span style="color:#F8F8F2">, SpacetimeDB.U128</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Collections</span></span>
+<span class="line"><span style="color:#F8F8F2">T</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">, List</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">T</span><span style="color:#FF79C6">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// SpacetimeDB types</span></span>
+<span class="line"><span style="color:#F8F8F2">Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Primitives</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">bool</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">f32</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">f64</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">i8</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">i16</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">i32</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">i64</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">i128</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">u16</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">u64</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">u128</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Collections</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">Option</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">T</span><span style="color:#F8F8F2">>, </span><span style="color:#8BE9FD;font-style:italic">Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">T</span><span style="color:#F8F8F2">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// SpacetimeDB types</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ConnectionId</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Duration</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ScheduleAt</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Primitives</span></span>
+<span class="line"><span style="color:#FF79C6">bool</span><span style="color:#F8F8F2">, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string, </span><span style="color:#FF79C6">float</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">double</span></span>
+<span class="line"><span style="color:#FF79C6">int8_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int16_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int32_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">int64_t</span></span>
+<span class="line"><span style="color:#FF79C6">uint8_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint16_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint64_t</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Large integers (SpacetimeDB types)</span></span>
+<span class="line"><span style="color:#F8F8F2">SpacetimeDB</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">i128, SpacetimeDB</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">u128</span></span>
+<span class="line"><span style="color:#F8F8F2">SpacetimeDB</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">i256, SpacetimeDB</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">u256</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Collections</span></span>
+<span class="line"><span style="color:#F8F8F2">std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">optional</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">T</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">T</span><span style="color:#FF79C6">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// SpacetimeDB types</span></span>
+<span class="line"><span style="color:#F8F8F2">Identity, ConnectionId, Timestamp, TimeDuration, ScheduleAt</span></span></code></pre></div></div></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00100-databases/00500-cheat-sheet.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/databases/building-publishing"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">spacetime publish</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/databases/automatic-migrations"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Automatic Migrations</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#project-setup" class="table-of-contents__link toc-highlight">Project Setup</a></li>\<li\><a href="#tables" class="table-of-contents__link toc-highlight">Tables</a></li>\<li\><a href="#reducers" class="table-of-contents__link toc-highlight">Reducers</a></li>\<li\><a href="#lifecycle-reducers" class="table-of-contents__link toc-highlight">Lifecycle Reducers</a></li>\<li\><a href="#schedule-tables" class="table-of-contents__link toc-highlight">Schedule Tables</a></li>\<li\><a href="#procedures" class="table-of-contents__link toc-highlight">Procedures</a></li>\<li\><a href="#views" class="table-of-contents__link toc-highlight">Views</a></li>\<li\><a href="#context-properties" class="table-of-contents__link toc-highlight">Context Properties</a></li>\<li\><a href="#logging" class="table-of-contents__link toc-highlight">Logging</a></li>\<li\><a href="#common-mistakes" class="table-of-contents__link toc-highlight">Common Mistakes</a></li>\<li\><a href="#common-cli-commands" class="table-of-contents__link toc-highlight">Common CLI Commands</a></li>\<li\><a href="#common-types" class="table-of-contents__link toc-highlight">Common Types</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

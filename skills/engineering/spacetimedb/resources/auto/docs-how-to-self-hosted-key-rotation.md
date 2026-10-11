@@ -1,1372 +1,733 @@
-Version: 2.0.0
-
-On this page
-
-This guide explains how JWT signing key rotation works in self-hosted
-SpacetimeDB and how to avoid breaking `spacetime publish` during
-rotation.
-
-## Assumptions and Risk Note
-
-This guide assumes the following baseline:
-
-- You operate 3 Azure VMs for hosted environments: `prod`, `test`, and
-  `dev`.
-- You may also run local development (`local`) outside those hosted VMs.
-- You have current system-disk backups/snapshots before rotating keys or
-  migrating data.
-
-This guide shows one practical pattern that combines:
-
-- Azure Key Vault for JWT key rotation and policy verification.
-- `rsync` between hosts (`prod` -\> `test` -\> `dev`) for staged data
-  migration/testing.
-
-This pattern can be used in production, and many teams do so, but you
-should fully understand the operational risks before adopting it:
-
-- key distribution and mount consistency across hosts,
-- identity ownership constraints during publish,
-- data consistency and rollback during host-to-host migration.
-
-## Opinionated Setup (Reproducible Defaults)
-
-This guide uses one strict path contract end-to-end:
-
-- host source directory: `./.generated/spacetimedb-keys`
-- host key files:
-  - `./.generated/spacetimedb-keys/id_ecdsa`
-  - `./.generated/spacetimedb-keys/id_ecdsa.pub`
-- runtime mount target: `/etc/spacetimedb`
-- runtime key files:
-  - `/etc/spacetimedb/id_ecdsa`
-  - `/etc/spacetimedb/id_ecdsa.pub`
-
-Environment mapping for this guide:
-
-- `prod` -\> `azvmprod`
-- `test` -\> `azvmtest`
-- `dev` -\> `azvmdev`
-- optional `local` for local workstation workflows
-
-Operational defaults in this guide:
-
-- run rotation with `just kv-rotate-jwt-keys ENV=prod` (or
-  `ENV=test|dev|local`),
-- keep token-preservation enabled,
-- keep mounted-key sync enabled (writes to
-  `./.generated/spacetimedb-keys`),
-- mount `./.generated/spacetimedb-keys` read-only into
-  `/etc/spacetimedb`,
-- use one tooling surface (single script is fine) that supports rotate,
-  verify, and token re-sign workflows.
-
-## Quickstart Scaffold
-
-Use this first if you want a fast bootstrap in a new repo.
-
-### 1) Generate a compatible keypair
-
-``` codeBlockStandalone_LlrK
-mkdir -p ./.generated/spacetimedb-keys
-openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:prime256v1 -out ./.generated/spacetimedb-keys/id_ecdsa
-openssl pkey -in ./.generated/spacetimedb-keys/id_ecdsa -pubout -out ./.generated/spacetimedb-keys/id_ecdsa.pub
-chmod 600 ./.generated/spacetimedb-keys/id_ecdsa
-chmod 644 ./.generated/spacetimedb-keys/id_ecdsa.pub
-```
-
-### 2) Start SpacetimeDB with explicit key paths
-
-This command assumes `./.generated/spacetimedb-keys` is mounted into
-`/etc/spacetimedb` for the running process.
-
-``` codeBlockStandalone_LlrK
-spacetime start \
-  --listen-addr 0.0.0.0:3003 \
-  --pg-port 5432 \
-  --jwt-priv-key-path /etc/spacetimedb/id_ecdsa \
-  --jwt-pub-key-path /etc/spacetimedb/id_ecdsa.pub
-```
-
-### 3) Run your rotation pipeline
-
-``` codeBlockStandalone_LlrK
-just az-login
-just kv-rotate-jwt-keys-preview
-just kv-rotate-jwt-keys ENV=local
-just kv-verify-jwt-keys
-```
-
-By default, the rotation tool preserves publisher identity tokens and
-refreshes mounted runtime key files unless you explicitly opt out.
-
-### 4) Restart and validate
-
-``` codeBlockStandalone_LlrK
-docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"
-```
-
-## Deployment Modes
-
-Pick one mode. The rotation/publish order stays the same in both:
-
-``` codeBlockStandalone_LlrK
-just az-login
-just kv-rotate-jwt-keys-preview
-just kv-rotate-jwt-keys ENV=prod
-just kv-verify-jwt-keys
-docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-just spacetimedb-publish
-docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"
-```
-
-### Mode A: Non-container self-hosted
-
-Run directly on the host using `spacetime start` with key paths mounted
-at `/etc/spacetimedb`.
-
-Simple sample:
-
-``` codeBlockStandalone_LlrK
-spacetime start \
-  --listen-addr=0.0.0.0:3003 \
-  --pg-port=5432 \
-  --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa \
-  --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub
-```
-
-### Mode B: Docker self-hosted
-
-Run in Docker, mount key files into `/etc/spacetimedb`, and pass
-explicit JWT key args.
-
-**Development / local** -- expose ports directly:
-
-``` prism-code
-services:
-  spacetimedb:
-    image: clockworklabs/spacetime:v2.0.1
-    restart: always
-    command:
-      - start
-      - --listen-addr=0.0.0.0:3003
-      - --pg-port=5432
-      - --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa
-      - --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub
-    ports:
-      - "3003:3003"
-      - "5432:5432"
-    volumes:
-      - "./.config/spacetimedb/data:/home/spacetime/.local/share/spacetime/data"
-      - "./.generated/spacetimedb-keys:/etc/spacetimedb:ro"
-```
-
-**Production** -- use `expose` with a reverse proxy (Caddy shown here)
-instead of raw `ports`. This snippet includes both the Caddy
-reverse-proxy container and SpacetimeDB, which is the minimum viable
-production stack:
-
-``` prism-code
-networks:
-  caddy:
-    external: true
-
-services:
-  caddy:
-    container_name: caddy
-    image: lucaslorentz/caddy-docker-proxy:ci-alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443/tcp"
-      - "443:443/udp"
-    environment:
-      CADDY_INGRESS_NETWORKS: caddy
-    labels:
-      caddy.email: "ops@example.com"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "caddy_data:/data"
-    networks:
-      - caddy
-    deploy:
-      restart_policy:
-        condition: any
-
-  spacetimedb:
-    container_name: spacetimedb
-    image: registry.example.com/spacetimedb:v2.0.1
-    restart: always
-    hostname: spacetimedb
-    environment:
-      SPACETIME_DATABASE_NAME: spacetime
-    build:
-      context: ./
-      dockerfile: spacetimedb/Dockerfile
-    command:
-      - start
-      - --listen-addr
-      - "0.0.0.0:3003"
-      - --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa
-      - --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub
-      - --pg-port
-      - "5432"
-    expose:
-      - 3003
-      - 5432
-    volumes:
-      - "./.config/spacetimedb/data:/home/spacetime/.local/share/spacetime/data"
-      - "./.generated/spacetimedb-keys:/etc/spacetimedb:ro"
-    labels:
-      caddy: "https://stdb.example.com"
-      caddy.reverse_proxy: "{{upstreams 3003}}"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-    networks:
-      caddy:
-        aliases:
-          - spacetimedb
-
-volumes:
-  caddy_data: {}
-```
-
-Key differences from the local variant:
-
-- `expose` keeps ports internal to the Docker network; only Caddy binds
-  host ports 80/443.
-- Caddy auto-provisions TLS certificates and routes traffic based on
-  service labels.
-- `caddy-docker-proxy` watches the Docker socket for label changes --
-  adding or restarting services automatically updates routing.
-- `deploy.restart_policy` ensures both containers restart on failure.
-- `networks` with an alias lets other services resolve `spacetimedb` by
-  name.
-
-Before first run, create the external network:
-`docker network create caddy`.
-
-## Background
-
-SpacetimeDB signs local identity tokens with an EC keypair (ES256,
-P-256). The keypair is read from:
-
-- `--jwt-priv-key-path` and `--jwt-pub-key-path` CLI args, or
-- `[certificate-authority]` in `config.toml` (see [Standalone
-  Configuration](https://spacetimedb.com/docs/cli-reference/standalone-config)).
-
-To generate compatible keys, use the canonical commands in
-`Quickstart Scaffold -> 1) Generate a compatible keypair`.
-
-Mount this directory into `/etc/spacetimedb` in your runtime so startup
-paths remain:
-
-``` codeBlockStandalone_LlrK
-docker run --rm \
-  -v "$(pwd)/.generated/spacetimedb-keys:/etc/spacetimedb:ro" \
-  clockworklabs/spacetime:v2.0.1 \
-  start --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub
-```
-
-Important constraints:
-
-- Keys are loaded at server startup; there is no hot-reload for JWT
-  keys.
-- For locally issued tokens, SpacetimeDB validates against one active
-  public key.
-- Rotating keys invalidates tokens signed by the previous private key.
-
-## Why rotation can cause 401 and 403
-
-After rotation, there are two common failure modes:
-
-- **401 Unauthorized**: the token signature is invalid for the new
-  keypair.
-- **403 Forbidden**: token is valid, but the caller identity is not the
-  database owner.
-
-The 403 case is the subtle one:
-
-1.  Database ownership is tied to the identity that first
-    created/published the database.
-2.  If you clear CLI credentials and get a fresh local token, the new
-    token usually has a different subject claim.
-3.  A different subject produces a different identity.
-4.  Publish/update now fails as "not authorized to perform action ...
-    update database."
-
-## Rotation strategies
-
-### Strategy A: Clean-slate rotation (dev/CI/stateless)
-
-Use this when you are fine recreating databases and losing existing
-data.
-
-1.  Rotate keypair in your secret store.
-2.  Restart SpacetimeDB so it loads new keys.
-3.  Clear persisted Spacetime CLI config used by your publish step.
-4.  Re-publish, which creates a fresh owner identity and database state.
-
-Tradeoff: this resets ownership and data.
-
-### Strategy B: Identity-preserving rotation (stateful)
-
-Use this when you must keep the existing database owner identity.
-
-1.  Before rotation, capture the current owner token (or at minimum its
-    `sub` and `iss` claims).
-2.  Rotate keypair.
-3.  Mint a new JWT signed by the new private key but with the same `iss`
-    and `sub`.
-4.  Update the CLI token used by `spacetime publish`.
-5.  Restart SpacetimeDB and publish.
-
-This preserves identity because identity derivation depends on claims
-(`iss`/`sub`), not on which key signed the token. In practice, keep
-these defaults unless you have a break-glass reason:
-
-- default token path: `./data/.config/spacetime/cli.toml`,
-- environment-aware preserve mode (`prod|test|dev|local`),
-- mounted-key sync on by default.
-
-Tradeoff: more operational complexity; requires careful token handling.
-
-### Strategy C: OIDC-backed identity (recommended for production)
-
-Use [Authentication](https://spacetimedb.com/docs/core-concepts/authentication) with an
-external OIDC IdP so identity is anchored to external `iss`/`sub`, and
-local SpacetimeDB signing-key rotation does not redefine publisher
-identity.
-
-## Azure Key Vault example (self-hosted)
-
-This example uses generic `just` recipes and names so you can adapt it
-to your own repo.
-
-### Example command flow
-
-``` codeBlockStandalone_LlrK
-# 1) Authenticate to Azure
-just az-login
-
-# 2) Preview rotation (no writes)
-just kv-rotate-jwt-keys-preview
-
-# 3) Apply rotation (choose env per host)
-just kv-rotate-jwt-keys ENV=local
-# just kv-rotate-jwt-keys ENV=dev
-# just kv-rotate-jwt-keys ENV=test
-# just kv-rotate-jwt-keys ENV=prod
-
-# 4) Verify keypair parity and policy
-just kv-verify-jwt-keys
-```
-
-### Direct Azure CLI pull/push snippets
-
-For concrete file-safe AKV pull/push commands, use
-`Reproducibility Addendum -> 2) Safer AKV pull/push with files`.
-
-### Example environment policy
-
-- `kv-prod`: unique keypair
-- `kv-test`: unique keypair
-- `kv-dev` + `kv-local`: shared keypair
-
-### Example secret names
-
-- `spacetimedb-jwt-private-key`
-- `spacetimedb-jwt-public-key`
-
-### What your rotation tool should guarantee
-
-- Generate ES256-compatible P-256 keypairs.
-- Normalize PEM values before upload (`\r\n` -\> `\n`, ensure trailing
-  newline).
-- Verify each private/public pair matches.
-- Compute fingerprints and enforce your policy across environments.
-- Require explicit confirmation for mutating operations.
-- Support both dry-run and verify-only modes.
-- Preserve publisher identity by default (re-sign cached CLI token),
-  with explicit opt-out for break-glass cases.
-- Refresh mounted key files by default, with explicit opt-out for
-  advanced workflows.
-- Support environment-aware token re-signing (`prod|test|dev|local`).
-- Support override for cached token path (default can be
-  `./data/.config/spacetime/cli.toml`).
-
-## Scaffold Templates
-
-These templates are intentionally generic so you can paste and adapt
-them in your own repository.
-
-### Template: `justfile` recipes
-
-``` prism-code
-[group('azure')]
-az-login:
-    az login --use-device-code && az account show --query "{name:name, id:id}" -o table
-
-[group('azure')]
-kv-rotate-jwt-keys-preview:
-    bun tools/azure/spacetimedb-tooling.ts --dry-run --verbose
-
-[group('azure')]
-[confirm("This rotates JWT signing keys in Key Vault environments. Continue?")]
-kv-rotate-jwt-keys ENV="local":
-    bun tools/azure/spacetimedb-tooling.ts --yes --preserve-publisher-token-env "{{ENV}}"
-
-[group('azure')]
-kv-verify-jwt-keys:
-    bun tools/azure/spacetimedb-tooling.ts --verify-only
-
-[group('azure')]
-kv-get SECRET VAULT="kv-local":
-    @az keyvault secret show --vault-name "{{VAULT}}" --name "{{SECRET}}" --query 'value' -o tsv
-
-[group('azure')]
-kv-set SECRET VALUE VAULT="kv-local":
-    az keyvault secret set --vault-name "{{VAULT}}" --name "{{SECRET}}" --value "{{VALUE}}" --only-show-errors
-
-[group('azure')]
-kv-resign-jwt-token CLI_TOML="./data/.config/spacetime/cli.toml" PRIV_KEY=".generated/spacetimedb-keys/id_ecdsa":
-    bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "{{CLI_TOML}}" --private-key-path "{{PRIV_KEY}}"
-
-[group('deploy')]
-spacetimedb-restart:
-    docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-
-[group('deploy')]
-spacetimedb-publish:
-    spacetime publish --yes --server http://127.0.0.1:3003 --js-path ./dist/bundle.js spacetime
-
-[group('deploy')]
-spacetimedb-build:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    just spacetimedb-prebuild
-    echo "Building SpacetimeDB container image"
-    docker compose -f ./.generated/docker-compose.yaml build spacetimedb --progress=auto
-    echo "SpacetimeDB container image built"
-
-[group('deploy')]
-spacetimedb-deploy VERSION:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    COMPOSE_FILE="./.generated/docker-compose.yaml"
-    echo "SpacetimeDB deploy pipeline ({{VERSION}})"
-
-    # 1) Prebuild module artifact on host
-    just spacetimedb-prebuild
-
-    # 2) Build container image
-    docker compose -f "${COMPOSE_FILE}" build spacetimedb --progress=auto
-
-    # 3) Preflight-verify publish in a throwaway container
-    just spacetimedb-verify-preflight "{{VERSION}}"
-
-    # 4) Push to registry
-    docker compose -f "${COMPOSE_FILE}" push spacetimedb
-
-    # 5) Deploy
-    docker compose -f "${COMPOSE_FILE}" up -d --force-recreate spacetimedb
-
-    # 6) Verify runtime publish marker
-    just spacetimedb-verify-runtime
-
-    echo "SpacetimeDB deploy pipeline complete ({{VERSION}})"
-
-[group('deploy')]
-spacetimedb-setup-host:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    BASE_DIR="${SPACETIME_HOST_DIR:-.config/spacetimedb}"
-    DATA_DIR="${BASE_DIR}/data"
-    TARGET_UID="${SPACETIME_HOST_UID:-1000}"
-    TARGET_GID="${SPACETIME_HOST_GID:-1000}"
-    DRY_RUN="${DRY_RUN:-0}"
-    VERBOSE="${VERBOSE:-0}"
-    CHOWN_WITH_SUDO="${CHOWN_WITH_SUDO:-1}"
-
-    run_cmd() {
-        [ "$VERBOSE" = "1" ] && echo "   $*"
-        [ "$DRY_RUN" = "1" ] && return 0
-        "$@"
-    }
-
-    echo "Preparing host directories for SpacetimeDB"
-    echo "   Base dir: ${BASE_DIR}"
-    echo "   Data dir: ${DATA_DIR}"
-    echo "   Target owner: ${TARGET_UID}:${TARGET_GID}"
-    [ "$DRY_RUN" = "1" ] && echo "   Mode: dry-run (no changes)"
-
-    run_cmd mkdir -p "${DATA_DIR}"
-
-    if [ "$CHOWN_WITH_SUDO" = "1" ] && command -v sudo >/dev/null 2>&1; then
-        [ "$DRY_RUN" != "1" ] && sudo chown -R "${TARGET_UID}:${TARGET_GID}" "${BASE_DIR}"
-    else
-        run_cmd chown -R "${TARGET_UID}:${TARGET_GID}" "${BASE_DIR}"
-    fi
-
-    run_cmd chmod -R u+rwX,g+rwX "${BASE_DIR}"
-
-    [ "$DRY_RUN" != "1" ] && ls -ld "${BASE_DIR}" "${DATA_DIR}"
-    echo "SpacetimeDB host setup complete"
-    echo "Override defaults: SPACETIME_HOST_DIR, SPACETIME_HOST_UID, SPACETIME_HOST_GID, DRY_RUN=1, VERBOSE=1"
-
-[group('deploy')]
-[confirm("This will DELETE all SpacetimeDB host data/config and recreate empty directories. Continue?")]
-spacetimedb-reset-host:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    BASE_DIR="${SPACETIME_HOST_DIR:-.config/spacetimedb}"
-    DRY_RUN="${DRY_RUN:-0}"
-    echo "Resetting SpacetimeDB host state: ${BASE_DIR}"
-    [ "$DRY_RUN" = "1" ] && echo "   Mode: dry-run (no changes)"
-    if [ "$DRY_RUN" != "1" ]; then
-        if command -v sudo >/dev/null 2>&1; then
-            sudo rm -rf "${BASE_DIR}"
-        else
-            rm -rf "${BASE_DIR}"
-        fi
-    fi
-    just spacetimedb-setup-host
-
-[group('deploy')]
-spacetimedb-prebuild:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    MODULE_DIR="${SPACETIME_MODULE_DIR:-spacetimedb}"
-    ARTIFACT_PATH="${MODULE_DIR}/dist/bundle.js"
-    if ! command -v spacetime >/dev/null 2>&1; then
-        echo "SpacetimeDB CLI not found."
-        echo "   Install: curl -sSf https://install.spacetimedb.com | sh"
-        exit 1
-    fi
-    echo "Host prebuild: SpacetimeDB module artifact"
-    ( cd "${MODULE_DIR}" && spacetime build )
-    if [ ! -f "${ARTIFACT_PATH}" ]; then
-        echo "Expected host artifact missing: ${ARTIFACT_PATH}"
-        exit 1
-    fi
-    echo "Host prebuild ready: ${ARTIFACT_PATH}"
-
-[group('deploy')]
-spacetimedb-verify-preflight VERSION:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    SPACETIME_IMAGE="registry.example.com/spacetimedb:{{VERSION}}"
-    SPACETIME_MARKER="SPACETIMEDB_PUBLISH_SUCCESS"
-    SPACETIME_DATA_DIR=$(mktemp -d)
-    CONTAINER_NAME="spacetimedb-preflight-{{VERSION}}"
-    echo "Preflight: validating SpacetimeDB publish in throwaway container"
-    echo "   Image: ${SPACETIME_IMAGE}"
-    echo "   Temp data: ${SPACETIME_DATA_DIR}"
-    cleanup() {
-        docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
-        rm -rf "${SPACETIME_DATA_DIR}" >/dev/null 2>&1 || true
-    }
-    trap cleanup EXIT
-    docker run -d --name "${CONTAINER_NAME}" \
-        -e SPACETIME_DATABASE_NAME=spacetime \
-        -v "${SPACETIME_DATA_DIR}:/home/spacetime/.local/share/spacetime/data" \
-        "${SPACETIME_IMAGE}" >/dev/null
-    PRECHECK_SUCCESS=0
-    for _ in $(seq 1 45); do
-        LOGS=$(docker logs "${CONTAINER_NAME}" 2>&1 || true)
-        if echo "${LOGS}" | grep -q "${SPACETIME_MARKER}"; then
-            PRECHECK_SUCCESS=1
-            break
-        fi
-        if ! docker ps --filter "name=^/${CONTAINER_NAME}$" -q | grep -q "."; then
-            echo "Preflight container exited before publish success"
-            echo "${LOGS}"
-            exit 1
-        fi
-        sleep 2
-    done
-    if [ "${PRECHECK_SUCCESS}" -ne 1 ]; then
-        echo "Preflight timed out waiting for publish success marker"
-        docker logs "${CONTAINER_NAME}" || true
-        exit 1
-    fi
-    echo "Preflight publish succeeded"
-
-[group('deploy')]
-spacetimedb-verify-runtime:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    COMPOSE_SERVICE="${SPACETIME_SERVICE:-spacetimedb}"
-    SPACETIME_MARKER="SPACETIMEDB_PUBLISH_SUCCESS"
-    COMPOSE_FILE="${COMPOSE_FILE:-./.generated/docker-compose.yaml}"
-    RUNTIME_SUCCESS=0
-    for _ in $(seq 1 45); do
-        RUNTIME_LOGS=$(docker compose -f "${COMPOSE_FILE}" logs --no-color --tail=200 "${COMPOSE_SERVICE}" 2>&1 || true)
-        if echo "${RUNTIME_LOGS}" | grep -q "${SPACETIME_MARKER}"; then
-            RUNTIME_SUCCESS=1
-            break
-        fi
-        if ! docker compose -f "${COMPOSE_FILE}" ps --status running "${COMPOSE_SERVICE}" | grep -q "${COMPOSE_SERVICE}"; then
-            echo "SpacetimeDB runtime container is not running"
-            echo "${RUNTIME_LOGS}"
-            exit 1
-        fi
-        sleep 2
-    done
-    if [ "${RUNTIME_SUCCESS}" -ne 1 ]; then
-        echo "SpacetimeDB runtime publish marker not found after deployment"
-        docker compose -f "${COMPOSE_FILE}" logs --no-color --tail=300 "${COMPOSE_SERVICE}" || true
-        exit 1
-    fi
-    echo "SpacetimeDB runtime publish verified"
-```
-
-### Template: rotation script skeleton (`tools/azure/spacetimedb-tooling.ts`)
-
-``` codeBlockStandalone_LlrK
-#!/usr/bin/env bun
-import { $ } from "bun";
-import { chmod, mkdir, mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { parseArgs } from "node:util";
-
-const SECRET_PRIVATE = "spacetimedb-jwt-private-key";
-const SECRET_PUBLIC = "spacetimedb-jwt-public-key";
-const VAULTS = { prod: "kv-prod", test: "kv-test", dev: "kv-dev", local: "kv-local" } as const;
-const { values } = parseArgs({
-  args: Bun.argv.slice(2),
-  options: {
-    "dry-run": { type: "boolean", short: "d", default: false },
-    "verify-only": { type: "boolean", default: false },
-    "resign-token-only": { type: "boolean", default: false },
-    "preserve-publisher-token": { type: "boolean", default: true },
-    "no-preserve-publisher-token": { type: "boolean", default: false },
-    "preserve-publisher-token-env": { type: "string", default: "local" },
-    "publisher-cli-toml-path": { type: "string", default: "./data/.config/spacetime/cli.toml" },
-    "private-key-path": { type: "string" },
-    "sync-mounted-keys": { type: "boolean", default: true },
-    "no-sync-mounted-keys": { type: "boolean", default: false },
-    "mounted-keys-dir": { type: "string", default: ".generated/spacetimedb-keys" },
-    yes: { type: "boolean", default: false },
-    verbose: { type: "boolean", short: "v", default: false },
-  },
-});
-
-const preservePublisherToken = values["preserve-publisher-token"] && !values["no-preserve-publisher-token"];
-const syncMountedKeys = values["sync-mounted-keys"] && !values["no-sync-mounted-keys"];
-const isResignOnly = values["resign-token-only"];
-
-async function generateKeyPair(label: string, dir: string) {
-  const priv = join(dir, `${label}_private.pem`);
-  const pub = join(dir, `${label}_public.pem`);
-  await $`openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:prime256v1 -out ${priv}`.quiet();
-  await $`openssl pkey -in ${priv} -pubout -out ${pub}`.quiet();
-  await chmod(priv, 0o600);
-  await chmod(pub, 0o644);
-  return { privPem: await Bun.file(priv).text(), pubPem: await Bun.file(pub).text(), privPath: priv, pubPath: pub };
-}
-
-async function setSecret(vault: string, name: string, value: string) {
-  await $`az keyvault secret set --vault-name ${vault} --name ${name} --value ${value} --only-show-errors`.quiet();
-}
-
-function normalizePem(value: string) {
-  const unix = value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  return unix.endsWith("\n") ? unix : `${unix}\n`;
-}
-
-async function fingerprintPublicKey(pubPath: string) {
-  const out = await $`bash -lc ${`openssl pkey -pubin -in "${pubPath}" -outform DER | openssl dgst -sha256`}`.text();
-  return out.trim();
-}
-
-async function preserveLocalPublisherToken(cliTomlPath: string, privatePem: string) {
-  // decode existing token, keep iss/sub/aud/hex_identity, refresh iat, clear exp, re-sign with ES256
-}
-
-async function syncMountedLocalKeys(targetDir: string, privatePem: string, publicPem: string) {
-  await mkdir(targetDir, { recursive: true });
-  await Bun.write(join(targetDir, "id_ecdsa"), privatePem);
-  await Bun.write(join(targetDir, "id_ecdsa.pub"), publicPem);
-  await chmod(join(targetDir, "id_ecdsa"), 0o600);
-  await chmod(join(targetDir, "id_ecdsa.pub"), 0o644);
-}
-
-async function runResignOnly(cliTomlPath: string, privateKeyPath: string) {
-  const privatePem = await Bun.file(privateKeyPath).text();
-  await preserveLocalPublisherToken(cliTomlPath, privatePem);
-}
-
-// flow:
-// 1) require --yes unless dry-run/verify-only
-// 2) generate prod/test/shared keypairs
-// 3) normalize PEM values before upload
-// 4) upload by policy (prod unique, test unique, dev/local shared)
-// 5) preserve token identity by default (unless no-preserve flag)
-// 6) sync mounted keys by default (unless no-sync flag)
-// 7) support re-sign-only mode for post-rsync destination identity continuity
-// 8) verify parity + fingerprints + policy, exit non-zero on failure
-```
-
-### Template: entrypoint publish flow
-
-``` codeBlockStandalone_LlrK
-#!/bin/sh
-set -eu
-
-DATA_DIR="${DATA_DIR:-/var/lib/spacetime/data}"
-CONFIG_HOME="${CONFIG_HOME:-${DATA_DIR}/.config}"
-SERVER_URL="${SERVER_URL:-http://127.0.0.1:3003}"
-DB_NAME="${DB_NAME:-spacetime}"
-MAX_READY_ATTEMPTS="${MAX_READY_ATTEMPTS:-20}"
-MAX_PUBLISH_ATTEMPTS="${MAX_PUBLISH_ATTEMPTS:-30}"
-PUBLISH_RETRY_SECONDS="${PUBLISH_RETRY_SECONDS:-2}"
-SUCCESS_MARKER="PUBLISH_SUCCESS"
-FAILURE_MARKER="PUBLISH_FAILED"
-
-mkdir -p "$DATA_DIR" "$CONFIG_HOME"
-export XDG_CONFIG_HOME="$CONFIG_HOME"
-
-spacetime start \
-  --listen-addr 0.0.0.0:3003 \
-  --pg-port 5432 \
-  --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa \
-  --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub &
-SERVER_PID=$!
-
-cleanup() { kill "$SERVER_PID" 2>/dev/null || true; }
-trap cleanup INT TERM
-
-ready_attempt=1
-while [ "$ready_attempt" -le "$MAX_READY_ATTEMPTS" ]; do
-  if curl -s --max-time 1 "${SERVER_URL}/v1/identity" >/dev/null 2>&1; then
-    break
-  fi
-  if [ "$ready_attempt" -eq "$MAX_READY_ATTEMPTS" ]; then
-    echo "${FAILURE_MARKER} server_not_ready"
-    exit 1
-  fi
-  ready_attempt=$((ready_attempt + 1))
-  sleep 1
-done
-
-publish_attempt=1
-while [ "$publish_attempt" -le "$MAX_PUBLISH_ATTEMPTS" ]; do
-  set +e
-  OUT="$(spacetime publish --yes --server "$SERVER_URL" --js-path /app/dist/bundle.js "$DB_NAME" 2>&1)"
-  STATUS=$?
-  set -e
-  [ -n "$OUT" ] && echo "$OUT"
-
-  if [ "$STATUS" -eq 0 ]; then
-    echo "${SUCCESS_MARKER} database=${DB_NAME} attempt=${publish_attempt}"
-    break
-  fi
-  if echo "$OUT" | rg -q "403 Forbidden|not authorized to perform action"; then
-    echo "${FAILURE_MARKER} publish_unauthorized database=${DB_NAME}"
-    exit 1
-  fi
-  if [ "$publish_attempt" -eq "$MAX_PUBLISH_ATTEMPTS" ]; then
-    echo "${FAILURE_MARKER} publish_retries_exhausted database=${DB_NAME}"
-    exit 1
-  fi
-  publish_attempt=$((publish_attempt + 1))
-  sleep "$PUBLISH_RETRY_SECONDS"
-done
-
-wait "$SERVER_PID"
-```
-
-## Mode B operator notes (Docker self-hosted)
-
-- Mount `./.generated/spacetimedb-keys` read-only to `/etc/spacetimedb`.
-- Always pass `--jwt-priv-key-path=/etc/spacetimedb/id_ecdsa` and
-  `--jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub` at startup.
-- Keep mounted-key sync enabled in rotation runs so runtime files are
-  refreshed with the same operation.
-- After rotation, restart with
-  `docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb`.
-- Validate with
-  `docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"`.
-
-## Operational runbook (copy/paste)
-
-``` codeBlockStandalone_LlrK
-# 0) Azure auth (run where your just/az tooling lives)
-just az-login
-
-# Preview
-just kv-rotate-jwt-keys-preview
-
-# Rotate (run on each host with matching env)
-# run on azvmprod
-just kv-rotate-jwt-keys ENV=prod
-# run on azvmtest
-just kv-rotate-jwt-keys ENV=test
-# run on azvmdev
-just kv-rotate-jwt-keys ENV=dev
-# optional local workstation
-just kv-rotate-jwt-keys ENV=local
-
-# Verify
-just kv-verify-jwt-keys
-
-# Restart so rotated keys are loaded
-docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-
-# Self-publish module to your self-hosted instance
-just spacetimedb-publish
-
-# Check runtime markers
-docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"
-```
-
-After restart/redeploy, verify your logs include your expected publish
-marker, for example:
-
-- `PUBLISH_SUCCESS`
-- `PUBLISH_FAILED`
-
-### Canonical data sync flow (source -\> destination)
-
-Use this flow for any host-to-host promotion hop (for example
-`prod -> test` or `test -> dev`).
-
-``` codeBlockStandalone_LlrK
-# 1) Stop destination service (run on destination host)
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml stop spacetimedb'
-
-# 2) Preview + sync data (run from control host)
-rsync -aHAX --delete --dry-run azvmprod:/var/lib/spacetime/data/ azvmtest:/var/lib/spacetime/data/
-rsync -aHAX --delete azvmprod:/var/lib/spacetime/data/ azvmtest:/var/lib/spacetime/data/
-
-# 3) Re-sign destination cached publish token (run in destination repo)
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "./data/.config/spacetime/cli.toml" --private-key-path "./.generated/spacetimedb-keys/id_ecdsa"'
-
-# 4) Start destination service, publish, and check logs
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml up -d spacetimedb'
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && just spacetimedb-publish'
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"'
-```
-
-### Sync justfile variables (DRY configuration)
-
-Define these once at the top of your sync justfile so every recipe
-reuses the same paths:
-
-``` prism-code
-sync_key := home_directory() / ".ssh/azvmsync"
-sync_remote_data := "/home/deploy/spacetimedb-app/.config/spacetimedb/data/"
-sync_local_data := ".config/spacetimedb/data/"
-sync_rsync_opts := "-avz --delete"
-sync_spacetime_service := "spacetimedb"
-sync_local_cli_toml := sync_local_data + ".config/spacetime/cli.toml"
-sync_local_priv_key := ".generated/spacetimedb-keys/id_ecdsa"
-```
-
-Then reference them in recipes instead of repeating literal paths:
-
-``` prism-code
-[group('sync')]
-sync-from-prod:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "Syncing SpacetimeDB data: azvmprod -> local"
-    docker compose -f ./.generated/docker-compose.yaml stop {{sync_spacetime_service}} || true
-    rsync {{sync_rsync_opts}} -e "ssh -i {{sync_key}}" \
-        "deploy@azvmprod:{{sync_remote_data}}" \
-        "{{sync_local_data}}"
-    bun tools/azure/spacetimedb-tooling.ts \
-        --resign-token-only \
-        --publisher-cli-toml-path "{{sync_local_cli_toml}}" \
-        --private-key-path "{{sync_local_priv_key}}"
-    docker compose -f ./.generated/docker-compose.yaml up -d {{sync_spacetime_service}}
-    echo "Sync complete: azvmprod -> local"
-
-[group('sync')]
-sync-from-prod-dry:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    rsync {{sync_rsync_opts}} --dry-run -e "ssh -i {{sync_key}}" \
-        "deploy@azvmprod:{{sync_remote_data}}" \
-        "{{sync_local_data}}"
-
-[group('sync')]
-sync-from-test:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "Syncing SpacetimeDB data: azvmtest -> local"
-    docker compose -f ./.generated/docker-compose.yaml stop {{sync_spacetime_service}} || true
-    rsync {{sync_rsync_opts}} -e "ssh -i {{sync_key}}" \
-        "deploy@azvmtest:{{sync_remote_data}}" \
-        "{{sync_local_data}}"
-    bun tools/azure/spacetimedb-tooling.ts \
-        --resign-token-only \
-        --publisher-cli-toml-path "{{sync_local_cli_toml}}" \
-        --private-key-path "{{sync_local_priv_key}}"
-    docker compose -f ./.generated/docker-compose.yaml up -d {{sync_spacetime_service}}
-    echo "Sync complete: azvmtest -> local"
-
-[group('sync')]
-sync-from-test-dry:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    rsync {{sync_rsync_opts}} --dry-run -e "ssh -i {{sync_key}}" \
-        "deploy@azvmtest:{{sync_remote_data}}" \
-        "{{sync_local_data}}"
-
-# Cross-VM sync (no local hop -- runs rsync from source VM to destination VM)
-[group('sync')]
-sync-prod-to-test:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "Syncing SpacetimeDB data: azvmprod -> azvmtest"
-    ssh -i "{{sync_key}}" deploy@azvmprod \
-        "rsync {{sync_rsync_opts}} -e 'ssh -i ~/.ssh/azvmsync' '{{sync_remote_data}}' 'deploy@azvmtest:{{sync_remote_data}}'"
-    ssh -i "{{sync_key}}" deploy@azvmtest \
-        "cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path {{sync_remote_data}}.config/spacetime/cli.toml --private-key-path .generated/spacetimedb-keys/id_ecdsa"
-    echo "Sync complete: azvmprod -> azvmtest"
-
-[group('sync')]
-sync-prod-to-test-dry:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    ssh -i "{{sync_key}}" deploy@azvmprod \
-        "rsync {{sync_rsync_opts}} --dry-run -e 'ssh -i ~/.ssh/azvmsync' '{{sync_remote_data}}' 'deploy@azvmtest:{{sync_remote_data}}'"
-```
-
-### Sync status (data size across hosts)
-
-Check SpacetimeDB data size on every host at a glance:
-
-``` prism-code
-[group('sync')]
-sync-status:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "SpacetimeDB data status across hosts"
-    echo ""
-    printf "%-20s %s\n" "HOST" "SIZE"
-    printf "%-20s %s\n" "----" "----"
-    PROD_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmprod "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")
-    printf "%-20s %s\n" "azvmprod" "${PROD_SIZE}"
-    TEST_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmtest "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")
-    printf "%-20s %s\n" "azvmtest" "${TEST_SIZE}"
-    DEV_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmdev "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")
-    printf "%-20s %s\n" "azvmdev" "${DEV_SIZE}"
-    LOCAL_SIZE=$(du -sh "{{sync_local_data}}" 2>/dev/null | cut -f1 || echo "not found")
-    printf "%-20s %s\n" "local" "${LOCAL_SIZE}"
-```
-
-## Reproducibility Addendum (Operator Copy/Paste)
-
-Use these snippets to reduce setup drift and make rotation/sync runs
-repeatable across teams.
-
-### 1) Preflight checks (before rotate or sync)
-
-``` codeBlockStandalone_LlrK
-#!/usr/bin/env bash
-set -euo pipefail
-
-REQUIRED_BINS=(az openssl bun rsync spacetime ssh)
-KEY_DIR="./.generated/spacetimedb-keys"
-CLI_TOML="./data/.config/spacetime/cli.toml"
-
-for bin in "${REQUIRED_BINS[@]}"; do
-  command -v "${bin}" >/dev/null 2>&1 || { echo "missing dependency: ${bin}"; exit 1; }
-done
-
-az account show >/dev/null 2>&1 || { echo "azure login required: run just az-login"; exit 1; }
-
-mkdir -p "${KEY_DIR}"
-[ -f "${KEY_DIR}/id_ecdsa" ] || echo "note: ${KEY_DIR}/id_ecdsa not present yet (expected before first pull/rotation)"
-[ -f "${KEY_DIR}/id_ecdsa.pub" ] || echo "note: ${KEY_DIR}/id_ecdsa.pub not present yet (expected before first pull/rotation)"
-[ -f "${CLI_TOML}" ] || echo "note: ${CLI_TOML} not present yet (expected before first publish/token write)"
-
-echo "preflight ok"
-```
-
-### 2) Safer AKV pull/push with files
-
-Prefer `--file` for upload to avoid placing multiline PEM values in
-shell command arguments.
-
-``` codeBlockStandalone_LlrK
-#!/usr/bin/env bash
-set -euo pipefail
-
-VAULT_NAME="kv-local" # or kv-dev, kv-test, kv-prod
-SECRET_PRIVATE="spacetimedb-jwt-private-key"
-SECRET_PUBLIC="spacetimedb-jwt-public-key"
-KEY_DIR="./.generated/spacetimedb-keys"
-
-mkdir -p "${KEY_DIR}"
-
-# Pull: Key Vault -> local files
-az keyvault secret show --vault-name "${VAULT_NAME}" --name "${SECRET_PRIVATE}" --query value -o tsv > "${KEY_DIR}/id_ecdsa"
-az keyvault secret show --vault-name "${VAULT_NAME}" --name "${SECRET_PUBLIC}" --query value -o tsv > "${KEY_DIR}/id_ecdsa.pub"
-chmod 600 "${KEY_DIR}/id_ecdsa"
-chmod 644 "${KEY_DIR}/id_ecdsa.pub"
-
-# Push: local files -> Key Vault
-az keyvault secret set --vault-name "${VAULT_NAME}" --name "${SECRET_PRIVATE}" --file "${KEY_DIR}/id_ecdsa" --encoding utf-8 --only-show-errors >/dev/null
-az keyvault secret set --vault-name "${VAULT_NAME}" --name "${SECRET_PUBLIC}" --file "${KEY_DIR}/id_ecdsa.pub" --encoding utf-8 --only-show-errors >/dev/null
-```
-
-### 3) Single-host end-to-end rotation script
-
-``` codeBlockStandalone_LlrK
-#!/usr/bin/env bash
-set -euo pipefail
-
-ENVIRONMENT="${ENVIRONMENT:-local}" # prod|test|dev|local
-
-just az-login
-just kv-rotate-jwt-keys-preview
-just kv-rotate-jwt-keys ENV="${ENVIRONMENT}"
-just kv-verify-jwt-keys
-
-# Load rotated keys in runtime
-docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-
-# Publish validation gate
-just spacetimedb-publish
-docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"
-```
-
-### 4) Identity continuity assertion (before/after re-sign)
-
-Run once before `--resign-token-only` and once after; `iss` and `sub`
-should remain stable.
-
-``` codeBlockStandalone_LlrK
-bun - <<'TS'
-import { readFileSync } from "node:fs";
-
-const cliTomlPath = "./data/.config/spacetime/cli.toml";
-const text = readFileSync(cliTomlPath, "utf8");
-const match = text.match(/^\s*spacetimedb_token\s*=\s*"([^"]+)"\s*$/m);
-if (!match?.[1]) {
-  throw new Error("spacetimedb_token not found");
-}
-
-const token = match[1];
-const parts = token.split(".");
-if (parts.length !== 3 || !parts[1]) {
-  throw new Error("invalid token format");
-}
-
-const payloadJson = Buffer.from(parts[1], "base64url").toString("utf8");
-const claims = JSON.parse(payloadJson) as Record<string, unknown>;
-
-console.log(
-  JSON.stringify(
-    {
-      iss: claims.iss ?? null,
-      sub: claims.sub ?? null,
-      aud: claims.aud ?? null,
-      hex_identity: claims.hex_identity ?? null,
-    },
-    null,
-    2,
-  ),
-);
-TS
-```
-
-### 5) SSH host alias template for rsync workflows
-
-``` prism-code
-Host azvmprod
-  HostName az-lxweb01.yourhost.com
-  User deploy
-  IdentityFile ~/.ssh/azvmsync
-
-Host azvmtest
-  HostName az-lxweb02.yourhost.com
-  User deploy
-  IdentityFile ~/.ssh/azvmsync
-
-Host azvmdev
-  HostName az-lxweb03.yourhost.com
-  User deploy
-  IdentityFile ~/.ssh/azvmsync
-```
-
-### 6) Generate `azvmsync` key for inter-VM sync
-
-Run these from your control host (the machine that runs `ssh`/`rsync`
-commands).
-
-``` codeBlockStandalone_LlrK
-#!/usr/bin/env bash
-set -euo pipefail
-
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-
-# Create a dedicated key for VM-to-VM/data-sync operations.
-ssh-keygen -t ed25519 -f ~/.ssh/azvmsync -C "azvmsync" -N ""
-chmod 600 ~/.ssh/azvmsync
-chmod 644 ~/.ssh/azvmsync.pub
-```
-
-Install the public key on each destination host:
-
-``` codeBlockStandalone_LlrK
-# Option A: if ssh-copy-id is available
-for host in azvmprod azvmtest azvmdev; do
-  ssh-copy-id -i ~/.ssh/azvmsync.pub "$host"
-done
-
-# Option B: manual append if ssh-copy-id is unavailable
-PUBKEY="$(cat ~/.ssh/azvmsync.pub)"
-for host in azvmprod azvmtest azvmdev; do
-  ssh "$host" "mkdir -p ~/.ssh && chmod 700 ~/.ssh && grep -qxF '$PUBKEY' ~/.ssh/authorized_keys || echo '$PUBKEY' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
-done
-```
-
-Verify passwordless connectivity:
-
-``` codeBlockStandalone_LlrK
-for host in azvmprod azvmtest azvmdev; do
-  ssh -i ~/.ssh/azvmsync "$host" "hostname"
-done
-```
-
-If you use host aliases from the prior section, your `rsync` commands
-can stay short and consistent.
-
-## Self-Publish and Versioning
-
-Keep module publish and runtime versions explicit to avoid drift across
-environments.
-
-### Non-container version pinning
-
-``` codeBlockStandalone_LlrK
-# Pin CLI/runtime version in your install process
-spacetime version list
-spacetime install 2.0.1
-spacetime version use 2.0.1
-```
-
-### Container image versioning (host-prebuilt artifact pattern)
-
-Build the SpacetimeDB module on the host first, then package the
-artifact into a lean image. No multi-stage Docker build is needed --
-`spacetime build` runs on the host, and the resulting `dist/bundle.js`
-is copied in:
-
-``` prism-code
-FROM clockworklabs/spacetime:v2.0.1
-
-WORKDIR /opt/app/spacetime
-
-# Host-prebuilt: expects dist/bundle.js from `spacetime build` before `docker build`
-COPY spacetimedb/dist ./spacetimedb/dist
-COPY --chmod=755 spacetimedb/spacetimedb-entrypoint.sh /usr/local/bin/spacetimedb-entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/spacetimedb-entrypoint.sh"]
-```
-
-Build and push workflow:
-
-``` codeBlockStandalone_LlrK
-# 1) Prebuild module artifact on host
-just spacetimedb-prebuild
-
-# 2) Build image with immutable + rolling tags
-docker build \
-  -t registry.example.com/spacetimedb:v2.0.1 \
-  -t registry.example.com/spacetimedb:v2.0 \
-  -f spacetimedb/Dockerfile .
-
-# 3) Preflight-verify publish in a throwaway container
-just spacetimedb-verify-preflight VERSION=v2.0.1
-
-# 4) Push to registry
-docker push registry.example.com/spacetimedb:v2.0.1
-docker push registry.example.com/spacetimedb:v2.0
-```
-
-### Deployment checkpoints
-
-Run each step individually, or use `just spacetimedb-deploy VERSION` to
-execute the full pipeline in one command:
-
-- run `just spacetimedb-prebuild` to confirm module artifact exists
-  before image build,
-- run `just spacetimedb-build` to prebuild + build the container image,
-- run `just spacetimedb-verify-preflight VERSION` to prove publish works
-  in a disposable container before pushing the image,
-- deploy pinned tag first, then optional rolling tag updates,
-- run `just spacetimedb-verify-runtime` after rollout to confirm publish
-  markers appear,
-- rollback by redeploying previous pinned image tag.
-
-## Verification Commands
-
-Use these commands directly in CI/CD or local troubleshooting.
-
-### Validate PEM structure
-
-``` codeBlockStandalone_LlrK
-KEY_DIR="./.generated/spacetimedb-keys"
-openssl pkey -in "${KEY_DIR}/id_ecdsa" -noout
-openssl pkey -pubin -in "${KEY_DIR}/id_ecdsa.pub" -noout
-```
-
-### Validate that public key matches private key
-
-``` codeBlockStandalone_LlrK
-KEY_DIR="./.generated/spacetimedb-keys"
-openssl pkey -in "${KEY_DIR}/id_ecdsa" -pubout -out /tmp/derived.pub
-diff -u <(openssl pkey -pubin -in "${KEY_DIR}/id_ecdsa.pub" -outform PEM) <(openssl pkey -pubin -in /tmp/derived.pub -outform PEM)
-```
-
-### Print stable SHA-256 fingerprint
-
-``` codeBlockStandalone_LlrK
-KEY_DIR="./.generated/spacetimedb-keys"
-openssl pkey -pubin -in "${KEY_DIR}/id_ecdsa.pub" -outform DER | openssl dgst -sha256
-```
-
-### Normalize newline style before upload
-
-``` codeBlockStandalone_LlrK
-# Converts CRLF to LF and ensures trailing newline
-bun -e '
-const keyDir = ".generated/spacetimedb-keys";
-for (const name of ["id_ecdsa", "id_ecdsa.pub"]) {
-  const path = `${keyDir}/${name}`;
-  const text = await Bun.file(path).text();
-  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const withTrailingNewline = normalized.endsWith("\n") ? normalized : `${normalized}\n`;
-  await Bun.write(`${path}.normalized`, withTrailingNewline);
-}
-'
-```
-
-## AI/Automation Contract
-
-Use this section as a machine-readable checklist for scripts or AI
-agents.
-
-### Inputs
-
-- Secret names:
-  - `spacetimedb-jwt-private-key`
-  - `spacetimedb-jwt-public-key`
-- Vault environments:
-  - `kv-prod`
-  - `kv-test`
-  - `kv-dev`
-  - `kv-local`
-- Policy:
-  - prod/test unique keypairs
-  - dev/local shared keypair
-
-### Outputs
-
-- Canonical path mapping:
-  - host source: `./.generated/spacetimedb-keys/id_ecdsa` -\> runtime:
-    `/etc/spacetimedb/id_ecdsa`
-  - host source: `./.generated/spacetimedb-keys/id_ecdsa.pub` -\>
-    runtime: `/etc/spacetimedb/id_ecdsa.pub`
-- Startup args:
-  - `--jwt-priv-key-path=/etc/spacetimedb/id_ecdsa`
-  - `--jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub`
-- Identity-preserving token source:
-  - default: `./data/.config/spacetime/cli.toml`
-  - override example:
-    `--publisher-cli-toml-path ./data/.config/spacetime/cli.toml`
-
-### Required command order
-
-``` codeBlockStandalone_LlrK
-just az-login
-just kv-rotate-jwt-keys-preview
-just kv-rotate-jwt-keys ENV=prod
-just kv-verify-jwt-keys
-rsync -aHAX --delete azvmprod:/var/lib/spacetime/data/ azvmtest:/var/lib/spacetime/data/
-ssh azvmtest 'cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "./data/.config/spacetime/cli.toml" --private-key-path "./.generated/spacetimedb-keys/id_ecdsa"'
-docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb
-```
-
-### Success/failure markers
-
-- Success marker example: `PUBLISH_SUCCESS`
-- Failure marker example: `PUBLISH_FAILED`
-- Auth signals to detect:
-  - `InvalidSignature` (usually stale token/key mismatch)
-  - `not authorized to perform action` (ownership mismatch)
-
-### Non-goals
-
-- No hot-reload for JWT keys (restart required)
-- No automatic ownership transfer during rotation
-- No graceful dual-signing window for local self-signed tokens
-
-## Troubleshooting
-
-``` prism-code
-flowchart TD
-  startNode["Publish Or Connect Fails"] --> statusCheck{"HTTP Status?"}
-  statusCheck -->|"401"| sigPath["Signature Path"]
-  statusCheck -->|"403"| ownerPath["Ownership Path"]
-  statusCheck -->|"other"| genericPath["General Runtime Checks"]
-
-  sigPath --> sigStep1["Confirm active key files are mounted at /etc/spacetimedb"]
-  sigStep1 --> sigStep2["Verify pair parity and SHA256 fingerprint"]
-  sigStep2 --> sigStep3["Replace stale cached CLI token if needed"]
-  sigStep3 --> sigStep4["Restart service to load new keys"]
-
-  ownerPath --> ownerStep1["Token is valid, but caller identity is not DB owner"]
-  ownerStep1 --> ownerStep2["Check XDG_CONFIG_HOME persistence and publish identity source"]
-  ownerStep2 --> ownerStep3["Choose strategy: clean-slate or identity-preserving"]
-
-  genericPath --> genStep1["Confirm restart/redeploy happened after rotation"]
-  genericPath --> genStep2["Check markers: PUBLISH_SUCCESS or PUBLISH_FAILED"]
-```
-
-### `401` path: signature mismatch
-
-Typical cause: token signed with an old/private key pair that no longer
-matches the server public key.
-
-Checks:
-
-- verify `id_ecdsa` and `id_ecdsa.pub` are the files actually mounted
-  into `/etc/spacetimedb`,
-- run the verification cookbook commands to check parity and
-  fingerprints,
-- refresh cached CLI token/config if it still carries old signature
-  material,
-- restart the service so the rotated files are loaded.
-
-### `403` path: ownership mismatch
-
-Typical cause: token is valid, but identity differs from the identity
-that owns the database.
-
-Checks:
-
-- confirm the publish step uses the expected persisted config path
-  (`XDG_CONFIG_HOME`),
-- confirm whether you intentionally rotated into a new identity
-  (clean-slate) or need identity-preserving flow,
-- if you cleared cached CLI auth/config, validate that your new token
-  maps to the expected owner identity.
-
-### General runtime checks
-
-- Confirm rotation order: preview -\> apply -\> verify -\> restart.
-- Confirm mounts are read-only and at the expected path.
-- Confirm publish step and log markers are emitted by the same runtime
-  instance.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/how-to/self-hosted-key-rotation" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Azure Self-Hosted VMs + Key Rotation & Key Vault | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/how-to/self-hosted-key-rotation"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Azure Self-Hosted VMs + Key Rotation & Key Vault | SpacetimeDB docs"><meta data-rh="true" name="description" content="This guide explains how JWT signing key rotation works in self-hosted SpacetimeDB and how to avoid breaking spacetime publish during rotation."><meta data-rh="true" property="og:description" content="This guide explains how JWT signing key rotation works in self-hosted SpacetimeDB and how to avoid breaking spacetime publish during rotation."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/how-to/self-hosted-key-rotation"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/how-to/self-hosted-key-rotation" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/how-to/self-hosted-key-rotation" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Azure Self-Hosted VMs + Key Rotation & Key Vault","item":"https://spacetimedb.com/docs/how-to/self-hosted-key-rotation"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/how-to/self-hosted-key-rotation">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/how-to/self-hosted-key-rotation">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/troubleshooting"><span title="Troubleshooting" class="linkLabel_UvDg">Troubleshooting</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/how-to/deploy/maincloud"><span title="Deploy" class="categoryLinkLabel_HATI">Deploy</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/pg-wire"><span title="PostgreSQL Wire Protocol (PGWire)" class="linkLabel_UvDg">PostgreSQL Wire Protocol (PGWire)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/logging"><span title="Logging" class="linkLabel_UvDg">Logging</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/rls"><span title="Row Level Security" class="linkLabel_UvDg">Row Level Security</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/how-to/reject-client-connections"><span title="Reject Client Connections" class="linkLabel_UvDg">Reject Client Connections</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/how-to/self-hosted-key-rotation"><span title="Azure Self-Hosted VMs + Key Rotation & Key Vault" class="linkLabel_UvDg">Azure Self-Hosted VMs + Key Rotation & Key Vault</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/migrating-from-convex"><span title="Migrating from Convex" class="linkLabel_UvDg">Migrating from Convex</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">How To</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Azure Self-Hosted VMs + Key Rotation & Key Vault</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Azure Self-Hosted VMs + Key Rotation & Key Vault</h1></header><p>This guide explains how JWT signing key rotation works in self-hosted SpacetimeDB and how to avoid breaking <code>spacetime publish</code> during rotation.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="assumptions-and-risk-note">Assumptions and Risk Note<a href="#assumptions-and-risk-note" class="hash-link" aria-label="Direct link to Assumptions and Risk Note" title="Direct link to Assumptions and Risk Note" translate="no">​</a></h2>
+<p>This guide assumes the following baseline:</p>
+\<ul\>
+<li class="">You operate 3 Azure VMs for hosted environments: <code>prod</code>, <code>test</code>, and <code>dev</code>.</li>
+<li class="">You may also run local development (<code>local</code>) outside those hosted VMs.</li>
+<li class="">You have current system-disk backups/snapshots before rotating keys or migrating data.</li>
+</ul>
+<p>This guide shows one practical pattern that combines:</p>
+\<ul\>
+<li class="">Azure Key Vault for JWT key rotation and policy verification.</li>
+<li class=""><code>rsync</code> between hosts (<code>prod</code> -> <code>test</code> -> <code>dev</code>) for staged data migration/testing.</li>
+</ul>
+<p>This pattern can be used in production, and many teams do so, but you should fully understand the operational risks before adopting it:</p>
+\<ul\>
+<li class="">key distribution and mount consistency across hosts,</li>
+<li class="">identity ownership constraints during publish,</li>
+<li class="">data consistency and rollback during host-to-host migration.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="opinionated-setup-reproducible-defaults">Opinionated Setup (Reproducible Defaults)<a href="#opinionated-setup-reproducible-defaults" class="hash-link" aria-label="Direct link to Opinionated Setup (Reproducible Defaults)" title="Direct link to Opinionated Setup (Reproducible Defaults)" translate="no">​</a></h2>
+<p>This guide uses one strict path contract end-to-end:</p>
+\<ul\>
+<li class="">host source directory: <code>./.generated/spacetimedb-keys</code></li>
+<li class="">host key files:<!-- -->
+\<ul\>
+<li class=""><code>./.generated/spacetimedb-keys/id_ecdsa</code></li>
+<li class=""><code>./.generated/spacetimedb-keys/id_ecdsa.pub</code></li>
+</ul>
+</li>
+<li class="">runtime mount target: <code>/etc/spacetimedb</code></li>
+<li class="">runtime key files:<!-- -->
+\<ul\>
+<li class=""><code>/etc/spacetimedb/id_ecdsa</code></li>
+<li class=""><code>/etc/spacetimedb/id_ecdsa.pub</code></li>
+</ul>
+</li>
+</ul>
+<p>Environment mapping for this guide:</p>
+\<ul\>
+<li class=""><code>prod</code> -> <code>azvmprod</code></li>
+<li class=""><code>test</code> -> <code>azvmtest</code></li>
+<li class=""><code>dev</code> -> <code>azvmdev</code></li>
+<li class="">optional <code>local</code> for local workstation workflows</li>
+</ul>
+<p>Operational defaults in this guide:</p>
+\<ul\>
+<li class="">run rotation with <code>just kv-rotate-jwt-keys ENV=prod</code> (or <code>ENV=test|dev|local</code>),</li>
+<li class="">keep token-preservation enabled,</li>
+<li class="">keep mounted-key sync enabled (writes to <code>./.generated/spacetimedb-keys</code>),</li>
+<li class="">mount <code>./.generated/spacetimedb-keys</code> read-only into <code>/etc/spacetimedb</code>,</li>
+<li class="">use one tooling surface (single script is fine) that supports rotate, verify, and token re-sign workflows.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="quickstart-scaffold">Quickstart Scaffold<a href="#quickstart-scaffold" class="hash-link" aria-label="Direct link to Quickstart Scaffold" title="Direct link to Quickstart Scaffold" translate="no">​</a></h2>
+<p>Use this first if you want a fast bootstrap in a new repo.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="1-generate-a-compatible-keypair">1) Generate a compatible keypair<a href="#1-generate-a-compatible-keypair" class="hash-link" aria-label="Direct link to 1) Generate a compatible keypair" title="Direct link to 1) Generate a compatible keypair" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> genpkey</span><span style="color:#BD93F9"> -algorithm</span><span style="color:#F1FA8C"> EC</span><span style="color:#BD93F9"> -pkeyopt</span><span style="color:#F1FA8C"> ec_paramgen_curve:prime256v1</span><span style="color:#BD93F9"> -out</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys/id_ecdsa</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey</span><span style="color:#BD93F9"> -in</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys/id_ecdsa</span><span style="color:#BD93F9"> -pubout</span><span style="color:#BD93F9"> -out</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys/id_ecdsa.pub</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 600</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys/id_ecdsa</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 644</span><span style="color:#F1FA8C"> ./.generated/spacetimedb-keys/id_ecdsa.pub</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="2-start-spacetimedb-with-explicit-key-paths">2) Start SpacetimeDB with explicit key paths<a href="#2-start-spacetimedb-with-explicit-key-paths" class="hash-link" aria-label="Direct link to 2) Start SpacetimeDB with explicit key paths" title="Direct link to 2) Start SpacetimeDB with explicit key paths" translate="no">​</a></h3>
+<p>This command assumes <code>./.generated/spacetimedb-keys</code> is mounted into <code>/etc/spacetimedb</code> for the running process.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --listen-addr</span><span style="color:#F1FA8C"> 0.0.0.0:3003</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --pg-port</span><span style="color:#BD93F9"> 5432</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-priv-key-path</span><span style="color:#F1FA8C"> /etc/spacetimedb/id_ecdsa</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-pub-key-path</span><span style="color:#F1FA8C"> /etc/spacetimedb/id_ecdsa.pub</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="3-run-your-rotation-pipeline">3) Run your rotation pipeline<a href="#3-run-your-rotation-pipeline" class="hash-link" aria-label="Direct link to 3) Run your rotation pipeline" title="Direct link to 3) Run your rotation pipeline" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=local</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span></code></pre>
+<p>By default, the rotation tool preserves publisher identity tokens and refreshes mounted runtime key files unless you explicitly opt out.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="4-restart-and-validate">4) Restart and validate<a href="#4-restart-and-validate" class="hash-link" aria-label="Direct link to 4) Restart and validate" title="Direct link to 4) Restart and validate" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> up</span><span style="color:#BD93F9"> -d</span><span style="color:#BD93F9"> --force-recreate</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --no-color</span><span style="color:#BD93F9"> --tail=200</span><span style="color:#F1FA8C"> spacetimedb</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> rg</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized</span><span style="color:#E9F284">"</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="deployment-modes">Deployment Modes<a href="#deployment-modes" class="hash-link" aria-label="Direct link to Deployment Modes" title="Direct link to Deployment Modes" translate="no">​</a></h2>
+<p>Pick one mode. The rotation/publish order stays the same in both:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=prod</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> up</span><span style="color:#BD93F9"> -d</span><span style="color:#BD93F9"> --force-recreate</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> spacetimedb-publish</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --no-color</span><span style="color:#BD93F9"> --tail=200</span><span style="color:#F1FA8C"> spacetimedb</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> rg</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized</span><span style="color:#E9F284">"</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="mode-a-non-container-self-hosted">Mode A: Non-container self-hosted<a href="#mode-a-non-container-self-hosted" class="hash-link" aria-label="Direct link to Mode A: Non-container self-hosted" title="Direct link to Mode A: Non-container self-hosted" translate="no">​</a></h3>
+<p>Run directly on the host using <code>spacetime start</code> with key paths mounted at <code>/etc/spacetimedb</code>.</p>
+<p>Simple sample:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --listen-addr=0.0.0.0:3003</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --pg-port=5432</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="mode-b-docker-self-hosted">Mode B: Docker self-hosted<a href="#mode-b-docker-self-hosted" class="hash-link" aria-label="Direct link to Mode B: Docker self-hosted" title="Direct link to Mode B: Docker self-hosted" translate="no">​</a></h3>
+<p>Run in Docker, mount key files into <code>/etc/spacetimedb</code>, and pass explicit JWT key args.</p>
+<p><strong>Development / local</strong> -- expose ports directly:</p>
+<div class="language-yaml codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-yaml codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token key atrule">services</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token key atrule">spacetimedb</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">image</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> clockworklabs/spacetime</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain">v2.0.1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">restart</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> always</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">command</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> start</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">listen</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">addr=0.0.0.0</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token number" style="color:rgb(247, 140, 108)">3003</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">pg</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">port=5432</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">jwt</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">priv</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">key</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">path=/etc/spacetimedb/id_ecdsa</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">jwt</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">pub</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">key</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">path=/etc/spacetimedb/id_ecdsa.pub</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">ports</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"3003:3003"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"5432:5432"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">volumes</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"./.config/spacetimedb/data:/home/spacetime/.local/share/spacetime/data"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"./.generated/spacetimedb-keys:/etc/spacetimedb:ro"</span><br></span></code></pre></div></div>
+<p><strong>Production</strong> -- use <code>expose</code> with a reverse proxy (Caddy shown here) instead of raw <code>ports</code>.
+This snippet includes both the Caddy reverse-proxy container and SpacetimeDB, which is the
+minimum viable production stack:</p>
+<div class="language-yaml codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-yaml codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token key atrule">networks</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token key atrule">caddy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">external</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token boolean important" style="color:rgb(255, 88, 116)">true</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token key atrule">services</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token key atrule">caddy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">container_name</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> caddy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">image</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> lucaslorentz/caddy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">docker</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">proxy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain">ci</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">alpine</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">restart</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> always</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">ports</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"80:80"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"443:443/tcp"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"443:443/udp"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">environment</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">CADDY_INGRESS_NETWORKS</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> caddy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">labels</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">caddy.email</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"ops@example.com"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">volumes</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"/var/run/docker.sock:/var/run/docker.sock"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"caddy_data:/data"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">networks</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> caddy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">deploy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">restart_policy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        </span><span class="token key atrule">condition</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> any</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token key atrule">spacetimedb</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">container_name</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">image</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> registry.example.com/spacetimedb</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain">v2.0.1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">restart</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> always</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">hostname</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">environment</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">SPACETIME_DATABASE_NAME</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> spacetime</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">build</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">context</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> ./</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">dockerfile</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> spacetimedb/Dockerfile</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">command</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> start</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">listen</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">addr</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"0.0.0.0:3003"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">jwt</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">priv</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">key</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">path=/etc/spacetimedb/id_ecdsa</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">jwt</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">pub</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">key</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">path=/etc/spacetimedb/id_ecdsa.pub</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">pg</span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain">port</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"5432"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">expose</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token number" style="color:rgb(247, 140, 108)">3003</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token number" style="color:rgb(247, 140, 108)">5432</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">volumes</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"./.config/spacetimedb/data:/home/spacetime/.local/share/spacetime/data"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"./.generated/spacetimedb-keys:/etc/spacetimedb:ro"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">labels</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">caddy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"https://stdb.example.com"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">caddy.reverse_proxy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">"{{upstreams 3003}}"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">deploy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">replicas</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token number" style="color:rgb(247, 140, 108)">1</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">restart_policy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        </span><span class="token key atrule">condition</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> any</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    </span><span class="token key atrule">networks</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">      </span><span class="token key atrule">caddy</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        </span><span class="token key atrule">aliases</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(199, 146, 234)">-</span><span class="token plain"> spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token key atrule">volumes</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token key atrule">caddy_data</span><span class="token punctuation" style="color:rgb(199, 146, 234)">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">{</span><span class="token punctuation" style="color:rgb(199, 146, 234)">}</span><br></span></code></pre></div></div>
+<p>Key differences from the local variant:</p>
+\<ul\>
+<li class=""><code>expose</code> keeps ports internal to the Docker network; only Caddy binds host ports 80/443.</li>
+<li class="">Caddy auto-provisions TLS certificates and routes traffic based on service labels.</li>
+<li class=""><code>caddy-docker-proxy</code> watches the Docker socket for label changes -- adding or restarting services automatically updates routing.</li>
+<li class=""><code>deploy.restart_policy</code> ensures both containers restart on failure.</li>
+<li class=""><code>networks</code> with an alias lets other services resolve <code>spacetimedb</code> by name.</li>
+</ul>
+<p>Before first run, create the external network: <code>docker network create caddy</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="background">Background<a href="#background" class="hash-link" aria-label="Direct link to Background" title="Direct link to Background" translate="no">​</a></h2>
+<p>SpacetimeDB signs local identity tokens with an EC keypair (ES256, P-256). The keypair is read from:</p>
+\<ul\>
+<li class=""><code>--jwt-priv-key-path</code> and <code>--jwt-pub-key-path</code> CLI args, or</li>
+<li class=""><code>[certificate-authority]</code> in <code>config.toml</code> (see <a class="" href="/docs/cli-reference/standalone-config">Standalone Configuration</a>).</li>
+</ul>
+<p>To generate compatible keys, use the canonical commands in <code>Quickstart Scaffold -> 1) Generate a compatible keypair</code>.</p>
+<p>Mount this directory into <code>/etc/spacetimedb</code> in your runtime so startup paths remain:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> run</span><span style="color:#BD93F9"> --rm</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  -v</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">$(</span><span style="color:#8BE9FD">pwd</span><span style="color:#F1FA8C">)/.generated/spacetimedb-keys:/etc/spacetimedb:ro</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#F1FA8C">  clockworklabs/spacetime:v2.0.1</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#F1FA8C">  start</span><span style="color:#BD93F9"> --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa</span><span style="color:#BD93F9"> --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub</span></span></code></pre>
+<p>Important constraints:</p>
+\<ul\>
+<li class="">Keys are loaded at server startup; there is no hot-reload for JWT keys.</li>
+<li class="">For locally issued tokens, SpacetimeDB validates against one active public key.</li>
+<li class="">Rotating keys invalidates tokens signed by the previous private key.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="why-rotation-can-cause-401-and-403">Why rotation can cause 401 and 403<a href="#why-rotation-can-cause-401-and-403" class="hash-link" aria-label="Direct link to Why rotation can cause 401 and 403" title="Direct link to Why rotation can cause 401 and 403" translate="no">​</a></h2>
+<p>After rotation, there are two common failure modes:</p>
+\<ul\>
+<li class=""><strong>401 Unauthorized</strong>: the token signature is invalid for the new keypair.</li>
+<li class=""><strong>403 Forbidden</strong>: token is valid, but the caller identity is not the database owner.</li>
+</ul>
+<p>The 403 case is the subtle one:</p>
+\<ol\>
+<li class="">Database ownership is tied to the identity that first created/published the database.</li>
+<li class="">If you clear CLI credentials and get a fresh local token, the new token usually has a different subject claim.</li>
+<li class="">A different subject produces a different identity.</li>
+<li class="">Publish/update now fails as "not authorized to perform action ... update database."</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="rotation-strategies">Rotation strategies<a href="#rotation-strategies" class="hash-link" aria-label="Direct link to Rotation strategies" title="Direct link to Rotation strategies" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="strategy-a-clean-slate-rotation-devcistateless">Strategy A: Clean-slate rotation (dev/CI/stateless)<a href="#strategy-a-clean-slate-rotation-devcistateless" class="hash-link" aria-label="Direct link to Strategy A: Clean-slate rotation (dev/CI/stateless)" title="Direct link to Strategy A: Clean-slate rotation (dev/CI/stateless)" translate="no">​</a></h3>
+<p>Use this when you are fine recreating databases and losing existing data.</p>
+\<ol\>
+<li class="">Rotate keypair in your secret store.</li>
+<li class="">Restart SpacetimeDB so it loads new keys.</li>
+<li class="">Clear persisted Spacetime CLI config used by your publish step.</li>
+<li class="">Re-publish, which creates a fresh owner identity and database state.</li>
+</ol>
+<p>Tradeoff: this resets ownership and data.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="strategy-b-identity-preserving-rotation-stateful">Strategy B: Identity-preserving rotation (stateful)<a href="#strategy-b-identity-preserving-rotation-stateful" class="hash-link" aria-label="Direct link to Strategy B: Identity-preserving rotation (stateful)" title="Direct link to Strategy B: Identity-preserving rotation (stateful)" translate="no">​</a></h3>
+<p>Use this when you must keep the existing database owner identity.</p>
+\<ol\>
+<li class="">Before rotation, capture the current owner token (or at minimum its <code>sub</code> and <code>iss</code> claims).</li>
+<li class="">Rotate keypair.</li>
+<li class="">Mint a new JWT signed by the new private key but with the same <code>iss</code> and <code>sub</code>.</li>
+<li class="">Update the CLI token used by <code>spacetime publish</code>.</li>
+<li class="">Restart SpacetimeDB and publish.</li>
+</ol>
+<p>This preserves identity because identity derivation depends on claims (<code>iss</code>/<code>sub</code>), not on which key signed the token.
+In practice, keep these defaults unless you have a break-glass reason:</p>
+\<ul\>
+<li class="">default token path: <code>./data/.config/spacetime/cli.toml</code>,</li>
+<li class="">environment-aware preserve mode (<code>prod|test|dev|local</code>),</li>
+<li class="">mounted-key sync on by default.</li>
+</ul>
+<p>Tradeoff: more operational complexity; requires careful token handling.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="strategy-c-oidc-backed-identity-recommended-for-production">Strategy C: OIDC-backed identity (recommended for production)<a href="#strategy-c-oidc-backed-identity-recommended-for-production" class="hash-link" aria-label="Direct link to Strategy C: OIDC-backed identity (recommended for production)" title="Direct link to Strategy C: OIDC-backed identity (recommended for production)" translate="no">​</a></h3>
+<p>Use <a class="" href="/docs/core-concepts/authentication">Authentication</a> with an external OIDC IdP so identity is anchored to external <code>iss</code>/<code>sub</code>, and local SpacetimeDB signing-key rotation does not redefine publisher identity.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="azure-key-vault-example-self-hosted">Azure Key Vault example (self-hosted)<a href="#azure-key-vault-example-self-hosted" class="hash-link" aria-label="Direct link to Azure Key Vault example (self-hosted)" title="Direct link to Azure Key Vault example (self-hosted)" translate="no">​</a></h2>
+<p>This example uses generic <code>just</code> recipes and names so you can adapt it to your own repo.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-command-flow">Example command flow<a href="#example-command-flow" class="hash-link" aria-label="Direct link to Example command flow" title="Direct link to Example command flow" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># 1) Authenticate to Azure</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 2) Preview rotation (no writes)</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 3) Apply rotation (choose env per host)</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=local</span></span>
+<span class="line"><span style="color:#6272A4"># just kv-rotate-jwt-keys ENV=dev</span></span>
+<span class="line"><span style="color:#6272A4"># just kv-rotate-jwt-keys ENV=test</span></span>
+<span class="line"><span style="color:#6272A4"># just kv-rotate-jwt-keys ENV=prod</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 4) Verify keypair parity and policy</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="direct-azure-cli-pullpush-snippets">Direct Azure CLI pull/push snippets<a href="#direct-azure-cli-pullpush-snippets" class="hash-link" aria-label="Direct link to Direct Azure CLI pull/push snippets" title="Direct link to Direct Azure CLI pull/push snippets" translate="no">​</a></h3>
+<p>For concrete file-safe AKV pull/push commands, use <code>Reproducibility Addendum -> 2) Safer AKV pull/push with files</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-environment-policy">Example environment policy<a href="#example-environment-policy" class="hash-link" aria-label="Direct link to Example environment policy" title="Direct link to Example environment policy" translate="no">​</a></h3>
+\<ul\>
+<li class=""><code>kv-prod</code>: unique keypair</li>
+<li class=""><code>kv-test</code>: unique keypair</li>
+<li class=""><code>kv-dev</code> + <code>kv-local</code>: shared keypair</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-secret-names">Example secret names<a href="#example-secret-names" class="hash-link" aria-label="Direct link to Example secret names" title="Direct link to Example secret names" translate="no">​</a></h3>
+\<ul\>
+<li class=""><code>spacetimedb-jwt-private-key</code></li>
+<li class=""><code>spacetimedb-jwt-public-key</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="what-your-rotation-tool-should-guarantee">What your rotation tool should guarantee<a href="#what-your-rotation-tool-should-guarantee" class="hash-link" aria-label="Direct link to What your rotation tool should guarantee" title="Direct link to What your rotation tool should guarantee" translate="no">​</a></h3>
+\<ul\>
+<li class="">Generate ES256-compatible P-256 keypairs.</li>
+<li class="">Normalize PEM values before upload (<code>\r\n</code> -> <code>\n</code>, ensure trailing newline).</li>
+<li class="">Verify each private/public pair matches.</li>
+<li class="">Compute fingerprints and enforce your policy across environments.</li>
+<li class="">Require explicit confirmation for mutating operations.</li>
+<li class="">Support both dry-run and verify-only modes.</li>
+<li class="">Preserve publisher identity by default (re-sign cached CLI token), with explicit opt-out for break-glass cases.</li>
+<li class="">Refresh mounted key files by default, with explicit opt-out for advanced workflows.</li>
+<li class="">Support environment-aware token re-signing (<code>prod|test|dev|local</code>).</li>
+<li class="">Support override for cached token path (default can be <code>./data/.config/spacetime/cli.toml</code>).</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="scaffold-templates">Scaffold Templates<a href="#scaffold-templates" class="hash-link" aria-label="Direct link to Scaffold Templates" title="Direct link to Scaffold Templates" translate="no">​</a></h2>
+<p>These templates are intentionally generic so you can paste and adapt them in your own repository.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="template-justfile-recipes">Template: <code>justfile</code> recipes<a href="#template-justfile-recipes" class="hash-link" aria-label="Direct link to template-justfile-recipes" title="Direct link to template-justfile-recipes" translate="no">​</a></h3>
+<div class="language-make codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-make codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">az-login:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    az login --use-device-code && az account show --query "{name:name, id:id}" -o table</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-rotate-jwt-keys-preview:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts --dry-run --verbose</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[confirm("This rotates JWT signing keys in Key Vault environments. Continue?")]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-rotate-jwt-keys ENV="local":</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts --yes --preserve-publisher-token-env "{{ENV}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-verify-jwt-keys:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts --verify-only</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-get SECRET VAULT="kv-local":</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    @az keyvault secret show --vault-name "{{VAULT}}" --name "{{SECRET}}" --query &#x27;value&#x27; -o tsv</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-set SECRET VALUE VAULT="kv-local":</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    az keyvault secret set --vault-name "{{VAULT}}" --name "{{SECRET}}" --value "{{VALUE}}" --only-show-errors</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;azure&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">kv-resign-jwt-token CLI_TOML="./data/.config/spacetime/cli.toml" PRIV_KEY=".generated/spacetimedb-keys/id_ecdsa":</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "{{CLI_TOML}}" --private-key-path "{{PRIV_KEY}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-restart:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-publish:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    spacetime publish --yes --server http://127.0.0.1:3003 --js-path ./dist/bundle.js spacetime</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-build:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    just spacetimedb-prebuild</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Building SpacetimeDB container image"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml build spacetimedb --progress=auto</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB container image built"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-deploy VERSION:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    COMPOSE_FILE="./.generated/docker-compose.yaml"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB deploy pipeline ({{VERSION}})"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 1) Prebuild module artifact on host</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    just spacetimedb-prebuild</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 2) Build container image</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f "${COMPOSE_FILE}" build spacetimedb --progress=auto</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 3) Preflight-verify publish in a throwaway container</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    just spacetimedb-verify-preflight "{{VERSION}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 4) Push to registry</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f "${COMPOSE_FILE}" push spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 5) Deploy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f "${COMPOSE_FILE}" up -d --force-recreate spacetimedb</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    # 6) Verify runtime publish marker</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    just spacetimedb-verify-runtime</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB deploy pipeline complete ({{VERSION}})"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-setup-host:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    BASE_DIR="${SPACETIME_HOST_DIR:-.config/spacetimedb}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    DATA_DIR="${BASE_DIR}/data"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    TARGET_UID="${SPACETIME_HOST_UID:-1000}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    TARGET_GID="${SPACETIME_HOST_GID:-1000}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    DRY_RUN="${DRY_RUN:-0}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    VERBOSE="${VERBOSE:-0}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    CHOWN_WITH_SUDO="${CHOWN_WITH_SUDO:-1}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    run_cmd() {</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        [ "$VERBOSE" = "1" ] && echo "   $*"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        [ "$DRY_RUN" = "1" ] && return 0</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "$@"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    }</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Preparing host directories for SpacetimeDB"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "   Base dir: ${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "   Data dir: ${DATA_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "   Target owner: ${TARGET_UID}:${TARGET_GID}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    [ "$DRY_RUN" = "1" ] && echo "   Mode: dry-run (no changes)"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    run_cmd mkdir -p "${DATA_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if [ "$CHOWN_WITH_SUDO" = "1" ] && command -v sudo >/dev/null 2>&1; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        [ "$DRY_RUN" != "1" ] && sudo chown -R "${TARGET_UID}:${TARGET_GID}" "${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    else</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        run_cmd chown -R "${TARGET_UID}:${TARGET_GID}" "${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    run_cmd chmod -R u+rwX,g+rwX "${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    [ "$DRY_RUN" != "1" ] && ls -ld "${BASE_DIR}" "${DATA_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB host setup complete"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Override defaults: SPACETIME_HOST_DIR, SPACETIME_HOST_UID, SPACETIME_HOST_GID, DRY_RUN=1, VERBOSE=1"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[confirm("This will DELETE all SpacetimeDB host data/config and recreate empty directories. Continue?")]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-reset-host:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    BASE_DIR="${SPACETIME_HOST_DIR:-.config/spacetimedb}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    DRY_RUN="${DRY_RUN:-0}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Resetting SpacetimeDB host state: ${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    [ "$DRY_RUN" = "1" ] && echo "   Mode: dry-run (no changes)"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if [ "$DRY_RUN" != "1" ]; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        if command -v sudo >/dev/null 2>&1; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            sudo rm -rf "${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        else</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            rm -rf "${BASE_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    just spacetimedb-setup-host</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-prebuild:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    MODULE_DIR="${SPACETIME_MODULE_DIR:-spacetimedb}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ARTIFACT_PATH="${MODULE_DIR}/dist/bundle.js"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if ! command -v spacetime >/dev/null 2>&1; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        echo "SpacetimeDB CLI not found."</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        echo "   Install: curl -sSf https://install.spacetimedb.com | sh"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Host prebuild: SpacetimeDB module artifact"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ( cd "${MODULE_DIR}" && spacetime build )</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if [ ! -f "${ARTIFACT_PATH}" ]; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        echo "Expected host artifact missing: ${ARTIFACT_PATH}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Host prebuild ready: ${ARTIFACT_PATH}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-verify-preflight VERSION:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    SPACETIME_IMAGE="registry.example.com/spacetimedb:{{VERSION}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    SPACETIME_MARKER="SPACETIMEDB_PUBLISH_SUCCESS"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    SPACETIME_DATA_DIR=$(mktemp -d)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    CONTAINER_NAME="spacetimedb-preflight-{{VERSION}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Preflight: validating SpacetimeDB publish in throwaway container"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "   Image: ${SPACETIME_IMAGE}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "   Temp data: ${SPACETIME_DATA_DIR}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    cleanup() {</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        rm -rf "${SPACETIME_DATA_DIR}" >/dev/null 2>&1 || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    }</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    trap cleanup EXIT</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker run -d --name "${CONTAINER_NAME}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        -e SPACETIME_DATABASE_NAME=spacetime \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        -v "${SPACETIME_DATA_DIR}:/home/spacetime/.local/share/spacetime/data" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "${SPACETIME_IMAGE}" >/dev/null</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    PRECHECK_SUCCESS=0</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    for _ in $(seq 1 45); do</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        LOGS=$(docker logs "${CONTAINER_NAME}" 2>&1 || true)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        if echo "${LOGS}" | grep -q "${SPACETIME_MARKER}"; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            PRECHECK_SUCCESS=1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            break</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        if ! docker ps --filter "name=^/${CONTAINER_NAME}$" -q | grep -q "."; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            echo "Preflight container exited before publish success"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            echo "${LOGS}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        sleep 2</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    done</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if [ "${PRECHECK_SUCCESS}" -ne 1 ]; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        echo "Preflight timed out waiting for publish success marker"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        docker logs "${CONTAINER_NAME}" || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Preflight publish succeeded"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;deploy&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">spacetimedb-verify-runtime:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    COMPOSE_SERVICE="${SPACETIME_SERVICE:-spacetimedb}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    SPACETIME_MARKER="SPACETIMEDB_PUBLISH_SUCCESS"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    COMPOSE_FILE="${COMPOSE_FILE:-./.generated/docker-compose.yaml}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    RUNTIME_SUCCESS=0</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    for _ in $(seq 1 45); do</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        RUNTIME_LOGS=$(docker compose -f "${COMPOSE_FILE}" logs --no-color --tail=200 "${COMPOSE_SERVICE}" 2>&1 || true)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        if echo "${RUNTIME_LOGS}" | grep -q "${SPACETIME_MARKER}"; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            RUNTIME_SUCCESS=1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            break</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        if ! docker compose -f "${COMPOSE_FILE}" ps --status running "${COMPOSE_SERVICE}" | grep -q "${COMPOSE_SERVICE}"; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            echo "SpacetimeDB runtime container is not running"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            echo "${RUNTIME_LOGS}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">            exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        sleep 2</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    done</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    if [ "${RUNTIME_SUCCESS}" -ne 1 ]; then</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        echo "SpacetimeDB runtime publish marker not found after deployment"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        docker compose -f "${COMPOSE_FILE}" logs --no-color --tail=300 "${COMPOSE_SERVICE}" || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        exit 1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    fi</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB runtime publish verified"</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="template-rotation-script-skeleton-toolsazurespacetimedb-toolingts">Template: rotation script skeleton (<code>tools/azure/spacetimedb-tooling.ts</code>)<a href="#template-rotation-script-skeleton-toolsazurespacetimedb-toolingts" class="hash-link" aria-label="Direct link to template-rotation-script-skeleton-toolsazurespacetimedb-toolingts" title="Direct link to template-rotation-script-skeleton-toolsazurespacetimedb-toolingts" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/usr/bin/env bun</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { $ } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">bun</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { chmod, mkdir, mkdtemp, rm } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">node:fs/promises</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { tmpdir } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">node:os</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { join } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">node:path</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { parseArgs } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">node:util</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> SECRET_PRIVATE </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spacetimedb-jwt-private-key</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> SECRET_PUBLIC </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spacetimedb-jwt-public-key</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> VAULTS </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> { prod</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">kv-prod</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, test</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">kv-test</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, dev</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">kv-dev</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, local</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">kv-local</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> } </span><span style="color:#FF79C6">as</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> { values } </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> parseArgs</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">  args</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> Bun.argv.</span><span style="color:#50FA7B">slice</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">  options</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">dry-run</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, short</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">d</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">verify-only</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">resign-token-only</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">preserve-publisher-token</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">no-preserve-publisher-token</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">preserve-publisher-token-env</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">string</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">local</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">publisher-cli-toml-path</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">string</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">./data/.config/spacetime/cli.toml</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">private-key-path</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">string</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">sync-mounted-keys</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">no-sync-mounted-keys</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">mounted-keys-dir</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">string</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">    yes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">    verbose</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { type</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">boolean</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, short</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">v</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, default</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> preservePublisherToken </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> values[</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">preserve-publisher-token</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">] </span><span style="color:#FF79C6">&&</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">values[</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">no-preserve-publisher-token</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">];</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> syncMountedKeys </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> values[</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">sync-mounted-keys</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">] </span><span style="color:#FF79C6">&&</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">values[</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">no-sync-mounted-keys</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">];</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> isResignOnly </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> values[</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">resign-token-only</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> generateKeyPair</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">label</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">dir</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> priv </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> join</span><span style="color:#F8F8F2">(dir, </span><span style="color:#F1FA8C">`</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">label</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">_private.pem`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> pub </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> join</span><span style="color:#F8F8F2">(dir, </span><span style="color:#F1FA8C">`</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">label</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">_public.pem`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> $</span><span style="color:#F1FA8C">`openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:prime256v1 -out </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">priv</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">quiet</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> $</span><span style="color:#F1FA8C">`openssl pkey -in </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">priv</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> -pubout -out </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">pub</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">quiet</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> chmod</span><span style="color:#F8F8F2">(priv, </span><span style="color:#BD93F9">0o600</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> chmod</span><span style="color:#F8F8F2">(pub, </span><span style="color:#BD93F9">0o644</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> { privPem</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> await</span><span style="color:#F8F8F2"> Bun.</span><span style="color:#50FA7B">file</span><span style="color:#F8F8F2">(priv).</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">(), pubPem</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> await</span><span style="color:#F8F8F2"> Bun.</span><span style="color:#50FA7B">file</span><span style="color:#F8F8F2">(pub).</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">(), privPath</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> priv, pubPath</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> pub };</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> setSecret</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">vault</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">value</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> $</span><span style="color:#F1FA8C">`az keyvault secret set --vault-name </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">vault</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> --name </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> --value </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">value</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> --only-show-errors`</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">quiet</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">function</span><span style="color:#50FA7B"> normalizePem</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">value</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> unix </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> value.</span><span style="color:#50FA7B">replace</span><span style="color:#F8F8F2">(</span><span style="color:#FF5555">/</span><span style="color:#BD93F9">\r\n</span><span style="color:#FF5555">/</span><span style="color:#FF79C6">g</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#FF79C6">\n</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">replace</span><span style="color:#F8F8F2">(</span><span style="color:#FF5555">/</span><span style="color:#BD93F9">\r</span><span style="color:#FF5555">/</span><span style="color:#FF79C6">g</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#FF79C6">\n</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> unix.</span><span style="color:#50FA7B">endsWith</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">\n</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2"> unix </span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> `</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">unix</span><span style="color:#FF79C6">}\n</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> fingerprintPublicKey</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">pubPath</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> out </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> await</span><span style="color:#50FA7B"> $</span><span style="color:#F1FA8C">`bash -lc </span><span style="color:#FF79C6">${</span><span style="color:#F1FA8C">`openssl pkey -pubin -in "</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">pubPath</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">" -outform DER | openssl dgst -sha256`</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> out.</span><span style="color:#50FA7B">trim</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> preserveLocalPublisherToken</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">cliTomlPath</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">privatePem</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">  // decode existing token, keep iss/sub/aud/hex_identity, refresh iat, clear exp, re-sign with ES256</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> syncMountedLocalKeys</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">targetDir</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">privatePem</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">publicPem</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> mkdir</span><span style="color:#F8F8F2">(targetDir, { recursive</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#F8F8F2"> Bun.</span><span style="color:#50FA7B">write</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">join</span><span style="color:#F8F8F2">(targetDir, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), privatePem);</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#F8F8F2"> Bun.</span><span style="color:#50FA7B">write</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">join</span><span style="color:#F8F8F2">(targetDir, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), publicPem);</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> chmod</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">join</span><span style="color:#F8F8F2">(targetDir, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#BD93F9">0o600</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> chmod</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">join</span><span style="color:#F8F8F2">(targetDir, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#BD93F9">0o644</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">async</span><span style="color:#FF79C6"> function</span><span style="color:#50FA7B"> runResignOnly</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">cliTomlPath</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">privateKeyPath</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> string</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> privatePem </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> await</span><span style="color:#F8F8F2"> Bun.</span><span style="color:#50FA7B">file</span><span style="color:#F8F8F2">(privateKeyPath).</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">  await</span><span style="color:#50FA7B"> preserveLocalPublisherToken</span><span style="color:#F8F8F2">(cliTomlPath, privatePem);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// flow:</span></span>
+<span class="line"><span style="color:#6272A4">// 1) require --yes unless dry-run/verify-only</span></span>
+<span class="line"><span style="color:#6272A4">// 2) generate prod/test/shared keypairs</span></span>
+<span class="line"><span style="color:#6272A4">// 3) normalize PEM values before upload</span></span>
+<span class="line"><span style="color:#6272A4">// 4) upload by policy (prod unique, test unique, dev/local shared)</span></span>
+<span class="line"><span style="color:#6272A4">// 5) preserve token identity by default (unless no-preserve flag)</span></span>
+<span class="line"><span style="color:#6272A4">// 6) sync mounted keys by default (unless no-sync flag)</span></span>
+<span class="line"><span style="color:#6272A4">// 7) support re-sign-only mode for post-rsync destination identity continuity</span></span>
+<span class="line"><span style="color:#6272A4">// 8) verify parity + fingerprints + policy, exit non-zero on failure</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="template-entrypoint-publish-flow">Template: entrypoint publish flow<a href="#template-entrypoint-publish-flow" class="hash-link" aria-label="Direct link to Template: entrypoint publish flow" title="Direct link to Template: entrypoint publish flow" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/bin/sh</span></span>
+<span class="line"><span style="color:#8BE9FD">set</span><span style="color:#BD93F9"> -eu</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">DATA_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">DATA_DIR</span><span style="color:#FF79C6">:-/</span><span style="color:#BD93F9">var</span><span style="color:#FF79C6">/</span><span style="color:#BD93F9">lib</span><span style="color:#FF79C6">/</span><span style="color:#BD93F9">spacetime</span><span style="color:#FF79C6">/</span><span style="color:#BD93F9">data</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">CONFIG_HOME</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">CONFIG_HOME</span><span style="color:#FF79C6">:-</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">DATA_DIR</span><span style="color:#F1FA8C">}</span><span style="color:#FF79C6">/</span><span style="color:#F1FA8C">.</span><span style="color:#BD93F9">config</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">SERVER_URL</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SERVER_URL</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">http</span><span style="color:#FF79C6">://</span><span style="color:#BD93F9">127</span><span style="color:#F1FA8C">.</span><span style="color:#BD93F9">0</span><span style="color:#F1FA8C">.</span><span style="color:#BD93F9">0</span><span style="color:#F1FA8C">.</span><span style="color:#BD93F9">1</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9">3003</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">DB_NAME</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">DB_NAME</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">spacetime</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">MAX_READY_ATTEMPTS</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">MAX_READY_ATTEMPTS</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">20</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">MAX_PUBLISH_ATTEMPTS</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">MAX_PUBLISH_ATTEMPTS</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">30</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">PUBLISH_RETRY_SECONDS</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">PUBLISH_RETRY_SECONDS</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">2</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">SUCCESS_MARKER</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PUBLISH_SUCCESS</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">FAILURE_MARKER</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PUBLISH_FAILED</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$DATA_DIR</span><span style="color:#E9F284">"</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$CONFIG_HOME</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#BD93F9"> XDG_CONFIG_HOME</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$CONFIG_HOME</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --listen-addr</span><span style="color:#F1FA8C"> 0.0.0.0:3003</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --pg-port</span><span style="color:#BD93F9"> 5432</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-priv-key-path=/etc/spacetimedb/id_ecdsa</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  --jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub</span><span style="color:#F8F8F2"> &</span></span>
+<span class="line"><span style="color:#BD93F9">SERVER_PID</span><span style="color:#FF79C6">=</span><span style="color:#BD93F9;font-style:italic">$!</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">cleanup</span><span style="color:#F8F8F2">() { </span><span style="color:#8BE9FD">kill</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$SERVER_PID</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> 2></span><span style="color:#F1FA8C">/dev/null</span><span style="color:#FF79C6"> ||</span><span style="color:#8BE9FD"> true</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#8BE9FD">trap</span><span style="color:#F1FA8C"> cleanup</span><span style="color:#F1FA8C"> INT</span><span style="color:#F1FA8C"> TERM</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">ready_attempt</span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C">1</span></span>
+<span class="line"><span style="color:#FF79C6">while</span><span style="color:#F8F8F2"> [ </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$ready_attempt</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> -le</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$MAX_READY_ATTEMPTS</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ]; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#50FA7B"> curl</span><span style="color:#BD93F9"> -s</span><span style="color:#BD93F9"> --max-time</span><span style="color:#BD93F9"> 1</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SERVER_URL</span><span style="color:#F1FA8C">}/v1/identity</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> ></span><span style="color:#F1FA8C">/dev/null</span><span style="color:#FF79C6"> 2>&1</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">then</span></span>
+<span class="line"><span style="color:#FF79C6">    break</span></span>
+<span class="line"><span style="color:#FF79C6">  fi</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> [ </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$ready_attempt</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> -eq</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$MAX_READY_ATTEMPTS</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ]; </span><span style="color:#FF79C6">then</span></span>
+<span class="line"><span style="color:#8BE9FD">    echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">FAILURE_MARKER</span><span style="color:#F1FA8C">} server_not_ready</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">    exit</span><span style="color:#BD93F9"> 1</span></span>
+<span class="line"><span style="color:#FF79C6">  fi</span></span>
+<span class="line"><span style="color:#BD93F9">  ready_attempt</span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2">$((</span><span style="color:#50FA7B">ready_attempt</span><span style="color:#F1FA8C"> +</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#50FA7B">  sleep</span><span style="color:#BD93F9"> 1</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">publish_attempt</span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C">1</span></span>
+<span class="line"><span style="color:#FF79C6">while</span><span style="color:#F8F8F2"> [ </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$publish_attempt</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> -le</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$MAX_PUBLISH_ATTEMPTS</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ]; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#8BE9FD">  set</span><span style="color:#F1FA8C"> +e</span></span>
+<span class="line"><span style="color:#BD93F9">  OUT</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">$(</span><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish </span><span style="color:#BD93F9">--yes</span><span style="color:#BD93F9"> --server</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$SERVER_URL</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --js-path</span><span style="color:#F1FA8C"> /app/dist/bundle.js </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$DB_NAME</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> 2>&1</span><span style="color:#F1FA8C">)</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">  STATUS</span><span style="color:#FF79C6">=</span><span style="color:#BD93F9;font-style:italic">$?</span></span>
+<span class="line"><span style="color:#8BE9FD">  set</span><span style="color:#BD93F9"> -e</span></span>
+<span class="line"><span style="color:#F8F8F2">  [ </span><span style="color:#FF79C6">-n</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$OUT</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ] && </span><span style="color:#8BE9FD">echo</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$OUT</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> [ </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$STATUS</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> -eq</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2"> ]; </span><span style="color:#FF79C6">then</span></span>
+<span class="line"><span style="color:#8BE9FD">    echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SUCCESS_MARKER</span><span style="color:#F1FA8C">} database=${</span><span style="color:#BD93F9">DB_NAME</span><span style="color:#F1FA8C">} attempt=${</span><span style="color:#BD93F9">publish_attempt</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">    break</span></span>
+<span class="line"><span style="color:#FF79C6">  fi</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#8BE9FD"> echo</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$OUT</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> rg</span><span style="color:#BD93F9"> -q</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">403 Forbidden|not authorized to perform action</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">then</span></span>
+<span class="line"><span style="color:#8BE9FD">    echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">FAILURE_MARKER</span><span style="color:#F1FA8C">} publish_unauthorized database=${</span><span style="color:#BD93F9">DB_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">    exit</span><span style="color:#BD93F9"> 1</span></span>
+<span class="line"><span style="color:#FF79C6">  fi</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> [ </span><span style="color:#E9F284">"</span><span style="color:#BD93F9">$publish_attempt</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> -eq</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$MAX_PUBLISH_ATTEMPTS</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ]; </span><span style="color:#FF79C6">then</span></span>
+<span class="line"><span style="color:#8BE9FD">    echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">FAILURE_MARKER</span><span style="color:#F1FA8C">} publish_retries_exhausted database=${</span><span style="color:#BD93F9">DB_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">    exit</span><span style="color:#BD93F9"> 1</span></span>
+<span class="line"><span style="color:#FF79C6">  fi</span></span>
+<span class="line"><span style="color:#BD93F9">  publish_attempt</span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2">$((</span><span style="color:#50FA7B">publish_attempt</span><span style="color:#F1FA8C"> +</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#50FA7B">  sleep</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$PUBLISH_RETRY_SECONDS</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD">wait</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$SERVER_PID</span><span style="color:#E9F284">"</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="mode-b-operator-notes-docker-self-hosted">Mode B operator notes (Docker self-hosted)<a href="#mode-b-operator-notes-docker-self-hosted" class="hash-link" aria-label="Direct link to Mode B operator notes (Docker self-hosted)" title="Direct link to Mode B operator notes (Docker self-hosted)" translate="no">​</a></h2>
+\<ul\>
+<li class="">Mount <code>./.generated/spacetimedb-keys</code> read-only to <code>/etc/spacetimedb</code>.</li>
+<li class="">Always pass <code>--jwt-priv-key-path=/etc/spacetimedb/id_ecdsa</code> and <code>--jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub</code> at startup.</li>
+<li class="">Keep mounted-key sync enabled in rotation runs so runtime files are refreshed with the same operation.</li>
+<li class="">After rotation, restart with <code>docker compose -f ./.generated/docker-compose.yaml up -d --force-recreate spacetimedb</code>.</li>
+<li class="">Validate with <code>docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"</code>.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="operational-runbook-copypaste">Operational runbook (copy/paste)<a href="#operational-runbook-copypaste" class="hash-link" aria-label="Direct link to Operational runbook (copy/paste)" title="Direct link to Operational runbook (copy/paste)" translate="no">​</a></h2>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># 0) Azure auth (run where your just/az tooling lives)</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Preview</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Rotate (run on each host with matching env)</span></span>
+<span class="line"><span style="color:#6272A4"># run on azvmprod</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=prod</span></span>
+<span class="line"><span style="color:#6272A4"># run on azvmtest</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=test</span></span>
+<span class="line"><span style="color:#6272A4"># run on azvmdev</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=dev</span></span>
+<span class="line"><span style="color:#6272A4"># optional local workstation</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=local</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Verify</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Restart so rotated keys are loaded</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> up</span><span style="color:#BD93F9"> -d</span><span style="color:#BD93F9"> --force-recreate</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Self-publish module to your self-hosted instance</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> spacetimedb-publish</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Check runtime markers</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --no-color</span><span style="color:#BD93F9"> --tail=200</span><span style="color:#F1FA8C"> spacetimedb</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> rg</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized</span><span style="color:#E9F284">"</span></span></code></pre>
+<p>After restart/redeploy, verify your logs include your expected publish marker, for example:</p>
+\<ul\>
+<li class=""><code>PUBLISH_SUCCESS</code></li>
+<li class=""><code>PUBLISH_FAILED</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="canonical-data-sync-flow-source---destination">Canonical data sync flow (source -> destination)<a href="#canonical-data-sync-flow-source---destination" class="hash-link" aria-label="Direct link to Canonical data sync flow (source -> destination)" title="Direct link to Canonical data sync flow (source -> destination)" translate="no">​</a></h3>
+<p>Use this flow for any host-to-host promotion hop (for example <code>prod -> test</code> or <code>test -> dev</code>).</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># 1) Stop destination service (run on destination host)</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml stop spacetimedb</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 2) Preview + sync data (run from control host)</span></span>
+<span class="line"><span style="color:#50FA7B">rsync</span><span style="color:#BD93F9"> -aHAX</span><span style="color:#BD93F9"> --delete</span><span style="color:#BD93F9"> --dry-run</span><span style="color:#F1FA8C"> azvmprod:/var/lib/spacetime/data/</span><span style="color:#F1FA8C"> azvmtest:/var/lib/spacetime/data/</span></span>
+<span class="line"><span style="color:#50FA7B">rsync</span><span style="color:#BD93F9"> -aHAX</span><span style="color:#BD93F9"> --delete</span><span style="color:#F1FA8C"> azvmprod:/var/lib/spacetime/data/</span><span style="color:#F1FA8C"> azvmtest:/var/lib/spacetime/data/</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 3) Re-sign destination cached publish token (run in destination repo)</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "./data/.config/spacetime/cli.toml" --private-key-path "./.generated/spacetimedb-keys/id_ecdsa"</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 4) Start destination service, publish, and check logs</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml up -d spacetimedb</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && just spacetimedb-publish</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && docker compose -f ./.generated/docker-compose.yaml logs --no-color --tail=200 spacetimedb | rg "PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized"</span><span style="color:#E9F284">&#x27;</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="sync-justfile-variables-dry-configuration">Sync justfile variables (DRY configuration)<a href="#sync-justfile-variables-dry-configuration" class="hash-link" aria-label="Direct link to Sync justfile variables (DRY configuration)" title="Direct link to Sync justfile variables (DRY configuration)" translate="no">​</a></h3>
+<p>Define these once at the top of your sync justfile so every recipe reuses the same paths:</p>
+<div class="language-make codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-make codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_key := home_directory() / ".ssh/azvmsync"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_remote_data := "/home/deploy/spacetimedb-app/.config/spacetimedb/data/"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_local_data := ".config/spacetimedb/data/"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_rsync_opts := "-avz --delete"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_spacetime_service := "spacetimedb"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_local_cli_toml := sync_local_data + ".config/spacetime/cli.toml"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync_local_priv_key := ".generated/spacetimedb-keys/id_ecdsa"</span><br></span></code></pre></div></div>
+<p>Then reference them in recipes instead of repeating literal paths:</p>
+<div class="language-make codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-make codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-from-prod:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Syncing SpacetimeDB data: azvmprod -> local"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml stop {{sync_spacetime_service}} || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    rsync {{sync_rsync_opts}} -e "ssh -i {{sync_key}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "deploy@azvmprod:{{sync_remote_data}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "{{sync_local_data}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --resign-token-only \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --publisher-cli-toml-path "{{sync_local_cli_toml}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --private-key-path "{{sync_local_priv_key}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml up -d {{sync_spacetime_service}}</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Sync complete: azvmprod -> local"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-from-prod-dry:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    rsync {{sync_rsync_opts}} --dry-run -e "ssh -i {{sync_key}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "deploy@azvmprod:{{sync_remote_data}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "{{sync_local_data}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-from-test:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Syncing SpacetimeDB data: azvmtest -> local"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml stop {{sync_spacetime_service}} || true</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    rsync {{sync_rsync_opts}} -e "ssh -i {{sync_key}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "deploy@azvmtest:{{sync_remote_data}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "{{sync_local_data}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    bun tools/azure/spacetimedb-tooling.ts \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --resign-token-only \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --publisher-cli-toml-path "{{sync_local_cli_toml}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        --private-key-path "{{sync_local_priv_key}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    docker compose -f ./.generated/docker-compose.yaml up -d {{sync_spacetime_service}}</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Sync complete: azvmtest -> local"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-from-test-dry:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    rsync {{sync_rsync_opts}} --dry-run -e "ssh -i {{sync_key}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "deploy@azvmtest:{{sync_remote_data}}" \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "{{sync_local_data}}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"># Cross-VM sync (no local hop -- runs rsync from source VM to destination VM)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-prod-to-test:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Syncing SpacetimeDB data: azvmprod -> azvmtest"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ssh -i "{{sync_key}}" deploy@azvmprod \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "rsync {{sync_rsync_opts}} -e &#x27;ssh -i ~/.ssh/azvmsync&#x27; &#x27;{{sync_remote_data}}&#x27; &#x27;deploy@azvmtest:{{sync_remote_data}}&#x27;"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ssh -i "{{sync_key}}" deploy@azvmtest \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path {{sync_remote_data}}.config/spacetime/cli.toml --private-key-path .generated/spacetimedb-keys/id_ecdsa"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "Sync complete: azvmprod -> azvmtest"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-prod-to-test-dry:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ssh -i "{{sync_key}}" deploy@azvmprod \</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">        "rsync {{sync_rsync_opts}} --dry-run -e &#x27;ssh -i ~/.ssh/azvmsync&#x27; &#x27;{{sync_remote_data}}&#x27; &#x27;deploy@azvmtest:{{sync_remote_data}}&#x27;"</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="sync-status-data-size-across-hosts">Sync status (data size across hosts)<a href="#sync-status-data-size-across-hosts" class="hash-link" aria-label="Direct link to Sync status (data size across hosts)" title="Direct link to Sync status (data size across hosts)" translate="no">​</a></h3>
+<p>Check SpacetimeDB data size on every host at a glance:</p>
+<div class="language-make codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-make codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">[group(&#x27;sync&#x27;)]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">sync-status:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    #!/usr/bin/env bash</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    set -euo pipefail</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo "SpacetimeDB data status across hosts"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    echo ""</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "HOST" "SIZE"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "----" "----"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    PROD_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmprod "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "azvmprod" "${PROD_SIZE}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    TEST_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmtest "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "azvmtest" "${TEST_SIZE}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    DEV_SIZE=$(ssh -i "{{sync_key}}" deploy@azvmdev "du -sh {{sync_remote_data}} 2>/dev/null | cut -f1" || echo "unreachable")</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "azvmdev" "${DEV_SIZE}"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    LOCAL_SIZE=$(du -sh "{{sync_local_data}}" 2>/dev/null | cut -f1 || echo "not found")</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    printf "%-20s %s\n" "local" "${LOCAL_SIZE}"</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="reproducibility-addendum-operator-copypaste">Reproducibility Addendum (Operator Copy/Paste)<a href="#reproducibility-addendum-operator-copypaste" class="hash-link" aria-label="Direct link to Reproducibility Addendum (Operator Copy/Paste)" title="Direct link to Reproducibility Addendum (Operator Copy/Paste)" translate="no">​</a></h2>
+<p>Use these snippets to reduce setup drift and make rotation/sync runs repeatable across teams.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="1-preflight-checks-before-rotate-or-sync">1) Preflight checks (before rotate or sync)<a href="#1-preflight-checks-before-rotate-or-sync" class="hash-link" aria-label="Direct link to 1) Preflight checks (before rotate or sync)" title="Direct link to 1) Preflight checks (before rotate or sync)" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/usr/bin/env bash</span></span>
+<span class="line"><span style="color:#8BE9FD">set</span><span style="color:#BD93F9"> -euo</span><span style="color:#F1FA8C"> pipefail</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">REQUIRED_BINS</span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">az</span><span style="color:#F1FA8C"> openssl</span><span style="color:#F1FA8C"> bun</span><span style="color:#F1FA8C"> rsync</span><span style="color:#F1FA8C"> spacetime</span><span style="color:#F1FA8C"> ssh</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#BD93F9">KEY_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">CLI_TOML</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./data/.config/spacetime/cli.toml</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#BD93F9"> bin</span><span style="color:#FF79C6"> in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">REQUIRED_BINS</span><span style="color:#F1FA8C">[</span><span style="color:#FF79C6">@</span><span style="color:#F1FA8C">]}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#8BE9FD">  command</span><span style="color:#BD93F9"> -v</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">bin</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> ></span><span style="color:#F1FA8C">/dev/null</span><span style="color:#FF79C6"> 2>&1</span><span style="color:#FF79C6"> ||</span><span style="color:#F8F8F2"> { </span><span style="color:#8BE9FD">echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">missing dependency: ${</span><span style="color:#BD93F9">bin</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">; </span><span style="color:#8BE9FD">exit</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">az</span><span style="color:#F1FA8C"> account</span><span style="color:#F1FA8C"> show</span><span style="color:#FF79C6"> ></span><span style="color:#F1FA8C">/dev/null</span><span style="color:#FF79C6"> 2>&1</span><span style="color:#FF79C6"> ||</span><span style="color:#F8F8F2"> { </span><span style="color:#8BE9FD">echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">azure login required: run just az-login</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">; </span><span style="color:#8BE9FD">exit</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">[ </span><span style="color:#FF79C6">-f</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ] </span><span style="color:#FF79C6">||</span><span style="color:#8BE9FD"> echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">note: ${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa not present yet (expected before first pull/rotation)</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">[ </span><span style="color:#FF79C6">-f</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ] </span><span style="color:#FF79C6">||</span><span style="color:#8BE9FD"> echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">note: ${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub not present yet (expected before first pull/rotation)</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">[ </span><span style="color:#FF79C6">-f</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">CLI_TOML</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> ] </span><span style="color:#FF79C6">||</span><span style="color:#8BE9FD"> echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">note: ${</span><span style="color:#BD93F9">CLI_TOML</span><span style="color:#F1FA8C">} not present yet (expected before first publish/token write)</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD">echo</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">preflight ok</span><span style="color:#E9F284">"</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="2-safer-akv-pullpush-with-files">2) Safer AKV pull/push with files<a href="#2-safer-akv-pullpush-with-files" class="hash-link" aria-label="Direct link to 2) Safer AKV pull/push with files" title="Direct link to 2) Safer AKV pull/push with files" translate="no">​</a></h3>
+<p>Prefer <code>--file</code> for upload to avoid placing multiline PEM values in shell command arguments.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/usr/bin/env bash</span></span>
+<span class="line"><span style="color:#8BE9FD">set</span><span style="color:#BD93F9"> -euo</span><span style="color:#F1FA8C"> pipefail</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">VAULT_NAME</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">kv-local</span><span style="color:#E9F284">"</span><span style="color:#6272A4"> # or kv-dev, kv-test, kv-prod</span></span>
+<span class="line"><span style="color:#BD93F9">SECRET_PRIVATE</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">spacetimedb-jwt-private-key</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">SECRET_PUBLIC</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">spacetimedb-jwt-public-key</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#BD93F9">KEY_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Pull: Key Vault -> local files</span></span>
+<span class="line"><span style="color:#50FA7B">az</span><span style="color:#F1FA8C"> keyvault</span><span style="color:#F1FA8C"> secret</span><span style="color:#F1FA8C"> show</span><span style="color:#BD93F9"> --vault-name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">VAULT_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SECRET_PRIVATE</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --query</span><span style="color:#F1FA8C"> value</span><span style="color:#BD93F9"> -o</span><span style="color:#F1FA8C"> tsv</span><span style="color:#FF79C6"> ></span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">az</span><span style="color:#F1FA8C"> keyvault</span><span style="color:#F1FA8C"> secret</span><span style="color:#F1FA8C"> show</span><span style="color:#BD93F9"> --vault-name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">VAULT_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SECRET_PUBLIC</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --query</span><span style="color:#F1FA8C"> value</span><span style="color:#BD93F9"> -o</span><span style="color:#F1FA8C"> tsv</span><span style="color:#FF79C6"> ></span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 600</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 644</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Push: local files -> Key Vault</span></span>
+<span class="line"><span style="color:#50FA7B">az</span><span style="color:#F1FA8C"> keyvault</span><span style="color:#F1FA8C"> secret</span><span style="color:#F1FA8C"> set</span><span style="color:#BD93F9"> --vault-name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">VAULT_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SECRET_PRIVATE</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --file</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --encoding</span><span style="color:#F1FA8C"> utf-8</span><span style="color:#BD93F9"> --only-show-errors</span><span style="color:#FF79C6"> ></span><span style="color:#F1FA8C">/dev/null</span></span>
+<span class="line"><span style="color:#50FA7B">az</span><span style="color:#F1FA8C"> keyvault</span><span style="color:#F1FA8C"> secret</span><span style="color:#F1FA8C"> set</span><span style="color:#BD93F9"> --vault-name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">VAULT_NAME</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --name</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">SECRET_PUBLIC</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --file</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> --encoding</span><span style="color:#F1FA8C"> utf-8</span><span style="color:#BD93F9"> --only-show-errors</span><span style="color:#FF79C6"> ></span><span style="color:#F1FA8C">/dev/null</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="3-single-host-end-to-end-rotation-script">3) Single-host end-to-end rotation script<a href="#3-single-host-end-to-end-rotation-script" class="hash-link" aria-label="Direct link to 3) Single-host end-to-end rotation script" title="Direct link to 3) Single-host end-to-end rotation script" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/usr/bin/env bash</span></span>
+<span class="line"><span style="color:#8BE9FD">set</span><span style="color:#BD93F9"> -euo</span><span style="color:#F1FA8C"> pipefail</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#BD93F9">ENVIRONMENT</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">ENVIRONMENT</span><span style="color:#FF79C6">:-</span><span style="color:#BD93F9">local</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span><span style="color:#6272A4"> # prod|test|dev|local</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">ENVIRONMENT</span><span style="color:#F1FA8C">}</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Load rotated keys in runtime</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> up</span><span style="color:#BD93F9"> -d</span><span style="color:#BD93F9"> --force-recreate</span><span style="color:#F1FA8C"> spacetimedb</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Publish validation gate</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> spacetimedb-publish</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --no-color</span><span style="color:#BD93F9"> --tail=200</span><span style="color:#F1FA8C"> spacetimedb</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> rg</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">PUBLISH_SUCCESS|PUBLISH_FAILED|InvalidSignature|not authorized</span><span style="color:#E9F284">"</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="4-identity-continuity-assertion-beforeafter-re-sign">4) Identity continuity assertion (before/after re-sign)<a href="#4-identity-continuity-assertion-beforeafter-re-sign" class="hash-link" aria-label="Direct link to 4) Identity continuity assertion (before/after re-sign)" title="Direct link to 4) Identity continuity assertion (before/after re-sign)" translate="no">​</a></h3>
+<p>Run once before <code>--resign-token-only</code> and once after; <code>iss</code> and <code>sub</code> should remain stable.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">bun</span><span style="color:#F1FA8C"> -</span><span style="color:#FF79C6"> <<</span><span style="color:#F8F8F2">&#x27;TS&#x27;</span></span>
+<span class="line"><span style="color:#F1FA8C">import { readFileSync } from "node:fs";</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F1FA8C">const cliTomlPath = "./data/.config/spacetime/cli.toml";</span></span>
+<span class="line"><span style="color:#F1FA8C">const text = readFileSync(cliTomlPath, "utf8");</span></span>
+<span class="line"><span style="color:#F1FA8C">const match = text.match(/^\s*spacetimedb_token\s*=\s*"([^"]+)"\s*$/m);</span></span>
+<span class="line"><span style="color:#F1FA8C">if (!match?.[1]) {</span></span>
+<span class="line"><span style="color:#F1FA8C">  throw new Error("spacetimedb_token not found");</span></span>
+<span class="line"><span style="color:#F1FA8C">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F1FA8C">const token = match[1];</span></span>
+<span class="line"><span style="color:#F1FA8C">const parts = token.split(".");</span></span>
+<span class="line"><span style="color:#F1FA8C">if (parts.length !== 3 || !parts[1]) {</span></span>
+<span class="line"><span style="color:#F1FA8C">  throw new Error("invalid token format");</span></span>
+<span class="line"><span style="color:#F1FA8C">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F1FA8C">const payloadJson = Buffer.from(parts[1], "base64url").toString("utf8");</span></span>
+<span class="line"><span style="color:#F1FA8C">const claims = JSON.parse(payloadJson) as Record\<string, unknown\>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F1FA8C">console.log(</span></span>
+<span class="line"><span style="color:#F1FA8C">  JSON.stringify(</span></span>
+<span class="line"><span style="color:#F1FA8C">    {</span></span>
+<span class="line"><span style="color:#F1FA8C">      iss: claims.iss ?? null,</span></span>
+<span class="line"><span style="color:#F1FA8C">      sub: claims.sub ?? null,</span></span>
+<span class="line"><span style="color:#F1FA8C">      aud: claims.aud ?? null,</span></span>
+<span class="line"><span style="color:#F1FA8C">      hex_identity: claims.hex_identity ?? null,</span></span>
+<span class="line"><span style="color:#F1FA8C">    },</span></span>
+<span class="line"><span style="color:#F1FA8C">    null,</span></span>
+<span class="line"><span style="color:#F1FA8C">    2,</span></span>
+<span class="line"><span style="color:#F1FA8C">  ),</span></span>
+<span class="line"><span style="color:#F1FA8C">);</span></span>
+<span class="line"><span style="color:#F8F8F2">TS</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="5-ssh-host-alias-template-for-rsync-workflows">5) SSH host alias template for rsync workflows<a href="#5-ssh-host-alias-template-for-rsync-workflows" class="hash-link" aria-label="Direct link to 5) SSH host alias template for rsync workflows" title="Direct link to 5) SSH host alias template for rsync workflows" translate="no">​</a></h3>
+<div class="language-sshconfig codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-sshconfig codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Host azvmprod</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  HostName az-lxweb01.yourhost.com</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  User deploy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  IdentityFile ~/.ssh/azvmsync</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Host azvmtest</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  HostName az-lxweb02.yourhost.com</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  User deploy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  IdentityFile ~/.ssh/azvmsync</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Host azvmdev</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  HostName az-lxweb03.yourhost.com</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  User deploy</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  IdentityFile ~/.ssh/azvmsync</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="6-generate-azvmsync-key-for-inter-vm-sync">6) Generate <code>azvmsync</code> key for inter-VM sync<a href="#6-generate-azvmsync-key-for-inter-vm-sync" class="hash-link" aria-label="Direct link to 6-generate-azvmsync-key-for-inter-vm-sync" title="Direct link to 6-generate-azvmsync-key-for-inter-vm-sync" translate="no">​</a></h3>
+<p>Run these from your control host (the machine that runs <code>ssh</code>/<code>rsync</code> commands).</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">#!/usr/bin/env bash</span></span>
+<span class="line"><span style="color:#8BE9FD">set</span><span style="color:#BD93F9"> -euo</span><span style="color:#F1FA8C"> pipefail</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#F1FA8C"> ~/.ssh</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 700</span><span style="color:#F1FA8C"> ~/.ssh</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Create a dedicated key for VM-to-VM/data-sync operations.</span></span>
+<span class="line"><span style="color:#50FA7B">ssh-keygen</span><span style="color:#BD93F9"> -t</span><span style="color:#F1FA8C"> ed25519</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync</span><span style="color:#BD93F9"> -C</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">azvmsync</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -N</span><span style="color:#E9F284"> ""</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 600</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync</span></span>
+<span class="line"><span style="color:#50FA7B">chmod</span><span style="color:#BD93F9"> 644</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync.pub</span></span></code></pre>
+<p>Install the public key on each destination host:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># Option A: if ssh-copy-id is available</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#BD93F9"> host</span><span style="color:#FF79C6"> in</span><span style="color:#F1FA8C"> azvmprod</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#F1FA8C"> azvmdev</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#50FA7B">  ssh-copy-id</span><span style="color:#BD93F9"> -i</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync.pub</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$host</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Option B: manual append if ssh-copy-id is unavailable</span></span>
+<span class="line"><span style="color:#BD93F9">PUBKEY</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">$(</span><span style="color:#50FA7B">cat</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync.pub)</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#BD93F9"> host</span><span style="color:#FF79C6"> in</span><span style="color:#F1FA8C"> azvmprod</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#F1FA8C"> azvmdev</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#50FA7B">  ssh</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$host</span><span style="color:#E9F284">"</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">mkdir -p ~/.ssh && chmod 700 ~/.ssh && grep -qxF &#x27;</span><span style="color:#BD93F9">$PUBKEY</span><span style="color:#F1FA8C">&#x27; ~/.ssh/authorized_keys || echo &#x27;</span><span style="color:#BD93F9">$PUBKEY</span><span style="color:#F1FA8C">&#x27; >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span></code></pre>
+<p>Verify passwordless connectivity:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">for</span><span style="color:#BD93F9"> host</span><span style="color:#FF79C6"> in</span><span style="color:#F1FA8C"> azvmprod</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#F1FA8C"> azvmdev</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">do</span></span>
+<span class="line"><span style="color:#50FA7B">  ssh</span><span style="color:#BD93F9"> -i</span><span style="color:#F1FA8C"> ~/.ssh/azvmsync</span><span style="color:#E9F284"> "</span><span style="color:#BD93F9">$host</span><span style="color:#E9F284">"</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">hostname</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">done</span></span></code></pre>
+<p>If you use host aliases from the prior section, your <code>rsync</code> commands can stay short and consistent.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="self-publish-and-versioning">Self-Publish and Versioning<a href="#self-publish-and-versioning" class="hash-link" aria-label="Direct link to Self-Publish and Versioning" title="Direct link to Self-Publish and Versioning" translate="no">​</a></h2>
+<p>Keep module publish and runtime versions explicit to avoid drift across environments.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="non-container-version-pinning">Non-container version pinning<a href="#non-container-version-pinning" class="hash-link" aria-label="Direct link to Non-container version pinning" title="Direct link to Non-container version pinning" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># Pin CLI/runtime version in your install process</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> version</span><span style="color:#F1FA8C"> list</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> install</span><span style="color:#BD93F9"> 2.0.1</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> version</span><span style="color:#F1FA8C"> use</span><span style="color:#BD93F9"> 2.0.1</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="container-image-versioning-host-prebuilt-artifact-pattern">Container image versioning (host-prebuilt artifact pattern)<a href="#container-image-versioning-host-prebuilt-artifact-pattern" class="hash-link" aria-label="Direct link to Container image versioning (host-prebuilt artifact pattern)" title="Direct link to Container image versioning (host-prebuilt artifact pattern)" translate="no">​</a></h3>
+<p>Build the SpacetimeDB module on the host first, then package the artifact into a lean image.
+No multi-stage Docker build is needed -- <code>spacetime build</code> runs on the host, and the resulting
+<code>dist/bundle.js</code> is copied in:</p>
+<div class="language-dockerfile codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-dockerfile codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">FROM clockworklabs/spacetime:v2.0.1</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">WORKDIR /opt/app/spacetime</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"># Host-prebuilt: expects dist/bundle.js from `spacetime build` before `docker build`</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">COPY spacetimedb/dist ./spacetimedb/dist</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">COPY --chmod=755 spacetimedb/spacetimedb-entrypoint.sh /usr/local/bin/spacetimedb-entrypoint.sh</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">ENTRYPOINT ["/usr/local/bin/spacetimedb-entrypoint.sh"]</span><br></span></code></pre></div></div>
+<p>Build and push workflow:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># 1) Prebuild module artifact on host</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> spacetimedb-prebuild</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 2) Build image with immutable + rolling tags</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> build</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  -t</span><span style="color:#F1FA8C"> registry.example.com/spacetimedb:v2.0.1</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  -t</span><span style="color:#F1FA8C"> registry.example.com/spacetimedb:v2.0</span><span style="color:#FF79C6"> \</span></span>
+<span class="line"><span style="color:#BD93F9">  -f</span><span style="color:#F1FA8C"> spacetimedb/Dockerfile</span><span style="color:#F1FA8C"> .</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 3) Preflight-verify publish in a throwaway container</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> spacetimedb-verify-preflight</span><span style="color:#F1FA8C"> VERSION=v2.0.1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># 4) Push to registry</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> push</span><span style="color:#F1FA8C"> registry.example.com/spacetimedb:v2.0.1</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> push</span><span style="color:#F1FA8C"> registry.example.com/spacetimedb:v2.0</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="deployment-checkpoints">Deployment checkpoints<a href="#deployment-checkpoints" class="hash-link" aria-label="Direct link to Deployment checkpoints" title="Direct link to Deployment checkpoints" translate="no">​</a></h3>
+<p>Run each step individually, or use <code>just spacetimedb-deploy VERSION</code> to execute the full pipeline in one command:</p>
+\<ul\>
+<li class="">run <code>just spacetimedb-prebuild</code> to confirm module artifact exists before image build,</li>
+<li class="">run <code>just spacetimedb-build</code> to prebuild + build the container image,</li>
+<li class="">run <code>just spacetimedb-verify-preflight VERSION</code> to prove publish works in a disposable container before pushing the image,</li>
+<li class="">deploy pinned tag first, then optional rolling tag updates,</li>
+<li class="">run <code>just spacetimedb-verify-runtime</code> after rollout to confirm publish markers appear,</li>
+<li class="">rollback by redeploying previous pinned image tag.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="verification-commands">Verification Commands<a href="#verification-commands" class="hash-link" aria-label="Direct link to Verification Commands" title="Direct link to Verification Commands" translate="no">​</a></h2>
+<p>Use these commands directly in CI/CD or local troubleshooting.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="validate-pem-structure">Validate PEM structure<a href="#validate-pem-structure" class="hash-link" aria-label="Direct link to Validate PEM structure" title="Direct link to Validate PEM structure" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#BD93F9">KEY_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey</span><span style="color:#BD93F9"> -in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -noout</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey</span><span style="color:#BD93F9"> -pubin</span><span style="color:#BD93F9"> -in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -noout</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="validate-that-public-key-matches-private-key">Validate that public key matches private key<a href="#validate-that-public-key-matches-private-key" class="hash-link" aria-label="Direct link to Validate that public key matches private key" title="Direct link to Validate that public key matches private key" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#BD93F9">KEY_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey</span><span style="color:#BD93F9"> -in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -pubout</span><span style="color:#BD93F9"> -out</span><span style="color:#F1FA8C"> /tmp/derived.pub</span></span>
+<span class="line"><span style="color:#50FA7B">diff</span><span style="color:#BD93F9"> -u</span><span style="color:#E9F284"> <(</span><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey </span><span style="color:#BD93F9">-pubin</span><span style="color:#BD93F9"> -in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -outform</span><span style="color:#F1FA8C"> PEM</span><span style="color:#E9F284">)</span><span style="color:#E9F284"> <(</span><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey </span><span style="color:#BD93F9">-pubin</span><span style="color:#BD93F9"> -in</span><span style="color:#F1FA8C"> /tmp/derived.pub </span><span style="color:#BD93F9">-outform</span><span style="color:#F1FA8C"> PEM</span><span style="color:#E9F284">)</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="print-stable-sha-256-fingerprint">Print stable SHA-256 fingerprint<a href="#print-stable-sha-256-fingerprint" class="hash-link" aria-label="Direct link to Print stable SHA-256 fingerprint" title="Direct link to Print stable SHA-256 fingerprint" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#BD93F9">KEY_DIR</span><span style="color:#FF79C6">=</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">./.generated/spacetimedb-keys</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B">openssl</span><span style="color:#F1FA8C"> pkey</span><span style="color:#BD93F9"> -pubin</span><span style="color:#BD93F9"> -in</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">${</span><span style="color:#BD93F9">KEY_DIR</span><span style="color:#F1FA8C">}/id_ecdsa.pub</span><span style="color:#E9F284">"</span><span style="color:#BD93F9"> -outform</span><span style="color:#F1FA8C"> DER</span><span style="color:#FF79C6"> |</span><span style="color:#50FA7B"> openssl</span><span style="color:#F1FA8C"> dgst</span><span style="color:#BD93F9"> -sha256</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="normalize-newline-style-before-upload">Normalize newline style before upload<a href="#normalize-newline-style-before-upload" class="hash-link" aria-label="Direct link to Normalize newline style before upload" title="Direct link to Normalize newline style before upload" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4"># Converts CRLF to LF and ensures trailing newline</span></span>
+<span class="line"><span style="color:#50FA7B">bun</span><span style="color:#BD93F9"> -e</span><span style="color:#E9F284"> &#x27;</span></span>
+<span class="line"><span style="color:#F1FA8C">const keyDir = ".generated/spacetimedb-keys";</span></span>
+<span class="line"><span style="color:#F1FA8C">for (const name of ["id_ecdsa", "id_ecdsa.pub"]) {</span></span>
+<span class="line"><span style="color:#F1FA8C">  const path = `${keyDir}/${name}`;</span></span>
+<span class="line"><span style="color:#F1FA8C">  const text = await Bun.file(path).text();</span></span>
+<span class="line"><span style="color:#F1FA8C">  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");</span></span>
+<span class="line"><span style="color:#F1FA8C">  const withTrailingNewline = normalized.endsWith("\n") ? normalized : `${normalized}\n`;</span></span>
+<span class="line"><span style="color:#F1FA8C">  await Bun.write(`${path}.normalized`, withTrailingNewline);</span></span>
+<span class="line"><span style="color:#F1FA8C">}</span></span>
+<span class="line"><span style="color:#E9F284">&#x27;</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="aiautomation-contract">AI/Automation Contract<a href="#aiautomation-contract" class="hash-link" aria-label="Direct link to AI/Automation Contract" title="Direct link to AI/Automation Contract" translate="no">​</a></h2>
+<p>Use this section as a machine-readable checklist for scripts or AI agents.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="inputs">Inputs<a href="#inputs" class="hash-link" aria-label="Direct link to Inputs" title="Direct link to Inputs" translate="no">​</a></h3>
+\<ul\>
+<li class="">Secret names:<!-- -->
+\<ul\>
+<li class=""><code>spacetimedb-jwt-private-key</code></li>
+<li class=""><code>spacetimedb-jwt-public-key</code></li>
+</ul>
+</li>
+<li class="">Vault environments:<!-- -->
+\<ul\>
+<li class=""><code>kv-prod</code></li>
+<li class=""><code>kv-test</code></li>
+<li class=""><code>kv-dev</code></li>
+<li class=""><code>kv-local</code></li>
+</ul>
+</li>
+<li class="">Policy:<!-- -->
+\<ul\>
+<li class="">prod/test unique keypairs</li>
+<li class="">dev/local shared keypair</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="outputs">Outputs<a href="#outputs" class="hash-link" aria-label="Direct link to Outputs" title="Direct link to Outputs" translate="no">​</a></h3>
+\<ul\>
+<li class="">Canonical path mapping:<!-- -->
+\<ul\>
+<li class="">host source: <code>./.generated/spacetimedb-keys/id_ecdsa</code> -> runtime: <code>/etc/spacetimedb/id_ecdsa</code></li>
+<li class="">host source: <code>./.generated/spacetimedb-keys/id_ecdsa.pub</code> -> runtime: <code>/etc/spacetimedb/id_ecdsa.pub</code></li>
+</ul>
+</li>
+<li class="">Startup args:<!-- -->
+\<ul\>
+<li class=""><code>--jwt-priv-key-path=/etc/spacetimedb/id_ecdsa</code></li>
+<li class=""><code>--jwt-pub-key-path=/etc/spacetimedb/id_ecdsa.pub</code></li>
+</ul>
+</li>
+<li class="">Identity-preserving token source:<!-- -->
+\<ul\>
+<li class="">default: <code>./data/.config/spacetime/cli.toml</code></li>
+<li class="">override example: <code>--publisher-cli-toml-path ./data/.config/spacetime/cli.toml</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="required-command-order">Required command order<a href="#required-command-order" class="hash-link" aria-label="Direct link to Required command order" title="Direct link to Required command order" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> az-login</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys-preview</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-rotate-jwt-keys</span><span style="color:#F1FA8C"> ENV=prod</span></span>
+<span class="line"><span style="color:#50FA7B">just</span><span style="color:#F1FA8C"> kv-verify-jwt-keys</span></span>
+<span class="line"><span style="color:#50FA7B">rsync</span><span style="color:#BD93F9"> -aHAX</span><span style="color:#BD93F9"> --delete</span><span style="color:#F1FA8C"> azvmprod:/var/lib/spacetime/data/</span><span style="color:#F1FA8C"> azvmtest:/var/lib/spacetime/data/</span></span>
+<span class="line"><span style="color:#50FA7B">ssh</span><span style="color:#F1FA8C"> azvmtest</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">cd /home/deploy/spacetimedb-app && bun tools/azure/spacetimedb-tooling.ts --resign-token-only --publisher-cli-toml-path "./data/.config/spacetime/cli.toml" --private-key-path "./.generated/spacetimedb-keys/id_ecdsa"</span><span style="color:#E9F284">&#x27;</span></span>
+<span class="line"><span style="color:#50FA7B">docker</span><span style="color:#F1FA8C"> compose</span><span style="color:#BD93F9"> -f</span><span style="color:#F1FA8C"> ./.generated/docker-compose.yaml</span><span style="color:#F1FA8C"> up</span><span style="color:#BD93F9"> -d</span><span style="color:#BD93F9"> --force-recreate</span><span style="color:#F1FA8C"> spacetimedb</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="successfailure-markers">Success/failure markers<a href="#successfailure-markers" class="hash-link" aria-label="Direct link to Success/failure markers" title="Direct link to Success/failure markers" translate="no">​</a></h3>
+\<ul\>
+<li class="">Success marker example: <code>PUBLISH_SUCCESS</code></li>
+<li class="">Failure marker example: <code>PUBLISH_FAILED</code></li>
+<li class="">Auth signals to detect:<!-- -->
+\<ul\>
+<li class=""><code>InvalidSignature</code> (usually stale token/key mismatch)</li>
+<li class=""><code>not authorized to perform action</code> (ownership mismatch)</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="non-goals">Non-goals<a href="#non-goals" class="hash-link" aria-label="Direct link to Non-goals" title="Direct link to Non-goals" translate="no">​</a></h3>
+\<ul\>
+<li class="">No hot-reload for JWT keys (restart required)</li>
+<li class="">No automatic ownership transfer during rotation</li>
+<li class="">No graceful dual-signing window for local self-signed tokens</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting" translate="no">​</a></h2>
+<div class="language-mermaid codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-mermaid codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">flowchart TD</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  startNode["Publish Or Connect Fails"] --> statusCheck{"HTTP Status?"}</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  statusCheck -->|"401"| sigPath["Signature Path"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  statusCheck -->|"403"| ownerPath["Ownership Path"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  statusCheck -->|"other"| genericPath["General Runtime Checks"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  sigPath --> sigStep1["Confirm active key files are mounted at /etc/spacetimedb"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  sigStep1 --> sigStep2["Verify pair parity and SHA256 fingerprint"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  sigStep2 --> sigStep3["Replace stale cached CLI token if needed"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  sigStep3 --> sigStep4["Restart service to load new keys"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  ownerPath --> ownerStep1["Token is valid, but caller identity is not DB owner"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  ownerStep1 --> ownerStep2["Check XDG_CONFIG_HOME persistence and publish identity source"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  ownerStep2 --> ownerStep3["Choose strategy: clean-slate or identity-preserving"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  genericPath --> genStep1["Confirm restart/redeploy happened after rotation"]</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  genericPath --> genStep2["Check markers: PUBLISH_SUCCESS or PUBLISH_FAILED"]</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="401-path-signature-mismatch"><code>401</code> path: signature mismatch<a href="#401-path-signature-mismatch" class="hash-link" aria-label="Direct link to 401-path-signature-mismatch" title="Direct link to 401-path-signature-mismatch" translate="no">​</a></h3>
+<p>Typical cause: token signed with an old/private key pair that no longer matches the server public key.</p>
+<p>Checks:</p>
+\<ul\>
+<li class="">verify <code>id_ecdsa</code> and <code>id_ecdsa.pub</code> are the files actually mounted into <code>/etc/spacetimedb</code>,</li>
+<li class="">run the verification cookbook commands to check parity and fingerprints,</li>
+<li class="">refresh cached CLI token/config if it still carries old signature material,</li>
+<li class="">restart the service so the rotated files are loaded.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="403-path-ownership-mismatch"><code>403</code> path: ownership mismatch<a href="#403-path-ownership-mismatch" class="hash-link" aria-label="Direct link to 403-path-ownership-mismatch" title="Direct link to 403-path-ownership-mismatch" translate="no">​</a></h3>
+<p>Typical cause: token is valid, but identity differs from the identity that owns the database.</p>
+<p>Checks:</p>
+\<ul\>
+<li class="">confirm the publish step uses the expected persisted config path (<code>XDG_CONFIG_HOME</code>),</li>
+<li class="">confirm whether you intentionally rotated into a new identity (clean-slate) or need identity-preserving flow,</li>
+<li class="">if you cleared cached CLI auth/config, validate that your new token maps to the expected owner identity.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="general-runtime-checks">General runtime checks<a href="#general-runtime-checks" class="hash-link" aria-label="Direct link to General runtime checks" title="Direct link to General runtime checks" translate="no">​</a></h3>
+\<ul\>
+<li class="">Confirm rotation order: preview -> apply -> verify -> restart.</li>
+<li class="">Confirm mounts are read-only and at the expected path.</li>
+<li class="">Confirm publish step and log markers are emitted by the same runtime instance.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00100-how-to/00700-self-hosted-key-rotation.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/upgrade"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Migrating from 1.0 to 2.0</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/migrating-from-convex"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Migrating from Convex</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#assumptions-and-risk-note" class="table-of-contents__link toc-highlight">Assumptions and Risk Note</a></li>\<li\><a href="#opinionated-setup-reproducible-defaults" class="table-of-contents__link toc-highlight">Opinionated Setup (Reproducible Defaults)</a></li>\<li\><a href="#quickstart-scaffold" class="table-of-contents__link toc-highlight">Quickstart Scaffold</a>\<ul\>\<li\><a href="#1-generate-a-compatible-keypair" class="table-of-contents__link toc-highlight">1) Generate a compatible keypair</a></li>\<li\><a href="#2-start-spacetimedb-with-explicit-key-paths" class="table-of-contents__link toc-highlight">2) Start SpacetimeDB with explicit key paths</a></li>\<li\><a href="#3-run-your-rotation-pipeline" class="table-of-contents__link toc-highlight">3) Run your rotation pipeline</a></li>\<li\><a href="#4-restart-and-validate" class="table-of-contents__link toc-highlight">4) Restart and validate</a></li></ul></li>\<li\><a href="#deployment-modes" class="table-of-contents__link toc-highlight">Deployment Modes</a>\<ul\>\<li\><a href="#mode-a-non-container-self-hosted" class="table-of-contents__link toc-highlight">Mode A: Non-container self-hosted</a></li>\<li\><a href="#mode-b-docker-self-hosted" class="table-of-contents__link toc-highlight">Mode B: Docker self-hosted</a></li></ul></li>\<li\><a href="#background" class="table-of-contents__link toc-highlight">Background</a></li>\<li\><a href="#why-rotation-can-cause-401-and-403" class="table-of-contents__link toc-highlight">Why rotation can cause 401 and 403</a></li>\<li\><a href="#rotation-strategies" class="table-of-contents__link toc-highlight">Rotation strategies</a>\<ul\>\<li\><a href="#strategy-a-clean-slate-rotation-devcistateless" class="table-of-contents__link toc-highlight">Strategy A: Clean-slate rotation (dev/CI/stateless)</a></li>\<li\><a href="#strategy-b-identity-preserving-rotation-stateful" class="table-of-contents__link toc-highlight">Strategy B: Identity-preserving rotation (stateful)</a></li>\<li\><a href="#strategy-c-oidc-backed-identity-recommended-for-production" class="table-of-contents__link toc-highlight">Strategy C: OIDC-backed identity (recommended for production)</a></li></ul></li>\<li\><a href="#azure-key-vault-example-self-hosted" class="table-of-contents__link toc-highlight">Azure Key Vault example (self-hosted)</a>\<ul\>\<li\><a href="#example-command-flow" class="table-of-contents__link toc-highlight">Example command flow</a></li>\<li\><a href="#direct-azure-cli-pullpush-snippets" class="table-of-contents__link toc-highlight">Direct Azure CLI pull/push snippets</a></li>\<li\><a href="#example-environment-policy" class="table-of-contents__link toc-highlight">Example environment policy</a></li>\<li\><a href="#example-secret-names" class="table-of-contents__link toc-highlight">Example secret names</a></li>\<li\><a href="#what-your-rotation-tool-should-guarantee" class="table-of-contents__link toc-highlight">What your rotation tool should guarantee</a></li></ul></li>\<li\><a href="#scaffold-templates" class="table-of-contents__link toc-highlight">Scaffold Templates</a>\<ul\>\<li\><a href="#template-justfile-recipes" class="table-of-contents__link toc-highlight">Template: <code>justfile</code> recipes</a></li>\<li\><a href="#template-rotation-script-skeleton-toolsazurespacetimedb-toolingts" class="table-of-contents__link toc-highlight">Template: rotation script skeleton (<code>tools/azure/spacetimedb-tooling.ts</code>)</a></li>\<li\><a href="#template-entrypoint-publish-flow" class="table-of-contents__link toc-highlight">Template: entrypoint publish flow</a></li></ul></li>\<li\><a href="#mode-b-operator-notes-docker-self-hosted" class="table-of-contents__link toc-highlight">Mode B operator notes (Docker self-hosted)</a></li>\<li\><a href="#operational-runbook-copypaste" class="table-of-contents__link toc-highlight">Operational runbook (copy/paste)</a>\<ul\>\<li\><a href="#canonical-data-sync-flow-source---destination" class="table-of-contents__link toc-highlight">Canonical data sync flow (source -> destination)</a></li>\<li\><a href="#sync-justfile-variables-dry-configuration" class="table-of-contents__link toc-highlight">Sync justfile variables (DRY configuration)</a></li>\<li\><a href="#sync-status-data-size-across-hosts" class="table-of-contents__link toc-highlight">Sync status (data size across hosts)</a></li></ul></li>\<li\><a href="#reproducibility-addendum-operator-copypaste" class="table-of-contents__link toc-highlight">Reproducibility Addendum (Operator Copy/Paste)</a>\<ul\>\<li\><a href="#1-preflight-checks-before-rotate-or-sync" class="table-of-contents__link toc-highlight">1) Preflight checks (before rotate or sync)</a></li>\<li\><a href="#2-safer-akv-pullpush-with-files" class="table-of-contents__link toc-highlight">2) Safer AKV pull/push with files</a></li>\<li\><a href="#3-single-host-end-to-end-rotation-script" class="table-of-contents__link toc-highlight">3) Single-host end-to-end rotation script</a></li>\<li\><a href="#4-identity-continuity-assertion-beforeafter-re-sign" class="table-of-contents__link toc-highlight">4) Identity continuity assertion (before/after re-sign)</a></li>\<li\><a href="#5-ssh-host-alias-template-for-rsync-workflows" class="table-of-contents__link toc-highlight">5) SSH host alias template for rsync workflows</a></li>\<li\><a href="#6-generate-azvmsync-key-for-inter-vm-sync" class="table-of-contents__link toc-highlight">6) Generate <code>azvmsync</code> key for inter-VM sync</a></li></ul></li>\<li\><a href="#self-publish-and-versioning" class="table-of-contents__link toc-highlight">Self-Publish and Versioning</a>\<ul\>\<li\><a href="#non-container-version-pinning" class="table-of-contents__link toc-highlight">Non-container version pinning</a></li>\<li\><a href="#container-image-versioning-host-prebuilt-artifact-pattern" class="table-of-contents__link toc-highlight">Container image versioning (host-prebuilt artifact pattern)</a></li>\<li\><a href="#deployment-checkpoints" class="table-of-contents__link toc-highlight">Deployment checkpoints</a></li></ul></li>\<li\><a href="#verification-commands" class="table-of-contents__link toc-highlight">Verification Commands</a>\<ul\>\<li\><a href="#validate-pem-structure" class="table-of-contents__link toc-highlight">Validate PEM structure</a></li>\<li\><a href="#validate-that-public-key-matches-private-key" class="table-of-contents__link toc-highlight">Validate that public key matches private key</a></li>\<li\><a href="#print-stable-sha-256-fingerprint" class="table-of-contents__link toc-highlight">Print stable SHA-256 fingerprint</a></li>\<li\><a href="#normalize-newline-style-before-upload" class="table-of-contents__link toc-highlight">Normalize newline style before upload</a></li></ul></li>\<li\><a href="#aiautomation-contract" class="table-of-contents__link toc-highlight">AI/Automation Contract</a>\<ul\>\<li\><a href="#inputs" class="table-of-contents__link toc-highlight">Inputs</a></li>\<li\><a href="#outputs" class="table-of-contents__link toc-highlight">Outputs</a></li>\<li\><a href="#required-command-order" class="table-of-contents__link toc-highlight">Required command order</a></li>\<li\><a href="#successfailure-markers" class="table-of-contents__link toc-highlight">Success/failure markers</a></li>\<li\><a href="#non-goals" class="table-of-contents__link toc-highlight">Non-goals</a></li></ul></li>\<li\><a href="#troubleshooting" class="table-of-contents__link toc-highlight">Troubleshooting</a>\<ul\>\<li\><a href="#401-path-signature-mismatch" class="table-of-contents__link toc-highlight"><code>401</code> path: signature mismatch</a></li>\<li\><a href="#403-path-ownership-mismatch" class="table-of-contents__link toc-highlight"><code>403</code> path: ownership mismatch</a></li>\<li\><a href="#general-runtime-checks" class="table-of-contents__link toc-highlight">General runtime checks</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

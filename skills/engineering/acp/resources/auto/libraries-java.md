@@ -11,3 +11,6 @@ The [java-sdk](https://github.com/agentclientprotocol/java-sdk) provides Java mo
 The repository includes runnable examples for client and agent implementations, plus Spring AI integrations, under [`examples/`](https://github.com/agentclientprotocol/java-sdk/tree/main/examples).
 
 For dependency setup and API details, see the repository README and published Javadocs from the project.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

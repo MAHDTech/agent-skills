@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-results\>
+# <pagefind-results>
 
 
 Displays search results with automatic lazy loading. Results load their full data only when scrolled into view.
@@ -61,7 +61,7 @@ Customize result rendering using `<script type="text/pagefind-template">` elemen
 </pagefind-results>
 ```
 
-Your template must have a single root element (e.g. a single `<li>`). Keyboard navigation moves between `<a>` elements in the results list, so ensure your main result link is an `<a>` tag.
+Your template must have a single root element (e.g. a single `\<li\>`). Keyboard navigation moves between `<a>` elements in the results list, so ensure your main result link is an `<a>` tag.
 
 The full templating syntax can be seen in the [adequate-little-templates](https://github.com/bglw/adequate-little-templates?tab=readme-ov-file#syntax) package.
 
@@ -76,7 +76,7 @@ Templates receive this data structure:
 | `meta.image` | Page image (if set) |
 | `meta.image_alt` | Image alt text |
 | `meta.*` | Any custom metadata |
-| `excerpt` | Search excerpt with `<mark>` highlighting (use `{{+ excerpt +}}`) |
+| `excerpt` | Search excerpt with `\<mark\>` highlighting (use `{{+ excerpt +}}`) |
 | `url` | Fallback URL |
 | `sub_results` | Array of matching sections within the page |
 | `options.*` | The attributes supplied to the `<pagefind-results>` element |
@@ -158,4 +158,5 @@ By default, results display in a single column. You can change the layout of the
 }
 ```
 
-See [CSS Variables](https://pagefind.app/docs/css-variables/) for all available layout variables.
+See [CSS Variables](/docs/css-variables/) for all available layout variables.
+

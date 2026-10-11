@@ -275,7 +275,7 @@ No, for several reasons:
 
 ### What about session deletion?
 
-Session deletion is intentionally left out of this RFD to keep scope focused. It is covered separately by the [Session Delete RFD](https://agentclientprotocol.com/rfds/session-delete) and the [`session/delete`](https://agentclientprotocol.com/protocol/v1/session-delete) method.
+Session deletion is intentionally left out of this RFD to keep scope focused. It is covered separately by the [Session Delete RFD](/rfds/session-delete) and the [`session/delete`](/protocol/v1/session-delete) method.
 
 ### How should pagination work for large session lists?
 
@@ -330,3 +330,6 @@ Corresponding response example:
 * **2025-11-11**: Remove `createdAt`, `updatedAt`, and `search` filters from the request parameters
 * **2025-11-23**: Remove `limit` parameter from request; make `createdAt` and `updatedAt` optional in SessionInfo
 * **2025-11-24**: Update capabilities schema, consolidate to single `updatedAt` timestamp
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

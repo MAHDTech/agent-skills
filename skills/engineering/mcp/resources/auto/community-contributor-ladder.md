@@ -8,7 +8,7 @@
 
 The Model Context Protocol contributor ladder defines roles, responsibilities, and advancement criteria for the project. It shows community members how to grow their involvement from a first contribution to project leadership.
 
-This document implements [SEP-2148](https://modelcontextprotocol.io/seps/2148-contributor-ladder). For Working Group and Interest Group governance, see [SEP-2149](https://modelcontextprotocol.io/seps/2149-working-group-charter-template).
+This document implements [SEP-2148](/seps/2148-contributor-ladder). For Working Group and Interest Group governance, see [SEP-2149](/seps/2149-working-group-charter-template).
 
 ## Guiding Principles
 
@@ -19,14 +19,14 @@ This document implements [SEP-2148](https://modelcontextprotocol.io/seps/2148-co
 
 ## Roles at a Glance
 
-| Role                                            | Summary                                       | Key Privileges                                                            | Minimum Timeline                                      |
-| ----------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [**Contributor**](#contributor)                 | Anyone who contributes to MCP                 | Submit issues, PRs, participate in discussions                            | Immediate                                             |
-| [**Member**](#member)                           | Established, active contributor               | GitHub org membership, triage rights, eligible for WG/IG leadership       | 2-3 months of meaningful contributions                |
-| [**Maintainer**](#maintainer)                   | Area steward with operational responsibility  | Merge rights, release participation                                       | 6+ months as Member                                   |
-| [**Core Maintainer**](#core-maintainer)         | Technical leadership and protocol stewardship | Final decision authority, governance participation                        | By invitation after sustained Maintainer contribution |
-| [**Lead Maintainer**](#lead-maintainer)         | Ultimate project authority (founders)         | All Core Maintainer privileges, veto authority, appoints Core Maintainers | Reserved for project founders; succession only        |
-| [**Community Moderator**](#community-moderator) | CoC enforcement and community health          | Moderation rights on community platforms, incident handling               | Parallel track: Member status + appointment           |
+| Role | Summary | Key Privileges | Minimum Timeline |
+| - | - | - | - |
+| [**Contributor**](#contributor) | Anyone who contributes to MCP | Submit issues, PRs, participate in discussions | Immediate |
+| [**Member**](#member) | Established, active contributor | GitHub org membership, triage rights, eligible for WG/IG leadership | 2-3 months of meaningful contributions |
+| [**Maintainer**](#maintainer) | Area steward with operational responsibility | Merge rights, release participation | 6+ months as Member |
+| [**Core Maintainer**](#core-maintainer) | Technical leadership and protocol stewardship | Final decision authority, governance participation | By invitation after sustained Maintainer contribution |
+| [**Lead Maintainer**](#lead-maintainer) | Ultimate project authority (founders) | All Core Maintainer privileges, veto authority, appoints Core Maintainers | Reserved for project founders; succession only |
+| [**Community Moderator**](#community-moderator) | CoC enforcement and community health | Moderation rights on community platforms, incident handling | Parallel track: Member status + appointment |
 
 \<Note\>
   Timelines are minimums, not guarantees. They protect the project from rapid
@@ -45,7 +45,7 @@ Anyone who has contributed to MCP in any form is a Contributor. This includes op
 
 **Getting started:**
 
-* Review the [Contributing Guide](https://modelcontextprotocol.io/community/contributing)
+* Review the [Contributing Guide](/community/contributing)
 * Join community channels (Discord, GitHub Discussions)
 * Look for issues tagged `good-first-issue` or `help-wanted`
 * Attend working group meetings
@@ -172,7 +172,7 @@ When evaluating candidates, Core Maintainers should consider whether the current
 **Privileges:**
 
 * Final approval on breaking changes and major spec revisions
-* Voting rights on [SEPs](https://modelcontextprotocol.io/community/sep-guidelines)
+* Voting rights on [SEPs](/community/sep-guidelines)
 * Approval of Maintainers
 * Governance voting rights and expectation of governance participation
 * Administrative rights to all MCP GitHub repositories
@@ -251,7 +251,7 @@ Community Moderators help keep the MCP community healthy, safe, and welcoming. T
 
 Working Group (WG) Leads and Interest Group (IG) Facilitators are a form of community leadership that does not require Maintainer status. WG and IG leadership centers on facilitation and coordination rather than merge authority.
 
-The full governance rules for WGs and IGs are defined in [SEP-2149: MCP Group Governance and Charter Template](https://modelcontextprotocol.io/seps/2149-working-group-charter-template). These include participation tiers, decision-making process, meeting requirements, and lifecycle.
+The full governance rules for WGs and IGs are defined in [SEP-2149: MCP Group Governance and Charter Template](/seps/2149-working-group-charter-template). These include participation tiers, decision-making process, meeting requirements, and lifecycle.
 
 **Requirements:**
 
@@ -289,12 +289,12 @@ Both paths are equally valid. Self-nomination is encouraged. It shows initiative
 3. **Decision.** The approving authority reviews and decides.
 4. **Onboarding.** The new role-holder receives appropriate access and onboarding.
 
-| Advancement To      | Approved By                                                                     |
-| ------------------- | ------------------------------------------------------------------------------- |
-| Member              | 2 existing Members+ from different organizations, **or** 1 Core/Lead Maintainer |
-| Maintainer          | 1 Maintainer or Core Maintainer sponsor + Core Maintainer approval              |
-| Core Maintainer     | Lead Maintainers                                                                |
-| Community Moderator | 1 Core Maintainer or Lead Maintainer                                            |
+| Advancement To | Approved By |
+| - | - |
+| Member | 2 existing Members+ from different organizations, **or** 1 Core/Lead Maintainer |
+| Maintainer | 1 Maintainer or Core Maintainer sponsor + Core Maintainer approval |
+| Core Maintainer | Lead Maintainers |
+| Community Moderator | 1 Core Maintainer or Lead Maintainer |
 
 Nominees who self-nominate must still secure the required sponsorship. Sponsors confirm support in the nomination issue.
 
@@ -312,20 +312,20 @@ MCP operates on a principle of delegation. Decisions should be made at the lowes
 
 When in doubt, make the decision at your level and document it. Escalate only when blocked, when the decision has project-wide implications, or when process explicitly requires it.
 
-The detailed escalation procedure for Working Group and Interest Group disputes is defined in [SEP-2149 §1.5](https://modelcontextprotocol.io/seps/2149-working-group-charter-template). It includes the designation of a Core Maintainer without shared organizational affiliation to resolve the issue.
+The detailed escalation procedure for Working Group and Interest Group disputes is defined in [SEP-2149 §1.5](/seps/2149-working-group-charter-template). It includes the designation of a Core Maintainer without shared organizational affiliation to resolve the issue.
 
 ### Escalation Matrix
 
-| Issue Type                                 | First Escalation    | Second Escalation | Timeline         |
-| ------------------------------------------ | ------------------- | ----------------- | ---------------- |
-| Technical disagreement in PR               | Maintainer in scope | Core Maintainer   | 5 business days  |
-| Technical disagreement in WG               | WG Lead             | Core Maintainer   | 5 business days  |
-| Technical disagreement in IG               | IG Facilitator      | Core Maintainer   | 5 business days  |
-| Disagreement with WG Lead / IG Facilitator | Core Maintainer     | Lead Maintainer   | 7 business days  |
-| Disagreement with Maintainer decision      | Core Maintainer     | Lead Maintainer   | 7 business days  |
-| Core Maintainer disagreement               | Lead Maintainer     | N/A               | 10 business days |
-| Code of Conduct violation                  | Community Moderator | Core Maintainer   | Immediate        |
-| Security issue                             | Core Maintainer     | Lead Maintainer   | Immediate        |
+| Issue Type | First Escalation | Second Escalation | Timeline |
+| - | - | - | - |
+| Technical disagreement in PR | Maintainer in scope | Core Maintainer | 5 business days |
+| Technical disagreement in WG | WG Lead | Core Maintainer | 5 business days |
+| Technical disagreement in IG | IG Facilitator | Core Maintainer | 5 business days |
+| Disagreement with WG Lead / IG Facilitator | Core Maintainer | Lead Maintainer | 7 business days |
+| Disagreement with Maintainer decision | Core Maintainer | Lead Maintainer | 7 business days |
+| Core Maintainer disagreement | Lead Maintainer | N/A | 10 business days |
+| Code of Conduct violation | Community Moderator | Core Maintainer | Immediate |
+| Security issue | Core Maintainer | Lead Maintainer | Immediate |
 
 **Escalation process:**
 
@@ -341,7 +341,7 @@ MCP values diverse contributions. All of these pathways can lead to advancement.
 
 **Code Contributions.** SDK development (TypeScript, Python, etc.), testing infrastructure, tooling and developer experience.
 
-**Specification Work.** Drafting or refining spec text, [SEP](https://modelcontextprotocol.io/community/sep-guidelines) authorship or co-authorship, protocol design participation, compatibility analysis.
+**Specification Work.** Drafting or refining spec text, [SEP](/community/sep-guidelines) authorship or co-authorship, protocol design participation, compatibility analysis.
 
 **Documentation.** User guides and tutorials, API documentation, architecture documentation, keeping content current.
 
@@ -380,3 +380,4 @@ The community recognizes contributors through:
 * **Public acknowledgment** in release notes
 * **Speaking opportunities** at community events
 * **Badges** (if implemented) on community platforms
+

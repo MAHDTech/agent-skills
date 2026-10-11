@@ -123,3 +123,4 @@ Or override variables directly:
 ```
 
 The Component UI does not honor `prefers-color-scheme` automatically because it cannot determine if the site it is placed on does so.
+

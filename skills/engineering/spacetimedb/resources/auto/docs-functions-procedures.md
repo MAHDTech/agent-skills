@@ -1,1456 +1,947 @@
-Version: 2.0.0
-
-On this page
-
-A **procedure** is a function exported by a [database](https://spacetimedb.com/docs/databases),
-similar to a [reducer](https://spacetimedb.com/docs/functions/reducers). Connected
-[clients](https://spacetimedb.com/docs/clients) can call procedures. Procedures can perform
-additional operations not possible in reducers, including making HTTP
-requests to external services. However, procedures don't automatically
-run in database transactions, and must manually open and commit a
-transaction in order to read from or modify the database state. For this
-reason, prefer defining reducers rather than procedures unless you need
-to use one of the special procedure operators.
-
-## Defining Procedures
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-Define a procedure with `spacetimedb.procedure`:
-
-``` codeBlockStandalone_LlrK
-export const add_two_numbers = spacetimedb.procedure(
-    { lhs: t.u32(), rhs: t.u32() },
-    t.u64(),
-    (ctx, { lhs, rhs }) => BigInt(lhs) + BigInt(rhs),
-);
-```
-
-The `spacetimedb.procedure` function takes:
-
-- the procedure name,
-- (optional) an object representing its parameter types,
-- its return type,
-- and the procedure function itself.
-
-The function will receive a `ProcedureContext` and an object of its
-arguments, and it must return a value corresponding to its return type.
-This return value will be sent to the caller, but will not be broadcast
-to any other clients.
-
-Unstable Feature
-
-Procedures in C# are currently unstable. To use them, add
-`#pragma warning disable STDB_UNSTABLE` at the top of your file.
-
-Define a procedure by annotating a static method with
-`[SpacetimeDB.Procedure]`.
-
-The method's first argument must be of type `ProcedureContext`. A
-procedure may accept any number of additional arguments and may return a
-value.
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-
-[SpacetimeDB.Procedure]
-public static ulong AddTwoNumbers(ProcedureContext ctx, uint lhs, uint rhs)
-{
-    return (ulong)lhs + (ulong)rhs;
-}
-```
-
-Because procedures are unstable, Rust modules that define them must opt
-in to the `unstable` feature in their `Cargo.toml`:
-
-``` codeBlockStandalone_LlrK
-[dependencies]
-spacetimedb = { version = "2.*", features = ["unstable"] }
-```
-
-Define a procedure by annotating a function with
-`#[spacetimedb::procedure]`.
-
-This function's first argument must be of type
-`&mut spacetimedb::ProcedureContext`. By convention, this argument is
-named `ctx`.
-
-A procedure may accept any number of additional arguments. Each argument
-must be of a type that implements `spacetimedb::SpacetimeType`. When
-defining a `struct` or `enum`, annotate it with
-`#[derive(spacetimedb::SpacetimeType)]` to make it usable as a procedure
-argument. These argument values will not be broadcast to clients other
-than the caller.
-
-A procedure may return a value of any type that implements
-`spacetimedb::SpacetimeType`. This return value will be sent to the
-caller, but will not be broadcast to any other clients.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn add_two_numbers(ctx: &mut spacetimedb::ProcedureContext, lhs: u32, rhs: u32) -> u64 {
-    lhs as u64 + rhs as u64
-}
-```
-
-Unstable Feature
-
-Procedures in C++ are currently unstable. To use them, add
-`#define SPACETIMEDB_UNSTABLE_FEATURES` before including the SpacetimeDB
-header.
-
-Define a procedure using the `SPACETIMEDB_PROCEDURE` macro.
-
-The macro's first parameter is the return type, followed by the
-procedure name. The function's first argument must be of type
-`ProcedureContext`. By convention, this argument is named `ctx`. A
-procedure may accept any number of additional arguments and must return
-a value.
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-SPACETIMEDB_PROCEDURE(uint64_t, add_two_numbers, ProcedureContext ctx, uint32_t lhs, uint32_t rhs) {
-    return static_cast<uint64_t>(lhs) + static_cast<uint64_t>(rhs);
-}
-```
-
-### Accessing the database
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-Unlike reducers, procedures don't automatically run in database
-transactions. This means there's no `ctx.db` field to access the
-database. Instead, procedure code must manage transactions explicitly
-with `ProcedureCtx.withTx`.
-
-``` codeBlockStandalone_LlrK
-const myTable = table(
-    { name: "my_table" },
-    {
-        a: t.u32(),
-        b: t.string(),
-    },
-)
-
-const spacetimedb = schema({ myTable });
-export default spacetimedb;
-
-export const insertAValue = spacetimedb.procedure({ a: t.u32(), b: t.u32() }, t.unit(), (ctx, { a, b }) => {
-    ctx.withTx(ctx => {
-        ctx.db.myTable.insert({ a, b });
-    });
-    return {};
-})
-```
-
-`ProcedureCtx.withTx` takes a function of `(ctx: TransactionCtx) => T`.
-Within that function, the `TransactionCtx` can be used to access the
-database [in all the same ways as a
-`ReducerCtx`](https://spacetimedb.com/docs/functions/reducers/reducer-context) When the
-function returns, the transaction will be committed, and its changes to
-the database state will become permanent and be broadcast to clients. If
-the function throws an error, the transaction will be rolled back, and
-its changes will be discarded.
-
-warning
-
-The function passed to `ProcedureCtx.withTx` may be invoked multiple
-times, possibly seeing a different version of the database state each
-time.
-
-If invoked more than once with reference to the same database state, it
-must perform the same operations and return the same result each time.
-
-If invoked more than once with reference to different database states,
-values observed during prior runs must not influence the behavior of the
-function or the calling procedure.
-
-Avoid capturing mutable state within functions passed to `withTx`.
-
-Unlike reducers, procedures don't automatically run in database
-transactions. This means there's no `ctx.Db` field to access the
-database. Instead, procedure code must manage transactions explicitly
-with `ProcedureContext.WithTx`.
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "MyTable")]
-    public partial struct MyTable
-    {
-        public uint A;
-        public string B;
-    }
-
-    [SpacetimeDB.Procedure]
-    public static void InsertAValue(ProcedureContext ctx, uint a, string b)
-    {
-        ctx.WithTx(txCtx =>
-        {
-            txCtx.Db.MyTable.Insert(new MyTable { A = a, B = b });
-            return 0;
-        });
-    }
-}
-```
-
-`ProcedureContext.WithTx` takes a function of type
-`Func<ProcedureTxContext, T>`. Within that function, the
-`TransactionContext` can be used to access the database [in all the same
-ways as a `ReducerContext`](https://spacetimedb.com/docs/functions/reducers/reducer-context).
-When the function returns, the transaction will be committed, and its
-changes to the database state will become permanent and be broadcast to
-clients. If the function throws an exception, the transaction will be
-rolled back, and its changes will be discarded.
-
-warning
-
-The function passed to `ProcedureContext.WithTx` may be invoked multiple
-times, possibly seeing a different version of the database state each
-time.
-
-If invoked more than once with reference to the same database state, it
-must perform the same operations and return the same result each time.
-
-If invoked more than once with reference to different database states,
-values observed during prior runs must not influence the behavior of the
-function or the calling procedure.
-
-Avoid capturing mutable state within functions passed to `WithTx`.
-
-Unlike reducers, procedures don't automatically run in database
-transactions. This means there's no `ctx.db` field to access the
-database. Instead, procedure code must manage transactions explicitly
-with `ProcedureContext::with_tx`.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = my_table)]
-struct MyTable {
-    a: u32,
-    b: String,
-}
-
-#[spacetimedb::procedure]
-fn insert_a_value(ctx: &mut ProcedureContext, a: u32, b: String) {
-    ctx.with_tx(|ctx| {
-        ctx.my_table().insert(MyTable { a, b });
-    });
-}
-```
-
-`ProcedureContext::with_tx` takes a function of type
-`Fn(&TxContext) -> T`. Within that function, the `&TxContext` can be
-used to access the database [in all the same ways as a
-`ReducerContext`](https://docs.rs/spacetimedb/latest/spacetimedb/struct.ReducerContext.html).
-When the function returns, the transaction will be committed, and its
-changes to the database state will become permanent and be broadcast to
-clients. If the function panics, the transaction will be rolled back,
-and its changes will be discarded. However, for transactions that may
-fail, [prefer calling `try_with_tx` and returning a
-`Result`](#fallible-database-operations) rather than panicking.
-
-warning
-
-The function passed to `ProcedureContext::with_tx` may be invoked
-multiple times, possibly seeing a different version of the database
-state each time.
-
-If invoked more than once with reference to the same database state, it
-must perform the same operations and return the same result each time.
-
-If invoked more than once with reference to different database states,
-values observed during prior runs must not influence the behavior of the
-function or the calling procedure.
-
-Avoid capturing mutable state within functions passed to `with_tx`.
-
-Unlike reducers, procedures don't automatically run in database
-transactions. This means there's no `ctx.db` field to access the
-database. Instead, procedure code must manage transactions explicitly
-with `ctx.with_tx`.
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct MyTable {
-    uint32_t a;
-    std::string b;
-};
-SPACETIMEDB_STRUCT(MyTable, a, b)
-SPACETIMEDB_TABLE(MyTable, my_table, Public)
-
-SPACETIMEDB_PROCEDURE(Unit, insert_a_value, ProcedureContext ctx, uint32_t a, std::string b) {
-    ctx.with_tx([&](https://spacetimedb.com/docs/functions/TxContext&%20tx) {
-        tx.db[my_table].insert(MyTable{a, b});
-    });
-    return Unit{};
-}
-```
-
-`ctx.with_tx` takes a lambda function with signature
-`[](https://spacetimedb.com/docs/functions/TxContext&%20tx) -> T`. Within that function, the `TxContext` can be
-used to access the database [in all the same ways as a
-`ReducerContext`](https://spacetimedb.com/docs/functions/reducers/reducer-context). When the
-function returns, the transaction will be committed, and its changes to
-the database state will become permanent and be broadcast to clients. If
-the function throws an exception, the transaction will be rolled back,
-and its changes will be discarded. However, for transactions that may
-fail, [prefer calling `try_with_tx` and returning
-`bool`](#fallible-database-operations) rather than throwing.
-
-warning
-
-The function passed to `ctx.with_tx` may be invoked multiple times,
-possibly seeing a different version of the database state each time.
-
-If invoked more than once with reference to the same database state, it
-must perform the same operations and return the same result each time.
-
-If invoked more than once with reference to different database states,
-values observed during prior runs must not influence the behavior of the
-function or the calling procedure.
-
-Avoid capturing mutable state within functions passed to `with_tx`.
-
-#### Fallible database operations
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-For fallible database operations, you can throw an error inside the
-transaction function:
-
-``` codeBlockStandalone_LlrK
-export const maybeInsertAValue = spacetimedb.procedure({ a: t.u32(), b: t.string() }, t.unit(), (ctx, { a, b }) => {
-    ctx.withTx(ctx => {
-        if (a < 10) {
-            throw new SenderError("a is less than 10!");
-        }
-        ctx.db.myTable.insert({ a, b });
-    });
-})
-```
-
-For fallible database operations, you can throw an exception inside the
-transaction function:
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Procedure]
-    public static void MaybeInsertAValue(ProcedureContext ctx, uint a, string b)
-    {
-        ctx.WithTx(txCtx =>
-        {
-            if (a < 10)
-            {
-                throw new Exception("a is less than 10!");
-            }
-            txCtx.Db.MyTable.Insert(new MyTable { A = a, B = b });
-            return 0;
-        });
-    }
-}
-```
-
-For fallible database operations, instead use
-`ProcedureContext::try_with_tx`:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn maybe_insert_a_value(ctx: &mut ProcedureContext, a: u32, b: String) {
-    ctx.try_with_tx(|ctx| {
-        if a < 10 {
-            return Err("a is less than 10!");
-        }
-        ctx.my_table().insert(MyTable { a, b });
-        Ok(())
-    });
-}
-```
-
-`ProcedureContext::try_with_tx` takes a function of type
-`Fn(&TxContext) -> Result<T, E>`. If the function returns `Ok`, the
-transaction will be committed, and its changes to the database state
-will become permanent and be broadcast to clients. If that function
-returns `Err`, the transaction will be rolled back, and its changes will
-be discarded.
-
-For fallible database operations, use `ctx.try_with_tx` with a lambda
-that returns `bool`:
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-SPACETIMEDB_PROCEDURE(bool, maybe_insert_a_value, ProcedureContext ctx, uint32_t a, std::string b) {
-    return ctx.try_with_tx([&](https://spacetimedb.com/docs/functions/TxContext&%20tx) -> bool {
-        if (a < 10) {
-            return false;  // Rollback transaction
-        }
-        tx.db[my_table].insert(MyTable{a, b});
-        return true;  // Commit transaction
-    });
-}
-```
-
-`ctx.try_with_tx` takes a lambda function with signature
-`[](https://spacetimedb.com/docs/functions/TxContext&%20tx) -> bool`. If the function returns `true`, the
-transaction will be committed, and its changes to the database state
-will become permanent and be broadcast to clients. If the function
-returns `false`, the transaction will be rolled back, and its changes
-will be discarded.
-
-note
-
-For non-bool return types, `try_with_tx` always commits the transaction.
-To abort in those cases, use `LOG_PANIC`.
-
-#### Reading values out of the database
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-Functions passed to [`ProcedureCtx.withTx`](#accessing-the-database) may
-return a value, and that value will be returned to the calling
-procedure.
-
-Transaction return values are never saved or broadcast to clients, and
-are used only by the calling procedure.
-
-``` codeBlockStandalone_LlrK
-const player = table(
-    { name: "player" },
-    {
-        id: t.identity(),
-        level: t.u32(),
-    },
-);
-
-const spacetimedb = schema({ player });
-export default spacetimedb;
-
-export const find_highest_level_player = spacetimedb.procedure(t.unit(), ctx => {
-    let highestLevelPlayer = ctx.withTx(ctx =>
-        Iterator.from(ctx.db.player).reduce(
-            (a, b) => a == null || b.level > a.level ? b : a,
-            null
-        )
-    );
-    if (highestLevelPlayer != null) {
-        console.log("Congratulations to ", highestLevelPlayer.id);
-    } else {
-        console.warn("No players...");
-    }
-    return {};
-});
-```
-
-Functions passed to [`ProcedureContext.WithTx`](#accessing-the-database)
-may return a value, and that value will be returned to the calling
-procedure.
-
-Transaction return values are never saved or broadcast to clients, and
-are used only by the calling procedure.
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "Player")]
-    public partial struct Player
-    {
-        public Identity Id;
-        public uint Level;
-    }
-
-    [SpacetimeDB.Procedure]
-    public static void FindHighestLevelPlayer(ProcedureContext ctx)
-    {
-        var highestLevelPlayer = ctx.WithTx(txCtx =>
-        {
-            Player? highest = null;
-            foreach (var player in txCtx.Db.Player.Iter())
-            {
-                if (highest == null || player.Level > highest.Value.Level)
-                {
-                    highest = player;
-                }
-            }
-            return highest;
-        });
-
-        if (highestLevelPlayer.HasValue)
-        {
-            Log.Info($"Congratulations to {highestLevelPlayer.Value.Id}");
-        }
-        else
-        {
-            Log.Warn("No players...");
-        }
-    }
-}
-```
-
-Functions passed to
-[`ProcedureContext::with_tx`](#accessing-the-database) and
-[`ProcedureContext::try_with_tx`](#fallible-database-operations) may
-return a value, and that value will be returned to the calling
-procedure.
-
-Transaction return values are never saved or broadcast to clients, and
-are used only by the calling procedure.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = player)]
-struct Player {
-    id: spacetimedb::Identity,
-    level: u32,
-}
-
-#[spacetimedb::procedure]
-fn find_highest_level_player(ctx: &mut ProcedureContext) {
-    let highest_level_player = ctx.with_tx(|ctx| {
-        ctx.db.player().iter().max_by_key(|player| player.level)
-    });
-    match highest_level_player {
-        Some(player) => log::info!("Congratulations to {}", player.id),
-        None => log::warn!("No players..."),
-    }
-}
-```
-
-Functions passed to [`ctx.with_tx`](#accessing-the-database) and
-[`ctx.try_with_tx`](#fallible-database-operations) may return a value,
-and that value will be returned to the calling procedure.
-
-Transaction return values are never saved or broadcast to clients, and
-are used only by the calling procedure.
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct Player {
-    Identity id;
-    uint32_t level;
-};
-SPACETIMEDB_STRUCT(Player, id, level)
-SPACETIMEDB_TABLE(Player, player, Public)
-
-SPACETIMEDB_PROCEDURE(Unit, find_highest_level_player, ProcedureContext ctx) {
-    auto highest_level_player = ctx.with_tx([](https://spacetimedb.com/docs/functions/TxContext&%20tx) -> std::optional<Player> {
-        std::optional<Player> highest;
-        for (const auto& player : tx.db[player]) {
-            if (!highest || player.level > highest->level) {
-                highest = player;
-            }
-        }
-        return highest;
-    });
-    
-    if (highest_level_player) {
-        LOG_INFO("Congratulations to " + highest_level_player->id.to_hex_string());
-    } else {
-        LOG_WARN("No players...");
-    }
-    return Unit{};
-}
-```
-
-## HTTP Requests
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-Procedures can make HTTP requests to external services using methods
-contained in `ctx.http`.
-
-`ctx.http.fetch` is similar to the browser `fetch()` API, but is
-synchronous.
-
-It can perform simple `GET` requests:
-
-``` codeBlockStandalone_LlrK
-export const get_request = spacetimedb.procedure(t.unit(), ctx => {
-    try {
-        const response = ctx.http.fetch("https://example.invalid");
-        const body = response.text();
-        console.log(`Got response with status ${response.status} and body ${body}`);
-    } catch (e) {
-        console.error("Request failed: ", e);
-    }
-    return {};
-});
-```
-
-It can also accept an options object to specify a body, headers, HTTP
-method, and timeout:
-
-``` codeBlockStandalone_LlrK
-export const post_request = spacetimedb.procedure(t.unit(), ctx => {
-    try {
-        const response = ctx.http.fetch("https://example.invalid/upload", {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: "This is the body of the HTTP request",
-        });
-        const body = response.text();
-        console.log(`Got response with status ${response.status} and body {body}`);
-    } catch (e) {
-        console.error("Request failed: ", e);
-    }
-    return {};
-});
-
-export const get_request_with_short_timeout = spacetimedb.procedure(t.unit(), ctx => {
-    try {
-        const response = ctx.http.fetch("https://example.invalid", {
-            method: "GET",
-            timeout: TimeDuration.fromMillis(10),
-        });
-        const body = response.text();
-        console.log(`Got response with status ${response.status} and body {body}`);
-    } catch (e) {
-        console.error("Request failed: ", e);
-    }
-    return {};
-});
-```
-
-Procedures can't send requests at the same time as holding open a
-[transaction](#accessing-the-database).
-
-Procedures can make HTTP requests to external services using methods on
-`ctx.Http`.
-
-`ctx.Http.Get` performs simple `GET` requests with no headers:
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Procedure]
-    public static void GetRequest(ProcedureContext ctx)
-    {
-        var result = ctx.Http.Get("https://example.invalid");
-        switch (result)
-        {
-            case Result<HttpResponse, HttpError>.OkR(var response):
-                var body = response.Body.ToStringUtf8Lossy();
-                Log.Info($"Got response with status {response.StatusCode} and body {body}");
-                break;
-            case Result<HttpResponse, HttpError>.ErrR(var e):
-                Log.Error($"Request failed: {e.Message}");
-                break;
-        }
-    }
-}
-```
-
-`ctx.Http.Send` sends an `HttpRequest` with custom method, headers, and
-body:
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Procedure]
-    public static void PostRequest(ProcedureContext ctx)
-    {
-        var request = new HttpRequest
-        {
-            Method = SpacetimeDB.HttpMethod.Post,
-            Uri = "https://example.invalid/upload",
-            Headers = new List<HttpHeader>
-            {
-                new HttpHeader("Content-Type", "text/plain")
-            },
-            Body = HttpBody.FromString("This is the body of the HTTP request")
-        };
-        var result = ctx.Http.Send(request);
-        switch (result)
-        {
-            case Result<HttpResponse, HttpError>.OkR(var response):
-                var body = response.Body.ToStringUtf8Lossy();
-                Log.Info($"Got response with status {response.StatusCode} and body {body}");
-                break;
-            case Result<HttpResponse, HttpError>.ErrR(var e):
-                Log.Error($"Request failed: {e.Message}");
-                break;
-        }
-    }
-}
-```
-
-Procedures can't send requests at the same time as holding open a
-[transaction](#accessing-the-database).
-
-Procedures can make HTTP requests to external services using methods
-contained in `ctx.http`.
-
-`ctx.http.get` performs simple `GET` requests with no headers:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn get_request(ctx: &mut ProcedureContext) {
-    match ctx.http.get("https://example.invalid") {
-        Ok(response) => {
-            let (response, body) = response.into_parts();
-            log::info!(
-                "Got response with status {} and body {}",
-                response.status,
-                body.into_string_lossy(),
-            )
-        },
-        Err(error) => log::error!("Request failed: {error:?}"),
-    }
-}
-```
-
-`ctx.http.send` sends any
-[`http::Request`](https://docs.rs/http/latest/http/request/struct.Request.html)
-whose body can be converted to `spacetimedb::http::Body`.
-`http::Request` is re-exported as `spacetimedb::http::Request`.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn post_request(ctx: &mut spacetimedb::ProcedureContext) {
-    let request = spacetimedb::http::Request::builder()
-        .uri("https://example.invalid/upload")
-        .method("POST")
-        .header("Content-Type", "text/plain")
-        .body("This is the body of the HTTP request")
-        .expect("Building `Request` object failed");
-    match ctx.http.send(request) {
-        Ok(response) => {
-            let (response, body) = response.into_parts();
-            log::info!(
-                "Got response with status {} and body {}",
-                response.status,
-                body.into_string_lossy(),
-            )
-        }
-        Err(error) => log::error!("Request failed: {error:?}"),
-    }
-}
-```
-
-Each of these methods returns a
-[`http::Response`](https://docs.rs/http/latest/http/response/struct.Response.html#method.body)
-containing a `spacetimedb::http::Body`. `http::Response` is re-exported
-as `spacetimedb::http::Response`.
-
-Set a timeout for a `ctx.http.send` request by including a
-`spacetimedb::http::Timeout` as an
-[`extension`](https://docs.rs/http/latest/http/request/struct.Builder.html#method.extension):
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn get_request_with_short_timeout(ctx: &mut spacetimedb::ProcedureContext) {
-    let request = spacetimedb::http::Request::builder()
-        .uri("https://example.invalid")
-        .method("GET")
-        // Set a timeout of 10 ms.
-        .extension(spacetimedb::http::Timeout(std::time::Duration::from_millis(10).into()))
-        // Empty body for a `GET` request.
-        .body(())
-        .expect("Building `Request` object failed");
-    ctx.http.send(request).expect("HTTP request failed");
-}
-```
-
-Procedures can't send requests at the same time as holding open a
-[transaction](#accessing-the-database).
-
-Unstable Feature
-
-HTTP requests in C++ procedures are currently unstable. To use them, add
-`#define SPACETIMEDB_UNSTABLE_FEATURES` before including the SpacetimeDB
-header.
-
-Procedures can make HTTP requests to external services using methods on
-`ctx.http`.
-
-`ctx.http.get` performs simple `GET` requests:
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-SPACETIMEDB_PROCEDURE(Unit, get_request, ProcedureContext ctx) {
-    auto result = ctx.http.get("https://example.invalid");
-    
-    if (result.is_ok()) {
-        auto& response = result.value();
-        auto body = response.body.to_string_utf8_lossy();
-        LOG_INFO("Got response with status " + std::to_string(response.status_code) + 
-                 " and body " + body);
-    } else {
-        LOG_ERROR("Request failed: " + result.error());
-    }
-    
-    return Unit{};
-}
-```
-
-`ctx.http.send` sends an `HttpRequest` with custom method, headers, and
-body:
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-SPACETIMEDB_PROCEDURE(Unit, post_request, ProcedureContext ctx) {
-    HttpRequest request{
-        .uri = "https://example.invalid/upload",
-        .method = HttpMethod::post(),
-        .headers = {HttpHeader{"Content-Type", "text/plain"}},
-        .body = HttpBody::from_string("This is the body of the HTTP request")
-    };
-    
-    auto result = ctx.http.send(request);
-    
-    if (result.is_ok()) {
-        auto& response = result.value();
-        auto body = response.body.to_string_utf8_lossy();
-        LOG_INFO("Got response with status " + std::to_string(response.status_code) + 
-                 " and body " + body);
-    } else {
-        LOG_ERROR("Request failed: " + result.error());
-    }
-    
-    return Unit{};
-}
-```
-
-Set a timeout for a request using `TimeDuration::from_millis()`:
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-SPACETIMEDB_PROCEDURE(Unit, get_request_with_short_timeout, ProcedureContext ctx) {
-    HttpRequest request{
-        .uri = "https://example.invalid",
-        .method = HttpMethod::get(),
-        .timeout = TimeDuration::from_millis(10)
-    };
-    
-    auto result = ctx.http.send(request);
-    
-    if (result.is_ok()) {
-        auto& response = result.value();
-        auto body = response.body.to_string_utf8_lossy();
-        LOG_INFO("Got response with status " + std::to_string(response.status_code) + 
-                 " and body " + body);
-    } else {
-        LOG_ERROR("Request failed: " + result.error());
-    }
-    
-    return Unit{};
-}
-```
-
-Procedures can't send requests at the same time as holding open a
-[transaction](#accessing-the-database).
-
-note
-
-If no timeout is specified, HTTP requests default to 30 seconds.
-User-specified timeouts are clamped to a maximum of 180 seconds by the
-host.
-
-## Calling Reducers from Procedures
-
-Procedures can call reducers by invoking them within a transaction
-block. The reducer function runs within the transaction context:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-// Define a reducer and save the reference
-export const processItem = spacetimedb.reducer({ itemId: t.u64() }, (ctx, { itemId }) => {
-  // ... reducer logic
-});
-
-// Call it from a procedure using the saved reference
-export const fetch_and_process = spacetimedb.procedure({ url: t.string() }, t.unit(), (ctx, { url }) => {
-  // Fetch external data
-  const response = ctx.http.fetch(url);
-  const data = response.json();
-
-  // Call the reducer within a transaction
-  ctx.withTx(txCtx => {
-    processItem(txCtx, { itemId: data.id });
-  });
-
-  return {};
-});
-```
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    // Note: In C#, you can define helper methods that work with the transaction context
-    // rather than calling reducers directly.
-    private static void ProcessItemLogic(ulong itemId)
-    {
-        // ... item processing logic
-    }
-
-    [SpacetimeDB.Procedure]
-    public static void FetchAndProcess(ProcedureContext ctx, string url)
-    {
-        // Fetch external data
-        var result = ctx.Http.Get(url);
-        var response = result.UnwrapOrThrow();
-        var body = response.Body.ToStringUtf8Lossy();
-        var itemId = ParseId(body);
-
-        // Process within a transaction
-        ctx.WithTx(txCtx =>
-        {
-            ProcessItemLogic(itemId);
-            return 0;
-        });
-    }
-
-    private static ulong ParseId(string body)
-    {
-        // Parse the ID from the response body
-        return ulong.Parse(body);
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer]
-fn process_item(ctx: &ReducerContext, item_id: u64) {
-    // ... reducer logic
-}
-
-#[spacetimedb::procedure]
-fn fetch_and_process(ctx: &mut ProcedureContext, url: String) -> Result<(), String> {
-    // Fetch external data
-    let response = ctx.http.get(&url).map_err(|e| format!("{e:?}"))?;
-    let (_, body) = response.into_parts();
-    let item_id: u64 = parse_id(&body.into_string_lossy());
-
-    // Call the reducer within a transaction
-    ctx.with_tx(|tx_ctx| {
-        process_item(tx_ctx, item_id);
-    });
-
-    Ok(())
-}
-```
-
-Unstable Feature
-
-Procedures in C++ are currently unstable. To use them, add
-`#define SPACETIMEDB_UNSTABLE_FEATURES` before including the SpacetimeDB
-header.
-
-In C++, `TxContext` and `ReducerContext` share the same database API, so
-it’s common to move shared logic into a helper that takes a
-`DatabaseContext&` and call it from both the reducer and the procedure.
-
-``` codeBlockStandalone_LlrK
-#define SPACETIMEDB_UNSTABLE_FEATURES
-#include <spacetimedb.h>
-using namespace SpacetimeDB;
-
-struct ProcessedItem {
-    uint64_t id;
-};
-SPACETIMEDB_STRUCT(ProcessedItem, id)
-SPACETIMEDB_TABLE(ProcessedItem, processed_item_proc, Public)
-FIELD_PrimaryKey(processed_item_proc, id)
-
-static void process_item_logic(DatabaseContext& db, uint64_t item_id) {
-    db[processed_item_proc].insert(ProcessedItem{item_id});
-}
-
-SPACETIMEDB_REDUCER(process_item, ReducerContext& ctx, uint64_t item_id) {
-    process_item_logic(ctx.db, item_id);
-    return Ok();
-}
-
-SPACETIMEDB_PROCEDURE(Unit, fetch_and_process, ProcedureContext ctx, std::string url) {
-    auto result = ctx.http.get(url);
-    if (!result.is_ok()) {
-        LOG_ERROR("Request failed: " + result.error());
-        return Unit{};
-    }
-
-    auto& response = result.value();
-    if (response.status_code != 200) {
-        LOG_ERROR("HTTP status: " + std::to_string(response.status_code));
-        return Unit{};
-    }
-
-    auto body = response.body.to_string_utf8_lossy();
-    uint64_t item_id = std::stoull(body);
-
-    ctx.with_tx([&](https://spacetimedb.com/docs/functions/TxContext&%20tx) {
-        process_item_logic(tx.db, item_id);
-    });
-
-    return Unit{};
-}
-```
-
-note
-
-When you call a reducer function inside `withTx`, it executes as part of
-the same transaction, not as a subtransaction. The reducer's logic runs
-inline within your anonymous transaction block, just like calling any
-other helper function.
-
-This pattern is useful when you need to:
-
-- Fetch external data and then process it transactionally
-- Reuse existing reducer logic from a procedure
-- Combine side effects (HTTP) with database operations
-
-## Calling procedures
-
-- TypeScript
-- C#
-- Rust
-- Unreal C++
-- Unreal Blueprint
-
-Clients can invoke procedures using methods on `ctx.procedures`:
-
-``` codeBlockStandalone_LlrK
-ctx.procedures.insertAValue({ a: 12, b: "Foo" });
-```
-
-Clients can invoke procedures using methods on `ctx.Procedures`:
-
-``` codeBlockStandalone_LlrK
-ctx.Procedures.InsertAValue(12, "Foo");
-```
-
-Clients can invoke procedures using methods on `ctx.procedures`:
-
-``` codeBlockStandalone_LlrK
-ctx.procedures.insert_a_value(12, "Foo".to_string());
-```
-
-Clients can invoke procedures using methods on `ctx.Procedures`:
-
-``` codeBlockStandalone_LlrK
-Context.Procedures->InsertAValue(12, TEXT("Foo"), {});
-```
-
-Clients can invoke procedures using methods on `ctx.Procedures`:
-
-![Calling
-Procedures](https://spacetimedb.com/docs/assets/images/ue-blueprint-calling-procedure-265d7e3c7cf419716bdd4d6fbdfd2489.png)
-
-### Observing return values
-
-- TypeScript
-- C#
-- Rust
-- Unreal C++
-- Unreal Blueprint
-
-When a client invokes a procedure, it gets a
-[`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-which resolves to the return value of the procedure.
-
-``` codeBlockStandalone_LlrK
-ctx.procedures.addTwoNumbers({ lhs: 1, rhs: 2 }).then(
-    sum => console.log(`1 + 2 = ${sum}`)
-);
-```
-
-A client can also invoke a procedure while registering a callback to run
-when it completes. That callback will have access to the return value of
-the procedure, or an error if the procedure fails.
-
-``` codeBlockStandalone_LlrK
-ctx.Procedures.AddTwoNumbers(1, 2, (ctx, result) =>
-{
-    if (result.IsSuccess)
-    {
-        Log.Info($"1 + 2 = {result.Value!}");
-    }
-    else
-    {
-        throw result.Error!;
-    }
-});
-```
-
-A client can also invoke a procedure while registering a callback to run
-when it completes. That callback will have access to the return value of
-the procedure, or an error if the procedure fails.
-
-``` codeBlockStandalone_LlrK
-ctx.procedures.add_two_numbers_then(1, 2, |ctx, result| {
-    let sum = result.expect("Procedure failed");
-    println!("1 + 2 = {sum}");
-});
-```
-
-A client can also invoke a procedure while registering a callback to run
-when it completes. That callback will have access to the return value of
-the procedure, or an error if the procedure fails.
-
-``` codeBlockStandalone_LlrK
-{
-    ...    
-    FOnAddTwoNumbersComplete ReturnCallback;
-    BIND_DELEGATE_SAFE(ReturnCallback, this, AGameManager, OnAddTwoNumbersComplete);
-    Context.Procedures->AddTwoNumbers(1, 2, ReturnCallback);
-}
-
-void AGameManager::OnAddTwoNumbersComplete(const FProcedureEventContext& Context, int32 Result, bool bSuccess)
-{
-    if (bSuccess)
-    {
-        UE_LOG(LogTemp, Log, TEXT("1 + 2 = %d"), Result);
-    }
-    else
-    {
-        if (Context.Event.Status.IsInternalError())
-        {
-            UE_LOG(LogTemp, Error, TEXT("Error: %s"), *Context.Event.Status.GetAsInternalError());
-            return;
-        }
-        UE_LOG(LogTemp, Error, TEXT("Out of energy!"));
-    }
-}
-```
-
-A client can also invoke a procedure while registering a callback to run
-when it completes. That callback will have access to the return value of
-the procedure, or an error if the procedure fails.
-
-![Procedure
-Callbacks](https://spacetimedb.com/docs/assets/images/ue-blueprint-procedure-callback-a022ea5b8cbc6a85706ac0375f781677.png)
-
-## Example: Calling an External AI API
-
-A common use case for procedures is integrating with external APIs like
-OpenAI's ChatGPT. Here's a complete example showing how to build an
-AI-powered chat feature.
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-import { schema, t, table, SenderError } from 'spacetimedb/server';
-import { TimeDuration } from 'spacetimedb';
-
-const aiMessage = table(
-  { name: 'ai_message', public: true },
-  {
-    user: t.identity(),
-    prompt: t.string(),
-    response: t.string(),
-    createdAt: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ aiMessage });
-export default spacetimedb;
-
-export const askAi = spacetimedb.procedure(
-  { prompt: t.string(), apiKey: t.string() },
-  t.string(),
-  (ctx, { prompt, apiKey }) => {
-    // Make the HTTP request to OpenAI
-    const response = ctx.http.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      // Give it some time to think
-      timeout: TimeDuration.fromMillis(3000),
-    });
-
-    if (response.status !== 200) {
-      throw new SenderError(`API returned status ${response.status}`);
-    }
-
-    const data = response.json();
-    const aiResponse = data.choices?.[0]?.message?.content;
-
-    if (!aiResponse) {
-      throw new SenderError('Failed to parse AI response');
-    }
-
-    // Store the conversation in the database
-    ctx.withTx(txCtx => {
-      txCtx.db.aiMessage.insert({
-        user: txCtx.sender,
-        prompt,
-        response: aiResponse,
-        createdAt: txCtx.timestamp,
-      });
-    });
-
-    return aiResponse;
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-using System.Text.Json;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "AiMessage", Public = true)]
-    public partial struct AiMessage
-    {
-        public Identity User;
-        public string Prompt;
-        public string Response;
-        public Timestamp CreatedAt;
-    }
-
-    [SpacetimeDB.Procedure]
-    public static string AskAi(ProcedureContext ctx, string prompt, string apiKey)
-    {
-        // Build the request to OpenAI's API
-        var requestBody = JsonSerializer.Serialize(new
-        {
-            model = "gpt-4",
-            messages = new[] { new { role = "user", content = prompt } }
-        });
-
-        var request = new HttpRequest
-        {
-            Method = SpacetimeDB.HttpMethod.Post,
-            Uri = "https://api.openai.com/v1/chat/completions",
-            Headers = new List<HttpHeader>
-            {
-                new HttpHeader("Content-Type", "application/json"),
-                new HttpHeader("Authorization", $"Bearer {apiKey}")
-            },
-            Body = HttpBody.FromString(requestBody),
-            // Give it some time to think
-            Timeout = TimeSpan.FromMilliseconds(3000)
-        };
-
-        // Make the HTTP request
-        var response = ctx.Http.Send(request).UnwrapOrThrow();
-
-        if (response.StatusCode != 200)
-        {
-            throw new Exception($"API returned status {response.StatusCode}");
-        }
-
-        var bodyStr = response.Body.ToStringUtf8Lossy();
-
-        // Parse the response
-        var aiResponse = ExtractContent(bodyStr)
-            ?? throw new Exception("Failed to parse AI response");
-
-        // Store the conversation in the database
-        ctx.WithTx(txCtx =>
-        {
-            txCtx.Db.AiMessage.Insert(new AiMessage
-            {
-                User = txCtx.Sender,
-                Prompt = prompt,
-                Response = aiResponse,
-                CreatedAt = txCtx.Timestamp
-            });
-            return 0;
-        });
-
-        return aiResponse;
-    }
-
-    private static string? ExtractContent(string json)
-    {
-        // Simple extraction - in production, use proper JSON parsing
-        var doc = JsonDocument.Parse(json);
-        return doc.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{procedure, table, Identity, ProcedureContext, Table, TimeDuration, Timestamp};
-
-#[table(accessor = ai_message, public)]
-pub struct AiMessage {
-    user: Identity,
-    prompt: String,
-    response: String,
-    created_at: Timestamp,
-}
-
-#[derive(serde::Deserialize)]
-struct AiResponse {
-    choices: Vec<AiResponseChoice>,
-    // more fields...
-}
-
-#[derive(serde::Deserialize)]
-struct AiResponseChoice {
-    message: AiResponseMessage,
-    // more fields...
-}
-
-#[derive(serde::Deserialize)]
-struct AiResponseMessage {
-    content: String,
-    // more fields...
-}
-
-#[procedure]
-pub fn ask_ai(ctx: &mut ProcedureContext, prompt: String, api_key: String) -> Result<String, String> {
-    // Build the request to OpenAI's API
-    let request_body = serde_json::json!({
-        "model": "gpt-4",
-        "messages": [{ "role": "user", "content": prompt }]
-    });
-
-    let request = spacetimedb::http::Request::builder()
-        .uri("https://api.openai.com/v1/chat/completions")
-        .method("POST")
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_key))
-        // Give it some time to think
-        .extension(spacetimedb::http::Timeout(TimeDuration::from_micros(3_000_000)))
-        .body(serde_json::to_vec(&request_body).unwrap())
-        .map_err(|e| format!("Failed to build request: {e}"))?;
-
-    // Make the HTTP request
-    let response = ctx.http.send(request)
-        .map_err(|e| format!("HTTP request failed: {e:?}"))?;
-
-    let (parts, body) = response.into_parts();
-
-    if parts.status != 200 {
-        return Err(format!("API returned status {}", parts.status));
-    }
-
-    let body = body.into_bytes();
-    let ai_response: AiResponse =
-        serde_json::from_slice(&body).map_err(|e| format!("Failed to parse AI response: {e}"))?;
-    let ai_response = ai_response.choices[0].message.content.clone();
-
-    // Store the conversation in the database
-    ctx.with_tx(|tx_ctx| {
-        tx_ctx.db.ai_message().insert(AiMessage {
-            user: tx_ctx.sender(),
-            prompt: prompt.clone(),
-            response: ai_response.clone(),
-            created_at: tx_ctx.timestamp,
-        });
-    });
-
-    Ok(ai_response)
-}
-```
-
-### Calling from a client
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-// Call the procedure and wait for the AI response
-const response = await ctx.procedures.askAi({
-  prompt: "What is SpacetimeDB?",
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-console.log("AI says:", response);
-```
-
-``` codeBlockStandalone_LlrK
-ctx.Procedures.AskAi("What is SpacetimeDB?", apiKey, (ctx, result) =>
-{
-    if (result.IsSuccess)
-    {
-        Console.WriteLine($"AI says: {result.Value}");
-    }
-    else
-    {
-        Console.WriteLine($"Error: {result.Error}");
-    }
-});
-```
-
-``` codeBlockStandalone_LlrK
-ctx.procedures.ask_ai_then(
-    "What is SpacetimeDB?".to_string(),
-    api_key,
-    |_ctx, result| {
-        match result {
-            Ok(response) => println!("AI says: {}", response),
-            Err(e) => eprintln!("Error: {:?}", e),
-        }
-    },
-);
-```
-
-warning
-
-**Security note:** Never hardcode API keys in your client code. Consider
-storing them securely on the server side or using environment variables
-during development.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/functions/procedures" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Procedures | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/functions/procedures"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Procedures | SpacetimeDB docs"><meta data-rh="true" name="description" content="A procedure is a function exported by a database, similar to a reducer."><meta data-rh="true" property="og:description" content="A procedure is a function exported by a database, similar to a reducer."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/functions/procedures"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/procedures" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/functions/procedures" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Functions","item":"https://spacetimedb.com/docs/functions"},{"@type":"ListItem","position":2,"name":"Procedures","item":"https://spacetimedb.com/docs/functions/procedures"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/functions/procedures">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/functions/procedures">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/functions/procedures">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Collapse sidebar category &#x27;Functions&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/functions/reducers"><span title="Reducers" class="categoryLinkLabel_HATI">Reducers</span></a><button aria-label="Expand sidebar category &#x27;Reducers&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/functions/procedures"><span title="Procedures" class="linkLabel_UvDg">Procedures</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/views"><span title="Views" class="linkLabel_UvDg">Views</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/functions/http-handlers"><span title="HTTP Handlers" class="linkLabel_UvDg">HTTP Handlers</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/functions"><span>Functions</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Procedures</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Procedures</h1></header><p>A <strong>procedure</strong> is a function exported by a <a class="" href="/docs/databases">database</a>, similar to a <a class="" href="/docs/functions/reducers">reducer</a>.
+Connected <a class="" href="/docs/clients">clients</a> can call procedures.
+Procedures can perform additional operations not possible in reducers, including making HTTP requests to external services.
+However, procedures don&#x27;t automatically run in database transactions,
+and must manually open and commit a transaction in order to read from or modify the database state.
+For this reason, prefer defining reducers rather than procedures unless you need to use one of the special procedure operators.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="defining-procedures">Defining Procedures<a href="#defining-procedures" class="hash-link" aria-label="Direct link to Defining Procedures" title="Direct link to Defining Procedures" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Define a procedure with <code>spacetimedb.procedure</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> addTwoNumbers </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    { lhs</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(), rhs</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">() },</span></span>
+<span class="line"><span style="color:#F8F8F2">    t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">lhs</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">rhs</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#50FA7B"> BigInt</span><span style="color:#F8F8F2">(lhs) </span><span style="color:#FF79C6">+</span><span style="color:#50FA7B"> BigInt</span><span style="color:#F8F8F2">(rhs),</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre><p>The <code>spacetimedb.procedure</code> function takes:</p>\<ul\>
+<li class="">optional procedure options, such as <code>onSchedule</code>,</li>
+<li class="">an optional object representing its parameter types,</li>
+<li class="">its return type,</li>
+<li class="">and the procedure function itself.</li>
+</ul><p>The exported value&#x27;s name becomes the procedure name. The callback receives a <code>ProcedureContext</code>
+and, when the procedure has parameters, an object of its arguments. It must return a value
+corresponding to its return type. This return value will be sent to the caller, but will not be
+broadcast to any other clients.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Unstable Feature</div><div class="admonitionContent_STxx"><p>Procedures in C# are currently unstable. To use them, add <code>#pragma warning disable STDB_UNSTABLE</code> at the top of your file.</p></div></div><p>Define a procedure by annotating a static method with <code>[SpacetimeDB.Procedure]</code>.</p><p>The method&#x27;s first argument must be of type <code>ProcedureContext</code>. A procedure may accept any number of additional arguments and may return a value.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> ulong</span><span style="color:#50FA7B"> AddTwoNumbers</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> lhs</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> rhs</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">ulong</span><span style="color:#F8F8F2">)lhs </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">ulong</span><span style="color:#F8F8F2">)rhs;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Because procedures are unstable, Rust modules that define them must opt in to the <code>unstable</code> feature in their <code>Cargo.toml</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">dependencies</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">spacetimedb</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> { </span><span style="color:#8BE9FD">version</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">2.*</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD">features</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> [</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">unstable</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">] }</span></span></code></pre><p>Define a procedure by annotating a function with <code>#[spacetimedb::procedure]</code>.</p><p>This function&#x27;s first argument must be of type <code>&mut spacetimedb::ProcedureContext</code>.
+By convention, this argument is named <code>ctx</code>.</p><p>A procedure may accept any number of additional arguments.
+Each argument must be of a type that implements <code>spacetimedb::SpacetimeType</code>.
+When defining a <code>struct</code> or <code>enum</code>, annotate it with <code>#[derive(spacetimedb::SpacetimeType)]</code>
+to make it usable as a procedure argument.
+These argument values will not be broadcast to clients other than the caller.</p><p>A procedure may return a value of any type that implements <code>spacetimedb::SpacetimeType</code>.
+This return value will be sent to the caller, but will not be broadcast to any other clients.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> add_two_numbers</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#F8F8F2">, lhs</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">, rhs</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    lhs </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> rhs </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> u64</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Unstable Feature</div><div class="admonitionContent_STxx"><p>Procedures in C++ are currently unstable. To use them, add <code>#define SPACETIMEDB_UNSTABLE_FEATURES</code> before including the SpacetimeDB header.</p></div></div><p>Define a procedure using the <code>SPACETIMEDB_PROCEDURE</code> macro.</p><p>The macro&#x27;s first parameter is the return type, followed by the procedure name. The function&#x27;s first argument must be of type <code>ProcedureContext</code>. By convention, this argument is named <code>ctx</code>. A procedure may accept any number of additional arguments and must return a value.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2">, add_two_numbers, ProcedureContext ctx, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2"> lhs, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2"> rhs) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#FF79C6"> static_cast\<uint64_t\></span><span style="color:#F8F8F2">(lhs) </span><span style="color:#FF79C6">+</span><span style="color:#FF79C6"> static_cast\<uint64_t\></span><span style="color:#F8F8F2">(rhs);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="accessing-the-database">Accessing the database<a href="#accessing-the-database" class="hash-link" aria-label="Direct link to Accessing the database" title="Direct link to Accessing the database" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Unlike reducers, procedures don&#x27;t automatically run in database transactions.
+This means there&#x27;s no <code>ctx.db</code> field to access the database.
+Instead, procedure code must manage transactions explicitly with <code>ProcedureCtx.withTx</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> myTable </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">my_table</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        a</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        b</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ myTable });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> insertAValue </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">({ a</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(), b</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">() }, t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">a</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">b</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db.myTable.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ a, b });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">})</span></span></code></pre><p><code>ProcedureCtx.withTx</code> takes a function of <code>(ctx: TransactionCtx) => T</code>.
+Within that function, the <code>TransactionCtx</code> can be used to access the database
+<a class="" href="/docs/functions/reducers/reducer-context">in all the same ways as a <code>ReducerCtx</code></a>
+When the function returns, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If the function throws an error, the transaction will be rolled back, and its changes will be discarded.</p><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The function passed to <code>ProcedureCtx.withTx</code> may be invoked multiple times,
+possibly seeing a different version of the database state each time.</p><p>If invoked more than once with reference to the same database state,
+it must perform the same operations and return the same result each time.</p><p>If invoked more than once with reference to different database states,
+values observed during prior runs must not influence the behavior of the function or the calling procedure.</p><p>Avoid capturing mutable state within functions passed to <code>withTx</code>.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Unlike reducers, procedures don&#x27;t automatically run in database transactions.
+This means there&#x27;s no <code>ctx.Db</code> field to access the database.
+Instead, procedure code must manage transactions explicitly with <code>ProcedureContext.WithTx</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">MyTable</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> MyTable</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> A;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> B;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> InsertAValue</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.MyTable.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> MyTable</span><span style="color:#F8F8F2"> { A </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a, B </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> b });</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ProcedureContext.WithTx</code> takes a function of type <code>Func\<ProcedureTxContext, T\></code>.
+Within that function, the <code>TransactionContext</code> can be used to access the database
+<a class="" href="/docs/functions/reducers/reducer-context">in all the same ways as a <code>ReducerContext</code></a>.
+When the function returns, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If the function throws an exception, the transaction will be rolled back, and its changes will be discarded.</p><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The function passed to <code>ProcedureContext.WithTx</code> may be invoked multiple times,
+possibly seeing a different version of the database state each time.</p><p>If invoked more than once with reference to the same database state,
+it must perform the same operations and return the same result each time.</p><p>If invoked more than once with reference to different database states,
+values observed during prior runs must not influence the behavior of the function or the calling procedure.</p><p>Avoid capturing mutable state within functions passed to <code>WithTx</code>.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Unlike reducers, procedures don&#x27;t automatically run in database transactions.
+This means there&#x27;s no <code>ctx.db</code> field to access the database.
+Instead, procedure code must manage transactions explicitly with <code>ProcedureContext::with_tx</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> my_table)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> MyTable</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    a</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    b</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> insert_a_value</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, a</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">, b</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">tx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">my_table</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">MyTable</span><span style="color:#F8F8F2"> { a, b });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ProcedureContext::with_tx</code> takes a function of type <code>Fn(&TxContext) -> T</code>.
+Within that function, the <code>&TxContext</code> can be used to access the database
+<a href="https://docs.rs/spacetimedb/latest/spacetimedb/struct.ReducerContext.html" target="_blank" rel="noopener noreferrer" class="">in all the same ways as a <code>ReducerContext</code></a>.
+When the function returns, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If the function panics, the transaction will be rolled back, and its changes will be discarded.
+However, for transactions that may fail,
+<a href="#fallible-database-operations" class="">prefer calling <code>try_with_tx</code> and returning a <code>Result</code></a> rather than panicking.</p><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The function passed to <code>ProcedureContext::with_tx</code> may be invoked multiple times,
+possibly seeing a different version of the database state each time.</p><p>If invoked more than once with reference to the same database state,
+it must perform the same operations and return the same result each time.</p><p>If invoked more than once with reference to different database states,
+values observed during prior runs must not influence the behavior of the function or the calling procedure.</p><p>Avoid capturing mutable state within functions passed to <code>with_tx</code>.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Unlike reducers, procedures don&#x27;t automatically run in database transactions.
+This means there&#x27;s no <code>ctx.db</code> field to access the database.
+Instead, procedure code must manage transactions explicitly with <code>ctx.with_tx</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> MyTable</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> a;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string b;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(MyTable, a, b)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(MyTable, my_table, Public)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, insert_a_value, ProcedureContext ctx, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2"> a, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string b) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">([</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx.db[my_table].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(MyTable{a, b});</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ctx.with_tx</code> takes a lambda function with signature <code>[](TxContext& tx) -> T</code>.
+Within that function, the <code>TxContext</code> can be used to access the database
+<a class="" href="/docs/functions/reducers/reducer-context">in all the same ways as a <code>ReducerContext</code></a>.
+When the function returns, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If the function throws an exception, the transaction will be rolled back, and its changes will be discarded.
+However, for transactions that may fail,
+<a href="#fallible-database-operations" class="">prefer calling <code>try_with_tx</code> and returning <code>bool</code></a> rather than throwing.</p><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The function passed to <code>ctx.with_tx</code> may be invoked multiple times,
+possibly seeing a different version of the database state each time.</p><p>If invoked more than once with reference to the same database state,
+it must perform the same operations and return the same result each time.</p><p>If invoked more than once with reference to different database states,
+values observed during prior runs must not influence the behavior of the function or the calling procedure.</p><p>Avoid capturing mutable state within functions passed to <code>with_tx</code>.</p></div></div></div></div></div>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="fallible-database-operations">Fallible database operations<a href="#fallible-database-operations" class="hash-link" aria-label="Direct link to Fallible database operations" title="Direct link to Fallible database operations" translate="no">​</a></h4>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>For fallible database operations, you can throw an error inside the transaction function:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> maybeInsertAValue </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">({ a</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(), b</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">a</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">b</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (a </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">            throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> SenderError</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">a is less than 10!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db.myTable.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ a, b });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">})</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>For fallible database operations, you can throw an exception inside the transaction function:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> MaybeInsertAValue</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (a </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">a is less than 10!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.MyTable.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> MyTable</span><span style="color:#F8F8F2"> { A </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a, B </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> b });</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>For fallible database operations, instead use <code>ProcedureContext::try_with_tx</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> maybe_insert_a_value</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, a</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">, b</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">try_with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">tx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> a </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#8BE9FD;font-style:italic"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"a is less than 10!"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">my_table</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">MyTable</span><span style="color:#F8F8F2"> { a, b });</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ProcedureContext::try_with_tx</code> takes a function of type <code>Fn(&TxContext) -> Result\<T, E\></code>.
+If the function returns <code>Ok</code>, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If that function returns <code>Err</code>, the transaction will be rolled back, and its changes will be discarded.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>For fallible database operations, use <code>ctx.try_with_tx</code> with a lambda that returns <code>bool</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">bool</span><span style="color:#F8F8F2">, maybe_insert_a_value, ProcedureContext ctx, </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2"> a, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string b) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">try_with_tx</span><span style="color:#F8F8F2">([</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) -> </span><span style="color:#FF79C6">bool</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (a </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2">;</span><span style="color:#6272A4">  // Rollback transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx.db[my_table].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(MyTable{a, b});</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">;</span><span style="color:#6272A4">  // Commit transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ctx.try_with_tx</code> takes a lambda function with signature <code>[](TxContext& tx) -> bool</code>.
+If the function returns <code>true</code>, the transaction will be committed,
+and its changes to the database state will become permanent and be broadcast to clients.
+If the function returns <code>false</code>, the transaction will be rolled back, and its changes will be discarded.</p><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>For non-bool return types, <code>try_with_tx</code> always commits the transaction. To abort in those cases, use <code>LOG_PANIC</code>.</p></div></div></div></div></div>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="reading-values-out-of-the-database">Reading values out of the database<a href="#reading-values-out-of-the-database" class="hash-link" aria-label="Direct link to Reading values out of the database" title="Direct link to Reading values out of the database" translate="no">​</a></h4>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Functions passed to
+<a href="#accessing-the-database" class=""><code>ProcedureCtx.withTx</code></a>
+may return a value, and that value will be returned to the calling procedure.</p><p>Transaction return values are never saved or broadcast to clients, and are used only by the calling procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        level</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ player });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> findHighestLevelPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> highestLevelPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        Iterator.</span><span style="color:#50FA7B">from</span><span style="color:#F8F8F2">(ctx.db.player).</span><span style="color:#50FA7B">reduce</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">            (</span><span style="color:#FFB86C;font-style:italic">a</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">b</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> a </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> null</span><span style="color:#FF79C6"> ||</span><span style="color:#F8F8F2"> b.level </span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> a.level </span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2"> b </span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> a,</span></span>
+<span class="line"><span style="color:#BD93F9">            null</span></span>
+<span class="line"><span style="color:#F8F8F2">        )</span></span>
+<span class="line"><span style="color:#F8F8F2">    );</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (highestLevelPlayer </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Congratulations to </span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, highestLevelPlayer.id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">warn</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">No players...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Functions passed to
+<a href="#accessing-the-database" class=""><code>ProcedureContext.WithTx</code></a>
+may return a value, and that value will be returned to the calling procedure.</p><p>Transaction return values are never saved or broadcast to clients, and are used only by the calling procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Level;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> FindHighestLevelPlayer</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> highestLevelPlayer </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            Player</span><span style="color:#F8F8F2">? highest </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">            foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> txCtx.Db.Player.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#F8F8F2"> (highest </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> null</span><span style="color:#FF79C6"> ||</span><span style="color:#F8F8F2"> player.Level </span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> highest.Value.Level)</span></span>
+<span class="line"><span style="color:#F8F8F2">                {</span></span>
+<span class="line"><span style="color:#F8F8F2">                    highest </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player;</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2"> highest;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (highestLevelPlayer.HasValue)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Congratulations to </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">highestLevelPlayer</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Value</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Id</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        else</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Log.</span><span style="color:#50FA7B">Warn</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">No players...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Functions passed to
+<a href="#accessing-the-database" class=""><code>ProcedureContext::with_tx</code></a> and <a href="#fallible-database-operations" class=""><code>ProcedureContext::try_with_tx</code></a>
+may return a value, and that value will be returned to the calling procedure.</p><p>Transaction return values are never saved or broadcast to clients, and are used only by the calling procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    level</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> find_highest_level_player</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> highest_level_player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">max_by_key</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">player</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">level)</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#FF79C6">    match</span><span style="color:#F8F8F2"> highest_level_player {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Some</span><span style="color:#F8F8F2">(player) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Congratulations to {}"</span><span style="color:#F8F8F2">, player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">id),</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        None</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">warn!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"No players..."</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Functions passed to
+<a href="#accessing-the-database" class=""><code>ctx.with_tx</code></a> and <a href="#fallible-database-operations" class=""><code>ctx.try_with_tx</code></a>
+may return a value, and that value will be returned to the calling procedure.</p><p>Transaction return values are never saved or broadcast to clients, and are used only by the calling procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity id;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> level;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, id, level)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, find_highest_level_player, ProcedureContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> highest_level_player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">([](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) -> </span><span style="color:#FF79C6">std::optional\<Player\></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">optional</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Player</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> highest;</span></span>
+<span class="line"><span style="color:#FF79C6">        for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#F8F8F2"> player : tx.db[player]) {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">highest </span><span style="color:#FF79C6">||</span><span style="color:#F8F8F2"> player.level </span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> highest</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">level) {</span></span>
+<span class="line"><span style="color:#F8F8F2">                highest </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player;</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> highest;</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (highest_level_player) {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Congratulations to </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> highest_level_player</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">id.</span><span style="color:#50FA7B">to_hex_string</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_WARN</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">No players...</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="http-requests">HTTP Requests<a href="#http-requests" class="hash-link" aria-label="Direct link to HTTP Requests" title="Direct link to HTTP Requests" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Procedures can make HTTP requests to external services using methods contained in <code>ctx.http</code>.</p><p><code>ctx.http.fetch</code> is similar to the browser <code>fetch()</code> API, but is synchronous.</p><p>It can perform simple <code>GET</code> requests:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> getRequest </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    try</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://example.invalid</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Got response with status </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">response.status</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> and body </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">body</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">catch</span><span style="color:#F8F8F2"> (e) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, e);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre><p>It can also accept an options object to specify a body, headers, HTTP method, and timeout:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> postRequest </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    try</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://example.invalid/upload</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">            method</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">POST</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            headers</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> { </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">text/plain</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">            body</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">This is the body of the HTTP request</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Got response with status </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">response.status</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> and body {body}`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">catch</span><span style="color:#F8F8F2"> (e) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, e);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> getRequestWithShortTimeout </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), </span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    try</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://example.invalid</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">            method</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">GET</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            timeout</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> TimeDuration.</span><span style="color:#50FA7B">fromMillis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#FF79C6">        const</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">text</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Got response with status </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">response.status</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> and body {body}`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">catch</span><span style="color:#F8F8F2"> (e) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, e);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre><p>Procedures can&#x27;t send requests at the same time as holding open a <a href="#accessing-the-database" class="">transaction</a>.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Procedures can make HTTP requests to external services using methods on <code>ctx.Http</code>.</p><p><code>ctx.Http.Get</code> performs simple <code>GET</code> requests with no headers:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> GetRequest</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Get</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://example.invalid</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        switch</span><span style="color:#F8F8F2"> (result)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            case</span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpResponse</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">HttpError</span><span style="color:#F8F8F2">>.</span><span style="color:#8BE9FD;font-style:italic">OkR</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> response):</span></span>
+<span class="line"><span style="color:#FF79C6">                var</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.Body.</span><span style="color:#50FA7B">ToStringUtf8Lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">                Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Got response with status </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">response</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">StatusCode</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> and body </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">body</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">                break</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">            case</span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpResponse</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">HttpError</span><span style="color:#F8F8F2">>.</span><span style="color:#8BE9FD;font-style:italic">ErrR</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> e):</span></span>
+<span class="line"><span style="color:#F8F8F2">                Log.</span><span style="color:#50FA7B">Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">e</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Message</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">                break</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ctx.Http.Send</code> sends an <code>HttpRequest</code> with custom method, headers, and body:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> PostRequest</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> HttpRequest</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Method </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> SpacetimeDB.HttpMethod.Post,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Uri </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://example.invalid/upload</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Headers </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpHeader</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                new</span><span style="color:#8BE9FD;font-style:italic"> HttpHeader</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">text/plain</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            },</span></span>
+<span class="line"><span style="color:#F8F8F2">            Body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> HttpBody.</span><span style="color:#50FA7B">FromString</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">This is the body of the HTTP request</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        };</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Send</span><span style="color:#F8F8F2">(request);</span></span>
+<span class="line"><span style="color:#FF79C6">        switch</span><span style="color:#F8F8F2"> (result)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            case</span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpResponse</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">HttpError</span><span style="color:#F8F8F2">>.</span><span style="color:#8BE9FD;font-style:italic">OkR</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> response):</span></span>
+<span class="line"><span style="color:#FF79C6">                var</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.Body.</span><span style="color:#50FA7B">ToStringUtf8Lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">                Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Got response with status </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">response</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">StatusCode</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> and body </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">body</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">                break</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">            case</span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpResponse</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">HttpError</span><span style="color:#F8F8F2">>.</span><span style="color:#8BE9FD;font-style:italic">ErrR</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> e):</span></span>
+<span class="line"><span style="color:#F8F8F2">                Log.</span><span style="color:#50FA7B">Error</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">e</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Message</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">                break</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Procedures can&#x27;t send requests at the same time as holding open a <a href="#accessing-the-database" class="">transaction</a>.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Procedures can make HTTP requests to external services using methods contained in <code>ctx.http</code>.</p><p><code>ctx.http.get</code> performs simple <code>GET</code> requests with no headers:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> get_request</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    match</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://example.invalid"</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(response) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">            let</span><span style="color:#F8F8F2"> (response, body) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_parts</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">            log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F1FA8C">                "Got response with status {} and body {}"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">                response</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status,</span></span>
+<span class="line"><span style="color:#F8F8F2">                body</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_string_lossy</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            )</span></span>
+<span class="line"><span style="color:#F8F8F2">        },</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Err</span><span style="color:#F8F8F2">(error) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">error!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Request failed: {error:?}"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ctx.http.send</code> sends any <a href="https://docs.rs/http/latest/http/request/struct.Request.html" target="_blank" rel="noopener noreferrer" class=""><code>http::Request</code></a>
+whose body can be converted to <code>spacetimedb::http::Body</code>.
+<code>http::Request</code> is re-exported as <code>spacetimedb::http::Request</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> post_request</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Request</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://example.invalid/upload"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">method</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"POST"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">header</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Content-Type"</span><span style="color:#F8F8F2">, </span><span style="color:#F1FA8C">"text/plain"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">body</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"This is the body of the HTTP request"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Building `Request` object failed"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    match</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request) {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Ok</span><span style="color:#F8F8F2">(response) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">            let</span><span style="color:#F8F8F2"> (response, body) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_parts</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">            log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F1FA8C">                "Got response with status {} and body {}"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">                response</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status,</span></span>
+<span class="line"><span style="color:#F8F8F2">                body</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_string_lossy</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            )</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Err</span><span style="color:#F8F8F2">(error) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">error!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Request failed: {error:?}"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Each of these methods returns a <a href="https://docs.rs/http/latest/http/response/struct.Response.html#method.body" target="_blank" rel="noopener noreferrer" class=""><code>http::Response</code></a>
+containing a <code>spacetimedb::http::Body</code>. <code>http::Response</code> is re-exported as <code>spacetimedb::http::Response</code>.</p><p>Set a timeout for a <code>ctx.http.send</code> request by including a <code>spacetimedb::http::Timeout</code> as an <a href="https://docs.rs/http/latest/http/request/struct.Builder.html#method.extension" target="_blank" rel="noopener noreferrer" class=""><code>extension</code></a>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> get_request_with_short_timeout</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Request</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://example.invalid"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">method</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"GET"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#6272A4">        // Set a timeout of 10 ms.</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">extension</span><span style="color:#F8F8F2">(spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Timeout</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">Duration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into</span><span style="color:#F8F8F2">()))</span></span>
+<span class="line"><span style="color:#6272A4">        // Empty body for a `GET` request.</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">body</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Building `Request` object failed"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"HTTP request failed"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Procedures can&#x27;t send requests at the same time as holding open a <a href="#accessing-the-database" class="">transaction</a>.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Unstable Feature</div><div class="admonitionContent_STxx"><p>HTTP requests in C++ procedures are currently unstable. To use them, add <code>#define SPACETIMEDB_UNSTABLE_FEATURES</code> before including the SpacetimeDB header.</p></div></div><p>Procedures can make HTTP requests to external services using methods on <code>ctx.http</code>.</p><p><code>ctx.http.get</code> performs simple <code>GET</code> requests:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, get_request, ProcedureContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://example.invalid</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result.</span><span style="color:#50FA7B">is_ok</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        auto&</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.body.</span><span style="color:#50FA7B">to_string_utf8_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Got response with status </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(response.status_code) </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> </span></span>
+<span class="line"><span style="color:#E9F284">                 "</span><span style="color:#F1FA8C"> and body </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> body);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p><code>ctx.http.send</code> sends an <code>HttpRequest</code> with custom method, headers, and body:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, post_request, ProcedureContext ctx) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    HttpRequest request{</span></span>
+<span class="line"><span style="color:#F8F8F2">        .uri </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://example.invalid/upload</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .method </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> HttpMethod</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">post</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        .headers </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> {HttpHeader{</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">text/plain</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">}},</span></span>
+<span class="line"><span style="color:#F8F8F2">        .body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> HttpBody</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_string</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">This is the body of the HTTP request</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result.</span><span style="color:#50FA7B">is_ok</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        auto&</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.body.</span><span style="color:#50FA7B">to_string_utf8_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Got response with status </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(response.status_code) </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> </span></span>
+<span class="line"><span style="color:#E9F284">                 "</span><span style="color:#F1FA8C"> and body </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> body);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Set a timeout for a request using <code>TimeDuration::from_millis()</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, get_request_with_short_timeout, ProcedureContext ctx) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    HttpRequest request{</span></span>
+<span class="line"><span style="color:#F8F8F2">        .uri </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://example.invalid</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .method </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> HttpMethod</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        .timeout </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> TimeDuration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result.</span><span style="color:#50FA7B">is_ok</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        auto&</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.body.</span><span style="color:#50FA7B">to_string_utf8_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Got response with status </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(response.status_code) </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> </span></span>
+<span class="line"><span style="color:#E9F284">                 "</span><span style="color:#F1FA8C"> and body </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> body);</span></span>
+<span class="line"><span style="color:#F8F8F2">    } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Procedures can&#x27;t send requests at the same time as holding open a <a href="#accessing-the-database" class="">transaction</a>.</p></div></div></div>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>If no timeout is specified, HTTP requests default to 30 seconds. User-specified timeouts are clamped to a maximum of 180 seconds by the host.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="calling-reducers-from-procedures">Calling Reducers from Procedures<a href="#calling-reducers-from-procedures" class="hash-link" aria-label="Direct link to Calling Reducers from Procedures" title="Direct link to Calling Reducers from Procedures" translate="no">​</a></h2>
+<p>Procedures can call reducers by invoking them within a transaction block. The reducer function runs within the transaction context:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Define a reducer and save the reference</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> processItem </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ itemId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">itemId</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // ... reducer logic</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Call it from a procedure using the saved reference</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> fetchAndProcess </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">({ url</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">url</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // Fetch external data</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">json</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Call the reducer within a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">    processItem</span><span style="color:#F8F8F2">(txCtx, { itemId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> data.id });</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Note: In C#, you can define helper methods that work with the transaction context</span></span>
+<span class="line"><span style="color:#6272A4">    // rather than calling reducers directly.</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> ProcessItemLogic</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">ulong</span><span style="color:#FFB86C;font-style:italic"> itemId</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // ... item processing logic</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> FetchAndProcess</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> url</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Fetch external data</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Get</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">UnwrapOrThrow</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.Body.</span><span style="color:#50FA7B">ToStringUtf8Lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> itemId </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> ParseId</span><span style="color:#F8F8F2">(body);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Process within a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#50FA7B">            ProcessItemLogic</span><span style="color:#F8F8F2">(itemId);</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> ulong</span><span style="color:#50FA7B"> ParseId</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> body</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Parse the ID from the response body</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Parse</span><span style="color:#F8F8F2">(body);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> process_item</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, item_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">    // ... reducer logic</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> fetch_and_process</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Fetch external data</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">url)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"{e:?}"</span><span style="color:#F8F8F2">))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> (_, body) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_parts</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> item_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#FF79C6"> =</span><span style="color:#50FA7B"> parse_id</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">body</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_string_lossy</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Call the reducer within a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">tx_ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        process_item</span><span style="color:#F8F8F2">(tx_ctx, item_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Unstable Feature</div><div class="admonitionContent_STxx"><p>Procedures in C++ are currently unstable. To use them, add <code>#define SPACETIMEDB_UNSTABLE_FEATURES</code> before including the SpacetimeDB header.</p></div></div><p>In C++, <code>TxContext</code> and <code>ReducerContext</code> share the same database API, so it’s common to move shared logic into a helper that takes a <code>DatabaseContext&</code> and call it from both the reducer and the procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#define</span><span style="color:#50FA7B"> SPACETIMEDB_UNSTABLE_FEATURES</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">></span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> ProcessedItem</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(ProcessedItem, id)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(ProcessedItem, processed_item_proc, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(processed_item_proc, id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> process_item_logic</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DatabaseContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> db</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint64_t</span><span style="color:#FFB86C;font-style:italic"> item_id</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    db[processed_item_proc].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(ProcessedItem{item_id});</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(process_item, ReducerContext</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> ctx, </span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2"> item_id) {</span></span>
+<span class="line"><span style="color:#50FA7B">    process_item_logic</span><span style="color:#F8F8F2">(ctx.db, item_id);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, fetch_and_process, ProcedureContext ctx, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string url) {</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> result </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">get</span><span style="color:#F8F8F2">(url);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">result.</span><span style="color:#50FA7B">is_ok</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Request failed: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    auto&</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (response.status_code </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_ERROR</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">HTTP status: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(response.status_code));</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.body.</span><span style="color:#50FA7B">to_string_utf8_lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> item_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">stoull</span><span style="color:#F8F8F2">(body);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">([</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#50FA7B">        process_item_logic</span><span style="color:#F8F8F2">(tx.db, item_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>When you call a reducer function inside <code>withTx</code>, it executes as part of the same transaction, not as a subtransaction. The reducer&#x27;s logic runs inline within your anonymous transaction block, just like calling any other helper function.</p></div></div>
+<p>This pattern is useful when you need to:</p>
+\<ul\>
+<li class="">Fetch external data and then process it transactionally</li>
+<li class="">Reuse existing reducer logic from a procedure</li>
+<li class="">Combine side effects (HTTP) with database operations</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="calling-procedures">Calling procedures<a href="#calling-procedures" class="hash-link" aria-label="Direct link to Calling procedures" title="Direct link to Calling procedures" translate="no">​</a></h2>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal C++</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal Blueprint</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Clients can invoke procedures using methods on <code>ctx.procedures</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.procedures.</span><span style="color:#50FA7B">insertAValue</span><span style="color:#F8F8F2">({ a</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 12</span><span style="color:#F8F8F2">, b</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Foo</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> });</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Clients can invoke procedures using methods on <code>ctx.Procedures</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.Procedures.</span><span style="color:#50FA7B">InsertAValue</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">12</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Foo</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Clients can invoke procedures using methods on <code>ctx.procedures</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">procedures</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert_a_value</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">12</span><span style="color:#F8F8F2">, </span><span style="color:#F1FA8C">"Foo"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">());</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Clients can invoke procedures using methods on <code>ctx.Procedures</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">Context.Procedures</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">InsertAValue</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">12</span><span style="color:#F8F8F2">, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Foo</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), {});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Clients can invoke procedures using methods on <code>ctx.Procedures</code>:</p><p><img decoding="async" loading="lazy" alt="Calling Procedures" src="/docs/assets/images/ue-blueprint-calling-procedure-265d7e3c7cf419716bdd4d6fbdfd2489.png" width="411" height="463" class="img_sDl7"></p></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="observing-return-values">Observing return values<a href="#observing-return-values" class="hash-link" aria-label="Direct link to Observing return values" title="Direct link to Observing return values" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal C++</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal Blueprint</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>When a client invokes a procedure, it gets a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" target="_blank" rel="noopener noreferrer" class=""><code>Promise</code></a> which resolves to the return value of the procedure.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.procedures.</span><span style="color:#50FA7B">addTwoNumbers</span><span style="color:#F8F8F2">({ lhs</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2">, rhs</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2"> }).</span><span style="color:#50FA7B">then</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FFB86C;font-style:italic">    sum</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`1 + 2 = </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">sum</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>A client can also invoke a procedure while registering a callback to run when it completes.
+That callback will have access to the return value of the procedure,
+or an error if the procedure fails.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.Procedures.</span><span style="color:#50FA7B">AddTwoNumbers</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">result</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result.IsSuccess)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">1 + 2 = </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">result</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Value</span><span style="color:#FF79C6">!}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    else</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        throw</span><span style="color:#F8F8F2"> result.Error</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>A client can also invoke a procedure while registering a callback to run when it completes.
+That callback will have access to the return value of the procedure,
+or an error if the procedure fails.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">procedures</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">add_two_numbers_then</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx, result</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> sum </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> result</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Procedure failed"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#50FA7B">    println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"1 + 2 = {sum}"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>A client can also invoke a procedure while registering a callback to run when it completes.
+That callback will have access to the return value of the procedure,
+or an error if the procedure fails.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    ...    </span></span>
+<span class="line"><span style="color:#F8F8F2">    FOnAddTwoNumbersComplete ReturnCallback;</span></span>
+<span class="line"><span style="color:#50FA7B">    BIND_DELEGATE_SAFE</span><span style="color:#F8F8F2">(ReturnCallback, </span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, AGameManager, OnAddTwoNumbersComplete);</span></span>
+<span class="line"><span style="color:#F8F8F2">    Context.Procedures</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">AddTwoNumbers</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">2</span><span style="color:#F8F8F2">, ReturnCallback);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#F8F8F2"> AGameManager</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">OnAddTwoNumbersComplete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> FProcedureEventContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> Context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">int32</span><span style="color:#FFB86C;font-style:italic"> Result</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">bool</span><span style="color:#FFB86C;font-style:italic"> bSuccess</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (bSuccess)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#50FA7B">        UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Log, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">1 + 2 = </span><span style="color:#BD93F9">%d</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), Result);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    else</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (Context.Event.Status.</span><span style="color:#50FA7B">IsInternalError</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#50FA7B">            UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Error, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Error: </span><span style="color:#BD93F9">%s</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">Context.Event.Status.</span><span style="color:#50FA7B">GetAsInternalError</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#50FA7B">        UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Error, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Out of energy!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">));</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>A client can also invoke a procedure while registering a callback to run when it completes.
+That callback will have access to the return value of the procedure,
+or an error if the procedure fails.</p><p><img decoding="async" loading="lazy" alt="Procedure Callbacks" src="/docs/assets/images/ue-blueprint-procedure-callback-a022ea5b8cbc6a85706ac0375f781677.png" width="901" height="764" class="img_sDl7"></p></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-calling-an-external-ai-api">Example: Calling an External AI API<a href="#example-calling-an-external-ai-api" class="hash-link" aria-label="Direct link to Example: Calling an External AI API" title="Direct link to Example: Calling an External AI API" translate="no">​</a></h2>
+<p>A common use case for procedures is integrating with external APIs like OpenAI&#x27;s ChatGPT. Here&#x27;s a complete example showing how to build an AI-powered chat feature.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, t, table, SenderError } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { TimeDuration } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> aiMessage </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">ai_message</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    user</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    prompt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    response</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    createdAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ aiMessage });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> askAi </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { prompt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(), apiKey</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">prompt</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">apiKey</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Make the HTTP request to OpenAI</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">https://api.openai.com/v1/chat/completions</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">      method</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">POST</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      headers</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#E9F284">        &#x27;</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">&#x27;</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">application/json</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#E9F284">        &#x27;</span><span style="color:#F1FA8C">Authorization</span><span style="color:#E9F284">&#x27;</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> `Bearer </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">apiKey</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#F8F8F2">      body</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> JSON</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">stringify</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">        model</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">gpt-4</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        messages</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [{ role</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, content</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> prompt }],</span></span>
+<span class="line"><span style="color:#F8F8F2">      }),</span></span>
+<span class="line"><span style="color:#6272A4">      // Give it some time to think</span></span>
+<span class="line"><span style="color:#F8F8F2">      timeout</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> TimeDuration.</span><span style="color:#50FA7B">fromMillis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">3000</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (response.status </span><span style="color:#FF79C6">!==</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">      throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> SenderError</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`API returned status </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">response.status</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.</span><span style="color:#50FA7B">json</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> aiResponse </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> data.choices?.[</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">]?.message?.content;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">aiResponse) {</span></span>
+<span class="line"><span style="color:#FF79C6">      throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> SenderError</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Failed to parse AI response</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Store the conversation in the database</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">      txCtx.db.aiMessage.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">        user</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> txCtx.sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">        prompt,</span></span>
+<span class="line"><span style="color:#F8F8F2">        response</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> aiResponse,</span></span>
+<span class="line"><span style="color:#F8F8F2">        createdAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> txCtx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">      });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> aiResponse;</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Text</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Json</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">AiMessage</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> AiMessage</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> User;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Prompt;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Response;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> CreatedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> string</span><span style="color:#50FA7B"> AskAi</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> prompt</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> apiKey</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Build the request to OpenAI&#x27;s API</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> requestBody </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> JsonSerializer.</span><span style="color:#50FA7B">Serialize</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            model </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">gpt-4</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            messages </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#F8F8F2">[] { </span><span style="color:#FF79C6">new</span><span style="color:#F8F8F2"> { role </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, content </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> prompt } }</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> HttpRequest</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Method </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> SpacetimeDB.HttpMethod.Post,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Uri </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://api.openai.com/v1/chat/completions</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Headers </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpHeader</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                new</span><span style="color:#8BE9FD;font-style:italic"> HttpHeader</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">application/json</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">                new</span><span style="color:#8BE9FD;font-style:italic"> HttpHeader</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Authorization</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Bearer </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">apiKey</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            },</span></span>
+<span class="line"><span style="color:#F8F8F2">            Body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> HttpBody.</span><span style="color:#50FA7B">FromString</span><span style="color:#F8F8F2">(requestBody),</span></span>
+<span class="line"><span style="color:#6272A4">            // Give it some time to think</span></span>
+<span class="line"><span style="color:#F8F8F2">            Timeout </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> TimeSpan.</span><span style="color:#50FA7B">FromMilliseconds</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">3000</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Make the HTTP request</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Send</span><span style="color:#F8F8F2">(request).</span><span style="color:#50FA7B">UnwrapOrThrow</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (response.StatusCode </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">API returned status </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">response</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">StatusCode</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> bodyStr </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response.Body.</span><span style="color:#50FA7B">ToStringUtf8Lossy</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Parse the response</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> aiResponse </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> ExtractContent</span><span style="color:#F8F8F2">(bodyStr)</span></span>
+<span class="line"><span style="color:#FF79C6">            ??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Failed to parse AI response</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Store the conversation in the database</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.AiMessage.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> AiMessage</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#F8F8F2">                User </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> txCtx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">                Prompt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> prompt,</span></span>
+<span class="line"><span style="color:#F8F8F2">                Response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> aiResponse,</span></span>
+<span class="line"><span style="color:#F8F8F2">                CreatedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> txCtx.Timestamp</span></span>
+<span class="line"><span style="color:#F8F8F2">            });</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> aiResponse;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2">? </span><span style="color:#50FA7B">ExtractContent</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> json</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Simple extraction - in production, use proper JSON parsing</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> doc </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> JsonDocument.</span><span style="color:#50FA7B">Parse</span><span style="color:#F8F8F2">(json);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> doc.RootElement</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">GetProperty</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">choices</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)[</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">GetProperty</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">message</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">GetProperty</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">content</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">GetString</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{procedure, table, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">TimeDuration</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ai_message, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> AiMessage</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    user</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    prompt</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    response</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    created_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(serde</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Deserialize</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> AiResponse</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    choices</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">AiResponseChoice</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#6272A4">    // more fields...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(serde</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Deserialize</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> AiResponseChoice</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    message</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> AiResponseMessage</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#6272A4">    // more fields...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(serde</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Deserialize</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> AiResponseMessage</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    content</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#6272A4">    // more fields...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> ask_ai</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, prompt</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">, api_key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Build the request to OpenAI&#x27;s API</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> request_body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> serde_json</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">json!</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F1FA8C">        "model"</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "gpt-4"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F1FA8C">        "messages"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [{ </span><span style="color:#F1FA8C">"role"</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "user"</span><span style="color:#F8F8F2">, </span><span style="color:#F1FA8C">"content"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> prompt }]</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Request</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://api.openai.com/v1/chat/completions"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">method</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"POST"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">header</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Content-Type"</span><span style="color:#F8F8F2">, </span><span style="color:#F1FA8C">"application/json"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">header</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Authorization"</span><span style="color:#F8F8F2">, </span><span style="color:#50FA7B">format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Bearer {}"</span><span style="color:#F8F8F2">, api_key))</span></span>
+<span class="line"><span style="color:#6272A4">        // Give it some time to think</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">extension</span><span style="color:#F8F8F2">(spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Timeout</span><span style="color:#F8F8F2">(TimeDuration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_micros</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">3_000_000</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">body</span><span style="color:#F8F8F2">(serde_json</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_vec</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">request_body)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">unwrap</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Failed to build request: {e}"</span><span style="color:#F8F8F2">))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Make the HTTP request</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"HTTP request failed: {e:?}"</span><span style="color:#F8F8F2">))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> (parts, body) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_parts</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> parts</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#8BE9FD;font-style:italic"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"API returned status {}"</span><span style="color:#F8F8F2">, parts</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status));</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> body </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> body</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_bytes</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> ai_response</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> AiResponse</span><span style="color:#FF79C6"> =</span></span>
+<span class="line"><span style="color:#F8F8F2">        serde_json</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_slice</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">body)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Failed to parse AI response: {e}"</span><span style="color:#F8F8F2">))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> ai_response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ai_response</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">choices[</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">]</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">message</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">content</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Store the conversation in the database</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">tx_ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ai_message</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">AiMessage</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            user</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            prompt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> prompt</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            response</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ai_response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            created_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(ai_response)</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="calling-from-a-client">Calling from a client<a href="#calling-from-a-client" class="hash-link" aria-label="Direct link to Calling from a client" title="Direct link to Calling from a client" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Call the procedure and wait for the AI response</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> await</span><span style="color:#F8F8F2"> ctx.procedures.</span><span style="color:#50FA7B">askAi</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">  prompt</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">What is SpacetimeDB?</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">  apiKey</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> process.env.</span><span style="color:#BD93F9">OPENAI_API_KEY</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">AI says:</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, response);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.Procedures.</span><span style="color:#50FA7B">AskAi</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">What is SpacetimeDB?</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, apiKey, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">result</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (result.IsSuccess)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">AI says: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">result</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Value</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    else</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Error: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">result</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Error</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">procedures</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ask_ai_then</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F1FA8C">    "What is SpacetimeDB?"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    api_key,</span></span>
+<span class="line"><span style="color:#FF79C6">    |</span><span style="color:#F8F8F2">_ctx, result</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        match</span><span style="color:#F8F8F2"> result {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            Ok</span><span style="color:#F8F8F2">(response) </span><span style="color:#FF79C6">=></span><span style="color:#50FA7B"> println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"AI says: {}"</span><span style="color:#F8F8F2">, response),</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            Err</span><span style="color:#F8F8F2">(e) </span><span style="color:#FF79C6">=></span><span style="color:#50FA7B"> eprintln!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Error: {:?}"</span><span style="color:#F8F8F2">, e),</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    },</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div></div></div>
+<div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p><strong>Security note:</strong> Never hardcode API keys in your client code. Consider storing them securely on the server side or using environment variables during development.</p></div></div></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00200-functions/00400-procedures.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/functions/reducers/error-handling"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Error Handling</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/functions/views"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Views</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#defining-procedures" class="table-of-contents__link toc-highlight">Defining Procedures</a>\<ul\>\<li\><a href="#accessing-the-database" class="table-of-contents__link toc-highlight">Accessing the database</a></li></ul></li>\<li\><a href="#http-requests" class="table-of-contents__link toc-highlight">HTTP Requests</a></li>\<li\><a href="#calling-reducers-from-procedures" class="table-of-contents__link toc-highlight">Calling Reducers from Procedures</a></li>\<li\><a href="#calling-procedures" class="table-of-contents__link toc-highlight">Calling procedures</a>\<ul\>\<li\><a href="#observing-return-values" class="table-of-contents__link toc-highlight">Observing return values</a></li></ul></li>\<li\><a href="#example-calling-an-external-ai-api" class="table-of-contents__link toc-highlight">Example: Calling an External AI API</a>\<ul\>\<li\><a href="#calling-from-a-client" class="table-of-contents__link toc-highlight">Calling from a client</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

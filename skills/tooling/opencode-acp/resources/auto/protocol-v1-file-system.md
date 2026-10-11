@@ -10,13 +10,14 @@ The filesystem methods allow Agents to read and write text files within the Clie
 
 ## Checking Support
 
-Before attempting to use filesystem methods, Agents **MUST** verify that the Client supports these capabilities by checking the [Client Capabilities](https://agentclientprotocol.com/protocol/v1/initialization#client-capabilities) field in the `initialize` response:
+Before attempting to use filesystem methods, Agents **MUST** verify that the Client supports these capabilities by checking the [Client Capabilities](/protocol/v1/initialization#client-capabilities) field in the Client's `initialize` request:
 
-```json highlight={8,9} theme={null}
+```json highlight={9,10} theme={null}
 {
   "jsonrpc": "2.0",
   "id": 0,
-  "result": {
+  "method": "initialize",
+  "params": {
     "protocolVersion": 1,
     "clientCapabilities": {
       "fs": {
@@ -49,7 +50,7 @@ The `fs/read_text_file` method allows Agents to read text file contents from the
 ```
 
 <ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup#session-id) for this request
+  The [Session ID](/protocol/v1/session-setup#session-id) for this request
 </ParamField>
 
 <ParamField path="path" type="string" required>
@@ -94,7 +95,7 @@ The `fs/write_text_file` method allows Agents to write or update text files in t
 ```
 
 <ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup#session-id) for this request
+  The [Session ID](/protocol/v1/session-setup#session-id) for this request
 </ParamField>
 
 <ParamField path="path" type="string" required>
@@ -113,6 +114,9 @@ The Client responds with an empty result on success:
 {
   "jsonrpc": "2.0",
   "id": 4,
-  "result": null
+  "result": {}
 }
 ```
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

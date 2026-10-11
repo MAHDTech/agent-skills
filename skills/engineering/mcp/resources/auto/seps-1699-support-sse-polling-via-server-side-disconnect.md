@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1699                                                                            |
-| **Title**     | Support SSE polling via server-side disconnect                                  |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-10-22                                                                      |
-| **Author(s)** | Jonathan Hefner ([@jonathanhefner](https://github.com/jonathanhefner))          |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1699](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1699) |
+| Field | Value |
+| - | - |
+| **SEP** | 1699 |
+| **Title** | Support SSE polling via server-side disconnect |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-10-22 |
+| **Author(s)** | Jonathan Hefner ([@jonathanhefner](https://github.com/jonathanhefner)) |
+| **Sponsor** | None |
+| **PR** | [#1699](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1699) |
 
 ***
 
@@ -73,3 +73,4 @@ Servers may disconnect at will, avoiding long-running connections. Sending a `re
 ## Additional Information
 
 This SEP supersedes (in part) [SEP-1335](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1335).
+

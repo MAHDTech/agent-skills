@@ -1,824 +1,684 @@
-Version: 2.0.0
-
-On this page
-
-SpacetimeDB can store binary data directly in table columns, making it
-suitable for files, images, and other blobs that need to participate in
-transactions and subscriptions.
-
-## Storing Binary Data Inline
-
-Store binary data using `Vec<u8>` (Rust), `List<byte>` (C#),
-`std::vector<uint8_t>` (C++), or `t.array(t.u8())` (TypeScript). This
-approach keeps data within the database, ensuring it participates in
-transactions and real-time updates.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-const userAvatar = table(
-  { name: 'user_avatar', public: true },
-  {
-    userId: t.u64().primaryKey(),
-    mimeType: t.string(),
-    data: t.array(t.u8()),  // Binary data stored inline
-    uploadedAt: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ userAvatar });
-export default spacetimedb;
-
-export const uploadAvatar = spacetimedb.reducer({
-  userId: t.u64(),
-  mimeType: t.string(),
-  data: t.array(t.u8()),
-}, (ctx, { userId, mimeType, data }) => {
-  // Delete existing avatar if present
-  ctx.db.userAvatar.userId.delete(userId);
-
-  // Insert new avatar
-  ctx.db.userAvatar.insert({
-    userId,
-    mimeType,
-    data,
-    uploadedAt: ctx.timestamp,
-  });
-});
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "UserAvatar", Public = true)]
-    public partial struct UserAvatar
-    {
-        [SpacetimeDB.PrimaryKey]
-        public ulong UserId;
-        public string MimeType;
-        public List<byte> Data;  // Binary data stored inline
-        public Timestamp UploadedAt;
-    }
-
-    [SpacetimeDB.Reducer]
-    public static void UploadAvatar(ReducerContext ctx, ulong userId, string mimeType, List<byte> data)
-    {
-        // Delete existing avatar if present
-        ctx.Db.UserAvatar.UserId.Delete(userId);
-
-        // Insert new avatar
-        ctx.Db.UserAvatar.Insert(new UserAvatar
-        {
-            UserId = userId,
-            MimeType = mimeType,
-            Data = data,
-            UploadedAt = ctx.Timestamp,
-        });
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{ReducerContext, Timestamp, Table};
-
-#[spacetimedb::table(accessor = user_avatar, public)]
-pub struct UserAvatar {
-    #[primary_key]
-    user_id: u64,
-    mime_type: String,
-    data: Vec<u8>,  // Binary data stored inline
-    uploaded_at: Timestamp,
-}
-
-#[spacetimedb::reducer]
-pub fn upload_avatar(
-    ctx: &ReducerContext,
-    user_id: u64,
-    mime_type: String,
-    data: Vec<u8>,
-) {
-    // Delete existing avatar if present
-    ctx.db.user_avatar().user_id().delete(user_id);
-
-    // Insert new avatar
-    ctx.db.user_avatar().insert(UserAvatar {
-        user_id,
-        mime_type,
-        data,
-        uploaded_at: ctx.timestamp,
-    });
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct UserAvatar {
-  uint64_t user_id;
-  std::string mime_type;
-  std::vector<uint8_t> data;  // Binary data stored inline
-  Timestamp uploaded_at;
-};
-SPACETIMEDB_STRUCT(UserAvatar, user_id, mime_type, data, uploaded_at)
-SPACETIMEDB_TABLE(UserAvatar, user_avatar, Public)
-FIELD_PrimaryKey(user_avatar, user_id)
-
-SPACETIMEDB_REDUCER(upload_avatar, ReducerContext ctx, 
-  uint64_t user_id, std::string mime_type, std::vector<uint8_t> data) {
-  // Delete existing avatar if present
-  ctx.db[user_avatar_user_id].delete_by_key(user_id);
-
-  // Insert new avatar
-  ctx.db[user_avatar].insert(UserAvatar{
-    .user_id = user_id,
-    .mime_type = mime_type,
-    .data = data,
-    .uploaded_at = ctx.timestamp,
-  });
-    
-  return Ok();
-}
-```
-
-### When to Use Inline Storage
-
-Inline storage works well for:
-
-- **Files up to ~100MB**
-- **Data that changes with other row fields** (e.g., user profile with
-  avatar)
-- **Data requiring transactional consistency** (file updates atomic with
-  metadata)
-- **Data clients need through subscriptions** (real-time avatar updates)
-
-### Size Considerations
-
-Very large binary data affects:
-
-- **Memory usage**: Rows are held in memory during reducer execution
-- **Network bandwidth**: Large rows increase subscription traffic
-- **Transaction size**: Large rows slow down transaction commits
-
-For very large files (over 100MB), consider external storage.
-
-## External Storage with References
-
-For large files or data that changes independently, store the file
-externally and keep a reference in the database. This pattern separates
-bulk storage from metadata management.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-const document = table(
-  { name: 'document', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    ownerId: t.identity().index('btree'),
-    filename: t.string(),
-    mimeType: t.string(),
-    sizeBytes: t.u64(),
-    storageUrl: t.string(),  // Reference to external storage
-    uploadedAt: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ document });
-export default spacetimedb;
-
-// Called after uploading file to external storage
-export const register_document = spacetimedb.reducer({
-  filename: t.string(),
-  mimeType: t.string(),
-  sizeBytes: t.u64(),
-  storageUrl: t.string(),
-}, (ctx, { filename, mimeType, sizeBytes, storageUrl }) => {
-  ctx.db.document.insert({
-    id: 0n,  // auto-increment
-    ownerId: ctx.sender,
-    filename,
-    mimeType,
-    sizeBytes,
-    storageUrl,
-    uploadedAt: ctx.timestamp,
-  });
-});
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "Document", Public = true)]
-    public partial struct Document
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong Id;
-        [SpacetimeDB.Index.BTree]
-        public Identity OwnerId;
-        public string Filename;
-        public string MimeType;
-        public ulong SizeBytes;
-        public string StorageUrl;  // Reference to external storage
-        public Timestamp UploadedAt;
-    }
-
-    // Called after uploading file to external storage
-    [SpacetimeDB.Reducer]
-    public static void RegisterDocument(
-        ReducerContext ctx,
-        string filename,
-        string mimeType,
-        ulong sizeBytes,
-        string storageUrl)
-    {
-        ctx.Db.Document.Insert(new Document
-        {
-            Id = 0,  // auto-increment
-            OwnerId = ctx.Sender,
-            Filename = filename,
-            MimeType = mimeType,
-            SizeBytes = sizeBytes,
-            StorageUrl = storageUrl,
-            UploadedAt = ctx.Timestamp,
-        });
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{Identity, ReducerContext, Timestamp, Table};
-
-#[spacetimedb::table(accessor = document, public)]
-pub struct Document {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    #[index(btree)]
-    owner_id: Identity,
-    filename: String,
-    mime_type: String,
-    size_bytes: u64,
-    storage_url: String,  // Reference to external storage
-    uploaded_at: Timestamp,
-}
-
-// Called after uploading file to external storage
-#[spacetimedb::reducer]
-pub fn register_document(
-    ctx: &ReducerContext,
-    filename: String,
-    mime_type: String,
-    size_bytes: u64,
-    storage_url: String,
-) {
-    ctx.db.document().insert(Document {
-        id: 0,  // auto-increment
-        owner_id: ctx.sender(),
-        filename,
-        mime_type,
-        size_bytes,
-        storage_url,
-        uploaded_at: ctx.timestamp,
-    });
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct Document {
-    uint64_t id;
-    Identity owner_id;
-    std::string filename;
-    std::string mime_type;
-    uint64_t size_bytes;
-    std::string storage_url;  // Reference to external storage
-    Timestamp uploaded_at;
-};
-SPACETIMEDB_STRUCT(Document, id, owner_id, filename, mime_type, size_bytes, storage_url, uploaded_at)
-SPACETIMEDB_TABLE(Document, document, Public)
-FIELD_PrimaryKeyAutoInc(document, id)
-FIELD_Index(document, owner_id)
-
-// Called after uploading file to external storage
-SPACETIMEDB_REDUCER(register_document, ReducerContext ctx,
-    std::string filename, std::string mime_type, uint64_t size_bytes, std::string storage_url) {
-    ctx.db[document].insert(Document{
-        .id = 0,  // auto-increment
-        .owner_id = ctx.sender(),
-        .filename = filename,
-        .mime_type = mime_type,
-        .size_bytes = size_bytes,
-        .storage_url = storage_url,
-        .uploaded_at = ctx.timestamp,
-    });
-    
-    return Ok();
-}
-```
-
-### External Storage Options
-
-Common external storage solutions include:
-
-| Service | Use Case |
-|----|----|
-| AWS S3 / Google Cloud Storage / Azure Blob | General-purpose object storage |
-| Cloudflare R2 | S3-compatible with no egress fees |
-| CDN (CloudFront, Cloudflare) | Static assets with global distribution |
-| Self-hosted (MinIO) | On-premises or custom deployments |
-
-### Upload Flow
-
-A typical external storage flow:
-
-1.  **Client requests upload URL**: Call a procedure or reducer to
-    generate a pre-signed upload URL
-2.  **Client uploads directly**: Upload the file to external storage
-    using the pre-signed URL
-3.  **Client registers metadata**: Call a reducer with the storage URL
-    and file metadata
-4.  **Database tracks reference**: The table stores the URL for later
-    retrieval
-
-This pattern keeps large files out of SpacetimeDB while maintaining
-metadata in the database for queries and subscriptions.
-
-### Example: Uploading to S3 from a Procedure
-
-[Procedures](https://spacetimedb.com/docs/functions/procedures) can make HTTP requests,
-enabling direct uploads to external storage services like S3. This
-example shows uploading a file to S3 and storing the metadata in
-SpacetimeDB:
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema, SenderError } from 'spacetimedb/server';
-
-const document = table(
-  { name: 'document', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    ownerId: t.identity(),
-    filename: t.string(),
-    s3Key: t.string(),
-    uploadedAt: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ document });
-export default spacetimedb;
-
-// Upload file to S3 and register in database
-export const upload_to_s3 = spacetimedb.procedure(
-  {
-    filename: t.string(),
-    contentType: t.string(),
-    data: t.array(t.u8()),
-    s3Bucket: t.string(),
-    s3Region: t.string(),
-  },
-  t.string(),  // Returns the S3 key
-  (ctx, { filename, contentType, data, s3Bucket, s3Region }) => {
-    // Generate a unique S3 key
-    const s3Key = `uploads/${ctx.timestamp.microsSinceUnixEpoch}-${filename}`;
-    const url = `https://${s3Bucket}.s3.${s3Region}.amazonaws.com/${s3Key}`;
-
-    // Upload to S3 (simplified - add AWS4 signature in production)
-    const response = ctx.http.fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': contentType,
-        'x-amz-content-sha256': 'UNSIGNED-PAYLOAD',
-        // Add Authorization header with AWS4 signature
-      },
-      body: new Uint8Array(data),
-    });
-
-    if (response.status !== 200) {
-      throw new SenderError(`S3 upload failed: ${response.status}`);
-    }
-
-    // Store metadata in database
-    ctx.withTx(txCtx => {
-      txCtx.db.document.insert({
-        id: 0n,
-        ownerId: txCtx.sender,
-        filename,
-        s3Key,
-        uploadedAt: txCtx.timestamp,
-      });
-    });
-
-    return s3Key;
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "Document", Public = true)]
-    public partial struct Document
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong Id;
-        public Identity OwnerId;
-        public string Filename;
-        public string S3Key;
-        public Timestamp UploadedAt;
-    }
-
-    // Upload file to S3 and register in database
-    [SpacetimeDB.Procedure]
-    public static string UploadToS3(
-        ProcedureContext ctx,
-        string filename,
-        string contentType,
-        List<byte> data,
-        string s3Bucket,
-        string s3Region)
-    {
-        // Generate a unique S3 key
-        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var s3Key = $"uploads/{timestamp}-{filename}";
-        var url = $"https://{s3Bucket}.s3.{s3Region}.amazonaws.com/{s3Key}";
-
-        // Build the S3 PUT request (simplified - add AWS4 signature in production)
-        var request = new HttpRequest
-        {
-            Uri = url,
-            Method = SpacetimeDB.HttpMethod.Put,
-            Headers = new List<HttpHeader>
-            {
-                new HttpHeader("Content-Type", contentType),
-                new HttpHeader("x-amz-content-sha256", "UNSIGNED-PAYLOAD"),
-                // Add Authorization header with AWS4 signature
-            },
-            Body = new HttpBody(data.ToArray()),
-        };
-
-        // Upload to S3
-        var response = ctx.Http.Send(request).UnwrapOrThrow();
-
-        if (response.StatusCode != 200)
-        {
-            throw new Exception($"S3 upload failed with status: {response.StatusCode}");
-        }
-
-        // Store metadata in database
-        ctx.WithTx(txCtx =>
-        {
-            txCtx.Db.Document.Insert(new Document
-            {
-                Id = 0,
-                OwnerId = txCtx.Sender,
-                Filename = filename,
-                S3Key = s3Key,
-                UploadedAt = txCtx.Timestamp,
-            });
-            return 0;
-        });
-
-        return s3Key;
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{Identity, ProcedureContext, Timestamp, Table};
-
-#[spacetimedb::table(accessor = document, public)]
-pub struct Document {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    owner_id: Identity,
-    filename: String,
-    s3_key: String,
-    uploaded_at: Timestamp,
-}
-
-// Upload file to S3 and register in database
-#[spacetimedb::procedure]
-pub fn upload_to_s3(
-    ctx: &mut ProcedureContext,
-    filename: String,
-    content_type: String,
-    data: Vec<u8>,
-    s3_bucket: String,
-    s3_region: String,
-) -> Result<String, String> {
-    // Generate a unique S3 key
-    let timestamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
-    let s3_key = format!("uploads/{}-{}", timestamp, filename);
-    let url = format!(
-        "https://{}.s3.{}.amazonaws.com/{}",
-        s3_bucket, s3_region, s3_key
-    );
-
-    // Build the S3 PUT request (simplified - add AWS4 signature in production)
-    let request = spacetimedb::http::Request::builder()
-        .uri(&url)
-        .method("PUT")
-        .header("Content-Type", &content_type)
-        .header("x-amz-content-sha256", "UNSIGNED-PAYLOAD")
-        // Add Authorization header with AWS4 signature
-        .body(data)
-        .map_err(|e| format!("Failed to build request: {}", e))?;
-
-    // Upload to S3
-    let response = ctx.http.send(request)
-        .map_err(|e| format!("S3 upload failed: {:?}", e))?;
-
-    let (parts, _body) = response.into_parts();
-    if parts.status != 200 {
-        return Err(format!("S3 upload failed with status: {}", parts.status));
-    }
-
-    // Store metadata in database
-    let s3_key_clone = s3_key.clone();
-    let filename_clone = filename.clone();
-    ctx.with_tx(|tx_ctx| {
-        tx_ctx.db.document().insert(Document {
-            id: 0,
-            owner_id: tx_ctx.sender(),
-            filename: filename_clone.clone(),
-            s3_key: s3_key_clone.clone(),
-            uploaded_at: tx_ctx.timestamp,
-        });
-    });
-
-    Ok(s3_key)
-}
-```
-
-AWS Authentication
-
-The example above is simplified. Production S3 uploads require proper
-[AWS Signature Version
-4](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html)
-authentication.
-
-### Alternative: Pre-signed URL Flow
-
-For larger files, generate a pre-signed URL and let the client upload
-directly:
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-// Procedure returns a pre-signed URL for client-side upload
-export const get_upload_url = spacetimedb.procedure(
-  { filename: t.string(), contentType: t.string() },
-  t.object('UploadInfo', { uploadUrl: t.string(), s3Key: t.string() }),
-  (ctx, { filename, contentType }) => {
-    const s3Key = `uploads/${ctx.timestamp.microsSinceUnixEpoch}-${filename}`;
-
-    // Generate pre-signed URL (requires AWS credentials and signing logic)
-    const uploadUrl = generatePresignedUrl(s3Key, contentType);
-
-    return { uploadUrl, s3Key };
-  }
-);
-
-// Client uploads directly to S3 using the pre-signed URL, then calls:
-export const confirm_upload = spacetimedb.reducer({ filename: t.string(), s3Key: t.string() }, (ctx, { filename, s3Key }) => {
-  ctx.db.document.insert({
-    id: 0n,
-    ownerId: ctx.sender,
-    filename,
-    s3Key,
-    uploadedAt: ctx.timestamp,
-  });
-});
-```
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-using SpacetimeDB;
-
-public static partial class Module
-{
-    [SpacetimeDB.Type]
-    public partial struct UploadInfo
-    {
-        public string UploadUrl;
-        public string S3Key;
-    }
-
-    // Procedure returns a pre-signed URL for client-side upload
-    [SpacetimeDB.Procedure]
-    public static UploadInfo GetUploadUrl(
-        ProcedureContext ctx,
-        string filename,
-        string contentType)
-    {
-        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var s3Key = $"uploads/{timestamp}-{filename}";
-
-        // Generate pre-signed URL (requires AWS credentials and signing logic)
-        var uploadUrl = GeneratePresignedUrl(s3Key, contentType);
-
-        return new UploadInfo { UploadUrl = uploadUrl, S3Key = s3Key };
-    }
-
-    // Client uploads directly to S3 using the pre-signed URL, then calls:
-    [SpacetimeDB.Reducer]
-    public static void ConfirmUpload(ReducerContext ctx, string filename, string s3Key)
-    {
-        ctx.Db.Document.Insert(new Document
-        {
-            Id = 0,
-            OwnerId = ctx.Sender,
-            Filename = filename,
-            S3Key = s3Key,
-            UploadedAt = ctx.Timestamp,
-        });
-    }
-
-    private static string GeneratePresignedUrl(string s3Key, string contentType)
-    {
-        // Implement AWS S3 pre-signed URL generation
-        throw new NotImplementedException();
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[derive(SpacetimeType)]
-pub struct UploadInfo {
-    upload_url: String,
-    s3_key: String,
-}
-
-// Procedure returns a pre-signed URL for client-side upload
-#[spacetimedb::procedure]
-pub fn get_upload_url(
-    _ctx: &mut ProcedureContext,
-    filename: String,
-    _content_type: String,
-) -> Result<UploadInfo, String> {
-    let timestamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
-    let s3_key = format!("uploads/{}-{}", timestamp, filename);
-
-    // Generate pre-signed URL (requires AWS credentials and signing logic)
-    let upload_url = generate_presigned_url(&s3_key)?;
-
-    Ok(UploadInfo { upload_url, s3_key })
-}
-
-// Client uploads directly to S3 using the pre-signed URL, then calls:
-#[spacetimedb::reducer]
-pub fn confirm_upload(ctx: &ReducerContext, filename: String, s3_key: String) {
-    ctx.db.document().insert(Document {
-        id: 0,
-        owner_id: ctx.sender(),
-        filename,
-        s3_key,
-        uploaded_at: ctx.timestamp,
-    });
-}
-```
-
-The pre-signed URL approach is preferred for large files because:
-
-- **No size limits**: Files don't pass through SpacetimeDB
-- **Better performance**: Direct client-to-S3 transfer
-- **Reduced load**: SpacetimeDB only handles metadata
-
-## Hybrid Approach: Thumbnails and Originals
-
-For images, store small thumbnails inline for fast access while keeping
-originals in external storage:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-const image = table(
-  { name: 'image', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    ownerId: t.identity().index('btree'),
-    thumbnail: t.array(t.u8()),      // Small preview stored inline
-    originalUrl: t.string(),          // Large original in external storage
-    width: t.u32(),
-    height: t.u32(),
-    uploadedAt: t.timestamp(),
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public partial class Module
-{
-    [SpacetimeDB.Table(Accessor = "Image", Public = true)]
-    public partial struct Image
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong Id;
-        [SpacetimeDB.Index.BTree]
-        public Identity OwnerId;
-        public List<byte> Thumbnail;      // Small preview stored inline
-        public string OriginalUrl;        // Large original in external storage
-        public uint Width;
-        public uint Height;
-        public Timestamp UploadedAt;
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{Identity, Timestamp};
-
-#[spacetimedb::table(accessor = image, public)]
-pub struct Image {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    #[index(btree)]
-    owner_id: Identity,
-    thumbnail: Vec<u8>,      // Small preview stored inline
-    original_url: String,    // Large original in external storage
-    width: u32,
-    height: u32,
-    uploaded_at: Timestamp,
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct Image {
-    uint64_t id;
-    Identity owner_id;
-    std::vector<uint8_t> thumbnail;  // Small preview stored inline
-    std::string original_url;        // Large original in external storage
-    uint32_t width;
-    uint32_t height;
-    Timestamp uploaded_at;
-};
-SPACETIMEDB_STRUCT(Image, id, owner_id, thumbnail, original_url, width, height, uploaded_at)
-SPACETIMEDB_TABLE(Image, image, Public)
-FIELD_PrimaryKeyAutoInc(image, id)
-FIELD_Index(image, owner_id)
-```
-
-This approach provides:
-
-- **Fast thumbnail access** through subscriptions (no extra network
-  requests)
-- **Efficient storage** for large originals (external storage optimized
-  for blobs)
-- **Real-time updates** for metadata changes through SpacetimeDB
-  subscriptions
-
-## Choosing a Strategy
-
-| Scenario                    | Recommended Approach                          |
-|-----------------------------|-----------------------------------------------|
-| User avatars (\< 10MB)      | Inline storage                                |
-| Chat attachments (\< 50MB)  | Inline storage                                |
-| Document uploads (\< 100MB) | Inline storage                                |
-| Large files (\> 100MB)      | External storage with reference               |
-| Video files                 | External storage with CDN                     |
-| Images with previews        | Hybrid (inline thumbnail + external original) |
-
-SpacetimeDB storage costs approximately \$1/GB compared to cheaper blob
-storage options like AWS S3. For large files that don't need atomic
-updates with other data, external storage may be more economical.
-
-The right choice depends on your file sizes, access patterns, and
-whether the data needs to participate in real-time subscriptions.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/tables/file-storage" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">File Storage | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tables/file-storage"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="File Storage | SpacetimeDB docs"><meta data-rh="true" name="description" content="SpacetimeDB can store binary data directly in table columns, making it suitable for files, images, and other blobs that need to participate in transactions and subscriptions."><meta data-rh="true" property="og:description" content="SpacetimeDB can store binary data directly in table columns, making it suitable for files, images, and other blobs that need to participate in transactions and subscriptions."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tables/file-storage"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/file-storage" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/file-storage" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tables","item":"https://spacetimedb.com/docs/tables"},{"@type":"ListItem","position":2,"name":"File Storage","item":"https://spacetimedb.com/docs/tables/file-storage"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tables/file-storage">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tables/file-storage">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tables/file-storage">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Collapse sidebar category &#x27;Tables&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/column-types"><span title="Column Types" class="linkLabel_UvDg">Column Types</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tables/file-storage"><span title="File Storage" class="linkLabel_UvDg">File Storage</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/auto-increment"><span title="Auto-Increment" class="linkLabel_UvDg">Auto-Increment</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/constraints"><span title="Constraints" class="linkLabel_UvDg">Constraints</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/default-values"><span title="Default Values" class="linkLabel_UvDg">Default Values</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/indexes"><span title="Indexes" class="linkLabel_UvDg">Indexes</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/access-permissions"><span title="Table Access Permissions" class="linkLabel_UvDg">Table Access Permissions</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/schedule-tables"><span title="Schedule Tables" class="linkLabel_UvDg">Schedule Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/event-tables"><span title="Event Tables" class="linkLabel_UvDg">Event Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/performance"><span title="Performance Best Practices" class="linkLabel_UvDg">Performance Best Practices</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tables"><span>Tables</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">File Storage</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>File Storage</h1></header><p>SpacetimeDB can store binary data directly in table columns, making it suitable for files, images, and other blobs that need to participate in transactions and subscriptions.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="storing-binary-data-inline">Storing Binary Data Inline<a href="#storing-binary-data-inline" class="hash-link" aria-label="Direct link to Storing Binary Data Inline" title="Direct link to Storing Binary Data Inline" translate="no">​</a></h2>
+<p>Store binary data using <code>Vec\<u8\></code> (Rust), <code>List<byte></code> (C#), <code>std::vector\<uint8_t\></code> (C++), or <code>t.array(t.u8())</code> (TypeScript). This approach keeps data within the database, ensuring it participates in transactions and real-time updates.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> userAvatar </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user_avatar</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    userId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    mimeType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    data</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">()),  </span><span style="color:#6272A4">// Binary data stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ userAvatar });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> uploadAvatar </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">  userId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  mimeType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  data</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">()),</span></span>
+<span class="line"><span style="color:#F8F8F2">}, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">userId</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">mimeType</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">data</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // Delete existing avatar if present</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.userAvatar.userId.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(userId);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Insert new avatar</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.userAvatar.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">    userId,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mimeType,</span></span>
+<span class="line"><span style="color:#F8F8F2">    data,</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">UserAvatar</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UserAvatar</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> UserId;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> MimeType;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">> Data;  </span><span style="color:#6272A4">// Binary data stored inline</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> UploadedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UploadAvatar</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">ulong</span><span style="color:#FFB86C;font-style:italic"> userId</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> mimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">List</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">data</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Delete existing avatar if present</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.UserAvatar.UserId.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(userId);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Insert new avatar</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.UserAvatar.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> UserAvatar</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            UserId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> userId,</span></span>
+<span class="line"><span style="color:#F8F8F2">            MimeType </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> mimeType,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> data,</span></span>
+<span class="line"><span style="color:#F8F8F2">            UploadedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user_avatar, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UserAvatar</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    user_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mime_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    data</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">>,  </span><span style="color:#6272A4">// Binary data stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> upload_avatar</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    user_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mime_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    data</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Delete existing avatar if present</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user_avatar</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(user_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Insert new avatar</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user_avatar</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">UserAvatar</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        user_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        mime_type,</span></span>
+<span class="line"><span style="color:#F8F8F2">        data,</span></span>
+<span class="line"><span style="color:#F8F8F2">        uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> UserAvatar</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> user_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">  std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string mime_type;</span></span>
+<span class="line"><span style="color:#F8F8F2">  std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6">\<uint8_t\></span><span style="color:#F8F8F2"> data;</span><span style="color:#6272A4">  // Binary data stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">  Timestamp uploaded_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(UserAvatar, user_id, mime_type, data, uploaded_at)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(UserAvatar, user_avatar, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(user_avatar, user_id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(upload_avatar, ReducerContext ctx, </span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> user_id, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string mime_type, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6">\<uint8_t\></span><span style="color:#F8F8F2"> data) {</span></span>
+<span class="line"><span style="color:#6272A4">  // Delete existing avatar if present</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[user_avatar_user_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(user_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Insert new avatar</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[user_avatar].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(UserAvatar{</span></span>
+<span class="line"><span style="color:#F8F8F2">    .user_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user_id,</span></span>
+<span class="line"><span style="color:#F8F8F2">    .mime_type </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> mime_type,</span></span>
+<span class="line"><span style="color:#F8F8F2">    .data </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> data,</span></span>
+<span class="line"><span style="color:#F8F8F2">    .uploaded_at </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="when-to-use-inline-storage">When to Use Inline Storage<a href="#when-to-use-inline-storage" class="hash-link" aria-label="Direct link to When to Use Inline Storage" title="Direct link to When to Use Inline Storage" translate="no">​</a></h3>
+<p>Inline storage works well for:</p>
+\<ul\>
+<li class=""><strong>Files up to ~100MB</strong></li>
+<li class=""><strong>Data that changes with other row fields</strong> (e.g., user profile with avatar)</li>
+<li class=""><strong>Data requiring transactional consistency</strong> (file updates atomic with metadata)</li>
+<li class=""><strong>Data clients need through subscriptions</strong> (real-time avatar updates)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="size-considerations">Size Considerations<a href="#size-considerations" class="hash-link" aria-label="Direct link to Size Considerations" title="Direct link to Size Considerations" translate="no">​</a></h3>
+<p>Very large binary data affects:</p>
+\<ul\>
+<li class=""><strong>Memory usage</strong>: Rows are held in memory during reducer execution</li>
+<li class=""><strong>Network bandwidth</strong>: Large rows increase subscription traffic</li>
+<li class=""><strong>Transaction size</strong>: Large rows slow down transaction commits</li>
+</ul>
+<p>For very large files (over 100MB), consider external storage.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="external-storage-with-references">External Storage with References<a href="#external-storage-with-references" class="hash-link" aria-label="Direct link to External Storage with References" title="Direct link to External Storage with References" translate="no">​</a></h2>
+<p>For large files or data that changes independently, store the file externally and keep a reference in the database. This pattern separates bulk storage from metadata management.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> document </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">document</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    mimeType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    sizeBytes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    storageUrl</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),  </span><span style="color:#6272A4">// Reference to external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ document });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Called after uploading file to external storage</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> registerDocument </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">  filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  mimeType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  sizeBytes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  storageUrl</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">}, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">filename</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">mimeType</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">sizeBytes</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">storageUrl</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.document.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4">// auto-increment</span></span>
+<span class="line"><span style="color:#F8F8F2">    ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mimeType,</span></span>
+<span class="line"><span style="color:#F8F8F2">    sizeBytes,</span></span>
+<span class="line"><span style="color:#F8F8F2">    storageUrl,</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Document</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Document</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> OwnerId;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Filename;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> MimeType;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> SizeBytes;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> StorageUrl;  </span><span style="color:#6272A4">// Reference to external storage</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> UploadedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Called after uploading file to external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> RegisterDocument</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> filename</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> mimeType</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        ulong</span><span style="color:#FFB86C;font-style:italic"> sizeBytes</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> storageUrl</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.Document.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Document</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4">// auto-increment</span></span>
+<span class="line"><span style="color:#F8F8F2">            OwnerId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Filename </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">            MimeType </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> mimeType,</span></span>
+<span class="line"><span style="color:#F8F8F2">            SizeBytes </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> sizeBytes,</span></span>
+<span class="line"><span style="color:#F8F8F2">            StorageUrl </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> storageUrl,</span></span>
+<span class="line"><span style="color:#F8F8F2">            UploadedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> document, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    owner_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mime_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    size_bytes</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    storage_url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4">// Reference to external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Called after uploading file to external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> register_document</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    mime_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    size_bytes</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    storage_url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">document</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4">// auto-increment</span></span>
+<span class="line"><span style="color:#F8F8F2">        owner_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">        mime_type,</span></span>
+<span class="line"><span style="color:#F8F8F2">        size_bytes,</span></span>
+<span class="line"><span style="color:#F8F8F2">        storage_url,</span></span>
+<span class="line"><span style="color:#F8F8F2">        uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity owner_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string filename;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string mime_type;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> size_bytes;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string storage_url;</span><span style="color:#6272A4">  // Reference to external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp uploaded_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Document, id, owner_id, filename, mime_type, size_bytes, storage_url, uploaded_at)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Document, document, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(document, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(document, owner_id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Called after uploading file to external storage</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(register_document, ReducerContext ctx,</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string filename, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string mime_type, </span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2"> size_bytes, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string storage_url) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[document].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(Document{</span></span>
+<span class="line"><span style="color:#F8F8F2">        .id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span><span style="color:#6272A4">  // auto-increment</span></span>
+<span class="line"><span style="color:#F8F8F2">        .owner_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        .filename </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .mime_type </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> mime_type,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .size_bytes </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> size_bytes,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .storage_url </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> storage_url,</span></span>
+<span class="line"><span style="color:#F8F8F2">        .uploaded_at </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="external-storage-options">External Storage Options<a href="#external-storage-options" class="hash-link" aria-label="Direct link to External Storage Options" title="Direct link to External Storage Options" translate="no">​</a></h3>
+<p>Common external storage solutions include:</p>
+<table><thead><tr><th>Service</th><th>Use Case</th></tr></thead>\<tbody\><tr><td>AWS S3 / Google Cloud Storage / Azure Blob</td><td>General-purpose object storage</td></tr><tr><td>Cloudflare R2</td><td>S3-compatible with no egress fees</td></tr><tr><td>CDN (CloudFront, Cloudflare)</td><td>Static assets with global distribution</td></tr><tr><td>Self-hosted (MinIO)</td><td>On-premises or custom deployments</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="upload-flow">Upload Flow<a href="#upload-flow" class="hash-link" aria-label="Direct link to Upload Flow" title="Direct link to Upload Flow" translate="no">​</a></h3>
+<p>A typical external storage flow:</p>
+\<ol\>
+<li class=""><strong>Client requests upload URL</strong>: Call a procedure or reducer to generate a pre-signed upload URL</li>
+<li class=""><strong>Client uploads directly</strong>: Upload the file to external storage using the pre-signed URL</li>
+<li class=""><strong>Client registers metadata</strong>: Call a reducer with the storage URL and file metadata</li>
+<li class=""><strong>Database tracks reference</strong>: The table stores the URL for later retrieval</li>
+</ol>
+<p>This pattern keeps large files out of SpacetimeDB while maintaining metadata in the database for queries and subscriptions.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-uploading-to-s3-from-a-procedure">Example: Uploading to S3 from a Procedure<a href="#example-uploading-to-s3-from-a-procedure" class="hash-link" aria-label="Direct link to Example: Uploading to S3 from a Procedure" title="Direct link to Example: Uploading to S3 from a Procedure" translate="no">​</a></h3>
+<p><a class="" href="/docs/functions/procedures">Procedures</a> can make HTTP requests, enabling direct uploads to external storage services like S3. This example shows uploading a file to S3 and storing the metadata in SpacetimeDB:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema, SenderError } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> document </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">document</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3Key</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ document });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Upload file to S3 and register in database</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> uploadToS3 </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    contentType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    data</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">()),</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3Bucket</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3Region</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),  </span><span style="color:#6272A4">// Returns the S3 key</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">filename</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">contentType</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">data</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">s3Bucket</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">s3Region</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Generate a unique S3 key</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> s3Key </span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C"> `uploads/</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">ctx.timestamp.microsSinceUnixEpoch</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">-</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">filename</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> url </span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C"> `https://</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">s3Bucket</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">.s3.</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">s3Region</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">.amazonaws.com/</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">s3Key</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Upload to S3 (simplified - add AWS4 signature in production)</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.http.</span><span style="color:#50FA7B">fetch</span><span style="color:#F8F8F2">(url, {</span></span>
+<span class="line"><span style="color:#F8F8F2">      method</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">PUT</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">      headers</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#E9F284">        &#x27;</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">&#x27;</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> contentType,</span></span>
+<span class="line"><span style="color:#E9F284">        &#x27;</span><span style="color:#F1FA8C">x-amz-content-sha256</span><span style="color:#E9F284">&#x27;</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">UNSIGNED-PAYLOAD</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#6272A4">        // Add Authorization header with AWS4 signature</span></span>
+<span class="line"><span style="color:#F8F8F2">      },</span></span>
+<span class="line"><span style="color:#F8F8F2">      body</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> Uint8Array</span><span style="color:#F8F8F2">(data),</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (response.status </span><span style="color:#FF79C6">!==</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">      throw</span><span style="color:#FF79C6;font-weight:bold"> new</span><span style="color:#50FA7B"> SenderError</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`S3 upload failed: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">response.status</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Store metadata in database</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">      txCtx.db.document.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> txCtx.sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">        filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">        s3Key,</span></span>
+<span class="line"><span style="color:#F8F8F2">        uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> txCtx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">      });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> s3Key;</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Document</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Document</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> OwnerId;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Filename;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> S3Key;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> UploadedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Upload file to S3 and register in database</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> string</span><span style="color:#50FA7B"> UploadToS3</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> filename</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> contentType</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        List</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">data</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> s3Bucket</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> s3Region</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Generate a unique S3 key</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> timestamp </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DateTimeOffset.UtcNow.</span><span style="color:#50FA7B">ToUnixTimeMilliseconds</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> s3Key </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">uploads/</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">timestamp</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">-</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">filename</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> url </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">https://</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">s3Bucket</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">.s3.</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">s3Region</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">.amazonaws.com/</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">s3Key</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Build the S3 PUT request (simplified - add AWS4 signature in production)</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> HttpRequest</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Uri </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> url,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Method </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> SpacetimeDB.HttpMethod.Put,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Headers </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">HttpHeader</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                new</span><span style="color:#8BE9FD;font-style:italic"> HttpHeader</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Content-Type</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, contentType),</span></span>
+<span class="line"><span style="color:#FF79C6">                new</span><span style="color:#8BE9FD;font-style:italic"> HttpHeader</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">x-amz-content-sha256</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">UNSIGNED-PAYLOAD</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#6272A4">                // Add Authorization header with AWS4 signature</span></span>
+<span class="line"><span style="color:#F8F8F2">            },</span></span>
+<span class="line"><span style="color:#F8F8F2">            Body </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> HttpBody</span><span style="color:#F8F8F2">(data.</span><span style="color:#50FA7B">ToArray</span><span style="color:#F8F8F2">()),</span></span>
+<span class="line"><span style="color:#F8F8F2">        };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Upload to S3</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Http.</span><span style="color:#50FA7B">Send</span><span style="color:#F8F8F2">(request).</span><span style="color:#50FA7B">UnwrapOrThrow</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (response.StatusCode </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">S3 upload failed with status: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">response</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">StatusCode</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Store metadata in database</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.Document.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Document</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#F8F8F2">                Id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">                OwnerId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> txCtx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">                Filename </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">                S3Key </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> s3Key,</span></span>
+<span class="line"><span style="color:#F8F8F2">                UploadedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> txCtx.Timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">            });</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> s3Key;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> document, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    owner_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3_key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Upload file to S3 and register in database</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> upload_to_s3</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    content_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    data</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">>,</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3_bucket</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3_region</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Generate a unique S3 key</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> timestamp </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">SystemTime</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">now</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">duration_since</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">UNIX_EPOCH</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">unwrap</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">as_millis</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> s3_key </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"uploads/{}-{}"</span><span style="color:#F8F8F2">, timestamp, filename);</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> url </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F1FA8C">        "https://{}.s3.{}.amazonaws.com/{}"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        s3_bucket, s3_region, s3_key</span></span>
+<span class="line"><span style="color:#F8F8F2">    );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Build the S3 PUT request (simplified - add AWS4 signature in production)</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> request </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Request</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">uri</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">url)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">method</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"PUT"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">header</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Content-Type"</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">content_type)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">header</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"x-amz-content-sha256"</span><span style="color:#F8F8F2">, </span><span style="color:#F1FA8C">"UNSIGNED-PAYLOAD"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#6272A4">        // Add Authorization header with AWS4 signature</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">body</span><span style="color:#F8F8F2">(data)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Failed to build request: {}"</span><span style="color:#F8F8F2">, e))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Upload to S3</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> response </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">http</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">send</span><span style="color:#F8F8F2">(request)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">map_err</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">e</span><span style="color:#FF79C6">|</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"S3 upload failed: {:?}"</span><span style="color:#F8F8F2">, e))</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> (parts, _body) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> response</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_parts</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> parts</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 200</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#8BE9FD;font-style:italic"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"S3 upload failed with status: {}"</span><span style="color:#F8F8F2">, parts</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">status));</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Store metadata in database</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> s3_key_clone </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> s3_key</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> filename_clone </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> filename</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">tx_ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">document</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            owner_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> filename_clone</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            s3_key</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> s3_key_clone</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> tx_ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(s3_key)</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>AWS Authentication</div><div class="admonitionContent_STxx"><p>The example above is simplified. Production S3 uploads require proper <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html" target="_blank" rel="noopener noreferrer" class="">AWS Signature Version 4</a> authentication.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="alternative-pre-signed-url-flow">Alternative: Pre-signed URL Flow<a href="#alternative-pre-signed-url-flow" class="hash-link" aria-label="Direct link to Alternative: Pre-signed URL Flow" title="Direct link to Alternative: Pre-signed URL Flow" translate="no">​</a></h3>
+<p>For larger files, generate a pre-signed URL and let the client upload directly:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Procedure returns a pre-signed URL for client-side upload</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> getUploadUrl </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(), contentType</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">object</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">UploadInfo</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, { uploadUrl</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(), s3Key</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">filename</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">contentType</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> s3Key </span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C"> `uploads/</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">ctx.timestamp.microsSinceUnixEpoch</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">-</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">filename</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Generate pre-signed URL (requires AWS credentials and signing logic)</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> uploadUrl </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> generatePresignedUrl</span><span style="color:#F8F8F2">(s3Key, contentType);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> { uploadUrl, s3Key };</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Client uploads directly to S3 using the pre-signed URL, then calls:</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> confirmUpload </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">({ filename</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(), s3Key</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">filename</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">s3Key</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.document.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3Key,</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx.timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UploadInfo</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> UploadUrl;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> S3Key;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Procedure returns a pre-signed URL for client-side upload</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> UploadInfo</span><span style="color:#50FA7B"> GetUploadUrl</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> filename</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">        string</span><span style="color:#FFB86C;font-style:italic"> contentType</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> timestamp </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DateTimeOffset.UtcNow.</span><span style="color:#50FA7B">ToUnixTimeMilliseconds</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> s3Key </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> $"</span><span style="color:#F1FA8C">uploads/</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">timestamp</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">-</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">filename</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Generate pre-signed URL (requires AWS credentials and signing logic)</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> uploadUrl </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> GeneratePresignedUrl</span><span style="color:#F8F8F2">(s3Key, contentType);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> UploadInfo</span><span style="color:#F8F8F2"> { UploadUrl </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> uploadUrl, S3Key </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> s3Key };</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Client uploads directly to S3 using the pre-signed URL, then calls:</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> ConfirmUpload</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> filename</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> s3Key</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.Document.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Document</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">            OwnerId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Sender,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Filename </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">            S3Key </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> s3Key,</span></span>
+<span class="line"><span style="color:#F8F8F2">            UploadedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">        });</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> string</span><span style="color:#50FA7B"> GeneratePresignedUrl</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> s3Key</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> contentType</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Implement AWS S3 pre-signed URL generation</span></span>
+<span class="line"><span style="color:#FF79C6">        throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> NotImplementedException</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UploadInfo</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    upload_url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    s3_key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Procedure returns a pre-signed URL for client-side upload</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> get_upload_url</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    _ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    _content_type</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">UploadInfo</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> timestamp </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">SystemTime</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">now</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">duration_since</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#BD93F9">UNIX_EPOCH</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">unwrap</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">as_millis</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> s3_key </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> format!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"uploads/{}-{}"</span><span style="color:#F8F8F2">, timestamp, filename);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Generate pre-signed URL (requires AWS credentials and signing logic)</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> upload_url </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> generate_presigned_url</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">s3_key)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">UploadInfo</span><span style="color:#F8F8F2"> { upload_url, s3_key })</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Client uploads directly to S3 using the pre-signed URL, then calls:</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> confirm_upload</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, filename</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">, s3_key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">document</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Document</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        owner_id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        filename,</span></span>
+<span class="line"><span style="color:#F8F8F2">        s3_key,</span></span>
+<span class="line"><span style="color:#F8F8F2">        uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">timestamp,</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>The pre-signed URL approach is preferred for large files because:</p>
+\<ul\>
+<li class=""><strong>No size limits</strong>: Files don&#x27;t pass through SpacetimeDB</li>
+<li class=""><strong>Better performance</strong>: Direct client-to-S3 transfer</li>
+<li class=""><strong>Reduced load</strong>: SpacetimeDB only handles metadata</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="hybrid-approach-thumbnails-and-originals">Hybrid Approach: Thumbnails and Originals<a href="#hybrid-approach-thumbnails-and-originals" class="hash-link" aria-label="Direct link to Hybrid Approach: Thumbnails and Originals" title="Direct link to Hybrid Approach: Thumbnails and Originals" translate="no">​</a></h2>
+<p>For images, store small thumbnails inline for fast access while keeping originals in external storage:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> image </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">image</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    ownerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    thumbnail</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">()),      </span><span style="color:#6272A4">// Small preview stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">    originalUrl</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),          </span><span style="color:#6272A4">// Large original in external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    width</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    height</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploadedAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Image</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Image</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> OwnerId;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">> Thumbnail;      </span><span style="color:#6272A4">// Small preview stored inline</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> OriginalUrl;        </span><span style="color:#6272A4">// Large original in external storage</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Width;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Height;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> UploadedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> image, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Image</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    owner_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    thumbnail</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">u8</span><span style="color:#F8F8F2">>,      </span><span style="color:#6272A4">// Small preview stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">    original_url</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,    </span><span style="color:#6272A4">// Large original in external storage</span></span>
+<span class="line"><span style="color:#F8F8F2">    width</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    height</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    uploaded_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Image</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity owner_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6">\<uint8_t\></span><span style="color:#F8F8F2"> thumbnail;</span><span style="color:#6272A4">  // Small preview stored inline</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string original_url;</span><span style="color:#6272A4">        // Large original in external storage</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> width;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> height;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp uploaded_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Image, id, owner_id, thumbnail, original_url, width, height, uploaded_at)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Image, image, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(image, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(image, owner_id)</span></span></code></pre></div></div></div>
+<p>This approach provides:</p>
+\<ul\>
+<li class=""><strong>Fast thumbnail access</strong> through subscriptions (no extra network requests)</li>
+<li class=""><strong>Efficient storage</strong> for large originals (external storage optimized for blobs)</li>
+<li class=""><strong>Real-time updates</strong> for metadata changes through SpacetimeDB subscriptions</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="choosing-a-strategy">Choosing a Strategy<a href="#choosing-a-strategy" class="hash-link" aria-label="Direct link to Choosing a Strategy" title="Direct link to Choosing a Strategy" translate="no">​</a></h2>
+<table><thead><tr><th>Scenario</th><th>Recommended Approach</th></tr></thead>\<tbody\><tr><td>User avatars (< 10MB)</td><td>Inline storage</td></tr><tr><td>Chat attachments (< 50MB)</td><td>Inline storage</td></tr><tr><td>Document uploads (< 100MB)</td><td>Inline storage</td></tr><tr><td>Large files (> 100MB)</td><td>External storage with reference</td></tr><tr><td>Video files</td><td>External storage with CDN</td></tr><tr><td>Images with previews</td><td>Hybrid (inline thumbnail + external original)</td></tr></tbody></table>
+<p>SpacetimeDB storage costs approximately $1/GB compared to cheaper blob storage options like AWS S3. For large files that don&#x27;t need atomic updates with other data, external storage may be more economical.</p>
+<p>The right choice depends on your file sizes, access patterns, and whether the data needs to participate in real-time subscriptions.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00300-tables/00210-file-storage.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tables/column-types"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Column Types</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tables/auto-increment"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Auto-Increment</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#storing-binary-data-inline" class="table-of-contents__link toc-highlight">Storing Binary Data Inline</a>\<ul\>\<li\><a href="#when-to-use-inline-storage" class="table-of-contents__link toc-highlight">When to Use Inline Storage</a></li>\<li\><a href="#size-considerations" class="table-of-contents__link toc-highlight">Size Considerations</a></li></ul></li>\<li\><a href="#external-storage-with-references" class="table-of-contents__link toc-highlight">External Storage with References</a>\<ul\>\<li\><a href="#external-storage-options" class="table-of-contents__link toc-highlight">External Storage Options</a></li>\<li\><a href="#upload-flow" class="table-of-contents__link toc-highlight">Upload Flow</a></li>\<li\><a href="#example-uploading-to-s3-from-a-procedure" class="table-of-contents__link toc-highlight">Example: Uploading to S3 from a Procedure</a></li>\<li\><a href="#alternative-pre-signed-url-flow" class="table-of-contents__link toc-highlight">Alternative: Pre-signed URL Flow</a></li></ul></li>\<li\><a href="#hybrid-approach-thumbnails-and-originals" class="table-of-contents__link toc-highlight">Hybrid Approach: Thumbnails and Originals</a></li>\<li\><a href="#choosing-a-strategy" class="table-of-contents__link toc-highlight">Choosing a Strategy</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

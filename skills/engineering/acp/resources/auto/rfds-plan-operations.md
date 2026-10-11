@@ -16,7 +16,7 @@ Introduce a new `plan_update` session update type that supports multiple plan fo
 
 > How do things work today and what problems does this cause? Why would we change things?
 
-* The `plan` session update contains `entries: Vec<PlanEntry>` — a flat list of items with priority/status
+* The `plan` session update contains `entries: Vec\<PlanEntry\>` — a flat list of items with priority/status
 * Plans are one-way notifications (agent → client) via `session/update`
 * No plan identity — each update replaces the previous plan entirely
 * No way to remove/dismiss a plan once sent
@@ -28,11 +28,11 @@ Introduce a new `plan_update` session update type that supports multiple plan fo
 
 Add a new `SessionUpdate` variant — `plan_update` — that carries a `plan` field. The `plan` field is a tagged union (discriminated by `type`) with the following variants:
 
-| Type       | Description                                           | Specific fields        |
-| ---------- | ----------------------------------------------------- | ---------------------- |
-| `items`    | Structured entries (same semantics as today's `plan`) | `entries: PlanEntry[]` |
-| `file`     | Agent provides a file URI containing the plan         | `uri: string`          |
-| `markdown` | Agent provides raw markdown text                      | `content: string`      |
+| Type | Description | Specific fields |
+| - | - | - |
+| `items` | Structured entries (same semantics as today's `plan`) | `entries: PlanEntry[]` |
+| `file` | Agent provides a file URI containing the plan | `uri: string` |
+| `markdown` | Agent provides raw markdown text | `content: string` |
 
 All variants carry a required `id: string` that identifies the plan, and an optional `_meta` for extensibility.
 
@@ -157,3 +157,6 @@ A generic "agent shares markdown document" API would be simpler and more reusabl
 ## Revision history
 
 2026-04-02: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

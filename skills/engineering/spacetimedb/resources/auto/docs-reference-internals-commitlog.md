@@ -1,381 +1,137 @@
-Version: 2.0.0
-
-On this page
-
-The commitlog is the write-ahead log (WAL) used by SpacetimeDB to
-persist all committed transactions. As an in-memory database,
-SpacetimeDB relies entirely on this log for durability. Every committed
-transaction is written to the commitlog before it is considered durable,
-and the full state of any database can be reconstructed by replaying the
-log from the beginning.
-
-This page describes the on-disk format, integrity model, and indexing
-strategy of the commitlog.
-
-## Overview
-
-The commitlog serves several purposes:
-
-- **Durability.** It is the sole record of committed state. If the
-  process terminates unexpectedly, the database is recovered by
-  replaying the log.
-- **Replication.** The log is streamed to replicas in the same binary
-  format used on disk, requiring no re-encoding.
-- **Historical reconstruction.** Because the log is never compacted, any
-  past database state can be reconstructed by replaying a prefix of the
-  log up to a given transaction offset.
-
-## Terminology
-
-| Term | Meaning |
-|----|----|
-| **Commitlog** | The full sequence of committed transaction data, stored across one or more segment files. |
-| **Commit** | A single entry in the commitlog. Contains one or more transaction records. |
-| **Segment** | A single file within the commitlog. Segments are created when the current file approaches a configurable maximum size. |
-| **Transaction offset** | A monotonically increasing, gapless sequence number assigned to each transaction record. Starts at zero. |
-| **Epoch** | The replication leader term. Used alongside the transaction offset to uniquely identify a commit within a replication group. |
-
-## Segments
-
-The commitlog is stored as a sequence of files called segments. Each
-segment is named after the minimum transaction offset it contains,
-left-padded with zeros to 20 characters, with the file extension
-`.stdb.log`. For example:
-
-``` prism-code
-00000000000000000000.stdb.log
-00000000000000010000.stdb.log
-00000000000000020000.stdb.log
-```
-
-A new segment is created when the encoded size of the next commit would
-exceed a configurable maximum segment size. The default maximum is 1 GiB
-(1,073,741,824 bytes).
-
-Because segment boundaries are determined by commit size, segments may
-be slightly smaller or larger than the maximum. A commit whose encoded
-size exceeds the maximum is written to a dedicated segment.
-
-Segments may be compressed using the [zstd seekable
-format](https://github.com/facebook/zstd/tree/dev/contrib/seekable_format).
-This compression format preserves random access, so the offset index
-remains valid after compression.
-
-### Segment Header
-
-Each segment begins with a 10-byte header:
-
-``` prism-code
-Bytes 0-5:  Magic       "(ds)^2"      — represents (Δs)², a spacetime interval
-Byte  6:    Format version  "0" or "1"
-Byte  7:    Checksum algo   "0"       — CRC32C
-Bytes 8-9:  Reserved        "00"
-```
-
-Format version 0 is the original format, which does not include an
-`epoch` field in commits. Format version 1 (the current default) adds
-the `epoch` field to each commit. Software must reject segments with a
-format version higher than what it supports. Because `epoch` has a
-default value of zero, software supporting version 1 can also read
-version 0 segments.
-
-## Commit Format
-
-Following the header, a segment contains zero or more commits. Each
-commit has the following binary layout:
-
-``` prism-code
-┌──────────────────┬───────┬─────┬─────┬──────────────┬──────┐
-│ min-tx-offset    │ epoch │  n  │ len │   records    │ crc  │
-│     (u64)        │ (u64) │(u16)│(u32)│  (len bytes) │(u32) │
-└──────────────────┴───────┴─────┴─────┴──────────────┴──────┘
-```
-
-All integers are encoded in little-endian byte order.
-
-| Field | Size | Description |
-|----|----|----|
-| `min-tx-offset` | 8 bytes | The transaction offset of the first record in this commit. Starts at zero and increments by `n` for each successive commit. |
-| `epoch` | 8 bytes | The replication leader epoch (term). Zero indicates single-node mode. Present only in format version 1 and later; in version 0, the epoch is implicitly zero and the commit header is 8 bytes shorter. |
-| `n` | 2 bytes | The number of transaction records in this commit. |
-| `len` | 4 bytes | The byte length of the `records` payload. Allows skipping over the payload without decoding it. |
-| `records` | `len` bytes | The encoded transaction data. See [Transaction Records](#transaction-records). |
-| `crc` | 4 bytes | A CRC32C checksum computed over all preceding fields of this commit. |
-
-The `min-tx-offset` of each commit must equal `min-tx-offset + n` of the
-preceding commit. This invariant holds across segment boundaries.
-
-### Epoch
-
-The `epoch` field supports distributed replication. Within a replication
-group, all nodes must eventually store identical commitlogs containing
-the same sequence of `(offset, txdata)` pairs. The replication protocol
-guarantees that commits are proposed by a single, majority-elected
-leader, and that followers accept commits only from the elected leader.
-
-The tuple `(epoch, offset)` uniquely identifies a commit within a
-replication group. The triple `(epoch, offset, crc)` additionally
-verifies the integrity of the payload.
-
-A zero epoch indicates single-node mode. A single-node database can be
-transitioned into a replicated database without changes to the
-commitlog, because the epoch has a default value of zero and the format
-is backwards-compatible.
-
-The commitlog writer must reject any attempt to set the epoch to a value
-smaller than the current epoch.
-
-## Transaction Records
-
-The `records` payload of a commit contains `n` transaction records. The
-payload is defined and interpreted by the datastore (not the commitlog
-itself).
-
-Each committed datastore transaction is encoded into a record called
-`txdata` with the following structure:
-
-``` prism-code
-┌───────┬──────────┬─────────┬───────────┐
-│ flags │ [inputs] │[outputs]│[mutations]│
-│ (u8)  │          │         │           │
-└───────┴──────────┴─────────┴───────────┘
-```
-
-The `flags` byte is a bitfield. The three most significant bits indicate
-which sections are present:
-
-| Mask   | Meaning           |
-|--------|-------------------|
-| `0x80` | Inputs present    |
-| `0x40` | Outputs present   |
-| `0x20` | Mutations present |
-| `0x1f` | Reserved          |
-
-Each section is present only if its corresponding bit is set.
-
-### Inputs
-
-The inputs section records the reducer call that produced this
-transaction:
-
-``` prism-code
-inputs = len(u32) slen(u8) slen(reducer-name) reducer-args
-```
-
-The section starts with a 4-byte (`u32`) length prefix covering the
-entire inputs payload (excluding the length prefix itself). Within this
-payload, the reducer name is encoded as a length-prefixed UTF-8 string
-with a 1-byte (`u8`) length prefix (maximum 255 bytes). The remaining
-bytes after the reducer name are the reducer arguments, encoded as a
-contiguous BSATN byte string.
-
-The arguments can only be decoded using a runtime representation of the
-WASM module in effect at that transaction offset, as the argument types
-are determined by the reducer signature.
-
-### Outputs
-
-The outputs section consists of a length-prefixed UTF-8 string (1-byte
-length prefix, maximum 255 bytes) representing an error result from the
-reducer, if any.
-
-### Mutations
-
-The mutations section records the database state modifications that
-constitute the transaction:
-
-``` prism-code
-mutations = inserts deletes truncates
-```
-
-Each sub-section uses varint-encoded counts (variable-length unsigned
-integers):
-
-- **Inserts**: A varint count of table groups, then for each group: a
-  `u32` table ID, a varint row count, and then that many rows encoded as
-  BSATN.
-- **Deletes**: Same structure as inserts. Each row is encoded in full
-  (whole-row content, not pointers).
-- **Truncates**: A varint count followed by that many `u32` table IDs
-  whose contents were cleared.
-
-Delete operations store the full row content rather than row pointers,
-because row IDs are not stable across restarts.
-
-#### Ordering and Atomicity
-
-The ordering of operations within the mutations section does not matter.
-SpacetimeDB treats all mutation operations of a committed transaction as
-having occurred instantly and atomically. This has two important
-implications:
-
-1.  Intermediate transaction state is not stored in or recoverable from
-    the commitlog. While a transaction is running, the datastore
-    maintains in-memory state for that transaction, but after commit,
-    only the final set of mutations is persisted.
-
-2.  References to the same row across `inserts`, `deletes`, and
-    `truncates` within a single transaction must be mutually exclusive.
-    If a row appears in both an insert and a delete for the same table,
-    the replay order would be ambiguous.
-
-Although mutations within a single table are unordered, mutations across
-tables are stored in ascending order by table ID. This ordering supports
-schema migrations, where system table updates must be applied before
-changes to user tables.
-
-All mutations within a transaction are written using the final schema of
-that transaction. If a schema change occurs mid-transaction (for
-example, adding a column), all row data in the commit reflects the
-post-migration schema.
-
-## Prerequisites for Replay
-
-A stated goal of the commitlog is that a database can be fully
-reconstructed from the log alone. This requires that:
-
-1.  System tables and their contents are stored in the log.
-2.  The module program data (WASM blob) is stored in the system tables
-    and, by extension, in the log.
-
-To bootstrap replay, the reader must have built-in knowledge of the
-`st_table` and `st_columns` system table schemas. The schemas of these
-two tables must remain stable across versions.
-
-## Integrity
-
-The commitlog is append-only. Commits are written in FIFO order as
-received from the transaction engine. The implementation may buffer
-commits in memory before writing to disk. Flushing and syncing (via
-`fsync`) is managed by a higher-level component, allowing users to trade
-durability for throughput.
-
-A segment must be flushed and synced to disk before the next segment is
-created. On failure, the log rejects further writes.
-
-Because not every commit is individually synced, partial writes may
-occur at the end of the log after an unexpected termination. Before
-resuming writes, the commitlog must verify that the last segment is
-intact, truncating it to the last valid commit if necessary.
-
-Every other detectable inconsistency is considered a fatal error.
-
-### Integrity Checking
-
-A thorough consistency check involves traversing the commitlog from the
-beginning and:
-
-1.  Computing the CRC32C of each commit and verifying it against the
-    stored value.
-2.  Verifying that `min-tx-offset` values are strictly sequential
-    (`previous.min-tx-offset + previous.n == current.min-tx-offset`)
-    across all commits and segment boundaries.
-3.  Verifying that the first offset in each segment matches that
-    segment's file name.
-
-Under some circumstances, it may be acceptable to seek to the last
-recorded offset via the offset index and check only the suffix of the
-final segment.
-
-## Offset Index
-
-To support random access into the commitlog, an offset index is
-maintained alongside each segment. The index maps transaction offsets to
-byte positions within the corresponding segment file.
-
-### Index Files
-
-Each segment has an associated index file with the same name but the
-file extension `.stdb.ofs`:
-
-``` prism-code
-00000000000000000000.stdb.log
-00000000000000000000.stdb.ofs
-00000000000000010000.stdb.log
-00000000000000010000.stdb.ofs
-```
-
-Index files are pre-allocated and accessed via memory mapping (`mmap`).
-The required space is determined from the segment's maximum size and the
-index interval configuration parameter.
-
-Like segment files, index files are never compacted. When moving
-segments to cold storage, the associated index files may be discarded,
-because they can be rebuilt from the segment data.
-
-### Index Entries
-
-Each index entry is 16 bytes:
-
-| Bytes | Field | Description |
-|----|----|----|
-| 0-7 | Transaction offset | The `min-tx-offset` of the indexed commit (u64, little-endian) |
-| 8-15 | Byte offset | The position of the commit within the segment file (u64, little-endian) |
-
-Entries are written back-to-back. An all-zero entry indicates unused,
-pre-allocated space (the zeroth commit is never indexed).
-
-### Write Behavior
-
-Index entries are written on a best-effort basis whenever a configurable
-number of bytes have been flushed to the segment (default: 4,096 bytes).
-The index is written asynchronously with respect to the database engine
-and does not block transaction processing.
-
-Only the index file for the currently active segment is open for
-writing. When a segment is closed, its index file becomes immutable.
-
-Errors writing to the index are not propagated. Segment writing
-continues normally regardless of index write failures.
-
-### Read Behavior
-
-Readers must not assume that the index is fully consistent with its
-segment. In particular, a byte offset in the index may point beyond the
-current end of the segment file if the index was updated before the
-segment was synced. Readers should handle this gracefully.
-
-Finding the byte offset for a given transaction offset is performed via
-binary search over the index entries. Because the dominant access
-pattern is reading near the end of the log (for replication and snapshot
-recovery), implementations may benefit from probing sections near the
-end of the index first.
-
-### Configuration
-
-The offset index is controlled by two parameters:
-
-| Parameter | Default | Description |
-|----|----|----|
-| `offset_index_interval_bytes` | 4,096 | An index entry is written whenever this many bytes have been flushed to the active segment. |
-| `offset_index_require_segment_fsync` | true | If true, the segment must be synced to disk before an index entry is written. |
-
-## Wire Format
-
-The commitlog's wire format is identical to its on-disk format. No
-re-encoding is required on the producer side. The receiver is
-responsible for integrity checking.
-
-A commitlog is typically sent as a contiguous stream. Producers may
-concatenate physical segments, which means receivers may encounter
-segment headers in the stream and should ignore them.
-
-Producers must support sending a log stream starting from a particular
-transaction offset. In this case, the stream begins at the commit
-containing the requested offset (which may be greater than the commit's
-`min-tx-offset` but less than the next commit's `min-tx-offset`).
-
-## Versioning
-
-Because commitlogs are never compacted, implementations must remain
-backwards-compatible. Any amendment that would prevent an older
-implementation from reading a newer segment requires incrementing the
-`log-format-version` in the segment header. Implementations must abort
-upon encountering a format version higher than the latest they support.
-
-The current format versions are:
-
-| Version | Description                           |
-|---------|---------------------------------------|
-| 0       | Original format                       |
-| 1       | Adds the `epoch` field to each commit |
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/reference/internals/commitlog" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Commitlog | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/reference/internals/commitlog"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Commitlog | SpacetimeDB docs"><meta data-rh="true" name="description" content="The commitlog is the write-ahead log (WAL) used by SpacetimeDB to persist all committed transactions. As an in-memory database, SpacetimeDB relies entirely on this log for durability. Every committed transaction is written to the commitlog before it is considered durable, and the full state of any database can be reconstructed by replaying the log from the beginning."><meta data-rh="true" property="og:description" content="The commitlog is the write-ahead log (WAL) used by SpacetimeDB to persist all committed transactions. As an in-memory database, SpacetimeDB relies entirely on this log for durability. Every committed transaction is written to the commitlog before it is considered durable, and the full state of any database can be reconstructed by replaying the log from the beginning."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/reference/internals/commitlog"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/reference/internals/commitlog" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/reference/internals/commitlog" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Commitlog","item":"https://spacetimedb.com/docs/reference/internals/commitlog"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/reference/internals/commitlog">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/reference/internals/commitlog">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/cli-reference"><span title="CLI Reference" class="categoryLinkLabel_HATI">CLI Reference</span></a><button aria-label="Expand sidebar category &#x27;CLI Reference&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/resources/mcp"><span title="MCP Reference" class="linkLabel_UvDg">MCP Reference</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/http/authorization"><span title="HTTP API" class="categoryLinkLabel_HATI">HTTP API</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/webassembly-abi"><span title="Internals" class="categoryLinkLabel_HATI">Internals</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/webassembly-abi"><span title="Module ABI Reference" class="linkLabel_UvDg">Module ABI Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/sats-json"><span title="SATS-JSON Data Format" class="linkLabel_UvDg">SATS-JSON Data Format</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/bsatn"><span title="BSATN Data Format" class="linkLabel_UvDg">BSATN Data Format</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/reference/internals/commitlog"><span title="Commitlog" class="linkLabel_UvDg">Commitlog</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/reference/sql"><span title="SQL Reference" class="linkLabel_UvDg">SQL Reference</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">References</span></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Internals</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Commitlog</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Commitlog</h1></header>
+<p>The commitlog is the write-ahead log (WAL) used by SpacetimeDB to persist all committed transactions. As an in-memory database, SpacetimeDB relies entirely on this log for durability. Every committed transaction is written to the commitlog before it is considered durable, and the full state of any database can be reconstructed by replaying the log from the beginning.</p>
+<p>This page describes the on-disk format, integrity model, and indexing strategy of the commitlog.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="overview">Overview<a href="#overview" class="hash-link" aria-label="Direct link to Overview" title="Direct link to Overview" translate="no">​</a></h2>
+<p>The commitlog serves several purposes:</p>
+\<ul\>
+<li class=""><strong>Durability.</strong> It is the sole record of committed state. If the process terminates unexpectedly, the database is recovered by replaying the log.</li>
+<li class=""><strong>Replication.</strong> The log is streamed to replicas in the same binary format used on disk, requiring no re-encoding.</li>
+<li class=""><strong>Historical reconstruction.</strong> Because the log is never compacted, any past database state can be reconstructed by replaying a prefix of the log up to a given transaction offset.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="terminology">Terminology<a href="#terminology" class="hash-link" aria-label="Direct link to Terminology" title="Direct link to Terminology" translate="no">​</a></h2>
+<table><thead><tr><th>Term</th><th>Meaning</th></tr></thead>\<tbody\><tr><td><strong>Commitlog</strong></td><td>The full sequence of committed transaction data, stored across one or more segment files.</td></tr><tr><td><strong>Commit</strong></td><td>A single entry in the commitlog. Contains one or more transaction records.</td></tr><tr><td><strong>Segment</strong></td><td>A single file within the commitlog. Segments are created when the current file approaches a configurable maximum size.</td></tr><tr><td><strong>Transaction offset</strong></td><td>A monotonically increasing, gapless sequence number assigned to each transaction record. Starts at zero.</td></tr><tr><td><strong>Epoch</strong></td><td>The replication leader term. Used alongside the transaction offset to uniquely identify a commit within a replication group.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="segments">Segments<a href="#segments" class="hash-link" aria-label="Direct link to Segments" title="Direct link to Segments" translate="no">​</a></h2>
+<p>The commitlog is stored as a sequence of files called segments. Each segment is named after the minimum transaction offset it contains, left-padded with zeros to 20 characters, with the file extension <code>.stdb.log</code>. For example:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000000000.stdb.log</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000010000.stdb.log</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000020000.stdb.log</span><br></span></code></pre></div></div>
+<p>A new segment is created when the encoded size of the next commit would exceed a configurable maximum segment size. The default maximum is 1 GiB (1,073,741,824 bytes).</p>
+<p>Because segment boundaries are determined by commit size, segments may be slightly smaller or larger than the maximum. A commit whose encoded size exceeds the maximum is written to a dedicated segment.</p>
+<p>Segments may be compressed using the <a href="https://github.com/facebook/zstd/tree/dev/contrib/seekable_format" target="_blank" rel="noopener noreferrer" class="">zstd seekable format</a>. This compression format preserves random access, so the offset index remains valid after compression.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="segment-header">Segment Header<a href="#segment-header" class="hash-link" aria-label="Direct link to Segment Header" title="Direct link to Segment Header" translate="no">​</a></h3>
+<p>Each segment begins with a 10-byte header:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Bytes 0-5:  Magic       "(ds)^2"      — represents (Δs)², a spacetime interval</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Byte  6:    Format version  "0" or "1"</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Byte  7:    Checksum algo   "0"       — CRC32C</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Bytes 8-9:  Reserved        "00"</span><br></span></code></pre></div></div>
+<p>Format version 0 is the original format, which does not include an <code>epoch</code> field in commits. Format version 1 (the current default) adds the <code>epoch</code> field to each commit. Software must reject segments with a format version higher than what it supports. Because <code>epoch</code> has a default value of zero, software supporting version 1 can also read version 0 segments.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="commit-format">Commit Format<a href="#commit-format" class="hash-link" aria-label="Direct link to Commit Format" title="Direct link to Commit Format" translate="no">​</a></h2>
+<p>Following the header, a segment contains zero or more commits. Each commit has the following binary layout:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">┌──────────────────┬───────┬─────┬─────┬──────────────┬──────┐</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│ min-tx-offset    │ epoch │  n  │ len │   records    │ crc  │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│     (u64)        │ (u64) │(u16)│(u32)│  (len bytes) │(u32) │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└──────────────────┴───────┴─────┴─────┴──────────────┴──────┘</span><br></span></code></pre></div></div>
+<p>All integers are encoded in little-endian byte order.</p>
+<table><thead><tr><th>Field</th><th>Size</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>min-tx-offset</code></td><td>8 bytes</td><td>The transaction offset of the first record in this commit. Starts at zero and increments by <code>n</code> for each successive commit.</td></tr><tr><td><code>epoch</code></td><td>8 bytes</td><td>The replication leader epoch (term). Zero indicates single-node mode. Present only in format version 1 and later; in version 0, the epoch is implicitly zero and the commit header is 8 bytes shorter.</td></tr><tr><td><code>n</code></td><td>2 bytes</td><td>The number of transaction records in this commit.</td></tr><tr><td><code>len</code></td><td>4 bytes</td><td>The byte length of the <code>records</code> payload. Allows skipping over the payload without decoding it.</td></tr><tr><td><code>records</code></td><td><code>len</code> bytes</td><td>The encoded transaction data. See <a href="#transaction-records" class="">Transaction Records</a>.</td></tr><tr><td><code>crc</code></td><td>4 bytes</td><td>A CRC32C checksum computed over all preceding fields of this commit.</td></tr></tbody></table>
+<p>The <code>min-tx-offset</code> of each commit must equal <code>min-tx-offset + n</code> of the preceding commit. This invariant holds across segment boundaries.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="epoch">Epoch<a href="#epoch" class="hash-link" aria-label="Direct link to Epoch" title="Direct link to Epoch" translate="no">​</a></h3>
+<p>The <code>epoch</code> field supports distributed replication. Within a replication group, all nodes must eventually store identical commitlogs containing the same sequence of <code>(offset, txdata)</code> pairs. The replication protocol guarantees that commits are proposed by a single, majority-elected leader, and that followers accept commits only from the elected leader.</p>
+<p>The tuple <code>(epoch, offset)</code> uniquely identifies a commit within a replication group. The triple <code>(epoch, offset, crc)</code> additionally verifies the integrity of the payload.</p>
+<p>A zero epoch indicates single-node mode. A single-node database can be transitioned into a replicated database without changes to the commitlog, because the epoch has a default value of zero and the format is backwards-compatible.</p>
+<p>The commitlog writer must reject any attempt to set the epoch to a value smaller than the current epoch.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="transaction-records">Transaction Records<a href="#transaction-records" class="hash-link" aria-label="Direct link to Transaction Records" title="Direct link to Transaction Records" translate="no">​</a></h2>
+<p>The <code>records</code> payload of a commit contains <code>n</code> transaction records. The payload is defined and interpreted by the datastore (not the commitlog itself).</p>
+<p>Each committed datastore transaction is encoded into a record called <code>txdata</code> with the following structure:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">┌───────┬──────────┬─────────┬───────────┐</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│ flags │ [inputs] │[outputs]│[mutations]│</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│ (u8)  │          │         │           │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└───────┴──────────┴─────────┴───────────┘</span><br></span></code></pre></div></div>
+<p>The <code>flags</code> byte is a bitfield. The three most significant bits indicate which sections are present:</p>
+<table><thead><tr><th>Mask</th><th>Meaning</th></tr></thead>\<tbody\><tr><td><code>0x80</code></td><td>Inputs present</td></tr><tr><td><code>0x40</code></td><td>Outputs present</td></tr><tr><td><code>0x20</code></td><td>Mutations present</td></tr><tr><td><code>0x1f</code></td><td>Reserved</td></tr></tbody></table>
+<p>Each section is present only if its corresponding bit is set.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="inputs">Inputs<a href="#inputs" class="hash-link" aria-label="Direct link to Inputs" title="Direct link to Inputs" translate="no">​</a></h3>
+<p>The inputs section records the reducer call that produced this transaction:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">inputs = len(u32) slen(u8) slen(reducer-name) reducer-args</span><br></span></code></pre></div></div>
+<p>The section starts with a 4-byte (<code>u32</code>) length prefix covering the entire inputs payload (excluding the length prefix itself). Within this payload, the reducer name is encoded as a length-prefixed UTF-8 string with a 1-byte (<code>u8</code>) length prefix (maximum 255 bytes). The remaining bytes after the reducer name are the reducer arguments, encoded as a contiguous BSATN byte string.</p>
+<p>The arguments can only be decoded using a runtime representation of the WASM module in effect at that transaction offset, as the argument types are determined by the reducer signature.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="outputs">Outputs<a href="#outputs" class="hash-link" aria-label="Direct link to Outputs" title="Direct link to Outputs" translate="no">​</a></h3>
+<p>The outputs section consists of a length-prefixed UTF-8 string (1-byte length prefix, maximum 255 bytes) representing an error result from the reducer, if any.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="mutations">Mutations<a href="#mutations" class="hash-link" aria-label="Direct link to Mutations" title="Direct link to Mutations" translate="no">​</a></h3>
+<p>The mutations section records the database state modifications that constitute the transaction:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">mutations = inserts deletes truncates</span><br></span></code></pre></div></div>
+<p>Each sub-section uses varint-encoded counts (variable-length unsigned integers):</p>
+\<ul\>
+<li class=""><strong>Inserts</strong>: A varint count of table groups, then for each group: a <code>u32</code> table ID, a varint row count, and then that many rows encoded as BSATN.</li>
+<li class=""><strong>Deletes</strong>: Same structure as inserts. Each row is encoded in full (whole-row content, not pointers).</li>
+<li class=""><strong>Truncates</strong>: A varint count followed by that many <code>u32</code> table IDs whose contents were cleared.</li>
+</ul>
+<p>Delete operations store the full row content rather than row pointers, because row IDs are not stable across restarts.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="ordering-and-atomicity">Ordering and Atomicity<a href="#ordering-and-atomicity" class="hash-link" aria-label="Direct link to Ordering and Atomicity" title="Direct link to Ordering and Atomicity" translate="no">​</a></h4>
+<p>The ordering of operations within the mutations section does not matter. SpacetimeDB treats all mutation operations of a committed transaction as having occurred instantly and atomically. This has two important implications:</p>
+\<ol\>
+<li class="">
+<p>Intermediate transaction state is not stored in or recoverable from the commitlog. While a transaction is running, the datastore maintains in-memory state for that transaction, but after commit, only the final set of mutations is persisted.</p>
+</li>
+<li class="">
+<p>References to the same row across <code>inserts</code>, <code>deletes</code>, and <code>truncates</code> within a single transaction must be mutually exclusive. If a row appears in both an insert and a delete for the same table, the replay order would be ambiguous.</p>
+</li>
+</ol>
+<p>Although mutations within a single table are unordered, mutations across tables are stored in ascending order by table ID. This ordering supports schema migrations, where system table updates must be applied before changes to user tables.</p>
+<p>All mutations within a transaction are written using the final schema of that transaction. If a schema change occurs mid-transaction (for example, adding a column), all row data in the commit reflects the post-migration schema.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites-for-replay">Prerequisites for Replay<a href="#prerequisites-for-replay" class="hash-link" aria-label="Direct link to Prerequisites for Replay" title="Direct link to Prerequisites for Replay" translate="no">​</a></h2>
+<p>A stated goal of the commitlog is that a database can be fully reconstructed from the log alone. This requires that:</p>
+\<ol\>
+<li class="">System tables and their contents are stored in the log.</li>
+<li class="">The module program data (WASM blob) is stored in the system tables and, by extension, in the log.</li>
+</ol>
+<p>To bootstrap replay, the reader must have built-in knowledge of the <code>st_table</code> and <code>st_columns</code> system table schemas. The schemas of these two tables must remain stable across versions.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="integrity">Integrity<a href="#integrity" class="hash-link" aria-label="Direct link to Integrity" title="Direct link to Integrity" translate="no">​</a></h2>
+<p>The commitlog is append-only. Commits are written in FIFO order as received from the transaction engine. The implementation may buffer commits in memory before writing to disk. Flushing and syncing (via <code>fsync</code>) is managed by a higher-level component, allowing users to trade durability for throughput.</p>
+<p>A segment must be flushed and synced to disk before the next segment is created. On failure, the log rejects further writes.</p>
+<p>Because not every commit is individually synced, partial writes may occur at the end of the log after an unexpected termination. Before resuming writes, the commitlog must verify that the last segment is intact, truncating it to the last valid commit if necessary.</p>
+<p>Every other detectable inconsistency is considered a fatal error.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="integrity-checking">Integrity Checking<a href="#integrity-checking" class="hash-link" aria-label="Direct link to Integrity Checking" title="Direct link to Integrity Checking" translate="no">​</a></h3>
+<p>A thorough consistency check involves traversing the commitlog from the beginning and:</p>
+\<ol\>
+<li class="">Computing the CRC32C of each commit and verifying it against the stored value.</li>
+<li class="">Verifying that <code>min-tx-offset</code> values are strictly sequential (<code>previous.min-tx-offset + previous.n == current.min-tx-offset</code>) across all commits and segment boundaries.</li>
+<li class="">Verifying that the first offset in each segment matches that segment&#x27;s file name.</li>
+</ol>
+<p>Under some circumstances, it may be acceptable to seek to the last recorded offset via the offset index and check only the suffix of the final segment.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="offset-index">Offset Index<a href="#offset-index" class="hash-link" aria-label="Direct link to Offset Index" title="Direct link to Offset Index" translate="no">​</a></h2>
+<p>To support random access into the commitlog, an offset index is maintained alongside each segment. The index maps transaction offsets to byte positions within the corresponding segment file.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="index-files">Index Files<a href="#index-files" class="hash-link" aria-label="Direct link to Index Files" title="Direct link to Index Files" translate="no">​</a></h3>
+<p>Each segment has an associated index file with the same name but the file extension <code>.stdb.ofs</code>:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000000000.stdb.log</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000000000.stdb.ofs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000010000.stdb.log</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">00000000000000010000.stdb.ofs</span><br></span></code></pre></div></div>
+<p>Index files are pre-allocated and accessed via memory mapping (<code>mmap</code>). The required space is determined from the segment&#x27;s maximum size and the index interval configuration parameter.</p>
+<p>Like segment files, index files are never compacted. When moving segments to cold storage, the associated index files may be discarded, because they can be rebuilt from the segment data.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="index-entries">Index Entries<a href="#index-entries" class="hash-link" aria-label="Direct link to Index Entries" title="Direct link to Index Entries" translate="no">​</a></h3>
+<p>Each index entry is 16 bytes:</p>
+<table><thead><tr><th>Bytes</th><th>Field</th><th>Description</th></tr></thead>\<tbody\><tr><td>0-7</td><td>Transaction offset</td><td>The <code>min-tx-offset</code> of the indexed commit (u64, little-endian)</td></tr><tr><td>8-15</td><td>Byte offset</td><td>The position of the commit within the segment file (u64, little-endian)</td></tr></tbody></table>
+<p>Entries are written back-to-back. An all-zero entry indicates unused, pre-allocated space (the zeroth commit is never indexed).</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="write-behavior">Write Behavior<a href="#write-behavior" class="hash-link" aria-label="Direct link to Write Behavior" title="Direct link to Write Behavior" translate="no">​</a></h3>
+<p>Index entries are written on a best-effort basis whenever a configurable number of bytes have been flushed to the segment (default: 4,096 bytes). The index is written asynchronously with respect to the database engine and does not block transaction processing.</p>
+<p>Only the index file for the currently active segment is open for writing. When a segment is closed, its index file becomes immutable.</p>
+<p>Errors writing to the index are not propagated. Segment writing continues normally regardless of index write failures.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="read-behavior">Read Behavior<a href="#read-behavior" class="hash-link" aria-label="Direct link to Read Behavior" title="Direct link to Read Behavior" translate="no">​</a></h3>
+<p>Readers must not assume that the index is fully consistent with its segment. In particular, a byte offset in the index may point beyond the current end of the segment file if the index was updated before the segment was synced. Readers should handle this gracefully.</p>
+<p>Finding the byte offset for a given transaction offset is performed via binary search over the index entries. Because the dominant access pattern is reading near the end of the log (for replication and snapshot recovery), implementations may benefit from probing sections near the end of the index first.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="configuration">Configuration<a href="#configuration" class="hash-link" aria-label="Direct link to Configuration" title="Direct link to Configuration" translate="no">​</a></h3>
+<p>The offset index is controlled by two parameters:</p>
+<table><thead><tr><th>Parameter</th><th>Default</th><th>Description</th></tr></thead>\<tbody\><tr><td><code>offset_index_interval_bytes</code></td><td>4,096</td><td>An index entry is written whenever this many bytes have been flushed to the active segment.</td></tr><tr><td><code>offset_index_require_segment_fsync</code></td><td>true</td><td>If true, the segment must be synced to disk before an index entry is written.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="wire-format">Wire Format<a href="#wire-format" class="hash-link" aria-label="Direct link to Wire Format" title="Direct link to Wire Format" translate="no">​</a></h2>
+<p>The commitlog&#x27;s wire format is identical to its on-disk format. No re-encoding is required on the producer side. The receiver is responsible for integrity checking.</p>
+<p>A commitlog is typically sent as a contiguous stream. Producers may concatenate physical segments, which means receivers may encounter segment headers in the stream and should ignore them.</p>
+<p>Producers must support sending a log stream starting from a particular transaction offset. In this case, the stream begins at the commit containing the requested offset (which may be greater than the commit&#x27;s <code>min-tx-offset</code> but less than the next commit&#x27;s <code>min-tx-offset</code>).</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="versioning">Versioning<a href="#versioning" class="hash-link" aria-label="Direct link to Versioning" title="Direct link to Versioning" translate="no">​</a></h2>
+<p>Because commitlogs are never compacted, implementations must remain backwards-compatible. Any amendment that would prevent an older implementation from reading a newer segment requires incrementing the <code>log-format-version</code> in the segment header. Implementations must abort upon encountering a format version higher than the latest they support.</p>
+<p>The current format versions are:</p>
+<table><thead><tr><th>Version</th><th>Description</th></tr></thead>\<tbody\><tr><td>0</td><td>Original format</td></tr><tr><td>1</td><td>Adds the <code>epoch</code> field to each commit</td></tr></tbody></table></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00200-reference/00300-internals/00400-commitlog.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/bsatn"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">BSATN Data Format</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/reference/sql"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">SQL Reference</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#overview" class="table-of-contents__link toc-highlight">Overview</a></li>\<li\><a href="#terminology" class="table-of-contents__link toc-highlight">Terminology</a></li>\<li\><a href="#segments" class="table-of-contents__link toc-highlight">Segments</a>\<ul\>\<li\><a href="#segment-header" class="table-of-contents__link toc-highlight">Segment Header</a></li></ul></li>\<li\><a href="#commit-format" class="table-of-contents__link toc-highlight">Commit Format</a>\<ul\>\<li\><a href="#epoch" class="table-of-contents__link toc-highlight">Epoch</a></li></ul></li>\<li\><a href="#transaction-records" class="table-of-contents__link toc-highlight">Transaction Records</a>\<ul\>\<li\><a href="#inputs" class="table-of-contents__link toc-highlight">Inputs</a></li>\<li\><a href="#outputs" class="table-of-contents__link toc-highlight">Outputs</a></li>\<li\><a href="#mutations" class="table-of-contents__link toc-highlight">Mutations</a></li></ul></li>\<li\><a href="#prerequisites-for-replay" class="table-of-contents__link toc-highlight">Prerequisites for Replay</a></li>\<li\><a href="#integrity" class="table-of-contents__link toc-highlight">Integrity</a>\<ul\>\<li\><a href="#integrity-checking" class="table-of-contents__link toc-highlight">Integrity Checking</a></li></ul></li>\<li\><a href="#offset-index" class="table-of-contents__link toc-highlight">Offset Index</a>\<ul\>\<li\><a href="#index-files" class="table-of-contents__link toc-highlight">Index Files</a></li>\<li\><a href="#index-entries" class="table-of-contents__link toc-highlight">Index Entries</a></li>\<li\><a href="#write-behavior" class="table-of-contents__link toc-highlight">Write Behavior</a></li>\<li\><a href="#read-behavior" class="table-of-contents__link toc-highlight">Read Behavior</a></li>\<li\><a href="#configuration" class="table-of-contents__link toc-highlight">Configuration</a></li></ul></li>\<li\><a href="#wire-format" class="table-of-contents__link toc-highlight">Wire Format</a></li>\<li\><a href="#versioning" class="table-of-contents__link toc-highlight">Versioning</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

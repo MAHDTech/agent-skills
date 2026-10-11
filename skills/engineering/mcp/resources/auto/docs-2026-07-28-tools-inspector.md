@@ -6,18 +6,20 @@
 
 > Interactive developer tooling for testing and debugging MCP servers, in the browser, on the command line, and in the terminal
 
-The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is the reference developer tool for testing and debugging [MCP servers](https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts). It ships as a single package, `@modelcontextprotocol/inspector`, providing **three clients behind one binary**:
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is the reference developer tool for testing and debugging [MCP servers](/docs/2026-07-28/learn/server-concepts). It ships as a single package, `@modelcontextprotocol/inspector`, providing **three clients behind one binary**:
 
-| Client  | Invocation                                  | What it's for                                                                     |
-| ------- | ------------------------------------------- | --------------------------------------------------------------------------------- |
-| **Web** | `npx @modelcontextprotocol/inspector`       | A full graphical inspector in the browser. The default, and the richest surface.  |
+| Client | Invocation | What it's for |
+| - | - | - |
+| **Web** | `npx @modelcontextprotocol/inspector` | A full graphical inspector in the browser. The default, and the richest surface. |
 | **CLI** | `npx @modelcontextprotocol/inspector --cli` | A scriptable, machine-readable client for CI, shell pipelines, and coding agents. |
-| **TUI** | `npx @modelcontextprotocol/inspector --tui` | An interactive terminal UI, for when a browser isn't available or wanted.         |
+| **TUI** | `npx @modelcontextprotocol/inspector --tui` | An interactive terminal UI, for when a browser isn't available or wanted. |
 
-All three are built on the same shared core, so a connection behaves identically across them: the same transports, the same configuration files, the same OAuth state on disk, and the same [protocol-era](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/protocol-eras) negotiation (legacy vs. modern 2026-07-28).
+All three are built on the same shared core, so a connection behaves identically across them: the same transports, the same configuration files, the same OAuth state on disk, and the same [protocol-era](/docs/2026-07-28/tools/inspector/protocol-eras) negotiation (legacy vs. modern 2026-07-28).
 
-<Frame caption="The MCP Inspector web client, connected to a server, with the monitoring sidebar pinned so protocol traffic stays visible while you work.">
-  <img src="https://mintcdn.com/mcp/gk28X8wi_tbRYzej/images/inspector/web-monitor-sidebar.png?fit=max&auto=format&n=gk28X8wi_tbRYzej&q=85&s=eef6e546b9831b3d169e26bba8c54ce3" width="3840" height="2160" data-path="images/inspector/web-monitor-sidebar.png" />
+The package also installs **`mcpdo`**, an experimental [connection client](/docs/2026-07-28/tools/inspector/mcpdo) that connects to a server once and keeps it open across many commands, on the same core.
+
+<Frame caption="The MCP Inspector web client after a tool call, with the monitoring sidebar pinned and widened so the JSON-RPC exchange stays readable while you work.">
+  <img src="https://mintcdn.com/mcp/pUebPdrb6PY5_mfH/images/inspector/web-monitor-sidebar.png?fit=max&auto=format&n=pUebPdrb6PY5_mfH&q=85&s=2ced9eeefa020be53fe4fe957b7d07c6" width="3840" height="2160" data-path="images/inspector/web-monitor-sidebar.png" />
 </Frame>
 
 ## Quickstart
@@ -34,7 +36,7 @@ The Inspector requires **Node 22.19.0 or newer** and runs directly through `npx`
     npx @modelcontextprotocol/inspector
     ```
 
-    The command prints a URL containing a one-time session token; open it in your browser. See [Web client](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/web).
+    The command prints a URL carrying a per-launch API token and opens it in your browser (set `MCP_AUTO_OPEN_ENABLED=false` to stop it opening). See [Web client](/docs/2026-07-28/tools/inspector/web).
   </Tab>
 
   <Tab title="CLI">
@@ -47,7 +49,7 @@ The Inspector requires **Node 22.19.0 or newer** and runs directly through `npx`
       --method tools/call --tool-name get_weather --tool-arg city=Boston --format json | jq .result
     ```
 
-    See [CLI client](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/cli).
+    See [CLI client](/docs/2026-07-28/tools/inspector/cli).
   </Tab>
 
   <Tab title="TUI">
@@ -55,7 +57,7 @@ The Inspector requires **Node 22.19.0 or newer** and runs directly through `npx`
     npx @modelcontextprotocol/inspector --tui node path/to/server/index.js
     ```
 
-    See [TUI client](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/tui).
+    See [TUI client](/docs/2026-07-28/tools/inspector/tui).
   </Tab>
 </Tabs>
 
@@ -85,6 +87,18 @@ Pass the command that launches the server as the Inspector's arguments, or point
 
 Always read a server's own README first, since every server requires different commands and arguments.
 
+\<Warning\>
+  **The Inspector stores secrets (OAuth tokens, OAuth client secrets, and stdio
+  `env:` values) in the OS keychain when one is available.** On a machine with
+  no keychain (Linux without libsecret or a Secret Service, headless and SSH
+  sessions, Termux, and containers with a mounted volume) they are saved to
+  `~/.mcp-inspector/secrets.json` instead, **unencrypted unless you supply a
+  key**. See [Where secrets are
+  stored](/docs/2026-07-28/tools/inspector/configuration#where-secrets-are-stored)
+  for how to get a keychain back, encrypt the file, or keep secrets in memory
+  only.
+</Warning>
+
 ## Launcher flags vs. client flags
 
 `mcp-inspector`, the binary that `npx @modelcontextprotocol/inspector` runs, is a thin launcher. It owns only two things:
@@ -92,7 +106,7 @@ Always read a server's own README first, since every server requires different c
 1. **The mode flag:** `--web` (default), `--cli`, or `--tui`. At most one; passing two errors with `Specify at most one of --web, --cli, or --tui.`
 2. **`-h` / `--help`.**
 
-Everything else (`--catalog`, `--config`, `--server-url`, `--transport`, `--method`, the OAuth flags) is defined by the *client*, not the launcher, and the clients do not all define the same set. The [Configuration and flags](https://modelcontextprotocol.io/docs/2026-07-28/tools/inspector/configuration) page is organized that way, by owner.
+Everything else (`--catalog`, `--config`, `--server-url`, `--transport`, `--method`, the OAuth flags) is defined by the *client*, not the launcher, and the clients do not all define the same set. The [Configuration and flags](/docs/2026-07-28/tools/inspector/configuration) page is organized that way, by owner.
 
 \<Note\>
   Mode flags are recognized only at the front of the command line: the first token that isn't `--web` / `--cli` / `--tui` ends launcher parsing, and everything after it is forwarded to the client unchanged. That's what lets a literal `--cli` appear later as one of your server's own arguments:
@@ -103,9 +117,10 @@ Everything else (`--catalog`, `--config`, `--server-url`, `--transport`, `--meth
 </Note>
 
 \<Note\>
-  `--help` behaves differently with and without a mode flag. Bare `mcp-inspector   --help` prints the launcher's help and exits. With a mode flag it is
-  forwarded, so `mcp-inspector --cli --help` prints the CLI's full flag
-  reference instead.
+  `--help` behaves differently with and without a mode flag. Without one,
+  `-h`/`--help` anywhere on the command line (even after a server command)
+  prints the launcher's help and exits. With a mode flag it is forwarded, so
+  `mcp-inspector --cli --help` prints the CLI's full flag reference instead.
 </Note>
 
 ## Where to go next
@@ -138,6 +153,15 @@ Everything else (`--catalog`, `--config`, `--server-url`, `--transport`, `--meth
     protocol eras.
   </Card>
 
+  <Card title="mcpdo connection client" icon="plug" href="/docs/2026-07-28/tools/inspector/mcpdo">
+    Connect once, then run many commands against a named connection.
+  </Card>
+
+  <Card title="Security" icon="shield-halved" href="/docs/2026-07-28/tools/inspector/security">
+    The threat model: the web backend's token, Docker, secret storage, stdio
+    servers, and the mcpdo daemon.
+  </Card>
+
   <Card title="Recipes" icon="book" href="/docs/2026-07-28/tools/inspector/recipes">
     Importing client configs, reviewing MCP Apps, Docker, and network hosting.
   </Card>
@@ -146,3 +170,4 @@ Everything else (`--catalog`, `--config`, `--server-url`, `--transport`, `--meth
     Broader debugging strategies beyond the Inspector.
   </Card>
 </CardGroup>
+

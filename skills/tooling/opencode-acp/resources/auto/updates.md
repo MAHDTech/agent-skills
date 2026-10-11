@@ -6,7 +6,19 @@
 
 > Updates and announcements about the Agent Client Protocol
 
-This page is for larger ACP announcements and project updates. For lifecycle changes to Requests for Dialog, see [RFD Updates](https://agentclientprotocol.com/rfds/updates).
+This page is for larger ACP announcements and project updates. For lifecycle changes to Requests for Dialog, see [RFD Updates](/rfds/updates).
+
+<Update label="September 17, 2026" tags={["Protocol"]}>
+  ## Tool Call Names are Stabilized
+
+  The Tool Call Name RFD has moved to Completed, and optional programmatic names
+  for tool calls are now stabilized in ACP v1 and the v2 baseline.
+
+  Agents can identify the invoked tool separately from its human-readable title
+  without introducing capability or authorization semantics.
+
+  [Read the full announcement](/announcements/tool-call-name-stabilized).
+</Update>
 
 <Update label="July 22, 2026" tags={["Protocol"]}>
   ## Elicitation is Stabilized
@@ -17,7 +29,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
   Agents can request structured non-sensitive input or direct users to secure
   out-of-band flows, while Clients explicitly advertise the modes they support.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/elicitation-stabilized).
+  [Read the full announcement](/announcements/elicitation-stabilized).
 </Update>
 
 <Update label="July 20, 2026" tags={["Protocol"]}>
@@ -25,7 +37,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   The ACP v2 protocol documentation and schema are now published in Draft form.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/acp-v2-draft).
+  [Read the full announcement](/announcements/acp-v2-draft).
 </Update>
 
 <Update label="July 6, 2026" tags={["Protocol"]}>
@@ -35,7 +47,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Agents can now expose native on/off controls, while v1 clients explicitly opt in through the `session.configOptions.boolean` capability.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/boolean-config-option-stabilized).
+  [Read the full announcement](/announcements/boolean-config-option-stabilized).
 </Update>
 
 <Update label="June 29, 2026" tags={["Protocol"]}>
@@ -45,7 +57,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Either side can now request cancellation of an outstanding JSON-RPC request by ID without relying on method-specific cancellation.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/request-cancellation-stabilized).
+  [Read the full announcement](/announcements/request-cancellation-stabilized).
 </Update>
 
 <Update label="June 25, 2026" tags={["SDKs"]}>
@@ -55,7 +67,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   The releases provide stable foundations for building ACP clients, agents, and protocol adapters in both ecosystems.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/sdk-1-0-releases).
+  [Read the full announcement](/announcements/sdk-1-0-releases).
 </Update>
 
 <Update label="June 24, 2026" tags={["Protocol"]}>
@@ -65,7 +77,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Agents can classify model-related parameters such as context size or speed and quality trade-offs so clients can present them alongside the main model selector.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/model-config-category-stabilized).
+  [Read the full announcement](/announcements/model-config-category-stabilized).
 </Update>
 
 <Update label="June 5, 2026" tags={["Protocol"]}>
@@ -75,7 +87,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Message IDs let clients group streamed chunks into individual messages and detect when a new message begins.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/message-id-stabilized).
+  [Read the full announcement](/announcements/message-id-stabilized).
 </Update>
 
 <Update label="June 5, 2026" tags={["Protocol"]}>
@@ -85,7 +97,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Agents can now report current context-window utilization and optional cumulative session cost so clients can keep usage displays up to date.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-usage-stabilized).
+  [Read the full announcement](/announcements/session-usage-stabilized).
 </Update>
 
 <Update label="June 5, 2026" tags={["Protocol"]}>
@@ -95,7 +107,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives users a standard way to remove sessions from session history while leaving storage and retention policy to the Agent.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-delete-stabilized).
+  [Read the full announcement](/announcements/session-delete-stabilized).
 </Update>
 
 <Update label="June 1, 2026" tags={["Protocol"]}>
@@ -105,7 +117,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Clients can declare absolute additional workspace roots while `cwd` remains the primary working directory.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/additional-directories-stabilized).
+  [Read the full announcement](/announcements/additional-directories-stabilized).
 </Update>
 
 <Update label="May 21, 2026" tags={["Protocol"]}>
@@ -115,7 +127,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives clients a standard way to end an authenticated state and let users authenticate again without restarting the ACP connection.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/logout-method-stabilized).
+  [Read the full announcement](/announcements/logout-method-stabilized).
 </Update>
 
 <Update label="April 23, 2026" tags={["Protocol"]}>
@@ -125,7 +137,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives clients a way to tell agents to cancel in-flight work for a session and free the resources tied to it without tearing down the whole ACP process.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-close-stabilized).
+  [Read the full announcement](/announcements/session-close-stabilized).
 </Update>
 
 <Update label="April 22, 2026" tags={["Protocol"]}>
@@ -135,7 +147,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives clients a way to reconnect to an existing session without replaying conversation history, and lets proxies and adapters build `session/load` semantics on top of the simpler primitive.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-resume-stabilized).
+  [Read the full announcement](/announcements/session-resume-stabilized).
 </Update>
 
 <Update label="April 22, 2026" tags={["Working Groups"]}>
@@ -145,7 +157,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   Anna Zhdan (JetBrains / Core Maintainer) and Alex Hancock (Block / Goose) are leading the effort, with a Draft RFD already underway.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/transports-working-group).
+  [Read the full announcement](/announcements/transports-working-group).
 </Update>
 
 <Update label="March 9, 2026" tags={["Protocol"]}>
@@ -155,7 +167,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   The registry gives ACP clients a standard way to discover, install, and configure compatible agents without inventing custom integration metadata.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/acp-agent-registry-stabilized).
+  [Read the full announcement](/announcements/acp-agent-registry-stabilized).
 </Update>
 
 <Update label="March 9, 2026" tags={["Protocol"]}>
@@ -165,7 +177,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This lets agents push session metadata updates to clients in real time so titles and related metadata stay current without polling.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-info-update-stabilized).
+  [Read the full announcement](/announcements/session-info-update-stabilized).
 </Update>
 
 <Update label="March 9, 2026" tags={["Protocol"]}>
@@ -175,7 +187,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives clients a standard way to discover existing sessions from an agent for features like history, switching, and cleanup.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-list-stabilized).
+  [Read the full announcement](/announcements/session-list-stabilized).
 </Update>
 
 <Update label="February 18, 2026" tags={["Governance"]}>
@@ -185,7 +197,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This reflects the growing collaboration between Zed and JetBrains around ACP and recognizes Sergey’s significant contributions to the protocol.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/sergey-ignatov-lead-maintainer).
+  [Read the full announcement](/announcements/sergey-ignatov-lead-maintainer).
 </Update>
 
 <Update label="February 4, 2026" tags={["Protocol"]}>
@@ -195,7 +207,7 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This gives agents a flexible way to expose session-level configuration such as models, modes, reasoning levels, and other selectors.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/session-config-options-stabilized).
+  [Read the full announcement](/announcements/session-config-options-stabilized).
 </Update>
 
 <Update label="October 24, 2025" tags={["Protocol"]}>
@@ -205,5 +217,8 @@ This page is for larger ACP announcements and project updates. For lifecycle cha
 
   This makes it easier to identify which implementation is running, improve compatibility diagnostics, and understand adoption across the ecosystem.
 
-  [Read the full announcement](https://agentclientprotocol.com/announcements/implementation-information).
+  [Read the full announcement](/announcements/implementation-information).
 </Update>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

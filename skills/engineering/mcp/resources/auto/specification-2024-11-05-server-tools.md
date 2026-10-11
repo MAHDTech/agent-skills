@@ -53,7 +53,7 @@ available tools changes.
 ### Listing Tools
 
 To discover available tools, clients send a `tools/list` request. This operation supports
-[pagination](https://modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination).
+[pagination](/specification/2024-11-05/server/utilities/pagination).
 
 **Request:**
 
@@ -207,7 +207,7 @@ Tool results can contain multiple content items of different types:
 
 #### Embedded Resources
 
-[Resources](https://modelcontextprotocol.io/specification/2024-11-05/server/resources) **MAY** be
+[Resources](/specification/2024-11-05/server/resources) **MAY** be
 embedded, to provide additional context or data, behind a URI that can be subscribed to
 or fetched again by the client later:
 
@@ -282,3 +282,4 @@ Example tool execution error:
    * Validate tool results before passing to LLM
    * Implement timeouts for tool calls
    * Log tool usage for audit purposes
+

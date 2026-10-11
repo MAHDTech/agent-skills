@@ -33,7 +33,7 @@ identifiers are unique to the authorization server that issued them. Clients **M
 separate registration state (client credentials, tokens) per authorization server and
 **MUST NOT** assume that credentials valid for one authorization server will be accepted by
 another. See
-[Authorization Server Binding](https://modelcontextprotocol.io/specification/draft/basic/authorization/client-registration#authorization-server-binding)
+[Authorization Server Binding](/specification/draft/basic/authorization/client-registration#authorization-server-binding)
 for the requirements on associating client credentials with the authorization server that issued them.
 
 ## Protected Resource Metadata Discovery Requirements
@@ -52,7 +52,7 @@ MCP clients **MUST** be able to parse `WWW-Authenticate` headers and respond app
 
 Servers can also include a `scope` parameter in the `WWW-Authenticate` challenge to indicate the
 scopes required for accessing the resource; the scope semantics and the associated client behavior
-are defined in the [Scope Selection Strategy](https://modelcontextprotocol.io/specification/draft/basic/authorization#scope-selection-strategy) section.
+are defined in the [Scope Selection Strategy](/specification/draft/basic/authorization#scope-selection-strategy) section.
 
 ## Authorization Server Metadata Discovery
 
@@ -144,3 +144,4 @@ sequenceDiagram
     M-->>C: MCP response
     Note over C,M: MCP communication continues with valid token
 ```
+

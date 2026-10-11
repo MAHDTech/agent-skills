@@ -12,7 +12,7 @@
 
 This document provides security considerations for the Model Context
 Protocol (MCP), complementing the
-[MCP Authorization](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization)
+[MCP Authorization](/specification/2025-03-26/basic/authorization)
 specification. This document identifies security risks, attack vectors,
 and best practices specific to MCP implementations.
 
@@ -152,7 +152,7 @@ possible:
    consent screen
 6. The MCP authorization code is redirected to the attacker's server
    (specified in the malicious `redirect_uri` parameter during
-   [dynamic client registration](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization#dynamic-client-registration))
+   [dynamic client registration](/specification/2025-03-26/basic/authorization#dynamic-client-registration))
 7. The attacker exchanges the stolen authorization code for access
    tokens for the MCP server without the user's explicit approval
 8. The attacker now has access to the third-party API as the compromised
@@ -288,7 +288,7 @@ downstream API.
 #### Risks
 
 Token passthrough is explicitly forbidden in the
-[authorization specification](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization)
+[authorization specification](/specification/2025-03-26/basic/authorization)
 as it introduces a number of security risks, that include:
 
 * **Security Control Circumvention**
@@ -587,7 +587,7 @@ MCP servers **SHOULD** bind session IDs to user-specific information.
 When storing or transmitting session-related data (e.g., in a queue),
 combine the session ID with information unique to the authorized user,
 such as their internal user ID. Use a key format like
-`<user_id>:<session_id>`. This ensures that even if an attacker guesses
+`\<user_id\>:\<session_id\>`. This ensures that even if an attacker guesses
 a session ID, they cannot impersonate another user as the user ID is
 derived from the user token and not provided by the client.
 
@@ -894,3 +894,4 @@ Client guidance:
 
 Proper minimization constrains compromise impact, improves audit
 clarity, and reduces consent churn.
+

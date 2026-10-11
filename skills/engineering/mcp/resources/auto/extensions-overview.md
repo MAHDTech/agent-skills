@@ -10,7 +10,7 @@
 
 MCP extensions are optional additions to the specification that define capabilities beyond the core protocol. Extensions enable functionality that may be modular (e.g., distinct features like authentication), specialized (e.g., industry-specific logic), or experimental (e.g., features being incubated for potential core inclusion).
 
-Extensions are identified using a unique *extension identifier* with the format: `{vendor-prefix}/{extension-name}`, e.g. `io.modelcontextprotocol/oauth-client-credentials`. Identifiers follow the same rules as [`_meta` keys](https://modelcontextprotocol.io/specification/draft/basic/index#meta), with a mandatory prefix. Official extensions use the `io.modelcontextprotocol` vendor prefix.
+Extensions are identified using a unique *extension identifier* with the format: `{vendor-prefix}/{extension-name}`, e.g. `io.modelcontextprotocol/oauth-client-credentials`. Identifiers follow the same rules as [`_meta` keys](/specification/draft/basic/index#meta), with a mandatory prefix. Official extensions use the `io.modelcontextprotocol` vendor prefix.
 
 \<Tip\>
   If you're building a third-party extension, use a reversed domain name you own as the vendor prefix to avoid collisions (similar to Java package naming). For example, a company owning `example.com` would use `com.example/` as their prefix (e.g., `com.example/my-extension`).
@@ -27,10 +27,10 @@ Official extensions live inside the [Model Context Protocol GitHub organization]
   specification.
 </Card>
 
-| Extension                                                                             | Description                                                                 |
-| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [OAuth Client Credentials](https://modelcontextprotocol.io/extensions/auth/oauth-client-credentials)                 | OAuth 2.0 client credentials flow for machine-to-machine authentication.    |
-| [Enterprise-Managed Authorization](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization) | Framework for enterprise environments requiring centralized access control. |
+| Extension | Description |
+| - | - |
+| [OAuth Client Credentials](/extensions/auth/oauth-client-credentials) | OAuth 2.0 client credentials flow for machine-to-machine authentication. |
+| [Enterprise-Managed Authorization](/extensions/auth/enterprise-managed-authorization) | Framework for enterprise environments requiring centralized access control. |
 
 ### MCP Apps
 
@@ -38,21 +38,34 @@ Official extensions live inside the [Model Context Protocol GitHub organization]
   Extensions for interactive UI elements in conversational MCP clients.
 </Card>
 
-| Extension                             | Description                                                                                                      |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| [MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview) | Allows MCP Servers to display interactive UI elements (charts, forms, video players) inline within conversations |
+| Extension | Description |
+| - | - |
+| [MCP Apps](/extensions/apps/overview) | Allows MCP Servers to display interactive UI elements (charts, forms, video players) inline within conversations |
 
-To get started building MCP Apps, see the [quickstart guide](https://modelcontextprotocol.io/extensions/apps/build#getting-started) or read the full [MCP Apps documentation](https://apps.extensions.modelcontextprotocol.io/api/documents/Quickstart.html).
+To get started building MCP Apps, see the [quickstart guide](/extensions/apps/build#getting-started) or read the full [MCP Apps documentation](https://apps.extensions.modelcontextprotocol.io/api/documents/Quickstart.html).
 
 ### MCP Tasks
 
-| Extension                               | Description                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| [MCP Tasks](https://modelcontextprotocol.io/extensions/tasks/overview) | Asynchronous task execution for long-running operations, with polling, mid-flight input, and durable handles. |
+| Extension | Description |
+| - | - |
+| [MCP Tasks](/extensions/tasks/overview) | Asynchronous task execution for long-running operations, with polling, mid-flight input, and durable handles. |
+
+### Skills over MCP
+
+<Card title="modelcontextprotocol/ext-skills" icon="github" href="https://github.com/modelcontextprotocol/ext-skills">
+  Discover and read Agent Skills from MCP servers.
+</Card>
+
+| Extension | Description |
+| - | - |
+| [Skills over MCP](/extensions/skills/overview) | Discover workflow instructions and read supporting files through MCP resources. |
+
+See the [Skills overview](/extensions/skills/overview) to get started and the
+[client matrix](/extensions/client-matrix) for implementation support.
 
 ## Experimental Extensions
 
-Experimental extensions provide an incubation pathway for [Working Groups and Interest Groups](https://modelcontextprotocol.io/community/working-interest-groups) to prototype ideas and collaborate on extension concepts before formal SEP submission.
+Experimental extensions provide an incubation pathway for [Working Groups and Interest Groups](/community/working-interest-groups) to prototype ideas and collaborate on extension concepts before formal SEP submission.
 
 Experimental extension repositories live within the MCP GitHub organization with the `experimental-ext-` prefix (e.g., `experimental-ext-interceptors`).
 
@@ -60,7 +73,7 @@ Experimental extension repositories live within the MCP GitHub organization with
 
 * Every experimental extension needs to be associated with a Working Group or Interest Group
 * Repositories and published packages need to clearly indicate their experimental status (e.g., in the README and package name)
-* [Core Maintainers](https://modelcontextprotocol.io/community/contributor-ladder#core-maintainer) retain oversight of experimental extension repositories, including the ability to archive or remove them
+* [Core Maintainers](/community/contributor-ladder#core-maintainer) retain oversight of experimental extension repositories, including the ability to archive or remove them
 
 ### Graduation to Official Status
 
@@ -68,11 +81,11 @@ To promote an experimental extension to official status, it goes through the sta
 
 ## Creating Extensions
 
-The lifecycle for official extensions follows a SEP-based process. For full details, see [SEP-2133: Extensions](https://modelcontextprotocol.io/seps/2133-extensions).
+The lifecycle for official extensions follows a SEP-based process. For full details, see [SEP-2133: Extensions](/seps/2133-extensions).
 
-1. **Propose**: Create a SEP in the main MCP repository using the [standard SEP guidelines](https://modelcontextprotocol.io/community/sep-guidelines) with type **Extensions Track**.
+1. **Propose**: Create a SEP in the main MCP repository using the [standard SEP guidelines](/community/sep-guidelines) with type **Extensions Track**.
 2. **Implement**: Build at least one reference implementation in an official SDK — this is required before the SEP can be reviewed.
-3. **Review**: [Core Maintainers](https://modelcontextprotocol.io/community/contributor-ladder#core-maintainer) review the SEP and have final authority over inclusion.
+3. **Review**: [Core Maintainers](/community/contributor-ladder#core-maintainer) review the SEP and have final authority over inclusion.
 4. **Publish**: Once approved, open a PR to add the extension to the extension repository.
 5. **Adopt**: After that, other clients, servers, and SDKs can implement the extension too.
 
@@ -174,3 +187,4 @@ Each extension specifies the schema of its settings object; an empty object indi
 If one side supports an extension but the other doesn't, the supporting side needs to either fall back to core protocol behavior or reject the request with an appropriate error if the extension is mandatory.
 
 It's a good practice to document expected fallback behavior in your extension. For example, a server offering UI-enhanced tools should still return meaningful text content for clients that don't support the UI extension. On the other hand, a server that requires a specific authentication extension can reject connections from clients that don't support it.
+

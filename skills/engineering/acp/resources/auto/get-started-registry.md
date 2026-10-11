@@ -20,7 +20,7 @@
 
 The ACP Registry is an easy way for developers to distribute their ACP-compatible agents to any client that speaks the protocol.
 
-This is a curated set of agents, including only the ones that [support authentication](https://agentclientprotocol.com/protocol/v1/authentication).
+This is a curated set of agents, including only the ones that [support authentication](/protocol/v1/authentication).
 
 Visit [the registry repository on GitHub](https://github.com/agentclientprotocol/registry) to learn more about it.
 
@@ -57,7 +57,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP wrapper for Amp - the frontier coding agent
 
-    **0.9.0**, <a href="https://github.com/tao12345666333/amp-acp"><Icon icon="github" /></a>
+    **0.10.0**, <a href="https://github.com/tao12345666333/amp-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -123,7 +123,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP wrapper for Anthropic's Claude
 
-    **0.73.0**, <a href="https://github.com/agentclientprotocol/claude-agent-acp"><Icon icon="github" /></a>
+    **0.89.1**, <a href="https://github.com/agentclientprotocol/claude-agent-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -140,7 +140,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Autonomous coding agent CLI - capable of creating/editing files, running commands, using the browser, and more
 
-    **3.0.60**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
+    **3.0.70**, <a href="https://github.com/cline/cline"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -156,7 +156,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Tencent Cloud's official intelligent coding tool
 
-    **2.143.0**
+    **2.164.0**
   </Card>
 
   <Card
@@ -170,7 +170,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP adapter for OpenAI's coding assistant
 
-    **1.8.0**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
+    **2.2.2**, <a href="https://github.com/agentclientprotocol/codex-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -239,7 +239,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Cursor's coding agent
 
-    **2026.08.31**
+    **2026.10.01**
   </Card>
 
   <Card
@@ -270,7 +270,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Devin CLI coding agent by Cognition
 
-    **3000.6.7**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
+    **3000.11.3**, <a href="https://github.com/CognitionAI/devin-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -284,7 +284,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A coding agent that puts leading models at your command.
 
-    **0.3.26**
+    **0.5.16**
   </Card>
 
   <Card
@@ -301,7 +301,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.5.2**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.5.19**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -313,7 +313,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Factory Droid - AI coding agent powered by Factory AI
 
-    **0.209.1**
+    **0.238.0**
   </Card>
 
   <Card
@@ -631,7 +631,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google's official CLI for Gemini
 
-    **0.58.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
+    **0.63.0**, <a href="https://github.com/google-gemini/gemini-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -647,7 +647,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     GitHub's AI pair programmer
 
-    **1.0.82**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
+    **1.0.95**, <a href="https://github.com/github/copilot-cli"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -659,7 +659,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP agent powered by Zhipu AI's GLM Coding Plan models (glm-5.1, glm-5-turbo, glm-4.7, glm-4.5-air). Supports streaming, tool calls, mid-session model switching, image input via Z.AI Coding Plan Vision MCP, and session load/fork/resume with on-disk persistence.
 
-    **1.8.0**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
+    **1.14.0**, <a href="https://github.com/stefandevo/glm-acp-agent"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -673,7 +673,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Google’s AI coding agent
 
-    **1.0.0**
+    **1.3.0**
   </Card>
 
   <Card
@@ -687,7 +687,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     A local, extensible, open source AI agent that automates engineering tasks
 
-    **1.48.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
+    **1.54.0**, <a href="https://github.com/block/goose"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -701,7 +701,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     xAI's coding agent and CLI
 
-    **1.0.17**
+    **1.0.51**
   </Card>
 
   <Card
@@ -715,7 +715,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.125**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.163**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -731,7 +731,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     AI Coding Agent by JetBrains
 
-    **3032.4.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
+    **3579.5.0**, <a href="https://github.com/JetBrains/junie-acp-release"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -745,7 +745,21 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **7.5.6**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+    **7.8.8**, <a href="https://github.com/Kilo-Org/kilocode"><Icon icon="github" /></a>
+  </Card>
+
+  <Card
+    title="Kimchi"
+    href="https://kimchi.dev"
+    icon={
+  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+    <path fill="currentColor" d="M3 1h2.5v5.5L9 1h3L8.5 6.5 12.5 13H9.5L6 8v5H3V1z"/>
+  </svg>
+}
+  >
+    Coding agent powered by multi-model orchestration
+
+    **1.9.1**, <a href="https://github.com/getkimchi/kimchi"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -759,7 +773,21 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Moonshot AI's coding assistant
 
-    **1.50.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
+    **1.52.0**, <a href="https://github.com/MoonshotAI/kimi-cli"><Icon icon="github" /></a>
+  </Card>
+
+  <Card
+    title="MiniMax Code"
+    href="https://agent.minimax.io"
+    icon={
+  <svg width="20" height="20" className="agent-icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+    <path fill="currentColor" d="M2 3h3l3 5 3-5h3v10h-2V6.5l-4 6-4-6V13H2V3Z"/>
+  </svg>
+}
+  >
+    MiniMax Code is an AI coding agent with Agent Client Protocol support.
+
+    **0.2.7**
   </Card>
 
   <Card
@@ -812,7 +840,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Mistral's open-source coding assistant
 
-    **2.24.1**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
+    **2.26.1**, <a href="https://github.com/mistralai/mistral-vibe"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -833,7 +861,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Nova by Compass AI - a fully-fledged software engineer at your command
 
-    **1.1.37**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
+    **1.1.51**, <a href="https://github.com/Compass-Agentic-Platform/nova"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -847,7 +875,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     The open source coding agent
 
-    **1.18.25**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
+    **1.18.35**, <a href="https://github.com/anomalyco/opencode"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -862,7 +890,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     ACP adapter for pi coding agent
 
-    **0.0.33**, <a href="https://github.com/svkozak/pi-acp"><Icon icon="github" /></a>
+    **0.0.34**, <a href="https://github.com/svkozak/pi-acp"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -902,7 +930,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Alibaba's Qwen coding assistant
 
-    **0.22.3**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
+    **0.25.0**, <a href="https://github.com/QwenLM/qwen-code"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -1010,7 +1038,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Local-first coding agent. Runs entirely on your machine with optional on-device LLM inference via Onde.
 
-    **1.5.2**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
+    **1.6.6**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -1064,3 +1092,6 @@ To add your agent to the registry:
 5. Submit a pull request
 
 See the [contributing guide](https://github.com/agentclientprotocol/registry/blob/main/CONTRIBUTING.md) for details.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

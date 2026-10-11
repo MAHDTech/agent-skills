@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 2484                                                                            |
-| **Title**     | Require Conformance Tests for Standards Track SEPs to Reach Final Status        |
-| **Status**    | Final                                                                           |
-| **Type**      | Process                                                                         |
-| **Created**   | 2026-03-27                                                                      |
-| **Author(s)** | Paul Carleton ([@pcarleton](https://github.com/pcarleton))                      |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#2484](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2484) |
+| Field | Value |
+| - | - |
+| **SEP** | 2484 |
+| **Title** | Require Conformance Tests for Standards Track SEPs to Reach Final Status |
+| **Status** | Final |
+| **Type** | Process |
+| **Created** | 2026-03-27 |
+| **Author(s)** | Paul Carleton ([@pcarleton](https://github.com/pcarleton)) |
+| **Sponsor** | None |
+| **PR** | [#2484](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2484) |
 
 ***
 
@@ -191,7 +191,7 @@ The conformance repository already demonstrates the scenario-tagging pattern thi
 * [`ServerSSEPollingScenario`](https://github.com/modelcontextprotocol/conformance/blob/main/src/scenarios/server/sse-polling.ts) — SEP-1699
 * [`ElicitationEnumsScenario`](https://github.com/modelcontextprotocol/conformance/blob/main/src/scenarios/server/elicitation-enums.ts) — SEP-1330
 
-The structured traceability file format and the scenario scaffolding tool (`npx @modelcontextprotocol/conformance new-scenario --sep <number>`) will be added to the conformance repository before this SEP reaches `Final`.
+The structured traceability file format and the scenario scaffolding tool (`npx @modelcontextprotocol/conformance new-scenario --sep \<number\>`) will be added to the conformance repository before this SEP reaches `Final`.
 
 The process change is implemented by updating `docs/community/sep-guidelines.mdx` to add the conformance check to the `Accepted → Final` transition (see the accompanying changes in this PR).
 
@@ -205,3 +205,4 @@ Before this SEP itself can be marked `Final`, the following conformance-reposito
 * `MAINTAINERS.md` published and the repository listed in MCP governance documentation
 
 These are this SEP's own reference implementation checklist, not ongoing process requirements.
+

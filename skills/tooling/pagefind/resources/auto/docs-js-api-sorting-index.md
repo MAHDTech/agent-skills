@@ -10,7 +10,7 @@ Pagefind's JavaScript API supports sorting your content when searching. Doing so
 
 ## Sorting as part of a search
 
-If pages on your site have been tagged with [sort attributes](https://pagefind.app/docs/sorts/), a `sort` object can be provided to Pagefind when searching:
+If pages on your site have been tagged with [sort attributes](/docs/sorts/), a `sort` object can be provided to Pagefind when searching:
 
 ```js
 const search = await pagefind.search("static", {
@@ -21,3 +21,4 @@ const search = await pagefind.search("static", {
 ```
 
 This object should contain one key, matching a `data-pagefind-sort` attribute, and specify either `asc` for ascending or `desc` for descending sort order.
+

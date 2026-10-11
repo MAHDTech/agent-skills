@@ -10,7 +10,11 @@ The Agent Client Protocol provides built-in extension mechanisms that allow impl
 
 ## The `_meta` Field
 
-All types in the protocol include a `_meta` field with type `{ [key: string]: unknown }` that implementations can use to attach custom information. This includes requests, responses, notifications, and even nested types like content blocks, tool calls, plan entries, and capability objects.
+Object types that define a `_meta` field can use it to attach custom information
+with type `{ [key: string]: unknown }`. This includes many requests, responses,
+notifications, and nested types such as content blocks, tool calls, plan
+entries, and capability objects. Not every protocol type defines `_meta`; for
+example, the `Error` object does not.
 
 ```json theme={null}
 {
@@ -135,3 +139,6 @@ Implementations **SHOULD** use the `_meta` field in capability objects to advert
 ```
 
 This allows implementations to negotiate custom features during initialization without breaking compatibility with standard Clients and Agents.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

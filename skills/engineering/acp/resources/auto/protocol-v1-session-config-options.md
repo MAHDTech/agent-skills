@@ -8,16 +8,16 @@
 
 Agents can provide an arbitrary list of configuration options for a session, allowing Clients to offer users customizable selectors for things like models, modes, reasoning levels, and more.
 
-\<Info\>
+<Info>
   Session Config Options are the preferred way to expose session-level
   configuration. If an Agent provides `configOptions`, Clients **SHOULD** use
-  them instead of the [`modes`](https://agentclientprotocol.com/protocol/v1/session-modes) field. Modes will be
+  them instead of the [`modes`](/protocol/v1/session-modes) field. Modes will be
   removed in a future version of the protocol.
 </Info>
 
 ## Initial State
 
-During [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup) the Agent **MAY** return a list of configuration options and their current values:
+During [Session Setup](/protocol/v1/session-setup) the Agent **MAY** return a list of configuration options and their current values:
 
 ```json theme={null}
 {
@@ -106,9 +106,10 @@ During [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup
   ID. For `boolean` options this is a boolean.
 </ResponseField>
 
-<ResponseField name="options" type="ConfigOptionValue[]">
+<ResponseField name="options" type="ConfigOptionValue[] | ConfigOptionGroup[]">
   The available values for a `select` option. Required when `type` is `"select"`
-  and omitted when `type` is `"boolean"`.
+  and omitted when `type` is `"boolean"`. This is either a flat array of values
+  or an array of groups; values and groups are not mixed in the same array.
 </ResponseField>
 
 ### ConfigOptionValue
@@ -124,6 +125,34 @@ During [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup
 <ResponseField name="description" type="string">
   Optional description of what this value does
 </ResponseField>
+
+### Grouped Select Options
+
+Select values may be organized into groups:
+
+```json theme={null}
+{
+  "options": [
+    {
+      "group": "recommended",
+      "name": "Recommended",
+      "options": [
+        {
+          "value": "model-1",
+          "name": "Model 1",
+          "description": "Fast for everyday tasks"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Each `ConfigOptionGroup` requires `group` (its unique string identifier),
+`name` (its human-readable label), and `options` (an array of
+`ConfigOptionValue` objects). A group may also include `_meta`. Each
+option still requires `value` and `name`; its `description` and `_meta` fields
+are optional.
 
 ### Boolean Config Options
 
@@ -173,12 +202,12 @@ Each config option **MAY** include a `category` field. Categories are semantic m
 
 Category names beginning with `_` are free for custom use (e.g., `_my_custom_category`). Category names that do not begin with `_` are reserved for the ACP spec.
 
-| Category        | Description                                                              |
-| --------------- | ------------------------------------------------------------------------ |
-| `mode`          | Session mode selector                                                    |
-| `model`         | Model selector                                                           |
-| `model_config`  | Model-related parameter, such as context size or speed/quality trade-off |
-| `thought_level` | Thought/reasoning level selector                                         |
+| Category | Description |
+| - | - |
+| `mode` | Session mode selector |
+| `model` | Model selector |
+| `model_config` | Model-related parameter, such as context size or speed/quality trade-off |
+| `thought_level` | Thought/reasoning level selector |
 
 Clients **SHOULD** render `model_config` options near the `model` selector, such as in the same popover or panel. No capability negotiation is required for category values.
 
@@ -330,7 +359,7 @@ This notification also contains the complete configuration state. Common reasons
 
 ## Relationship to Session Modes
 
-Session Config Options supersede the older [Session Modes](https://agentclientprotocol.com/protocol/v1/session-modes) API. However, during the transition period, Agents that provide mode-like configuration **SHOULD** send both:
+Session Config Options supersede the older [Session Modes](/protocol/v1/session-modes) API. However, during the transition period, Agents that provide mode-like configuration **SHOULD** send both:
 
 * `configOptions` with a `category: "mode"` option for Clients that support config options
 * `modes` for Clients that only support the older API
@@ -344,3 +373,6 @@ If an Agent provides both `configOptions` and `modes` in the session response:
 <Card icon="gears" horizontal href="/protocol/v1/session-modes">
   Learn about the Session Modes API
 </Card>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

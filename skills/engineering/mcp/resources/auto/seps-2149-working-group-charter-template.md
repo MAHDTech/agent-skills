@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                                                                        |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **SEP**       | 2149                                                                                                                         |
-| **Title**     | MCP Group Governance and Charter Template                                                                                    |
-| **Status**    | Final                                                                                                                        |
-| **Type**      | Process                                                                                                                      |
-| **Created**   | 2025-01-15                                                                                                                   |
+| Field | Value |
+| - | - |
+| **SEP** | 2149 |
+| **Title** | MCP Group Governance and Charter Template |
+| **Status** | Final |
+| **Type** | Process |
+| **Created** | 2025-01-15 |
 | **Author(s)** | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant)), Sarah Novotny ([@sarahnovotny](https://github.com/sarahnovotny)) |
-| **Sponsor**   | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant))                                                                   |
-| **PR**        | [#2149](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2149)                                              |
+| **Sponsor** | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant)) |
+| **PR** | [#2149](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2149) |
 
 ***
 
@@ -41,7 +41,7 @@
 
 This SEP establishes governance rules and a standardized charter template for MCP's two collaborative group types: **Working Groups (WGs)** and **Interest Groups (IGs)**. Working Groups produce concrete deliverables — SEPs, implementations, and code. Interest Groups facilitate discussion and knowledge-sharing to identify problems and gather requirements. The governance rules define the requirements that all groups must follow, with lighter expectations for IGs where appropriate. The charter template defines the structure each group uses to document its specific mission, scope, leadership, and work. Together they address community feedback about unclear authority delegation and inconsistent processes across groups.
 
-This SEP is a companion to [SEP-2148: MCP Contributor Ladder](seps-2148-contributor-ladder.md), which defines the org-wide contributor roles (Member, Maintainer, Core Maintainer, Lead Maintainer) referenced throughout this document. Group leadership roles intersect with the contributor ladder: WG Leads and IG Facilitators must hold at least Member status on the ladder, and group participation is a recognized pathway to ladder advancement.
+This SEP is a companion to [SEP-2148: MCP Contributor Ladder](./2148-contributor-ladder.md), which defines the org-wide contributor roles (Member, Maintainer, Core Maintainer, Lead Maintainer) referenced throughout this document. Group leadership roles intersect with the contributor ladder: WG Leads and IG Facilitators must hold at least Member status on the ladder, and group participation is a recognized pathway to ladder advancement.
 
 ## Motivation
 
@@ -85,7 +85,7 @@ Each group has one or more **Leads** (referred to as **Facilitators** for Intere
 
 **Requirements for all Leads and Facilitators:**
 
-* Hold at least Member status on the [MCP Contributor Ladder](seps-2148-contributor-ladder.md)
+* Hold at least Member status on the [MCP Contributor Ladder](./2148-contributor-ladder.md)
 * Demonstrated sustained engagement with the group's scope area
 * Ability to facilitate across organizational boundaries
 * Commitment to running the group's operations
@@ -117,14 +117,14 @@ Each group has one or more **Leads** (referred to as **Facilitators** for Intere
 
 #### 1.3 Participation Levels
 
-All groups use the following participation tiers. Note that **WG Member** is a group-specific participation level distinct from the org-wide **Member** role defined in the [Contributor Ladder](seps-2148-contributor-ladder.md) — an individual may be a WG Member in a specific group without holding org-wide Member status, and vice versa.
+All groups use the following participation tiers. Note that **WG Member** is a group-specific participation level distinct from the org-wide **Member** role defined in the [Contributor Ladder](./2148-contributor-ladder.md) — an individual may be a WG Member in a specific group without holding org-wide Member status, and vice versa.
 
-| Level                | Description                                       | Privileges                                                         |
-| -------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| **Observer**         | Anyone interested in following the group's work   | Read access, may attend meetings, limited discussion participation |
-| **Participant**      | Active contributor to group discussions           | Can propose agenda items, participate in async votes               |
-| **WG Member**        | Sustained contributor with demonstrated expertise | Counted for quorum (WGs only)                                      |
-| **Lead/Facilitator** | Operational leadership of the group               | Sets agenda, facilitates, escalates                                |
+| Level | Description | Privileges |
+| - | - | - |
+| **Observer** | Anyone interested in following the group's work | Read access, may attend meetings, limited discussion participation |
+| **Participant** | Active contributor to group discussions | Can propose agenda items, participate in async votes |
+| **WG Member** | Sustained contributor with demonstrated expertise | Counted for quorum (WGs only) |
+| **Lead/Facilitator** | Operational leadership of the group | Sets agenda, facilitates, escalates |
 
 Interest Groups primarily operate with Observers, Participants, and Facilitators. IGs may adopt the WG Member tier if their work warrants formal decision-making, but are not required to.
 
@@ -211,10 +211,10 @@ Leads should actively involve WG Members and Participants in operational duties 
 
 All groups use the following channels:
 
-| Channel                              | Purpose                        | Response Expectation |
-| ------------------------------------ | ------------------------------ | -------------------- |
-| Discord `#{name}-wg` or `#{name}-ig` | Quick questions, coordination  | Best effort          |
-| GitHub Discussions                   | Long-form technical discussion | Weekly triage        |
+| Channel | Purpose | Response Expectation |
+| - | - | - |
+| Discord `#{name}-wg` or `#{name}-ig` | Quick questions, coordination | Best effort |
+| GitHub Discussions | Long-form technical discussion | Weekly triage |
 
 In addition to Discord, groups can establish a discussion category in the [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/). Leads will be granted the appropriate roles to manage and moderate discussions.
 
@@ -265,7 +265,7 @@ Changes to a group's charter (WG or IG) require:
 
 ### Part 2: Charter Template
 
-Every MCP Working Group and Interest Group must maintain a charter document following this template structure. Charters are stored as MDX files at `docs/community/\<group-name\>/charter.mdx` in the modelcontextprotocol repository and added to the `docs/docs.json` file. A copyable version of this template is published at [`docs/community/charter-template.mdx`](https://modelcontextprotocol.io/community/charter-template).
+Every MCP Working Group and Interest Group must maintain a charter document following this template structure. Charters are stored as MDX files at `docs/community/<group-name>/charter.mdx` in the modelcontextprotocol repository and added to the `docs/docs.json` file. A copyable version of this template is published at [`docs/community/charter-template.mdx`](/community/charter-template).
 
 The charter captures information specific to each group. Governance rules from Part 1 apply automatically and do not need to be repeated in the charter. Sections marked **(WG only)** are required for Working Groups but optional for Interest Groups.
 
@@ -324,16 +324,16 @@ Each WG must explicitly define its decision authority. The decision-making proce
 
 *Example:*
 
-| Decision Type                       | Authority Level                                        |
-| ----------------------------------- | ------------------------------------------------------ |
-| Meeting logistics & scheduling      | WG Leads (autonomous)                                  |
-| Proposal prioritization within WG   | WG Leads (autonomous)                                  |
-| SEP triage & closure (in scope)     | WG Leads (autonomous, with documented rationale)       |
-| Technical design within scope       | WG consensus                                           |
-| Spec changes (additive)             | WG consensus → Core Maintainer approval                |
+| Decision Type | Authority Level |
+| - | - |
+| Meeting logistics & scheduling | WG Leads (autonomous) |
+| Proposal prioritization within WG | WG Leads (autonomous) |
+| SEP triage & closure (in scope) | WG Leads (autonomous, with documented rationale) |
+| Technical design within scope | WG consensus |
+| Spec changes (additive) | WG consensus → Core Maintainer approval |
 | Spec changes (breaking/fundamental) | WG consensus → Core Maintainer approval + wider review |
-| Scope expansion                     | Core Maintainer approval required                      |
-| WG Member approval                  | WG Member sponsors                                     |
+| Scope expansion | Core Maintainer approval required |
+| WG Member approval | WG Member sponsors |
 
 IGs do not make binding decisions and do not need this section.
 
@@ -348,18 +348,18 @@ Document the group's current meeting approach. Meeting requirements and communic
 
 *Example:*
 
-| Meeting         | Frequency       | Duration | Purpose                               |
-| --------------- | --------------- | -------- | ------------------------------------- |
-| Working Session | Weekly/Biweekly | 60 min   | Technical discussion, proposal review |
-| Office Hours    | Monthly         | 30 min   | Open Q\&A for newcomers and observers |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
+| Working Session | Weekly/Biweekly | 60 min | Technical discussion, proposal review |
+| Office Hours | Monthly | 30 min | Open Q\&A for newcomers and observers |
 
 #### 8. Deliverables & Success Metrics (WG only)
 
 **Active Work Items:**
 
-| Item          | Status                | Target Date | Champion |
-| ------------- | --------------------- | ----------- | -------- |
-| SEP-XXX: Name | Draft/Review/Approved | Date        | Name     |
+| Item | Status | Target Date | Champion |
+| - | - | - | - |
+| SEP-XXX: Name | Draft/Review/Approved | Date | Name |
 
 **Success Criteria:** Measurable outcomes for WG success.
 
@@ -443,3 +443,4 @@ This SEP is implemented by:
 2. `docs/community/charter-template.mdx` — copyable charter template (Part 2) linked from the above
 3. Both pages added to `docs/docs.json` under the Community → Governance navigation group
 4. Existing WGs and IGs must create conforming charters at `docs/community/\<name\>/charter.mdx` within 8 weeks of acceptance
+

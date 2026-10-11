@@ -6,6 +6,14 @@
 
 > Community managed libraries for the Agent Client Protocol
 
+## Cangjie
+
+* [acp-cj](https://atomgit.com/ystyle/acp-cj)
+
+## C++
+
+* [acp-cpp](https://github.com/dunkbing/acp-cpp)
+
 ## Crystal
 
 * [acp.cr](https://github.com/hahwul/acp.cr)
@@ -34,6 +42,9 @@
 * [acp-go](https://github.com/ironpark/acp-go)
 * [acp](https://github.com/eino-contrib/acp)
 * [acp-sdk](https://github.com/spachava753/acp-sdk)
+* [acp](https://github.com/Tangerg/acp)
+* [acp-go-sdk](https://github.com/caelis-labs/acp-go-sdk)
+* [acp-go](https://github.com/BrokkAi/acp-go)
 
 ## React
 
@@ -52,3 +63,6 @@
 ## Vala
 
 * [Agent Client Protocol Vala SDK](https://gitcode.com/ai-outputs/AgentClientProtocol)
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

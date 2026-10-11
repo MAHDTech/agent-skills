@@ -30,7 +30,7 @@ model.
 ## Capabilities
 
 Servers that support prompts **MUST** declare the `prompts` capability during
-[initialization](https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#initialization):
+[initialization](/specification/2025-06-18/basic/lifecycle#initialization):
 
 ```json theme={null}
 {
@@ -50,7 +50,7 @@ available prompts changes.
 ### Listing Prompts
 
 To retrieve available prompts, clients send a `prompts/list` request. This operation
-supports [pagination](https://modelcontextprotocol.io/specification/2025-06-18/server/utilities/pagination).
+supports [pagination](/specification/2025-06-18/server/utilities/pagination).
 
 **Request:**
 
@@ -94,7 +94,7 @@ supports [pagination](https://modelcontextprotocol.io/specification/2025-06-18/s
 ### Getting a Prompt
 
 To retrieve a specific prompt, clients send a `prompts/get` request. Arguments may be
-auto-completed through [the completion API](https://modelcontextprotocol.io/specification/2025-06-18/server/utilities/completion).
+auto-completed through [the completion API](/specification/2025-06-18/server/utilities/completion).
 
 **Request:**
 
@@ -188,7 +188,7 @@ Messages in a prompt can contain:
 
 \<Note\>
   All content types in prompt messages support optional
-  [annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations) for
+  [annotations](/specification/2025-06-18/server/resources#annotations) for
   metadata about audience, priority, and modification times.
 </Note>
 
@@ -278,3 +278,4 @@ Servers **SHOULD** return standard JSON-RPC errors for common failure cases:
 
 Implementations **MUST** carefully validate all prompt inputs and outputs to prevent
 injection attacks or unauthorized access to resources.
+

@@ -197,3 +197,6 @@ removed and moved to a separate proposal.
   `name`.
 * 2026-02-27: Updated the proposal to reflect the implementation.
 * 2026-01-14: Incorporated Core Maintainer feedback.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.
