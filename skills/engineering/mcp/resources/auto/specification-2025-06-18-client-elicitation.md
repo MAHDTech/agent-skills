@@ -40,7 +40,7 @@ model.
 ## Capabilities
 
 Clients that support elicitation **MUST** declare the `elicitation` capability during
-[initialization](https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#initialization):
+[initialization](/specification/2025-06-18/basic/lifecycle#initialization):
 
 ```json theme={null}
 {
@@ -323,3 +323,4 @@ Servers should handle each state appropriately:
 5. Clients **SHOULD** allow users to decline elicitation requests at any time
 6. Clients **SHOULD** implement rate limiting
 7. Clients **SHOULD** present elicitation requests in a way that makes it clear what information is being requested and why
+

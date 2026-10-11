@@ -53,6 +53,9 @@ impl SkillLinter {
         Self::check_em_dashes(&skill.raw, &skill.path, &mut report);
         self.check_links(skill, &mut report);
         Self::check_code_blocks(skill, &mut report);
+        Self::check_headings(skill, &mut report);
+        Self::check_frontmatter_slop(skill, &mut report);
+        Self::check_content_slop(skill, &mut report);
 
         if self.check_resources
             && let Some(parent) = skill.path.parent()
@@ -830,6 +833,206 @@ impl SkillLinter {
                     .build(),
             );
         }
+    }
+
+    fn check_headings(skill: &Skill, report: &mut LintReport) {
+        let mut in_frontmatter = false;
+        let stripped = Self::strip_code_blocks(&skill.raw);
+
+        for (line_num, line) in (1..).zip(stripped.split('\n')) {
+            let trimmed = line.trim();
+
+            if line_num == 1 && trimmed == "---" {
+                in_frontmatter = true;
+                continue;
+            }
+
+            if in_frontmatter {
+                if trimmed == "---" {
+                    in_frontmatter = false;
+                }
+                continue;
+            }
+
+            if trimmed.starts_with('#') && (trimmed.contains("**") || trimmed.contains("__")) {
+                report.add(
+                    LintIssue::builder()
+                        .file(skill.path.clone())
+                        .line(Some(line_num))
+                        .rule("heading-formatting")
+                        .message(
+                            "Heading contains bold markup ('**' or '__'). Headings must use plain text sentence case without bold formatting."
+                        )
+                        .severity(LintSeverity::Error)
+                        .build(),
+                );
+            }
+        }
+    }
+
+    fn check_frontmatter_slop(skill: &Skill, report: &mut LintReport) {
+        let desc = skill.frontmatter.description.trim();
+        if desc.is_empty() {
+            return;
+        }
+
+        const FORBIDDEN_PREFIXES: &[&str] = &[
+            "this skill provides",
+            "expert guidance",
+            "expert reference",
+            "comprehensive guide",
+            "a comprehensive",
+        ];
+
+        for &prefix in FORBIDDEN_PREFIXES {
+            if Self::starts_with_case_insensitive(desc, prefix) {
+                report.add(
+                    LintIssue::builder()
+                        .file(skill.path.clone())
+                        .rule("frontmatter-slop")
+                        .message(format!(
+                            "Skill description contains AI slop/puffery opener '{prefix}'. Lead directly with an imperative capability verb phrase (e.g. 'Build...', 'Audit...', 'Manage...')."
+                        ))
+                        .severity(LintSeverity::Error)
+                        .build(),
+                );
+                return;
+            }
+        }
+
+        const FORBIDDEN_WORDS: &[&str] = &[
+            "comprehensive",
+            "delve",
+            "seamlessly",
+            "furthermore",
+            "utilize",
+            "utilizes",
+            "utilized",
+        ];
+
+        for &word in FORBIDDEN_WORDS {
+            if Self::contains_word(desc, word) {
+                report.add(
+                    LintIssue::builder()
+                        .file(skill.path.clone())
+                        .rule("frontmatter-slop")
+                        .message(format!(
+                            "Skill description contains AI slop word '{word}'. Use direct, plain language without corporate or AI puffery."
+                        ))
+                        .severity(LintSeverity::Error)
+                        .build(),
+                );
+            }
+        }
+    }
+
+    fn check_content_slop(skill: &Skill, report: &mut LintReport) {
+        if skill.tree != SkillTree::Live
+            || skill.name() == "unslop"
+            || skill.name() == "skill-creator"
+        {
+            return;
+        }
+
+        const FORBIDDEN_WORDS: &[&str] = &[
+            "seamlessly",
+            "furthermore",
+            "utilize",
+            "utilizes",
+            "utilized",
+            "delve",
+            "delves",
+            "delving",
+        ];
+
+        const FORBIDDEN_PHRASES: &[&str] =
+            &["testament to", "pivotal moment", "evolving landscape"];
+
+        let mut in_frontmatter = false;
+        let stripped = Self::strip_code_blocks(&skill.raw);
+
+        for (line_num, line) in (1..).zip(stripped.split('\n')) {
+            let trimmed = line.trim();
+
+            if line_num == 1 && trimmed == "---" {
+                in_frontmatter = true;
+                continue;
+            }
+
+            if in_frontmatter {
+                if trimmed == "---" {
+                    in_frontmatter = false;
+                }
+                continue;
+            }
+
+            for &word in FORBIDDEN_WORDS {
+                if Self::contains_word(trimmed, word) {
+                    report.add(
+                        LintIssue::builder()
+                            .file(skill.path.clone())
+                            .line(Some(line_num))
+                            .rule("no-slop-content")
+                            .message(format!(
+                                "Line contains AI slop word '{word}'. Replace with plain, direct operational instructions."
+                            ))
+                            .severity(LintSeverity::Error)
+                            .build(),
+                    );
+                }
+            }
+
+            for &phrase in FORBIDDEN_PHRASES {
+                if trimmed.to_ascii_lowercase().contains(phrase) {
+                    report.add(
+                        LintIssue::builder()
+                            .file(skill.path.clone())
+                            .line(Some(line_num))
+                            .rule("no-slop-content")
+                            .message(format!(
+                                "Line contains AI slop phrase '{phrase}'. Replace with plain, direct operational instructions."
+                            ))
+                            .severity(LintSeverity::Error)
+                            .build(),
+                    );
+                }
+            }
+        }
+    }
+
+    fn starts_with_case_insensitive(text: &str, prefix: &str) -> bool {
+        text.trim()
+            .to_ascii_lowercase()
+            .starts_with(&prefix.to_ascii_lowercase())
+    }
+
+    fn contains_word(text: &str, word: &str) -> bool {
+        let lower_text = text.to_ascii_lowercase();
+        let lower_word = word.to_ascii_lowercase();
+        let word_len = lower_word.len();
+
+        let mut start = 0;
+        while let Some(pos) = lower_text[start..].find(&lower_word) {
+            let abs_pos = start + pos;
+            let before_ok = lower_text[..abs_pos]
+                .chars()
+                .next_back()
+                .map_or(true, |c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
+
+            let after_pos = abs_pos + word_len;
+            let after_ok = lower_text[after_pos..]
+                .chars()
+                .next()
+                .map_or(true, |c| !c.is_ascii_alphanumeric() && c != '_' && c != '-');
+
+            if before_ok && after_ok {
+                return true;
+            }
+
+            start = abs_pos + word_len;
+        }
+
+        false
     }
 
     fn strip_code_blocks(content: &str) -> String {

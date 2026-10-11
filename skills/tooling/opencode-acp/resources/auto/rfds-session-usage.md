@@ -13,7 +13,7 @@
 
 Add a standardized `usage_update` session notification that lets agents report the current context window utilization and optional cumulative session cost.
 
-This RFD is intentionally scoped to session-level context size and cost. End-turn token accounting is covered separately in the [End-Turn Token Usage RFD](https://agentclientprotocol.com/rfds/end-turn-token-usage).
+This RFD is intentionally scoped to session-level context size and cost. End-turn token accounting is covered separately in the [End-Turn Token Usage RFD](/rfds/end-turn-token-usage).
 
 ## Status quo
 
@@ -151,7 +151,7 @@ This approach provides flexibility for different agent implementations:
 4. Document the `session/update` notification variant in the protocol docs.
 5. Add examples showing when agents should send context window and cost updates.
 
-This RFD does not add end-turn token usage to the turn-completion signal. That proposal remains in draft in the [End-Turn Token Usage RFD](https://agentclientprotocol.com/rfds/end-turn-token-usage).
+This RFD does not add end-turn token usage to the turn-completion signal. That proposal remains in draft in the [End-Turn Token Usage RFD](/rfds/end-turn-token-usage).
 
 ## Frequently asked questions
 
@@ -171,12 +171,12 @@ The `usage_update` notification provides the raw values clients need:
 
 **Recommended client behavior:**
 
-| Percentage | Action                                                           |
-| ---------- | ---------------------------------------------------------------- |
-| \< 75%     | Normal operation                                                 |
-| 75-90%     | Yellow indicator, suggest "Context filling up"                   |
-| 90-95%     | Orange indicator, recommend "Start new session or summarize"     |
-| > 95%      | Red indicator, warn "Next prompt may fail - handoff recommended" |
+| Percentage | Action |
+| - | - |
+| \< 75% | Normal operation |
+| 75-90% | Yellow indicator, suggest "Context filling up" |
+| 90-95% | Orange indicator, recommend "Start new session or summarize" |
+| > 95% | Red indicator, warn "Next prompt may fail - handoff recommended" |
 
 ### Why is cost in `session/update` instead of the turn-completion signal?
 
@@ -248,3 +248,6 @@ For agents that only provide usage during active prompting, the client UI may no
 * 2026-06-02: Split end-turn token accounting into a separate draft RFD.
 * 2026-06-03: Moved to Preview.
 * 2026-06-05: Moved to Completed.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

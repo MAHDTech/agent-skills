@@ -68,7 +68,7 @@ The receiver **MAY** then send progress notifications containing:
    * Send notifications at whatever frequency they deem appropriate
    * Omit the total value if unknown
 
-3. For [task-augmented requests](specification-2025-11-25-basic-utilities-tasks.md), the `progressToken` provided in the original request **MUST** continue to be used for progress notifications throughout the task's lifetime, even after the `CreateTaskResult` has been returned. The progress token remains valid and associated with the task until the task reaches a terminal status.
+3. For [task-augmented requests](./tasks), the `progressToken` provided in the original request **MUST** continue to be used for progress notifications throughout the task's lifetime, even after the `CreateTaskResult` has been returned. The progress token remains valid and associated with the task until the task reaches a terminal status.
    * Progress notifications for tasks **MUST** use the same `progressToken` that was provided in the initial task-augmented request
    * Progress notifications for tasks **MUST** stop after the task reaches a terminal status (`completed`, `failed`, or `cancelled`)
 
@@ -94,3 +94,4 @@ sequenceDiagram
 * Senders and receivers **SHOULD** track active progress tokens
 * Both parties **SHOULD** implement rate limiting to prevent flooding
 * Progress notifications **MUST** stop after completion
+

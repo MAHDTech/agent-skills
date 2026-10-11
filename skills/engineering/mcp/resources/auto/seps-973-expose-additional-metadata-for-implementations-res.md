@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                         |
-| ------------- | ----------------------------------------------------------------------------- |
-| **SEP**       | 973                                                                           |
-| **Title**     | Expose additional metadata for Implementations, Resources, Tools and Prompts  |
-| **Status**    | Final                                                                         |
-| **Type**      | Standards Track                                                               |
-| **Created**   | 2025-07-15                                                                    |
-| **Author(s)** | [@jesselumarie](https://github.com/jesselumarie)                              |
-| **Sponsor**   | None                                                                          |
-| **PR**        | [#973](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/973) |
+| Field | Value |
+| - | - |
+| **SEP** | 973 |
+| **Title** | Expose additional metadata for Implementations, Resources, Tools and Prompts |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-15 |
+| **Author(s)** | [@jesselumarie](https://github.com/jesselumarie) |
+| **Sponsor** | None |
+| **PR** | [#973](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/973) |
 
 ***
 
@@ -151,3 +151,4 @@ Both icons and websiteUrl are optional fields; clients that ignore them will fal
 ## Security Implications
 
 This shouldn't introduce any new security implications.
+

@@ -1,13 +1,13 @@
 ---
 name: antigravity
-description: Provides a comprehensive guide, quick reference, and sitemap for Google Antigravity (AGY), including the Antigravity CLI (agy), Antigravity 2.0, Antigravity IDE, Python SDK, slash commands, keybindings, and customizations (skills, rules, MCP, sidecars). Activate this skill when the user asks questions about how to use, configure, or customize Antigravity, AGY, the agy CLI, the Antigravity IDE, or Antigravity 2.0.
+description: Guide, quick reference, and sitemap for Google Antigravity (AGY), including the Antigravity CLI (agy), Antigravity 2.0, Antigravity IDE, Python SDK, slash commands, keybindings, and customizations (skills, rules, MCP, sidecars). Activate this skill when the user asks questions about how to use, configure, or customize Antigravity, AGY, the agy CLI, the Antigravity IDE, or Antigravity 2.0.
 resources:
   - https://antigravity.google/llms.txt
 ---
 
 # Google Antigravity Documentation
 
-This skill provides a local knowledge repository of the official Google Antigravity developer documentation. Always read these files directly to obtain accurate specifications, rules, and commands instead of relying on model pretraining memory.
+Local reference documentation for official Google Antigravity developer guides. Always read these files directly to obtain accurate specifications, rules, and commands instead of relying on model pretraining memory.
 
 ## Role & Purpose
 

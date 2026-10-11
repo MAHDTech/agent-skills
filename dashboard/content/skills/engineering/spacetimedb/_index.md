@@ -1,6 +1,6 @@
 +++
 title = "spacetimedb"
-description = "Expert guidance for developing, publishing, and debugging SpacetimeDB database modules (in Rust, C#, TypeScript, C++) and connecting real-time clients. Use when asked to write SpacetimeDB table schemas, reducers, views, schedule/event tables, or when using the spacetime CLI, generating client SDK bindings, or implementing WebSocket subscriptions."
+description = "Develop, publish, and debug SpacetimeDB database modules (in Rust, C#, TypeScript, C++) and connect real-time clients. Use when asked to write SpacetimeDB table schemas, reducers, views, schedule/event tables, or when using the spacetime CLI, generating client SDK bindings, or implementing WebSocket subscriptions."
 sort_by = "title"
 template = "skill.html"
 [extra]

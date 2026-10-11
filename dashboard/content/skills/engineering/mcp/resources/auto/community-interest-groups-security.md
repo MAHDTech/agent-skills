@@ -22,7 +22,7 @@ skill_name = "mcp"
 ## Mission Statement
 
 The Security Interest Group catalogs MCP-specific threats, reviews security-relevant proposals, and
-scopes validated problems into focused Working Groups or [SEPs](https://modelcontextprotocol.io/community/sep-guidelines).
+scopes validated problems into focused Working Groups or [SEPs](/community/sep-guidelines).
 
 ## Scope
 
@@ -46,7 +46,7 @@ scopes validated problems into focused Working Groups or [SEPs](https://modelcon
   area for stdio and other non-HTTP transports where the HTTP authorization specification does not
   apply
 * **Security Best Practices documentation**: authoring and reviewing entries in the
-  [Security Best Practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices) guidance, including
+  [Security Best Practices](/docs/tutorials/security/security_best_practices) guidance, including
   liaising with external bodies such as OWASP GenAI and CoSAI on MCP-specific content
 * **Vulnerability disclosure routing**: providing a known point of contact for reporters who have
   filed a private security advisory against an MCP repository and need help reaching the right
@@ -55,61 +55,61 @@ scopes validated problems into focused Working Groups or [SEPs](https://modelcon
 ### Out of Scope
 
 * **Authorization protocol mechanics**: OAuth flows, scopes, client registration, and token handling
-  belong to the [Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth) and its spawned Working Groups
+  belong to the [Authorization IG](/community/interest-groups/auth) and its spawned Working Groups
 * **Transport wire security**: TLS, mTLS, and certificate handling belong to the Transports WG
 * **Tool annotation design**: the annotation model itself belongs to the
-  [Tool Annotations IG](https://modelcontextprotocol.io/community/interest-groups/tool-annotations). This group provides security
+  [Tool Annotations IG](/community/interest-groups/tool-annotations). This group provides security
   requirements as input
 * **Registry service operation**: running and securing the hosted Registry service belongs to the
-  [Registry WG](https://modelcontextprotocol.io/community/working-groups/registry). This group provides threat input on provenance and
+  [Registry WG](/community/working-groups/registry). This group provides threat input on provenance and
   publishing
 * **Product-specific hardening guides**: step-by-step configuration for individual host applications
   or cloud platforms is documentation for those products rather than protocol work
 * **Competitively sensitive or non-public business information**, per the
-  [MCP Antitrust Policy](https://modelcontextprotocol.io/community/antitrust)
+  [MCP Antitrust Policy](/community/antitrust)
 
 ### Related Groups
 
-* **[Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth)**: token confusion, audience mismatch, and SSRF in
+* **[Authorization IG](/community/interest-groups/auth)**: token confusion, audience mismatch, and SSRF in
   metadata discovery sit at the boundary between the two groups
-* **[Tool Annotations IG](https://modelcontextprotocol.io/community/interest-groups/tool-annotations)**: trust and sensitivity annotations
+* **[Tool Annotations IG](/community/interest-groups/tool-annotations)**: trust and sensitivity annotations
   ([SEP-1913](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1913)) span both
   groups
-* **[Interceptors WG](https://modelcontextprotocol.io/community/working-groups/interceptors)**: interceptors are the primary enforcement
+* **[Interceptors WG](/community/working-groups/interceptors)**: interceptors are the primary enforcement
   point for runtime security decisions surfaced here
-* **[Server Card WG](https://modelcontextprotocol.io/community/working-groups/server-card) / [Registry WG](https://modelcontextprotocol.io/community/working-groups/registry)**:
+* **[Server Card WG](/community/working-groups/server-card) / [Registry WG](/community/working-groups/registry)**:
   server identity, provenance, and discovery metadata intersect with admission and supply-chain
   concerns
-* **[Transports WG](https://modelcontextprotocol.io/community/working-groups/transports)**: stdio process isolation and unauthenticated method surface
+* **[Transports WG](/community/working-groups/transports)**: stdio process isolation and unauthenticated method surface
 * **SDK Maintainers**: coordinated handling of SDK security advisories and cross-SDK security
   defaults
 
 ## Leadership
 
-| Role        | Name           | Organization | GitHub                                     | Term    |
-| ----------- | -------------- | ------------ | ------------------------------------------ | ------- |
-| Facilitator | Den Delimarsky | Anthropic    | [@localden](https://github.com/localden)   | Initial |
-| Facilitator | Paul Carleton  | Anthropic    | [@pcarleton](https://github.com/pcarleton) | Initial |
+| Role | Name | Organization | GitHub | Term |
+| - | - | - | - | - |
+| Facilitator | Den Delimarsky | Anthropic | [@localden](https://github.com/localden) | Initial |
+| Facilitator | Paul Carleton | Anthropic | [@pcarleton](https://github.com/pcarleton) | Initial |
 
 ## Membership
 
-| Name                     | Organization | GitHub                                               | Discord          | Level       |
-| ------------------------ | ------------ | ---------------------------------------------------- | ---------------- | ----------- |
-| Sam Morrow               | GitHub       | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | `sammorrowdrums` | Participant |
-| Ola Hungerford           | Nordstrom    | [@olaservo](https://github.com/olaservo)             | `olaservo`       | Participant |
-| Peder Holdgaard Pedersen | Saxo Bank    | [@PederHP](https://github.com/PederHP)               | `pederhp`        | Participant |
-| Stefano Ortolani         | Broadcom     | [@ostefano](https://github.com/ostefano)             | `ostefano.`      | Participant |
+| Name | Organization | GitHub | Discord | Level |
+| - | - | - | - | - |
+| Sam Morrow | GitHub | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | `sammorrowdrums` | Participant |
+| Ola Hungerford | Nordstrom | [@olaservo](https://github.com/olaservo) | `olaservo` | Participant |
+| Peder Holdgaard Pedersen | Saxo Bank | [@PederHP](https://github.com/PederHP) | `pederhp` | Participant |
+| Stefano Ortolani | Broadcom | [@ostefano](https://github.com/ostefano) | `ostefano.` | Participant |
 
 Open to anyone. Join the `#security-ig` channel on the
-[MCP Contributors Discord](https://modelcontextprotocol.io/community/communication#discord). Calls are open and active
+[MCP Contributors Discord](/community/communication#discord). Calls are open and active
 participation is highly encouraged. The group is looking for contributors who will engage with
 proposals and help drive work forward rather than observe.
 
 ## Operations
 
-| Meeting      | Frequency     | Duration | Purpose                                                                 |
-| ------------ | ------------- | -------- | ----------------------------------------------------------------------- |
-| Office Hours | Every 2 weeks | 45 min   | Threat review, proposal triage, deployment reports, WG-proposal scoping |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
+| Office Hours | Every 2 weeks | 45 min | Threat review, proposal triage, deployment reports, WG-proposal scoping |
 
 An agenda is shared in `#security-ig` ahead of each call.
 
@@ -124,17 +124,19 @@ category in GitHub Discussions.
 The following items form the IG's current discussion agenda. This list is not exhaustive and will
 evolve as the group identifies new areas of interest.
 
-| Item                                                                               | Name                                                                                                                        | Status      | Champion                                                 |
-| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------- |
-| [SEP-2809](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2809) | Attested Tool-Server Admission (ATSA)                                                                                       | Draft       | [@metereconsulting](https://github.com/metereconsulting) |
-| —                                                                                  | SDK vulnerability disclosure                                                                                                | In progress | Facilitators                                             |
-| —                                                                                  | Runtime drift: `list_changed` semantics after approval                                                                      | Open        | —                                                        |
-| —                                                                                  | Supply-chain integrity: protocol, registry, or companion standard                                                           | Open        | —                                                        |
-| —                                                                                  | Tool identity across servers                                                                                                | Open        | —                                                        |
-| —                                                                                  | Capability declarations: hints or contracts (joint with [Tool Annotations IG](https://modelcontextprotocol.io/community/interest-groups/tool-annotations)) | Open        | —                                                        |
+| Item | Name | Status | Champion |
+| - | - | - | - |
+| [SEP-2809](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2809) | Attested Tool-Server Admission (ATSA) | Draft | [@metereconsulting](https://github.com/metereconsulting) |
+| — | SDK vulnerability disclosure | In progress | Facilitators |
+| — | Runtime drift: `list_changed` semantics after approval | Open | — |
+| — | Supply-chain integrity: protocol, registry, or companion standard | Open | — |
+| — | Tool identity across servers | Open | — |
+| — | Capability declarations: hints or contracts (joint with [Tool Annotations IG](/community/interest-groups/tool-annotations)) | Open | — |
 
 ## Changelog
 
-| Date       | Change          |
-| ---------- | --------------- |
+| Date | Change |
+| - | - |
 | 2026-06-13 | Initial charter |
+
+

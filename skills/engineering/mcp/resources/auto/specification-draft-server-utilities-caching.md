@@ -23,7 +23,7 @@ the following operations:
 * `resources/read`
 
 Interim results with `resultType: "input_required"` (see
-[multi round-trip requests](https://modelcontextprotocol.io/specification/draft/basic/patterns/mrtr)) are not cacheable
+[multi round-trip requests](/specification/draft/basic/patterns/mrtr)) are not cacheable
 and carry no caching hints.
 
 ## Cache Key
@@ -34,7 +34,7 @@ parameters that affect the result (for example, the `uri` for `resources/read`, 
 a request whose method or parameters differ from the request that produced it.
 
 Results produced by retrying a request through the
-[multi round-trip requests](https://modelcontextprotocol.io/specification/draft/basic/patterns/mrtr) mechanism—that
+[multi round-trip requests](/specification/draft/basic/patterns/mrtr) mechanism—that
 is, requests carrying `inputResponses` or `requestState`—**MUST NOT** be cached,
 as they depend on inputs that are not part of the cache key.
 
@@ -97,9 +97,9 @@ issues, server downtime).
 The `cacheScope` field controls who may cache a response, analogous to HTTP
 `Cache-Control: public` vs `Cache-Control: private`.
 
-| Value       | Meaning                                                                                                                                                                                                                                                                           |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `"public"`  | The response does not contain user-specific data. Any client, shared gateway, or caching proxy **MAY** store and serve the cached response to any user.                                                                                                                           |
+| Value | Meaning |
+| - | - |
+| `"public"` | The response does not contain user-specific data. Any client, shared gateway, or caching proxy **MAY** store and serve the cached response to any user. |
 | `"private"` | The response contains private data that is not meant to be shared between callers. Cached responses **MAY** be reused for the same authorization context. Caches **MUST NOT** be shared across authorization contexts (e.g. a different access token requires a different cache). |
 
 #### Choosing a Cache Scope
@@ -148,7 +148,7 @@ sequenceDiagram
 
 ## Interaction with Pagination
 
-When a list result is [paginated](https://modelcontextprotocol.io/specification/draft/server/utilities/pagination), each
+When a list result is [paginated](/specification/draft/server/utilities/pagination), each
 page is an independently cacheable response—consistent with how HTTP
 `Cache-Control` treats paginated resources.
 
@@ -179,3 +179,4 @@ Server implementors:
 * should ensure that the `cacheScope` correctly reflects the intended visibility of the primitive.
 * MUST apply appropriate per-primitive access controls, and MUST NOT rely on
   `cacheScope` alone to prevent unauthorized access to primitives.
+

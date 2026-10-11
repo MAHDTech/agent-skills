@@ -31,3 +31,4 @@ The documentation is organized into key sections:
 
 - [Tauri GitHub repository](https://github.com/tauri-apps/tauri): source code and issue tracker for the Tauri framework
 - [Awesome Tauri](https://github.com/tauri-apps/awesome-tauri): list of community plugins, templates, and resources
+

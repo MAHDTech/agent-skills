@@ -17,11 +17,11 @@ A reference set of MCP development skills is available as the
 [`mcp-server-dev` plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/mcp-server-dev).
 It provides three composing skills:
 
-| Skill              | Purpose                                                                                                                 |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Skill | Purpose |
+| - | - |
 | `build-mcp-server` | Entry point. Interrogates the use case, picks a deployment model and tool-design pattern, routes to specialized skills. |
-| `build-mcp-app`    | Adds interactive UI widgets (forms, pickers, dashboards) rendered inline in chat.                                       |
-| `build-mcpb`       | Packages a local stdio server with its runtime so users can install it without Node or Python.                          |
+| `build-mcp-app` | Adds interactive UI widgets (forms, pickers, dashboards) rendered inline in chat. |
+| `build-mcpb` | Packages a local stdio server with its runtime so users can install it without Node or Python. |
 
 Each skill ships a `SKILL.md` file plus a `references/` folder of supporting
 material (auth flows, tool-design patterns, widget templates, manifest schemas)
@@ -61,13 +61,13 @@ recommendation.
 Based on discovery, the skill recommends one of four paths and scaffolds
 accordingly:
 
-**Remote [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http)**
+**Remote [Streamable HTTP](/specification/2025-03-26/basic/transports#streamable-http)**
 is the default for anything wrapping a cloud API. Zero install friction, one
 deployment serves all users, and OAuth flows work properly because the server
 can handle redirects and token storage. The reference skill includes scaffolds
 for Cloudflare Workers and portable Express/FastMCP setups.
 
-**[MCP apps](https://modelcontextprotocol.io/extensions/apps/overview)** extend a server with interactive
+**[MCP apps](/extensions/apps/overview)** extend a server with interactive
 widgets rendered in chat, such as searchable pickers, charts, and live
 dashboards. The skill hands off to `build-mcp-app` when plain text output
 doesn't fit.
@@ -78,7 +78,7 @@ can install it without setting up Node or Python. Use this path when the server
 must touch the user's machine: reading local files, driving desktop apps, or
 talking to localhost services. The skill hands off to `build-mcpb`.
 
-**Local [stdio](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#stdio)** remains available
+**Local [stdio](/specification/2025-03-26/basic/transports#stdio)** remains available
 for prototyping, with a noted upgrade path to MCPB when you're ready to
 distribute.
 
@@ -100,3 +100,4 @@ handling, then test and ship:
     Make your server discoverable in the MCP Registry
   </Card>
 </CardGroup>
+

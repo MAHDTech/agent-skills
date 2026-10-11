@@ -55,7 +55,7 @@ available tools changes.
 ### Listing Tools
 
 To discover available tools, clients send a `tools/list` request. This operation supports
-[pagination](https://modelcontextprotocol.io/specification/2025-06-18/server/utilities/pagination).
+[pagination](/specification/2025-06-18/server/utilities/pagination).
 
 **Request:**
 
@@ -202,7 +202,7 @@ Tool results may contain [**structured**](#structured-content) or **unstructured
 \<Note\>
   All content types (text, image, audio, resource links, and embedded resources)
   support optional
-  [annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations) that
+  [annotations](/specification/2025-06-18/server/resources#annotations) that
   provide metadata about audience, priority, and modification times. This is the
   same annotation format used by resources and prompts.
 </Note>
@@ -222,12 +222,11 @@ Tool results may contain [**structured**](#structured-content) or **unstructured
 {
   "type": "image",
   "data": "base64-encoded-data",
-  "mimeType": "image/png"
+  "mimeType": "image/png",
   "annotations": {
     "audience": ["user"],
     "priority": 0.9
   }
-
 }
 ```
 
@@ -245,7 +244,7 @@ This example demonstrates the use of an optional Annotation.
 
 #### Resource Links
 
-A tool **MAY** return links to [Resources](https://modelcontextprotocol.io/specification/2025-06-18/server/resources), to provide additional context
+A tool **MAY** return links to [Resources](/specification/2025-06-18/server/resources), to provide additional context
 or data. In this case, the tool will return a URI that can be subscribed to or fetched by the client:
 
 ```json theme={null}
@@ -262,17 +261,17 @@ or data. In this case, the tool will return a URI that can be subscribed to or f
 }
 ```
 
-Resource links support the same [Resource annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations) as regular resources to help clients understand how to use them.
+Resource links support the same [Resource annotations](/specification/2025-06-18/server/resources#annotations) as regular resources to help clients understand how to use them.
 
-\<Info\>
+<Info>
   Resource links returned by tools are not guaranteed to appear in the results
   of a `resources/list` request.
 </Info>
 
 #### Embedded Resources
 
-[Resources](https://modelcontextprotocol.io/specification/2025-06-18/server/resources) **MAY** be embedded to provide additional context
-or data using a suitable [URI scheme](specification-2025-06-18-server-resources.md#common-uri-schemes). Servers that use embedded resources **SHOULD** implement the `resources` capability:
+[Resources](/specification/2025-06-18/server/resources) **MAY** be embedded to provide additional context
+or data using a suitable [URI scheme](./resources#common-uri-schemes). Servers that use embedded resources **SHOULD** implement the `resources` capability:
 
 ```json theme={null}
 {
@@ -290,7 +289,7 @@ or data using a suitable [URI scheme](specification-2025-06-18-server-resources.
 }
 ```
 
-Embedded resources support the same [Resource annotations](https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations) as regular resources to help clients understand how to use them.
+Embedded resources support the same [Resource annotations](/specification/2025-06-18/server/resources#annotations) as regular resources to help clients understand how to use them.
 
 #### Structured Content
 
@@ -438,3 +437,4 @@ Example tool execution error:
    * Validate tool results before passing to LLM
    * Implement timeouts for tool calls
    * Log tool usage for audit purposes
+

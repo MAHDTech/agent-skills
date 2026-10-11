@@ -15,9 +15,9 @@ skill_name = "acp"
 
 > Creating and resuming sessions
 
-Sessions represent a specific conversation or thread between the [Client](https://agentclientprotocol.com/protocol/v2/overview#client) and [Agent](https://agentclientprotocol.com/protocol/v2/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
+Sessions represent a specific conversation or thread between the [Client](/protocol/v2/overview#client) and [Agent](/protocol/v2/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
 
-Before creating a session, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v2/initialization) phase to establish protocol compatibility and capabilities.
+Before creating a session, Clients **MUST** first complete the [initialization](/protocol/v2/initialization) phase to establish protocol compatibility and capabilities.
 
 <br />
 
@@ -90,6 +90,39 @@ The Agent **MUST** respond with a unique [Session ID](#session-id) that identifi
 }
 ```
 
+## Initial Session State
+
+Agents **MAY** include initial [configuration options](/protocol/v2/session-config-options) in `configOptions` and [available slash commands](/protocol/v2/slash-commands) in `availableCommands` in both `session/new` and `session/resume` responses. For example, a new session can return both:
+
+```json theme={null}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "sessionId": "sess_abc123def456",
+    "configOptions": [
+      {
+        "configId": "brave_mode",
+        "name": "Brave Mode",
+        "description": "Skip confirmation prompts and act autonomously",
+        "type": "boolean",
+        "currentValue": false
+      }
+    ],
+    "availableCommands": [
+      {
+        "name": "test",
+        "description": "Run tests for the current project"
+      }
+    ]
+  }
+}
+```
+
+`availableCommands` is optional. Omission or `[]` means no initial commands are advertised, and empty lists are omitted when serializing setup responses. Agents **MUST NOT** send `null` for this field. Tolerant receivers treat `null` or a malformed non-array value like omission and skip invalid command items within an array.
+
+Returning commands in the response avoids requiring command notifications before the `session/new` response. Agents can still advertise commands later or update the list through `available_commands_update` notifications. Each notification replaces the complete command list, including `[]` to clear it.
+
 ## Resuming Sessions
 
 Agents that support the `session` method surface **MUST** support
@@ -136,7 +169,7 @@ To request full history replay, Clients set `replayFrom` to
 `{ "type": "start" }`:
 
 Replay cursors are inclusive: replay includes the position identified by the
-cursor. For `{ "type": "start" }`, that means replaying the whole conversation.
+cursor. For `{ "type": "start" }`, that means replaying all retained conversation history.
 
 ```json theme={null}
 {
@@ -153,10 +186,24 @@ cursor. For `{ "type": "start" }`, that means replaying the whole conversation.
 }
 ```
 
-When `replayFrom.type` is `"start"`, the Agent **MUST** replay the entire
-conversation to the Client in the form of `session/update` notifications before
+When `replayFrom.type` is `"start"`, the Agent **MUST** replay all retained
+conversation history to the Client in the form of `session/update` notifications before
 responding. User, agent, and thought messages can each be replayed as message
 updates with full `content` arrays or as chunks.
+
+Agents are not required to persist every inserted user message or retain it for
+any minimum period. Live-only messages, including locally handled commands, may
+be absent from replay. A successful prompt response confirms insertion, not
+future availability in history; absence from replay does not contradict it.
+
+[Session compactions](/protocol/v2/prompt-lifecycle#session-compaction)
+are replayed using the same update, chunk, and patch semantics as live delivery.
+No Client capability is required.
+
+Live-only [notices](/protocol/v2/prompt-lifecycle#session-notices) are not
+conversation history and **SHOULD NOT** be replayed. If the underlying condition
+is still relevant after resuming finishes, the Agent may emit a new notice as a
+new live event.
 
 For example, a user message from the conversation history:
 
@@ -202,10 +249,22 @@ Followed by the agent's response:
 }
 ```
 
-During replay, the Agent **MUST** include an opaque, unique `messageId` for each
-replayed message. `user_message`, `agent_message`, and `agent_thought` updates
+During replay, the Agent **MUST** include an opaque `messageId` for each
+replayed message, unique among messages of the same
+[type](/protocol/v2/prompt-lifecycle#entity-ids). A retained user message
+inserted by `session/prompt` **MUST** use the ID returned in that prompt
+response, including after reconnecting or restarting the Agent. Replaying a command reports its message; it does not
+execute the command again.
+
+`user_message`, `agent_message`, and `agent_thought` updates
 are upserts keyed by `messageId`; their `content` arrays replace the whole
 message content, while chunk updates with the same `messageId` append content.
+
+When replay reconstructs a message from its beginning using chunks, the Agent
+**MUST** first send the corresponding message update (`user_message`,
+`agent_message`, or `agent_thought`) with the same ID and `content: []`.
+This clears any content the Client already holds before replayed chunks append.
+A full-content message update can instead replace the retained content directly.
 
 Clients apply replayed message updates and chunks in the order they are
 received. If a message update with `content` arrives after chunks for the same
@@ -225,8 +284,9 @@ When all requested replay entries have been reported to the Client, the Agent
 }
 ```
 
-The response **MAY** also include initial session configuration state when that
-feature is supported by the Agent.
+The response **MAY** also include `configOptions` and `availableCommands` as
+described in [Initial Session State](#initial-session-state), whether or not
+history replay was requested.
 
 ## Closing Active Sessions
 
@@ -251,7 +311,7 @@ To close an active session, Clients **MUST** call the `session/close` method wit
   The ID of the active session to close.
 </ParamField>
 
-The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation) had been called, then free the resources associated with the session.
+The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](/protocol/v2/prompt-lifecycle#cancellation) had been called, then free the resources associated with the session.
 
 On success, the Agent responds with an empty result object:
 
@@ -450,6 +510,11 @@ Before using stdio or HTTP transports, Clients **MUST** verify the Agent's capab
           "http": {}
         }
       }
+    },
+    "info": {
+      "name": "my-agent",
+      "title": "My Agent",
+      "version": "1.0.0"
     }
   }
 }
@@ -462,3 +527,6 @@ Supplying `{}` means the Agent supports the corresponding transport.
 Agents **SHOULD** connect to all MCP servers specified by the Client.
 
 Clients **MAY** use this ability to provide tools directly to the underlying language model by including their own MCP server.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

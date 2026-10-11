@@ -17,8 +17,11 @@ skill_name = "acp"
 
 **Published:** June 25, 2026
 
-The [Rust SDK based on SACP RFD](https://agentclientprotocol.com/rfds/rust-sdk-v1) has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
+The [Rust SDK based on SACP RFD](/rfds/rust-sdk-v1) has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
 
 The Rust SDK's component-based architecture provides explicit message ordering and composable handlers for clients, agents, and protocol adapters. The matching TypeScript milestone demonstrates that the SDK design goals apply across language ecosystems.
 
 The releases are available as [`agent-client-protocol` v1.0.0](https://crates.io/crates/agent-client-protocol/1.0.0) and [`@agentclientprotocol/sdk` v1.0.0](https://www.npmjs.com/package/@agentclientprotocol/sdk/v/1.0.0).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

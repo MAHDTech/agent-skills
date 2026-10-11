@@ -4,7 +4,7 @@
 
 Previously, the developer tooling was split into two top-level entrypoints: `bin/skills` and `bin/dashboard`.
 Maintaining separate scripts causes CLI fragmentation, duplicated argument parsing logic, and disjointed developer workflows.
-Furthermore, developers lack an interactive inspection interface to quickly search, view, lint, and manage skills in the terminal without remembering complex CLI flags.
+Developers also lack an interactive inspection interface to quickly search, view, lint, and manage skills in the terminal without remembering complex CLI flags.
 
 ## Decision
 

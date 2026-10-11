@@ -12,7 +12,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-modal-trigger\>
+# <pagefind-modal-trigger>
 
 
 A button that opens the associated modal.
@@ -70,3 +70,5 @@ Supported syntax:
 - **Case-insensitive:** Keys are normalized to lowercase
 
 The shortcut display auto-detects the platform to show the correct modifier key (⌘ on Mac, Ctrl on other platforms).
+
+

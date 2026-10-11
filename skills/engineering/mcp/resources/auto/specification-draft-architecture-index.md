@@ -121,7 +121,7 @@ The Model Context Protocol uses a capability-based negotiation system where clie
 servers declare their supported features on each request. Clients include their
 capabilities in `_meta.io.modelcontextprotocol/clientCapabilities` on every request.
 Servers advertise their capabilities in response to
-[`server/discover`](https://modelcontextprotocol.io/specification/draft/server/discover), which clients may call before
+[`server/discover`](/specification/draft/server/discover), which clients may call before
 any other request for up-front capability discovery.
 
 * Servers declare capabilities like tool support, resource subscriptions, and prompt
@@ -165,12 +165,13 @@ sequenceDiagram
 
 Each capability unlocks specific protocol features on a per-request basis. For example:
 
-* Implemented [server features](https://modelcontextprotocol.io/specification/draft/server) must be advertised in the
+* Implemented [server features](/specification/draft/server) must be advertised in the
   server's capabilities
 * Receiving resource update notifications requires opening a
-  [`subscriptions/listen`](https://modelcontextprotocol.io/specification/draft/basic/patterns/subscriptions) stream
+  [`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions) stream
   with the desired resource URIs
-* [Tool](https://modelcontextprotocol.io/specification/draft/server/tools) invocation requires the server to declare tool capabilities
+* [Tool](/specification/draft/server/tools) invocation requires the server to declare tool capabilities
 
 This capability negotiation ensures clients and servers have a clear understanding of
 supported functionality while maintaining protocol extensibility.
+

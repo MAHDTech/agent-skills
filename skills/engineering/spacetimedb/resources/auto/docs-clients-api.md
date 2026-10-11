@@ -1,183 +1,103 @@
-Version: 2.0.0
-
-On this page
-
-The SpacetimeDB client SDKs provide a comprehensive API for interacting
-with your [database](https://spacetimedb.com/docs/databases). After [generating client
-bindings](https://spacetimedb.com/docs/clients/codegen) and [establishing a
-connection](https://spacetimedb.com/docs/clients/connection), you can query data, invoke server
-functions, and observe real-time changes.
-
-This page describes the core concepts and patterns that apply across all
-client SDKs. For language-specific details and complete API
-documentation, see the reference pages for [Rust](https://spacetimedb.com/docs/clients/rust),
-[C#](https://spacetimedb.com/docs/clients/c-sharp), [TypeScript](https://spacetimedb.com/docs/clients/typescript), or
-[Unreal Engine](https://spacetimedb.com/docs/clients/unreal).
-
-## Prerequisites
-
-Before using the SDK API, you must:
-
-1.  [Generate client bindings](https://spacetimedb.com/docs/clients/codegen) using
-    `spacetime generate`
-2.  [Create a connection](https://spacetimedb.com/docs/clients/connection) to your database
-
-## Subscriptions
-
-Subscriptions replicate a subset of the database to your client,
-maintaining a local cache that automatically updates as the server state
-changes. Clients should subscribe to the data they need, then query the
-local cache.
-
-Typical flow:
-
-1.  Create a subscription with the SDK builder API
-2.  Wait for `onApplied`/`OnApplied` to know initial rows are present
-3.  Read from the local cache and register callbacks
-4.  Unsubscribe when the data is no longer needed
-
-For lifecycle guarantees and semantics, see
-[Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) and [Subscription
-Semantics](https://spacetimedb.com/docs/clients/subscriptions/semantics).
-
-### Example
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-import { tables } from './module_bindings';
-
-const handle = conn
-  .subscriptionBuilder()
-  .onApplied(ctx => {
-    console.log(`Ready with ${ctx.db.user.count()} users`);
-  })
-  .onError((ctx, error) => {
-    console.error(`Subscription failed: ${error}`);
-  })
-  .subscribe([tables.user.where(r => r.online.eq(true))]);
-```
-
-``` codeBlockStandalone_LlrK
-var handle = conn
-    .SubscriptionBuilder()
-    .OnApplied(ctx =>
-    {
-        Console.WriteLine($"Ready with {ctx.Db.User.Count} users");
-    })
-    .OnError((ctx, error) =>
-    {
-        Console.WriteLine($"Subscription failed: {error}");
-    })
-    .AddQuery(q => q.From.User())
-    .Subscribe();
-```
-
-``` codeBlockStandalone_LlrK
-let handle = conn
-    .subscription_builder()
-    .on_applied(|ctx| {
-        println!("Ready with {} users", ctx.db().user().count());
-    })
-    .on_error(|_ctx, error| {
-        eprintln!("Subscription failed: {}", error);
-    })
-    .add_query(|q| q.from.user())
-    .subscribe();
-```
-
-``` codeBlockStandalone_LlrK
-TArray<FString> Queries = { TEXT("SELECT * FROM user") };
-
-USubscriptionHandle* Handle = Conn->SubscriptionBuilder()
-    ->OnApplied(AppliedDelegate)
-    ->OnError(ErrorDelegate)
-    ->Subscribe(Queries);
-```
-
-## Querying the Local Cache
-
-After a subscription is applied, reads are local and do not require
-network round-trips.
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-const userCount = conn.db.user.count();
-const user = conn.db.user.name.find('Alice');
-```
-
-``` codeBlockStandalone_LlrK
-var userCount = conn.Db.User.Count;
-var user = conn.Db.User.Name.Find("Alice");
-```
-
-``` codeBlockStandalone_LlrK
-let user_count = conn.db().user().count();
-let user = conn.db().user().name().find("Alice");
-```
-
-``` codeBlockStandalone_LlrK
-int32 UserCount = Conn->Db->User->Count();
-FUserType User = Conn->Db->User->Name->Find(TEXT("Alice"));
-```
-
-## Reacting to Cache Changes
-
-Use row callbacks to react when subscribed rows are inserted, updated,
-or deleted.
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-conn.db.user.onInsert((ctx, row) => {});
-conn.db.user.onUpdate((ctx, oldRow, newRow) => {});
-conn.db.user.onDelete((ctx, row) => {});
-```
-
-``` codeBlockStandalone_LlrK
-conn.Db.User.OnInsert += (ctx, row) => {};
-conn.Db.User.OnUpdate += (ctx, oldRow, newRow) => {};
-conn.Db.User.OnDelete += (ctx, row) => {};
-```
-
-``` codeBlockStandalone_LlrK
-conn.db().user().on_insert(|ctx, row| {});
-conn.db().user().on_update(|ctx, old_row, new_row| {});
-conn.db().user().on_delete(|ctx, row| {});
-```
-
-``` codeBlockStandalone_LlrK
-Conn->Db->User->OnInsert.AddDynamic(this, &AMyActor::OnUserInsert);
-Conn->Db->User->OnUpdate.AddDynamic(this, &AMyActor::OnUserUpdate);
-Conn->Db->User->OnDelete.AddDynamic(this, &AMyActor::OnUserDelete);
-```
-
-## Canonical API References
-
-- [Subscriptions](https://spacetimedb.com/docs/clients/subscriptions) - Lifecycle, usage
-  patterns, and semantics
-- [Subscription Semantics](https://spacetimedb.com/docs/clients/subscriptions/semantics) -
-  Detailed consistency and ordering behavior
-- [TypeScript
-  Reference](https://spacetimedb.com/docs/clients/typescript#subscribe-to-queries) -
-  `SubscriptionBuilder`, `SubscriptionHandle`, query builder API
-- [C# Reference](https://spacetimedb.com/docs/clients/c-sharp#subscribe-to-queries) -
-  `SubscriptionBuilder`, `SubscriptionHandle`
-- [C# Query Builder API](https://spacetimedb.com/docs/clients/c-sharp#query-builder-api) -
-  Typed subscription query builder
-- [Rust Reference](https://spacetimedb.com/docs/clients/rust#subscribe-to-queries) -
-  `SubscriptionBuilder`, `SubscriptionHandle`
-- [Rust Query Builder API](https://spacetimedb.com/docs/clients/rust#query-builder-api) - Typed
-  subscription query builder
-- [Unreal Reference](https://spacetimedb.com/docs/clients/unreal#subscriptions) - Unreal
-  subscription APIs
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/clients/sdk-api" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">SDK API Overview | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/clients/api"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="SDK API Overview | SpacetimeDB docs"><meta data-rh="true" name="description" content="The SpacetimeDB client SDKs provide a comprehensive API for interacting with your database. After generating client bindings and establishing a connection, you can query data, invoke server functions, and observe real-time changes."><meta data-rh="true" property="og:description" content="The SpacetimeDB client SDKs provide a comprehensive API for interacting with your database. After generating client bindings and establishing a connection, you can query data, invoke server functions, and observe real-time changes."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/clients/api"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/api" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/api" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Clients","item":"https://spacetimedb.com/docs/clients"},{"@type":"ListItem","position":2,"name":"SDK API Overview","item":"https://spacetimedb.com/docs/clients/api"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/clients/api">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/clients/api">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Collapse sidebar category &#x27;Clients&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/codegen"><span title="Generating Client Bindings" class="linkLabel_UvDg">Generating Client Bindings</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/connection"><span title="Connecting to SpacetimeDB" class="linkLabel_UvDg">Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/clients/api"><span title="SDK API Overview" class="linkLabel_UvDg">SDK API Overview</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/clients/subscriptions"><span title="Subscriptions" class="categoryLinkLabel_HATI">Subscriptions</span></a><button aria-label="Expand sidebar category &#x27;Subscriptions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/rust"><span title="Rust Reference" class="linkLabel_UvDg">Rust Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/c-sharp"><span title="C# Reference" class="linkLabel_UvDg">C# Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/typescript"><span title="TypeScript Reference" class="linkLabel_UvDg">TypeScript Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/unreal"><span title="Unreal Reference" class="linkLabel_UvDg">Unreal Reference</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/clients"><span>Clients</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">SDK API Overview</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>SDK API Overview</h1></header><p>The SpacetimeDB client SDKs provide a comprehensive API for interacting with your <a class="" href="/docs/databases">database</a>. After <a class="" href="/docs/clients/codegen">generating client bindings</a> and <a class="" href="/docs/clients/connection">establishing a connection</a>, you can query data, invoke server functions, and observe real-time changes.</p>
+<p>This page describes the core concepts and patterns that apply across all client SDKs. For language-specific details and complete API documentation, see the reference pages for <a class="" href="/docs/clients/rust">Rust</a>, <a class="" href="/docs/clients/c-sharp">C#</a>, <a class="" href="/docs/clients/typescript">TypeScript</a>, or <a class="" href="/docs/clients/unreal">Unreal Engine</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h2>
+<p>Before using the SDK API, you must:</p>
+\<ol\>
+<li class=""><a class="" href="/docs/clients/codegen">Generate client bindings</a> using <code>spacetime generate</code></li>
+<li class=""><a class="" href="/docs/clients/connection">Create a connection</a> to your database</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="subscriptions">Subscriptions<a href="#subscriptions" class="hash-link" aria-label="Direct link to Subscriptions" title="Direct link to Subscriptions" translate="no">​</a></h2>
+<p>Subscriptions replicate a subset of the database to your client, maintaining a local cache that automatically updates as the server state changes. Clients should subscribe to the data they need, then query the local cache.</p>
+<p>Typical flow:</p>
+\<ol\>
+<li class="">Create a subscription with the SDK builder API</li>
+<li class="">Wait for <code>onApplied</code>/<code>OnApplied</code> to know initial rows are present</li>
+<li class="">Read from the local cache and register callbacks</li>
+<li class="">Unsubscribe when the data is no longer needed</li>
+</ol>
+<p>For lifecycle guarantees and semantics, see <a class="" href="/docs/clients/subscriptions">Subscriptions</a> and <a class="" href="/docs/clients/subscriptions/semantics">Subscription Semantics</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="example">Example<a href="#example" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { tables } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">./module_bindings</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">  .</span><span style="color:#50FA7B">subscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">  .</span><span style="color:#50FA7B">onApplied</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Ready with </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">ctx.db.user.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> users`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  })</span></span>
+<span class="line"><span style="color:#F8F8F2">  .</span><span style="color:#50FA7B">onError</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">error</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Subscription failed: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">error</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  })</span></span>
+<span class="line"><span style="color:#F8F8F2">  .</span><span style="color:#50FA7B">subscribe</span><span style="color:#F8F8F2">([tables.user.</span><span style="color:#50FA7B">where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">r</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> r.online.</span><span style="color:#50FA7B">eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">))]);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Ready with </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ctx</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Db</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">User</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Count</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> users</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">OnError</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">error</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Subscription failed: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">error</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">subscription_builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">on_applied</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Ready with {} users"</span><span style="color:#F8F8F2">, ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">on_error</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">_ctx, error</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        eprintln!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Subscription failed: {}"</span><span style="color:#F8F8F2">, error);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">add_query</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">q</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> q</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">from</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">TArray</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">FString</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> Queries </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> { </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">SELECT * FROM user</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">) };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">USubscriptionHandle</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> Handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(AppliedDelegate)</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">OnError</span><span style="color:#F8F8F2">(ErrorDelegate)</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">(Queries);</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="querying-the-local-cache">Querying the Local Cache<a href="#querying-the-local-cache" class="hash-link" aria-label="Direct link to Querying the Local Cache" title="Direct link to Querying the Local Cache" translate="no">​</a></h2>
+<p>After a subscription is applied, reads are local and do not require network round-trips.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> userCount </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.db.user.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.db.user.name.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> userCount </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.Db.User.Count;</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.Db.User.Name.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> user_count </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">count</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">name</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Alice"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">int32 UserCount </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Db</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">Count</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">FUserType User </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Conn</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Db</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">));</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="reacting-to-cache-changes">Reacting to Cache Changes<a href="#reacting-to-cache-changes" class="hash-link" aria-label="Direct link to Reacting to Cache Changes" title="Direct link to Reacting to Cache Changes" translate="no">​</a></h2>
+<p>Use row callbacks to react when subscribed rows are inserted, updated, or deleted.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn.db.user.</span><span style="color:#50FA7B">onInsert</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">row</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {});</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.db.user.</span><span style="color:#50FA7B">onUpdate</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">oldRow</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">newRow</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {});</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.db.user.</span><span style="color:#50FA7B">onDelete</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">row</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn.Db.User.OnInsert </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">row</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.Db.User.OnUpdate </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">oldRow</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">newRow</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.Db.User.OnDelete </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">row</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {};</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">on_insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx, row</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {});</span></span>
+<span class="line"><span style="color:#F8F8F2">conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">on_update</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx, old_row, new_row</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {});</span></span>
+<span class="line"><span style="color:#F8F8F2">conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">db</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">on_delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx, row</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">Conn</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Db</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">OnInsert.</span><span style="color:#50FA7B">AddDynamic</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">AMyActor</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">OnUserInsert);</span></span>
+<span class="line"><span style="color:#F8F8F2">Conn</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Db</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">OnUpdate.</span><span style="color:#50FA7B">AddDynamic</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">AMyActor</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">OnUserUpdate);</span></span>
+<span class="line"><span style="color:#F8F8F2">Conn</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">Db</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">-></span><span style="color:#F8F8F2">OnDelete.</span><span style="color:#50FA7B">AddDynamic</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">AMyActor</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">OnUserDelete);</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="canonical-api-references">Canonical API References<a href="#canonical-api-references" class="hash-link" aria-label="Direct link to Canonical API References" title="Direct link to Canonical API References" translate="no">​</a></h2>
+\<ul\>
+<li class=""><a class="" href="/docs/clients/subscriptions">Subscriptions</a> - Lifecycle, usage patterns, and semantics</li>
+<li class=""><a class="" href="/docs/clients/subscriptions/semantics">Subscription Semantics</a> - Detailed consistency and ordering behavior</li>
+<li class=""><a class="" href="/docs/clients/typescript#subscribe-to-queries">TypeScript Reference</a> - <code>SubscriptionBuilder</code>, <code>SubscriptionHandle</code>, query builder API</li>
+<li class=""><a class="" href="/docs/clients/c-sharp#subscribe-to-queries">C# Reference</a> - <code>SubscriptionBuilder</code>, <code>SubscriptionHandle</code></li>
+<li class=""><a class="" href="/docs/clients/c-sharp#query-builder-api">C# Query Builder API</a> - Typed subscription query builder</li>
+<li class=""><a class="" href="/docs/clients/rust#subscribe-to-queries">Rust Reference</a> - <code>SubscriptionBuilder</code>, <code>SubscriptionHandle</code></li>
+<li class=""><a class="" href="/docs/clients/rust#query-builder-api">Rust Query Builder API</a> - Typed subscription query builder</li>
+<li class=""><a class="" href="/docs/clients/unreal#subscriptions">Unreal Reference</a> - Unreal subscription APIs</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00600-clients/00400-sdk-api.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/clients/connection"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Connecting to SpacetimeDB</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/clients/subscriptions"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Subscriptions</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#prerequisites" class="table-of-contents__link toc-highlight">Prerequisites</a></li>\<li\><a href="#subscriptions" class="table-of-contents__link toc-highlight">Subscriptions</a>\<ul\>\<li\><a href="#example" class="table-of-contents__link toc-highlight">Example</a></li></ul></li>\<li\><a href="#querying-the-local-cache" class="table-of-contents__link toc-highlight">Querying the Local Cache</a></li>\<li\><a href="#reacting-to-cache-changes" class="table-of-contents__link toc-highlight">Reacting to Cache Changes</a></li>\<li\><a href="#canonical-api-references" class="table-of-contents__link toc-highlight">Canonical API References</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

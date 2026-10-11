@@ -264,9 +264,11 @@ Note: A conductor can be configured to run in either terminal mode (expecting `i
 
 ### MCP-over-ACP support
 
-Proxies that provide MCP servers use the [MCP-over-ACP transport](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md) mechanism. The conductor always advertises `mcpCapabilities.acp: true` to proxies and handles bridging for agents that don't support native ACP transport.
+The [MCP-over-ACP transport](./mcp-over-acp) targets stateless MCP 2026-07-28 only. Requests target a declared `serverId`; a separate logical MCP `requestId` correlates request-scoped notifications and remains unchanged when proxies renumber the outer ACP JSON-RPC ID. There is no MCP connect/disconnect lifecycle.
 
-All proxies MUST respond to `proxy/initialize` with the MCP-over-ACP capability enabled. When the conductor sends `proxy/initialize`, proxies should be prepared to handle `mcp/connect`, `mcp/message`, and `mcp/disconnect` messages for any MCP servers they provide.
+Proxies that provide MCP servers use the [MCP-over-ACP transport](./mcp-over-acp) mechanism. Capability advertising reflects what the downstream chain can consume; the conductor does not unconditionally add MCP-over-ACP support. In the Rust SDK, an explicit `McpOverAcpPolyfill` proxy can be placed immediately before an HTTP-capable agent that lacks native ACP MCP support.
+
+A forwarding proxy preserves downstream MCP capabilities. A bridging proxy may advertise ACP MCP support only when its successor can consume the target MCP revision over the adapted transport. Proxies that publish MCP servers handle `mcp/message` requests as soon as their declarations are forwarded, including while session setup is still in progress. Ordinary ACP response forwarding and hop-local cancellation apply; logical MCP IDs and payloads are preserved. See the transport RFD for the v1 and draft-v2 capability shapes.
 
 ### Message reference
 
@@ -409,7 +411,7 @@ Because proxies sit between the client and agent, they can replicate the functio
 
 * **AGENTS.md files**: Proxies can inject context and instructions into prompts before they reach the agent
 * **Claude Code plugins/skills**: Proxies can add contextual data for available skills and provide MCP resources with detailed skill instructions that are provided on-demand when requested by the agent
-* **MCP servers**: Proxies can provide tools via [MCP-over-ACP](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md) and handle tool callbacks
+* **MCP servers**: Proxies can provide tools via [MCP-over-ACP](./mcp-over-acp) and handle tool callbacks
 * **Subagents**: Proxies can create "subagents" by initiating new sessions and coordinating between multiple agent instances
 * **Hooks and steering files**: Proxies can modify conversation flow by intercepting requests and responses
 * **System prompt customization**: Proxies can switch between predefined session modes or prepend system messages to prompts
@@ -418,11 +420,11 @@ The key advantage is that proxy-based extensions work with any ACP-compatible ag
 
 ### How do proxies work with MCP servers?
 
-Proxies can provide MCP servers via [MCP-over-ACP transport](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md), enabling a single proxy to add context, provide tools, and handle callbacks with full awareness of the conversation state.
+Proxies can provide MCP servers via [MCP-over-ACP transport](./mcp-over-acp), enabling a single proxy to add context, provide tools, and handle callbacks with full awareness of the conversation state.
 
-The conductor always advertises `mcpCapabilities.acp: true` to proxies, regardless of whether the downstream agent supports it natively. When the agent doesn't support ACP transport, the conductor handles bridging transparently - spawning stdio shims or HTTP servers that the agent connects to normally, then relaying messages to/from the proxy's ACP channel.
+When the agent supports native ACP MCP transport, no adapter is needed. Otherwise, the chain can include an explicit adapter for a modern MCP HTTP client. The Rust SDK's HTTP polyfill rewrites MCP declarations to local HTTP endpoints and relays requests and request-scoped notifications to and from the providing proxy's ACP channel. Requests may share a listening endpoint without sharing MCP session state.
 
-This means proxy authors don't need to worry about agent compatibility - they implement MCP-over-ACP, and the conductor handles the rest.
+Tool-providing proxies implement MCP-over-ACP without managing those alternative transports themselves. The chain's owner chooses an appropriate adapter, and the resulting advertised capability tells providers whether ACP MCP servers can be consumed.
 
 ```mermaid theme={null}
 sequenceDiagram
@@ -568,4 +570,7 @@ The canonical sources for those crates is currently the \[symposium-dev/symposiu
 ## Revision history
 
 * Initial draft based on working implementation in symposium-acp repository.
-* Split MCP-over-ACP transport into [separate RFD](@/skills/engineering/acp/resources/auto/rfds-mcp-over-acp.md) to enable independent use by any ACP component.
+* Split MCP-over-ACP transport into [separate RFD](./mcp-over-acp) to enable independent use by any ACP component.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -1,641 +1,368 @@
-Version: 2.0.0
-
-On this page
-
-Indexes accelerate queries by maintaining sorted data structures
-alongside your tables. Without an index, finding rows that match a
-condition requires scanning every row. With an index, the database
-locates matching rows directly.
-
-## When to Use Indexes
-
-Add an index when you frequently query a column with equality or range
-conditions. Common scenarios include:
-
-- **Filtering by foreign key**: A `player_id` column in an inventory
-  table benefits from an index when you query items belonging to a
-  specific player.
-- **Range queries**: An `age` column benefits from an index when you
-  query users within an age range.
-- **Sorting**: Columns used in ORDER BY clauses benefit from indexes
-  that maintain sort order.
-
-Indexes consume additional memory and slow down inserts and updates,
-since the database must maintain the index structure. Add indexes based
-on your actual query patterns rather than speculatively.
-
-Primary keys and unique constraints automatically create indexes. You do
-not need to add a separate index for columns that already have these
-constraints.
-
-## Index Types
-
-SpacetimeDB supports two index types:
-
-| Type   | Use Case                | Key Types                 | Multi-Column |
-|--------|-------------------------|---------------------------|--------------|
-| B-tree | General purpose         | Any                       | Yes          |
-| Direct | Dense integer sequences | `u8`, `u16`, `u32`, `u64` | No           |
-
-### Supported Column Types
-
-Not all column types can be used as index keys. The following types are
-supported for B-tree indexes:
-
-| Category | Types |
-|----|----|
-| Integers | `u8`, `u16`, `u32`, `u64`, `u128`, `u256`, `i8`, `i16`, `i32`, `i64`, `i128`, `i256` |
-| Boolean | `bool` |
-| Strings | `String` |
-| Identifiers | `Identity`, `ConnectionId`, `Uuid`, `Hash` |
-| Enums | No-payload (C-style) enums annotated with `#[derive(SpacetimeType)]` |
-
-The following types are **not** supported as index keys:
-
-| Type | Reason |
-|----|----|
-| `f32`, `f64` | Floating-point values do not have a total ordering (`NaN` is not comparable) |
-| `ScheduleAt`, `TimeDuration`, `Timestamp` | Not yet supported ([\#2650](https://github.com/clockworklabs/SpacetimeDB/issues/2650)) |
-| `Vec<T>`, arrays | Variable-length collections are not indexable |
-| Enums with payloads | Only no-payload (C-style) enums are supported |
-| Nested structs | Product types cannot be used as index keys |
-
-If you attempt to use an unsupported type as an index key, you will get
-a compile error. For multi-column indexes, every column in the index
-must use a supported type.
-
-Workaround for floating-point data
-
-If you need to index floating-point coordinates (for example, `x` and
-`y` positions), consider storing them as scaled integers. For instance,
-multiply by 1000 and store as `i32` to get three decimal places of
-precision while remaining indexable.
-
-Direct indexes have additional restrictions: only `u8`, `u16`, `u32`,
-`u64`, and no-payload enums are supported.
-
-### B-tree Indexes
-
-B-trees maintain data in sorted order, enabling both equality lookups
-(`x = 5`) and range queries (`x > 5`, `x BETWEEN 1 AND 10`). The sorted
-structure also supports prefix matching on multi-column indexes. B-tree
-is the default and most commonly used index type.
-
-### Direct Indexes
-
-Direct indexes use array indexing instead of tree traversal, providing
-O(1) lookups for unsigned integer keys. SpacetimeDB uses the key value
-directly as an array offset, eliminating the need to search through a
-tree structure.
-
-Direct indexes perform well when:
-
-- Keys are dense (few gaps between values)
-- Keys start near zero
-- Insert patterns are sequential rather than random
-
-Direct indexes perform poorly when:
-
-- Keys are sparse (large gaps between values)
-- The first key inserted is a large number
-- Insert patterns are highly random
-
-Direct indexes only support single-column indexes on unsigned integer
-types. Use them for auto-increment primary keys or other dense
-sequential identifiers where you need maximum lookup performance.
-
-note
-
-Direct indexes are currently available in Rust and TypeScript. C#
-support is planned.
-
-- TypeScript
-- Rust
-
-``` codeBlockStandalone_LlrK
-const position = table(
-  { name: 'position', public: true },
-  {
-    id: t.u32().primaryKey().index('direct'),
-    x: t.f32(),
-    y: t.f32(),
-    z: t.f32(),
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = position, public)]
-pub struct Position {
-    #[primary_key]
-    #[index(direct)]
-    id: u32,
-    x: f32,
-    y: f32,
-    z: f32,
-}
-```
-
-This example from the SpacetimeDB benchmarks uses direct indexes for a
-million entities with sequential IDs starting at 0, enabling O(1)
-lookups when joining position and velocity data by entity ID.
-
-For most use cases, B-tree indexes provide good performance without
-these restrictions. Consider direct indexes only when profiling reveals
-that index lookups are a bottleneck and your key distribution matches
-the ideal pattern.
-
-## Single-Column Indexes
-
-A single-column index accelerates queries that filter on one column. You
-can define the index at the field level or the table level.
-
-### Field-Level Syntax
-
-The field-level syntax places the index declaration directly on the
-column:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-const user = table(
-  { name: 'user', public: true },
-  {
-    id: t.u32().primaryKey(),
-    name: t.string().index('btree'),
-    age: t.u8().index('btree'),
-  }
-);
-```
-
-Use full namespace
-
-Never use bare `Index` — it conflicts with `System.Index`. Always write
-`SpacetimeDB.Index.BTree`. For table-level indexes, use
-`Columns = new[] { nameof(Col) }` or `new[] { "Col1", "Col2" }`, not
-collection expressions like `[nameof(X)]`.
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "User", Public = true)]
-public partial struct User
-{
-    [SpacetimeDB.PrimaryKey]
-    public uint Id;
-
-    [SpacetimeDB.Index.BTree]
-    public string Name;
-
-    [SpacetimeDB.Index.BTree]
-    public byte Age;
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = user, public)]
-pub struct User {
-    #[primary_key]
-    id: u32,
-    #[index(btree)]
-    name: String,
-    #[index(btree)]
-    age: u8,
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct User {
-  uint32_t id;
-  std::string name;
-  uint8_t age;
-};
-SPACETIMEDB_STRUCT(User, id, name, age)
-SPACETIMEDB_TABLE(User, user, Public)
-FIELD_PrimaryKey(user, id)
-FIELD_Index(user, name)
-FIELD_Index(user, age)
-```
-
-Use `FIELD_Index(table, field)` to create a B-tree index on individual
-columns.
-
-### Table-Level Syntax
-
-The table-level syntax defines indexes separately from columns. This
-approach allows you to name the index explicitly:
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-const user = table(
-  {
-    name: 'user',
-    public: true,
-    indexes: [
-      { accessor: 'idx_age', algorithm: 'btree', columns: ['age'] },
-    ],
-  },
-  {
-    id: t.u32().primaryKey(),
-    name: t.string(),
-    age: t.u8(),
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "User", Public = true)]
-[SpacetimeDB.Index.BTree(Accessor = "idx_age", Columns = new[] { "Age" })]
-public partial struct User
-{
-    [SpacetimeDB.PrimaryKey]
-    public uint Id;
-
-    public string Name;
-
-    public byte Age;
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = user, public, index(accessor = idx_age, btree(columns = [age])))]
-pub struct User {
-    #[primary_key]
-    id: u32,
-    name: String,
-    age: u8,
-}
-```
-
-## Multi-Column Indexes
-
-A multi-column index (also called a composite index) spans multiple
-columns. The index maintains rows sorted by the first column, then by
-the second column within equal values of the first, and so on.
-
-Multi-column indexes support:
-
-- **Full match**: Queries that specify all indexed columns
-- **Prefix match**: Queries that specify the leftmost columns in order
-- **Range on trailing column**: A prefix of equality conditions followed
-  by a range on the next column
-
-A multi-column index on `(player_id, level)` accelerates these queries:
-
-- `player_id = 123` (prefix match on first column)
-- `player_id = 123 AND level = 5` (full match)
-- `player_id = 123 AND level > 5` (prefix match with range)
-
-The same index does not accelerate a query on `level` alone, since
-`level` is not a prefix of the index.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-const score = table(
-  {
-    name: 'score',
-    public: true,
-    indexes: [
-      { accessor: 'by_player_and_level', algorithm: 'btree', columns: ['player_id', 'level'] },
-    ],
-  },
-  {
-    player_id: t.u32(),
-    level: t.u32(),
-    points: t.i64(),
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "Score", Public = true)]
-[SpacetimeDB.Index.BTree(Accessor = "by_player_and_level", Columns = new[] { "PlayerId", "Level" })]
-public partial struct Score
-{
-    public uint PlayerId;
-    public uint Level;
-    public long Points;
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = score, public, index(accessor = by_player_and_level, btree(columns = [player_id, level])))]
-pub struct Score {
-    player_id: u32,
-    level: u32,
-    points: i64,
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct Score {
-  uint32_t player_id;
-  uint32_t level;
-  int64_t points;
-};
-SPACETIMEDB_STRUCT(Score, player_id, level, points)
-SPACETIMEDB_TABLE(Score, score, Public)
-FIELD_NamedMultiColumnIndex(score, by_player_and_level, player_id, level)
-```
-
-Use
-`FIELD_NamedMultiColumnIndex(table, index_name, field1, field2, ...)` to
-create a named multi-column B-tree index.
-
-## Querying with Indexes
-
-SpacetimeDB generates type-safe accessor methods for each index. These
-methods accept filter arguments and return matching rows.
-
-### Equality Queries
-
-Pass a single value to find rows where the indexed column equals that
-value:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-// Find users with a specific name
-for (const user of ctx.db.user.name.filter('Alice')) {
-  console.log(`Found user: ${user.id}`);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find users with a specific name
-foreach (var user in ctx.Db.User.Name.Filter("Alice"))
-{
-    Log.Info($"Found user: {user.Id}");
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find users with a specific name
-for user in ctx.db.user().name().filter("Alice") {
-    log::info!("Found user: {}", user.id);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find users with a specific name
-for (auto user : ctx.db[user_name].filter("Alice")) {
-    LOG_INFO("Found user: " + user.name);
-}
-```
-
-Use the index accessor `ctx.db[index_name]` created by `FIELD_Index` to
-perform filtered queries.
-
-### Range Queries
-
-Pass a `Range` object to find rows where the indexed column falls within
-bounds. The `Range` constructor accepts `from` and `to` bounds, each
-specified as `{ tag: 'included', value }`, `{ tag: 'excluded', value }`,
-or `{ tag: 'unbounded' }`:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { Range } from 'spacetimedb/server';
-
-// Find users aged 18 to 65 (inclusive)
-for (const user of ctx.db.user.age.filter(
-  new Range({ tag: 'included', value: 18 }, { tag: 'included', value: 65 })
-)) {
-  console.log(`${user.name} is ${user.age}`);
-}
-
-// Find users aged 18 or older (from 18 inclusive, unbounded above)
-for (const user of ctx.db.user.age.filter(
-  new Range({ tag: 'included', value: 18 }, { tag: 'unbounded' })
-)) {
-  console.log(`${user.name} is an adult`);
-}
-
-// Find users younger than 18 (unbounded below, to 18 exclusive)
-for (const user of ctx.db.user.age.filter(
-  new Range({ tag: 'unbounded' }, { tag: 'excluded', value: 18 })
-)) {
-  console.log(`${user.name} is a minor`);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find users aged 18 to 65 (inclusive)
-foreach (var user in ctx.Db.User.Age.Filter(new Bound<byte>(18, 65)))
-{
-    Log.Info($"{user.Name} is {user.Age}");
-}
-
-// Find users aged 18 or older (inclusive, unbounded above)
-foreach (var user in ctx.Db.User.Age.Filter(new Bound<byte>(18, byte.MaxValue)))
-{
-    Log.Info($"{user.Name} is an adult");
-}
-
-// Find users younger than 18 (unbounded below, to 17 inclusive)
-foreach (var user in ctx.Db.User.Age.Filter(new Bound<byte>(byte.MinValue, 17)))
-{
-    Log.Info($"{user.Name} is a minor");
-}
-```
-
-You can also use the implicit tuple conversion, like
-`ctx.Db.User.Age.Filter((18, byte.MaxValue))`, which is functionally
-identical.
-
-``` codeBlockStandalone_LlrK
-// Find users aged 18 to 65 (inclusive)
-for user in ctx.db.user().age().filter(18..=65) {
-    log::info!("{} is {}", user.name, user.age);
-}
-
-// Find users aged 18 or older
-for user in ctx.db.user().age().filter(18..) {
-    log::info!("{} is an adult", user.name);
-}
-
-// Find users younger than 18
-for user in ctx.db.user().age().filter(..18) {
-    log::info!("{} is a minor", user.name);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find users aged 18 to 65 (inclusive)
-for (auto user : ctx.db[user_age].filter(range_inclusive(uint8_t(18), uint8_t(65)))) {
-    // Process user
-}
-
-// Find users aged 18 or older
-for (auto user : ctx.db[user_age].filter(range_from(uint8_t(18)))) {
-    // Process user
-}
-
-// Find users younger than 18
-for (auto user : ctx.db[user_age].filter(range_to(uint8_t(18)))) {
-    // Process user
-}
-```
-
-Use range query functions: `range_inclusive()`, `range_from()`,
-`range_to()`, and `range_to_inclusive()`. Include
-`<spacetimedb/range_queries.h>` for full range query support.
-
-### Multi-Column Queries
-
-For multi-column indexes, pass a tuple of values. You can specify exact
-values for prefix columns and optionally a range for the trailing
-column:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { Range } from 'spacetimedb/server';
-
-// Find all scores for player 123 (prefix match on first column)
-for (const score of ctx.db.score.by_player_and_level.filter(123)) {
-  console.log(`Level ${score.level}: ${score.points} points`);
-}
-
-// Find scores for player 123 at levels 1-10 (inclusive)
-for (const score of ctx.db.score.by_player_and_level.filter([
-  123,
-  new Range({ tag: 'included', value: 1 }, { tag: 'included', value: 10 })
-])) {
-  console.log(`Level ${score.level}: ${score.points} points`);
-}
-
-// Find the exact score for player 123 at level 5
-for (const score of ctx.db.score.by_player_and_level.filter([123, 5])) {
-  console.log(`Points: ${score.points}`);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find all scores for player 123
-foreach (var score in ctx.Db.Score.by_player_and_level.Filter(123u))
-{
-    Log.Info($"Level {score.Level}: {score.Points} points");
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find all scores for player 123 (prefix match)
-for score in ctx.db.score().by_player_and_level().filter(&123u32) {
-    log::info!("Level {}: {} points", score.level, score.points);
-}
-
-// Find scores for player 123 at levels 1-10
-for score in ctx.db.score().by_player_and_level().filter((123u32, 1u32..=10u32)) {
-    log::info!("Level {}: {} points", score.level, score.points);
-}
-
-// Find the exact score for player 123 at level 5
-for score in ctx.db.score().by_player_and_level().filter((123u32, 5u32)) {
-    log::info!("Points: {}", score.points);
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Find all scores for player 123 (prefix match)
-for (auto score : ctx.db[score_by_player_and_level].filter(uint32_t(123))) {
-    LOG_INFO("Level " + std::to_string(score.level) + ": " + std::to_string(score.points) + " points");
-}
-
-// Find scores for player 123 at levels 1-10
-for (auto score : ctx.db[score_by_player_and_level].filter(
-         std::make_tuple(uint32_t(123), range_inclusive(uint32_t(1), uint32_t(10))))) {
-    LOG_INFO("Level " + std::to_string(score.level) + ": " + std::to_string(score.points) + " points");
-}
-
-// Find the exact score for player 123 at level 5
-for (auto score : ctx.db[score_by_player_and_level].filter(
-         std::make_tuple(uint32_t(123), uint32_t(5)))) {
-    LOG_INFO("Points: " + std::to_string(score.points));
-}
-```
-
-## Deleting with Indexes
-
-Indexes also accelerate deletions. Instead of scanning the entire table
-to find rows to delete, you can delete directly by index value:
-
-- TypeScript
-- C#
-- Rust
-
-``` codeBlockStandalone_LlrK
-import { Range } from 'spacetimedb/server';
-
-// Delete all users named "Alice"
-const deleted = ctx.db.user.name.delete('Alice');
-console.log(`Deleted ${deleted} user(s)`);
-
-// Delete users younger than 18
-const deletedMinors = ctx.db.user.age.delete(
-  new Range({ tag: 'unbounded' }, { tag: 'excluded', value: 18 })
-);
-console.log(`Deleted ${deletedMinors} minor(s)`);
-```
-
-``` codeBlockStandalone_LlrK
-// Delete all users named "Alice"
-var deleted = ctx.Db.User.Name.Delete("Alice");
-Log.Info($"Deleted {deleted} user(s)");
-```
-
-``` codeBlockStandalone_LlrK
-// Delete all users named "Alice"
-let deleted = ctx.db.user().name().delete("Alice");
-log::info!("Deleted {} user(s)", deleted);
-
-// Delete users in an age range
-let deleted = ctx.db.user().age().delete(..18);
-log::info!("Deleted {} minor(s)", deleted);
-```
-
-## Index Design Guidelines
-
-**Choose columns based on query patterns.** Index the columns that
-appear in your WHERE clauses and JOIN conditions. An unused index wastes
-memory.
-
-**Consider column order in multi-column indexes.** Place the most
-selective column (the one that narrows results most) first, followed by
-columns used in range conditions. An index on `(country, city)` works
-for queries on `country` alone or `country AND city`, but not for
-queries on `city` alone.
-
-**Avoid redundant indexes.** A multi-column index on `(a, b)` makes a
-separate index on `(a)` redundant, since the multi-column index handles
-prefix queries. However, an index on `(b)` is not redundant if you query
-`b` independently.
-
-**Balance read and write performance.** Each index speeds up reads but
-slows down writes. Tables with high write volume and few reads may
-benefit from fewer indexes.
-
-## Next Steps
-
-- Learn about [Constraints](https://spacetimedb.com/docs/tables/constraints) for primary keys
-  and unique indexes
-- See [Access Permissions](https://spacetimedb.com/docs/tables/access-permissions) for querying
-  tables from reducers
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/tables/indexes" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Indexes | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tables/indexes"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Indexes | SpacetimeDB docs"><meta data-rh="true" name="description" content="Indexes accelerate queries by maintaining sorted data structures alongside your tables. Without an index, finding rows that match a condition requires scanning every row. With an index, the database locates matching rows directly."><meta data-rh="true" property="og:description" content="Indexes accelerate queries by maintaining sorted data structures alongside your tables. Without an index, finding rows that match a condition requires scanning every row. With an index, the database locates matching rows directly."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tables/indexes"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/indexes" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/indexes" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tables","item":"https://spacetimedb.com/docs/tables"},{"@type":"ListItem","position":2,"name":"Indexes","item":"https://spacetimedb.com/docs/tables/indexes"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tables/indexes">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tables/indexes">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tables/indexes">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Collapse sidebar category &#x27;Tables&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/column-types"><span title="Column Types" class="linkLabel_UvDg">Column Types</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/file-storage"><span title="File Storage" class="linkLabel_UvDg">File Storage</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/auto-increment"><span title="Auto-Increment" class="linkLabel_UvDg">Auto-Increment</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/constraints"><span title="Constraints" class="linkLabel_UvDg">Constraints</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/default-values"><span title="Default Values" class="linkLabel_UvDg">Default Values</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tables/indexes"><span title="Indexes" class="linkLabel_UvDg">Indexes</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/access-permissions"><span title="Table Access Permissions" class="linkLabel_UvDg">Table Access Permissions</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/schedule-tables"><span title="Schedule Tables" class="linkLabel_UvDg">Schedule Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/event-tables"><span title="Event Tables" class="linkLabel_UvDg">Event Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/performance"><span title="Performance Best Practices" class="linkLabel_UvDg">Performance Best Practices</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tables"><span>Tables</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Indexes</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Indexes</h1></header><p>Indexes accelerate queries by maintaining sorted data structures alongside your tables. Without an index, finding rows that match a condition requires scanning every row. With an index, the database locates matching rows directly.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="when-to-use-indexes">When to Use Indexes<a href="#when-to-use-indexes" class="hash-link" aria-label="Direct link to When to Use Indexes" title="Direct link to When to Use Indexes" translate="no">​</a></h2>
+<p>Add an index when you frequently query a column with equality or range conditions. Common scenarios include:</p>
+\<ul\>
+<li class=""><strong>Filtering by foreign key</strong>: A <code>player_id</code> column in an inventory table benefits from an index when you query items belonging to a specific player.</li>
+<li class=""><strong>Range queries</strong>: An <code>age</code> column benefits from an index when you query users within an age range.</li>
+<li class=""><strong>Sorting</strong>: Columns used in ORDER BY clauses benefit from indexes that maintain sort order.</li>
+</ul>
+<p>Indexes consume additional memory and slow down inserts and updates, since the database must maintain the index structure. Add indexes based on your actual query patterns rather than speculatively.</p>
+<p>Primary keys and unique constraints automatically create indexes. You do not need to add a separate index for columns that already have these constraints.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="index-types">Index Types<a href="#index-types" class="hash-link" aria-label="Direct link to Index Types" title="Direct link to Index Types" translate="no">​</a></h2>
+<p>SpacetimeDB supports two index types:</p>
+<table><thead><tr><th>Type</th><th>Use Case</th><th>Key Types</th><th>Multi-Column</th></tr></thead>\<tbody\><tr><td>B-tree</td><td>General purpose</td><td>Any</td><td>Yes</td></tr><tr><td>Direct</td><td>Dense integer sequences</td><td><code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code></td><td>No</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="supported-column-types">Supported Column Types<a href="#supported-column-types" class="hash-link" aria-label="Direct link to Supported Column Types" title="Direct link to Supported Column Types" translate="no">​</a></h3>
+<p>Not all column types can be used as index keys. The following types are supported for B-tree indexes:</p>
+<table><thead><tr><th>Category</th><th>Types</th></tr></thead>\<tbody\><tr><td>Integers</td><td><code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code>, <code>u128</code>, <code>u256</code>, <code>i8</code>, <code>i16</code>, <code>i32</code>, <code>i64</code>, <code>i128</code>, <code>i256</code></td></tr><tr><td>Boolean</td><td><code>bool</code></td></tr><tr><td>Strings</td><td><code>String</code></td></tr><tr><td>Identifiers</td><td><code>Identity</code>, <code>ConnectionId</code>, <code>Uuid</code>, <code>Hash</code></td></tr><tr><td>Enums</td><td>No-payload (C-style) enums annotated with <code>#[derive(SpacetimeType)]</code></td></tr></tbody></table>
+<p>The following types are <strong>not</strong> supported as index keys:</p>
+<table><thead><tr><th>Type</th><th>Reason</th></tr></thead>\<tbody\><tr><td><code>f32</code>, <code>f64</code></td><td>Floating-point values do not have a total ordering (<code>NaN</code> is not comparable)</td></tr><tr><td><code>ScheduleAt</code>, <code>TimeDuration</code>, <code>Timestamp</code></td><td>Not yet supported (<a href="https://github.com/clockworklabs/SpacetimeDB/issues/2650" target="_blank" rel="noopener noreferrer" class="">#2650</a>)</td></tr><tr><td><code>Vec\<T\></code>, arrays</td><td>Variable-length collections are not indexable</td></tr><tr><td>Enums with payloads</td><td>Only no-payload (C-style) enums are supported</td></tr><tr><td>Nested structs</td><td>Product types cannot be used as index keys</td></tr></tbody></table>
+<p>If you attempt to use an unsupported type as an index key, you will get a compile error. For multi-column indexes, every column in the index must use a supported type.</p>
+<div class="theme-admonition theme-admonition-tip admonition_Ph9R alert alert--success"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Workaround for floating-point data</div><div class="admonitionContent_STxx"><p>If you need to index floating-point coordinates (for example, <code>x</code> and <code>y</code> positions), consider storing them as scaled integers. For instance, multiply by 1000 and store as <code>i32</code> to get three decimal places of precision while remaining indexable.</p></div></div>
+<p>Direct indexes have additional restrictions: only <code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code>, and no-payload enums are supported.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="b-tree-indexes">B-tree Indexes<a href="#b-tree-indexes" class="hash-link" aria-label="Direct link to B-tree Indexes" title="Direct link to B-tree Indexes" translate="no">​</a></h3>
+<p>B-trees maintain data in sorted order, enabling both equality lookups (<code>x = 5</code>) and range queries (<code>x > 5</code>, <code>x BETWEEN 1 AND 10</code>). The sorted structure also supports prefix matching on multi-column indexes. B-tree is the default and most commonly used index type.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="direct-indexes">Direct Indexes<a href="#direct-indexes" class="hash-link" aria-label="Direct link to Direct Indexes" title="Direct link to Direct Indexes" translate="no">​</a></h3>
+<p>Direct indexes use array indexing instead of tree traversal, providing O(1) lookups for unsigned integer keys. SpacetimeDB uses the key value directly as an array offset, eliminating the need to search through a tree structure.</p>
+<p>Direct indexes perform well when:</p>
+\<ul\>
+<li class="">Keys are dense (few gaps between values)</li>
+<li class="">Keys start near zero</li>
+<li class="">Insert patterns are sequential rather than random</li>
+</ul>
+<p>Direct indexes perform poorly when:</p>
+\<ul\>
+<li class="">Keys are sparse (large gaps between values)</li>
+<li class="">The first key inserted is a large number</li>
+<li class="">Insert patterns are highly random</li>
+</ul>
+<p>Direct indexes only support single-column indexes on unsigned integer types. Use them for auto-increment primary keys or other dense sequential identifiers where you need maximum lookup performance.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>Direct indexes are currently available in Rust and TypeScript. C# support is planned.</p></div></div>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> position </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">position</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">direct</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    x</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">f32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    y</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">f32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    z</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">f32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> position, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Position</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(direct)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    x</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    y</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    z</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>This example from the SpacetimeDB benchmarks uses direct indexes for a million entities with sequential IDs starting at 0, enabling O(1) lookups when joining position and velocity data by entity ID.</p>
+<p>For most use cases, B-tree indexes provide good performance without these restrictions. Consider direct indexes only when profiling reveals that index lookups are a bottleneck and your key distribution matches the ideal pattern.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="single-column-indexes">Single-Column Indexes<a href="#single-column-indexes" class="hash-link" aria-label="Direct link to Single-Column Indexes" title="Direct link to Single-Column Indexes" translate="no">​</a></h2>
+<p>A single-column index accelerates queries that filter on one column. You can define the index at the field level or the table level.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="field-level-syntax">Field-Level Syntax<a href="#field-level-syntax" class="hash-link" aria-label="Direct link to Field-Level Syntax" title="Direct link to Field-Level Syntax" translate="no">​</a></h3>
+<p>The field-level syntax places the index declaration directly on the column:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    age</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><div class="theme-admonition theme-admonition-danger admonition_Ph9R alert alert--danger"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Use full namespace</div><div class="admonitionContent_STxx"><p>Never use bare <code>Index</code> — it conflicts with <code>System.Index</code>. Always write <code>SpacetimeDB.Index.BTree</code>. For table-level indexes, use <code>Columns = new[] { nameof(Col) }</code> or <code>new[] { "Col1", "Col2" }</code>, not collection expressions like <code>[nameof(X)]</code>.</p></div></div><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">User</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> byte</span><span style="color:#F8F8F2"> Age;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    age</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u8</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint32_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">  std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#FF79C6">  uint8_t</span><span style="color:#F8F8F2"> age;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(User, id, name, age)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(User, user, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(user, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(user, name)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(user, age)</span></span></code></pre><p>Use <code>FIELD_Index(table, field)</code> to create a B-tree index on individual columns.</p></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="table-level-syntax">Table-Level Syntax<a href="#table-level-syntax" class="hash-link" aria-label="Direct link to Table-Level Syntax" title="Direct link to Table-Level Syntax" translate="no">​</a></h3>
+<p>The table-level syntax defines indexes separately from columns. This approach allows you to name the index explicitly:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    indexes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">      { accessor</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">idxAge</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, algorithm</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, columns</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">age</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">] },</span></span>
+<span class="line"><span style="color:#F8F8F2">    ],</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    age</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u8</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">User</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">IdxAge</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Columns </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#F8F8F2">[] { </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Age</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> })]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> byte</span><span style="color:#F8F8F2"> Age;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user, public, index(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> idx_age, btree(columns </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> [age])))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    age</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u8</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="multi-column-indexes">Multi-Column Indexes<a href="#multi-column-indexes" class="hash-link" aria-label="Direct link to Multi-Column Indexes" title="Direct link to Multi-Column Indexes" translate="no">​</a></h2>
+<p>A multi-column index (also called a composite index) spans multiple columns. The index maintains rows sorted by the first column, then by the second column within equal values of the first, and so on.</p>
+<p>Multi-column indexes support:</p>
+\<ul\>
+<li class=""><strong>Full match</strong>: Queries that specify all indexed columns</li>
+<li class=""><strong>Prefix match</strong>: Queries that specify the leftmost columns in order</li>
+<li class=""><strong>Range on trailing column</strong>: A prefix of equality conditions followed by a range on the next column</li>
+</ul>
+<p>For indexes with three or more columns, the same rule applies: provide any leftmost prefix of exact
+values, optionally followed by a range on the next column. You cannot put a range in the middle and
+then continue with more exact values.</p>
+<p>A multi-column index on <code>(player_id, level)</code> accelerates these queries:</p>
+\<ul\>
+<li class=""><code>player_id = 123</code> (prefix match on first column)</li>
+<li class=""><code>player_id = 123 AND level = 5</code> (full match)</li>
+<li class=""><code>player_id = 123 AND level > 5</code> (prefix match with range)</li>
+</ul>
+<p>The same index does not accelerate a query on <code>level</code> alone, since <code>level</code> is not a prefix of the index.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">score</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    indexes</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#F8F8F2">      { accessor</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">byPlayerAndLevel</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, algorithm</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, columns</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> [</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">playerId</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">level</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">] },</span></span>
+<span class="line"><span style="color:#F8F8F2">    ],</span></span>
+<span class="line"><span style="color:#F8F8F2">  },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    playerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    level</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    points</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">i64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Score</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">ByPlayerAndLevel</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Columns </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#F8F8F2">[] { </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">PlayerId</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, </span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Level</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> })]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> PlayerId;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Level;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> long</span><span style="color:#F8F8F2"> Points;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> score, public, index(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> by_player_and_level, btree(columns </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> [player_id, level])))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    level</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    points</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Score</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint32_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#FF79C6">  uint32_t</span><span style="color:#F8F8F2"> level;</span></span>
+<span class="line"><span style="color:#FF79C6">  int64_t</span><span style="color:#F8F8F2"> points;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Score, player_id, level, points)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Score, score, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_NamedMultiColumnIndex</span><span style="color:#F8F8F2">(score, by_player_and_level, player_id, level)</span></span></code></pre><p>Use <code>FIELD_NamedMultiColumnIndex(table, index_name, field1, field2, ...)</code> to create a named multi-column B-tree index.</p></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="querying-with-indexes">Querying with Indexes<a href="#querying-with-indexes" class="hash-link" aria-label="Direct link to Querying with Indexes" title="Direct link to Querying with Indexes" translate="no">​</a></h2>
+<p>SpacetimeDB generates type-safe accessor methods for each index. These methods accept filter arguments and return matching rows.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="equality-queries">Equality Queries<a href="#equality-queries" class="hash-link" aria-label="Direct link to Equality Queries" title="Direct link to Equality Queries" translate="no">​</a></h3>
+<p>Pass a single value to find rows where the indexed column equals that value:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users with a specific name</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.user.name.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Found user: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">user.id</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users with a specific name</span></span>
+<span class="line"><span style="color:#FF79C6">foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.User.Name.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Found user: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Id</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users with a specific name</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">name</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Alice"</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Found user: {}"</span><span style="color:#F8F8F2">, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">id);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users with a specific name</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> user : ctx.db[user_name].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Found user: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> user.name);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Use the index accessor <code>ctx.db[index_name]</code> created by <code>FIELD_Index</code> to perform filtered queries.</p></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="range-queries">Range Queries<a href="#range-queries" class="hash-link" aria-label="Direct link to Range Queries" title="Direct link to Range Queries" translate="no">​</a></h3>
+<p>Pass a <code>Range</code> object to find rows where the indexed column falls within bounds. The <code>Range</code> constructor accepts <code>from</code> and <code>to</code> bounds, each specified as <code>{ tag: &#x27;included&#x27;, value }</code>, <code>{ tag: &#x27;excluded&#x27;, value }</code>, or <code>{ tag: &#x27;unbounded&#x27; }</code>:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { Range } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users aged 18 to 65 (inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.user.age.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6;font-weight:bold">  new</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">({ tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">included</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 18</span><span style="color:#F8F8F2"> }, { tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">included</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 65</span><span style="color:#F8F8F2"> })</span></span>
+<span class="line"><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">user.name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">user.age</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users aged 18 or older (from 18 inclusive, unbounded above)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.user.age.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6;font-weight:bold">  new</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">({ tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">included</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 18</span><span style="color:#F8F8F2"> }, { tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">unbounded</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> })</span></span>
+<span class="line"><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">user.name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is an adult`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users younger than 18 (unbounded below, to 18 exclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.user.age.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6;font-weight:bold">  new</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">({ tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">unbounded</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> }, { tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">excluded</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 18</span><span style="color:#F8F8F2"> })</span></span>
+<span class="line"><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">user.name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is a minor`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users aged 18 to 65 (inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.User.Age.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Bound</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">>(</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">65</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Age</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users aged 18 or older (inclusive, unbounded above)</span></span>
+<span class="line"><span style="color:#FF79C6">foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.User.Age.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Bound</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">>(</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">.MaxValue)))</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is an adult</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users younger than 18 (unbounded below, to 17 inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.User.Age.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Bound</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">>(</span><span style="color:#FF79C6">byte</span><span style="color:#F8F8F2">.MinValue, </span><span style="color:#BD93F9">17</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> is a minor</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>You can also use the implicit tuple conversion, like <code>ctx.Db.User.Age.Filter((18, byte.MaxValue))</code>, which is functionally identical.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users aged 18 to 65 (inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">age</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">18</span><span style="color:#FF79C6">..=</span><span style="color:#BD93F9">65</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"{} is {}"</span><span style="color:#F8F8F2">, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">age);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users aged 18 or older</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">age</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">18</span><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"{} is an adult"</span><span style="color:#F8F8F2">, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users younger than 18</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">age</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">..</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"{} is a minor"</span><span style="color:#F8F8F2">, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find users aged 18 to 65 (inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> user : ctx.db[user_age].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">range_inclusive</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint8_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">uint8_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">65</span><span style="color:#F8F8F2">)))) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Process user</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users aged 18 or older</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> user : ctx.db[user_age].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">range_from</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint8_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">)))) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Process user</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find users younger than 18</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> user : ctx.db[user_age].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">range_to</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint8_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">)))) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Process user</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Use range query functions: <code>range_inclusive()</code>, <code>range_from()</code>, <code>range_to()</code>, <code>range_to_inclusive()</code>, and <code>range_full\<T\>()</code>. These helpers are included by <code>spacetimedb.h</code>; include <code><spacetimedb/range_queries.h></code> directly only when you are not using the umbrella header.</p></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="multi-column-queries">Multi-Column Queries<a href="#multi-column-queries" class="hash-link" aria-label="Direct link to Multi-Column Queries" title="Direct link to Multi-Column Queries" translate="no">​</a></h3>
+<p>For multi-column indexes, pass a tuple of values. You can specify exact values for prefix columns and optionally a range for the trailing column:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { Range } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find all scores for player 123 (prefix match on first column)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.score.byPlayerAndLevel.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Level </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">score.level</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">score.points</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> points`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find scores for player 123 at levels 1-10 (inclusive)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.score.byPlayerAndLevel.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">([</span></span>
+<span class="line"><span style="color:#BD93F9">  123</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6;font-weight:bold">  new</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">({ tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">included</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 1</span><span style="color:#F8F8F2"> }, { tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">included</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2"> })</span></span>
+<span class="line"><span style="color:#F8F8F2">])) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Level </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">score.level</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">score.points</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> points`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find the exact score for player 123 at level 5</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.score.byPlayerAndLevel.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">([</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">5</span><span style="color:#F8F8F2">])) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Points: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">score.points</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find all scores for player 123</span></span>
+<span class="line"><span style="color:#FF79C6">foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.Score.ByPlayerAndLevel.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123u</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Level </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">score</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Level</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">score</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Points</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> points</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find all scores for player 123 (prefix match)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">by_player_and_level</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#BD93F9">123</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Level {}: {} points"</span><span style="color:#F8F8F2">, score</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">level, score</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">points);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find scores for player 123 at levels 1-10</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">by_player_and_level</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">((</span><span style="color:#BD93F9">123</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#FF79C6">..=</span><span style="color:#BD93F9">10</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Level {}: {} points"</span><span style="color:#F8F8F2">, score</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">level, score</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">points);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find the exact score for player 123 at level 5</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> score </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">score</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">by_player_and_level</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">((</span><span style="color:#BD93F9">123</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">5</span><span style="color:#8BE9FD;font-style:italic">u32</span><span style="color:#F8F8F2">)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Points: {}"</span><span style="color:#F8F8F2">, score</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">points);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Find all scores for player 123 (prefix match)</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> score : ctx.db[score_by_player_and_level].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">))) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Level </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(score.level) </span><span style="color:#FF79C6">+</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(score.points) </span><span style="color:#FF79C6">+</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C"> points</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find scores for player 123 at levels 1-10</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> score : ctx.db[score_by_player_and_level].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">         std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">make_tuple</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">), </span><span style="color:#50FA7B">range_inclusive</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10</span><span style="color:#F8F8F2">))))) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Level </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(score.level) </span><span style="color:#FF79C6">+</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(score.points) </span><span style="color:#FF79C6">+</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C"> points</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Find the exact score for player 123 at level 5</span></span>
+<span class="line"><span style="color:#FF79C6">for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> score : ctx.db[score_by_player_and_level].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">         std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">make_tuple</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">uint32_t</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">5</span><span style="color:#F8F8F2">)))) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Points: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(score.points));</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="deleting-with-indexes">Deleting with Indexes<a href="#deleting-with-indexes" class="hash-link" aria-label="Direct link to Deleting with Indexes" title="Direct link to Deleting with Indexes" translate="no">​</a></h2>
+<p>Indexes also accelerate deletions. Instead of scanning the entire table to find rows to delete, you can delete directly by index value:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { Range } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Delete all users named "Alice"</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> deleted </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.user.name.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Deleted </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">deleted</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> user(s)`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Delete users younger than 18</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> deletedMinors </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.user.age.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#FF79C6;font-weight:bold">  new</span><span style="color:#50FA7B"> Range</span><span style="color:#F8F8F2">({ tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">unbounded</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> }, { tag</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">excluded</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, value</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 18</span><span style="color:#F8F8F2"> })</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Deleted </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">deletedMinors</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> minor(s)`</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Delete all users named "Alice"</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> deleted </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.User.Name.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Deleted </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">deleted</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> user(s)</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Delete all users named "Alice"</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> deleted </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">name</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Alice"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Deleted {} user(s)"</span><span style="color:#F8F8F2">, deleted);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Delete users in an age range</span></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> deleted </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">age</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">..</span><span style="color:#BD93F9">18</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Deleted {} minor(s)"</span><span style="color:#F8F8F2">, deleted);</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="index-design-guidelines">Index Design Guidelines<a href="#index-design-guidelines" class="hash-link" aria-label="Direct link to Index Design Guidelines" title="Direct link to Index Design Guidelines" translate="no">​</a></h2>
+<p><strong>Choose columns based on query patterns.</strong> Index the columns that appear in your WHERE clauses and JOIN conditions. An unused index wastes memory.</p>
+<p><strong>Consider column order in multi-column indexes.</strong> Place the most selective column (the one that narrows results most) first, followed by columns used in range conditions. An index on <code>(country, city)</code> works for queries on <code>country</code> alone or <code>country AND city</code>, but not for queries on <code>city</code> alone.</p>
+<p><strong>Avoid redundant indexes.</strong> A multi-column index on <code>(a, b)</code> makes a separate index on <code>(a)</code> redundant, since the multi-column index handles prefix queries. However, an index on <code>(b)</code> is not redundant if you query <code>b</code> independently.</p>
+<p><strong>Balance read and write performance.</strong> Each index speeds up reads but slows down writes. Tables with high write volume and few reads may benefit from fewer indexes.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+\<ul\>
+<li class="">Learn about <a class="" href="/docs/tables/constraints">Constraints</a> for primary keys and unique indexes</li>
+<li class="">See <a class="" href="/docs/tables/access-permissions">Access Permissions</a> for querying tables from reducers</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00300-tables/00300-indexes.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tables/default-values"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Default Values</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tables/access-permissions"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Table Access Permissions</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#when-to-use-indexes" class="table-of-contents__link toc-highlight">When to Use Indexes</a></li>\<li\><a href="#index-types" class="table-of-contents__link toc-highlight">Index Types</a>\<ul\>\<li\><a href="#supported-column-types" class="table-of-contents__link toc-highlight">Supported Column Types</a></li>\<li\><a href="#b-tree-indexes" class="table-of-contents__link toc-highlight">B-tree Indexes</a></li>\<li\><a href="#direct-indexes" class="table-of-contents__link toc-highlight">Direct Indexes</a></li></ul></li>\<li\><a href="#single-column-indexes" class="table-of-contents__link toc-highlight">Single-Column Indexes</a>\<ul\>\<li\><a href="#field-level-syntax" class="table-of-contents__link toc-highlight">Field-Level Syntax</a></li>\<li\><a href="#table-level-syntax" class="table-of-contents__link toc-highlight">Table-Level Syntax</a></li></ul></li>\<li\><a href="#multi-column-indexes" class="table-of-contents__link toc-highlight">Multi-Column Indexes</a></li>\<li\><a href="#querying-with-indexes" class="table-of-contents__link toc-highlight">Querying with Indexes</a>\<ul\>\<li\><a href="#equality-queries" class="table-of-contents__link toc-highlight">Equality Queries</a></li>\<li\><a href="#range-queries" class="table-of-contents__link toc-highlight">Range Queries</a></li>\<li\><a href="#multi-column-queries" class="table-of-contents__link toc-highlight">Multi-Column Queries</a></li></ul></li>\<li\><a href="#deleting-with-indexes" class="table-of-contents__link toc-highlight">Deleting with Indexes</a></li>\<li\><a href="#index-design-guidelines" class="table-of-contents__link toc-highlight">Index Design Guidelines</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

@@ -25,7 +25,7 @@ The following agents can be used with an ACP Client:
 * [Claude Agent](https://platform.claude.com/docs/en/agent-sdk/overview) (via [Zed's SDK adapter](https://github.com/zed-industries/claude-agent-acp))
 * [Claw Orchestrator](https://github.com/Enderfga/claw-orchestrator/blob/main/skills/references/acp.md)
 * [Cline](https://cline.bot/)
-* [Codex CLI](https://developers.openai.com/codex/cli) (via [Zed's adapter](https://github.com/zed-industries/codex-acp))
+* [Codex CLI](https://developers.openai.com/codex/cli) (via [ACP's adapter](https://github.com/agentclientprotocol/codex-acp))
 * [Code Assistant](https://github.com/stippi/code-assistant?tab=readme-ov-file#configuration)
 * [Construct](https://github.com/construct-worlds/construct#acp-agent-client-protocol-server)
 * [crow-cli](https://crow-ai.dev)
@@ -52,8 +52,12 @@ The following agents can be used with an ACP Client:
 * [Poolside](https://github.com/poolsideai/pool)
 * [Qoder CLI](https://docs.qoder.com/cli/acp)
 * [Qwen Code](https://github.com/QwenLM/qwen-code)
+* [Raven](https://evermind-ai.github.io/Raven/agent-protocols/) (`raven acp`)
 * [Raxol](https://github.com/DROOdotFOO/raxol/blob/master/docs/features/CODING_AGENT.md) (`raxol acp`)
 * [siGit Code](https://github.com/getsigit/sigit)
 * [Stakpak](https://github.com/stakpak/agent?tab=readme-ov-file#agent-client-protocol-acp)
 * [stdio Bus](https://github.com/stdiobus/stdiobus)
 * [VT Code](https://github.com/vinhnx/vtcode/blob/main/README.md#zed-ide-integration-agent-client-protocol)
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

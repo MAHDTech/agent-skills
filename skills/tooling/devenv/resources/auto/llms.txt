@@ -1,0 +1,180 @@
+# SecretSpec
+
+> SecretSpec is a declarative secrets manager for development workflows. It separates secret **declaration** from secret **storage**: commit a `secretspec.toml` that declares what secrets your application needs, while the actual values live in a secure provider (system keyring, 1Password, Vault, etc.).
+
+SecretSpec answers three questions for every project:
+
+- **WHAT** secrets does the application need?
+- **HOW** do requirements change per environment (via profiles)?
+- **WHERE** are the actual values stored (via providers)?
+
+## Quick Start
+
+1. Initialize: `secretspec init --from .env` or create `secretspec.toml` manually
+2. Set secrets: `secretspec set DATABASE_URL`
+3. Check status: `secretspec check`
+4. Run commands with secrets: `secretspec run -- npm start`
+
+## Configuration Example
+
+```toml
+[project]
+name = "my-app"
+revision = "1.0"
+
+[profiles.default]
+DATABASE_URL = { description = "PostgreSQL connection string", required = true }
+REDIS_URL    = { description = "Redis cache" }
+TLS_CERT     = { description = "TLS cert", as_path = true }
+DB_PASSWORD  = { description = "DB password", type = "password", generate = true }
+
+[profiles.development]
+DATABASE_URL = { default = "postgresql://localhost/dev" }
+```
+
+## Composed Secrets (0.16+)
+
+`composed` derives a read-only value from other declared secrets with strict,
+order-independent `${UPPERCASE_NAME}` references. Names must match
+`[A-Z][A-Z0-9_]*`; it does not perform dotenv, shell, ambient-environment, or
+recursive expansion.
+
+## Type-safe Rust SDK
+
+```rust
+secretspec_derive::declare_secrets!("secretspec.toml");
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let resolved = SecretSpec::builder()
+        .with_provider("keyring://")
+        .with_profile("development")
+        .with_reason("start application")
+        .load()?;
+
+    println!("Database: {}", resolved.secrets.database_url);
+
+    if let Some(redis_url) = &resolved.secrets.redis_url {
+        println!("Redis: {redis_url}");
+    }
+
+    resolved.secrets.set_as_env_vars();
+
+    println!("Profile: {}", resolved.profile);
+    println!("Provider: {}", resolved.provider);
+
+    Ok(())
+}
+```
+
+## Migration
+
+Move every secret between providers without changing application code:
+
+```bash
+$ secretspec import dotenv://.env.production
+```
+
+## Providers
+
+Values can be resolved from: keyring (default), KeePass KDBX (0.17+), dotenv files, plaintext file directories (0.19+), EJSON files (0.20+, read-only), environment variables, systemd service credentials (0.17+), 1Password, Gopass (0.15+), LastPass, Dashlane (0.18+, read-only), Pass, Proton Pass, Passbolt (0.19+), Keeper Secrets Manager (0.18+), Doppler (0.21+), Google Cloud Secret Manager, AWS Secrets Manager, AWS Systems Manager Parameter Store (0.18+), Scaleway Secret Manager (0.17+), Tailscale Setec (0.21+), HashiCorp Vault, OpenBao (0.17+), Bitwarden Password Manager (0.18+), Bitwarden Secrets Manager, Azure Key Vault, Azure App Configuration (0.20+), Infisical (0.16+), age (0.17+), SOPS (0.17+), or Kubernetes (0.20+). Fly.io application secrets and Cloudflare Secrets Store entries can be published through the write-only fly and cloudflare providers (0.20+). The null provider (0.19+) uses manifest defaults, ephemeral generation, or ephemeral run prompts without storage.
+
+## Documentation Sets
+
+- [Complete documentation](https://secretspec.dev/llms-full.txt): every page of the SecretSpec documentation as Markdown
+
+## Documentation
+
+- [Basic Usage](https://secretspec.dev/basic-usage/index.md): The SecretSpec commands you will use most often
+- [But I Use SOPS](https://secretspec.dev/blog/but-i-use-sops/index.md): SOPS encrypts files. SecretSpec gives applications a portable contract for the secrets they need.
+- [Claude Code Stores OAuth Tokens in Plaintext](https://secretspec.dev/blog/claude-code-stores-oauth-tokens-in-plaintext/index.md): On Linux, Claude Code protects MCP OAuth credentials with file permissions—not encryption. It should let users choose a real secret store.
+- [Secrets Don’t Belong in Config](https://secretspec.dev/blog/secrets-dont-belong-in-config/index.md): An audit of 445 NixOS modules shows the cost of making configuration and secrets share one interface.
+- [SecretSpec 0.12: Audit logs and coding agents](https://secretspec.dev/blog/secretspec-0-12-audit-logs-and-coding-agents/index.md): Require a human-readable reason whenever a coding agent reaches for your secrets.
+- [SecretSpec 0.13: SDKs for Python, Node.js, Go, Ruby, and Haskell](https://secretspec.dev/blog/secretspec-0-13-sdks/index.md): Native Python, Node.js, Go, Ruby, and Haskell bindings over the same Rust resolver as the CLI.
+- [SecretSpec 0.14: Secret references](https://secretspec.dev/blog/secretspec-0-14-secret-references/index.md): A secret can now point at one that already exists in a provider's store, by the store's own coordinates, instead of a name SecretSpec picks.
+- [SecretSpec 0.15: Provider credentials, Azure Key Vault / Gopass, and PHP SDK](https://secretspec.dev/blog/secretspec-0-15-provider-credentials-azure-key-vault-gopass-and-php-sdk/index.md): Authenticate providers from another secret store, use Azure Key Vault or Gopass, export secrets for CI, and resolve them from PHP.
+- [SecretSpec 0.16: Composed secrets, Infisical, and C# SDK](https://secretspec.dev/blog/secretspec-0-16-composed-secrets-infisical-and-csharp-sdk/index.md): Derive secrets from other declared values, use Infisical Cloud or self-hosted, and resolve secrets natively from .NET.
+- [SecretSpec 0.17: Scopes, secrets caching, SOPS, age, and systemd credentials](https://secretspec.dev/blog/secretspec-0-17-scopes-secrets-caching-age-and-systemd-credentials/index.md): Resolve only the secrets a service needs, cache remote secrets safely, and use age-encrypted files or native systemd credentials alongside new providers.
+- [SecretSpec 0.18: Secret lifecycle, Bitwarden, Keeper, AWS Parameter Store, and Swift](https://secretspec.dev/blog/secretspec-0-18-secret-lifecycle-bitwarden-keeper-aws-parameter-store-and-swift/index.md): Declare, discover, migrate, and delete secrets from the CLI; use four new providers; and resolve the same manifests from Swift.
+- [SecretSpec 0.19: Moving and importing secrets between providers](https://secretspec.dev/blog/secretspec-0-19-moving-and-importing-secrets-between-providers/index.md): Move secrets safely between storage layouts, keep config and ephemeral values in the same declaration model, and make remote providers faster.
+- [SecretSpec 0.20: Git, Docker, inline specs, and five new providers](https://secretspec.dev/blog/secretspec-0-20-git-docker-inline-specs-and-five-new-providers/index.md): Let Git and Docker retrieve credentials from any provider, declare secrets in application code, use the JVM SDK, and deploy on Alpine.
+- [SecretSpec 0.21: Resolver IPC, external providers, and binary secrets](https://secretspec.dev/blog/secretspec-0-21-resolver-ipc-external-providers-and-binary-secrets/index.md): Resolve secrets over IPC, build providers outside the Rust workspace, connect Claude Code to your secret store, and preserve binary values end to end.
+- [We Are Forking dotenvy into dotenv-ng](https://secretspec.dev/blog/we-are-forking-dotenvy-into-dotenv-ng/index.md): A modern Rust dotenv implementation with literal dollars, round-trip rendering, and structured parse errors.
+- [Where .env Went Wrong](https://secretspec.dev/blog/where-env-went-wrong/index.md): A local convenience became a secrets interface, an environment model, and a deployment format. It was never designed to be any of them.
+- [GitHub Actions](https://secretspec.dev/ci/github-actions/index.md): Resolve secrets from secretspec.toml in GitHub Actions, Forgejo Actions, and other CI systems
+- [Comparison](https://secretspec.dev/comparison/index.md): See how SecretSpec and its providers work together
+- [Audit Logging](https://secretspec.dev/concepts/audit/index.md): A local, append-only record of every secret access for after-the-fact review
+- [Composed Secrets](https://secretspec.dev/concepts/composed-secrets/index.md): Derive read-only values from other declared secrets with strict templates
+- [Declarative Configuration](https://secretspec.dev/concepts/declarative/index.md): Understanding secretspec.toml and its declarative approach
+- [Secret Generation](https://secretspec.dev/concepts/generation/index.md): Automatically generating passwords, tokens, and keys for missing secrets
+- [Configuration Inheritance](https://secretspec.dev/concepts/inheritance/index.md): Sharing common secret definitions across projects with extends
+- [Concepts Overview](https://secretspec.dev/concepts/overview/index.md): How SecretSpec's core concepts work together
+- [Profiles](https://secretspec.dev/concepts/profiles/index.md): Managing environment-specific secret requirements with profiles
+- [Providers](https://secretspec.dev/concepts/providers/index.md): Choose and configure the storage backends SecretSpec uses for secrets
+- [Provider caching](https://secretspec.dev/concepts/providers/caching/index.md): Cache slow provider routes in a local secret store
+- [Provider fallback](https://secretspec.dev/concepts/providers/fallback/index.md): Select providers and define ordered fallback routes for secrets
+- [Secret References](https://secretspec.dev/concepts/references/index.md): Point a secret at one already managed in a provider's store, by the store's own coordinates
+- [Scopes](https://secretspec.dev/concepts/scopes/index.md): Resolve and expose only the secrets a service or task needs
+- [Adding a New Provider](https://secretspec.dev/development/adding-providers/index.md): Step-by-step guide for implementing custom provider backends
+- [Implementing SecretSpec IPC](https://secretspec.dev/development/ipc-implementation/index.md): Repository layout, handler design, trait mapping, conformance tests, and delivery order for IPC version 1
+- [SDK Development](https://secretspec.dev/development/sdks/index.md): How the language SDKs are built, packaged, and released, and which platforms each one supports
+- [Adding an Integration](https://secretspec.dev/integrations/adding/index.md): Choose a mechanism for making an external tool read secrets from SecretSpec, then build it
+- [Claude Code](https://secretspec.dev/integrations/claude-code/index.md): Let Claude Code retrieve API and gateway credentials through SecretSpec providers
+- [Docker credentials](https://secretspec.dev/integrations/docker/index.md): Let Docker retrieve registry credentials through SecretSpec providers
+- [Git credentials](https://secretspec.dev/integrations/git/index.md): Let Git retrieve HTTPS and SMTP credentials through SecretSpec providers
+- [Migration](https://secretspec.dev/migration/index.md): Bring existing secret declarations and values into SecretSpec
+- [Azure App Configuration Provider](https://secretspec.dev/providers/aac/index.md): Azure App Configuration integration
+- [age Provider](https://secretspec.dev/providers/age/index.md): Store secrets in an age-encrypted file committed alongside code
+- [Azure Key Vault Provider](https://secretspec.dev/providers/akv/index.md): Azure Key Vault integration
+- [AWS Systems Manager Parameter Store Provider](https://secretspec.dev/providers/awsps/index.md): AWS Systems Manager Parameter Store integration
+- [AWS Secrets Manager Provider](https://secretspec.dev/providers/awssm/index.md): AWS Secrets Manager integration
+- [Bitwarden Password Manager Provider](https://secretspec.dev/providers/bw/index.md): Bitwarden Password Manager secrets management integration
+- [Bitwarden Secrets Manager Provider](https://secretspec.dev/providers/bws/index.md): Bitwarden Secrets Manager integration
+- [Cloudflare Secrets Store provider](https://secretspec.dev/providers/cloudflare/index.md): Publish SecretSpec values to Cloudflare account-level Secrets Store
+- [Dashlane Provider](https://secretspec.dev/providers/dashlane/index.md): Read-only access to a Dashlane vault through the Dashlane CLI
+- [Doppler Provider](https://secretspec.dev/providers/doppler/index.md): Doppler integration over the Doppler REST API, with verbatim secret names
+- [Dotenv Provider](https://secretspec.dev/providers/dotenv/index.md): Traditional .env file storage for secrets
+- [EJSON Provider](https://secretspec.dev/providers/ejson/index.md): Read secrets from EJSON encrypted files
+- [Environment Variable Provider](https://secretspec.dev/providers/env/index.md): Read-only access to environment variables
+- [File Provider](https://secretspec.dev/providers/file/index.md): Store each secret in one plaintext file beneath a local directory
+- [Fly.io secrets provider](https://secretspec.dev/providers/fly/index.md): Publish SecretSpec values to Fly.io application secrets through flyctl
+- [Fly.io provider name](https://secretspec.dev/providers/flyctl/index.md): The Fly.io provider uses the fly name and URI scheme in SecretSpec 0.20+.
+- [Google Cloud Secret Manager Provider](https://secretspec.dev/providers/gcsm/index.md): Google Cloud Secret Manager integration
+- [Gopass Provider](https://secretspec.dev/providers/gopass/index.md): GPG-encrypted, git-synced password store integration
+- [Infisical Provider](https://secretspec.dev/providers/infisical/index.md): Infisical integration
+- [KeePass KDBX Provider](https://secretspec.dev/providers/kdbx/index.md): Store SecretSpec values in an encrypted KeePass database
+- [Keeper Secrets Manager Provider](https://secretspec.dev/providers/keeper/index.md): Keeper Secrets Manager integration through Keeper's official Rust SDK
+- [Keyring Provider](https://secretspec.dev/providers/keyring/index.md): Secure system credential store integration
+- [Kubernetes Provider](https://secretspec.dev/providers/kubernetes/index.md): Kubernetes ConfigMap & Secerts
+- [LastPass Provider](https://secretspec.dev/providers/lastpass/index.md): LastPass password manager integration
+- [Null Provider](https://secretspec.dev/providers/null/index.md): Use committed defaults, ephemeral generation, or run-time prompts without storage
+- [1Password Provider](https://secretspec.dev/providers/onepassword/index.md): 1Password secrets management integration
+- [OpenBao Provider](https://secretspec.dev/providers/openbao/index.md): OpenBao integration, available in SecretSpec 0.17+
+- [Pass Provider](https://secretspec.dev/providers/pass/index.md): Unix password manager integration with GPG encryption
+- [Passbolt Provider](https://secretspec.dev/providers/passbolt/index.md): Store and read SecretSpec values in a self-hosted Passbolt server
+- [Proton Pass Provider](https://secretspec.dev/providers/protonpass/index.md): Proton Pass integration via the official pass-cli
+- [Scaleway Secret Manager Provider](https://secretspec.dev/providers/scaleway/index.md): Scaleway Secret Manager integration
+- [Tailscale Setec Provider](https://secretspec.dev/providers/setec/index.md): Store secrets in a tailnet-authenticated Setec service
+- [SOPS Provider](https://secretspec.dev/providers/sops/index.md): Store secrets in SOPS-encrypted files
+- [systemd Credential Provider](https://secretspec.dev/providers/systemd-credential/index.md): Read secrets passed to a service through systemd credentials
+- [Vault Provider](https://secretspec.dev/providers/vault/index.md): HashiCorp Vault integration
+- [Quick Start](https://secretspec.dev/quick-start/index.md): Get up and running with SecretSpec in minutes
+- [CLI Commands Reference](https://secretspec.dev/reference/cli/index.md): Complete reference for SecretSpec CLI commands
+- [secretspec.toml Reference](https://secretspec.dev/reference/configuration/index.md): Complete reference for secretspec.toml configuration options
+- [IPC architecture](https://secretspec.dev/reference/ipc-architecture/index.md): Design and trust boundaries for SecretSpec client and external-provider IPC
+- [IPC wire protocol](https://secretspec.dev/reference/ipc-wire/index.md): Shared framing, negotiation, cancellation, errors, and lifecycle for SecretSpec IPC
+- [Provider credentials](https://secretspec.dev/reference/provider-credentials/index.md): Semantic provider credential names and their environment fallbacks
+- [Secret Provider Protocol](https://secretspec.dev/reference/provider-protocol/index.md): Version 1 IPC contract for out-of-tree SecretSpec provider endpoints
+- [Providers Reference](https://secretspec.dev/reference/providers/index.md): Complete reference for SecretSpec storage providers and their URI configurations
+- [Secret Resolution Protocol](https://secretspec.dev/reference/resolver-protocol/index.md): Version 1 IPC contract between an SDK or application and the SecretSpec resolver
+- [C# SDK](https://secretspec.dev/sdk/csharp/index.md): Resolve SecretSpec secrets from C# and .NET
+- [Go SDK](https://secretspec.dev/sdk/go/index.md): Resolve SecretSpec secrets from Go
+- [Haskell SDK](https://secretspec.dev/sdk/haskell/index.md): Resolve SecretSpec secrets from Haskell
+- [JVM SDK](https://secretspec.dev/sdk/jvm/index.md): Resolve SecretSpec secrets from Java Virtual Machine languages
+- [Node.js SDK](https://secretspec.dev/sdk/nodejs/index.md): Resolve SecretSpec secrets from Node.js and TypeScript
+- [SDK Overview](https://secretspec.dev/sdk/overview/index.md): How the SecretSpec language SDKs work
+- [PHP SDK](https://secretspec.dev/sdk/php/index.md): Resolve SecretSpec secrets from PHP, Laravel, and Symfony
+- [Python SDK](https://secretspec.dev/sdk/python/index.md): Resolve SecretSpec secrets from Python
+- [Ruby SDK](https://secretspec.dev/sdk/ruby/index.md): Resolve SecretSpec secrets from Ruby
+- [Rust SDK](https://secretspec.dev/sdk/rust/index.md): Type-safe Rust integration for SecretSpec
+- [Swift SDK](https://secretspec.dev/sdk/swift/index.md): Resolve SecretSpec secrets from Swift on macOS
+

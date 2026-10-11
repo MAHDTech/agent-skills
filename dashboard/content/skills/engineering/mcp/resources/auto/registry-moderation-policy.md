@@ -70,3 +70,5 @@ Think we made a mistake? Open an issue on our [GitHub repository](https://github
 ## Changes to This Policy
 
 We're still learning how best to run the MCP Registry! As such, we might end up changing this policy in the future.
+
+

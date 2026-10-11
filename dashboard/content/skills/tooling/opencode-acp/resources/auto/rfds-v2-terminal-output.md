@@ -199,3 +199,6 @@ Display-only terminal output has a small safe fallback: decode the bytes, saniti
 ## Revision history
 
 * 2026-07-14: Initial draft.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

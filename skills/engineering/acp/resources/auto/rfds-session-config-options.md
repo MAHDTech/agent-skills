@@ -265,3 +265,6 @@ This is a question we should discuss of how much complexity we want to introduce
 * 2025-10-29: Initial draft
 * 2026-01-09: Add option categories
 * 2026-01-15: Allow for category extensions
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

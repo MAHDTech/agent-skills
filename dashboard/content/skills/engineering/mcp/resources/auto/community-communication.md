@@ -19,13 +19,13 @@ This document explains how to communicate and collaborate within the Model Conte
 
 ## Communication Channels
 
-| Channel                                                                                                     | Purpose               | When to Use                                      |
-| ----------------------------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------ |
-| [Discord](https://discord.gg/6CSzBmMkjX)                                                                    | Real-time discussion  | Quick questions, coordination, WG/IG discussions |
-| [Live calls](https://meet.modelcontextprotocol.io/)                                                         | Sync up               | WG/IG presentations, progress reports            |
-| [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions)              | Structured discussion | Proposals, roadmap planning, longer-form debate  |
-| [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues)                        | Actionable tasks      | Bug reports, documentation fixes                 |
-| [Vulnerability reports](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/SECURITY.md) | Security issues       | Vulnerabilities - **never post publicly**        |
+| Channel | Purpose | When to Use |
+| - | - | - |
+| [Discord](https://discord.gg/6CSzBmMkjX) | Real-time discussion | Quick questions, coordination, WG/IG discussions |
+| [Live calls](https://meet.modelcontextprotocol.io/) | Sync up | WG/IG presentations, progress reports |
+| [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions) | Structured discussion | Proposals, roadmap planning, longer-form debate |
+| [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) | Actionable tasks | Bug reports, documentation fixes |
+| [Vulnerability reports](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/SECURITY.md) | Security issues | Vulnerabilities - **never post publicly** |
 
 All communication is governed by our [Code of Conduct](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/CODE_OF_CONDUCT.md). We expect respectful, professional, and inclusive interactions across all channels.
 
@@ -40,7 +40,7 @@ The [MCP Contributor Discord](https://discord.gg/6CSzBmMkjX) is for real-time co
 **Primary use cases:**
 
 * SDK and tooling development (e.g., `#typescript-sdk-dev`, `#inspector-dev`)
-* [Working Group and Interest Group](https://modelcontextprotocol.io/community/working-interest-groups) discussions (e.g., `#auth-wg`, `#security-ig`)
+* [Working Group and Interest Group](/community/working-interest-groups) discussions (e.g., `#auth-wg`, `#security-ig`)
 * Community onboarding and contribution guidance
 * Community feedback and collaborative brainstorming
 * Public office hours and maintainer availability
@@ -92,26 +92,26 @@ Use for bug reports and actionable development tasks. Feature requests should go
 * CI/CD problems and infrastructure issues
 * Release tasks and milestone tracking
 
-**Note:** SEP proposals are submitted as pull requests to the [`seps/` directory](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/main/seps), not as GitHub Issues. See the [SEP Guidelines](https://modelcontextprotocol.io/community/sep-guidelines).
+**Note:** SEP proposals are submitted as pull requests to the [`seps/` directory](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/main/seps), not as GitHub Issues. See the [SEP Guidelines](/community/sep-guidelines).
 
 ## Security Issues
 
 **Do not post security issues publicly.**
 
 1. Use the private security reporting process in [SECURITY.md](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/SECURITY.md)
-2. Contact Lead or [Core Maintainers](https://modelcontextprotocol.io/community/governance#current-core-maintainers) directly
+2. Contact Lead or [Core Maintainers](/community/governance#current-core-maintainers) directly
 3. Follow responsible disclosure guidelines
 
 ## Decision Records
 
 All MCP decisions are documented in public channels:
 
-| Type                  | Location                                                                                      |
-| --------------------- | --------------------------------------------------------------------------------------------- |
-| Technical decisions   | [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) and SEPs |
-| Specification changes | [Changelog](https://modelcontextprotocol.io/specification/draft/changelog)                    |
-| Process changes       | [Community documentation](https://modelcontextprotocol.io/community/governance)               |
-| Governance decisions  | [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) and SEPs |
+| Type | Location |
+| - | - |
+| Technical decisions | [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) and SEPs |
+| Specification changes | [Changelog](https://modelcontextprotocol.io/specification/draft/changelog) |
+| Process changes | [Community documentation](https://modelcontextprotocol.io/community/governance) |
+| Governance decisions | [GitHub Issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) and SEPs |
 
 When documenting decisions, we retain as much context as possible:
 
@@ -120,3 +120,5 @@ When documenting decisions, we retain as much context as possible:
 * Options considered
 * Rationale for chosen approach
 * Implementation steps
+
+

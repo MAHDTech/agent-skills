@@ -15,19 +15,19 @@ skill_name = "mcp"
 
 <div id="enable-section-numbers" />
 
-\<Info\>
+<Info>
   Streamable HTTP was introduced in protocol version 2025-03-26 as a replacement
   for the [HTTP+SSE transport][http-sse] from protocol version 2024-11-05.
 </Info>
 
-\<Info\>
+<Info>
   Revision 2026-07-28 changed the behavior of Streamable HTTP. Clients must
   ensure they handle backwards compatibility correctly. Changes included:
 
   * Removal of the GET stream endpoint.
   * Removal of protocol-level sessions.
 
-  See the [changelog](https://modelcontextprotocol.io/specification/draft/changelog) and
+  See the [changelog](/specification/draft/changelog) and
   [Backward Compatibility](#backward-compatibility) below.
 </Info>
 
@@ -102,7 +102,7 @@ request to the MCP endpoint.
   This revision of the core protocol defines no client-to-server
   *notifications* over Streamable HTTP. The only client-sent notification in
   the core protocol, `notifications/cancelled`, is used only on the
-  [stdio](https://modelcontextprotocol.io/specification/draft/basic/transports/stdio) transport; on
+  [stdio](/specification/draft/basic/transports/stdio) transport; on
   Streamable HTTP, closing the SSE response stream is itself the cancellation
   signal and no `notifications/cancelled` message is expected (see
   [Cancellation][cancellation]). The notification rules above describe the
@@ -295,10 +295,10 @@ the header per [Server Validation](#server-validation).
 
 ### Standard Request Headers
 
-| Header Name  | Source Field                  | Required For                                           |
-| ------------ | ----------------------------- | ------------------------------------------------------ |
-| `Mcp-Method` | `method`                      | All requests                                           |
-| `Mcp-Name`   | `params.name` or `params.uri` | `tools/call`, `resources/read`, `prompts/get` requests |
+| Header Name | Source Field | Required For |
+| - | - | - |
+| `Mcp-Method` | `method` | All requests |
+| `Mcp-Name` | `params.name` or `params.uri` | `tools/call`, `resources/read`, `prompts/get` requests |
 
 These headers are **REQUIRED** for compliance.
 
@@ -520,13 +520,13 @@ and ends with `?=`).
 
 **Encoding examples:**
 
-| Original Value         | Reason                   | Encoded Header Value                                  |
-| ---------------------- | ------------------------ | ----------------------------------------------------- |
-| `"us-west1"`           | Plain ASCII              | `Mcp-Param-Region: us-west1`                          |
-| `"Hello, 世界"`          | Contains non-ASCII       | `Mcp-Param-Greeting: =?base64?SGVsbG8sIOS4lueVjA==?=` |
-| `" padded "`           | Leading/trailing spaces  | `Mcp-Param-Text: =?base64?IHBhZGRlZCA=?=`             |
-| `"line1\nline2"`       | Contains newline         | `Mcp-Param-Text: =?base64?bGluZTEKbGluZTI=?=`         |
-| `"=?base64?literal?="` | Matches sentinel pattern | `Mcp-Param-Val: =?base64?PT9iYXNlNjQ/bGl0ZXJhbD89?=`  |
+| Original Value | Reason | Encoded Header Value |
+| - | - | - |
+| `"us-west1"` | Plain ASCII | `Mcp-Param-Region: us-west1` |
+| `"Hello, 世界"` | Contains non-ASCII | `Mcp-Param-Greeting: =?base64?SGVsbG8sIOS4lueVjA==?=` |
+| `" padded "` | Leading/trailing spaces | `Mcp-Param-Text: =?base64?IHBhZGRlZCA=?=` |
+| `"line1\nline2"` | Contains newline | `Mcp-Param-Text: =?base64?bGluZTEKbGluZTI=?=` |
+| `"=?base64?literal?="` | Matches sentinel pattern | `Mcp-Param-Val: =?base64?PT9iYXNlNjQ/bGl0ZXJhbD89?=` |
 
 [rfc9110-values]: https://datatracker.ietf.org/doc/html/rfc9110#name-field-values
 
@@ -569,12 +569,12 @@ values in the request body. Servers **MUST** reject requests with a
 `400 Bad Request` HTTP status and JSON-RPC error code `-32020`
 (`HeaderMismatch`) if any validation fails.
 
-| Scenario                                 | Client Behavior                | Server Behavior                          |
-| ---------------------------------------- | ------------------------------ | ---------------------------------------- |
-| Parameter value provided                 | Client MUST include the header | Server MUST validate header matches body |
-| Parameter value is `null`                | Client MUST omit the header    | Server MUST NOT expect the header        |
-| Parameter not in arguments               | Client MUST omit the header    | Server MUST NOT expect the header        |
-| Client omits header but value is in body | Non-conforming client          | Server MUST reject the request           |
+| Scenario | Client Behavior | Server Behavior |
+| - | - | - |
+| Parameter value provided | Client MUST include the header | Server MUST validate header matches body |
+| Parameter value is `null` | Client MUST omit the header | Server MUST NOT expect the header |
+| Parameter not in arguments | Client MUST omit the header | Server MUST NOT expect the header |
+| Client omits header but value is in body | Non-conforming client | Server MUST reject the request |
 
 [http-semantics]: https://www.rfc-editor.org/rfc/rfc9110.html#name-field-names
 
@@ -607,13 +607,13 @@ When rejecting a request due to header validation failure, servers **MUST**
 return HTTP status `400 Bad Request` and **MUST** include a JSON-RPC error
 response using the following error code:
 
-| Code     | Name                                                                | Description                                                                                                            |
-| -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `-32020` | [`HeaderMismatch`](https://modelcontextprotocol.io/specification/draft/schema#headermismatcherror) | The HTTP headers do not match the corresponding values in the request body, or required headers are missing/malformed. |
+| Code | Name | Description |
+| - | - | - |
+| `-32020` | [`HeaderMismatch`](/specification/draft/schema#headermismatcherror) | The HTTP headers do not match the corresponding values in the request body, or required headers are missing/malformed. |
 
 This error code is allocated from the sub-range the MCP specification
 reserves for protocol-defined errors. See
-[Error Codes](https://modelcontextprotocol.io/specification/draft/basic/index#error-codes).
+[Error Codes](/specification/draft/basic/index#error-codes).
 
 **Example error response:**
 
@@ -674,7 +674,7 @@ and a compatibility matrix for implementors.
 
 ### Earlier Streamable HTTP Revisions
 
-Protocol versions `2025-03-26` through [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
+Protocol versions `2025-03-26` through [`2025-11-25`](/specification/2025-11-25/basic/transports)
 also used the Streamable HTTP transport, but in a different shape: servers could assign a session via
 the `Mcp-Session-Id` header (terminated with HTTP DELETE), clients could open
 a standalone SSE stream with HTTP GET to receive server-initiated messages,
@@ -694,7 +694,7 @@ older client **SHOULD** respond as follows:
 Servers and clients that need to interoperate with counterparts speaking
 those protocol versions implement the behavior described in the corresponding
 revision (for example,
-[2025-11-25: Streamable HTTP](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#streamable-http)),
+[2025-11-25: Streamable HTTP](/specification/2025-11-25/basic/transports#streamable-http)),
 in addition to the version-negotiation fallback described above.
 
 ### HTTP+SSE Transport (2024-11-05)
@@ -703,13 +703,13 @@ in addition to the version-negotiation fallback described above.
   **Deprecated**: The [HTTP+SSE transport][http-sse] from protocol version
   2024-11-05 has been deprecated since protocol version `2025-03-26` and is
   classified as Deprecated under the [feature lifecycle
-  policy](https://modelcontextprotocol.io/community/feature-lifecycle#deprecating-a-feature)
+  policy](/community/feature-lifecycle#deprecating-a-feature)
   ([SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596)).
   New implementations **SHOULD NOT** adopt it; existing implementations
   **SHOULD** migrate to [Streamable
-  HTTP](https://modelcontextprotocol.io/specification/draft/basic/transports/streamable-http). It is eligible
+  HTTP](/specification/draft/basic/transports/streamable-http). It is eligible
   for removal in a future revision; see the [deprecated features
-  registry](https://modelcontextprotocol.io/specification/draft/deprecated).
+  registry](/specification/draft/deprecated).
 </Warning>
 
 Clients and servers can maintain backward compatibility with the
@@ -742,3 +742,5 @@ protocol version 2024-11-05) as follows:
        transport for all subsequent communication.
 
 [lifecycle-compat]: /specification/draft/basic/versioning#backward-compatibility-with-initialization-based-versions
+
+

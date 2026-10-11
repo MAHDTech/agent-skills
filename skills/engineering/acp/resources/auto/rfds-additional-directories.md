@@ -437,3 +437,6 @@ This proposal is preferred because it is additive, keeps `cwd` semantics stable,
 
 * 2026-05-21: Moved to Preview.
 * 2026-03-24: Initial draft.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

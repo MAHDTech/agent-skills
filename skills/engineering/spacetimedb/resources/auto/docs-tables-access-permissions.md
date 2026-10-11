@@ -1,918 +1,732 @@
-Version: 2.0.0
-
-On this page
-
-SpacetimeDB controls data access through table visibility and
-context-based permissions. Tables can be public or private, and
-different execution contexts (reducers, views, clients) have different
-levels of access.
-
-## Public and Private Tables
-
-Tables are **private** by default. Private tables can only be accessed
-by reducers and views running on the server. Clients cannot query,
-subscribe to, or see private tables.
-
-**Public** tables are exposed to clients for read access through
-subscriptions and queries. Clients can see public table data but can
-only modify it by calling reducers.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-// Private table (default) - only accessible from server-side code
-const internalConfig = table(
-  { name: 'internal_config' },
-  {
-    key: t.string().primaryKey(),
-    value: t.string(),
-  }
-);
-
-// Public table - clients can subscribe and query
-const player = table(
-  { name: 'player', public: true },
-  {
-    id: t.u64().primaryKey().autoInc(),
-    name: t.string(),
-    score: t.u64(),
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-// Private table (default) - only accessible from server-side code
-[SpacetimeDB.Table(Accessor = "InternalConfig")]
-public partial struct InternalConfig
-{
-    [SpacetimeDB.PrimaryKey]
-    public string Key;
-    public string Value;
-}
-
-// Public table - clients can subscribe and query
-[SpacetimeDB.Table(Accessor = "Player", Public = true)]
-public partial struct Player
-{
-    [SpacetimeDB.PrimaryKey]
-    [SpacetimeDB.AutoInc]
-    public ulong Id;
-    public string Name;
-    public ulong Score;
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Private table (default) - only accessible from server-side code
-#[spacetimedb::table(accessor = internal_config)]
-pub struct InternalConfig {
-    #[primary_key]
-    key: String,
-    value: String,
-}
-
-// Public table - clients can subscribe and query
-#[spacetimedb::table(accessor = player, public)]
-pub struct Player {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    name: String,
-    score: u64,
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Private table (default) - only accessible from server-side code
-struct InternalConfig {
-    std::string key;
-    std::string value;
-};
-SPACETIMEDB_STRUCT(InternalConfig, key, value)
-SPACETIMEDB_TABLE(InternalConfig, internal_config, Private)
-FIELD_PrimaryKey(internal_config, key)
-
-// Public table - clients can subscribe and query
-struct Player {
-    uint64_t id;
-    std::string name;
-    uint64_t score;
-};
-SPACETIMEDB_STRUCT(Player, id, name, score)
-SPACETIMEDB_TABLE(Player, player, Public)
-FIELD_PrimaryKeyAutoInc(player, id)
-```
-
-Use `Private` or `Public` as the third parameter to `SPACETIMEDB_TABLE`
-to control table visibility.
-
-Use private tables for:
-
-- Internal configuration or state that clients should not see
-- Sensitive data like password hashes or API keys
-- Intermediate computation results
-
-Use public tables for:
-
-- Data that clients need to display or interact with
-- Game state, user profiles, or other user-facing data
-
-## Reducers - Read-Write Access
-
-Reducers receive a `ReducerContext` which provides full read-write
-access to all tables (both public and private). They can perform all
-CRUD operations: insert, read, update, and delete.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const example = spacetimedb.reducer((ctx) => {
-  // Insert
-  ctx.db.user.insert({ id: 0n, name: 'Alice', email: 'alice@example.com' });
-
-  // Read: iterate all rows
-  for (const user of ctx.db.user.iter()) {
-    console.log(user.name);
-  }
-
-  // Read: find by unique column
-  const foundUser = ctx.db.user.id.find(123);
-  if (foundUser) {
-    // Update
-    foundUser.name = 'Bob';
-    ctx.db.user.id.update(foundUser);
-  }
-
-  // Delete
-  ctx.db.user.id.delete(456);
-});
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Reducer]
-public static void Example(ReducerContext ctx)
-{
-    // Insert
-    ctx.Db.User.Insert(new User { Id = 0, Name = "Alice", Email = "alice@example.com" });
-
-    // Read: iterate all rows
-    foreach (var user in ctx.Db.User.Iter())
-    {
-        Log.Info($"User: {user.Name}");
-    }
-
-    // Read: find by unique column
-    if (ctx.Db.User.Id.Find(123) is User foundUser)
-    {
-        // Update
-        foundUser.Name = "Bob";
-        ctx.Db.User.Id.Update(foundUser);
-    }
-
-    // Delete
-    ctx.Db.User.Id.Delete(456);
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{ReducerContext, Table};
-
-#[spacetimedb::reducer]
-fn example(ctx: &ReducerContext) -> Result<(), String> {
-    // Insert
-    ctx.db.user().insert(User {
-        id: 0,
-        name: "Alice".to_string(),
-        email: "alice@example.com".to_string(),
-    });
-
-    // Read: iterate all rows
-    for user in ctx.db.user().iter() {
-        log::info!("User: {}", user.name);
-    }
-
-    // Read: find by unique column
-    if let Some(mut user) = ctx.db.user().id().find(123) {
-        // Update
-        user.name = "Bob".to_string();
-        ctx.db.user().id().update(user);
-    }
-
-    // Delete
-    ctx.db.user().id().delete(456);
-
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_REDUCER(example, ReducerContext ctx) {
-    // Insert
-    ctx.db[user].insert(User{.id = 0, .name = "Alice", .email = "alice@example.com"});
-
-    // Read: iterate all rows
-    for (const auto& user_row : ctx.db[user]) {
-        LOG_INFO("User: " + user_row.name);
-    }
-
-    // Read: find by unique column
-    auto found_user = ctx.db[user_id].find(123);
-    if (found_user.has_value()) {
-        // Update
-        auto updated = found_user.value();
-        updated.name = "Bob";
-        ctx.db[user_id].update(updated);
-    }
-
-    // Delete
-    ctx.db[user_id].delete_by_key(456);
-    
-    return Ok();
-}
-```
-
-## Procedures with Transactions - Read-Write Access
-
-Procedures receive a `ProcedureContext` and can access tables through
-transactions. Unlike reducers, procedures must explicitly open a
-transaction to read from or modify the database.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const updateUserProcedure = spacetimedb.procedure({ userId: t.u64(), newName: t.string() }, t.unit(), (ctx, { userId, newName }) => {
-  // Must explicitly open a transaction
-  ctx.withTx(ctx => {
-    // Full read-write access within the transaction
-    const user = ctx.db.user.id.find(userId);
-    if (user) {
-      user.name = newName;
-      ctx.db.user.id.update(user);
-    }
-  });
-  // Transaction is committed when the function returns
-  return {};
-});
-```
-
-``` codeBlockStandalone_LlrK
-#pragma warning disable STDB_UNSTABLE
-
-[SpacetimeDB.Procedure]
-public static void UpdateUserProcedure(ProcedureContext ctx, ulong userId, string newName)
-{
-    // Must explicitly open a transaction
-    ctx.WithTx(txCtx =>
-    {
-        // Full read-write access within the transaction
-        var user = txCtx.Db.User.Id.Find(userId);
-        if (user != null)
-        {
-            var updated = user.Value;
-            updated.Name = newName;
-            txCtx.Db.User.Id.Update(updated);
-        }
-        return 0;
-    });
-    // Transaction is committed when the lambda returns
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::procedure]
-fn update_user_procedure(ctx: &mut ProcedureContext, user_id: u64, new_name: String) {
-    // Must explicitly open a transaction
-    ctx.with_tx(|ctx| {
-        // Full read-write access within the transaction
-        if let Some(mut user) = ctx.db.user().id().find(user_id) {
-            user.name = new_name.clone();
-            ctx.db.user().id().update(user);
-        }
-    });
-    // Transaction is committed when the closure returns
-}
-```
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_PROCEDURE(Unit, update_user_procedure, ProcedureContext ctx, uint64_t userId, std::string newName) {
-    // Must explicitly open a transaction
-    ctx.with_tx([userId, newName](https://spacetimedb.com/docs/tables/TxContext&%20tx) {
-        // Full read-write access within the transaction
-        auto user_opt = tx.db[user_id].find(userId);
-        if (user_opt.has_value()) {
-            User updated = user_opt.value();
-            updated.name = newName;
-            tx.db[user_id].update(updated);
-        }
-    });
-    // Transaction is committed when the lambda returns
-    return Unit{};
-}
-```
-
-See the [Procedures documentation](https://spacetimedb.com/docs/functions/procedures) for more
-details on using procedures, including making HTTP requests to external
-services.
-
-## Views - Read-Only Access
-
-[Views](https://spacetimedb.com/docs/functions/views) receive a `ViewContext` or
-`AnonymousViewContext` which provides read-only access to all tables
-(both public and private). They can query and iterate tables, but cannot
-insert, update, or delete rows.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-export const findUsersByName = spacetimedb.view(
-  { name: 'findUsersByName', public: true },
-  t.array(user.rowType),
-  (ctx) => {
-    // Can read and filter
-    return Array.from(ctx.db.user.name.filter('Alice'));
-
-    // Cannot insert, update, or delete
-    // ctx.db.user.insert(...) // ❌ Method not available
-  });
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.View(Accessor = "FindUsersByName", Public = true)]
-public static List<User> FindUsersByName(ViewContext ctx)
-{
-    // Can read and filter
-    return ctx.Db.User.Name.Filter("Alice").ToList();
-
-    // Cannot insert, update, or delete
-    // ctx.Db.User.Insert(...) // ❌ Method not available
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::view(accessor = find_users_by_name, public)]
-fn find_users_by_name(ctx: &ViewContext) -> Vec<User> {
-    // Can read and filter
-    ctx.db.user().name().filter("Alice").collect()
-
-    // Cannot insert, update, or delete
-    // ctx.db.user().insert(...) // ❌ Compile error
-}
-```
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_VIEW(std::vector<User>, find_users_by_name, Public, ViewContext ctx) {
-    return ctx.db[user_name].filter("Alice").collect();
-    // Cannot insert, update, or delete
-    // ctx.db[user].insert(...) // ❌ Methods not available in ViewContext
-}
-```
-
-See the [Views documentation](https://spacetimedb.com/docs/functions/views) for more details on
-defining and querying views.
-
-## Using Views for Fine-Grained Access Control
-
-While table visibility controls whether clients can access a table at
-all, views provide fine-grained control over which rows and columns
-clients can see. Views can read from private tables and expose only the
-data appropriate for each client.
-
-note
-
-Views can only access table data through indexed lookups, not by
-scanning all rows. This restriction ensures views remain performant. See
-the [Views documentation](https://spacetimedb.com/docs/functions/views) for details.
-
-### Filtering Rows by Caller
-
-Use views with `ViewContext` to return only the rows that belong to the
-caller. The view accesses the caller's identity through `ctx.sender()`
-and uses it to look up rows via an index.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-// Private table containing all messages
-const message = table(
-  { name: 'message' },  // Private by default
-  {
-    id: t.u64().primaryKey().autoInc(),
-    sender: t.identity().index('btree'),
-    recipient: t.identity().index('btree'),
-    content: t.string(),
-    timestamp: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ message });
-export default spacetimedb;
-
-// Public view that only returns messages the caller can see
-export const my_messages = spacetimedb.view(
-  { name: 'my_messages', public: true },
-  t.array(message.rowType),
-  (ctx) => {
-    // Look up messages by index where caller is sender or recipient
-    const sent = Array.from(ctx.db.message.sender.filter(ctx.sender));
-    const received = Array.from(ctx.db.message.recipient.filter(ctx.sender));
-    return [...sent, ...received];
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public partial class Module 
-{
-    // Private table containing all messages
-    [SpacetimeDB.Table(Accessor = "Message")]  // Private by default
-    public partial struct Message
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong Id;
-        [SpacetimeDB.Index.BTree]
-        public Identity Sender;
-        [SpacetimeDB.Index.BTree]
-        public Identity Recipient;
-        public string Content;
-        public Timestamp Timestamp;
-    }
-
-    // Public view that only returns messages the caller can see
-    [SpacetimeDB.View(Accessor = "MyMessages", Public = true)]
-    public static List<Message> MyMessages(ViewContext ctx)
-    {
-        // Look up messages by index where caller is sender or recipient
-        var sent = ctx.Db.Message.Sender.Filter(ctx.Sender).ToList();
-        var received = ctx.Db.Message.Recipient.Filter(ctx.Sender).ToList();
-        sent.AddRange(received);
-        return sent;
-    }
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{Identity, Timestamp, ViewContext};
-
-// Private table containing all messages
-#[spacetimedb::table(accessor = message)]  // Private by default
-pub struct Message {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    #[index(btree)]
-    sender: Identity,
-    #[index(btree)]
-    recipient: Identity,
-    content: String,
-    timestamp: Timestamp,
-}
-
-// Public view that only returns messages the caller can see
-#[spacetimedb::view(accessor = my_messages, public)]
-fn my_messages(ctx: &ViewContext) -> Vec<Message> {
-    // Look up messages by index where caller is sender or recipient
-    let sent: Vec<_> = ctx.db.message().sender().filter(&ctx.sender()).collect();
-    let received: Vec<_> = ctx.db.message().recipient().filter(&ctx.sender()).collect();
-    sent.into_iter().chain(received).collect()
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct Message {
-    uint64_t id;
-    Identity sender;
-    Identity recipient;
-    std::string content;
-};
-SPACETIMEDB_STRUCT(Message, id, sender, recipient, content)
-SPACETIMEDB_TABLE(Message, message, Private)  // Private by default
-FIELD_PrimaryKeyAutoInc(message, id)
-FIELD_Index(message, sender)
-FIELD_Index(message, recipient)
-
-// Public view that only returns messages the caller can see
-SPACETIMEDB_VIEW(std::vector<Message>, my_messages, Public, ViewContext ctx) {
-    // Look up messages by index where caller is sender or recipient
-    auto sent = ctx.db[message_sender].filter(ctx.sender()).collect();
-    auto received = ctx.db[message_recipient].filter(ctx.sender()).collect();
-    
-    // Combine both vectors
-    sent.insert(sent.end(), received.begin(), received.end());
-    return sent;
-}
-```
-
-Clients querying `my_messages` will only see their own messages, even
-though all messages are stored in the same table.
-
-### Hiding Sensitive Columns
-
-Use views to return a custom type that omits sensitive columns. The view
-reads from a table with sensitive data and returns a projection
-containing only the columns clients should see.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import {schema, t, table} from 'spacetimedb/server';
-
-// Private table with sensitive data
-const userAccount = table(
-  { name: 'user_account' },  // Private by default
-  {
-    id: t.u64().primaryKey().autoInc(),
-    identity: t.identity().unique(),
-    username: t.string(),
-    email: t.string(),
-    passwordHash: t.string(),  // Sensitive
-    apiKey: t.string(),        // Sensitive
-    createdAt: t.timestamp(),
-  }
-);
-
-const spacetimedb = schema({ userAccount });
-export default spacetimedb;
-
-// Public type without sensitive columns
-const publicUserProfile = t.row('PublicUserProfile', {
-  id: t.u64(),
-  username: t.string(),
-  createdAt: t.timestamp(),
-});
-
-// Public view that returns the caller's profile without sensitive data
-export const myProfile = spacetimedb.view(
-  { name: 'my_profile', public: true },
-  t.option(publicUserProfile),
-  (ctx) => {
-    // Look up the caller's account by their identity (unique index)
-    const user = ctx.db.userAccount.identity.find(ctx.sender);
-    if (!user) return null;
-    return {
-      id: user.id,
-      username: user.username,
-      createdAt: user.createdAt,
-      // email, passwordHash, and apiKey are not included
-    };
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public partial class Module
-{
-    // Private table with sensitive data
-    [SpacetimeDB.Table(Accessor = "UserAccount")]  // Private by default
-    public partial struct UserAccount
-    {
-        [SpacetimeDB.PrimaryKey]
-        [SpacetimeDB.AutoInc]
-        public ulong Id;
-        [SpacetimeDB.Unique]
-        public Identity Identity;
-        public string Username;
-        public string Email;
-        public string PasswordHash;  // Sensitive
-        public string ApiKey;        // Sensitive
-        public Timestamp CreatedAt;
-    }
-
-    // Public type without sensitive columns
-    [SpacetimeDB.Type]
-        public partial struct PublicUserProfile
-    {
-        public ulong Id;
-        public string Username;
-        public Timestamp CreatedAt;
-    }
-
-    // Public view that returns the caller's profile without sensitive data
-    [SpacetimeDB.View(Accessor = "MyProfile", Public = true)]
-    public static PublicUserProfile? MyProfile(ViewContext ctx)
-    {
-        // Look up the caller's account by their identity (unique index)
-        if (ctx.Db.UserAccount.Identity.Find(ctx.Sender) is not UserAccount user)
-        {
-            return null;
-        }
-        return new PublicUserProfile
-        {
-            Id = user.Id,
-            Username = user.Username,
-            CreatedAt = user.CreatedAt,
-            // Email, PasswordHash, and ApiKey are not included
-        };
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{SpacetimeType, ViewContext, Timestamp, Identity};
-
-// Private table with sensitive data
-#[spacetimedb::table(accessor = user_account)]  // Private by default
-pub struct UserAccount {
-    #[primary_key]
-    #[auto_inc]
-    id: u64,
-    #[unique]
-    identity: Identity,
-    username: String,
-    email: String,
-    password_hash: String,  // Sensitive
-    api_key: String,        // Sensitive
-    created_at: Timestamp,
-}
-
-// Public type without sensitive columns
-#[derive(SpacetimeType)]
-pub struct PublicUserProfile {
-    id: u64,
-    username: String,
-    created_at: Timestamp,
-}
-
-// Public view that returns the caller's profile without sensitive data
-#[spacetimedb::view(accessor = my_profile, public)]
-fn my_profile(ctx: &ViewContext) -> Option<PublicUserProfile> {
-    // Look up the caller's account by their identity (unique index)
-    let user = ctx.db.user_account().identity().find(&ctx.sender())?;
-    Some(PublicUserProfile {
-        id: user.id,
-        username: user.username,
-        created_at: user.created_at,
-        // email, password_hash, and api_key are not included
-    })
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct UserAccount {
-    uint64_t id;
-    Identity identity;
-    std::string username;
-    std::string email;
-    std::string password_hash;  // Sensitive - not exposed in view
-    std::string api_key;        // Sensitive - not exposed in view
-    Timestamp created_at;
-};
-SPACETIMEDB_STRUCT(UserAccount, id, identity, username, email, password_hash, api_key, created_at)
-SPACETIMEDB_TABLE(UserAccount, user_account, Private)  // Private by default
-FIELD_PrimaryKeyAutoInc(user_account, id)
-FIELD_Unique(user_account, identity)
-
-// Public type without sensitive columns
-struct PublicUserProfile {
-    uint64_t id;
-    std::string username;
-    Timestamp created_at;
-};
-SPACETIMEDB_STRUCT(PublicUserProfile, id, username, created_at)
-
-// Public view that returns the caller's profile without sensitive data
-SPACETIMEDB_VIEW(std::optional<PublicUserProfile>, my_profile, Public, ViewContext ctx) {
-    // Look up the caller's account by their identity (unique index)
-    auto user_opt = ctx.db[user_account_identity].find(ctx.sender());
-    if (!user_opt.has_value()) {
-        return std::nullopt;
-    }
-    
-    UserAccount user = user_opt.value();
-    return PublicUserProfile{
-        user.id,
-        user.username,
-        user.created_at
-        // email, password_hash, and api_key are not included
-    };
-}
-```
-
-Clients can query `my_profile` to see their username and creation date,
-but never see their email address, password hash, or API key.
-
-### Combining Both Techniques
-
-Views can combine row filtering and column projection. This example
-returns colleagues in the same department as the caller, with salary
-information hidden:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-import { table, t, schema } from 'spacetimedb/server';
-
-// Private table with all employee data
-const employee = table(
-  { name: 'employee' },
-  {
-    id: t.u64().primaryKey(),
-    identity: t.identity().unique(),
-    name: t.string(),
-    department: t.string().index('btree'),
-    salary: t.u64(),           // Sensitive
-  }
-);
-
-const spacetimedb = schema({ employee });
-export default spacetimedb;
-
-// Public type for colleagues (no salary)
-const colleague = t.row('Colleague', {
-  id: t.u64(),
-  name: t.string(),
-  department: t.string(),
-});
-
-// View that returns colleagues in the caller's department, without salary info
-export const my_colleagues = spacetimedb.view(
-  { name: 'my_colleagues', public: true },
-  t.array(colleague),
-  (ctx) => {
-    // Find the caller's employee record by identity (unique index)
-    const me = ctx.db.employee.identity.find(ctx.sender);
-    if (!me) return [];
-
-    // Look up employees in the same department
-    return Array.from(ctx.db.employee.department.filter(me.department)).map(emp => ({
-      id: emp.id,
-      name: emp.name,
-      department: emp.department,
-      // salary is not included
-    }));
-  }
-);
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public partial class Module
-{
-    // Private table with all employee data
-    [SpacetimeDB.Table(Accessor = "Employee")]
-    public partial struct Employee
-    {
-        [SpacetimeDB.PrimaryKey]
-        public ulong Id;
-        [SpacetimeDB.Unique]
-        public Identity Identity;
-        public string Name;
-        [SpacetimeDB.Index.BTree]
-        public string Department;
-        public ulong Salary;           // Sensitive
-    }
-
-    // Public type for colleagues (no salary)
-    [SpacetimeDB.Type]
-    public partial struct Colleague
-    {
-        public ulong Id;
-        public string Name;
-        public string Department;
-    }
-
-    // View that returns colleagues in the caller's department, without salary info
-    [SpacetimeDB.View(Accessor = "MyColleagues", Public = true)]
-    public static List<Colleague> MyColleagues(ViewContext ctx)
-    {
-        // Find the caller's employee record by identity (unique index)
-        if (ctx.Db.Employee.Identity.Find(ctx.Sender) is not Employee me)
-        {
-            return new List<Colleague>();
-        }
-
-        // Look up employees in the same department
-        return ctx.Db.Employee.Department.Filter(me.Department)
-            .Select(emp => new Colleague
-            {
-                Id = emp.Id,
-                Name = emp.Name,
-                Department = emp.Department,
-                // Salary is not included
-            })
-            .ToList();
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::{SpacetimeType, Identity, ViewContext};
-
-// Private table with all employee data
-#[spacetimedb::table(accessor = employee)]
-pub struct Employee {
-    #[primary_key]
-    id: u64,
-    #[unique]
-    identity: Identity,
-    name: String,
-    #[index(btree)]
-    department: String,
-    salary: u64,           // Sensitive
-}
-
-// Public type for colleagues (no salary)
-#[derive(SpacetimeType)]
-pub struct Colleague {
-    id: u64,
-    name: String,
-    department: String,
-}
-
-// View that returns colleagues in the caller's department, without salary info
-#[spacetimedb::view(accessor = my_colleagues, public)]
-fn my_colleagues(ctx: &ViewContext) -> Vec<Colleague> {
-    // Find the caller's employee record by identity (unique index)
-    let Some(me) = ctx.db.employee().identity().find(&ctx.sender()) else {
-        return vec![];
-    };
-
-    // Look up employees in the same department
-    ctx.db.employee().department().filter(&me.department)
-        .map(|emp| Colleague {
-            id: emp.id,
-            name: emp.name.clone(),
-            department: emp.department.clone(),
-            // salary is not included
-        })
-        .collect()
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Private table with all employee data
-struct Employee {
-    uint64_t id;
-    Identity identity;
-    std::string name;
-    std::string department;
-    uint64_t salary;           // Sensitive - not exposed in view
-};
-SPACETIMEDB_STRUCT(Employee, id, identity, name, department, salary)
-SPACETIMEDB_TABLE(Employee, employee, Private)
-FIELD_PrimaryKey(employee, id)
-FIELD_Unique(employee, identity)
-FIELD_Index(employee, department)
-
-// Public type for colleagues (no salary)
-struct Colleague {
-    uint64_t id;
-    std::string name;
-    std::string department;
-};
-SPACETIMEDB_STRUCT(Colleague, id, name, department)
-
-// View that returns colleagues in the caller's department, without salary info
-SPACETIMEDB_VIEW(std::vector<Colleague>, my_colleagues, Public, ViewContext ctx) {
-    // Find the caller's employee record by identity (unique index)
-    auto me_opt = ctx.db[employee_identity].find(ctx.sender());
-    if (!me_opt.has_value()) {
-        return std::vector<Colleague>();
-    }
-    
-    Employee me = me_opt.value();
-    std::vector<Colleague> results;
-    
-    // Look up employees in the same department
-    for (auto row : ctx.db[employee_department].filter(me.department)) {
-        results.push_back(Colleague{row.id, row.name, row.department});
-    }
-    
-    return results;
-}
-```
-
-## Client Access - Read-Only Access
-
-Clients connect to databases and can access public tables and views
-through subscriptions and queries. They cannot access private tables
-directly. See the [Subscriptions
-documentation](https://spacetimedb.com/docs/clients/subscriptions) for details on client-side
-table access.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/tables/access-permissions" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Table Access Permissions | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tables/access-permissions"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Table Access Permissions | SpacetimeDB docs"><meta data-rh="true" name="description" content="SpacetimeDB controls data access through table visibility and context-based permissions. Tables can be public or private, and different execution contexts (reducers, views, clients) have different levels of access."><meta data-rh="true" property="og:description" content="SpacetimeDB controls data access through table visibility and context-based permissions. Tables can be public or private, and different execution contexts (reducers, views, clients) have different levels of access."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tables/access-permissions"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/access-permissions" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables/access-permissions" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tables","item":"https://spacetimedb.com/docs/tables"},{"@type":"ListItem","position":2,"name":"Table Access Permissions","item":"https://spacetimedb.com/docs/tables/access-permissions"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tables/access-permissions">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tables/access-permissions">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tables/access-permissions">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Collapse sidebar category &#x27;Tables&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/column-types"><span title="Column Types" class="linkLabel_UvDg">Column Types</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/file-storage"><span title="File Storage" class="linkLabel_UvDg">File Storage</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/auto-increment"><span title="Auto-Increment" class="linkLabel_UvDg">Auto-Increment</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/constraints"><span title="Constraints" class="linkLabel_UvDg">Constraints</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/default-values"><span title="Default Values" class="linkLabel_UvDg">Default Values</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/indexes"><span title="Indexes" class="linkLabel_UvDg">Indexes</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tables/access-permissions"><span title="Table Access Permissions" class="linkLabel_UvDg">Table Access Permissions</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/schedule-tables"><span title="Schedule Tables" class="linkLabel_UvDg">Schedule Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/event-tables"><span title="Event Tables" class="linkLabel_UvDg">Event Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/performance"><span title="Performance Best Practices" class="linkLabel_UvDg">Performance Best Practices</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tables"><span>Tables</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Table Access Permissions</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Table Access Permissions</h1></header><p>SpacetimeDB controls data access through table visibility and context-based permissions. Tables can be public or private, and different execution contexts (reducers, views, clients) have different levels of access.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="public-and-private-tables">Public and Private Tables<a href="#public-and-private-tables" class="hash-link" aria-label="Direct link to Public and Private Tables" title="Direct link to Public and Private Tables" translate="no">​</a></h2>
+<p>Tables are <strong>private</strong> by default. Private tables can only be accessed by reducers and views running on the server. Clients cannot query, subscribe to, or see private tables.</p>
+<p><strong>Public</strong> tables are exposed to clients for read access through subscriptions and queries. Clients can see public table data but can only modify it by calling reducers.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Private table (default) - only accessible from server-side code</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> internalConfig </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">internal_config</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    key</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    value</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public table - clients can subscribe and query</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    score</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Private table (default) - only accessible from server-side code</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">InternalConfig</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> InternalConfig</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Key;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Value;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public table - clients can subscribe and query</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Score;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Private table (default) - only accessible from server-side code</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> internal_config)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> InternalConfig</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    value</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public table - clients can subscribe and query</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    score</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Private table (default) - only accessible from server-side code</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> InternalConfig</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string key;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string value;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(InternalConfig, key, value)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(InternalConfig, internal_config, Private)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(internal_config, key)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public table - clients can subscribe and query</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> score;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, id, name, score)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(player, id)</span></span></code></pre><p>Use <code>Private</code> or <code>Public</code> as the third parameter to <code>SPACETIMEDB_TABLE</code> to control table visibility.</p></div></div></div>
+<p>Use private tables for:</p>
+\<ul\>
+<li class="">Internal configuration or state that clients should not see</li>
+<li class="">Sensitive data like password hashes or API keys</li>
+<li class="">Intermediate computation results</li>
+</ul>
+<p>Use public tables for:</p>
+\<ul\>
+<li class="">Data that clients need to display or interact with</li>
+<li class="">Game state, user profiles, or other user-facing data</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="reducers---read-write-access">Reducers - Read-Write Access<a href="#reducers---read-write-access" class="hash-link" aria-label="Direct link to Reducers - Read-Write Access" title="Direct link to Reducers - Read-Write Access" translate="no">​</a></h2>
+<p>Reducers receive a <code>ReducerContext</code> which provides full read-write access to all tables (both public and private). They can perform all CRUD operations: insert, read, update, and delete.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> example </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // Insert</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.user.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#FF79C6">n</span><span style="color:#F8F8F2">, name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, email</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">alice@example.com</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Read: iterate all rows</span></span>
+<span class="line"><span style="color:#FF79C6">  for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.user.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(user.name);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Read: find by unique column</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> foundUser </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.user.id.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (foundUser) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Update</span></span>
+<span class="line"><span style="color:#F8F8F2">    foundUser.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">Bob</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db.user.id.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(foundUser);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">  // Delete</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db.user.id.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">456</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Example</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Insert</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.User.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> { Id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, Name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Email </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">alice@example.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: iterate all rows</span></span>
+<span class="line"><span style="color:#FF79C6">    foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.User.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">User: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">user</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Name</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: find by unique column</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (ctx.Db.User.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">is</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> foundUser)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Update</span></span>
+<span class="line"><span style="color:#F8F8F2">        foundUser.Name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Bob</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.User.Id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(foundUser);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Delete</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.User.Id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">456</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> example</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Insert</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        name</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "Alice"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">        email</span><span style="color:#FF79C6">:</span><span style="color:#F1FA8C"> "alice@example.com"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: iterate all rows</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#F8F8F2">        log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">info!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"User: {}"</span><span style="color:#F8F8F2">, user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: find by unique column</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">mut</span><span style="color:#F8F8F2"> user) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">        // Update</span></span>
+<span class="line"><span style="color:#F8F8F2">        user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name </span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C"> "Bob"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(user);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Delete</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">456</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(example, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Insert</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[user].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(User{.id </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">, .name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, .email </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">alice@example.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: iterate all rows</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> auto&</span><span style="color:#F8F8F2"> user_row : ctx.db[user]) {</span></span>
+<span class="line"><span style="color:#50FA7B">        LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">User: </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> user_row.name);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Read: find by unique column</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> found_user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[user_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">123</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (found_user.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#6272A4">        // Update</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> updated </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> found_user.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        updated.name </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Bob</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[user_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(updated);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Delete</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db[user_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">456</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="procedures-with-transactions---read-write-access">Procedures with Transactions - Read-Write Access<a href="#procedures-with-transactions---read-write-access" class="hash-link" aria-label="Direct link to Procedures with Transactions - Read-Write Access" title="Direct link to Procedures with Transactions - Read-Write Access" translate="no">​</a></h2>
+<p>Procedures receive a <code>ProcedureContext</code> and can access tables through transactions. Unlike reducers, procedures must explicitly open a transaction to read from or modify the database.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> updateUserProcedure </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">procedure</span><span style="color:#F8F8F2">({ userId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(), newName</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() }, t.</span><span style="color:#50FA7B">unit</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">userId</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">newName</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">  // Must explicitly open a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.</span><span style="color:#50FA7B">withTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Full read-write access within the transaction</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.user.id.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(userId);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (user) {</span></span>
+<span class="line"><span style="color:#F8F8F2">      user.name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> newName;</span></span>
+<span class="line"><span style="color:#F8F8F2">      ctx.db.user.id.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(user);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span>
+<span class="line"><span style="color:#6272A4">  // Transaction is committed when the function returns</span></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> {};</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#FF79C6"> warning</span><span style="color:#FF79C6"> disable</span><span style="color:#F8F8F2"> STDB_UNSTABLE</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Procedure</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UpdateUserProcedure</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ProcedureContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">ulong</span><span style="color:#FFB86C;font-style:italic"> userId</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> newName</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Must explicitly open a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">WithTx</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">txCtx</span><span style="color:#FF79C6"> =></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Full read-write access within the transaction</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> txCtx.Db.User.Id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(userId);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (user </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            var</span><span style="color:#F8F8F2"> updated </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user.Value;</span></span>
+<span class="line"><span style="color:#F8F8F2">            updated.Name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> newName;</span></span>
+<span class="line"><span style="color:#F8F8F2">            txCtx.Db.User.Id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(updated);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#6272A4">    // Transaction is committed when the lambda returns</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">procedure]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> update_user_procedure</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &mut</span><span style="color:#8BE9FD;font-style:italic"> ProcedureContext</span><span style="color:#F8F8F2">, user_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">, new_name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Must explicitly open a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">        // Full read-write access within the transaction</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">mut</span><span style="color:#F8F8F2"> user) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(user_id) {</span></span>
+<span class="line"><span style="color:#F8F8F2">            user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_name</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">            ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(user);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#6272A4">    // Transaction is committed when the closure returns</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_PROCEDURE</span><span style="color:#F8F8F2">(Unit, update_user_procedure, ProcedureContext ctx, </span><span style="color:#FF79C6">uint64_t</span><span style="color:#F8F8F2"> userId, std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string newName) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Must explicitly open a transaction</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.</span><span style="color:#50FA7B">with_tx</span><span style="color:#F8F8F2">([</span><span style="color:#FFB86C;font-style:italic">userId</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">newName</span><span style="color:#F8F8F2">](</span><span style="color:#8BE9FD;font-style:italic">TxContext</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> tx</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#6272A4">        // Full read-write access within the transaction</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> user_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> tx.db[user_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(userId);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (user_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">            User updated </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">            updated.name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> newName;</span></span>
+<span class="line"><span style="color:#F8F8F2">            tx.db[user_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(updated);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span>
+<span class="line"><span style="color:#6272A4">    // Transaction is committed when the lambda returns</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Unit{};</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>See the <a class="" href="/docs/functions/procedures">Procedures documentation</a> for more details on using procedures, including making HTTP requests to external services.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="views---read-only-access">Views - Read-Only Access<a href="#views---read-only-access" class="hash-link" aria-label="Direct link to Views - Read-Only Access" title="Direct link to Views - Read-Only Access" translate="no">​</a></h2>
+<p><a class="" href="/docs/functions/views">Views</a> receive a <code>ViewContext</code> or <code>AnonymousViewContext</code> which provides read-only access to all tables (both public and private). They can query tables through indexed lookups, but cannot scan full tables or insert, update, or delete rows.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> findUsersByName </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">findUsersByName</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(user.rowType),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Can read and filter</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Array.</span><span style="color:#50FA7B">from</span><span style="color:#F8F8F2">(ctx.db.user.name.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Cannot insert, update, or delete</span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.db.user.insert(...) // ❌ Method not available</span></span>
+<span class="line"><span style="color:#F8F8F2">  });</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">FindUsersByName</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">User</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">FindUsersByName</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Can read and filter</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.Db.User.Name.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">ToList</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Cannot insert, update, or delete</span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.Db.User.Insert(...) // ❌ Method not available</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> find_users_by_name, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> find_users_by_name</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">User</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Can read and filter</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">name</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Alice"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Cannot insert, update, or delete</span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.db.user().insert(...) // ❌ Compile error</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">User</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, find_users_by_name, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> ctx.db[user_name].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Alice</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#6272A4">    // Cannot insert, update, or delete</span></span>
+<span class="line"><span style="color:#6272A4">    // ctx.db[user].insert(...) // ❌ Methods not available in ViewContext</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>See the <a class="" href="/docs/functions/views">Views documentation</a> for more details on defining and querying views.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-views-for-fine-grained-access-control">Using Views for Fine-Grained Access Control<a href="#using-views-for-fine-grained-access-control" class="hash-link" aria-label="Direct link to Using Views for Fine-Grained Access Control" title="Direct link to Using Views for Fine-Grained Access Control" translate="no">​</a></h2>
+<p>While table visibility controls whether clients can access a table at all, views provide fine-grained control over which rows and columns clients can see. Views can read from private tables and expose only the data appropriate for each client.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>Views can only access table data through indexed lookups, not by scanning all rows. This restriction ensures views remain performant. See the <a class="" href="/docs/functions/views">Views documentation</a> for details.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="filtering-rows-by-caller">Filtering Rows by Caller<a href="#filtering-rows-by-caller" class="hash-link" aria-label="Direct link to Filtering Rows by Caller" title="Direct link to Filtering Rows by Caller" translate="no">​</a></h3>
+<p>Use views with <code>ViewContext</code> to return only the rows that belong to the caller. The view accesses the caller&#x27;s identity through <code>ctx.sender()</code> and uses it to look up rows via an index.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table containing all messages</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> message </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">message</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    sender</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    recipient</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    content</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    timestamp</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ message });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that only returns messages the caller can see</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> myMessages </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">my_messages</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(message.rowType),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up messages by index where caller is sender or recipient</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> sent </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Array.</span><span style="color:#50FA7B">from</span><span style="color:#F8F8F2">(ctx.db.message.sender.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(ctx.sender));</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> received </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Array.</span><span style="color:#50FA7B">from</span><span style="color:#F8F8F2">(ctx.db.message.recipient.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(ctx.sender));</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> [</span><span style="color:#FF79C6">...</span><span style="color:#F8F8F2">sent, </span><span style="color:#FF79C6">...</span><span style="color:#F8F8F2">received];</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Private table containing all messages</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Message</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Message</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Sender;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Recipient;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Content;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> Timestamp;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Public view that only returns messages the caller can see</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">MyMessages</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Message</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">MyMessages</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Look up messages by index where caller is sender or recipient</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> sent </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Message.Sender.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(ctx.Sender).</span><span style="color:#50FA7B">ToList</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> received </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.Message.Recipient.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(ctx.Sender).</span><span style="color:#50FA7B">ToList</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        sent.</span><span style="color:#50FA7B">AddRange</span><span style="color:#F8F8F2">(received);</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> sent;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table containing all messages</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> message)]  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Message</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    sender</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    recipient</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    content</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    timestamp</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that only returns messages the caller can see</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> my_messages, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> my_messages</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Message</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up messages by index where caller is sender or recipient</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> sent</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2">\<_\> </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">message</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> received</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2">\<_\> </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">message</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">recipient</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    sent</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into_iter</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">chain</span><span style="color:#F8F8F2">(received)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Message</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity sender;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity recipient;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string content;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Message, id, sender, recipient, content)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Message, message, Private)</span><span style="color:#6272A4">  // Private by default</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(message, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(message, sender)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(message, recipient)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that only returns messages the caller can see</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Message</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, my_messages, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up messages by index where caller is sender or recipient</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> sent </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[message_sender].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()).</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> received </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[message_recipient].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()).</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Combine both vectors</span></span>
+<span class="line"><span style="color:#F8F8F2">    sent.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(sent.</span><span style="color:#50FA7B">end</span><span style="color:#F8F8F2">(), received.</span><span style="color:#50FA7B">begin</span><span style="color:#F8F8F2">(), received.</span><span style="color:#50FA7B">end</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> sent;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>Clients querying <code>my_messages</code> will only see their own messages, even though all messages are stored in the same table.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="hiding-sensitive-columns">Hiding Sensitive Columns<a href="#hiding-sensitive-columns" class="hash-link" aria-label="Direct link to Hiding Sensitive Columns" title="Direct link to Hiding Sensitive Columns" translate="no">​</a></h3>
+<p>Use views to return a custom type that omits sensitive columns. The view reads from a table with sensitive data and returns a projection containing only the columns clients should see.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> {schema, t, table} </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table with sensitive data</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> userAccount </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user_account</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">unique</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    email</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    passwordHash</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),  </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">    apiKey</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),        </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">    createdAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ userAccount });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type without sensitive columns</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> publicUserProfile </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">row</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">PublicUserProfile</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">  id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  createdAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">timestamp</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that returns the caller&#x27;s profile without sensitive data</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> myProfile </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">my_profile</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">option</span><span style="color:#F8F8F2">(publicUserProfile),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up the caller&#x27;s account by their identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.userAccount.identity.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.sender);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">user) </span><span style="color:#FF79C6">return</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">      id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user.id,</span></span>
+<span class="line"><span style="color:#F8F8F2">      username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user.username,</span></span>
+<span class="line"><span style="color:#F8F8F2">      createdAt</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user.createdAt,</span></span>
+<span class="line"><span style="color:#6272A4">      // email, passwordHash, and apiKey are not included</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Private table with sensitive data</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">UserAccount</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UserAccount</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Identity;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Username;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Email;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> PasswordHash;  </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> ApiKey;        </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> CreatedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Public type without sensitive columns</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> PublicUserProfile</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Username;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> CreatedAt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Public view that returns the caller&#x27;s profile without sensitive data</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">MyProfile</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> PublicUserProfile</span><span style="color:#F8F8F2">? </span><span style="color:#50FA7B">MyProfile</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Look up the caller&#x27;s account by their identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (ctx.Db.UserAccount.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">is</span><span style="color:#FF79C6"> not</span><span style="color:#8BE9FD;font-style:italic"> UserAccount</span><span style="color:#F8F8F2"> user)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> PublicUserProfile</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user.Id,</span></span>
+<span class="line"><span style="color:#F8F8F2">            Username </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user.Username,</span></span>
+<span class="line"><span style="color:#F8F8F2">            CreatedAt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user.CreatedAt,</span></span>
+<span class="line"><span style="color:#6272A4">            // Email, PasswordHash, and ApiKey are not included</span></span>
+<span class="line"><span style="color:#F8F8F2">        };</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table with sensitive data</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user_account)]  </span><span style="color:#6272A4">// Private by default</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> UserAccount</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    username</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    email</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    password_hash</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,  </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">    api_key</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,        </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">    created_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type without sensitive columns</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> PublicUserProfile</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    username</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    created_at</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that returns the caller&#x27;s profile without sensitive data</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> my_profile, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> my_profile</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Option</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">PublicUserProfile</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up the caller&#x27;s account by their identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">user_account</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Some</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">PublicUserProfile</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        username</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">username,</span></span>
+<span class="line"><span style="color:#F8F8F2">        created_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> user</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">created_at,</span></span>
+<span class="line"><span style="color:#6272A4">        // email, password_hash, and api_key are not included</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> UserAccount</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string username;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string email;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string password_hash;</span><span style="color:#6272A4">  // Sensitive - not exposed in view</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string api_key;</span><span style="color:#6272A4">        // Sensitive - not exposed in view</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp created_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(UserAccount, id, identity, username, email, password_hash, api_key, created_at)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(UserAccount, user_account, Private)</span><span style="color:#6272A4">  // Private by default</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(user_account, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Unique</span><span style="color:#F8F8F2">(user_account, identity)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type without sensitive columns</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> PublicUserProfile</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string username;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp created_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(PublicUserProfile, id, username, created_at)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public view that returns the caller&#x27;s profile without sensitive data</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">optional</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">PublicUserProfile</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, my_profile, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Look up the caller&#x27;s account by their identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> user_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[user_account_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">user_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">nullopt;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    UserAccount user </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> PublicUserProfile{</span></span>
+<span class="line"><span style="color:#F8F8F2">        user.id,</span></span>
+<span class="line"><span style="color:#F8F8F2">        user.username,</span></span>
+<span class="line"><span style="color:#F8F8F2">        user.created_at</span></span>
+<span class="line"><span style="color:#6272A4">        // email, password_hash, and api_key are not included</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>Clients can query <code>my_profile</code> to see their username and creation date, but never see their email address, password hash, or API key.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="combining-both-techniques">Combining Both Techniques<a href="#combining-both-techniques" class="hash-link" aria-label="Direct link to Combining Both Techniques" title="Direct link to Combining Both Techniques" translate="no">​</a></h3>
+<p>Views can combine row filtering and column projection. This example returns colleagues in the same department as the caller, with salary information hidden:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t, schema } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table with all employee data</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> employee </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">employee</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">unique</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    department</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    salary</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),           </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ employee });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type for colleagues (no salary)</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> colleague </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">row</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Colleague</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, {</span></span>
+<span class="line"><span style="color:#F8F8F2">  id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u64</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  department</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// View that returns colleagues in the caller&#x27;s department, without salary info</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> myColleagues </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">view</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">my_colleagues</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  t.</span><span style="color:#50FA7B">array</span><span style="color:#F8F8F2">(colleague),</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the caller&#x27;s employee record by identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    const</span><span style="color:#F8F8F2"> me </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db.employee.identity.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.sender);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">me) </span><span style="color:#FF79C6">return</span><span style="color:#F8F8F2"> [];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Look up employees in the same department</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> Array.</span><span style="color:#50FA7B">from</span><span style="color:#F8F8F2">(ctx.db.employee.department.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(me.department)).</span><span style="color:#50FA7B">map</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">emp</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> ({</span></span>
+<span class="line"><span style="color:#F8F8F2">      id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp.id,</span></span>
+<span class="line"><span style="color:#F8F8F2">      name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp.name,</span></span>
+<span class="line"><span style="color:#F8F8F2">      department</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp.department,</span></span>
+<span class="line"><span style="color:#6272A4">      // salary is not included</span></span>
+<span class="line"><span style="color:#F8F8F2">    }));</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Private table with all employee data</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Employee</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Employee</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Identity;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"><span style="color:#F8F8F2">        [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Department;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Salary;           </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Public type for colleagues (no salary)</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Colleague</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"><span style="color:#FF79C6">        public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Department;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // View that returns colleagues in the caller&#x27;s department, without salary info</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">View</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">MyColleagues</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Colleague</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">MyColleagues</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#6272A4">        // Find the caller&#x27;s employee record by identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (ctx.Db.Employee.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">is</span><span style="color:#FF79C6"> not</span><span style="color:#8BE9FD;font-style:italic"> Employee</span><span style="color:#F8F8F2"> me)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> List</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Colleague</span><span style="color:#F8F8F2">>();</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Look up employees in the same department</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> ctx.Db.Employee.Department.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(me.Department)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">Select</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">emp</span><span style="color:#FF79C6"> =></span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Colleague</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#F8F8F2">                Id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> emp.Id,</span></span>
+<span class="line"><span style="color:#F8F8F2">                Name </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> emp.Name,</span></span>
+<span class="line"><span style="color:#F8F8F2">                Department </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> emp.Department,</span></span>
+<span class="line"><span style="color:#6272A4">                // Salary is not included</span></span>
+<span class="line"><span style="color:#F8F8F2">            })</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">ToList</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Private table with all employee data</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> employee)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Employee</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    department</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    salary</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,           </span><span style="color:#6272A4">// Sensitive</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type for colleagues (no salary)</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Colleague</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    department</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// View that returns colleagues in the caller&#x27;s department, without salary info</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">view(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> my_colleagues, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> my_colleagues</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ViewContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Vec</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Colleague</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the caller&#x27;s employee record by identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(me) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">employee</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()) </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> vec!</span><span style="color:#F8F8F2">[];</span></span>
+<span class="line"><span style="color:#F8F8F2">    };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Look up employees in the same department</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">employee</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">department</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">me</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">department)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">map</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">emp</span><span style="color:#FF79C6">|</span><span style="color:#8BE9FD;font-style:italic"> Colleague</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">id,</span></span>
+<span class="line"><span style="color:#F8F8F2">            name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">name</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">            department</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> emp</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">department</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#6272A4">            // salary is not included</span></span>
+<span class="line"><span style="color:#F8F8F2">        })</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">collect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Private table with all employee data</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Employee</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string department;</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> salary;</span><span style="color:#6272A4">           // Sensitive - not exposed in view</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Employee, id, identity, name, department, salary)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Employee, employee, Private)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(employee, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Unique</span><span style="color:#F8F8F2">(employee, identity)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(employee, department)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Public type for colleagues (no salary)</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Colleague</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string department;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Colleague, id, name, department)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// View that returns colleagues in the caller&#x27;s department, without salary info</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_VIEW</span><span style="color:#F8F8F2">(std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Colleague</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">, my_colleagues, Public, ViewContext ctx) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the caller&#x27;s employee record by identity (unique index)</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> me_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[employee_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">me_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">vector</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Colleague</span><span style="color:#F8F8F2">>();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    Employee me </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> me_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">vector</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">Colleague</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> results;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Look up employees in the same department</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> row : ctx.db[employee_department].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(me.department)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        results.</span><span style="color:#50FA7B">push_back</span><span style="color:#F8F8F2">(Colleague{row.id, row.name, row.department});</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> results;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="client-access---read-only-access">Client Access - Read-Only Access<a href="#client-access---read-only-access" class="hash-link" aria-label="Direct link to Client Access - Read-Only Access" title="Direct link to Client Access - Read-Only Access" translate="no">​</a></h2>
+<p>Clients connect to databases and can access public tables and views through subscriptions and queries. They cannot access private tables directly. See the <a class="" href="/docs/clients/subscriptions">Subscriptions documentation</a> for details on client-side table access.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00300-tables/00400-access-permissions.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tables/indexes"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Indexes</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tables/schedule-tables"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Schedule Tables</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#public-and-private-tables" class="table-of-contents__link toc-highlight">Public and Private Tables</a></li>\<li\><a href="#reducers---read-write-access" class="table-of-contents__link toc-highlight">Reducers - Read-Write Access</a></li>\<li\><a href="#procedures-with-transactions---read-write-access" class="table-of-contents__link toc-highlight">Procedures with Transactions - Read-Write Access</a></li>\<li\><a href="#views---read-only-access" class="table-of-contents__link toc-highlight">Views - Read-Only Access</a></li>\<li\><a href="#using-views-for-fine-grained-access-control" class="table-of-contents__link toc-highlight">Using Views for Fine-Grained Access Control</a>\<ul\>\<li\><a href="#filtering-rows-by-caller" class="table-of-contents__link toc-highlight">Filtering Rows by Caller</a></li>\<li\><a href="#hiding-sensitive-columns" class="table-of-contents__link toc-highlight">Hiding Sensitive Columns</a></li>\<li\><a href="#combining-both-techniques" class="table-of-contents__link toc-highlight">Combining Both Techniques</a></li></ul></li>\<li\><a href="#client-access---read-only-access" class="table-of-contents__link toc-highlight">Client Access - Read-Only Access</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                         |
-| ------------- | ----------------------------------------------------------------------------- |
-| **SEP**       | 990                                                                           |
-| **Title**     | Enable enterprise IdP policy controls during MCP OAuth flows                  |
-| **Status**    | Final                                                                         |
-| **Type**      | Standards Track                                                               |
-| **Created**   | 2025-06-04                                                                    |
-| **Author(s)** | Aaron Parecki ([@aaronpk](https://github.com/aaronpk))                        |
-| **Sponsor**   | None                                                                          |
-| **PR**        | [#646](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/646) |
+| Field | Value |
+| - | - |
+| **SEP** | 990 |
+| **Title** | Enable enterprise IdP policy controls during MCP OAuth flows |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-06-04 |
+| **Author(s)** | Aaron Parecki ([@aaronpk](https://github.com/aaronpk)) |
+| **Sponsor** | None |
+| **PR** | [#646](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/646) |
 
 ***
 
@@ -97,3 +97,4 @@ sequenceDiagram
 
 > \[!IMPORTANT]
 > **State:** Ready to Review
+

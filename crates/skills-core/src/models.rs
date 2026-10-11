@@ -274,7 +274,7 @@ pub struct ResourceFile {
     pub content: Option<String>,
 }
 
-/// Comprehensive representation of an Agent Skill.
+/// Parsed representation of an Agent Skill.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TypedBuilder)]
 pub struct Skill {
     /// Relative path from repository root (e.g. `skills/engineering/domain-modeling/SKILL.md`).

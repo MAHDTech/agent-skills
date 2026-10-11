@@ -82,3 +82,6 @@ seems like a good idea.
 * 2026-04-14: Move to preview and update capability docs to `sessionCapabilities.close`
 * 2026-03-09: Rename from session/stop to session/close
 * 2026-02-24: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

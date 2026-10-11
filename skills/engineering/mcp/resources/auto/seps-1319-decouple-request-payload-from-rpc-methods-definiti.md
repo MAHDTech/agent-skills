@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1319                                                                            |
-| **Title**     | Decouple Request Payload from RPC Methods Definition                            |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-08-08                                                                      |
-| **Author(s)** | [@kurtisvg](https://github.com/kurtisvg)                                        |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1319](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1319) |
+| Field | Value |
+| - | - |
+| **SEP** | 1319 |
+| **Title** | Decouple Request Payload from RPC Methods Definition |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-08-08 |
+| **Author(s)** | [@kurtisvg](https://github.com/kurtisvg) |
+| **Sponsor** | None |
+| **PR** | [#1319](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1319) |
 
 ***
 
@@ -112,3 +112,4 @@ Crucially, this design refactors the specification document itself but intention
 This proposal is a **non-breaking change** for existing implementations. It is a refactoring of the *specification document itself* and does not alter the on-the-wire JSON format of the protocol messages. A client or server that is compliant with the old specification structure will remain compliant with the new one, as the resulting JSON payloads are identical.
 
 The primary impact is on developers who read the specification and on tools that parse the specification to generate code or documentation.
+

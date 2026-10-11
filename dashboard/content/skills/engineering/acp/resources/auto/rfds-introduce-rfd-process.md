@@ -97,3 +97,6 @@ Well, partly because "dialog" emphasizes conversation and exploration rather tha
 
 * 2026-07-02: Added Active between Draft and Preview to show which RFDs have current maintainer or working-group bandwidth.
 * 2025-10-28: Initial version, created alongside RFD infrastructure
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

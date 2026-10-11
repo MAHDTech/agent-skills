@@ -7,155 +7,93 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-Get a SpacetimeDB app with TanStack Start running in under 5 minutes.
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) 18+ installed
-- [SpacetimeDB CLI](https://spacetimedb.com/install) installed
-
-[](https://spacetimedb.com/install)
-
-###### Install the SpacetimeDB CLI tool
-
-------------------------------------------------------------------------
-
-**Create your project**
-
-Run the `spacetime dev` command to create a new project with a
-SpacetimeDB module and TanStack Start.
-
-This will start the local SpacetimeDB server, publish your module,
-generate TypeScript bindings, and start the development server.
-
-``` codeBlockStandalone_LlrK
-spacetime dev --template tanstack-ts
-```
-
-**Open your app**
-
-Navigate to [http://localhost:5173](http://localhost:5173) to see your
-app running.
-
-The template includes a TanStack Start app with TanStack Query
-integration with SpacetimeDB.
-
-**Explore the project structure**
-
-Your project contains both server and client code.
-
-Edit `spacetimedb/src/index.ts` to add tables and reducers. Edit
-`src/routes/index.tsx` to build your UI.
-
-``` prism-code
-my-spacetime-app/
-├── spacetimedb/          # Your SpacetimeDB module
-│   └── src/
-│       └── index.ts      # Server-side logic
-├── src/                  # TanStack Start frontend
-│   ├── router.tsx        # QueryClient + SpacetimeDB setup
-│   ├── routes/
-│   │   ├── __root.tsx    # Root layout
-│   │   └── index.tsx     # Main app component
-│   └── module_bindings/  # Auto-generated types
-└── package.json
-```
-
-**Understand tables and reducers**
-
-Open `spacetimedb/src/index.ts` to see the module code. The template
-includes a `person` table and two reducers: `add` to insert a person,
-and `sayHello` to greet everyone.
-
-Tables store your data. Reducers are functions that modify data —
-they're the only way to write to the database.
-
-``` codeBlockStandalone_LlrK
-import { schema, table, t } from 'spacetimedb/server';
-
-const spacetimedb = schema({
-  person: table(
-    { public: true },
-    {
-      name: t.string(),
-    }
-  ),
-});
-export default spacetimedb;
-
-export const add = spacetimedb.reducer(
-  { name: t.string() },
-  (ctx, { name }) => {
-    ctx.db.person.insert({ name });
-  }
-);
-
-export const sayHello = spacetimedb.reducer(ctx => {
-  for (const person of ctx.db.person.iter()) {
-    console.info(`Hello, ${person.name}!`);
-  }
-  console.info('Hello, World!');
-});
-```
-
-**Test with the CLI**
-
-Open a new terminal and navigate to your project directory. Then use the
-SpacetimeDB CLI to call reducers and query your data directly.
-
-``` codeBlockStandalone_LlrK
-cd my-spacetime-app
-
-# Call the add reducer to insert a person
-spacetime call add Alice
-
-# Query the person table
-spacetime sql "SELECT * FROM person"
- name
----------
- "Alice"
-
-# Call sayHello to greet everyone
-spacetime call say_hello
-
-# View the module logs
-spacetime logs
-2025-01-13T12:00:00.000000Z  INFO: Hello, Alice!
-2025-01-13T12:00:00.000000Z  INFO: Hello, World!
-```
-
-**Query and update data**
-
-Use `useSpacetimeDBQuery()` to subscribe to tables with TanStack Query —
-it returns `[data, loading, query]`. SpacetimeDB React hooks also work
-with TanStack Start.
-
-``` codeBlockStandalone_LlrK
-import { useSpacetimeDBQuery, useReducer } from 'spacetimedb/tanstack';
-import { tables, reducers } from '../module_bindings';
-
-function App() {
-  const [people, loading] = useSpacetimeDBQuery(tables.person);
-  const addPerson = useReducer(reducers.add);
-
-  if (loading) return <p>Loading...</p>;
-
-  return (
-    <ul>
-      {people.map((person, i) => (
-        <li key={i}>{person.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-## Next steps
-
-- See the [Chat App Tutorial](https://spacetimedb.com/docs/tutorials/chat-app) for a complete
-  example
-- Read the [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript) for
-  detailed API docs
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-intro/quickstarts/tanstack" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">TanStack Start Quickstart | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/quickstarts/tanstack"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="TanStack Start Quickstart | SpacetimeDB docs"><meta data-rh="true" name="description" content="Get a SpacetimeDB app with TanStack Start running in under 5 minutes."><meta data-rh="true" property="og:description" content="Get a SpacetimeDB app with TanStack Start running in under 5 minutes."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/quickstarts/tanstack"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/quickstarts/tanstack" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/quickstarts/tanstack" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Quickstarts","item":"https://spacetimedb.com/docs/quickstarts/react"},{"@type":"ListItem","position":2,"name":"TanStack Start","item":"https://spacetimedb.com/docs/quickstarts/tanstack"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/quickstarts/tanstack">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/quickstarts/tanstack">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Collapse sidebar category &#x27;Quickstarts&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/react"><span title="React" class="linkLabel_UvDg">React</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/nextjs"><span title="Next.js" class="linkLabel_UvDg">Next.js</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/vue"><span title="Vue" class="linkLabel_UvDg">Vue</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/astro"><span title="Astro" class="linkLabel_UvDg">Astro</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/nuxt"><span title="Nuxt" class="linkLabel_UvDg">Nuxt</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/svelte"><span title="Svelte" class="linkLabel_UvDg">Svelte</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/solid"><span title="SolidJS" class="linkLabel_UvDg">SolidJS</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/angular"><span title="Angular" class="linkLabel_UvDg">Angular</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/quickstarts/tanstack"><span title="TanStack Start" class="linkLabel_UvDg">TanStack Start</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/remix"><span title="Remix" class="linkLabel_UvDg">Remix</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/browser"><span title="Browser" class="linkLabel_UvDg">Browser</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/bun"><span title="Bun" class="linkLabel_UvDg">Bun</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/deno"><span title="Deno" class="linkLabel_UvDg">Deno</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/nodejs"><span title="Node.js" class="linkLabel_UvDg">Node.js</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/typescript"><span title="TypeScript" class="linkLabel_UvDg">TypeScript</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/rust"><span title="Rust" class="linkLabel_UvDg">Rust</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/c-sharp"><span title="C#" class="linkLabel_UvDg">C#</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/quickstarts/c-plus-plus"><span title="C++" class="linkLabel_UvDg">C++</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/quickstarts/react"><span>Quickstarts</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">TanStack Start</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="theme-doc-markdown markdown">\<header\>\<h1\>TanStack Start Quickstart</h1></header><p>Get a SpacetimeDB app with TanStack Start running in under 5 minutes.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h2>
+\<ul\>
+<li class=""><a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" class="">Node.js</a> 18+ installed</li>
+<li class=""><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="">SpacetimeDB CLI</a> installed</li>
+</ul>
+<div style="max-width:400px"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="card"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" fill="none" viewBox="0 0 20 20"><path fill="#F4F6FC" fill-rule="evenodd" d="M2.22 4.47a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06-1.06L6.69 10 2.22 5.53a.75.75 0 0 1 0-1.06M8.25 14.833c0-.46.373-.833.833-.833h7.5a.833.833 0 1 1 0 1.667h-7.5a.833.833 0 0 1-.833-.834" clip-rule="evenodd"></path></svg><div class="card--body"><h6 class="text--truncate" title="Install the SpacetimeDB CLI tool">Install the SpacetimeDB CLI tool</h6></div></a></div>
+\<hr\>
+<div class="steps"><div class="step"><div class="step-content"><strong class="step-title">Create your project</strong><div class="step-description"><p>Run the <code>spacetime dev</code> command to create a new project with a SpacetimeDB module and TanStack Start.</p><p>This will start the local SpacetimeDB server, publish your module, generate TypeScript bindings, and start the development server.</p></div></div><div class="step-code"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> dev</span><span style="color:#BD93F9"> --template</span><span style="color:#F1FA8C"> tanstack-ts</span></span></code></pre></div></div><div class="step"><div class="step-content"><strong class="step-title">Open your app</strong><div class="step-description"><p>Navigate to <a href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="">http://localhost:5173</a> to see your app running.</p><p>The template includes a TanStack Start app with TanStack Query integration with SpacetimeDB.</p></div></div></div><div class="step"><div class="step-content"><strong class="step-title">Explore the project structure</strong><div class="step-description"><p>Your project contains both server and client code.</p><p>Edit <code>spacetimedb/src/index.ts</code> to add tables and reducers. Edit <code>src/routes/index.tsx</code> to build your UI.</p></div></div><div class="step-code"><div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">my-spacetime-app/</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── spacetimedb/          # Your SpacetimeDB module</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── src/</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│       └── index.ts      # Server-side logic</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── src/                  # TanStack Start frontend</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── router.tsx        # QueryClient + SpacetimeDB setup</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── routes/</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   │   ├── __root.tsx    # Root layout</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   │   └── index.tsx     # Main app component</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── module_bindings/  # Auto-generated types</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── package.json</span><br></span></code></pre></div></div></div></div><div class="step"><div class="step-content"><strong class="step-title">Understand tables and reducers</strong><div class="step-description"><p>Open <code>spacetimedb/src/index.ts</code> to see the module code. The template includes a <code>person</code> table and two reducers: <code>add</code> to insert a person, and <code>sayHello</code> to greet everyone.</p><p>Tables store your data. Reducers are functions that modify data — they&#x27;re the only way to write to the database.</p></div></div><div class="step-code"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({</span></span>
+<span class="line"><span style="color:#F8F8F2">  person</span><span style="color:#FF79C6">:</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">    { public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">      name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">  ),</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> add </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">() },</span></span>
+<span class="line"><span style="color:#F8F8F2">  (</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#F8F8F2">, { </span><span style="color:#FFB86C;font-style:italic">name</span><span style="color:#F8F8F2"> }) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.db.person.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ name });</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> const</span><span style="color:#F8F8F2"> sayHello </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> spacetimedb.</span><span style="color:#50FA7B">reducer</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">ctx</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> person </span><span style="color:#FF79C6">of</span><span style="color:#F8F8F2"> ctx.db.person.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">info</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Hello, </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">person.name</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">!`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">  console.</span><span style="color:#50FA7B">info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Hello, World!</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div></div><div class="step"><div class="step-content"><strong class="step-title">Test with the CLI</strong><div class="step-description"><p>Open a new terminal and navigate to your project directory. Then use the SpacetimeDB CLI to call reducers and query your data directly.</p></div></div><div class="step-code"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-spacetime-app</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Call the add reducer to insert a person</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#F1FA8C"> add</span><span style="color:#F1FA8C"> Alice</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Query the person table</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> sql</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">SELECT * FROM person</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#50FA7B"> name</span></span>
+<span class="line"><span style="color:#50FA7B">---------</span></span>
+<span class="line"><span style="color:#50FA7B"> "Alice"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># Call sayHello to greet everyone</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#F1FA8C"> say_hello</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4"># View the module logs</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-13T12:00:00.000000Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> Hello,</span><span style="color:#F1FA8C"> Alice!</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-13T12:00:00.000000Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> Hello,</span><span style="color:#F1FA8C"> World!</span></span></code></pre></div></div><div class="step"><div class="step-content"><strong class="step-title">Query and update data</strong><div class="step-description"><p>Use <code>useSpacetimeDBQuery()</code> to subscribe to tables with TanStack Query — it returns <code>[data, loading, query]</code>. SpacetimeDB React hooks also work with TanStack Start.</p></div></div><div class="step-code"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { useSpacetimeDBQuery, useReducer } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/tanstack</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { tables, reducers } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">../module_bindings</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">function</span><span style="color:#50FA7B"> App</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> [people, loading] </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> useSpacetimeDBQuery</span><span style="color:#F8F8F2">(tables.person);</span></span>
+<span class="line"><span style="color:#FF79C6">  const</span><span style="color:#F8F8F2"> addPerson </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> useReducer</span><span style="color:#F8F8F2">(reducers.add);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">  if</span><span style="color:#F8F8F2"> (loading) </span><span style="color:#FF79C6">return</span><span style="color:#F8F8F2"> <</span><span style="color:#8BE9FD;font-style:italic">p</span><span style="color:#F8F8F2">>Loading</span><span style="color:#FF79C6">...</</span><span style="color:#F8F8F2">p</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">  return</span><span style="color:#F8F8F2"> (</span></span>
+<span class="line"><span style="color:#F8F8F2">    <</span><span style="color:#8BE9FD;font-style:italic">ul</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">      {</span><span style="color:#FFB86C;font-style:italic">people</span><span style="color:#F8F8F2">.</span><span style="color:#FFB86C;font-style:italic">map</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">person</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">i</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> (</span></span>
+<span class="line"><span style="color:#FF79C6">        <</span><span style="color:#F8F8F2">li key</span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2">{i}</span><span style="color:#FF79C6">></span><span style="color:#F8F8F2">{person.name}</span><span style="color:#FF79C6"></</span><span style="color:#F8F8F2">li</span><span style="color:#FF79C6">></span></span>
+<span class="line"><span style="color:#F8F8F2">      ))}</span></span>
+<span class="line"><span style="color:#FF79C6">    </</span><span style="color:#F8F8F2">ul</span><span style="color:#FF79C6">></span></span>
+<span class="line"><span style="color:#F8F8F2">  );</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next steps" title="Direct link to Next steps" translate="no">​</a></h2>
+\<ul\>
+<li class="">See the <a class="" href="/docs/tutorials/chat-app">Chat App Tutorial</a> for a complete example</li>
+<li class="">Read the <a class="" href="/docs/clients/typescript">TypeScript SDK Reference</a> for detailed API docs</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00100-intro/00200-quickstarts/00170-tanstack.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/quickstarts/angular"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Angular</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/quickstarts/remix"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Remix</div></a></nav></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

@@ -51,9 +51,9 @@ sequenceDiagram
 
 ## Streamable HTTP
 
-\<Info\>
+<Info>
   This replaces the [HTTP+SSE
-  transport](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports#http-with-sse) from
+  transport](/specification/2024-11-05/basic/transports#http-with-sse) from
   protocol version 2024-11-05. See the [backwards compatibility](#backwards-compatibility)
   guide below.
 </Info>
@@ -170,7 +170,7 @@ act as a cursor within that particular stream.
 ### Session Management
 
 An MCP "session" consists of logically related interactions between a client and a
-server, beginning with the [initialization phase](https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle). To support
+server, beginning with the [initialization phase](/specification/2025-06-18/basic/lifecycle). To support
 servers which want to establish stateful sessions:
 
 1. A server using the Streamable HTTP transport **MAY** assign a session ID at
@@ -245,7 +245,7 @@ server, allowing the MCP server to respond based on the MCP protocol version.
 For example: `MCP-Protocol-Version: 2025-06-18`
 
 The protocol version sent by the client **SHOULD** be the one [negotiated during
-initialization](https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#version-negotiation).
+initialization](/specification/2025-06-18/basic/lifecycle#version-negotiation).
 
 For backwards compatibility, if the server does *not* receive an `MCP-Protocol-Version`
 header, and has no other way to identify the version - for example, by relying on the
@@ -258,7 +258,7 @@ If the server receives a request with an invalid or unsupported
 ### Backwards Compatibility
 
 Clients and servers can maintain backwards compatibility with the deprecated [HTTP+SSE
-transport](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports#http-with-sse) (from
+transport](/specification/2024-11-05/basic/transports#http-with-sse) (from
 protocol version 2024-11-05) as follows:
 
 **Servers** wanting to support older clients should:
@@ -294,3 +294,4 @@ Implementers who choose to support custom transports **MUST** ensure they preser
 JSON-RPC message format and lifecycle requirements defined by MCP. Custom transports
 **SHOULD** document their specific connection establishment and message exchange patterns
 to aid interoperability.
+

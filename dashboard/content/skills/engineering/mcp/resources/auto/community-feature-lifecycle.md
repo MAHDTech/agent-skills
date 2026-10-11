@@ -29,17 +29,17 @@ This policy was adopted via
 This policy governs **features** of the MCP core specification: protocol
 messages, capabilities, transports, schema types, and normative behavioral
 requirements. The revision lifecycle of the specification document itself
-(Draft, Current, Final) is defined in the [versioning guide](https://modelcontextprotocol.io/docs/learn/versioning).
+(Draft, Current, Final) is defined in the [versioning guide](/docs/learn/versioning).
 
 ## Feature States
 
 A specification feature is in exactly one of three states:
 
-| State          | Meaning                                                                                                                                                       | Implementer expectation                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Active**     | The feature is part of the Current specification revision.                                                                                                    | Implement per the feature's normative requirements.                                                                         |
-| **Deprecated** | The feature remains in the specification but is scheduled for removal. A migration path is documented (see below).                                            | New implementations should not adopt the feature. Existing implementations should migrate before the earliest removal date. |
-| **Removed**    | The feature has been deleted from `draft` and will be absent from the next Current revision. It remains documented in the Final revision it last appeared in. | Implementations targeting that next Current revision must not depend on the feature.                                        |
+| State | Meaning | Implementer expectation |
+| - | - | - |
+| **Active** | The feature is part of the Current specification revision. | Implement per the feature's normative requirements. |
+| **Deprecated** | The feature remains in the specification but is scheduled for removal. A migration path is documented (see below). | New implementations should not adopt the feature. Existing implementations should migrate before the earliest removal date. |
+| **Removed** | The feature has been deleted from `draft` and will be absent from the next Current revision. It remains documented in the Final revision it last appeared in. | Implementations targeting that next Current revision must not depend on the feature. |
 
 A Deprecated feature MAY be restored to Active by a SEP that supersedes the
 deprecation SEP and documents the changed circumstances. Restoration follows
@@ -65,7 +65,7 @@ A feature may be proposed for deprecation when:
 * or any other reasons the Core Maintainers deem appropriate.
 
 Deprecation is a specification change and therefore requires a SEP per the
-[SEP guidelines](https://modelcontextprotocol.io/community/sep-guidelines). The deprecation SEP must:
+[SEP guidelines](/community/sep-guidelines). The deprecation SEP must:
 
 1. Identify the feature by name and link to its definition in `schema.ts`
    (where applicable) and the specification prose.
@@ -98,12 +98,12 @@ When the deprecation SEP is accepted and reaches Final, the deprecation is sched
   removal.
 
 The feature becomes Deprecated when the revision carrying these changes is released
-and becomes the new Current revision (see [versioning guide](https://modelcontextprotocol.io/docs/learn/versioning)).
+and becomes the new Current revision (see [versioning guide](/docs/learn/versioning)).
 The minimum deprecation window is counted from that release.
 
 ## The Deprecated Registry
 
-[`docs/specification/draft/deprecated.mdx`](https://modelcontextprotocol.io/specification/draft/deprecated) is
+[`docs/specification/draft/deprecated.mdx`](/specification/draft/deprecated) is
 a single page listing every feature in a Deprecated or Removed state. It is
 the canonical answer to "what is on its way out, and by when," so that an
 implementer does not have to reconstruct that picture from deprecation entries
@@ -125,7 +125,7 @@ released as Current, Tier 1 SDKs:
   logger).
 
 A Tier 1 SDK that consistently fails to surface a Deprecated feature is subject to the
-[Tier Relegation Process](https://modelcontextprotocol.io/community/sdk-tiers#tier-relegation).
+[Tier Relegation Process](/community/sdk-tiers#tier-relegation).
 
 ## Removing a Feature
 
@@ -145,7 +145,7 @@ The twelve-month floor may be shortened when the feature presents an active
 security risk, meaning a vulnerability with a published security advisory or
 documented in-the-wild exploitation for which no in-place mitigation exists.
 Shortening the window requires Core Maintainer approval under the
-[governance decision process](https://modelcontextprotocol.io/community/governance#decision-process), recorded
+[governance decision process](/community/governance#decision-process), recorded
 in the deprecation SEP or, where the risk surfaces after that SEP is already
 Final, in a short expedited-removal SEP that references it. The shortened
 window must still provide at least ninety days between the feature becoming
@@ -153,14 +153,16 @@ Deprecated and its earliest removal.
 
 ## Roles
 
-| Action                                         | Who                                                                                             |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Propose deprecation, extension, or restoration | Any contributor, per the SEP process                                                            |
-| Sponsor                                        | A Maintainer or Core Maintainer, per the SEP process                                            |
-| Approve a deprecation SEP                      | Core Maintainers, per the [governance decision process](https://modelcontextprotocol.io/community/governance#decision-process) |
-| Decide a removal during release preparation    | Core Maintainers, per the [governance decision process](https://modelcontextprotocol.io/community/governance#decision-process) |
-| Approve an extension or restoration SEP        | Core Maintainers, per the [governance decision process](https://modelcontextprotocol.io/community/governance#decision-process) |
-| Approve expedited removal                      | Core Maintainers, per the [governance decision process](https://modelcontextprotocol.io/community/governance#decision-process) |
+| Action | Who |
+| - | - |
+| Propose deprecation, extension, or restoration | Any contributor, per the SEP process |
+| Sponsor | A Maintainer or Core Maintainer, per the SEP process |
+| Approve a deprecation SEP | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
+| Decide a removal during release preparation | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
+| Approve an extension or restoration SEP | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
+| Approve expedited removal | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
 
 Lead Maintainers retain veto authority over each of the approvals
-above, per the [governance roles](https://modelcontextprotocol.io/community/governance#roles) definition.
+above, per the [governance roles](/community/governance#roles) definition.
+
+

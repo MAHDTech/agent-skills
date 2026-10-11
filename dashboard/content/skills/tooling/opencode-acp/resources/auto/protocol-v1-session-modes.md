@@ -16,7 +16,7 @@ skill_name = "opencode-acp"
 > Switch between different agent operating modes
 
 \<Note\>
-  You can now use [Session Config Options](https://agentclientprotocol.com/protocol/v1/session-config-options).
+  You can now use [Session Config Options](/protocol/v1/session-config-options).
   Dedicated session mode methods will be removed in a future version of the
   protocol. Until then, you can offer both to clients for backwards
   compatibility.
@@ -26,7 +26,7 @@ Agents can provide a set of modes they can operate in. Modes often affect the sy
 
 ## Initial state
 
-During [Session Setup](https://agentclientprotocol.com/protocol/v1/session-setup) the Agent **MAY** return a list of modes it can operate in and the currently active mode:
+During [Session Setup](/protocol/v1/session-setup) the Agent **MAY** return a list of modes it can operate in and the currently active mode:
 
 ```json theme={null}
 {
@@ -92,7 +92,7 @@ The current mode can be changed at any point during a session, whether the Agent
 
 ### From the Client
 
-Typically, Clients display the available modes to the user and allow them to change the current one, which they can do by calling the [`session/set_mode`](https://agentclientprotocol.com/protocol/v1/schema#session%2Fset-mode) method.
+Typically, Clients display the available modes to the user and allow them to change the current one, which they can do by calling the [`session/set_mode`](/protocol/v1/schema#session%2Fset-mode) method.
 
 ```json theme={null}
 {
@@ -127,7 +127,7 @@ The Agent can also change its own mode and let the Client know by sending the `c
     "sessionId": "sess_abc123def456",
     "update": {
       "sessionUpdate": "current_mode_update",
-      "modeId": "code"
+      "currentModeId": "code"
     }
   }
 }
@@ -153,8 +153,11 @@ This "switch mode" tool will usually request permission before running, which it
       "status": "pending",
       "content": [
         {
-          "type": "text",
-          "text": "## Implementation Plan..."
+          "type": "content",
+          "content": {
+            "type": "text",
+            "text": "## Implementation Plan..."
+          }
         }
       ]
     },
@@ -184,3 +187,6 @@ When an option is chosen, the tool runs, setting the mode and sending the `curre
 <Card icon="shield-check" horizontal href="/protocol/v1/tool-calls#requesting-permission">
   Learn more about permission requests
 </Card>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

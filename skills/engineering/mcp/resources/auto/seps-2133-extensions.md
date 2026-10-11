@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 2133                                                                            |
-| **Title**     | Extensions                                                                      |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-01-21                                                                      |
-| **Author(s)** | Peter Alexander ([@pja-ant](https://github.com/pja-ant))                        |
-| **Sponsor**   | None (seeking sponsor)                                                          |
-| **PR**        | [#2133](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2133) |
+| Field | Value |
+| - | - |
+| **SEP** | 2133 |
+| **Title** | Extensions |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-01-21 |
+| **Author(s)** | Peter Alexander ([@pja-ant](https://github.com/pja-ant)) |
+| **Sponsor** | None (seeking sponsor) |
+| **PR** | [#2133](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2133) |
 
 ***
 
@@ -291,3 +291,4 @@ Clients and servers SHOULD treat any new fields or data introduced as part of an
 ## Reference Implementation
 
 To be provided.
+

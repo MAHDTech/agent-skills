@@ -10,13 +10,13 @@
   **Deprecated**: The Logging feature is deprecated as of protocol version
   `2026-07-28`
   ([SEP-2577](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2577)).
-  Under the [feature lifecycle policy](https://modelcontextprotocol.io/community/feature-lifecycle), it remains
+  Under the [feature lifecycle policy](/community/feature-lifecycle), it remains
   in the specification for at least twelve months after this revision's release
   before it becomes eligible for removal. New implementations **SHOULD NOT**
   adopt it; existing implementations **SHOULD** migrate to logging to `stderr`
   for stdio transports, or to [OpenTelemetry](https://opentelemetry.io/) for
   structured observability. See the [deprecated features
-  registry](https://modelcontextprotocol.io/specification/draft/deprecated).
+  registry](/specification/draft/deprecated).
 </Warning>
 
 The Model Context Protocol (MCP) provides a standardized way for servers to send
@@ -46,16 +46,16 @@ Servers that emit log message notifications **MUST** declare the `logging` capab
 The protocol follows the standard syslog severity levels specified in
 [RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424#section-6.2.1):
 
-| Level     | Description                      | Example Use Case           |
-| --------- | -------------------------------- | -------------------------- |
-| debug     | Detailed debugging information   | Function entry/exit points |
-| info      | General informational messages   | Operation progress updates |
-| notice    | Normal but significant events    | Configuration changes      |
-| warning   | Warning conditions               | Deprecated feature usage   |
-| error     | Error conditions                 | Operation failures         |
-| critical  | Critical conditions              | System component failures  |
-| alert     | Action must be taken immediately | Data corruption detected   |
-| emergency | System is unusable               | Complete system failure    |
+| Level | Description | Example Use Case |
+| - | - | - |
+| debug | Detailed debugging information | Function entry/exit points |
+| info | General informational messages | Operation progress updates |
+| notice | Normal but significant events | Configuration changes |
+| warning | Warning conditions | Deprecated feature usage |
+| error | Error conditions | Operation failures |
+| critical | Critical conditions | System component failures |
+| alert | Action must be taken immediately | Data corruption detected |
+| emergency | System is unusable | Complete system failure |
 
 ## Requesting Log Messages
 
@@ -69,7 +69,7 @@ When the field is present, the server **MAY** send `notifications/message`
 notifications at or above the requested level on the response stream of that
 request, before the final response. `notifications/message` is request-scoped:
 the server **MUST NOT** deliver it on a
-[`subscriptions/listen`](https://modelcontextprotocol.io/specification/draft/basic/patterns/subscriptions)
+[`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions)
 stream or on any stream other than the one carrying the response to the request
 that set the log level.
 
@@ -132,3 +132,4 @@ request with a standard JSON-RPC error:
    * Validate all data fields
    * Control log access
    * Monitor for sensitive content
+

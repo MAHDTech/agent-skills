@@ -64,7 +64,7 @@ Remove the following standard v2 Client methods:
 * `terminal/wait_for_exit`
 * `terminal/kill`
 
-Remove the v1 Client-owned terminal tool-call content semantics as well. Without standard Client terminal methods, that content type no longer has a standard producer or lifetime model. The separate [Terminal Output](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-terminal-output.md) RFD defines a new Agent-owned, display-only terminal model instead.
+Remove the v1 Client-owned terminal tool-call content semantics as well. Without standard Client terminal methods, that content type no longer has a standard producer or lifetime model. The separate [Terminal Output](./terminal-output.mdx) RFD defines a new Agent-owned, display-only terminal model instead.
 
 As this was always opt-in anyway, it should require minimal changes on the agent side, as they just no longer have to check these capabilities.
 
@@ -102,9 +102,12 @@ No. Terminal authentication is represented by v2 `capabilities.auth.terminal`, n
 
 ### Does this remove terminal display?
 
-No. It removes Client execution and control. The [Terminal Output](@/skills/tooling/opencode-acp/resources/auto/rfds-v2-terminal-output.md) RFD adds a separate Agent-owned, display-only stream for command output.
+No. It removes Client execution and control. The [Terminal Output](./terminal-output.mdx) RFD adds a separate Agent-owned, display-only stream for command output.
 
 ## Revision history
 
 * 2026-07-14: Linked the Agent-owned Terminal Output replacement and clarified the incompatible ownership models.
 * 2026-06-02: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

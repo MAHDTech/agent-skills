@@ -17,6 +17,9 @@ skill_name = "acp"
 
 We welcome contributions from the community!
 
-All contributors must adhere to our [Code of Conduct](@/skills/engineering/acp/resources/auto/community-code-of-conduct.md).
+All contributors must adhere to our [Code of Conduct](./code-of-conduct).
 
 For questions and discussions, please use GitHub Discussions.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -10,15 +10,15 @@ Within the MCP contributor community we maintain two types of collaboration form
 
 ## Quick Reference
 
-|                | Interest Group (IG)                                | Working Group (WG)                                     |
-| -------------- | -------------------------------------------------- | ------------------------------------------------------ |
-| **Purpose**    | Identify and discuss problems                      | Build concrete solutions                               |
-| **Output**     | Problem statements, use cases, recommendations     | SEPs, implementations, code                            |
-| **Commitment** | Active contribution expected                       | Active contribution expected                           |
-| **Duration**   | Ongoing as long as topic is relevant               | Until deliverables complete                            |
-| **Leadership** | Facilitator(s)                                     | Lead(s)                                                |
-| **Decisions**  | Rough consensus, non-binding                       | Binding (lazy consensus → vote → escalation)           |
-| **Example**    | "Security in MCP" — discussing security challenges | "Server Identity" — implementing identity verification |
+| | Interest Group (IG) | Working Group (WG) |
+| - | - | - |
+| **Purpose** | Identify and discuss problems | Build concrete solutions |
+| **Output** | Problem statements, use cases, recommendations | SEPs, implementations, code |
+| **Commitment** | Active contribution expected | Active contribution expected |
+| **Duration** | Ongoing as long as topic is relevant | Until deliverables complete |
+| **Leadership** | Facilitator(s) | Lead(s) |
+| **Decisions** | Rough consensus, non-binding | Binding (lazy consensus → vote → escalation) |
+| **Example** | "Security in MCP" — discussing security challenges | "Server Identity" — implementing identity verification |
 
 ## When to Use Which
 
@@ -85,7 +85,7 @@ Each group has one or more **Leads** (referred to as **Facilitators** for Intere
 
 **Requirements for all Leads and Facilitators:**
 
-* Hold at least Member status on the MCP Contributor Ladder — see [Governance](https://modelcontextprotocol.io/community/governance) for role definitions
+* Hold at least Member status on the MCP Contributor Ladder — see [Governance](/community/governance) for role definitions
 * Demonstrated sustained engagement with the group's scope area
 * Ability to facilitate across organizational boundaries
 * Commitment to running the group's operations
@@ -106,7 +106,7 @@ Each group has one or more **Leads** (referred to as **Facilitators** for Intere
 
 **WG Leads are additionally responsible for:**
 
-* Drive proposals through the [SEP process](https://modelcontextprotocol.io/community/sep-guidelines) to resolution
+* Drive proposals through the [SEP process](/community/sep-guidelines) to resolution
 * Triage SEPs in the WG's scope area, including closing SEPs that do not fit the roadmap (with documented rationale; authors may appeal to Core Maintainers)
 * Escalate blocked decisions to Core Maintainers with clear context
 * Maintain the working group's roadmap
@@ -117,12 +117,12 @@ Each group has one or more **Leads** (referred to as **Facilitators** for Intere
 
 All groups use the following participation tiers. Note that **WG Member** is a group-specific participation level distinct from the org-wide **Member** role — an individual may be a WG Member in a specific group without holding org-wide Member status, and vice versa.
 
-| Level                | Description                                       | Privileges                                                         |
-| -------------------- | ------------------------------------------------- | ------------------------------------------------------------------ |
-| **Observer**         | Anyone interested in following the group's work   | Read access, may attend meetings, limited discussion participation |
-| **Participant**      | Active contributor to group discussions           | Can propose agenda items, participate in async votes               |
-| **WG Member**        | Sustained contributor with demonstrated expertise | Counted for quorum (WGs only)                                      |
-| **Lead/Facilitator** | Operational leadership of the group               | Sets agenda, facilitates, escalates                                |
+| Level | Description | Privileges |
+| - | - | - |
+| **Observer** | Anyone interested in following the group's work | Read access, may attend meetings, limited discussion participation |
+| **Participant** | Active contributor to group discussions | Can propose agenda items, participate in async votes |
+| **WG Member** | Sustained contributor with demonstrated expertise | Counted for quorum (WGs only) |
+| **Lead/Facilitator** | Operational leadership of the group | Sets agenda, facilitates, escalates |
 
 Interest Groups primarily operate with Observers, Participants, and Facilitators. IGs may adopt the WG Member tier if their work warrants formal decision-making, but are not required to.
 
@@ -206,10 +206,10 @@ Leads should actively involve WG Members and Participants in operational duties 
 
 All groups use the following channels:
 
-| Channel                              | Purpose                        | Response Expectation |
-| ------------------------------------ | ------------------------------ | -------------------- |
-| Discord `#{name}-wg` or `#{name}-ig` | Quick questions, coordination  | Best effort          |
-| GitHub Discussions                   | Long-form technical discussion | Weekly triage        |
+| Channel | Purpose | Response Expectation |
+| - | - | - |
+| Discord `#{name}-wg` or `#{name}-ig` | Quick questions, coordination | Best effort |
+| GitHub Discussions | Long-form technical discussion | Weekly triage |
 
 In addition to Discord, groups can establish a discussion category in [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/). Leads will be granted the appropriate roles to manage and moderate discussions.
 
@@ -232,7 +232,7 @@ The quarterly updates are provided as a document posted in the [GitHub Discussio
 **Working Group Formation:**
 
 * There must be a widely acknowledged concern requiring coordination
-* PR adding the WG charter as `docs/community/working-groups/\<name\>.mdx`, written from the [Group Charter Template](https://modelcontextprotocol.io/community/charter-template) and including the corresponding navigation entry in `docs/docs.json`, gated by CODEOWNERS requiring approval from Core Maintainers
+* PR adding the WG charter as `docs/community/working-groups/\<name\>.mdx`, written from the [Group Charter Template](/community/charter-template) and including the corresponding navigation entry in `docs/docs.json`, gated by CODEOWNERS requiring approval from Core Maintainers
 * Initial member list approved by WG Lead
 
 **Interest Group Formation:**
@@ -258,7 +258,7 @@ Changes to a group's charter (WG or IG) require:
 
 Every MCP Working Group and Interest Group must maintain a charter document that captures its specific mission, scope, leadership, membership, and operations. The governance rules above apply automatically and do not need to be repeated in the charter.
 
-See the [Group Charter Template](https://modelcontextprotocol.io/community/charter-template) for the required structure and a copyable template.
+See the [Group Charter Template](/community/charter-template) for the required structure and a copyable template.
 
 ## FAQ
 
@@ -281,7 +281,7 @@ No. IG participation can help validate ideas and build support, but it's not req
 
 ### Do I need to be in a WG to submit a SEP?
 
-No. Anyone can submit a SEP. However, WG collaboration can strengthen your proposal and help it find a sponsor.
+No. Anyone can submit a SEP, and group membership is not required. The proposal must still be brought to the relevant group's Discord channel before the SEP pull request is opened, as described in the [SEP guidelines](/community/sep-guidelines#step-by-step-process). Beyond that requirement, closer WG collaboration can strengthen your proposal and help it find a sponsor.
 
 ### What if my IG discussion leads to a concrete solution?
 
@@ -294,3 +294,4 @@ You can either:
 ### Can one person be in multiple IGs/WGs?
 
 Yes. Participate in as many groups as your time allows.
+

@@ -1,6 +1,6 @@
 ---
 name: acp
-description: Expert guidance for Agent Client Protocol (ACP) - building, integrating, or debugging ACP agents and clients, implementing JSON-RPC 2.0 schemas, managing session lifecycles, elicitation, tool calls, v1/v2 migration, and using official SDKs (TypeScript, Rust, Python, Java, Kotlin). Use when working with ACP protocols, building ACP-compatible AI agent servers or client applications, or inspecting ACP specifications and RFDs.
+description: Build, integrate, and debug Agent Client Protocol (ACP) agents and clients, implementing JSON-RPC 2.0 schemas, session lifecycles, elicitation, tool calls, v1/v2 migration, and official SDKs (TypeScript, Rust, Python, Java, Kotlin). Use when working with ACP protocols, building ACP-compatible AI agent servers or client applications, or inspecting ACP specifications and RFDs.
 resources:
   - https://agentclientprotocol.com/llms.txt
 ---
@@ -164,7 +164,7 @@ ACP v2 introduces several protocol refinements:
 - **Prompt Lifecycle**: Unified event stream replacing discrete update variants.
 - **Enhanced Terminal & FS Capabilities**: Richer terminal output streaming and granular diff file states (including deleted files).
 - **Plan Variants**: Support for alternative sub-plans and branch choices.
-- **Session Resume Replay**: Streamlined history hydration on session resume.
+- **Session Resume Replay**: Replay and hydration of history on session resume.
 
 ---
 

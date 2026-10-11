@@ -10,7 +10,7 @@ The `session/list` method allows Clients to discover sessions known to an Agent.
 
 Agents can also push session metadata updates to Clients in real-time via the `session_info_update` notification, keeping session titles and metadata in sync without polling.
 
-Before listing sessions, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v2/initialization) phase. Agents that support the `session` method surface **MUST** support `session/list`.
+Before listing sessions, Clients **MUST** first complete the [initialization](/protocol/v2/initialization) phase. Agents that support the `session` method surface **MUST** support `session/list`.
 
 <br />
 
@@ -42,7 +42,7 @@ additional workspace roots for listed sessions.
 \<Note\>
   If the Agent advertises the `session.delete` capability, Clients can remove
   sessions from future `session/list` results with
-  [`session/delete`](https://agentclientprotocol.com/protocol/v2/session-delete).
+  [`session/delete`](/protocol/v2/session-delete).
 </Note>
 
 ## Listing Sessions
@@ -138,7 +138,7 @@ The Agent **MUST** respond with a list of sessions and optional pagination metad
     </ResponseField>
 
     <ResponseField name="_meta" type="object">
-      Agent-specific metadata. See [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility).
+      Agent-specific metadata. See [Extensibility](/protocol/v2/extensibility).
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -161,7 +161,7 @@ When no sessions match the criteria, the Agent **MUST** return an empty `session
 
 ## Updating Session Metadata
 
-Agents can update session metadata in real-time by sending a `session_info_update` notification via `session/update`. This follows the same pattern as other session notifications like [`available_commands_update`](https://agentclientprotocol.com/protocol/v2/slash-commands) and [`config_option_update`](https://agentclientprotocol.com/protocol/v2/session-config-options#from-the-agent).
+Agents can update session metadata in real-time by sending a `session_info_update` notification via `session/update`. This follows the same pattern as other session notifications like [`available_commands_update`](/protocol/v2/slash-commands) and [`config_option_update`](/protocol/v2/session-config-options#from-the-agent).
 
 ```json theme={null}
 {
@@ -193,7 +193,7 @@ All fields are optional. Only include fields that have changed; omitted fields a
 
 <ResponseField name="_meta" type="object | null">
   Agent-specific metadata update. Omit to leave unchanged; set to `null` to
-  clear. See [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility).
+  clear. See [Extensibility](/protocol/v2/extensibility).
 </ResponseField>
 
 The `sessionId`, `cwd`, and `additionalDirectories` fields are **not** included
@@ -208,4 +208,7 @@ after the first meaningful exchange to auto-generate a title.
 
 1. Client calls `session/list` to discover available sessions
 2. User selects a session from the list
-3. Client calls [`session/resume`](https://agentclientprotocol.com/protocol/v2/session-setup#resuming-sessions) with the chosen `sessionId` to resume the conversation, optionally setting `replayFrom` to request history replay
+3. Client calls [`session/resume`](/protocol/v2/session-setup#resuming-sessions) with the chosen `sessionId` to resume the conversation, optionally setting `replayFrom` to request history replay
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

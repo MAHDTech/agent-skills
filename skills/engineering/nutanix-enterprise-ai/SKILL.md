@@ -1,6 +1,6 @@
 ---
 name: nutanix-enterprise-ai
-description: Expert guidance, architecture reference, sizing guidelines, Helm deployment, fine-grained RBAC authorization, Hugging Face and NVIDIA NIM model management, local and unified inference endpoints, batch inference, security scanning, and MCP server configuration for Nutanix Enterprise AI (NAI v2.8). Use when configuring or troubleshooting Nutanix Enterprise AI, GPT-in-a-Box 2.0, LLM model serving, AI Gateway, or Model Context Protocol on Kubernetes.
+description: Architecture reference, sizing guidelines, Helm deployment, fine-grained RBAC authorization, Hugging Face and NVIDIA NIM model management, local and unified inference endpoints, batch inference, security scanning, and MCP server configuration for Nutanix Enterprise AI (NAI v2.8). Use when configuring or troubleshooting Nutanix Enterprise AI, GPT-in-a-Box 2.0, LLM model serving, AI Gateway, or Model Context Protocol on Kubernetes.
 metadata:
   group: nutanix
 ---
@@ -15,7 +15,7 @@ Nutanix Enterprise AI combines:
 - **Inference Endpoint Orchestration**: One-click deployment of optimized LLM endpoints powered by vLLM and NVIDIA NIM runtime engines, with support for GPU and CPU acceleration.
 - **Unified Endpoints & Agent Gateway**: Intelligent routing across local endpoints and external commercial LLM providers (OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, Google Gemini, Mistral, Cohere, GCP Vertex AI) with rate limiting.
 - **Model Context Protocol (MCP) Integration**: Native support for connecting external MCP servers and deploying local containerized MCP tools to augment agentic AI applications.
-- **Enterprise Security & Compliance**: Built-in inline model security scanning, fine-grained role-based access control (RBAC), API client keys, and comprehensive audit event tracking.
+- **Enterprise Security & Compliance**: Built-in inline model security scanning, fine-grained role-based access control (RBAC), API client keys, and audit event tracking.
 - **Observability & NAI Labs**: Real-time telemetry via OpenTelemetry and ClickHouse, coupled with NAI Labs applications (Chat, Talk to My Data, Agent) for rapid endpoint verification.
 
 ---
@@ -71,7 +71,7 @@ curl -k -X POST "$NAI_ENDPOINT_URL/chat/completions" \
 
 ### 3. Unified Endpoints and Commercial Providers
 
-Route inference traffic seamlessly between on-prem models and cloud APIs:
+Route inference traffic between on-prem models and cloud APIs:
 
 - **Local Endpoints**: Route between multiple local deployments for load balancing and high availability.
 - **Third-Party Providers**: Aggregate AWS Bedrock, Azure OpenAI, Google Gemini, Anthropic, or OpenAI behind a unified gateway endpoint with rate limits and unified API keys.

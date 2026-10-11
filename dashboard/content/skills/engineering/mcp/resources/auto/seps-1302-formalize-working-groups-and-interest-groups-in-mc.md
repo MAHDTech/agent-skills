@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1302                                                                            |
-| **Title**     | Formalize Working Groups and Interest Groups in MCP Governance                  |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-08-05                                                                      |
-| **Author(s)** | tadasant                                                                        |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1302](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1302) |
+| Field | Value |
+| - | - |
+| **SEP** | 1302 |
+| **Title** | Formalize Working Groups and Interest Groups in MCP Governance |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-08-05 |
+| **Author(s)** | tadasant |
+| **Sponsor** | None |
+| **PR** | [#1302](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1302) |
 
 ***
 
@@ -262,3 +262,5 @@ After this SEP is approved, we can ping each of the groups to confirm they are o
 * tool-interfaces --> Retire
 * ui --> Interest Group
 * schema-validation --> Retire (same as Steering equivalent)
+
+

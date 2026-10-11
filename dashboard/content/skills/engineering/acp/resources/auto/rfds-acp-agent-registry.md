@@ -36,17 +36,17 @@ Each agent advertises itself via a manifest stored as `<id>/agent.json` in the r
 
 Fields marked with **\*** are required:
 
-| Field                 | Description                                                                                                                                                                                                                                                                      |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id` **\***           | Unique agent identifier. Lowercase letters, digits, and hyphens; must start with a letter (pattern: `^[a-z][a-z0-9-]*$`). Also the folder name in the registry repo.                                                                                                             |
-| `name` **\***         | Human-readable display name.                                                                                                                                                                                                                                                     |
-| `version` **\***      | Semantic version of the agent release (e.g. `1.0.0`).                                                                                                                                                                                                                            |
-| `description` **\***  | Brief description of the agent's functionality and purpose.                                                                                                                                                                                                                      |
+| Field | Description |
+| - | - |
+| `id` **\*** | Unique agent identifier. Lowercase letters, digits, and hyphens; must start with a letter (pattern: `^[a-z][a-z0-9-]*$`). Also the folder name in the registry repo. |
+| `name` **\*** | Human-readable display name. |
+| `version` **\*** | Semantic version of the agent release (e.g. `1.0.0`). |
+| `description` **\*** | Brief description of the agent's functionality and purpose. |
 | `distribution` **\*** | Object describing how to obtain and run the agent. Supports three distribution types: `binary` (platform-specific archives), `npx` (Node packages), and `uvx` (Python packages). At least one distribution type must be provided. See [Distribution](#distribution) for details. |
-| `repository`          | Source code repository URL.                                                                                                                                                                                                                                                      |
-| `authors`             | Array of author/organization names.                                                                                                                                                                                                                                              |
-| `license`             | SPDX license identifier or `"proprietary"`.                                                                                                                                                                                                                                      |
-| `icon`                | Path to icon file (relative path or absolute URL). Must be SVG format, 16×16, monochrome using `currentColor` (enables light/dark theme adaptation). See [Icon requirements](#icon-requirements).                                                                                |
+| `repository` | Source code repository URL. |
+| `authors` | Array of author/organization names. |
+| `license` | SPDX license identifier or `"proprietary"`. |
+| `icon` | Path to icon file (relative path or absolute URL). Must be SVG format, 16×16, monochrome using `currentColor` (enables light/dark theme adaptation). See [Icon requirements](#icon-requirements). |
 
 ### Distribution
 
@@ -54,37 +54,37 @@ The `distribution` object supports three mutually independent strategies. An age
 
 #### `binary`
 
-Platform-specific archive downloads. Keyed by `<os>-<arch>` targets:
+Platform-specific archive downloads. Keyed by `\<os\>-\<arch\>` targets:
 
-| Target            | OS      | Architecture |
-| ----------------- | ------- | ------------ |
-| `darwin-aarch64`  | macOS   | ARM64        |
-| `darwin-x86_64`   | macOS   | x86-64       |
-| `linux-aarch64`   | Linux   | ARM64        |
-| `linux-x86_64`    | Linux   | x86-64       |
-| `windows-aarch64` | Windows | ARM64        |
-| `windows-x86_64`  | Windows | x86-64       |
+| Target | OS | Architecture |
+| - | - | - |
+| `darwin-aarch64` | macOS | ARM64 |
+| `darwin-x86_64` | macOS | x86-64 |
+| `linux-aarch64` | Linux | ARM64 |
+| `linux-x86_64` | Linux | x86-64 |
+| `windows-aarch64` | Windows | ARM64 |
+| `windows-x86_64` | Windows | x86-64 |
 
 When using `binary` distribution, builds **must be provided for all three operating systems** (darwin, linux, windows). CI will reject entries that only cover a subset.
 
 Each target is an object with:
 
-| Field     | Required | Description                         |
-| --------- | -------- | ----------------------------------- |
-| `archive` | Yes      | URL to download archive             |
-| `cmd`     | Yes      | Command to execute after extraction |
-| `args`    | No       | Array of command-line arguments     |
-| `env`     | No       | Object of environment variables     |
+| Field | Required | Description |
+| - | - | - |
+| `archive` | Yes | URL to download archive |
+| `cmd` | Yes | Command to execute after extraction |
+| `args` | No | Array of command-line arguments |
+| `env` | No | Object of environment variables |
 
 #### `npx` / `uvx`
 
 Package-manager-based distribution (Node via `npx`, Python via `uvx`). Each is an object with:
 
-| Field     | Required | Description                               |
-| --------- | -------- | ----------------------------------------- |
-| `package` | Yes      | Package name (with optional version spec) |
-| `args`    | No       | Array of command-line arguments           |
-| `env`     | No       | Object of environment variables           |
+| Field | Required | Description |
+| - | - | - |
+| `package` | Yes | Package name (with optional version spec) |
+| `args` | No | Array of command-line arguments |
+| `env` | No | Object of environment variables |
 
 ### Icon requirements
 
@@ -166,10 +166,10 @@ Using `currentColor` lets icons adapt automatically to the client's light or dar
 
 The aggregated `registry.json` file conforms to the registry schema and contains:
 
-| Field     | Description                                                                                               |
-| --------- | --------------------------------------------------------------------------------------------------------- |
-| `version` | Registry schema version (semver, e.g. `1.0.0`).                                                           |
-| `agents`  | Array of agent entries (each following the agent manifest schema above, sourced from `agent.json` files). |
+| Field | Description |
+| - | - |
+| `version` | Registry schema version (semver, e.g. `1.0.0`). |
+| `agents` | Array of agent entries (each following the agent manifest schema above, sourced from `agent.json` files). |
 
 ## Authentication requirements
 
@@ -180,7 +180,7 @@ To be listed in the registry, an agent **must support at least one** of the foll
 
 CI verifies this by checking that the agent returns an `authMethods` array in
 its `initialize` response, with at least one method. See the [Terminal
-Authentication RFD](@/skills/engineering/acp/resources/auto/rfds-auth-methods.md) for the terminal flow.
+Authentication RFD](./auth-methods) for the terminal flow.
 
 ## What we propose to do about it
 
@@ -190,7 +190,7 @@ Authentication RFD](@/skills/engineering/acp/resources/auto/rfds-auth-methods.md
    * CI validates manifests on every PR: schema compliance, slug uniqueness, icon format (16×16 SVG, monochrome `currentColor`), URL accessibility for all distribution URLs, authentication support via ACP handshake, and binary OS coverage.
    * Push to `main` triggers a build that aggregates all entries into `registry.json` and publishes versioned + `latest` GitHub releases.
 3. **Aggregated outputs**:
-   * `registry.json`: deterministic list of all agents with icons copied to `dist/\<id\>.svg`.
+   * `registry.json`: deterministic list of all agents with icons copied to `dist/<id>.svg`.
 4. **Distribution & search**:
    * Clients fetch `registry.json` from `https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json`.
    * Static site offers filters for deployment model, license, and distribution type.
@@ -218,3 +218,6 @@ Authentication RFD](@/skills/engineering/acp/resources/auto/rfds-auth-methods.md
 * 2025-11-28: Initial draft.
 * 2025-12-16: Minors.
 * 2026-02-04: Updated to match latest schema — removed `schema_version`, `homepage`, `capabilities`, and `auth` fields; added `icon` field; restructured `distribution` into `binary`, `npx`, and `uvx` types.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

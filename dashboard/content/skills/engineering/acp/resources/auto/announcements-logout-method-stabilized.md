@@ -17,8 +17,11 @@ skill_name = "acp"
 
 **Published:** May 21, 2026
 
-The [Logout Method RFD](https://agentclientprotocol.com/rfds/logout-method) has moved to Completed and the `logout` method is stabilized.
+The [Logout Method RFD](/rfds/logout-method) has moved to Completed and the `logout` method is stabilized.
 
 When advertised via `agentCapabilities.auth.logout`, Clients can now ask Agents to end the current authenticated state and return the connection to a state where future authentication-gated requests require `authenticate` again.
 
-For the protocol documentation, see [Logging Out](https://agentclientprotocol.com/protocol/v1/authentication#logging-out).
+For the protocol documentation, see [Logging Out](/protocol/v1/authentication#logging-out).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

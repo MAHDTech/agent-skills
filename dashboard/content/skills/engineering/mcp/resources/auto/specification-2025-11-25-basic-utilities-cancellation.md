@@ -44,7 +44,7 @@ notification containing:
    * Were previously issued in the same direction
    * Are believed to still be in-progress
 2. The `initialize` request **MUST NOT** be cancelled by clients
-3. For [task-augmented requests](@/skills/engineering/mcp/resources/auto/specification-2025-11-25-basic-utilities-tasks.md), the `tasks/cancel` request **MUST** be used instead of the `notifications/cancelled` notification. Tasks have their own dedicated cancellation mechanism that returns the final task state.
+3. For [task-augmented requests](./tasks), the `tasks/cancel` request **MUST** be used instead of the `notifications/cancelled` notification. Tasks have their own dedicated cancellation mechanism that returns the final task state.
 4. Receivers of cancellation notifications **SHOULD**:
    * Stop processing the cancelled request
    * Free associated resources
@@ -93,3 +93,5 @@ Invalid cancellation notifications **SHOULD** be ignored:
 
 This maintains the "fire and forget" nature of notifications while allowing for race
 conditions in asynchronous communication.
+
+

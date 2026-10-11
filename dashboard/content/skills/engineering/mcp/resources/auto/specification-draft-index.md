@@ -85,16 +85,16 @@ Clients may offer the following features to servers:
 
 ### Extensions
 
-Beyond the core protocol, MCP defines optional [extensions](https://modelcontextprotocol.io/extensions/overview)
+Beyond the core protocol, MCP defines optional [extensions](/extensions/overview)
 that add modular, specialized, or experimental functionality. Extensions
 are always opt-in and require explicit support from both client and server, negotiated
 during initialization. Notable extensions include:
 
-* **[Tasks](https://modelcontextprotocol.io/extensions/tasks/overview)**: Asynchronous execution of long-running
+* **[Tasks](/extensions/tasks/overview)**: Asynchronous execution of long-running
   operations, with polling, mid-flight input, and durable handles
-* **[Skills over MCP](https://modelcontextprotocol.io/community/working-groups/skills-over-mcp)**: Rich, structured
+* **[Skills over MCP](/community/working-groups/skills-over-mcp)**: Rich, structured
   instructions for agent workflows, discovered and consumed through MCP
-* **[MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)**: Interactive UI elements (charts, forms,
+* **[MCP Apps](/extensions/apps/overview)**: Interactive UI elements (charts, forms,
   video players) rendered inline within conversations
 
 ## Security and Trust & Safety
@@ -149,3 +149,5 @@ Explore the detailed specification for each protocol component:
 
   <Card title="Contributing" icon="pencil" href="/community/contributing" />
 </CardGroup>
+
+

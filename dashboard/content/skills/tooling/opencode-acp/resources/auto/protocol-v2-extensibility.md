@@ -19,7 +19,7 @@ The Agent Client Protocol provides built-in extension mechanisms that allow impl
 
 ## The `_meta` Field
 
-All types in the protocol include a `_meta` field with type `{ [key: string]: unknown }` that implementations can use to attach custom information. This includes requests, responses, notifications, and even nested types like content blocks, tool calls, plan entries, and capability objects.
+Protocol object types that define a `_meta` field can use it to attach custom information. This includes requests, responses, notifications, and nested object types such as content blocks, tool calls, plan entries, and capability objects. Primitive types and object types that do not define `_meta` cannot carry it.
 
 ```json theme={null}
 {
@@ -144,18 +144,23 @@ Implementations **SHOULD** use the `_meta` field in capability objects to advert
   "result": {
     "protocolVersion": 2,
     "capabilities": {
-      "session": {
-        "load": {}
-      },
       "_meta": {
         "zed.dev": {
           "workspace": true,
           "fileNotifications": true
         }
       }
+    },
+    "info": {
+      "name": "my-agent",
+      "title": "My Agent",
+      "version": "1.0.0"
     }
   }
 }
 ```
 
 This allows implementations to negotiate custom features during initialization without breaking compatibility with standard Clients and Agents.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

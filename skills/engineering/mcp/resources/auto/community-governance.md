@@ -24,12 +24,12 @@ All documentation (excluding specifications) will be made available under Creati
 
 The MCP project adopts a hierarchical structure, similar to Python, PyTorch, and other open source projects:
 
-| Role                        | Scope                            |
-| --------------------------- | -------------------------------- |
-| **Lead Maintainers (BDFL)** | Final decision authority         |
-| **Core Maintainers**        | Overall project direction        |
-| **Maintainers**             | Working Groups, SDKs, components |
-| **Contributors**            | Issues, PRs, discussions         |
+| Role | Scope |
+| - | - |
+| **Lead Maintainers (BDFL)** | Final decision authority |
+| **Core Maintainers** | Overall project direction |
+| **Maintainers** | Working Groups, SDKs, components |
+| **Contributors** | Issues, PRs, discussions |
 
 * **Contributors** file issues, make pull requests, and contribute to the project.
 * **Maintainers** drive components within the MCP project, such as SDKs, documentation, and Working Groups.
@@ -46,15 +46,15 @@ Technical governance is facilitated through a shared [Discord server](https://di
 
 ### Roles
 
-The [Contributor Ladder](https://modelcontextprotocol.io/community/contributor-ladder) is the canonical definition of each role — its requirements, responsibilities, privileges, advancement process, and inactivity policy. This section gives a conceptual overview of how the roles relate to governance.
+The [Contributor Ladder](/community/contributor-ladder) is the canonical definition of each role — its requirements, responsibilities, privileges, advancement process, and inactivity policy. This section gives a conceptual overview of how the roles relate to governance.
 
-**Maintainers** steward specific areas such as SDKs, documentation, or [Working Groups](https://modelcontextprotocol.io/community/working-interest-groups). They make decisions for their area independently and escalate to Core Maintainers when needed. Maintainers have write access to their respective repositories.
+**Maintainers** steward specific areas such as SDKs, documentation, or [Working Groups](/community/working-interest-groups). They make decisions for their area independently and escalate to Core Maintainers when needed. Maintainers have write access to their respective repositories.
 
 **Core Maintainers** steer the MCP specification and overall project direction. They can veto Maintainer decisions by majority vote, resolve disputes, and appoint or remove Maintainers. Core Maintainers have admin access to all MCP repositories but use the same pull-request workflow as outside contributors.
 
 **Lead Maintainers** hold final authority and can veto any decision by Core Maintainers or Maintainers — the role commonly known as Benevolent Dictator for Life (BDFL). Lead Maintainers appoint and remove Core Maintainers, and are administrators on all project infrastructure. They are part of the Core Maintainer group and are expected to publicly articulate their reasoning.
 
-The [Contributor Ladder](https://modelcontextprotocol.io/community/contributor-ladder) also defines the **Member** and **Community Moderator** roles, which sit outside the Steering Group.
+The [Contributor Ladder](/community/contributor-ladder) also defines the **Member** and **Community Moderator** roles, which sit outside the Steering Group.
 
 ### Decision Process
 
@@ -70,18 +70,18 @@ Maintainers, Core Maintainers, and Lead Maintainers should use the same contribu
 
 ### Working Groups and Interest Groups
 
-MCP collaboration and contributions are organized around two structures: [Working Groups and Interest Groups](https://modelcontextprotocol.io/community/working-interest-groups).
+MCP collaboration and contributions are organized around two structures: [Working Groups and Interest Groups](/community/working-interest-groups).
 
 * **Interest Groups** identify and articulate problems that MCP should address through open discussions
 * **Working Groups** develop concrete solutions by producing deliverables like SEPs or implementations
 
-For details on how to create, participate in, and facilitate these groups, see the [Working and Interest Groups](https://modelcontextprotocol.io/community/working-interest-groups) documentation.
+For details on how to create, participate in, and facilitate these groups, see the [Working and Interest Groups](/community/working-interest-groups) documentation.
 
 ### Specification Enhancement Proposals (SEPs)
 
-Proposed changes to the specification must be submitted as [Specification Enhancement Proposals (SEPs)](https://modelcontextprotocol.io/community/sep-guidelines). SEPs are the primary mechanism for proposing major new features, collecting community input, and documenting design decisions.
+Proposed changes to the specification must be submitted as [Specification Enhancement Proposals (SEPs)](/community/sep-guidelines). SEPs are the primary mechanism for proposing major new features, collecting community input, and documenting design decisions.
 
-For the complete SEP process, format requirements, and status workflow, see the [SEP Guidelines](https://modelcontextprotocol.io/community/sep-guidelines).
+For the complete SEP process, format requirements, and status workflow, see the [SEP Guidelines](/community/sep-guidelines).
 
 ### Maintenance Responsibilities
 
@@ -103,7 +103,7 @@ The MCP project maintains a [public Discord server](https://discord.gg/6CSzBmMkj
 
 Membership in maintainer groups is given to **individuals** on a merit basis after demonstrated expertise and alignment with MCP's direction. Membership is associated with the person, not their employer, and has no term limit.
 
-The nomination process, sponsorship requirements, review timeline, and inactivity criteria for each role are defined in the [Contributor Ladder's Advancement Process](https://modelcontextprotocol.io/community/contributor-ladder#advancement-process).
+The nomination process, sponsorship requirements, review timeline, and inactivity criteria for each role are defined in the [Contributor Ladder's Advancement Process](/community/contributor-ladder#advancement-process).
 
 ## Current Lead Maintainers
 
@@ -129,3 +129,4 @@ The nomination process, sponsorship requirements, review timeline, and inactivit
 ## Current Maintainers and Working Groups
 
 Refer to [the maintainer list](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md).
+

@@ -34,7 +34,7 @@ interaction model.
 ## Capabilities
 
 Clients that support roots **MUST** declare the `roots` capability during
-[initialization](https://modelcontextprotocol.io/specification/2025-03-26/basic/lifecycle#initialization):
+[initialization](/specification/2025-03-26/basic/lifecycle#initialization):
 
 ```json theme={null}
 {
@@ -195,3 +195,5 @@ Example error:
    * Handle root list changes gracefully
    * Respect root boundaries in operations
    * Cache root information appropriately
+
+

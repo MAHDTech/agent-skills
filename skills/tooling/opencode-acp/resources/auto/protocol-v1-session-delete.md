@@ -8,7 +8,7 @@
 
 The `session/delete` method allows Clients to remove sessions from an Agent's `session/list` results. This gives users a standard way to manage session history across ACP Clients and Agents.
 
-Before deleting sessions, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v1/initialization) phase and verify the Agent supports this capability.
+Before deleting sessions, Clients **MUST** first complete the [initialization](/protocol/v1/initialization) phase and verify the Agent supports this capability.
 
 <br />
 
@@ -90,3 +90,6 @@ On success, the Agent returns an empty result:
 * Agents may implement soft delete or hard delete. ACP only specifies the user-facing session-list behavior.
 * Behavior for `session/load` on a deleted session is implementation-defined.
 * Behavior for deleting an active session is implementation-defined.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

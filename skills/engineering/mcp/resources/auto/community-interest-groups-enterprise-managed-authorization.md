@@ -8,7 +8,7 @@
 
 \<Note\>
   As of 2026-08-17 this Interest Group is folded into the [Authorization
-  IG](https://modelcontextprotocol.io/community/interest-groups/auth). EMA interoperability and deployment
+  IG](/community/interest-groups/auth). EMA interoperability and deployment
   progress is presented as agenda slots on the Auth IG call, discussion
   continues in `#auth-ig` threads, and `#enterprise-managed-auth-ig` is
   archived. This page is kept for reference.
@@ -20,7 +20,7 @@
 
 ## Mission Statement
 
-The Enterprise-Managed Authorization Interest Group provides a venue for identity-provider vendors, MCP client implementers, and MCP server operators to coordinate on real-world adoption of the [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization) (`io.modelcontextprotocol/enterprise-managed-authorization`). The extension's ID-JAG flow only delivers value when an enterprise IdP, an MCP client, and an MCP server's authorization server all interoperate end to end — this group exists to gather deployment experience, surface compatibility gaps between independent implementations, and feed validated problems back to the [Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth) and the [ext-auth](https://github.com/modelcontextprotocol/ext-auth) specification.
+The Enterprise-Managed Authorization Interest Group provides a venue for identity-provider vendors, MCP client implementers, and MCP server operators to coordinate on real-world adoption of the [Enterprise-Managed Authorization extension](/extensions/auth/enterprise-managed-authorization) (`io.modelcontextprotocol/enterprise-managed-authorization`). The extension's ID-JAG flow only delivers value when an enterprise IdP, an MCP client, and an MCP server's authorization server all interoperate end to end — this group exists to gather deployment experience, surface compatibility gaps between independent implementations, and feed validated problems back to the [Authorization IG](/community/interest-groups/auth) and the [ext-auth](https://github.com/modelcontextprotocol/ext-auth) specification.
 
 ## Scope
 
@@ -34,23 +34,23 @@ The Enterprise-Managed Authorization Interest Group provides a venue for identit
 
 ### Out of Scope
 
-* **Other authorization profiles**: Client Credentials, DPoP, Workload Identity Federation, and the core OAuth 2.1 flow belong to the [Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth)
+* **Other authorization profiles**: Client Credentials, DPoP, Workload Identity Federation, and the core OAuth 2.1 flow belong to the [Authorization IG](/community/interest-groups/auth)
 * **General enterprise deployment topics**: networking, packaging, and host-application rollout concerns that are not specific to the ID-JAG flow
 * **End-user product configuration walk-throughs**: the IG discusses patterns, not step-by-step setup for individual IdP or client products. Vendor-reported constraints on what an IdP can or cannot implement *are* in scope as deployment experience
-* **Competitively sensitive or non-public business information**, per the [MCP Antitrust Policy](https://modelcontextprotocol.io/community/antitrust)
+* **Competitively sensitive or non-public business information**, per the [MCP Antitrust Policy](/community/antitrust)
 
 ### Related Groups
 
-* **[Authorization IG](https://modelcontextprotocol.io/community/interest-groups/auth)**: parent group for all MCP authorization work; EMA spec changes are incubated there and this IG's findings feed its agenda
-* **[Security IG](https://modelcontextprotocol.io/community/interest-groups/security)**: token-audience confusion, issuer validation, and account-linking risks in the ID-JAG flow sit at the boundary between the two groups
+* **[Authorization IG](/community/interest-groups/auth)**: parent group for all MCP authorization work; EMA spec changes are incubated there and this IG's findings feed its agenda
+* **[Security IG](/community/interest-groups/security)**: token-audience confusion, issuer validation, and account-linking risks in the ID-JAG flow sit at the boundary between the two groups
 * **SDK Maintainers**: SDKs ship the EMA client implementation; interop findings inform cross-SDK behaviour and defaults
 
 ## Leadership
 
-| Role        | Name          | Organization | GitHub                                     | Term    |
-| ----------- | ------------- | ------------ | ------------------------------------------ | ------- |
-| Facilitator | Paul Carleton | Anthropic    | [@pcarleton](https://github.com/pcarleton) | Initial |
-| Facilitator | Aaron Parecki | Okta         | [@aaronpk](https://github.com/aaronpk)     | Initial |
+| Role | Name | Organization | GitHub | Term |
+| - | - | - | - | - |
+| Facilitator | Paul Carleton | Anthropic | [@pcarleton](https://github.com/pcarleton) | Initial |
+| Facilitator | Aaron Parecki | Okta | [@aaronpk](https://github.com/aaronpk) | Initial |
 
 Sponsored by Den Delimarsky ([@localden](https://github.com/localden), Lead Maintainer).
 
@@ -58,13 +58,13 @@ Sponsored by Den Delimarsky ([@localden](https://github.com/localden), Lead Main
 
 Open to anyone; no formal membership or approval step is required to join the channel, attend calls, or contribute. The group particularly seeks participants from enterprise IdP vendors, MCP client implementers shipping EMA support, and MCP server operators integrating with an enterprise IdP.
 
-Join the `#enterprise-managed-auth-ig` channel on the [MCP Contributors Discord](https://modelcontextprotocol.io/community/communication#discord) or open a thread in the Authorization category of [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions). Calls are open and attendance is optional — async participation via Discord and GitHub is equally valued.
+Join the `#enterprise-managed-auth-ig` channel on the [MCP Contributors Discord](/community/communication#discord) or open a thread in the Authorization category of [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions). Calls are open and attendance is optional — async participation via Discord and GitHub is equally valued.
 
 ## Operations
 
-| Meeting      | Frequency     | Duration | Purpose                                                               |
-| ------------ | ------------- | -------- | --------------------------------------------------------------------- |
-| Interop Call | Every 2 weeks | 45 min   | Deployment reports, compatibility-matrix review, spec-feedback triage |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
+| Interop Call | Every 2 weeks | 45 min | Deployment reports, compatibility-matrix review, spec-feedback triage |
 
 An agenda is shared in `#enterprise-managed-auth-ig` ahead of each call. Meeting notes are posted to the Authorization category in [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions).
 
@@ -72,7 +72,8 @@ Discord: [#enterprise-managed-auth-ig](https://discord.com/channels/135886984813
 
 ## Changelog
 
-| Date       | Change                                             |
-| ---------- | -------------------------------------------------- |
+| Date | Change |
+| - | - |
 | 2026-08-17 | Folded into the Authorization IG; channel archived |
-| 2026-06-16 | Initial charter                                    |
+| 2026-06-16 | Initial charter |
+

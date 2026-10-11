@@ -17,8 +17,11 @@ skill_name = "opencode-acp"
 
 **Published:** June 29, 2026
 
-The [Request Cancellation RFD](https://agentclientprotocol.com/rfds/request-cancellation) has moved to Completed and the `$/cancel_request` notification is stabilized.
+The [Request Cancellation RFD](/rfds/request-cancellation) has moved to Completed and the `$/cancel_request` notification is stabilized.
 
 Either side can use the optional notification to request cancellation of an outstanding JSON-RPC request by ID. Implementations can return a valid partial result or the standard `-32800` Request Cancelled error, while feature-specific mechanisms such as `session/cancel` remain available for richer semantics.
 
-For the protocol documentation, see [Cancellation](https://agentclientprotocol.com/protocol/v1/cancellation).
+For the protocol documentation, see [Cancellation](/protocol/v1/cancellation).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -14,7 +14,7 @@ This tutorial will show you how to publish an MCP server written in TypeScript t
 
 * **Node.js** — This tutorial assumes the MCP server is written in TypeScript.
 * **npm account** — The MCP Registry only hosts metadata, not artifacts. Before publishing to the MCP Registry, we will publish the MCP server's package to npm, so you will need an [npm](https://www.npmjs.com) account.
-* **GitHub account** — The MCP Registry supports [multiple authentication methods](registry-authentication.md). For simplicity, this tutorial will use GitHub-based authentication, so you will need a [GitHub](https://github.com/) account.
+* **GitHub account** — The MCP Registry supports [multiple authentication methods](./authentication). For simplicity, this tutorial will use GitHub-based authentication, so you will need a [GitHub](https://github.com/) account.
 
 If you do not have an MCP server written in TypeScript, you can copy the `weather-server-typescript` server from the [`modelcontextprotocol/quickstart-resources` repository](https://github.com/modelcontextprotocol/quickstart-resources) to follow along with this tutorial:
 
@@ -274,15 +274,16 @@ You should see your server's metadata in the search results JSON:
 
 ## Troubleshooting
 
-| Error Message                                       | Action                                                                                                                                                  |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "Registry validation failed for package"            | Ensure your package includes the required validation information (e.g, `mcpName` property in `package.json`).                                           |
-| "Invalid or expired Registry JWT token"             | Re-authenticate by running `mcp-publisher login github`.                                                                                                |
+| Error Message | Action |
+| - | - |
+| "Registry validation failed for package" | Ensure your package includes the required validation information (e.g, `mcpName` property in `package.json`). |
+| "Invalid or expired Registry JWT token" | Re-authenticate by running `mcp-publisher login github`. |
 | "You do not have permission to publish this server" | Your authentication method doesn't match your server's namespace format. With GitHub auth, your server name must start with `io.github.your-username/`. |
 
 ## Next Steps
 
-* Learn about [support for other package types](registry-package-types.md).
-* Learn about [support for remote servers](registry-remote-servers.md).
-* Learn how to [use other authentication methods](registry-authentication.md), such as [DNS authentication](registry-authentication.md#dns-authentication) which enables custom domains for server name prefixes.
-* Learn how to [automate publishing with GitHub Actions](registry-github-actions.md).
+* Learn about [support for other package types](./package-types).
+* Learn about [support for remote servers](./remote-servers).
+* Learn how to [use other authentication methods](./authentication), such as [DNS authentication](./authentication#dns-authentication) which enables custom domains for server name prefixes.
+* Learn how to [automate publishing with GitHub Actions](./github-actions).
+

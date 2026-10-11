@@ -7,1032 +7,747 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-Need help with the tutorial? [Join our Discord
-server](https://discord.gg/spacetimedb)!
-
-This progressive tutorial is continued from [part
-3](https://spacetimedb.com/docs/tutorials/unity/part-3).
-
-### Moving the player
-
-At this point, we're very close to having a working game. All we have to
-do is modify our server to allow the player to move around, and to
-simulate the physics and collisions of the game.
-
-- C#
-- Rust
-- C++
-
-Let's start by building out a simple math library to help us do
-collision calculations. Create a new `Math.cs` file in the
-`blackholio-server/spacetimedb` directory and add the following
-contents. Let's also remove the `DbVector2` type from `Lib.cs`.
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Type]
-public partial struct DbVector2
-{
-    public float x;
-    public float y;
-
-    public DbVector2(float x, float y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-
-    public float SqrMagnitude => x * x + y * y;
-    public float Magnitude => MathF.Sqrt(SqrMagnitude);
-    public DbVector2 Normalized => this / Magnitude;
-
-    public static DbVector2 operator +(DbVector2 a, DbVector2 b) => new DbVector2(a.x + b.x, a.y + b.y);
-    public static DbVector2 operator -(DbVector2 a, DbVector2 b) => new DbVector2(a.x - b.x, a.y - b.y);
-    public static DbVector2 operator *(DbVector2 a, float b) => new DbVector2(a.x * b, a.y * b);
-    public static DbVector2 operator /(DbVector2 a, float b) => new DbVector2(a.x / b, a.y / b);
-}
-```
-
-Next, add the following reducer to the `Module` class of your `Lib.cs`
-file.
-
-``` codeBlockStandalone_LlrK
-[Reducer]
-public static void UpdatePlayerInput(ReducerContext ctx, DbVector2 direction)
-{
-    var player = ctx.Db.player.identity.Find(ctx.Sender) ?? throw new Exception("Player not found");
-    foreach (var c in ctx.Db.circle.player_id.Filter(player.player_id))
-    {
-        var circle = c;
-        circle.direction = direction.Normalized;
-        circle.speed = Math.Clamp(direction.Magnitude, 0f, 1f);
-        ctx.Db.circle.entity_id.Update(circle);
-    }
-}
-```
-
-This is a simple reducer that takes the movement input from the client
-and applies it to all circles that the player controls. Note that it is
-not possible for a player to move another player's circles using this
-reducer, because the `ctx.Sender` value is not set by the client.
-Instead `ctx.Sender` is set by SpacetimeDB after it has authenticated
-that sender. You can rest assured that the caller has been authenticated
-as that player by the time this reducer is called.
-
-Let's start by building out a simple math library to help us do
-collision calculations. Create a new `math.rs` file in the
-`spacetimedb/src` directory and add the following contents. Let's also
-move the `DbVector2` type from `lib.rs` into this file.
-
-``` codeBlockStandalone_LlrK
-use spacetimedb::SpacetimeType;
-
-// This allows us to store 2D points in tables.
-#[derive(SpacetimeType, Debug, Clone, Copy)]
-pub struct DbVector2 {
-    pub x: f32,
-    pub y: f32,
-}
-
-impl std::ops::Add<&DbVector2> for DbVector2 {
-    type Output = DbVector2;
-
-    fn add(self, other: &DbVector2) -> DbVector2 {
-        DbVector2 {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
-    }
-}
-
-impl std::ops::Add<DbVector2> for DbVector2 {
-    type Output = DbVector2;
-
-    fn add(self, other: DbVector2) -> DbVector2 {
-        DbVector2 {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
-    }
-}
-
-impl std::ops::AddAssign<DbVector2> for DbVector2 {
-    fn add_assign(&mut self, rhs: DbVector2) {
-        self.x += rhs.x;
-        self.y += rhs.y;
-    }
-}
-
-impl std::iter::Sum<DbVector2> for DbVector2 {
-    fn sum<I: Iterator<Item = DbVector2>>(iter: I) -> Self {
-        let mut r = DbVector2::new(0.0, 0.0);
-        for val in iter {
-            r += val;
-        }
-        r
-    }
-}
-
-impl std::ops::Sub<&DbVector2> for DbVector2 {
-    type Output = DbVector2;
-
-    fn sub(self, other: &DbVector2) -> DbVector2 {
-        DbVector2 {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
-    }
-}
-
-impl std::ops::Sub<DbVector2> for DbVector2 {
-    type Output = DbVector2;
-
-    fn sub(self, other: DbVector2) -> DbVector2 {
-        DbVector2 {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
-    }
-}
-
-impl std::ops::SubAssign<DbVector2> for DbVector2 {
-    fn sub_assign(&mut self, rhs: DbVector2) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
-    }
-}
-
-impl std::ops::Mul<f32> for DbVector2 {
-    type Output = DbVector2;
-
-    fn mul(self, other: f32) -> DbVector2 {
-        DbVector2 {
-            x: self.x * other,
-            y: self.y * other,
-        }
-    }
-}
-
-impl std::ops::Div<f32> for DbVector2 {
-    type Output = DbVector2;
-
-    fn div(self, other: f32) -> DbVector2 {
-        if other != 0.0 {
-            DbVector2 {
-                x: self.x / other,
-                y: self.y / other,
-            }
-        } else {
-            DbVector2 { x: 0.0, y: 0.0 }
-        }
-    }
-}
-
-impl DbVector2 {
-    pub fn new(x: f32, y: f32) -> Self {
-        Self { x, y }
-    }
-
-    pub fn sqr_magnitude(&self) -> f32 {
-        self.x * self.x + self.y * self.y
-    }
-
-    pub fn magnitude(&self) -> f32 {
-        (self.x * self.x + self.y * self.y).sqrt()
-    }
-
-    pub fn normalized(self) -> DbVector2 {
-        self / self.magnitude()
-    }
-}
-```
-
-At the very top of `lib.rs` add the following lines to import the moved
-`DbVector2` from the `math` module.
-
-``` codeBlockStandalone_LlrK
-pub mod math;
-
-use math::DbVector2;
-// ...
-```
-
-Next, add the following reducer to your `lib.rs` file.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer]
-pub fn update_player_input(ctx: &ReducerContext, direction: DbVector2) -> Result<(), String> {
-    let player = ctx
-        .db
-        .player()
-        .identity()
-        .find(&ctx.sender())
-        .ok_or("Player not found")?;
-    for mut circle in ctx.db.circle().player_id().filter(&player.player_id) {
-        circle.direction = direction.normalized();
-        circle.speed = direction.magnitude().clamp(0.0, 1.0);
-        ctx.db.circle().entity_id().update(circle);
-    }
-    Ok(())
-}
-```
-
-This is a simple reducer that takes the movement input from the client
-and applies it to all circles that the player controls. Note that it is
-not possible for a player to move another player's circles using this
-reducer, because the `ctx.sender()` value is not set by the client.
-Instead `ctx.sender()` is set by SpacetimeDB after it has authenticated
-that sender. You can rest assured that the caller has been authenticated
-as that player by the time this reducer is called.
-
-Let's start by building out a simple math library to help us do
-collision calculations. Create a new `math.h` file in the
-`blackholio/spacetimedb/src` directory and add the following contents.
-We'll also move the `DbVector2` type from `lib.cpp` into this file.
-
-``` codeBlockStandalone_LlrK
-#pragma once
-
-#include "spacetimedb.h"
-#include <cmath>
-
-using namespace SpacetimeDB;
-
-// This allows us to store 2D points in tables.
-struct DbVector2 {
-    float x;
-    float y;
-    
-    // Helper methods
-    float sqr_magnitude() const {
-        return x * x + y * y;
-    }
-    
-    float magnitude() const {
-        return std::sqrt(x * x + y * y);
-    }
-    
-    DbVector2 normalized() const {
-        float mag = magnitude();
-        if (mag != 0.0f) {
-            return DbVector2{x / mag, y / mag};
-        }
-        return DbVector2{0.0f, 0.0f};
-    }
-    
-    // Operator overloads
-    DbVector2 operator+(const DbVector2& other) const {
-        return DbVector2{x + other.x, y + other.y};
-    }
-    
-    DbVector2& operator+=(const DbVector2& other) {
-        x += other.x;
-        y += other.y;
-        return *this;
-    }
-    
-    DbVector2 operator-(const DbVector2& other) const {
-        return DbVector2{x - other.x, y - other.y};
-    }
-    
-    DbVector2& operator-=(const DbVector2& other) {
-        x -= other.x;
-        y -= other.y;
-        return *this;
-    }
-    
-    DbVector2 operator*(float scalar) const {
-        return DbVector2{x * scalar, y * scalar};
-    }
-    
-    DbVector2 operator/(float scalar) const {
-        if (scalar != 0.0f) {
-            return DbVector2{x / scalar, y / scalar};
-        }
-        return DbVector2{0.0f, 0.0f};
-    }
-};
-SPACETIMEDB_STRUCT(DbVector2, x, y);
-```
-
-At the very top of `lib.cpp` add the following line to include the
-`DbVector2` from the `math.h` header, and remove the `DbVector2` struct
-definition from `lib.cpp`:
-
-``` codeBlockStandalone_LlrK
-#include "spacetimedb.h"
-#include "math.h"
-// ...
-```
-
-Next, add the following reducer to the end of your `lib.cpp` file.
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_REDUCER(update_player_input, ReducerContext ctx, DbVector2 direction) {
-    // Find the player
-    auto player_opt = ctx.db[player_identity].find(ctx.sender());
-    if (!player_opt.has_value()) {
-        return Err("Player not found");
-    }
-    
-    int32_t player_id = player_opt.value().player_id;
-    
-    // Update all circles owned by this player
-    for (Circle circle : ctx.db[circle_player_id].filter(player_id)) {
-        circle.direction = direction.normalized();
-        circle.speed = std::clamp(direction.magnitude(), 0.0f, 1.0f);
-        ctx.db[circle_entity_id].update(circle);
-    }
-    
-    return Ok();
-}
-```
-
-This is a simple reducer that takes the movement input from the client
-and applies it to all circles that the player controls. Note that it is
-not possible for a player to move another player's circles using this
-reducer, because the `ctx.sender()` value is not set by the client.
-Instead `ctx.sender()` is set by SpacetimeDB after it has authenticated
-that sender. You can rest assured that the caller has been authenticated
-as that player by the time this reducer is called.
-
-Finally, let's schedule a reducer to run every 50 milliseconds to move
-the player's circles around based on the most recently set player input.
-
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "move_all_players_timer", Scheduled = nameof(MoveAllPlayers), ScheduledAt = nameof(scheduled_at))]
-public partial struct MoveAllPlayersTimer
-{
-    [PrimaryKey, AutoInc]
-    public ulong scheduled_id;
-    public ScheduleAt scheduled_at;
-}
-
-const int START_PLAYER_SPEED = 10;
-
-public static float MassToMaxMoveSpeed(int mass) => 2f * START_PLAYER_SPEED / (1f + MathF.Sqrt((float)mass / START_PLAYER_MASS));
-
-[Reducer]
-public static void MoveAllPlayers(ReducerContext ctx, MoveAllPlayersTimer timer)
-{
-    var worldSize = (ctx.Db.config.id.Find(0) ?? throw new Exception("Config not found")).world_size;
-
-    // var circleDirections = ctx.Db.circle.Iter().Select(c => (c.entity_id, c.direction * c.speed)).ToDictionary();
-
-    // Handle player input
-    foreach (var circle in ctx.Db.circle.Iter())
-    {
-        var checkEntity = ctx.Db.entity.entity_id.Find(circle.entity_id);
-        if (!checkEntity.HasValue)
-        {
-            // This can happen if the circle has been eaten by another circle.
-            continue;
-        }
-
-        var circleEntity = checkEntity.Value;
-        var circleRadius = MassToRadius(circleEntity.mass);
-        var direction = circle.direction * circle.speed;
-        var newPosition = circleEntity.position + direction * MassToMaxMoveSpeed(circleEntity.mass);
-        circleEntity.position.x = Math.Clamp(newPosition.x, circleRadius, worldSize - circleRadius);
-        circleEntity.position.y = Math.Clamp(newPosition.y, circleRadius, worldSize - circleRadius);
-        ctx.Db.entity.entity_id.Update(circleEntity);
-    }
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = move_all_players_timer, scheduled(move_all_players))]
-pub struct MoveAllPlayersTimer {
-    #[primary_key]
-    #[auto_inc]
-    scheduled_id: u64,
-    scheduled_at: spacetimedb::ScheduleAt,
-}
-
-const START_PLAYER_SPEED: i32 = 10;
-
-fn mass_to_max_move_speed(mass: i32) -> f32 {
-    2.0 * START_PLAYER_SPEED as f32 / (1.0 + (mass as f32 / START_PLAYER_MASS as f32).sqrt())
-}
-
-#[spacetimedb::reducer]
-pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Result<(), String> {
-    let world_size = ctx
-        .db
-        .config()
-        .id()
-        .find(0)
-        .ok_or("Config not found")?
-        .world_size;
-
-    // Handle player input
-    for circle in ctx.db.circle().iter() {
-        let circle_entity = ctx.db.entity().entity_id().find(&circle.entity_id);
-        if !circle_entity.is_some() {
-            // This can happen if a circle is eaten by another circle
-            continue;
-        }
-        let mut circle_entity = circle_entity.unwrap();
-        let circle_radius = mass_to_radius(circle_entity.mass);
-        let direction = circle.direction * circle.speed;
-        let new_pos =
-            circle_entity.position + direction * mass_to_max_move_speed(circle_entity.mass);
-        let min = circle_radius;
-        let max = world_size as f32 - circle_radius;
-        circle_entity.position.x = new_pos.x.clamp(min, max);
-        circle_entity.position.y = new_pos.y.clamp(min, max);
-        ctx.db.entity().entity_id().update(circle_entity);
-    }
-
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-struct MoveAllPlayersTimer {
-    uint64_t scheduled_id;
-    ScheduleAt scheduled_at;
-};
-SPACETIMEDB_STRUCT(MoveAllPlayersTimer, scheduled_id, scheduled_at);
-SPACETIMEDB_TABLE(MoveAllPlayersTimer, move_all_players_timer, Private);
-FIELD_PrimaryKeyAutoInc(move_all_players_timer, scheduled_id);
-SPACETIMEDB_SCHEDULE(move_all_players_timer, 1, move_all_players);
-
-const int32_t START_PLAYER_SPEED = 10;
-
-float mass_to_max_move_speed(int32_t mass) {
-    return 2.0f * START_PLAYER_SPEED / (1.0f + std::sqrt(static_cast<float>(mass) / static_cast<float>(START_PLAYER_MASS)));
-}
-
-SPACETIMEDB_REDUCER(move_all_players, ReducerContext ctx, MoveAllPlayersTimer _timer) {
-    // Get world size from config
-    auto config_opt = ctx.db[config_id].find(0);
-    if (!config_opt.has_value()) {
-        return Err("Config not found");
-    }
-    int64_t world_size = config_opt.value().world_size;
-    
-    // Handle player input
-    for (const Circle& circle : ctx.db[circle]) {
-        auto circle_entity_opt = ctx.db[entity_entity_id].find(circle.entity_id);
-        if (!circle_entity_opt.has_value()) {
-            // This can happen if a circle is eaten by another circle
-            continue;
-        }
-        Entity circle_entity = circle_entity_opt.value();
-        float circle_radius = mass_to_radius(circle_entity.mass);
-        DbVector2 direction = circle.direction * circle.speed;
-        DbVector2 new_pos = circle_entity.position + direction * mass_to_max_move_speed(circle_entity.mass);
-        float min_bound = circle_radius;
-        float max_bound = static_cast<float>(world_size) - circle_radius;
-        circle_entity.position.x = std::clamp(new_pos.x, min_bound, max_bound);
-        circle_entity.position.y = std::clamp(new_pos.y, min_bound, max_bound);
-        ctx.db[entity_entity_id].update(circle_entity);
-    }
-    
-    return Ok();
-}
-```
-
-This reducer is very similar to a standard game "tick" or "frame" that
-you might find in an ordinary game server or similar to something like
-the `Update` loop in a game engine like Unity. We've scheduled it every
-50 milliseconds and we can use it to step forward our simulation by
-moving all the circles a little bit further in the direction they're
-moving.
-
-In this reducer, we're just looping through all the circles in the game
-and updating their position based on their direction, speed, and mass.
-Just basic physics.
-
-- C#
-- Rust
-- C++
-
-Add the following to your `Init` reducer to schedule the
-`MoveAllPlayers` reducer to run every 50 milliseconds.
-
-``` codeBlockStandalone_LlrK
-ctx.Db.move_all_players_timer.Insert(new MoveAllPlayersTimer
-{
-    scheduled_at = new ScheduleAt.Interval(TimeSpan.FromMilliseconds(50))
-});
-```
-
-Add the following to your `init` reducer to schedule the
-`move_all_players` reducer to run every 50 milliseconds.
-
-``` codeBlockStandalone_LlrK
-ctx.db
-    .move_all_players_timer()
-    .try_insert(MoveAllPlayersTimer {
-        scheduled_id: 0,
-        scheduled_at: ScheduleAt::Interval(Duration::from_millis(50).into()),
-    })?;
-```
-
-Add the following to your `init` reducer to schedule the
-`move_all_players` reducer to run every 50 milliseconds.
-
-``` codeBlockStandalone_LlrK
-ctx.db[move_all_players_timer].insert(MoveAllPlayersTimer{
-    0,
-    ScheduleAt(TimeDuration::from_millis(50)),
-});
-```
-
-Republish your module with:
-
-``` codeBlockStandalone_LlrK
-spacetime publish --server local blackholio --delete-data
-```
-
-Regenerate your server bindings with:
-
-``` codeBlockStandalone_LlrK
-spacetime generate --lang csharp --out-dir ../../module_bindings
-```
-
-### Moving on the Client
-
-All that's left is to modify our `PlayerController` on the client to
-call the `update_player_input` reducer. Open `PlayerController.cs` and
-add an `Update` function:
-
-``` codeBlockStandalone_LlrK
-public void Update()
-{
-    if (!IsLocalPlayer || NumberOfOwnedCircles == 0)
-    {
-        return;
-    }
-
-    if (Input.GetKeyDown(KeyCode.Q))
-    {
-        if (LockInputPosition.HasValue)
-        {
-            LockInputPosition = null;
-        }
-        else
-        {
-            LockInputPosition = (Vector2)Input.mousePosition;
-        }
-    }
-
-    // Throttled input requests
-    if (Time.time - LastMovementSendTimestamp >= SEND_UPDATES_FREQUENCY)
-    {
-        LastMovementSendTimestamp = Time.time;
-
-        var mousePosition = LockInputPosition ?? (Vector2)Input.mousePosition;
-        var screenSize = new Vector2
-        {
-            x = Screen.width,
-            y = Screen.height,
-        };
-        var centerOfScreen = screenSize / 2;
-
-        var direction = (mousePosition - centerOfScreen) / (screenSize.y / 3);
-        if (testInputEnabled) { direction = testInput; }
-        GameManager.Conn.Reducers.UpdatePlayerInput(direction);
-    }
-}
-```
-
-Let's try it out! Press play and roam freely around the arena! Now we're
-cooking with gas.
-
-note
-
-You may get errors complaining that you're using the wrong Input System.
-If that's the case, open the Unity Project Settings via
-`Edit -> Project Settings...`, select the `Player` tab on the left,
-scroll down to `Other Settings -> Configuration`, find
-`Active Input Handling` and select `Input Manager (Old)` (or `Both`).
-The Unity Editor will have to restart to apply the change.
-
-### Collisions and Eating Food
-
-Let's try it out! Press play and roam freely around the arena! Now we're
-cooking with gas.
-
-### Collisions and Eating Food
-
-Well this is pretty fun, but wouldn't it be better if we could eat food
-and grow our circle? Surely, that's going to be a pain, right?
-
-- C#
-- Rust
-- C++
-
-Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an
-`IsOverlapping` helper function which does some basic math based on mass
-radii, and modify our `MoveAllPlayers` reducer to loop through every
-entity in the arena for every circle, checking each for overlaps. This
-may not be the most efficient way to do collision checking (building a
-quad tree or doing [spatial
-hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/)
-might be better), but SpacetimeDB is very fast so for this number of
-entities it'll be a breeze. Sometimes, simple is best!
-
-Add the following code to the `Module` class of your `Lib.cs` file and
-make sure to replace the existing `MoveAllPlayers` reducer.
-
-``` codeBlockStandalone_LlrK
-private const float MINIMUM_SAFE_MASS_RATIO = 0.85f;
-
-public static bool IsOverlapping(Entity a, Entity b)
-{
-    var dx = a.position.x - b.position.x;
-    var dy = a.position.y - b.position.y;
-    var distanceSq = dx * dx + dy * dy;
-
-    var aRadius = MassToRadius(a.mass);
-    var bRadius = MassToRadius(b.mass);
-
-    // If the distance between the two circle centers is less than the
-    // maximum radius, then the center of the smaller circle is inside
-    // the larger circle. This gives some leeway for the circles to overlap
-    // before being eaten.
-    var maxRadius = aRadius > bRadius ? aRadius: bRadius;
-    return distanceSq <= maxRadius * maxRadius;
-}
-
-[Reducer]
-public static void MoveAllPlayers(ReducerContext ctx, MoveAllPlayersTimer timer)
-{
-    var worldSize = (ctx.Db.config.id.Find(0) ?? throw new Exception("Config not found")).world_size;
-
-    // Handle player input
-    foreach (var circle in ctx.Db.circle.Iter())
-    {
-        var checkEntity = ctx.Db.entity.entity_id.Find(circle.entity_id);
-        if (checkEntity == null)
-        {
-            // This can happen if the circle has been eaten by another circle.
-            continue;
-        }
-        var circleEntity = checkEntity.Value;
-        var circleRadius = MassToRadius(circleEntity.mass);
-        var direction = circle.direction * circle.speed;
-        var newPosition = circleEntity.position + direction * MassToMaxMoveSpeed(circleEntity.mass);
-        circleEntity.position.x = Math.Clamp(newPosition.x, circleRadius, worldSize - circleRadius);
-        circleEntity.position.y = Math.Clamp(newPosition.y, circleRadius, worldSize - circleRadius);
-
-        // Check collisions
-        foreach (var entity in ctx.Db.entity.Iter())
-        {
-            if (entity.entity_id == circleEntity.entity_id || !IsOverlapping(circleEntity, entity))  continue;
-
-            // Check to see if we're overlapping with food
-            if (ctx.Db.food.entity_id.Find(entity.entity_id).HasValue) {
-                ctx.Db.entity.entity_id.Delete(entity.entity_id);
-                ctx.Db.food.entity_id.Delete(entity.entity_id);
-                circleEntity.mass += entity.mass;
-
-                continue;
-            }
-
-            // Check to see if we're overlapping with another circle owned by another player
-            var otherCircle = ctx.Db.circle.entity_id.Find(entity.entity_id);
-            if (otherCircle.HasValue && otherCircle.Value.player_id != circle.player_id)
-            {
-                var massRatio = (float)entity.mass / circleEntity.mass;
-                if (massRatio < MINIMUM_SAFE_MASS_RATIO)
-                {
-                    ctx.Db.entity.entity_id.Delete(entity.entity_id);
-                    ctx.Db.circle.entity_id.Delete(entity.entity_id);
-                    circleEntity.mass += entity.mass;
-                }
-            }
-        }
-        ctx.Db.entity.entity_id.Update(circleEntity);
-    }
-}
-```
-
-Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an
-`is_overlapping` helper function which does some basic math based on
-mass radii, and modify our `move_all_players` reducer to loop through
-every entity in the arena for every circle, checking each for overlaps.
-This may not be the most efficient way to do collision checking
-(building a quad tree or doing [spatial
-hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/)
-might be better), but SpacetimeDB is very fast so for this number of
-entities it'll be a breeze. Sometimes, simple is best!
-
-Add the following code to your `lib.rs` file and make sure to replace
-the existing `move_all_players` reducer.
-
-``` codeBlockStandalone_LlrK
-const MINIMUM_SAFE_MASS_RATIO: f32 = 0.85;
-
-fn is_overlapping(a: &Entity, b: &Entity) -> bool {
-    let dx = a.position.x - b.position.x;
-    let dy = a.position.y - b.position.y;
-    let distance_sq = dx * dx + dy * dy;
-
-    let radius_a = mass_to_radius(a.mass);
-    let radius_b = mass_to_radius(b.mass);
-
-    // If the distance between the two circle centers is less than the
-    // maximum radius, then the center of the smaller circle is inside
-    // the larger circle. This gives some leeway for the circles to overlap
-    // before being eaten.
-    let max_radius = f32::max(radius_a, radius_b);
-    distance_sq <= max_radius * max_radius
-}
-
-#[spacetimedb::reducer]
-pub fn move_all_players(ctx: &ReducerContext, _timer: MoveAllPlayersTimer) -> Result<(), String> {
-    let world_size = ctx
-        .db
-        .config()
-        .id()
-        .find(0)
-        .ok_or("Config not found")?
-        .world_size;
-
-    // Handle player input
-    for circle in ctx.db.circle().iter() {
-        let circle_entity = ctx.db.entity().entity_id().find(&circle.entity_id);
-        if !circle_entity.is_some() {
-            // This can happen if a circle is eaten by another circle
-            continue;
-        }
-        let mut circle_entity = circle_entity.unwrap();
-        let circle_radius = mass_to_radius(circle_entity.mass);
-        let direction = circle.direction * circle.speed;
-        let new_pos =
-            circle_entity.position + direction * mass_to_max_move_speed(circle_entity.mass);
-        let min = circle_radius;
-        let max = world_size as f32 - circle_radius;
-        circle_entity.position.x = new_pos.x.clamp(min, max);
-        circle_entity.position.y = new_pos.y.clamp(min, max);
-
-        // Check collisions
-        for entity in ctx.db.entity().iter() {
-            if entity.entity_id == circle_entity.entity_id {
-                continue;
-            }
-            if is_overlapping(&circle_entity, &entity) {
-                // Check to see if we're overlapping with food
-                if ctx.db.food().entity_id().find(&entity.entity_id).is_some() {
-                    ctx.db.entity().entity_id().delete(&entity.entity_id);
-                    ctx.db.food().entity_id().delete(&entity.entity_id);
-                    circle_entity.mass += entity.mass;
-                }
-
-                // Check to see if we're overlapping with another circle owned by another player
-                let other_circle = ctx.db.circle().entity_id().find(&entity.entity_id);
-                if let Some(other_circle) = other_circle {
-                    if other_circle.player_id != circle.player_id {
-                        let mass_ratio = entity.mass as f32 / circle_entity.mass as f32;
-                        if mass_ratio < MINIMUM_SAFE_MASS_RATIO {
-                            ctx.db.entity().entity_id().delete(&entity.entity_id);
-                            ctx.db.circle().entity_id().delete(&entity.entity_id);
-                            circle_entity.mass += entity.mass;
-                        }
-                    }
-                }
-            }
-        }
-        ctx.db.entity().entity_id().update(circle_entity);
-    }
-
-    Ok(())
-}
-```
-
-Wrong. With SpacetimeDB it's extremely easy. All we have to do is add an
-`is_overlapping` helper function which does some basic math based on
-mass radii, and modify our `move_all_players` reducer to loop through
-every entity in the arena for every circle, checking each for overlaps.
-This may not be the most efficient way to do collision checking
-(building a quad tree or doing [spatial
-hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/)
-might be better), but SpacetimeDB is very fast so for this number of
-entities it'll be a breeze. Sometimes, simple is best!
-
-Add the following code to your `lib.cpp` file and make sure to replace
-the existing `move_all_players` reducer.
-
-``` codeBlockStandalone_LlrK
-const float MINIMUM_SAFE_MASS_RATIO = 0.85f;
-
-bool is_overlapping(const Entity& a, const Entity& b) {
-    float dx = a.position.x - b.position.x;
-    float dy = a.position.y - b.position.y;
-    float distance_sq = dx * dx + dy * dy;
-    
-    float radius_a = mass_to_radius(a.mass);
-    float radius_b = mass_to_radius(b.mass);
-    
-    // If the distance between the two circle centers is less than the
-    // maximum radius, then the center of the smaller circle is inside
-    // the larger circle. This gives some leeway for the circles to overlap
-    // before being eaten.
-    float max_radius = std::max(radius_a, radius_b);
-    return distance_sq <= max_radius * max_radius;
-}
-
-SPACETIMEDB_REDUCER(move_all_players, ReducerContext ctx, MoveAllPlayersTimer _timer) {
-    // Get world size from config
-    auto config_opt = ctx.db[config_id].find(0);
-    if (!config_opt.has_value()) {
-        return Err("Config not found");
-    }
-    int64_t world_size = config_opt.value().world_size;
-    
-    // Handle player input
-    for (const Circle& circle : ctx.db[circle]) {
-        auto circle_entity_opt = ctx.db[entity_entity_id].find(circle.entity_id);
-        if (!circle_entity_opt.has_value()) {
-            // This can happen if a circle is eaten by another circle
-            continue;
-        }
-        Entity circle_entity = circle_entity_opt.value();
-        float circle_radius = mass_to_radius(circle_entity.mass);
-        DbVector2 direction = circle.direction * circle.speed;
-        DbVector2 new_pos = circle_entity.position + direction * mass_to_max_move_speed(circle_entity.mass);
-        float min_bound = circle_radius;
-        float max_bound = static_cast<float>(world_size) - circle_radius;
-        circle_entity.position.x = std::clamp(new_pos.x, min_bound, max_bound);
-        circle_entity.position.y = std::clamp(new_pos.y, min_bound, max_bound);
-        
-        // Check collisions
-        for (const Entity& entity : ctx.db[entity]) {
-            if (entity.entity_id == circle_entity.entity_id) {
-                continue;
-            }
-            if (is_overlapping(circle_entity, entity)) {
-                // Check to see if we're overlapping with food
-                auto food_opt = ctx.db[food_entity_id].find(entity.entity_id);
-                if (food_opt.has_value()) {
-                    ctx.db[entity_entity_id].delete_by_key(entity.entity_id);
-                    ctx.db[food_entity_id].delete_by_key(entity.entity_id);
-                    circle_entity.mass += entity.mass;
-                }
-                
-                // Check to see if we're overlapping with another circle owned by another player
-                auto other_circle_opt = ctx.db[circle_entity_id].find(entity.entity_id);
-                if (other_circle_opt.has_value()) {
-                    const Circle& other_circle = other_circle_opt.value();
-                    if (other_circle.player_id != circle.player_id) {
-                        float mass_ratio = static_cast<float>(entity.mass) / static_cast<float>(circle_entity.mass);
-                        if (mass_ratio < MINIMUM_SAFE_MASS_RATIO) {
-                            ctx.db[entity_entity_id].delete_by_key(entity.entity_id);
-                            ctx.db[circle_entity_id].delete_by_key(entity.entity_id);
-                            circle_entity.mass += entity.mass;
-                        }
-                    }
-                }
-            }
-        }
-        
-        ctx.db[entity_entity_id].update(circle_entity);
-    }
-    
-    return Ok();
-}
-```
-
-For every circle, we look at all other entities. If they are overlapping
-then for food, we add the mass of the food to the circle and delete the
-food, otherwise if it's a circle we delete the smaller circle and add
-the mass to the bigger circle.
-
-That's it. We don't even have to do anything on the client.
-
-``` codeBlockStandalone_LlrK
-spacetime publish --server local blackholio
-```
-
-Just update your module by publishing and you're on your way eating
-food! Try to see how big you can get!
-
-We didn't even have to update the client, because our client's
-`OnDelete` callbacks already handled deleting entities from the scene
-when they're deleted on the server. SpacetimeDB just synchronizes the
-state with your client automatically.
-
-Notice that the food automatically respawns as you vaccuum them up. This
-is because our scheduled reducer is automatically replacing the food 2
-times per second, to ensure that there is always close to 600 food on
-the map.
-
-## Connecting to Maincloud
-
-- Publish to Maincloud
-  `spacetime publish --server maincloud \<your database name\> --delete-data`
-  - `<your database name>` This name should be unique and cannot contain
-    any special characters other than internal hyphens (`-`). You will
-    have to update the database name in
-    `blackholio-server/spacetime.local.json` to match.
-- Update the URL in the Unity project to:
-  `https://maincloud.spacetimedb.com`
-- Update the database name in the Unity project to
-  `<your database name>`.
-- Clear the PlayerPrefs in Start() within `GameManager.cs`
-- Your `GameManager.cs` should look something like this:
-
-``` codeBlockStandalone_LlrK
-const string SERVER_URL = "https://maincloud.spacetimedb.com";
-const string DATABASE_NAME = "<your database name>";
-
-...
-
-private void Start()
-{
-    // Clear cached connection data to ensure proper connection
-    PlayerPrefs.DeleteAll();
-
-    // Continue with initialization
-}
-```
-
-To delete your Maincloud database, you can run:
-`spacetime delete --server maincloud <your database name>`
-
-# Conclusion
-
-- C#
-- Rust
-- C++
-
-So far you've learned how to configure a new Unity project to work with
-SpacetimeDB, how to develop, build, and publish a SpacetimeDB server
-module. Within the module, you've learned how to create tables, update
-tables, and write reducers. You've learned about special reducers like
-`ClientConnected` and `Init` and how to created scheduled reducers. You
-learned how we can used scheduled reducers to implement a physics
-simulation right within your module.
-
-So far you've learned how to configure a new Unity project to work with
-SpacetimeDB, how to develop, build, and publish a SpacetimeDB server
-module. Within the module, you've learned how to create tables, update
-tables, and write reducers. You've learned about special reducers like
-`client_connected` and `init` and how to created scheduled reducers. You
-learned how we can used scheduled reducers to implement a physics
-simulation right within your module.
-
-So far you've learned how to configure a new Unity project to work with
-SpacetimeDB, how to develop, build, and publish a SpacetimeDB server
-module. Within the module, you've learned how to create tables, update
-tables, and write reducers. You've learned about special reducers like
-`SPACETIMEDB_CLIENT_CONNECTED` and `SPACETIMEDB_INIT` and how to create
-scheduled reducers. You learned how we can use scheduled reducers to
-implement a physics simulation right within your module.
-
-You've also learned how view module logs and connect your client to your
-database server, call reducers from the client and synchronize the data
-with client. Finally you learned how to use that synchronized data to
-draw game objects on the screen, so that we can interact with them and
-play a game!
-
-And all of that completely from scratch!
-
-Our game is still pretty limited in some important ways. The biggest
-limitation is that the client assumes your username is "3Blave" and
-doesn't give you a menu or a window to set your username before joining
-the game. Notably, we do not have a unique constraint on the `name`
-column, so that does not prevent us from connecting multiple clients to
-the same server.
-
-In fact, if you build what we have and run multiple clients you already
-have a (very simple) MMO! You can connect hundreds of players to this
-arena with SpacetimeDB. Note that you would need to run the client in
-different computers to use different auth tokens.
-
-There's still plenty more we can do to build this into a proper game
-though. For example, you might want to also add
-
-- Username chooser
-- Chat
-- Leaderboards
-- The ability to split into multiple circles
-- Nice animations
-- Nice shaders
-- Space theme!
-- Object Pooling (for FoodController, PlayerController and
-  CircleController)
-
-Fortunately, we've done that for you! If you'd like to check out the
-completed tutorial game, with most of these additional features, you can
-download it on GitHub:
-
-[https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio](https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio)
-
-If you have any suggestions or comments on the tutorial, either [open an
-issue](https://github.com/clockworklabs/SpacetimeDB/issues/new), or join
-our Discord
-([https://discord.gg/SpacetimeDB](https://discord.gg/SpacetimeDB)) and
-chat with us!
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-intro/tutorials/unity-tutorial/part-4" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">4 - Moving and Colliding | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tutorials/unity/part-4"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="4 - Moving and Colliding | SpacetimeDB docs"><meta data-rh="true" name="description" content="Need help with the tutorial? Join our Discord server!"><meta data-rh="true" property="og:description" content="Need help with the tutorial? Join our Discord server!"><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tutorials/unity/part-4"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/unity/part-4" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/unity/part-4" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tutorials","item":"https://spacetimedb.com/docs/tutorials/chat-app"},{"@type":"ListItem","position":2,"name":"Unity Tutorial","item":"https://spacetimedb.com/docs/tutorials/unity"},{"@type":"ListItem","position":3,"name":"4 - Moving and Colliding","item":"https://spacetimedb.com/docs/tutorials/unity/part-4"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tutorials/unity/part-4">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tutorials/unity/part-4">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tutorials/unity/part-4">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Collapse sidebar category &#x27;Tutorials&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/chat-app"><span title="Chat App Tutorial" class="linkLabel_UvDg">Chat App Tutorial</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/tutorials/unity"><span title="Unity Tutorial" class="categoryLinkLabel_HATI">Unity Tutorial</span></a><button aria-label="Collapse sidebar category &#x27;Unity Tutorial&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-1"><span title="1 - Setup" class="linkLabel_UvDg">1 - Setup</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-2"><span title="2 - Connecting to SpacetimeDB" class="linkLabel_UvDg">2 - Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/unity/part-3"><span title="3 - Gameplay" class="linkLabel_UvDg">3 - Gameplay</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tutorials/unity/part-4"><span title="4 - Moving and Colliding" class="linkLabel_UvDg">4 - Moving and Colliding</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/unreal"><span title="Unreal Tutorial" class="categoryLinkLabel_HATI">Unreal Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Unreal Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/godot"><span title="Godot Tutorial" class="categoryLinkLabel_HATI">Godot Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Godot Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/chat-app"><span>Tutorials</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/unity"><span>Unity Tutorial</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">4 - Moving and Colliding</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>4 - Moving and Colliding</h1></header><p>Need help with the tutorial? <a href="https://discord.gg/spacetimedb" target="_blank" rel="noopener noreferrer" class="">Join our Discord server</a>!</p>
+<p>This progressive tutorial is continued from <a class="" href="/docs/tutorials/unity/part-3">part 3</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="moving-the-player">Moving the player<a href="#moving-the-player" class="hash-link" aria-label="Direct link to Moving the player" title="Direct link to Moving the player" translate="no">​</a></h3>
+<p>At this point, we&#x27;re very close to having a working game. All we have to do is modify our server to allow the player to move around, and to simulate the physics and collisions of the game.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s start by building out a simple math library to help us do collision calculations. Create a new <code>Math.cs</code> file in the <code>blackholio-server/spacetimedb</code> directory and add the following contents. Let&#x27;s also remove the <code>DbVector2</code> type from <code>Lib.cs</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#50FA7B"> DbVector2</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> x</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> y</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        this</span><span style="color:#F8F8F2">.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        this</span><span style="color:#F8F8F2">.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> SqrMagnitude </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> Magnitude </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> MathF.</span><span style="color:#50FA7B">Sqrt</span><span style="color:#F8F8F2">(SqrMagnitude);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> Normalized </span><span style="color:#FF79C6">=></span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#FF79C6"> /</span><span style="color:#F8F8F2"> Magnitude;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#50FA7B"> +</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(a.x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> b.x, a.y </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> b.y);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#50FA7B"> -</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(a.x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.x, a.y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.y);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#50FA7B"> *</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(a.x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> b, a.y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> b);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#50FA7B"> /</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">(a.x </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> b, a.y </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> b);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Next, add the following reducer to the <code>Module</code> class of your <code>Lib.cs</code> file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UpdatePlayerInput</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#FFB86C;font-style:italic"> direction</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.player.identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> c </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.circle.player_id.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(player.player_id))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> c;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle.direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> direction.Normalized;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle.speed </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Math.</span><span style="color:#50FA7B">Clamp</span><span style="color:#F8F8F2">(direction.Magnitude, </span><span style="color:#BD93F9">0f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1f</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.circle.entity_id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(circle);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This is a simple reducer that takes the movement input from the client and applies it to all circles that the player controls. Note that it is not possible for a player to move another player&#x27;s circles using this reducer, because the <code>ctx.Sender</code> value is not set by the client. Instead <code>ctx.Sender</code> is set by SpacetimeDB after it has authenticated that sender. You can rest assured that the caller has been authenticated as that player by the time this reducer is called.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>Let&#x27;s start by building out a simple math library to help us do collision calculations. Create a new <code>math.rs</code> file in the <code>spacetimedb/src</code> directory and add the following contents. Let&#x27;s also move the <code>DbVector2</code> type from <code>lib.rs</code> into this file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// This allows us to store 2D points in tables.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Clone</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Copy</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> x</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> y</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Add</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">&</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> add</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y,</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Add</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> add</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y,</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">AddAssign</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> add_assign</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&mut</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#F8F8F2">, rhs</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> rhs</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x;</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> rhs</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">iter</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Sum</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> sum</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">I</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Iterator</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Item</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">>>(iter</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> I</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#BD93F9;font-style:italic"> Self</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> r </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">new</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0.0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">0.0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        for</span><span style="color:#F8F8F2"> val </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> iter {</span></span>
+<span class="line"><span style="color:#F8F8F2">            r </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> val;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        r</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Sub</span><span style="color:#F8F8F2"><</span><span style="color:#FF79C6">&</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> sub</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y,</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Sub</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> sub</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y,</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">SubAssign</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> sub_assign</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&mut</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#F8F8F2">, rhs</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">-=</span><span style="color:#F8F8F2"> rhs</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x;</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">-=</span><span style="color:#F8F8F2"> rhs</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Mul</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">f32</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> mul</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> other,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> other,</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">ops</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Div</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">f32</span><span style="color:#F8F8F2">> </span><span style="color:#FF79C6">for</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    type</span><span style="color:#8BE9FD;font-style:italic"> Output</span><span style="color:#FF79C6"> =</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    fn</span><span style="color:#50FA7B"> div</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">, other</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> other </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 0.0</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">                x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> other,</span></span>
+<span class="line"><span style="color:#F8F8F2">                y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> other,</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">            DbVector2</span><span style="color:#F8F8F2"> { x</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0.0</span><span style="color:#F8F8F2">, y</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0.0</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">impl</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> new</span><span style="color:#F8F8F2">(x</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">, y</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#BD93F9;font-style:italic"> Self</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        Self</span><span style="color:#F8F8F2"> { x, y }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> sqr_magnitude</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">+</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> magnitude</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        (</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">+</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">*</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> normalized</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9;font-style:italic">self</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        self</span><span style="color:#FF79C6"> /</span><span style="color:#BD93F9;font-style:italic"> self</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">magnitude</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>At the very top of <code>lib.rs</code> add the following lines to import the moved <code>DbVector2</code> from the <code>math</code> module.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> mod</span><span style="color:#F8F8F2"> math;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> math</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">DbVector2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#6272A4">// ...</span></span></code></pre><p>Next, add the following reducer to your <code>lib.rs</code> file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> update_player_input</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, direction</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Player not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> direction</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">normalized</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">speed </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> direction</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">magnitude</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0.0</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1.0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This is a simple reducer that takes the movement input from the client and applies it to all circles that the player controls. Note that it is not possible for a player to move another player&#x27;s circles using this reducer, because the <code>ctx.sender()</code> value is not set by the client. Instead <code>ctx.sender()</code> is set by SpacetimeDB after it has authenticated that sender. You can rest assured that the caller has been authenticated as that player by the time this reducer is called.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Let&#x27;s start by building out a simple math library to help us do collision calculations. Create a new <code>math.h</code> file in the <code>blackholio/spacetimedb/src</code> directory and add the following contents. We&#x27;ll also move the <code>DbVector2</code> type from <code>lib.cpp</code> into this file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#pragma</span><span style="color:#50FA7B;font-style:italic"> once</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> <</span><span style="color:#F1FA8C">cmath</span><span style="color:#E9F284">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// This allows us to store 2D points in tables.</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Helper methods</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#50FA7B"> sqr_magnitude</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#50FA7B"> magnitude</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">(x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> y);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#50FA7B"> normalized</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> mag </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> magnitude</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (mag </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2"> DbVector2{x </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> mag, y </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> mag};</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> DbVector2{</span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Operator overloads</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">+(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> other</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> DbVector2{x </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other.x, y </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> other.y};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">+=(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> other</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        x </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> other.x;</span></span>
+<span class="line"><span style="color:#F8F8F2">        y </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> other.y;</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> *</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">-(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> other</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> DbVector2{x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other.x, y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> other.y};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">-=(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> other</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        x </span><span style="color:#FF79C6">-=</span><span style="color:#F8F8F2"> other.x;</span></span>
+<span class="line"><span style="color:#F8F8F2">        y </span><span style="color:#FF79C6">-=</span><span style="color:#F8F8F2"> other.y;</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#FF79C6"> *</span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">*(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> scalar</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> DbVector2{x </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> scalar, y </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> scalar};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    DbVector2</span><span style="color:#FF79C6"> operator</span><span style="color:#F8F8F2">/(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> scalar</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (scalar </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> 0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">            return</span><span style="color:#F8F8F2"> DbVector2{x </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> scalar, y </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> scalar};</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2"> DbVector2{</span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(DbVector2, x, y);</span></span></code></pre><p>At the very top of <code>lib.cpp</code> add the following line to include the <code>DbVector2</code> from the <code>math.h</code> header, and remove the <code>DbVector2</code> struct definition from <code>lib.cpp</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">math.h</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#6272A4">// ...</span></span></code></pre><p>Next, add the following reducer to the end of your <code>lib.cpp</code> file.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(update_player_input, ReducerContext ctx, DbVector2 direction) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Find the player</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> player_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">player_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Player not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Update all circles owned by this player</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (Circle circle : ctx.db[circle_player_id].</span><span style="color:#50FA7B">filter</span><span style="color:#F8F8F2">(player_id)) {</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle.direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> direction.</span><span style="color:#50FA7B">normalized</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle.speed </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(direction.</span><span style="color:#50FA7B">magnitude</span><span style="color:#F8F8F2">(), </span><span style="color:#BD93F9">0.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">, </span><span style="color:#BD93F9">1.0</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[circle_entity_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>This is a simple reducer that takes the movement input from the client and applies it to all circles that the player controls. Note that it is not possible for a player to move another player&#x27;s circles using this reducer, because the <code>ctx.sender()</code> value is not set by the client. Instead <code>ctx.sender()</code> is set by SpacetimeDB after it has authenticated that sender. You can rest assured that the caller has been authenticated as that player by the time this reducer is called.</p></div></div></div>
+<p>Finally, let&#x27;s schedule a reducer to run every 50 milliseconds to move the player&#x27;s circles around based on the most recently set player input.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">move_all_players_timer</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Scheduled </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(MoveAllPlayers), ScheduledAt </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> nameof</span><span style="color:#F8F8F2">(scheduled_at))]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> ulong</span><span style="color:#F8F8F2"> scheduled_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2"> scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> START_PLAYER_SPEED </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> float</span><span style="color:#50FA7B"> MassToMaxMoveSpeed</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#BD93F9"> 2f</span><span style="color:#FF79C6"> *</span><span style="color:#F8F8F2"> START_PLAYER_SPEED </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> (</span><span style="color:#BD93F9">1f</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> MathF.</span><span style="color:#50FA7B">Sqrt</span><span style="color:#F8F8F2">((</span><span style="color:#FF79C6">float</span><span style="color:#F8F8F2">)mass </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> START_PLAYER_MASS));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> MoveAllPlayers</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">MoveAllPlayersTimer</span><span style="color:#FFB86C;font-style:italic"> timer</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (ctx.Db.config.id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)).world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // var circleDirections = ctx.Db.circle.Iter().Select(c => (c.entity_id, c.direction * c.speed)).ToDictionary();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.circle.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> checkEntity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">checkEntity.HasValue)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if the circle has been eaten by another circle.</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> circleEntity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> checkEntity.Value;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> circleRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(circleEntity.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle.direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle.speed;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> newPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circleEntity.position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> MassToMaxMoveSpeed</span><span style="color:#F8F8F2">(circleEntity.mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circleEntity.position.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Math.</span><span style="color:#50FA7B">Clamp</span><span style="color:#F8F8F2">(newPosition.x, circleRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circleRadius);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circleEntity.position.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Math.</span><span style="color:#50FA7B">Clamp</span><span style="color:#F8F8F2">(newPosition.y, circleRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circleRadius);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(circleEntity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> move_all_players_timer, scheduled(move_all_players))]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">ScheduleAt</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> START_PLAYER_SPEED</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(mass</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#BD93F9">    2.0</span><span style="color:#FF79C6"> *</span><span style="color:#BD93F9"> START_PLAYER_SPEED</span><span style="color:#FF79C6"> as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> /</span><span style="color:#F8F8F2"> (</span><span style="color:#BD93F9">1.0</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> (mass </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> /</span><span style="color:#BD93F9"> START_PLAYER_MASS</span><span style="color:#FF79C6"> as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> move_all_players</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, _timer</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Config not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">is_some</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if a circle is eaten by another circle</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">unwrap</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> circle_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">speed;</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> new_pos </span><span style="color:#FF79C6">=</span></span>
+<span class="line"><span style="color:#F8F8F2">            circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> min </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> max </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_pos</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(min, max);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_pos</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(min, max);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle_entity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint64_t</span><span style="color:#F8F8F2"> scheduled_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ScheduleAt scheduled_at;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(MoveAllPlayersTimer, scheduled_id, scheduled_at);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(MoveAllPlayersTimer, move_all_players_timer, Private);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(move_all_players_timer, scheduled_id);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_SCHEDULE</span><span style="color:#F8F8F2">(move_all_players_timer, </span><span style="color:#BD93F9">1</span><span style="color:#F8F8F2">, move_all_players);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> int32_t</span><span style="color:#F8F8F2"> START_PLAYER_SPEED </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 10</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">float</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">int32_t</span><span style="color:#FFB86C;font-style:italic"> mass</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#BD93F9"> 2.0</span><span style="color:#FF79C6">f</span><span style="color:#FF79C6"> *</span><span style="color:#F8F8F2"> START_PLAYER_SPEED </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> (</span><span style="color:#BD93F9">1.0</span><span style="color:#FF79C6">f</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">sqrt</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">static_cast\<float\></span><span style="color:#F8F8F2">(mass) </span><span style="color:#FF79C6">/</span><span style="color:#FF79C6"> static_cast\<float\></span><span style="color:#F8F8F2">(START_PLAYER_MASS)));</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(move_all_players, ReducerContext ctx, MoveAllPlayersTimer _timer) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Get world size from config</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> config_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[config_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">config_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    int64_t</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().world_size;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> Circle</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> circle : ctx.db[circle]) {</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> circle_entity_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[entity_entity_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">circle_entity_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if a circle is eaten by another circle</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        Entity circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> circle_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(circle_entity.mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">        DbVector2 direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle.direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle.speed;</span></span>
+<span class="line"><span style="color:#F8F8F2">        DbVector2 new_pos </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity.position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(circle_entity.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> min_bound </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> max_bound </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity.position.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(new_pos.x, min_bound, max_bound);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity.position.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(new_pos.y, min_bound, max_bound);</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[entity_entity_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle_entity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>This reducer is very similar to a standard game "tick" or "frame" that you might find in an ordinary game server or similar to something like the <code>Update</code> loop in a game engine like Unity. We&#x27;ve scheduled it every 50 milliseconds and we can use it to step forward our simulation by moving all the circles a little bit further in the direction they&#x27;re moving.</p>
+<p>In this reducer, we&#x27;re just looping through all the circles in the game and updating their position based on their direction, speed, and mass. Just basic physics.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Add the following to your <code>Init</code> reducer to schedule the <code>MoveAllPlayers</code> reducer to run every 50 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.Db.move_all_players_timer.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    scheduled_at </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> ScheduleAt</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Interval</span><span style="color:#F8F8F2">(TimeSpan.</span><span style="color:#50FA7B">FromMilliseconds</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Add the following to your <code>init</code> reducer to schedule the <code>move_all_players</code> reducer to run every 50 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">move_all_players_timer</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">try_insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">MoveAllPlayersTimer</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        scheduled_id</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">        scheduled_at</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> ScheduleAt</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Interval</span><span style="color:#F8F8F2">(Duration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">into</span><span style="color:#F8F8F2">()),</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Add the following to your <code>init</code> reducer to schedule the <code>move_all_players</code> reducer to run every 50 milliseconds.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">ctx.db[move_all_players_timer].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(MoveAllPlayersTimer{</span></span>
+<span class="line"><span style="color:#BD93F9">    0</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#50FA7B">    ScheduleAt</span><span style="color:#F8F8F2">(TimeDuration</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">from_millis</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">50</span><span style="color:#F8F8F2">)),</span></span>
+<span class="line"><span style="color:#F8F8F2">});</span></span></code></pre></div></div></div>
+<p>Republish your module with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span><span style="color:#BD93F9"> --delete-data</span></span></code></pre>
+<p>Regenerate your server bindings with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> ../../module_bindings</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="moving-on-the-client">Moving on the Client<a href="#moving-on-the-client" class="hash-link" aria-label="Direct link to Moving on the Client" title="Direct link to Moving on the Client" translate="no">​</a></h3>
+<p>All that&#x27;s left is to modify our <code>PlayerController</code> on the client to call the <code>update_player_input</code> reducer. Open <code>PlayerController.cs</code> and add an <code>Update</code> function:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Update</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">IsLocalPlayer </span><span style="color:#FF79C6">||</span><span style="color:#F8F8F2"> NumberOfOwnedCircles </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> 0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (Input.</span><span style="color:#50FA7B">GetKeyDown</span><span style="color:#F8F8F2">(KeyCode.Q))</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (LockInputPosition.HasValue)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            LockInputPosition </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        else</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            LockInputPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#F8F8F2">)Input.mousePosition;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Throttled input requests</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (Time.time </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> LastMovementSendTimestamp </span><span style="color:#FF79C6">>=</span><span style="color:#F8F8F2"> SEND_UPDATES_FREQUENCY)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        LastMovementSendTimestamp </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Time.time;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> mousePosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> LockInputPosition </span><span style="color:#FF79C6">??</span><span style="color:#F8F8F2"> (</span><span style="color:#8BE9FD;font-style:italic">Vector2</span><span style="color:#F8F8F2">)Input.mousePosition;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> screenSize </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Vector2</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Screen.width,</span></span>
+<span class="line"><span style="color:#F8F8F2">            y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Screen.height,</span></span>
+<span class="line"><span style="color:#F8F8F2">        };</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> centerOfScreen </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> screenSize </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 2</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (mousePosition </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> centerOfScreen) </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> (screenSize.y </span><span style="color:#FF79C6">/</span><span style="color:#BD93F9"> 3</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (testInputEnabled) { direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> testInput; }</span></span>
+<span class="line"><span style="color:#F8F8F2">        GameManager.Conn.Reducers.</span><span style="color:#50FA7B">UpdatePlayerInput</span><span style="color:#F8F8F2">(direction);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Let&#x27;s try it out! Press play and roam freely around the arena! Now we&#x27;re cooking with gas.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>You may get errors complaining that you&#x27;re using the wrong Input System. If that&#x27;s the case, open the Unity Project Settings via <code>Edit -> Project Settings...</code>, select the <code>Player</code> tab on the left, scroll down to <code>Other Settings -> Configuration</code>, find <code>Active Input Handling</code> and select <code>Input Manager (Old)</code> (or <code>Both</code>). The Unity Editor will have to restart to apply the change.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="collisions-and-eating-food">Collisions and Eating Food<a href="#collisions-and-eating-food" class="hash-link" aria-label="Direct link to Collisions and Eating Food" title="Direct link to Collisions and Eating Food" translate="no">​</a></h3>
+<p>Let&#x27;s try it out! Press play and roam freely around the arena! Now we&#x27;re cooking with gas.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="collisions-and-eating-food-1">Collisions and Eating Food<a href="#collisions-and-eating-food-1" class="hash-link" aria-label="Direct link to Collisions and Eating Food" title="Direct link to Collisions and Eating Food" translate="no">​</a></h3>
+<p>Well this is pretty fun, but wouldn&#x27;t it be better if we could eat food and grow our circle? Surely, that&#x27;s going to be a pain, right?</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Wrong. With SpacetimeDB it&#x27;s extremely easy. All we have to do is add an <code>IsOverlapping</code> helper function which does some basic math based on mass radii, and modify our <code>MoveAllPlayers</code> reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing <a href="https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/" target="_blank" rel="noopener noreferrer" class="">spatial hashing</a> might be better), but SpacetimeDB is very fast so for this number of entities it&#x27;ll be a breeze. Sometimes, simple is best!</p><p>Add the following code to the <code>Module</code> class of your <code>Lib.cs</code> file and make sure to replace the existing <code>MoveAllPlayers</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> const</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> MINIMUM_SAFE_MASS_RATIO </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0.85f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> bool</span><span style="color:#50FA7B"> IsOverlapping</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a.position.x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.position.x;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a.position.y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.position.y;</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> distanceSq </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dy;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> aRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(a.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> bRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(b.mass);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // If the distance between the two circle centers is less than the</span></span>
+<span class="line"><span style="color:#6272A4">    // maximum radius, then the center of the smaller circle is inside</span></span>
+<span class="line"><span style="color:#6272A4">    // the larger circle. This gives some leeway for the circles to overlap</span></span>
+<span class="line"><span style="color:#6272A4">    // before being eaten.</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> maxRadius </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> aRadius </span><span style="color:#FF79C6">></span><span style="color:#F8F8F2"> bRadius </span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2"> aRadius</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> bRadius;</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> distanceSq </span><span style="color:#FF79C6"><=</span><span style="color:#F8F8F2"> maxRadius </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> maxRadius;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> MoveAllPlayers</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">MoveAllPlayersTimer</span><span style="color:#FFB86C;font-style:italic"> timer</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> worldSize </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (ctx.Db.config.id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">??</span><span style="color:#FF79C6"> throw</span><span style="color:#FF79C6"> new</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)).world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.circle.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> checkEntity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (checkEntity </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if the circle has been eaten by another circle.</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> circleEntity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> checkEntity.Value;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> circleRadius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> MassToRadius</span><span style="color:#F8F8F2">(circleEntity.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle.direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle.speed;</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> newPosition </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circleEntity.position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> MassToMaxMoveSpeed</span><span style="color:#F8F8F2">(circleEntity.mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circleEntity.position.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Math.</span><span style="color:#50FA7B">Clamp</span><span style="color:#F8F8F2">(newPosition.x, circleRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circleRadius);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circleEntity.position.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Math.</span><span style="color:#50FA7B">Clamp</span><span style="color:#F8F8F2">(newPosition.y, circleRadius, worldSize </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circleRadius);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Check collisions</span></span>
+<span class="line"><span style="color:#FF79C6">        foreach</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx.Db.entity.</span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (entity.entity_id </span><span style="color:#FF79C6">==</span><span style="color:#F8F8F2"> circleEntity.entity_id </span><span style="color:#FF79C6">||</span><span style="color:#FF79C6"> !</span><span style="color:#50FA7B">IsOverlapping</span><span style="color:#F8F8F2">(circleEntity, entity))  </span><span style="color:#FF79C6">continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">            // Check to see if we&#x27;re overlapping with food</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (ctx.Db.food.entity_id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(entity.entity_id).HasValue) {</span></span>
+<span class="line"><span style="color:#F8F8F2">                ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                ctx.Db.food.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                circleEntity.mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity.mass;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">                continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">            // Check to see if we&#x27;re overlapping with another circle owned by another player</span></span>
+<span class="line"><span style="color:#FF79C6">            var</span><span style="color:#F8F8F2"> otherCircle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.circle.entity_id.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (otherCircle.HasValue </span><span style="color:#FF79C6">&&</span><span style="color:#F8F8F2"> otherCircle.Value.player_id </span><span style="color:#FF79C6">!=</span><span style="color:#F8F8F2"> circle.player_id)</span></span>
+<span class="line"><span style="color:#F8F8F2">            {</span></span>
+<span class="line"><span style="color:#FF79C6">                var</span><span style="color:#F8F8F2"> massRatio </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">float</span><span style="color:#F8F8F2">)entity.mass </span><span style="color:#FF79C6">/</span><span style="color:#F8F8F2"> circleEntity.mass;</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#F8F8F2"> (massRatio </span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2"> MINIMUM_SAFE_MASS_RATIO)</span></span>
+<span class="line"><span style="color:#F8F8F2">                {</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx.Db.circle.entity_id.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    circleEntity.mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity.mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.Db.entity.entity_id.</span><span style="color:#50FA7B">Update</span><span style="color:#F8F8F2">(circleEntity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Wrong. With SpacetimeDB it&#x27;s extremely easy. All we have to do is add an <code>is_overlapping</code> helper function which does some basic math based on mass radii, and modify our <code>move_all_players</code> reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing <a href="https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/" target="_blank" rel="noopener noreferrer" class="">spatial hashing</a> might be better), but SpacetimeDB is very fast so for this number of entities it&#x27;ll be a breeze. Sometimes, simple is best!</p><p>Add the following code to your <code>lib.rs</code> file and make sure to replace the existing <code>move_all_players</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#BD93F9"> MINIMUM_SAFE_MASS_RATIO</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 0.85</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> is_overlapping</span><span style="color:#F8F8F2">(a</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2">, b</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">Entity</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> bool</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y;</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> distance_sq </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dy;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> radius_a </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(a</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> radius_b </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(b</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // If the distance between the two circle centers is less than the</span></span>
+<span class="line"><span style="color:#6272A4">    // maximum radius, then the center of the smaller circle is inside</span></span>
+<span class="line"><span style="color:#6272A4">    // the larger circle. This gives some leeway for the circles to overlap</span></span>
+<span class="line"><span style="color:#6272A4">    // before being eaten.</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> max_radius </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">max</span><span style="color:#F8F8F2">(radius_a, radius_b);</span></span>
+<span class="line"><span style="color:#F8F8F2">    distance_sq </span><span style="color:#FF79C6"><=</span><span style="color:#F8F8F2"> max_radius </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> max_radius</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> move_all_players</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, _timer</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> MoveAllPlayersTimer</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">db</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">config</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Config not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span></span>
+<span class="line"><span style="color:#FF79C6">        .</span><span style="color:#F8F8F2">world_size;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> circle </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#FF79C6"> !</span><span style="color:#F8F8F2">circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">is_some</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if a circle is eaten by another circle</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#FF79C6"> mut</span><span style="color:#F8F8F2"> circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">unwrap</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> circle_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">speed;</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> new_pos </span><span style="color:#FF79C6">=</span></span>
+<span class="line"><span style="color:#F8F8F2">            circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> min </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#FF79C6">        let</span><span style="color:#F8F8F2"> max </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> -</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_pos</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">x</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(min, max);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">position</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> new_pos</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">y</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(min, max);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Check collisions</span></span>
+<span class="line"><span style="color:#FF79C6">        for</span><span style="color:#F8F8F2"> entity </span><span style="color:#FF79C6">in</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">iter</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id </span><span style="color:#FF79C6">==</span><span style="color:#F8F8F2"> circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id {</span></span>
+<span class="line"><span style="color:#FF79C6">                continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#50FA7B"> is_overlapping</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">circle_entity, </span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity) {</span></span>
+<span class="line"><span style="color:#6272A4">                // Check to see if we&#x27;re overlapping with food</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">food</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">is_some</span><span style="color:#F8F8F2">() {</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">food</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">                // Check to see if we&#x27;re overlapping with another circle owned by another player</span></span>
+<span class="line"><span style="color:#FF79C6">                let</span><span style="color:#F8F8F2"> other_circle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(other_circle) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> other_circle {</span></span>
+<span class="line"><span style="color:#FF79C6">                    if</span><span style="color:#F8F8F2"> other_circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id </span><span style="color:#FF79C6">!=</span><span style="color:#F8F8F2"> circle</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">player_id {</span></span>
+<span class="line"><span style="color:#FF79C6">                        let</span><span style="color:#F8F8F2"> mass_ratio </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#FF79C6"> /</span><span style="color:#F8F8F2"> circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass </span><span style="color:#FF79C6">as</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">                        if</span><span style="color:#F8F8F2"> mass_ratio </span><span style="color:#FF79C6"><</span><span style="color:#BD93F9"> MINIMUM_SAFE_MASS_RATIO</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">                            ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                            ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">circle</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                            circle_entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">                        }</span></span>
+<span class="line"><span style="color:#F8F8F2">                    }</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">entity_id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle_entity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Wrong. With SpacetimeDB it&#x27;s extremely easy. All we have to do is add an <code>is_overlapping</code> helper function which does some basic math based on mass radii, and modify our <code>move_all_players</code> reducer to loop through every entity in the arena for every circle, checking each for overlaps. This may not be the most efficient way to do collision checking (building a quad tree or doing <a href="https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/" target="_blank" rel="noopener noreferrer" class="">spatial hashing</a> might be better), but SpacetimeDB is very fast so for this number of entities it&#x27;ll be a breeze. Sometimes, simple is best!</p><p>Add the following code to your <code>lib.cpp</code> file and make sure to replace the existing <code>move_all_players</code> reducer.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> MINIMUM_SAFE_MASS_RATIO </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 0.85</span><span style="color:#FF79C6">f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">bool</span><span style="color:#50FA7B"> is_overlapping</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> a</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> b</span><span style="color:#F8F8F2">) {</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a.position.x </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.position.x;</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> a.position.y </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> b.position.y;</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> distance_sq </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dx </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> dy </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> dy;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> radius_a </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(a.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> radius_b </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(b.mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // If the distance between the two circle centers is less than the</span></span>
+<span class="line"><span style="color:#6272A4">    // maximum radius, then the center of the smaller circle is inside</span></span>
+<span class="line"><span style="color:#6272A4">    // the larger circle. This gives some leeway for the circles to overlap</span></span>
+<span class="line"><span style="color:#6272A4">    // before being eaten.</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> max_radius </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">max</span><span style="color:#F8F8F2">(radius_a, radius_b);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#F8F8F2"> distance_sq </span><span style="color:#FF79C6"><=</span><span style="color:#F8F8F2"> max_radius </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> max_radius;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(move_all_players, ReducerContext ctx, MoveAllPlayersTimer _timer) {</span></span>
+<span class="line"><span style="color:#6272A4">    // Get world size from config</span></span>
+<span class="line"><span style="color:#FF79C6">    auto</span><span style="color:#F8F8F2"> config_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[config_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">0</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">config_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#50FA7B"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Config not found</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#FF79C6">    int64_t</span><span style="color:#F8F8F2"> world_size </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">().world_size;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#6272A4">    // Handle player input</span></span>
+<span class="line"><span style="color:#FF79C6">    for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> Circle</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> circle : ctx.db[circle]) {</span></span>
+<span class="line"><span style="color:#FF79C6">        auto</span><span style="color:#F8F8F2"> circle_entity_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[entity_entity_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(circle.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">!</span><span style="color:#F8F8F2">circle_entity_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#6272A4">            // This can happen if a circle is eaten by another circle</span></span>
+<span class="line"><span style="color:#FF79C6">            continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        Entity circle_entity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> circle_radius </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> mass_to_radius</span><span style="color:#F8F8F2">(circle_entity.mass);</span></span>
+<span class="line"><span style="color:#F8F8F2">        DbVector2 direction </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle.direction </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> circle.speed;</span></span>
+<span class="line"><span style="color:#F8F8F2">        DbVector2 new_pos </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_entity.position </span><span style="color:#FF79C6">+</span><span style="color:#F8F8F2"> direction </span><span style="color:#FF79C6">*</span><span style="color:#50FA7B"> mass_to_max_move_speed</span><span style="color:#F8F8F2">(circle_entity.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> min_bound </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#FF79C6">        float</span><span style="color:#F8F8F2"> max_bound </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> static_cast\<float\></span><span style="color:#F8F8F2">(world_size) </span><span style="color:#FF79C6">-</span><span style="color:#F8F8F2"> circle_radius;</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity.position.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(new_pos.x, min_bound, max_bound);</span></span>
+<span class="line"><span style="color:#F8F8F2">        circle_entity.position.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">clamp</span><span style="color:#F8F8F2">(new_pos.y, min_bound, max_bound);</span></span>
+<span class="line"><span style="color:#F8F8F2">        </span></span>
+<span class="line"><span style="color:#6272A4">        // Check collisions</span></span>
+<span class="line"><span style="color:#FF79C6">        for</span><span style="color:#F8F8F2"> (</span><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> Entity</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> entity : ctx.db[entity]) {</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (entity.entity_id </span><span style="color:#FF79C6">==</span><span style="color:#F8F8F2"> circle_entity.entity_id) {</span></span>
+<span class="line"><span style="color:#FF79C6">                continue</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#FF79C6">            if</span><span style="color:#F8F8F2"> (</span><span style="color:#50FA7B">is_overlapping</span><span style="color:#F8F8F2">(circle_entity, entity)) {</span></span>
+<span class="line"><span style="color:#6272A4">                // Check to see if we&#x27;re overlapping with food</span></span>
+<span class="line"><span style="color:#FF79C6">                auto</span><span style="color:#F8F8F2"> food_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[food_entity_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#F8F8F2"> (food_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx.db[entity_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    ctx.db[food_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                    circle_entity.mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity.mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"><span style="color:#F8F8F2">                </span></span>
+<span class="line"><span style="color:#6272A4">                // Check to see if we&#x27;re overlapping with another circle owned by another player</span></span>
+<span class="line"><span style="color:#FF79C6">                auto</span><span style="color:#F8F8F2"> other_circle_opt </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[circle_entity_id].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#FF79C6">                if</span><span style="color:#F8F8F2"> (other_circle_opt.</span><span style="color:#50FA7B">has_value</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#FF79C6">                    const</span><span style="color:#F8F8F2"> Circle</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2"> other_circle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> other_circle_opt.</span><span style="color:#50FA7B">value</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#FF79C6">                    if</span><span style="color:#F8F8F2"> (other_circle.player_id </span><span style="color:#FF79C6">!=</span><span style="color:#F8F8F2"> circle.player_id) {</span></span>
+<span class="line"><span style="color:#FF79C6">                        float</span><span style="color:#F8F8F2"> mass_ratio </span><span style="color:#FF79C6">=</span><span style="color:#FF79C6"> static_cast\<float\></span><span style="color:#F8F8F2">(entity.mass) </span><span style="color:#FF79C6">/</span><span style="color:#FF79C6"> static_cast\<float\></span><span style="color:#F8F8F2">(circle_entity.mass);</span></span>
+<span class="line"><span style="color:#FF79C6">                        if</span><span style="color:#F8F8F2"> (mass_ratio </span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2"> MINIMUM_SAFE_MASS_RATIO) {</span></span>
+<span class="line"><span style="color:#F8F8F2">                            ctx.db[entity_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                            ctx.db[circle_entity_id].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(entity.entity_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">                            circle_entity.mass </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> entity.mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">                        }</span></span>
+<span class="line"><span style="color:#F8F8F2">                    }</span></span>
+<span class="line"><span style="color:#F8F8F2">                }</span></span>
+<span class="line"><span style="color:#F8F8F2">            }</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">        </span></span>
+<span class="line"><span style="color:#F8F8F2">        ctx.db[entity_entity_id].</span><span style="color:#50FA7B">update</span><span style="color:#F8F8F2">(circle_entity);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>For every circle, we look at all other entities. If they are overlapping then for food, we add the mass of the food to the circle and delete the food, otherwise if it&#x27;s a circle we delete the smaller circle and add the mass to the bigger circle.</p>
+<p>That&#x27;s it. We don&#x27;t even have to do anything on the client.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre>
+<p>Just update your module by publishing and you&#x27;re on your way eating food! Try to see how big you can get!</p>
+<p>We didn&#x27;t even have to update the client, because our client&#x27;s <code>OnDelete</code> callbacks already handled deleting entities from the scene when they&#x27;re deleted on the server. SpacetimeDB just synchronizes the state with your client automatically.</p>
+<p>Notice that the food automatically respawns as you vaccuum them up. This is because our scheduled reducer is automatically replacing the food 2 times per second, to ensure that there is always close to 600 food on the map.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="connecting-to-maincloud">Connecting to Maincloud<a href="#connecting-to-maincloud" class="hash-link" aria-label="Direct link to Connecting to Maincloud" title="Direct link to Connecting to Maincloud" translate="no">​</a></h2>
+\<ul\>
+<li class="">Publish to Maincloud <code>spacetime publish --server maincloud \<your database name\> --delete-data</code>
+\<ul\>
+<li class=""><code>\<your database name\></code> This name should be unique and cannot contain any special characters other than internal hyphens (<code>-</code>). You will have to update the database name in <code>blackholio-server/spacetime.local.json</code> to match.</li>
+</ul>
+</li>
+<li class="">Update the URL in the Unity project to: <code>https://maincloud.spacetimedb.com</code></li>
+<li class="">Update the database name in the Unity project to <code>\<your database name\></code>.</li>
+<li class="">Clear the PlayerPrefs in Start() within <code>GameManager.cs</code></li>
+<li class="">Your <code>GameManager.cs</code> should look something like this:</li>
+</ul>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> SERVER_URL </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> DATABASE_NAME </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">\<your database name\></span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">..</span><span style="color:#F8F8F2">.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Start</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    // Clear cached connection data to ensure proper connection</span></span>
+<span class="line"><span style="color:#F8F8F2">    PlayerPrefs.</span><span style="color:#50FA7B">DeleteAll</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Continue with initialization</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>To delete your Maincloud database, you can run: <code>spacetime delete --server maincloud \<your database name\></code></p>
+\<h1\>Conclusion</h1>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>So far you&#x27;ve learned how to configure a new Unity project to work with
+SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module.
+Within the module, you&#x27;ve learned how to create tables, update tables, and
+write reducers. You&#x27;ve learned about special reducers like <code>ClientConnected</code>
+and <code>Init</code> and how to created scheduled reducers. You learned how we can
+used scheduled reducers to implement a physics simulation right within your
+module.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>So far you&#x27;ve learned how to configure a new Unity project to work with
+SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module.
+Within the module, you&#x27;ve learned how to create tables, update tables, and
+write reducers. You&#x27;ve learned about special reducers like
+<code>client_connected</code> and <code>init</code> and how to created scheduled reducers. You
+learned how we can used scheduled reducers to implement a physics simulation
+right within your module.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>So far you&#x27;ve learned how to configure a new Unity project to work with SpacetimeDB, how to develop, build, and publish a SpacetimeDB server module. Within the module, you&#x27;ve learned how to create tables, update tables, and write reducers. You&#x27;ve learned about special reducers like <code>SPACETIMEDB_CLIENT_CONNECTED</code> and <code>SPACETIMEDB_INIT</code> and how to create scheduled reducers. You learned how we can use scheduled reducers to implement a physics simulation right within your module.</p></div></div></div>
+<p>You&#x27;ve also learned how view module logs and connect your client to your database server, call reducers from the client and synchronize the data with client. Finally you learned how to use that synchronized data to draw game objects on the screen, so that we can interact with them and play a game!</p>
+<p>And all of that completely from scratch!</p>
+<p>Our game is still pretty limited in some important ways. The biggest limitation is that the client assumes your username is "3Blave" and doesn&#x27;t give you a menu or a window to set your username before joining the game. Notably, we do not have a unique constraint on the <code>name</code> column, so that does not prevent us from connecting multiple clients to the same server.</p>
+<p>In fact, if you build what we have and run multiple clients you already have a (very simple) MMO! You can connect hundreds of players to this arena with SpacetimeDB. Note that you would need to run the client in different computers to use different auth tokens.</p>
+<p>There&#x27;s still plenty more we can do to build this into a proper game though. For example, you might want to also add</p>
+\<ul\>
+<li class="">Username chooser</li>
+<li class="">Chat</li>
+<li class="">Leaderboards</li>
+<li class="">The ability to split into multiple circles</li>
+<li class="">Nice animations</li>
+<li class="">Nice shaders</li>
+<li class="">Space theme!</li>
+<li class="">Object Pooling (for FoodController, PlayerController and CircleController)</li>
+</ul>
+<p>Fortunately, we&#x27;ve done that for you! If you&#x27;d like to check out the completed tutorial game, with most of these additional features, you can download it on GitHub:</p>
+<p><a href="https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio" target="_blank" rel="noopener noreferrer" class="">https://github.com/clockworklabs/SpacetimeDB/tree/master/demo/Blackholio</a></p>
+<p>If you have any suggestions or comments on the tutorial, either <a href="https://github.com/clockworklabs/SpacetimeDB/issues/new" target="_blank" rel="noopener noreferrer" class="">open an issue</a>, or join our Discord (<a href="https://discord.gg/SpacetimeDB" target="_blank" rel="noopener noreferrer" class="">https://discord.gg/SpacetimeDB</a>) and chat with us!</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00100-intro/00300-tutorials/00300-unity-tutorial/00500-part-4.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tutorials/unity/part-3"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">3 - Gameplay</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tutorials/unreal"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Unreal Tutorial</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#moving-the-player" class="table-of-contents__link toc-highlight">Moving the player</a></li>\<li\><a href="#moving-on-the-client" class="table-of-contents__link toc-highlight">Moving on the Client</a></li>\<li\><a href="#collisions-and-eating-food" class="table-of-contents__link toc-highlight">Collisions and Eating Food</a></li>\<li\><a href="#collisions-and-eating-food-1" class="table-of-contents__link toc-highlight">Collisions and Eating Food</a></li>\<li\><a href="#connecting-to-maincloud" class="table-of-contents__link toc-highlight">Connecting to Maincloud</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

@@ -20,7 +20,7 @@ Before starting this tutorial, ensure you have the following installed on your s
 
 ### Claude Desktop
 
-Download and install [Claude Desktop](https://claude.ai/download) for your operating system. Claude Desktop is available for macOS and Windows.
+Download and install [Claude Desktop](https://claude.ai/download) for your operating system. Claude Desktop is available for macOS, Windows, and Linux.
 
 If you already have Claude Desktop installed, verify you're running the latest version by clicking the Claude menu and selecting "Check for Updates..."
 
@@ -228,7 +228,7 @@ If you encounter issues setting up or using the Filesystem Server, these solutio
   </Accordion>
 
   <Accordion title="None of this is working. What do I do?">
-    Please refer to our [debugging guide](https://modelcontextprotocol.io/docs/2025-03-26/tools/debugging) for better debugging tools and more detailed guidance.
+    Please refer to our [debugging guide](/docs/2025-03-26/tools/debugging) for better debugging tools and more detailed guidance.
   </Accordion>
 
   <Accordion title="ENOENT error and `${APPDATA}` in paths on Windows">
@@ -285,3 +285,4 @@ Now that you've successfully connected Claude Desktop to a local MCP server, exp
     Dive deeper into how MCP works and its architecture
   </Card>
 </CardGroup>
+

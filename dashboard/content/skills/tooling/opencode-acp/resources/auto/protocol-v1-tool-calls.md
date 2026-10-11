@@ -15,11 +15,11 @@ skill_name = "opencode-acp"
 
 > How Agents report tool call execution
 
-Tool calls represent actions that language models request Agents to perform during a [prompt turn](https://agentclientprotocol.com/protocol/v1/prompt-turn). When an LLM determines it needs to interact with external systems—like reading files, running code, or fetching data—it generates tool calls that the Agent executes on its behalf.
+Tool calls represent actions that language models request Agents to perform during a [prompt turn](/protocol/v1/prompt-turn). When an LLM determines it needs to interact with external systems—like reading files, running code, or fetching data—it generates tool calls that the Agent executes on its behalf.
 
-Agents report tool calls through [`session/update`](https://agentclientprotocol.com/protocol/v1/prompt-turn#3-agent-reports-output) notifications, allowing Clients to display real-time progress and results to users.
+Agents report tool calls through [`session/update`](/protocol/v1/prompt-turn#3-agent-reports-output) notifications, allowing Clients to display real-time progress and results to users.
 
-While Agents handle the actual execution, they may leverage Client capabilities like [permission requests](#requesting-permission) or [file system access](https://agentclientprotocol.com/protocol/v1/file-system) to provide a richer, more integrated experience.
+While Agents handle the actual execution, they may leverage Client capabilities like [permission requests](#requesting-permission) or [file system access](/protocol/v1/file-system) to provide a richer, more integrated experience.
 
 ## Creating
 
@@ -34,6 +34,7 @@ When the language model requests a tool invocation, the Agent **SHOULD** report 
     "update": {
       "sessionUpdate": "tool_call",
       "toolCallId": "call_001",
+      "name": "read_file",
       "title": "Reading configuration file",
       "kind": "read",
       "status": "pending"
@@ -46,6 +47,14 @@ When the language model requests a tool invocation, the Agent **SHOULD** report 
   A unique identifier for this tool call within the session
 </ParamField>
 
+<ParamField path="name" type="string">
+  The optional programmatic name of the invoked tool, such as `read_file`.
+  Agents **SHOULD** include it in the first report when available and **SHOULD
+  NOT** change it later except to correct metadata. Names are opaque,
+  informational metadata: they do not advertise a capability or grant
+  authorization. Omission and `null` both mean that no name is provided.
+</ParamField>
+
 <ParamField path="title" type="string" required>
   A human-readable title describing what the tool is doing
 </ParamField>
@@ -54,10 +63,15 @@ When the language model requests a tool invocation, the Agent **SHOULD** report 
   The category of tool being invoked.
 
   <Expandable title="kinds">
-    * `read` - Reading files or data - `edit` - Modifying files or content -
-      `delete` - Removing files or data - `move` - Moving or renaming files -
-      `search` - Searching for information - `execute` - Running commands or code -
-      `think` - Internal reasoning or planning - `fetch` - Retrieving external data
+    * `read` - Reading files or data
+    * `edit` - Modifying files or content
+    * `delete` - Removing files or data
+    * `move` - Moving or renaming files
+    * `search` - Searching for information
+    * `execute` - Running commands or code
+    * `think` - Internal reasoning or planning
+    * `fetch` - Retrieving external data
+    * `switch_mode` - Switching the session mode
     * `other` - Other tool types (default)
   </Expandable>
 
@@ -76,13 +90,19 @@ When the language model requests a tool invocation, the Agent **SHOULD** report 
   [File locations](#following-the-agent) affected by this tool call
 </ParamField>
 
-<ParamField path="rawInput" type="object">
-  The raw input parameters sent to the tool
+<ParamField path="rawInput" type="unknown">
+  The raw input sent to the tool. Any JSON value is accepted, including objects,
+  arrays, strings, numbers, booleans, and `null`.
 </ParamField>
 
-<ParamField path="rawOutput" type="object">
-  The raw output returned by the tool
+<ParamField path="rawOutput" type="unknown">
+  The raw output returned by the tool. Any JSON value is accepted, including
+  objects, arrays, strings, numbers, booleans, and `null`.
 </ParamField>
+
+Omission and `null` are equivalent for `rawInput` and `rawOutput`.
+On an initial tool call, both mean no value is provided. On a tool call
+update, both leave the previously reported value unchanged.
 
 ## Updating
 
@@ -114,7 +134,10 @@ Updates use the `session/update` notification with `tool_call_update`:
 }
 ```
 
-All fields except `toolCallId` are optional in updates. Only the fields being changed need to be included.
+All fields except `toolCallId` are optional in updates. Only the fields being
+changed need to be included. For `name`, omission and `null` both leave the
+existing value unchanged, while a string sets or replaces it. ACP v1 cannot
+clear a previously reported name.
 
 ## Requesting Permission
 
@@ -176,7 +199,7 @@ The Client responds with the user's decision:
 
 Clients **MAY** automatically allow or reject permission requests according to the user settings.
 
-If the current prompt turn gets [cancelled](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation), the Client **MUST** respond with the `"cancelled"` outcome:
+If the current prompt turn gets [cancelled](/protocol/v1/prompt-turn#cancellation), the Client **MUST** respond with the `"cancelled"` outcome:
 
 ```json theme={null}
 {
@@ -192,7 +215,7 @@ If the current prompt turn gets [cancelled](https://agentclientprotocol.com/prot
 
 <ResponseField name="outcome" type="RequestPermissionOutcome" required>
   The user's decision, either: - `cancelled` - The [prompt turn was
-  cancelled](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation) - `selected` with an
+  cancelled](/protocol/v1/prompt-turn#cancellation) - `selected` with an
   `optionId` - The ID of the selected permission option
 </ResponseField>
 
@@ -242,7 +265,7 @@ Tool calls can produce different types of content:
 
 ### Regular Content
 
-Standard [content blocks](https://agentclientprotocol.com/protocol/v1/content) like text, images, or resources:
+Standard [content blocks](/protocol/v1/content) like text, images, or resources:
 
 ```json theme={null}
 {
@@ -315,6 +338,11 @@ Tool calls can report file locations they're working with, enabling Clients to i
   The absolute file path being accessed or modified
 </ParamField>
 
-<ParamField path="line" type="number">
-  Optional line number within the file
+<ParamField path="line" type="integer | null">
+  Optional line number within the file, represented as an unsigned 32-bit
+  integer. Omission and `null` are equivalent and mean no specific line was
+  provided.
 </ParamField>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

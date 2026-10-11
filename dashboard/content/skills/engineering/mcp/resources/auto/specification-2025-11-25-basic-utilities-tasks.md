@@ -47,10 +47,10 @@ Servers and clients that support task-augmented requests **MUST** declare a `tas
 
 Servers declare if they support tasks, and if so, which server-side requests can be augmented with tasks.
 
-| Capability                  | Description                                          |
-| --------------------------- | ---------------------------------------------------- |
-| `tasks.list`                | Server supports the `tasks/list` operation           |
-| `tasks.cancel`              | Server supports the `tasks/cancel` operation         |
+| Capability | Description |
+| - | - |
+| `tasks.list` | Server supports the `tasks/list` operation |
+| `tasks.cancel` | Server supports the `tasks/cancel` operation |
 | `tasks.requests.tools.call` | Server supports task-augmented `tools/call` requests |
 
 ```json theme={null}
@@ -73,12 +73,12 @@ Servers declare if they support tasks, and if so, which server-side requests can
 
 Clients declare if they support tasks, and if so, which client-side requests can be augmented with tasks.
 
-| Capability                              | Description                                                      |
-| --------------------------------------- | ---------------------------------------------------------------- |
-| `tasks.list`                            | Client supports the `tasks/list` operation                       |
-| `tasks.cancel`                          | Client supports the `tasks/cancel` operation                     |
+| Capability | Description |
+| - | - |
+| `tasks.list` | Client supports the `tasks/list` operation |
+| `tasks.cancel` | Client supports the `tasks/cancel` operation |
 | `tasks.requests.sampling.createMessage` | Client supports task-augmented `sampling/createMessage` requests |
-| `tasks.requests.elicitation.create`     | Client supports task-augmented `elicitation/create` requests     |
+| `tasks.requests.elicitation.create` | Client supports task-augmented `elicitation/create` requests |
 
 ```json theme={null}
 {
@@ -175,7 +175,7 @@ To create a task, requestors send a request with the `task` field included in th
 }
 ```
 
-When a receiver accepts a task-augmented request, it returns a [`CreateTaskResult`](https://modelcontextprotocol.io/specification/2025-11-25/schema#createtaskresult) containing task data. The response does not include the actual operation result. The actual result (e.g., tool result for `tools/call`) becomes available only through `tasks/result` after the task completes.
+When a receiver accepts a task-augmented request, it returns a [`CreateTaskResult`](/specification/2025-11-25/schema#createtaskresult) containing task data. The response does not include the actual operation result. The actual result (e.g., tool result for `tools/call`) becomes available only through `tasks/result` after the task completes.
 
 \<Note\>
   When a task is created in response to a `tools/call` request, host applications may wish to return control to the model while the task is executing. This allows the model to continue processing other requests or perform additional work while waiting for the task to complete.
@@ -191,10 +191,10 @@ When a receiver accepts a task-augmented request, it returns a [`CreateTaskResul
 \<Note\>
   In the Streamable HTTP (SSE) transport, clients **MAY** disconnect from an SSE stream opened by the server in response to a `tasks/get` request at any time.
 
-  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](@/skills/engineering/mcp/resources/auto/specification-2025-11-25-basic-transports.md#sending-messages-to-the-server).
+  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](../transports#sending-messages-to-the-server).
 </Note>
 
-Requestors poll for task completion by sending [`tasks/get`](https://modelcontextprotocol.io/specification/2025-11-25/schema#tasks%2Fget) requests.
+Requestors poll for task completion by sending [`tasks/get`](/specification/2025-11-25/schema#tasks%2Fget) requests.
 Requestors **SHOULD** respect the `pollInterval` provided in responses when determining polling frequency.
 
 Requestors **SHOULD** continue polling until the task reaches a terminal status (`completed`, `failed`, or `cancelled`), or until encountering the [`input_required`](#input-required-status) status. Note that invoking `tasks/result` does not imply that the requestor needs to stop polling - requestors **SHOULD** continue polling the task status via `tasks/get` if they are not actively waiting for `tasks/result` to complete.
@@ -235,10 +235,10 @@ Requestors **SHOULD** continue polling until the task reaches a terminal status 
 \<Note\>
   In the Streamable HTTP (SSE) transport, clients **MAY** disconnect from an SSE stream opened by the server in response to a `tasks/result` request at any time.
 
-  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](@/skills/engineering/mcp/resources/auto/specification-2025-11-25-basic-transports.md#sending-messages-to-the-server).
+  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](../transports#sending-messages-to-the-server).
 </Note>
 
-After a task completes the operation result is retrieved via [`tasks/result`](https://modelcontextprotocol.io/specification/2025-11-25/schema#tasks%2Fresult). This is distinct from the initial `CreateTaskResult` response, which contains only task data. The result structure matches the original request type (e.g., `CallToolResult` for `tools/call`).
+After a task completes the operation result is retrieved via [`tasks/result`](/specification/2025-11-25/schema#tasks%2Fresult). This is distinct from the initial `CreateTaskResult` response, which contains only task data. The result structure matches the original request type (e.g., `CallToolResult` for `tools/call`).
 
 To retrieve the result of a completed task, requestors can send a `tasks/result` request:
 
@@ -282,7 +282,7 @@ While `tasks/result` blocks until the task reaches a terminal status, requestors
 
 ### Task Status Notification
 
-When a task status changes, receivers **MAY** send a [`notifications/tasks/status`](https://modelcontextprotocol.io/specification/2025-11-25/schema#notifications%2Ftasks%2Fstatus) notification to inform the requestor of the change. This notification includes the full task state.
+When a task status changes, receivers **MAY** send a [`notifications/tasks/status`](/specification/2025-11-25/schema#notifications%2Ftasks%2Fstatus) notification to inform the requestor of the change. This notification includes the full task state.
 
 **Notification:**
 
@@ -301,13 +301,13 @@ When a task status changes, receivers **MAY** send a [`notifications/tasks/statu
 }
 ```
 
-The notification includes the full [`Task`](https://modelcontextprotocol.io/specification/2025-11-25/schema#task) object, including the updated `status` and `statusMessage` (if present). This allows requestors to access the complete task state without making an additional `tasks/get` request.
+The notification includes the full [`Task`](/specification/2025-11-25/schema#task) object, including the updated `status` and `statusMessage` (if present). This allows requestors to access the complete task state without making an additional `tasks/get` request.
 
 Requestors **MUST NOT** rely on receiving this notifications, as it is optional. Receivers are not required to send status notifications and may choose to only send them for certain status transitions. Requestors **SHOULD** continue to poll via `tasks/get` to ensure they receive status updates.
 
 ### Listing Tasks
 
-To retrieve a list of tasks, requestors can send a [`tasks/list`](https://modelcontextprotocol.io/specification/2025-11-25/schema#tasks%2Flist) request. This operation supports pagination.
+To retrieve a list of tasks, requestors can send a [`tasks/list`](/specification/2025-11-25/schema#tasks%2Flist) request. This operation supports pagination.
 
 **Request:**
 
@@ -353,7 +353,7 @@ To retrieve a list of tasks, requestors can send a [`tasks/list`](https://modelc
 
 ### Cancelling Tasks
 
-To explicitly cancel a task, requestors can send a [`tasks/cancel`](https://modelcontextprotocol.io/specification/2025-11-25/schema#tasks%2Fcancel) request.
+To explicitly cancel a task, requestors can send a [`tasks/cancel`](/specification/2025-11-25/schema#tasks%2Fcancel) request.
 
 **Request:**
 
@@ -442,7 +442,7 @@ stateDiagram-v2
   One possible approach is maintaining an SSE stream on `tasks/result` (see notes on the `input_required` status).
   Where possible, servers **SHOULD NOT** upgrade to an SSE stream in response to a `tasks/get` request, as the client has indicated it wishes to poll for a result.
 
-  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](@/skills/engineering/mcp/resources/auto/specification-2025-11-25-basic-transports.md#sending-messages-to-the-server).
+  While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](../transports#sending-messages-to-the-server).
 </Note>
 
 1. When the task receiver has messages for the requestor that are necessary to complete the task, the receiver **SHOULD** move the task to the `input_required` status.
@@ -481,7 +481,7 @@ stateDiagram-v2
 
 ### Task Progress Notifications
 
-Task-augmented requests support progress notifications as defined in the [progress](@/skills/engineering/mcp/resources/auto/specification-2025-11-25-basic-utilities-progress.md) specification. The `progressToken` provided in the initial request remains valid throughout the task lifetime.
+Task-augmented requests support progress notifications as defined in the [progress](./progress) specification. The `progressToken` provided in the initial request remains valid throughout the task lifetime.
 
 ### Task Listing
 
@@ -897,3 +897,5 @@ Additionally, receivers **SHOULD** implement rate limiting on task operations to
 2. Requestors **SHOULD**:
    1. Log task lifecycle events for debugging and audit purposes
    2. Track task IDs and their associated operations
+
+

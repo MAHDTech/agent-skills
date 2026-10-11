@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1046                                                                            |
-| **Title**     | Support OAuth client credentials flow in authorization                          |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-07-23                                                                      |
-| **Author(s)** | Darin McAdams ([@D-McAdams](https://github.com/D-McAdams) )                     |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1046](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1046) |
+| Field | Value |
+| - | - |
+| **SEP** | 1046 |
+| **Title** | Support OAuth client credentials flow in authorization |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-23 |
+| **Author(s)** | Darin McAdams ([@D-McAdams](https://github.com/D-McAdams) ) |
+| **Sponsor** | None |
+| **PR** | [#1046](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1046) |
 
 ***
 
@@ -78,3 +78,5 @@ This change is fully backward compatible. It introduces a new authorization flow
 ### Security Implications
 
 The specification refers to the existing OAuth security guidance.
+
+

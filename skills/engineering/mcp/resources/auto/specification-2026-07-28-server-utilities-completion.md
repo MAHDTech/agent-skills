@@ -17,7 +17,7 @@ resource template (identified by URI), servers can provide contextual suggestion
   `io.modelcontextprotocol/clientInfo`, and
   `io.modelcontextprotocol/clientCapabilities`). Every request **MUST** include
   the required `_meta` fields; see
-  [`_meta`](https://modelcontextprotocol.io/specification/2026-07-28/basic/index#meta).
+  [`_meta`](/specification/2026-07-28/basic/index#meta).
 </Note>
 
 ## User Interaction Model
@@ -136,9 +136,9 @@ For prompts or URI templates with multiple arguments, clients should include pre
 
 The protocol supports two types of completion references:
 
-| Type           | Description                               | Example                                             |
-| -------------- | ----------------------------------------- | --------------------------------------------------- |
-| `ref/prompt`   | References a prompt by name               | `{"type": "ref/prompt", "name": "code_review"}`     |
+| Type | Description | Example |
+| - | - | - |
+| `ref/prompt` | References a prompt by name | `{"type": "ref/prompt", "name": "code_review"}` |
 | `ref/resource` | References a resource URI or URI template | `{"type": "ref/resource", "uri": "file:///{path}"}` |
 
 ### Completion Results
@@ -214,3 +214,4 @@ Implementations **MUST**:
 * Implement appropriate rate limiting
 * Control access to sensitive suggestions
 * Prevent completion-based information disclosure
+

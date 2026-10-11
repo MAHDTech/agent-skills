@@ -105,3 +105,6 @@ No. Implementations should preserve unknown values when practical and degrade gr
 ## Revision history
 
 2026-05-27: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

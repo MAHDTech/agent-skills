@@ -28,7 +28,7 @@ If using the Component UI, options can be set declaratively with the `<pagefind-
 <pagefind-results></pagefind-results>
 ```
 
-See the full list of available attributes in the [`<pagefind-config>` reference](https://pagefind.app/docs/components/config/).
+See the full list of available attributes in the [`<pagefind-config>` reference](/docs/components/config/).
 **UI (programmatic):**
 
 Options can be passed through to Pagefind via `configureInstance`. Import the function based on how you installed the Component UI:
@@ -136,7 +136,7 @@ await pagefind.options({
 
 If set, Pagefind will add the search term as a query parameter under the same name.
 
-If using the [Pagefind highlight script](https://pagefind.app/docs/highlighting/), make sure this is configured to match.
+If using the [Pagefind highlight script](/docs/highlighting/), make sure this is configured to match.
 
 **UI (declarative):**
 
@@ -162,7 +162,7 @@ await pagefind.options({
 
 Defaults to `false`. When set to `true`, diacritics (accents such as àéö) are treated as fully distinct characters.
 
-By default, Pagefind normalizes diacritics so that searching for "cafe" will match pages containing "café" and vice versa. When diacritics are normalized, exact matches are still preferred via the [`ranking.diacriticSimilarity`](https://pagefind.app/docs/ranking/#configuring-diacritic-similarity) parameter.
+By default, Pagefind normalizes diacritics so that searching for "cafe" will match pages containing "café" and vice versa. When diacritics are normalized, exact matches are still preferred via the [`ranking.diacriticSimilarity`](/docs/ranking/#configuring-diacritic-similarity) parameter.
 
 When `exactDiacritics` is set to `true`:
 - Searching for "café" will only match pages containing "café"
@@ -216,15 +216,15 @@ await pagefind.options({
 
 ### Ranking
 
-See [customize ranking](https://pagefind.app/docs/ranking/)
+See [customize ranking](/docs/ranking/)
 
 ### Index weight
 
-See [multisite search > weighting](https://pagefind.app/docs/multisite/#changing-the-weighting-of-individual-indexes)
+See [multisite search > weighting](/docs/multisite/#changing-the-weighting-of-individual-indexes)
 
 ### Merge filter
 
-See [multisite search > filtering](https://pagefind.app/docs/multisite/#filtering-results-by-index)
+See [multisite search > filtering](/docs/multisite/#filtering-results-by-index)
 
 ### Disable web worker
 
@@ -251,3 +251,5 @@ await pagefind.options({
 +    noWorker: true
 });
 ```
+
+

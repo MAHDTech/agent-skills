@@ -139,7 +139,7 @@ To require enterprise-managed authorization:
   Support for this extension varies by client. Extensions are opt-in and never active by default.
 </Note>
 
-Check the [client matrix](https://modelcontextprotocol.io/extensions/client-matrix) for current implementation status across MCP clients. Enterprise-Managed Authorization typically requires client-level support from the organization's IT team in addition to the MCP client application.
+Check the [client matrix](/extensions/client-matrix) for current implementation status across MCP clients. Enterprise-Managed Authorization typically requires client-level support from the organization's IT team in addition to the MCP client application.
 
 ## Related resources
 
@@ -160,3 +160,4 @@ Check the [client matrix](https://modelcontextprotocol.io/extensions/client-matr
     Core MCP authorization specification
   </Card>
 </CardGroup>
+

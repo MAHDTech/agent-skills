@@ -22,11 +22,11 @@ When a `$/cancel_request` notification is received by a supporting implementatio
 * **MAY** finish sending any pending notifications before responding
 * **MUST** send one of these responses for the original request:
   * A valid response with appropriate data (such as partial results or cancellation marker)
-  * An error response with code [`-32800` (Request Cancelled)](https://agentclientprotocol.com/protocol/v2/schema#errorcode)
+  * An error response with code [`-32800` (Request Cancelled)](/protocol/v2/schema#errorcode)
 
 The calling side **MAY** implement graceful cancellation processing by waiting for the response from the remote side.
 
-Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of [active session work](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation).
+Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of [active session work](/protocol/v2/prompt-lifecycle#cancellation).
 
 ## Internal Cancellation
 
@@ -39,6 +39,8 @@ When internal cancellation occurs, the executing party **SHOULD**:
 
 * Send the same `-32800` (Cancelled) error response as if `$/cancel_request` was received
 * Ensure consistent behavior regardless of cancellation source
+
+Both kinds of cancellation answer `session/prompt` with `-32800` only before the user message is inserted. Once it is inserted, the Agent responds successfully with its `messageId`, and the work it started is stopped with [`session/cancel`](/protocol/v2/prompt-lifecycle#cancellation) or ends with a [stop reason](/protocol/v2/prompt-lifecycle#stop-reasons). See [Prompt Accepted](/protocol/v2/prompt-lifecycle#2-prompt-accepted).
 
 ## Example: Cascading Cancellation Flow
 
@@ -70,3 +72,6 @@ sequenceDiagram
     Note over Client,Agent: 6. Agent reports cancellation completion
     Agent->>Client: session/update (state_update: idle, stopReason: "cancelled")
 ```
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

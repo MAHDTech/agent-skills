@@ -17,8 +17,11 @@ skill_name = "acp"
 
 **Published:** April 23, 2026
 
-The [Session Close RFD](https://agentclientprotocol.com/rfds/session-close) has moved to Completed and the `session/close` method is stabilized.
+The [Session Close RFD](/rfds/session-close) has moved to Completed and the `session/close` method is stabilized.
 
 When advertised via `sessionCapabilities.close`, Clients can now ask Agents to cancel any ongoing work for a session and free the resources associated with it, without having to terminate the whole ACP process. This lets long-running Clients keep memory, threads, and subprocesses under control as users accumulate sessions over time.
 
-For the protocol documentation, see [Closing Active Sessions](https://agentclientprotocol.com/protocol/v1/session-setup#closing-active-sessions).
+For the protocol documentation, see [Closing Active Sessions](/protocol/v1/session-setup#closing-active-sessions).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

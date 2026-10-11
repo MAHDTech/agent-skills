@@ -66,7 +66,7 @@ When configuring xAI API integration for a task, follow this lookup protocol:
 
 1. **Model Selection:** Verify current active model strings and pricing/rate-limit tiers in `resources/auto/`.
 2. **Streaming & Tool Calling:** Use standard OpenAI-style `stream: true` or `tools` arrays for function calling.
-3. **Structured Outputs:** Utilize JSON mode or JSON schema response formats when precise downstream parsing is required.
+3. **Structured Outputs:** Use JSON mode or JSON schema response formats when precise downstream parsing is required.
 4. **Vision & Multimodal:** Pass image URLs or base64 data to vision-supported Grok models following standard message content block arrays.
 
 ## Completion Criteria

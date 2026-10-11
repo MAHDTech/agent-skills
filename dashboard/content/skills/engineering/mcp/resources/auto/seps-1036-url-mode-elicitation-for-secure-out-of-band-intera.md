@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **SEP**       | 1036                                                                                                                      |
-| **Title**     | URL Mode Elicitation for secure out-of-band interactions                                                                  |
-| **Status**    | Final                                                                                                                     |
-| **Type**      | Standards Track                                                                                                           |
-| **Created**   | 2025-07-22                                                                                                                |
+| Field | Value |
+| - | - |
+| **SEP** | 1036 |
+| **Title** | URL Mode Elicitation for secure out-of-band interactions |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-22 |
 | **Author(s)** | Nate Barbettini ([@nbarbettini](https://github.com/nbarbettini)) and Wils Dawson ([@wdawson](https://github.com/wdawson)) |
-| **Sponsor**   | None                                                                                                                      |
-| **PR**        | [#1036](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1036)                                           |
+| **Sponsor** | None |
+| **PR** | [#1036](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1036) |
 
 ***
 
@@ -127,11 +127,11 @@ The only change from the existing specification is the addition of a `mode` fiel
 
 URL elicitation requests **MUST** specify `mode: "url"` and include these parameters:
 
-| Name            | Type   | Description                                                        |
-| --------------- | ------ | ------------------------------------------------------------------ |
-| `url`           | string | The URL that the user should navigate to.                          |
-| `elicitationId` | string | A unique identifier for the elicitation.                           |
-| `message`       | string | A human-readable message explaining why the interaction is needed. |
+| Name | Type | Description |
+| - | - | - |
+| `url` | string | The URL that the user should navigate to. |
+| `elicitationId` | string | A unique identifier for the elicitation. |
+| `message` | string | A human-readable message explaining why the interaction is needed. |
 
 #### Example: OAuth Authorization Flow
 
@@ -342,3 +342,5 @@ This proposal builds upon and complements existing MCP security measures:
 * Works within the existing MCP authorization framework (MCP authorization is not affected by this proposal)
 * Follows Security Best Practices regarding token handling
 * Maintains separation of concerns between client-server and server-third-party authorization
+
+

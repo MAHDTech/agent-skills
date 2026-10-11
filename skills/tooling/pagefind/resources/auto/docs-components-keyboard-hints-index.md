@@ -3,7 +3,7 @@
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-keyboard-hints\>
+# <pagefind-keyboard-hints>
 
 
 Displays contextual keyboard shortcuts based on which component currently has focus.
@@ -44,3 +44,4 @@ The Component UI shortcuts are either the expected controls for WAI-ARIA pattern
 ### Touch Devices
 
 Keyboard hints are automatically hidden on touch-only devices.
+

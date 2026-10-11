@@ -13,7 +13,7 @@
 
 Explore a standard way for agents to report token usage when a prompt turn ends.
 
-This RFD is intentionally kept in Draft while token accounting semantics are still being refined. Session-level context window size and cumulative cost are covered separately in the [Session Context Size and Cost RFD](https://agentclientprotocol.com/rfds/session-usage).
+This RFD is intentionally kept in Draft while token accounting semantics are still being refined. Session-level context window size and cumulative cost are covered separately in the [Session Context Size and Cost RFD](/rfds/session-usage).
 
 ## Status quo
 
@@ -165,3 +165,6 @@ Context size and cost have a clear session-level contract. Token usage still nee
 ## Revision history
 
 * 2026-06-02: Split from the original combined session usage and context RFD for separate draft discussion.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

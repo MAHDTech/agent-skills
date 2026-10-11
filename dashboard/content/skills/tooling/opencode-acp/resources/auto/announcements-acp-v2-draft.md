@@ -26,11 +26,11 @@ export const Author = ({name, role, github}) => <div className="mt-8 border-t bo
 
 Today is a day the ACP team has been working towards for months, and we are excited to share the **first Draft of version 2 of the Agent Client Protocol**.
 
-Since releasing v1, we have been able to leverage the future-compatible nature of the protocol and our [RFD process](https://agentclientprotocol.com/rfds) to ship **15+ RFDs** and their related features. A huge thank you to everyone who made this possible, and also proof that we can evolve the protocol rapidly without needing a huge migration every few months.
+Since releasing v1, we have been able to leverage the future-compatible nature of the protocol and our [RFD process](/rfds) to ship **15+ RFDs** and their related features. A huge thank you to everyone who made this possible, and also proof that we can evolve the protocol rapidly without needing a huge migration every few months.
 
 However, it also became clear while working with v1 that **some** breaking changes would unlock new use cases and features that are hard to express in the protocol as it is today. v2 is all about making it possible to express more session states, consolidating on patterns we have found useful, and overall making everything more consistent.
 
-The goal was to avoid cramming as much as possible into a v2 and it never landing. So we are relying on our [RFD process](https://agentclientprotocol.com/rfds), that already worked so well in v1, to guide new features landing in both v1 and v2 as we move forward, and keep this release tightly focused on changing several core behaviors. If there is a new feature you really want, but don't see here, that doesn't mean it won't be added. We just wanted to decouple the release cadence for features that would remain optional or additive anyway.
+The goal was to avoid cramming as much as possible into a v2 and it never landing. So we are relying on our [RFD process](/rfds), that already worked so well in v1, to guide new features landing in both v1 and v2 as we move forward, and keep this release tightly focused on changing several core behaviors. If there is a new feature you really want, but don't see here, that doesn't mean it won't be added. We just wanted to decouple the release cadence for features that would remain optional or additive anyway.
 
 Our core design goal remains to provide as much freedom as possible to both agents and clients in their implementations, and agree on the semantically meaningful parts we need in order to do so. v2 enables allows even more flexibility in how an agent is able to work during a session, and also paves the way for new client patterns as well.
 
@@ -40,9 +40,9 @@ Our core design goal remains to provide as much freedom as possible to both agen
 
 When we launched ACP v1, most agents happily emitted events only after a user-initiated message and usually stopped once they finished generating. But these days, agents are able to work longer and even orchestrate more and more work in the background. While the ACP v1 spec didn't *prohibit* `session/update` notifications from coming outside of the turn, it was a common point of confusion for implementers, who usually wanted to guarantee interaction patterns around the idea of a user-initiated turn, but it is clear that enforcing this actually prevents useful behavior. An agent could be ready to receive new input while background events are happening, but it still wants to provide real-time updates for those as well. If we stick with a turn-focused orientation for prompts, neither side is happy.
 
-If we want to allow for queueing, steering, or receiving updates from work that isn't necessarily initiated by the user, we need to make it clearer that the prompt request/response doesn't own the entire lifecycle of work being done. Now `session/update` notifications can proceed freely at any point in the session, and a prompt response is the indication that the message was acknowledged by the agent, not the end of the turn. The agent will replay the user message where it inserted it, which also makes it easier for both replay and the potential for multiple clients observing the same session. The agent can indicate when it is "idle", or ready to receive new inputs, allowing the client to indicate readiness, and agents can continue to update the session state in the meantime.
+If we want to allow for queueing, steering, or receiving updates from work that isn't necessarily initiated by the user, we need to make it clearer that the prompt request/response doesn't own the entire lifecycle of work being done. Now `session/update` notifications can proceed freely at any point in the session, and a prompt response returns the `messageId` of the user message inserted into the conversation, not the end of the turn. The agent reports that user message through the update stream with the same ID, which also makes it easier for both replay of retained history and the potential for multiple clients observing the same session. The agent can indicate when it is "idle", or ready to receive new inputs, allowing the client to indicate readiness, and agents can continue to update the session state in the meantime.
 
-You can read more about this in the [new prompt lifecycle RFD](https://agentclientprotocol.com/rfds/v2/prompt).
+You can read more about this in the [new prompt lifecycle RFD](/rfds/v2/prompt).
 
 ### Updating Messages and Streaming Tool Calls
 
@@ -78,20 +78,23 @@ As you start implementing it, gate your implementation behind the version negoti
 
 Adding v2 support should not mean dropping v1. v1-only peers will remain common for some time, so implementers should support both versions side by side. We are working on making this easier to express in the various SDKs.
 
-A majority of the types haven't changed between versions, but if you maintain an Agent, Client, or SDK, the [migration guide](https://agentclientprotocol.com/protocol/v2/migration) walks through the key changes you need to know with before/after examples.
+A majority of the types haven't changed between versions, but if you maintain an Agent, Client, or SDK, the [migration guide](/protocol/v2/migration) walks through the key changes you need to know with before/after examples.
 
 ## Where to start
 
-* Read the [v2 protocol docs](https://agentclientprotocol.com/protocol/v2/overview) and the [migration guide](https://agentclientprotocol.com/protocol/v2/migration).
+* Read the [v2 protocol docs](/protocol/v2/overview) and the [migration guide](/protocol/v2/migration).
 * SDK authors can generate against the v2 JSON schemas, published in the repository releases as `v2.0.0-alphaX` alongside v1.
-* The [v2 RFD collection](https://agentclientprotocol.com/rfds/v2/overview) records the key decisions behind the larger changes.
+* The [v2 RFD collection](/rfds/v2/overview) records the key decisions behind the larger changes.
 
 ## We want your feedback
 
-This is exactly the moment where feedback has the most leverage. If something in v2 doesn't work for your implementation, tell us before it stabilizes: open an issue or discussion on [GitHub](https://github.com/agentclientprotocol/agent-client-protocol), or engage with the individual RFDs through the [RFD process](https://agentclientprotocol.com/rfds).
+This is exactly the moment where feedback has the most leverage. If something in v2 doesn't work for your implementation, tell us before it stabilizes: open an issue or discussion on [GitHub](https://github.com/agentclientprotocol/agent-client-protocol), or engage with the individual RFDs through the [RFD process](/rfds).
 
 I firmly believe v2 provides a much better foundation for us to build on. It incorporates all of the learnings we've gained in the past year, consolidates on some common patterns, and allows for much more flexibility as we all build our agentic future together.
 
 Overall, I am astounded by how many of you have been using ACP to build your agents, clients, and just about everything else you can imagine. It is a big tent, and every new use case or app that adopts it brings me joy. Your creativity keeps us going, and I am excited to see what you all can do with v2.
 
 <Author name="Ben Brandt" role="Zed Industries / ACP Lead Maintainer" github="https://github.com/benbrandt" />
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

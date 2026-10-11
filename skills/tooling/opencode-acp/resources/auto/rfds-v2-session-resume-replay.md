@@ -48,9 +48,13 @@ The initial replay cursor is:
 }
 ```
 
-`replayFrom: { "type": "start" }` means the Agent replays the whole
-conversation through `session/update` notifications before responding to the
+`replayFrom: { "type": "start" }` means the Agent replays all retained
+conversation history through `session/update` notifications before responding to the
 `session/resume` request.
+
+This does not require the Agent to retain every inserted user message.
+Live-only or discarded messages may be absent; retained user messages must
+preserve the ID returned on insertion, as defined by the [Prompt Lifecycle RFD](./prompt.mdx#correlation-and-replay).
 
 Replay cursors are inclusive: replay includes the position identified by the
 cursor. Future cursors that identify a message would replay that message before
@@ -93,3 +97,6 @@ An object leaves room for future cursor forms that need fields. The initial
 ## Revision history
 
 * 2026-07-02: Initial draft.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

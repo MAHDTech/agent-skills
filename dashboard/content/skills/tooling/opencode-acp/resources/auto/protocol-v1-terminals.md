@@ -19,13 +19,14 @@ The terminal methods allow Agents to execute shell commands within the Client's 
 
 ## Checking Support
 
-Before attempting to use terminal methods, Agents **MUST** verify that the Client supports this capability by checking the [Client Capabilities](https://agentclientprotocol.com/protocol/v1/initialization#client-capabilities) field in the `initialize` response:
+Before attempting to use terminal methods, Agents **MUST** verify that the Client supports this capability by checking the [Client Capabilities](/protocol/v1/initialization#client-capabilities) field in the Client's `initialize` request:
 
-```json highlight={7} theme={null}
+```json highlight={8} theme={null}
 {
   "jsonrpc": "2.0",
   "id": 0,
-  "result": {
+  "method": "initialize",
+  "params": {
     "protocolVersion": 1,
     "clientCapabilities": {
       "terminal": true
@@ -62,7 +63,7 @@ The `terminal/create` method starts a command in a new terminal:
 ```
 
 <ParamField path="sessionId" type="SessionId" required>
-  The [Session ID](https://agentclientprotocol.com/protocol/v1/session-setup#session-id) for this request
+  The [Session ID](/protocol/v1/session-setup#session-id) for this request
 </ParamField>
 
 <ParamField path="command" type="string" required>
@@ -121,7 +122,7 @@ After creating the terminal, the Agent can use the `terminal/wait_for_exit` meth
 
 ## Embedding in Tool Calls
 
-Terminals can be embedded directly in [tool calls](https://agentclientprotocol.com/protocol/v1/tool-calls) to provide real-time output to users:
+Terminals can be embedded directly in [tool calls](/protocol/v1/tool-calls) to provide real-time output to users:
 
 ```json theme={null}
 {
@@ -288,3 +289,6 @@ The `terminal/release` kills the command if still running and releases all resou
 After release the terminal ID becomes invalid for all other `terminal/*` methods.
 
 If the terminal was added to a tool call, the client **SHOULD** continue to display its output after release.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

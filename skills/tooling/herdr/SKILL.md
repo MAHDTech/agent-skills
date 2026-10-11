@@ -5,7 +5,7 @@ metadata:
   source: herdrdev/herdr
   license: MIT
 resources:
-  - https://herdr.dev/llms-full.txt
+  - https://herdr.dev/llms.txt
   - https://raw.githubusercontent.com/herdrdev/herdr/master/skills/herdr/SKILL.md
 ---
 
@@ -24,9 +24,9 @@ This skill serves two distinct roles:
 
 ## Progressive Disclosure & Reference Resources
 
-- **Full Documentation Index:** See [resources/auto/herdr-llms-full.txt](resources/auto/herdr-llms-full.txt) for the complete consolidated reference.
-- **Human Setup & Troubleshooting Guide:** See [resources/auto/herdr-agent-guide.md](resources/auto/herdr-agent-guide.md) for human onboarding, concept models, and diagnostic recipes.
-- **Upstream Agent Control Skill:** See [resources/auto/githubusercontent-herdrdev-herdr-master-skills-herdr-SKILL.md](resources/auto/githubusercontent-herdrdev-herdr-master-skills-herdr-SKILL.md) for the upstream agent skill file.
+- **Full Documentation Index:** See [resources/auto/llms-full.txt](resources/auto/llms-full.txt) for the complete consolidated reference.
+- **Human Setup & Troubleshooting Guide:** See [resources/auto/agent-guide.md](resources/auto/agent-guide.md) for human onboarding, concept models, and diagnostic recipes.
+- **Upstream Agent Control Skill:** See [resources/auto/herdrdev-herdr-master-skills-herdr-skill.md](resources/auto/herdrdev-herdr-master-skills-herdr-skill.md) for the upstream agent skill file.
 - **CLI Command Reference:** See [resources/auto/herdr-docs-cli-reference.md](resources/auto/herdr-docs-cli-reference.md) for full syntax of all CLI commands and JSON output structures.
 - **Configuration Reference:** See [resources/auto/herdr-docs-configuration.md](resources/auto/herdr-docs-configuration.md) for `config.toml` options and keybinding chords.
 - **Agent Integrations Reference:** See [resources/auto/herdr-docs-integrations.md](resources/auto/herdr-docs-integrations.md) for agent lifecycle detection and session restore plugins.

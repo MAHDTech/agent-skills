@@ -21,7 +21,7 @@ skill_name = "mcp"
 
 This document provides security considerations for the Model Context
 Protocol (MCP), complementing the
-[MCP Authorization](https://modelcontextprotocol.io/specification/latest/basic/authorization)
+[MCP Authorization](/specification/latest/basic/authorization)
 specification. This document identifies security risks, attack vectors,
 and best practices specific to MCP implementations.
 
@@ -161,7 +161,7 @@ possible:
    consent screen
 6. The MCP authorization code is redirected to the attacker's server
    (specified in the malicious `redirect_uri` parameter during
-   [dynamic client registration](https://modelcontextprotocol.io/specification/latest/basic/authorization#dynamic-client-registration))
+   [dynamic client registration](/specification/latest/basic/authorization#dynamic-client-registration))
 7. The attacker exchanges the stolen authorization code for access
    tokens for the MCP server without the user's explicit approval
 8. The attacker now has access to the third-party API as the compromised
@@ -316,7 +316,7 @@ This vulnerability has two critical dimensions:
 #### Risks
 
 Token passthrough is explicitly forbidden in the
-[authorization specification](https://modelcontextprotocol.io/specification/latest/basic/authorization)
+[authorization specification](/specification/latest/basic/authorization)
 as it introduces a number of security risks, that include:
 
 * **Security Control Circumvention**
@@ -497,7 +497,7 @@ DNS-based validation:
 
 SSRF risks are not limited to MCP clients. When an authorization
 server supports
-[Client ID Metadata Documents](https://modelcontextprotocol.io/specification/draft/basic/authorization/client-registration#client-id-metadata-documents),
+[Client ID Metadata Documents](/specification/draft/basic/authorization/client-registration#client-id-metadata-documents),
 the authorization server takes a URL as input from an unknown client
 and fetches that URL. A malicious client could use this to trigger
 the authorization server to make requests to arbitrary URLs, such as
@@ -527,7 +527,7 @@ in MCP clients.
 
 ### State Handle Hijacking
 
-MCP is [stateless](https://modelcontextprotocol.io/specification/draft/basic/index#statelessness) and
+MCP is [stateless](/specification/draft/basic/index#statelessness) and
 has no protocol-level sessions. Servers that need state spanning
 multiple requests mint an explicit handle, such as a shopping cart ID
 or a workflow ID, and receive it back as an ordinary tool argument on
@@ -558,7 +558,7 @@ identifiers that could be guessed by an attacker. Expiring handles can
 also reduce the risk.
 
 MCP servers **SHOULD** bind handles server-side to the authenticated
-user, for example by keying stored state as `<user_id>:<handle>` where
+user, for example by keying stored state as `\<user_id\>:\<handle\>` where
 the user ID is derived from the verified token rather than supplied by
 the client, and reject a handle presented by any other principal. This
 ensures that even if an attacker guesses a handle, they cannot
@@ -566,7 +566,7 @@ impersonate another user.
 
 For guidance on securing the server-assigned session IDs used by
 protocol version `2025-11-25` and earlier, see
-[Session Hijacking in the 2025-11-25 version of this page](https://modelcontextprotocol.io/docs/2025-11-25/tutorials/security/security_best_practices#session-hijacking).
+[Session Hijacking in the 2025-11-25 version of this page](/docs/2025-11-25/tutorials/security/security_best_practices#session-hijacking).
 
 ### Local MCP Server Compromise
 
@@ -819,7 +819,7 @@ authorization server (a mix-up attack, described in
 
 #### Mitigation
 
-[Authorization Response Validation](https://modelcontextprotocol.io/specification/draft/basic/authorization#authorization-response-validation)
+[Authorization Response Validation](/specification/draft/basic/authorization#authorization-response-validation)
 mitigates this by binding the response to the authorization server
 the client recorded before redirecting, so the authorization code
 cannot be redeemed at an unintended token endpoint. PKCE alone does
@@ -834,7 +834,7 @@ provides no protection against an honest server that does not.
 
 Native and locally-running MCP clients commonly use `localhost`
 redirect URIs. When clients identify themselves with
-[Client ID Metadata Documents](https://modelcontextprotocol.io/specification/draft/basic/authorization/client-registration#client-id-metadata-documents),
+[Client ID Metadata Documents](/specification/draft/basic/authorization/client-registration#client-id-metadata-documents),
 the metadata document proves control of a domain, but it cannot prove
 which local process is listening on a `localhost` redirect URI.
 
@@ -855,7 +855,7 @@ difficult.
 #### Mitigation
 
 See
-[Localhost Redirect URI Risks](https://modelcontextprotocol.io/specification/draft/basic/authorization/security-considerations#localhost-redirect-uri-risks)
+[Localhost Redirect URI Risks](/specification/draft/basic/authorization/security-considerations#localhost-redirect-uri-risks)
 in the authorization specification for the countermeasures expected
 of authorization servers, including displaying additional warnings for
 `localhost`-only redirect URIs and clearly displaying the redirect URI
@@ -864,7 +864,7 @@ hostname during authorization.
 ### CIMD Trust Policies
 
 Authorization servers that accept
-[Client ID Metadata Documents](https://modelcontextprotocol.io/specification/draft/basic/authorization/client-registration#client-id-metadata-documents)
+[Client ID Metadata Documents](/specification/draft/basic/authorization/client-registration#client-id-metadata-documents)
 can apply domain-based trust policies to decide which URL-based
 client IDs to accept:
 
@@ -876,7 +876,7 @@ client IDs to accept:
   to prevent phishing
 
 Servers maintain full control over their access policies. See
-[Trust Policies](https://modelcontextprotocol.io/specification/draft/basic/authorization/security-considerations#trust-policies)
+[Trust Policies](/specification/draft/basic/authorization/security-considerations#trust-policies)
 in the authorization specification, along with
 [Section 6.4](https://www.ietf.org/archive/id/draft-ietf-oauth-client-id-metadata-document-00.html#section-6.4)
 and
@@ -949,7 +949,7 @@ Client guidance:
 
 When the initial `WWW-Authenticate` challenge carries no `scope`
 parameter, the
-[Scope Selection Strategy](https://modelcontextprotocol.io/specification/draft/basic/authorization#scope-selection-strategy)
+[Scope Selection Strategy](/specification/draft/basic/authorization#scope-selection-strategy)
 directs clients to fall back to requesting all scopes listed in
 `scopes_supported`. This approach accommodates the general-purpose
 nature of MCP clients, which typically lack domain-specific knowledge
@@ -964,7 +964,7 @@ least privilege.
   **SHOULD** compute the union of previously requested scopes and newly
   challenged scopes when initiating re-authorization, as described in [Step-Up
   Authorization
-  Flow](https://modelcontextprotocol.io/specification/draft/basic/authorization#step-up-authorization-flow).
+  Flow](/specification/draft/basic/authorization#step-up-authorization-flow).
   This allows servers to remain stateless with respect to client scope sets
   while ensuring clients do not lose previously granted permissions.
 </Note>
@@ -994,3 +994,5 @@ least privilege.
 
 Proper minimization constrains compromise impact, improves audit
 clarity, and reduces consent churn.
+
+

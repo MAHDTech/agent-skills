@@ -25,7 +25,7 @@ The protocol follows the [JSON-RPC 2.0](https://www.jsonrpc.org/specification) s
 * **Notifications**: One-way messages that don't expect a response
 
 ACP follows JSON-RPC 2.0 batch behavior. See
-[Transports](https://agentclientprotocol.com/protocol/v2/transports#json-rpc-batch-messages) for batch
+[Transports](/protocol/v2/transports#json-rpc-batch-messages) for batch
 handling requirements.
 
 ## Message Flow
@@ -62,7 +62,7 @@ Agents are programs that use generative AI to autonomously modify code. They typ
 Some baseline methods belong to optional surfaces. An Agent that returns one or more valid entries in `authMethods` **MUST** implement both `auth/login` and `auth/logout`. If `authMethods` is omitted or empty, Clients **MUST NOT** call either method.
 
 <ResponseField name="initialize" post={[<a href="/protocol/v2/schema#initialize">Schema</a>]}>
-  [Negotiate versions and exchange capabilities.](https://agentclientprotocol.com/protocol/v2/initialization).
+  [Negotiate versions and exchange capabilities.](/protocol/v2/initialization).
 </ResponseField>
 
 <ResponseField name="auth/login" post={[<a href="/protocol/v2/schema#auth%2Flogin">Schema</a>]}>
@@ -71,36 +71,36 @@ Some baseline methods belong to optional surfaces. An Agent that returns one or 
 
 <ResponseField name="auth/logout" post={[<a href="/protocol/v2/schema#auth%2Flogout">Schema</a>]}>
   [End the current authenticated
-  state](https://agentclientprotocol.com/protocol/v2/authentication#logging-out).
+  state](/protocol/v2/authentication#logging-out).
 </ResponseField>
 
 <ResponseField name="session/new" post={[<a href="/protocol/v2/schema#session%2Fnew">Schema</a>]}>
   [Create a new conversation
-  session](https://agentclientprotocol.com/protocol/v2/session-setup#creating-a-session).
+  session](/protocol/v2/session-setup#creating-a-session).
 </ResponseField>
 
 <ResponseField name="session/prompt" post={[<a href="/protocol/v2/schema#session%2Fprompt">Schema</a>]}>
-  [Send user prompts](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#1-user-message) to the
+  [Send user prompts](/protocol/v2/prompt-lifecycle#1-user-message) to the
   Agent.
 </ResponseField>
 
 <ResponseField name="session/list" post={[<a href="/protocol/v2/schema#session%2Flist">Schema</a>]}>
-  [List known sessions](https://agentclientprotocol.com/protocol/v2/session-list).
+  [List known sessions](/protocol/v2/session-list).
 </ResponseField>
 
 <ResponseField name="session/resume" post={[<a href="/protocol/v2/schema#session%2Fresume">Schema</a>]}>
   [Resume an existing session, optionally replaying
-  history](https://agentclientprotocol.com/protocol/v2/session-setup#resuming-sessions).
+  history](/protocol/v2/session-setup#resuming-sessions).
 </ResponseField>
 
 <ResponseField name="session/close" post={[<a href="/protocol/v2/schema#session%2Fclose">Schema</a>]}>
-  [Close an active session](https://agentclientprotocol.com/protocol/v2/session-setup#closing-active-sessions).
+  [Close an active session](/protocol/v2/session-setup#closing-active-sessions).
 </ResponseField>
 
 ### Notifications
 
 <ResponseField name="session/cancel" post={[<a href="/protocol/v2/schema#session%2Fcancel">Schema</a>]}>
-  [Cancel ongoing operations](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation) (no
+  [Cancel ongoing operations](/protocol/v2/prompt-lifecycle#cancellation) (no
   response expected).
 </ResponseField>
 
@@ -111,14 +111,14 @@ Clients provide the interface between users and agents. They are typically code 
 ### Baseline Methods
 
 <ResponseField name="session/request_permission" post={[<a href="/protocol/v2/schema#session%2Frequest_permission">Schema</a>]}>
-  [Request user authorization](https://agentclientprotocol.com/protocol/v2/tool-calls#requesting-permission)
+  [Request user authorization](/protocol/v2/tool-calls#requesting-permission)
   for operations such as tool calls and commands.
 </ResponseField>
 
 ### Optional Methods
 
 <ResponseField name="elicitation/create" post={[<a href="/protocol/v2/schema#elicitation%2Fcreate">Schema</a>]}>
-  [Request structured information from the user](https://agentclientprotocol.com/protocol/v2/elicitation)
+  [Request structured information from the user](/protocol/v2/elicitation)
   (requires the matching `elicitation` mode capability).
 </ResponseField>
 
@@ -126,18 +126,20 @@ Clients provide the interface between users and agents. They are typically code 
 
 <ResponseField name="elicitation/complete" post={[<a href="/protocol/v2/schema#elicitation%2Fcomplete">Schema</a>]}>
   [Report completion of an out-of-band URL
-  interaction](https://agentclientprotocol.com/protocol/v2/elicitation#url-completion) (no response expected).
+  interaction](/protocol/v2/elicitation#url-completion) (no response expected).
 </ResponseField>
 
 <ResponseField name="session/update" post={[<a href="/protocol/v2/schema#session%2Fupdate">Schema</a>]}>
-  [Send session updates](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#3-agent-reports-output)
+  [Send session updates](/protocol/v2/prompt-lifecycle#3-agent-reports-output)
   to inform the Client of changes (no response expected). This includes [message
-  updates and chunks](https://agentclientprotocol.com/protocol/v2/content), [tool calls, updates, and content
-  chunks](https://agentclientprotocol.com/protocol/v2/tool-calls), [display-only terminal state and output
-  chunks](https://agentclientprotocol.com/protocol/v2/tool-calls#display-only-terminals),
-  [plans](https://agentclientprotocol.com/protocol/v2/agent-plan), [available commands
-  updates](https://agentclientprotocol.com/protocol/v2/slash-commands#advertising-commands), and [config option
-  updates](https://agentclientprotocol.com/protocol/v2/session-config-options#from-the-agent).
+  updates and chunks](/protocol/v2/content), [tool calls, updates, and content
+  chunks](/protocol/v2/tool-calls), [display-only terminal state and output
+  chunks](/protocol/v2/tool-calls#display-only-terminals),
+  [plans](/protocol/v2/agent-plan), [available commands
+  updates](/protocol/v2/slash-commands#advertising-commands), [config option
+  updates](/protocol/v2/session-config-options#from-the-agent), [context
+  compactions](/protocol/v2/prompt-lifecycle#session-compaction), and
+  [user-facing notices](/protocol/v2/prompt-lifecycle#session-notices).
 </ResponseField>
 
 ## Argument requirements
@@ -167,11 +169,15 @@ The protocol provides built-in mechanisms for adding custom functionality while 
 * Create custom methods by prefixing their name with underscore (`_`)
 * Advertise custom capabilities during initialization
 
-Learn about [protocol extensibility](https://agentclientprotocol.com/protocol/v2/extensibility) to understand how to use these mechanisms.
+Learn about [protocol extensibility](/protocol/v2/extensibility) to understand how to use these mechanisms.
 
 ## Next Steps
 
-* Learn about [Initialization](https://agentclientprotocol.com/protocol/v2/initialization) to understand version and capability negotiation
-* Understand [Session Setup](https://agentclientprotocol.com/protocol/v2/session-setup) for creating and loading sessions
-* Review the [Prompt Lifecycle](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle)
-* Explore [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility) to add custom features
+* Learn about [Initialization](/protocol/v2/initialization) to understand version and capability negotiation
+* Understand [Session Setup](/protocol/v2/session-setup) for creating and loading sessions
+* Review the [Prompt Lifecycle](/protocol/v2/prompt-lifecycle)
+* Explore [Extensibility](/protocol/v2/extensibility) to add custom features
+* Check your agent implementation with the [Test Compatibility Kit](/libraries/testing)
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

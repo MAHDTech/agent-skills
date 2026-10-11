@@ -21,4 +21,7 @@ The ACP Registry RFD has moved to Completed and the initial version of the regis
 
 The registry gives ACP clients a standard way to discover, install, and configure compatible agents. It introduces a curated catalog and a shared manifest format so editors and other clients do not need to invent their own integration metadata.
 
-If you want to explore the shipped experience, start with [ACP Registry](https://agentclientprotocol.com/get-started/registry). For the design history and rationale, see the [ACP Agent Registry RFD](https://agentclientprotocol.com/rfds/acp-agent-registry).
+If you want to explore the shipped experience, start with [ACP Registry](/get-started/registry). For the design history and rationale, see the [ACP Agent Registry RFD](/rfds/acp-agent-registry).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

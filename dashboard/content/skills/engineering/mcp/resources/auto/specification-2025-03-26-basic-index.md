@@ -109,7 +109,7 @@ batches, but **MUST** support receiving JSON-RPC batches.
 
 ## Auth
 
-MCP provides an [Authorization](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization) framework for use with HTTP.
+MCP provides an [Authorization](/specification/2025-03-26/basic/authorization) framework for use with HTTP.
 Implementations using an HTTP-based transport **SHOULD** conform to this specification,
 whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
 and instead retrieve credentials from the environment.
@@ -132,3 +132,5 @@ There is also a
 [JSON Schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/2025-03-26/schema.json),
 which is automatically generated from the TypeScript source of truth, for use with
 various automated tooling.
+
+

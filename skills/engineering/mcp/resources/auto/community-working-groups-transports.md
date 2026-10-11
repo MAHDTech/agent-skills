@@ -28,7 +28,7 @@ within these boundaries.
 * **Transport Bindings**: Framing, delivery, request and envelope metadata,
   cancellation and termination, connection lifecycle, backward compatibility, and
   the behavior of existing and future MCP transports. The current specification's
-  [transport overview](https://modelcontextprotocol.io/specification/draft/basic/transports) defines the boundary
+  [transport overview](/specification/draft/basic/transports) defines the boundary
   between a transport binding and core protocol semantics.
 * **Scalability and Reliability**: Transport-level connection management, resource
   efficiency, multiplexing, load distribution, error handling, reconnection,
@@ -68,17 +68,17 @@ provides supporting context but cannot expand the boundaries in this charter.
 
 ### Related Groups
 
-* **[SDK WG](https://modelcontextprotocol.io/community/working-groups/sdk)**: Official SDKs implement transport
+* **[SDK WG](/community/working-groups/sdk)**: Official SDKs implement transport
   changes; the groups coordinate on feasibility, reference implementations, and
   rollout sequencing.
-* **[Agents WG](https://modelcontextprotocol.io/community/working-groups/agents)**: The Agents WG owns Tasks and
+* **[Agents WG](/community/working-groups/agents)**: The Agents WG owns Tasks and
   durable execution; the groups coordinate where these depend on multi-round-trip
   requests, request association, stateless operation, or binding behavior.
-* **[Triggers and Events WG](https://modelcontextprotocol.io/community/working-groups/triggers-events)**: Event
+* **[Triggers and Events WG](/community/working-groups/triggers-events)**: Event
   callbacks, subscriptions, and application-level delivery semantics are owned by that
   group; Transports owns binding-specific carriage and guarantees.
-* **[Auth IG](https://modelcontextprotocol.io/community/interest-groups/auth)** and
-  **[Security IG](https://modelcontextprotocol.io/community/interest-groups/security)**: The groups coordinate on
+* **[Auth IG](/community/interest-groups/auth)** and
+  **[Security IG](/community/interest-groups/security)**: The groups coordinate on
   credential carriage and transport wire security while authorization mechanics and
   broader security requirements remain with the respective IGs.
 
@@ -89,16 +89,16 @@ The current WG Lead is
 
 ## Authority & Decision Rights
 
-| Decision Type                       | Authority Level                                        |
-| ----------------------------------- | ------------------------------------------------------ |
-| Meeting logistics & scheduling      | WG Leads (autonomous)                                  |
-| Proposal prioritization within WG   | WG Leads (autonomous)                                  |
-| SEP triage & closure (in scope)     | WG Leads (autonomous, with documented rationale)       |
-| Technical design within scope       | WG consensus                                           |
-| Spec changes (additive)             | WG consensus → Core Maintainer approval                |
+| Decision Type | Authority Level |
+| - | - |
+| Meeting logistics & scheduling | WG Leads (autonomous) |
+| Proposal prioritization within WG | WG Leads (autonomous) |
+| SEP triage & closure (in scope) | WG Leads (autonomous, with documented rationale) |
+| Technical design within scope | WG consensus |
+| Spec changes (additive) | WG consensus → Core Maintainer approval |
 | Spec changes (breaking/fundamental) | WG consensus → Core Maintainer approval + wider review |
-| Scope expansion                     | Core Maintainer approval required                      |
-| WG Member approval                  | WG Member sponsors                                     |
+| Scope expansion | Core Maintainer approval required |
+| WG Member approval | WG Member sponsors |
 
 ## Membership
 
@@ -121,7 +121,7 @@ Work follows a problem-first workflow:
 3. Review and iterate on the solution to address WG feedback.
 4. After the WG reaches consensus under its decision-making process, present the
    solution to Core Maintainers as an SEP through the
-   [SEP process](https://modelcontextprotocol.io/community/sep-guidelines).
+   [SEP process](/community/sep-guidelines).
 
 ## Resources
 
@@ -149,6 +149,7 @@ and the [`roadmaps/` directory](https://github.com/modelcontextprotocol/transpor
 
 ## Changelog
 
-| Date       | Change          |
-| ---------- | --------------- |
+| Date | Change |
+| - | - |
 | 2026-08-23 | Initial charter |
+

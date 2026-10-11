@@ -1,116 +1,66 @@
-Version: 2.0.0
-
-On this page
-
-The HTTP endpoints in `/v1/identity` allow clients to generate and
-manage Spacetime public identities and private tokens.
-
-## At a glance
-
-| Route | Description |
-|----|----|
-| [`POST /v1/identity`](#post-v1identity) | Generate a new identity and token. |
-| [`POST /v1/identity/websocket-token`](#post-v1identitywebsocket-token) | Generate a short-lived access token for use in untrusted contexts. |
-| [`GET /v1/identity/public-key`](#get-v1identitypublic-key) | Get the public key used for verifying tokens. |
-| [`GET /v1/identity/:identity/databases`](#get-v1identityidentitydatabases) | List databases owned by an identity. |
-| [`GET /v1/identity/:identity/verify`](#get-v1identityidentityverify) | Verify an identity and token. |
-
-## `POST /v1/identity`
-
-Create a new identity.
-
-#### Returns
-
-Returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{
-    "identity": string,
-    "token": string
-}
-```
-
-## `POST /v1/identity/websocket-token`
-
-Generate a short-lived access token which can be used in untrusted
-contexts, e.g. embedded in URLs.
-
-#### Required Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [encoded as Bearer authorization](https://spacetimedb.com/docs/http/authorization). |
-
-#### Returns
-
-Returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{
-    "token": string
-}
-```
-
-The `token` value is a short-lived [JSON Web
-Token](https://datatracker.ietf.org/doc/html/rfc7519).
-
-## `GET /v1/identity/public-key`
-
-Fetches the public key used by the database to verify tokens.
-
-#### Returns
-
-Returns a response of content-type `application/pem-certificate-chain`.
-
-## `GET /v1/identity/:identity/databases`
-
-List all databases owned by an identity.
-
-#### Parameters
-
-| Name        | Value                 |
-|-------------|-----------------------|
-| `:identity` | A Spacetime identity. |
-
-#### Returns
-
-Returns JSON in the form:
-
-``` codeBlockStandalone_LlrK
-{
-    "identities": array<string>
-}
-```
-
-The `identities` value is an array of zero or more strings, each of
-which is the identity of a database owned by the identity passed as a
-parameter.
-
-## `GET /v1/identity/:identity/verify`
-
-Verify the validity of an identity/token pair.
-
-#### Parameters
-
-| Name        | Value                   |
-|-------------|-------------------------|
-| `:identity` | The identity to verify. |
-
-#### Required Headers
-
-| Name | Value |
-|----|----|
-| `Authorization` | A Spacetime token [encoded as Bearer authorization](https://spacetimedb.com/docs/http/authorization). |
-
-#### Returns
-
-Returns no data.
-
-If the token is valid and matches the identity, returns
-`204 No Content`.
-
-If the token is valid but does not match the identity, returns
-`400 Bad Request`.
-
-If the token is invalid, or no `Authorization` header is included in the
-request, returns `401 Unauthorized`.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/reference/http-api/identity" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">/v1/identity | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/http/identity"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="/v1/identity | SpacetimeDB docs"><meta data-rh="true" name="description" content="The HTTP endpoints in /v1/identity allow clients to generate and manage Spacetime public identities and private tokens."><meta data-rh="true" property="og:description" content="The HTTP endpoints in /v1/identity allow clients to generate and manage Spacetime public identities and private tokens."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/http/identity"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/http/identity" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/http/identity" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"/v1/identity","item":"https://spacetimedb.com/docs/http/identity"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/http/identity">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/http/identity">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/http/identity">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/cli-reference"><span title="CLI Reference" class="categoryLinkLabel_HATI">CLI Reference</span></a><button aria-label="Expand sidebar category &#x27;CLI Reference&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/resources/mcp"><span title="MCP Reference" class="linkLabel_UvDg">MCP Reference</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/http/authorization"><span title="HTTP API" class="categoryLinkLabel_HATI">HTTP API</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/http/authorization"><span title="Authorization" class="linkLabel_UvDg">Authorization</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/http/identity"><span title="/v1/identity" class="linkLabel_UvDg">/v1/identity</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/http/database"><span title="/v1/database" class="linkLabel_UvDg">/v1/database</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/webassembly-abi"><span title="Internals" class="categoryLinkLabel_HATI">Internals</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/reference/sql"><span title="SQL Reference" class="linkLabel_UvDg">SQL Reference</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">References</span></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">HTTP API</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">/v1/identity</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\><code>/v1/identity</code></h1></header>
+<p>The HTTP endpoints in <code>/v1/identity</code> allow clients to generate and manage Spacetime public identities and private tokens.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="at-a-glance">At a glance<a href="#at-a-glance" class="hash-link" aria-label="Direct link to At a glance" title="Direct link to At a glance" translate="no">​</a></h2>
+<table><thead><tr><th>Route</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#post-v1identity" class=""><code>POST /v1/identity</code></a></td><td>Generate a new identity and token.</td></tr><tr><td><a href="#post-v1identitywebsocket-token" class=""><code>POST /v1/identity/websocket-token</code></a></td><td>Generate a short-lived access token for use in untrusted contexts.</td></tr><tr><td><a href="#get-v1identitypublic-key" class=""><code>GET /v1/identity/public-key</code></a></td><td>Get the public key used for verifying tokens.</td></tr><tr><td><a href="#get-v1identityidentitydatabases" class=""><code>GET /v1/identity/:identity/databases</code></a></td><td>List databases owned by an identity.</td></tr><tr><td><a href="#get-v1identityidentityverify" class=""><code>GET /v1/identity/:identity/verify</code></a></td><td>Verify an identity and token.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1identity"><code>POST /v1/identity</code><a href="#post-v1identity" class="hash-link" aria-label="Direct link to post-v1identity" title="Direct link to post-v1identity" translate="no">​</a></h2>
+<p>Create a new identity.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns">Returns<a href="#returns" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">identity</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">token</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="post-v1identitywebsocket-token"><code>POST /v1/identity/websocket-token</code><a href="#post-v1identitywebsocket-token" class="hash-link" aria-label="Direct link to post-v1identitywebsocket-token" title="Direct link to post-v1identitywebsocket-token" translate="no">​</a></h2>
+<p>Generate a short-lived access token which can be used in untrusted contexts, e.g. embedded in URLs.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="required-headers">Required Headers<a href="#required-headers" class="hash-link" aria-label="Direct link to Required Headers" title="Direct link to Required Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization">encoded as Bearer authorization</a>.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-1">Returns<a href="#returns-1" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">token</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: string</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>token</code> value is a short-lived <a href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener noreferrer" class="">JSON Web Token</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1identitypublic-key"><code>GET /v1/identity/public-key</code><a href="#get-v1identitypublic-key" class="hash-link" aria-label="Direct link to get-v1identitypublic-key" title="Direct link to get-v1identitypublic-key" translate="no">​</a></h2>
+<p>Fetches the public key used by the database to verify tokens.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-2">Returns<a href="#returns-2" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns a response of content-type <code>application/pem-certificate-chain</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1identityidentitydatabases"><code>GET /v1/identity/:identity/databases</code><a href="#get-v1identityidentitydatabases" class="hash-link" aria-label="Direct link to get-v1identityidentitydatabases" title="Direct link to get-v1identityidentitydatabases" translate="no">​</a></h2>
+<p>List all databases owned by an identity.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="parameters">Parameters<a href="#parameters" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>:identity</code></td><td>A Spacetime identity.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-3">Returns<a href="#returns-3" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns JSON in the form:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">identities</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">: array</span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2">string</span><span style="color:#FF79C6">></span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>identities</code> value is an array of zero or more strings, each of which is the identity of a database owned by the identity passed as a parameter.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="get-v1identityidentityverify"><code>GET /v1/identity/:identity/verify</code><a href="#get-v1identityidentityverify" class="hash-link" aria-label="Direct link to get-v1identityidentityverify" title="Direct link to get-v1identityidentityverify" translate="no">​</a></h2>
+<p>Verify the validity of an identity/token pair.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="parameters-1">Parameters<a href="#parameters-1" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>:identity</code></td><td>The identity to verify.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="required-headers-1">Required Headers<a href="#required-headers-1" class="hash-link" aria-label="Direct link to Required Headers" title="Direct link to Required Headers" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Value</th></tr></thead>\<tbody\><tr><td><code>Authorization</code></td><td>A Spacetime token <a class="" href="/docs/http/authorization">encoded as Bearer authorization</a>.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="returns-4">Returns<a href="#returns-4" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns" translate="no">​</a></h4>
+<p>Returns no data.</p>
+<p>If the token is valid and matches the identity, returns <code>204 No Content</code>.</p>
+<p>If the token is valid but does not match the identity, returns <code>400 Bad Request</code>.</p>
+<p>If the token is invalid, or no <code>Authorization</code> header is included in the request, returns <code>401 Unauthorized</code>.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00200-reference/00200-http-api/00200-identity.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/http/authorization"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Authorization</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/http/database"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">/v1/database</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#at-a-glance" class="table-of-contents__link toc-highlight">At a glance</a></li>\<li\><a href="#post-v1identity" class="table-of-contents__link toc-highlight"><code>POST /v1/identity</code></a></li>\<li\><a href="#post-v1identitywebsocket-token" class="table-of-contents__link toc-highlight"><code>POST /v1/identity/websocket-token</code></a></li>\<li\><a href="#get-v1identitypublic-key" class="table-of-contents__link toc-highlight"><code>GET /v1/identity/public-key</code></a></li>\<li\><a href="#get-v1identityidentitydatabases" class="table-of-contents__link toc-highlight"><code>GET /v1/identity/:identity/databases</code></a></li>\<li\><a href="#get-v1identityidentityverify" class="table-of-contents__link toc-highlight"><code>GET /v1/identity/:identity/verify</code></a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

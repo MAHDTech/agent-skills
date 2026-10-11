@@ -15,9 +15,9 @@ skill_name = "opencode-acp"
 
 > Creating and loading sessions
 
-Sessions represent a specific conversation or thread between the [Client](https://agentclientprotocol.com/protocol/v1/overview#client) and [Agent](https://agentclientprotocol.com/protocol/v1/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
+Sessions represent a specific conversation or thread between the [Client](/protocol/v1/overview#client) and [Agent](/protocol/v1/overview#agent). Each session maintains its own context, conversation history, and state, allowing multiple independent interactions with the same Agent.
 
-Before creating a session, Clients **MUST** first complete the [initialization](https://agentclientprotocol.com/protocol/v1/initialization) phase to establish protocol compatibility and capabilities.
+Before creating a session, Clients **MUST** first complete the [initialization](/protocol/v1/initialization) phase to establish protocol compatibility and capabilities.
 
 <br />
 
@@ -145,6 +145,17 @@ To load an existing session, Clients **MUST** call the `session/load` method wit
 
 The Agent **MUST** replay the entire conversation to the Client in the form of `session/update` notifications (like `session/prompt`).
 
+[Session compactions](/protocol/v1/prompt-turn#session-compaction) are
+replayed using the same update, chunk, and patch semantics as live delivery.
+The Client's `session.compaction` capability is required for replay as well as
+live delivery.
+
+Live-only [notices](/protocol/v1/prompt-turn#session-notices) are not
+conversation history and **SHOULD NOT** be replayed. If the underlying
+condition is still relevant after loading finishes, the Agent may emit a new
+notice as a new live event, subject to the Client's `session.notices`
+capability.
+
 For example, a user message from the conversation history:
 
 ```json theme={null}
@@ -193,7 +204,7 @@ When **all** the conversation entries have been streamed to the Client, the Agen
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "result": null
+  "result": {}
 }
 ```
 
@@ -308,7 +319,7 @@ To close an active session, Clients **MUST** call the `session/close` method wit
   The ID of the active session to close.
 </ParamField>
 
-The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation) had been called, then free the resources associated with the session.
+The Agent **MUST** cancel any ongoing work for that session as if [`session/cancel`](/protocol/v1/prompt-turn#cancellation) had been called, then free the resources associated with the session.
 
 On success, the Agent responds with an empty result object:
 
@@ -558,3 +569,6 @@ If `mcpCapabilities.sse` is `false` or not present, the Agent does not support S
 Agents **SHOULD** connect to all MCP servers specified by the Client.
 
 Clients **MAY** use this ability to provide tools directly to the underlying language model by including their own MCP server.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

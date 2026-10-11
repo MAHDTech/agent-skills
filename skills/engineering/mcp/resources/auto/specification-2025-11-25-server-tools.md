@@ -55,7 +55,7 @@ available tools changes.
 ### Listing Tools
 
 To discover available tools, clients send a `tools/list` request. This operation supports
-[pagination](https://modelcontextprotocol.io/specification/2025-11-25/server/utilities/pagination).
+[pagination](/specification/2025-11-25/server/utilities/pagination).
 
 **Request:**
 
@@ -196,18 +196,18 @@ A tool definition includes:
 * `description`: Human-readable description of functionality
 * `icons`: Optional array of icons for display in user interfaces
 * `inputSchema`: JSON Schema defining expected parameters
-  * Follows the [JSON Schema usage guidelines](https://modelcontextprotocol.io/specification/2025-11-25/basic#json-schema-usage)
+  * Follows the [JSON Schema usage guidelines](/specification/2025-11-25/basic#json-schema-usage)
   * Defaults to 2020-12 if no `$schema` field is present
   * **MUST** be a valid JSON Schema object (not `null`)
   * For tools with no parameters, use one of these valid approaches:
     * `{ "type": "object", "additionalProperties": false }` - **Recommended**: explicitly accepts only empty objects
     * `{ "type": "object" }` - accepts any object (including with properties)
 * `outputSchema`: Optional JSON Schema defining expected output structure
-  * Follows the [JSON Schema usage guidelines](https://modelcontextprotocol.io/specification/2025-11-25/basic#json-schema-usage)
+  * Follows the [JSON Schema usage guidelines](/specification/2025-11-25/basic#json-schema-usage)
   * Defaults to 2020-12 if no `$schema` field is present
 * `annotations`: Optional properties describing tool behavior
 * `execution`: Optional object describing execution-related properties
-  * `taskSupport`: Indicates whether this tool supports [task-augmented execution](https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/tasks#tool-level-negotiation). Values: `"forbidden"` (default), `"optional"`, or `"required"`
+  * `taskSupport`: Indicates whether this tool supports [task-augmented execution](/specification/2025-11-25/basic/utilities/tasks#tool-level-negotiation). Values: `"forbidden"` (default), `"optional"`, or `"required"`
 
 \<Warning\>
   For trust & safety and security, clients **MUST** consider tool annotations to
@@ -236,7 +236,7 @@ Tool results may contain [**structured**](#structured-content) or **unstructured
 \<Note\>
   All content types (text, image, audio, resource links, and embedded resources)
   support optional
-  [annotations](https://modelcontextprotocol.io/specification/2025-11-25/server/resources#annotations) that
+  [annotations](/specification/2025-11-25/server/resources#annotations) that
   provide metadata about audience, priority, and modification times. This is the
   same annotation format used by resources and prompts.
 </Note>
@@ -276,7 +276,7 @@ Tool results may contain [**structured**](#structured-content) or **unstructured
 
 #### Resource Links
 
-A tool **MAY** return links to [Resources](https://modelcontextprotocol.io/specification/2025-11-25/server/resources), to provide additional context
+A tool **MAY** return links to [Resources](/specification/2025-11-25/server/resources), to provide additional context
 or data. In this case, the tool will return a URI that can be subscribed to or fetched by the client:
 
 ```json theme={null}
@@ -289,17 +289,17 @@ or data. In this case, the tool will return a URI that can be subscribed to or f
 }
 ```
 
-Resource links support the same [Resource annotations](https://modelcontextprotocol.io/specification/2025-11-25/server/resources#annotations) as regular resources to help clients understand how to use them.
+Resource links support the same [Resource annotations](/specification/2025-11-25/server/resources#annotations) as regular resources to help clients understand how to use them.
 
-\<Info\>
+<Info>
   Resource links returned by tools are not guaranteed to appear in the results
   of a `resources/list` request.
 </Info>
 
 #### Embedded Resources
 
-[Resources](https://modelcontextprotocol.io/specification/2025-11-25/server/resources) **MAY** be embedded to provide additional context
-or data using a suitable [URI scheme](specification-2025-11-25-server-resources.md#common-uri-schemes). Servers that use embedded resources **SHOULD** implement the `resources` capability:
+[Resources](/specification/2025-11-25/server/resources) **MAY** be embedded to provide additional context
+or data using a suitable [URI scheme](./resources#common-uri-schemes). Servers that use embedded resources **SHOULD** implement the `resources` capability:
 
 ```json theme={null}
 {
@@ -317,7 +317,7 @@ or data using a suitable [URI scheme](specification-2025-11-25-server-resources.
 }
 ```
 
-Embedded resources support the same [Resource annotations](https://modelcontextprotocol.io/specification/2025-11-25/server/resources#annotations) as regular resources to help clients understand how to use them.
+Embedded resources support the same [Resource annotations](/specification/2025-11-25/server/resources#annotations) as regular resources to help clients understand how to use them.
 
 #### Structured Content
 
@@ -461,7 +461,7 @@ Tools use two error reporting mechanisms:
 
 1. **Protocol Errors**: Standard JSON-RPC errors for issues like:
    * Unknown tools
-   * Malformed requests (requests that fail to satisfy [CallToolRequest schema](https://modelcontextprotocol.io/specification/2025-11-25/schema#calltoolrequest))
+   * Malformed requests (requests that fail to satisfy [CallToolRequest schema](/specification/2025-11-25/schema#calltoolrequest))
    * Server errors
 
 2. **Tool Execution Errors**: Reported in tool results with `isError: true`:
@@ -520,3 +520,4 @@ Example tool execution error (input validation):
    * Validate tool results before passing to LLM
    * Implement timeouts for tool calls
    * Log tool usage for audit purposes
+

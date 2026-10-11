@@ -87,7 +87,7 @@ either, or both:
 ### Listing Resources
 
 To discover available resources, clients send a `resources/list` request. This operation
-supports [pagination](https://modelcontextprotocol.io/specification/2025-11-25/server/utilities/pagination).
+supports [pagination](/specification/2025-11-25/server/utilities/pagination).
 
 **Request:**
 
@@ -169,7 +169,7 @@ To retrieve resource contents, clients send a `resources/read` request:
 
 Resource templates allow servers to expose parameterized resources using
 [URI templates](https://datatracker.ietf.org/doc/html/rfc6570). Arguments may be
-auto-completed through [the completion API](https://modelcontextprotocol.io/specification/2025-11-25/server/utilities/completion).
+auto-completed through [the completion API](/specification/2025-11-25/server/utilities/completion).
 
 **Request:**
 
@@ -412,3 +412,4 @@ Example error:
 2. Access controls **SHOULD** be implemented for sensitive resources
 3. Binary data **MUST** be properly encoded
 4. Resource permissions **SHOULD** be checked before operations
+

@@ -15,7 +15,7 @@ skill_name = "opencode-acp"
 
 > How all Agent Client Protocol connections begin
 
-The Initialization phase allows [Clients](https://agentclientprotocol.com/protocol/v2/overview#client) and [Agents](https://agentclientprotocol.com/protocol/v2/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
+The Initialization phase allows [Clients](/protocol/v2/overview#client) and [Agents](/protocol/v2/overview#agent) to negotiate protocol versions, capabilities, and authentication methods.
 
 <br />
 
@@ -120,7 +120,7 @@ only apply within a supported surface.
 
 Capabilities may specify the availability of protocol methods, notifications, or a subset of their parameters. They may also signal behaviors of the Agent or Client implementation.
 
-Implementations can also [advertise custom capabilities](https://agentclientprotocol.com/protocol/v2/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
+Implementations can also [advertise custom capabilities](/protocol/v2/extensibility#advertising-custom-capabilities) using the `_meta` field to indicate support for protocol extensions.
 
 ### Client Capabilities
 
@@ -183,7 +183,7 @@ additional session methods such as `session/delete` by specifying nested
 capabilities.
 
 <ResponseField name="prompt" type="PromptCapabilities Object">
-  Object indicating the different types of [content](https://agentclientprotocol.com/protocol/v2/content) that
+  Object indicating the different types of [content](/protocol/v2/content) that
   may be included in `session/prompt` requests. Omitted or `null` means the
   Agent does not advertise any prompt extensions beyond the baseline text and
   resource-link content required by `session/prompt`.
@@ -196,7 +196,7 @@ capabilities.
 </ResponseField>
 
 <ResponseField name="delete" type="SessionDeleteCapabilities Object">
-  The [`session/delete`](https://agentclientprotocol.com/protocol/v2/session-delete) method is available.
+  The [`session/delete`](/protocol/v2/session-delete) method is available.
   Omitted or `null` both mean the Agent does not advertise support. Supplying an
   empty object means the Agent supports deleting sessions from `session/list`.
 </ResponseField>
@@ -211,7 +211,7 @@ capabilities.
 
 As a baseline, Agents that advertise `session` **MUST** support `ContentBlock::Text` and `ContentBlock::ResourceLink` in `session/prompt` requests.
 
-Optionally, they **MAY** support richer types of [content](https://agentclientprotocol.com/protocol/v2/content) by specifying the following capabilities:
+Optionally, they **MAY** support richer types of [content](/protocol/v2/content) by specifying the following capabilities:
 
 <ResponseField name="image" type="PromptImageCapabilities Object">
   The prompt may include `ContentBlock::Image`. Omitted or `null` means the
@@ -270,4 +270,7 @@ Both Clients and Agents **MUST** provide information about their implementation 
 
 ***
 
-Once the connection is initialized, you're ready to [create a session](https://agentclientprotocol.com/protocol/v2/session-setup) and begin the conversation with the Agent.
+Once the connection is initialized, you're ready to [create a session](/protocol/v2/session-setup) and begin the conversation with the Agent.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

@@ -85,3 +85,6 @@ Not now. Existing clients already handle `thought_level`, so changing its semant
 * 2026-06-24: Moved to Completed and stabilized `model_config` in the protocol artifacts
 * 2026-06-22: Move to preview
 * 2026-04-08: Initial proposal
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

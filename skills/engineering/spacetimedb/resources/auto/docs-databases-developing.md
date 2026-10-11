@@ -1,258 +1,167 @@
-Version: 2.0.0
-
-On this page
-
-This guide covers how to create a new SpacetimeDB database module
-project.
-
-## Prerequisites
-
-First, [install the SpacetimeDB CLI](https://spacetimedb.com/install).
-
-## Interactive Development with `spacetime dev`
-
-The fastest way to get started developing a database module is with
-`spacetime dev`. This interactive command guides you through creating a
-new SpacetimeDB project with hot-reloading - whenever you save changes
-to your module code, SpacetimeDB automatically rebuilds and republishes
-your module.
-
-caution
-
-`spacetime dev` is currently an unstable command and may change in the
-future.
-
-### Getting Started
-
-Run the command from your terminal:
-
-``` codeBlockStandalone_LlrK
-spacetime dev
-```
-
-**First Time Setup**
-
-If no SpacetimeDB project is found in the current directory, you'll be
-guided through creating a new one:
-
-**Step 1: Project Name** Enter a name for your project (e.g.,
-`my-project`)
-
-**Step 2: Project Path** Choose where to create the project files
-(defaults to `./<project-name>`)
-
-**Step 3: Select a Client Type** Choose how you want to develop:
-
-- **React** - React web app with TypeScript server (recommended for web
-  apps)
-- **Use Template** - Choose from built-in templates or clone from GitHub
-- **None** - Server module only
-
-**Existing Projects**
-
-If you run `spacetime dev` in a directory with an existing SpacetimeDB
-project (containing a `spacetimedb/` directory), it will skip setup and
-enter development mode directly, connecting to your database and
-watching for file changes.
-
-### Client Type Options
-
-#### React
-
-Creates a full-stack React web application with:
-
-- TypeScript server module
-- React frontend with SpacetimeDB client SDK
-- Pre-configured hot-reloading for both client and server
-
-#### Use Template
-
-Choose from several built-in templates:
-
-- `basic-ts` - Basic TypeScript client and server stubs
-- `basic-cs` - Basic C# client and server stubs
-- `basic-rs` - Basic Rust client and server stubs
-- `basic-cpp` - Basic C++ server stubs
-- `react-ts` - React web app with TypeScript server
-- `chat-console-rs` - Complete Rust chat implementation
-- `chat-console-cs` - Complete C# chat implementation
-- `chat-react-ts` - Complete TypeScript chat implementation
-
-You can also clone an existing project by entering a GitHub repository
-(`owner/repo`) or git URL.
-
-#### None
-
-Creates a server module only, without any client code. You'll choose
-your server language:
-
-- **TypeScript** - Server module in TypeScript
-- **Rust** - Server module in Rust
-- **C#** - Server module in C#
-- **C++** - Server module in C++
-
-The server code will be created in a `spacetimedb/` subdirectory within
-your project.
-
-### What Happens Next
-
-After completing setup, `spacetime dev`:
-
-- Starts a local SpacetimeDB server
-- Creates a new database
-- Builds and publishes your module to the database
-- Watches your source files for changes
-- Automatically rebuilds and republishes when you save changes
-- **Runs your client development server** (if configured)
-
-Your database will be available at `https://maincloud.spacetimedb.com`.
-
-### Client Development Server
-
-`spacetime dev` can automatically run your client's development server
-alongside the SpacetimeDB module. This is configured via the
-`spacetime.json` file in your project root:
-
-``` codeBlockStandalone_LlrK
-{
-  "dev": {
-    "run": "npm run dev"
-  }
-}
-```
-
-The client command can be:
-
-- Auto-detected from your project (package.json, Cargo.toml, .csproj)
-- Configured in `spacetime.json`
-- Overridden via CLI flag: `spacetime dev --run "yarn dev"`
-- Disabled with: `spacetime dev --server-only`
-
-When you run `spacetime init` with a client template, a default client
-command is automatically configured in `spacetime.json` based on your
-project type.
-
-### Project Structure
-
-After initialization, your project will contain:
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-my-project/
-├── spacetimedb/            # Server module code
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       └── index.ts
-├── src/                    # Client code
-│   └── module_bindings/    # Generated client bindings
-├── package.json
-├── tsconfig.json
-├── spacetime.json          # SpacetimeDB configuration
-└── README.md
-```
-
-``` codeBlockStandalone_LlrK
-my-project/
-├── spacetimedb/            # Server module code
-│   ├── StdbModule.csproj
-│   └── Lib.cs
-├── module_bindings/        # Generated client bindings
-├── client.csproj
-├── Program.cs
-├── spacetime.json          # SpacetimeDB configuration
-└── README.md
-```
-
-``` codeBlockStandalone_LlrK
-my-project/
-├── spacetimedb/            # Server module code
-│   ├── Cargo.toml
-│   └── src/
-│       └── lib.rs
-├── src/                    # Client code
-│   └── module_bindings/    # Generated client bindings
-├── Cargo.toml
-├── spacetime.json          # SpacetimeDB configuration
-├── .gitignore
-└── README.md
-```
-
-``` codeBlockStandalone_LlrK
-my-project/
-├── spacetimedb/            # Server module code (C++)
-│   ├── CMakeLists.txt
-│   └── src/
-│       └── lib.cpp
-└── README.md
-```
-
-## Alternative: Manual Project Creation
-
-If you prefer more control over the development workflow, you can create
-a database module project manually and use the standard build and
-publish workflow.
-
-### Create a New Project with `spacetime init`
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang typescript --project-path ./my-project my-project
-cd my-project
-```
-
-This creates a new TypeScript project with:
-
-- A `package.json` configured for SpacetimeDB
-- A `src/index.ts` with a sample module
-- Sample table and reducer definitions
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang csharp --project-path ./my-project my-project
-cd my-project
-```
-
-This creates a new C# project with:
-
-- A `StdbModule.csproj` configured for SpacetimeDB
-- A `Lib.cs` with a sample module
-- Sample table and reducer definitions
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang rust --project-path ./my-project my-project
-cd my-project
-```
-
-This creates a new Rust project with:
-
-- A `Cargo.toml` configured for SpacetimeDB
-- A `src/lib.rs` with a sample module
-- Sample table and reducer definitions
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang cpp --project-path ./my-project my-project
-cd my-project
-```
-
-This creates a new C++ project with:
-
-- A `CMakeLists.txt` configured for SpacetimeDB
-- A `src/lib.cpp` with a sample module
-- Sample table and reducer definitions
-
-## Next Steps
-
-After creating your database module:
-
-- Learn about [Tables](https://spacetimedb.com/docs/tables),
-  [Reducers](https://spacetimedb.com/docs/functions/reducers), and
-  [Procedures](https://spacetimedb.com/docs/functions/procedures)
-- [Build and publish your module](https://spacetimedb.com/docs/databases/building-publishing)
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/databases/spacetime-dev" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">spacetime dev | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/databases/developing"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="spacetime dev | SpacetimeDB docs"><meta data-rh="true" name="description" content="This guide covers how to create a new SpacetimeDB database module project."><meta data-rh="true" property="og:description" content="This guide covers how to create a new SpacetimeDB database module project."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/databases/developing"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/developing" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/databases/developing" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Databases","item":"https://spacetimedb.com/docs/databases"},{"@type":"ListItem","position":2,"name":"spacetime dev","item":"https://spacetimedb.com/docs/databases/developing"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/databases/developing">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/databases/developing">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/databases/developing">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Collapse sidebar category &#x27;Databases&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/transactions-atomicity"><span title="Transactions and Atomicity" class="linkLabel_UvDg">Transactions and Atomicity</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/databases/developing"><span title="spacetime dev" class="linkLabel_UvDg">spacetime dev</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/building-publishing"><span title="spacetime publish" class="linkLabel_UvDg">spacetime publish</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/databases/cheat-sheet"><span title="Cheat Sheet" class="linkLabel_UvDg">Cheat Sheet</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/databases/automatic-migrations"><span title="Migrations" class="categoryLinkLabel_HATI">Migrations</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/submodules"><span title="Submodules" class="linkLabel_UvDg">Submodules</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/databases"><span>Databases</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">spacetime dev</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\><code>spacetime dev</code></h1></header>
+<p>This guide covers how to create a new SpacetimeDB database module project.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h2>
+<p>First, <a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="">install the SpacetimeDB CLI</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="interactive-development-with-spacetime-dev">Interactive Development with <code>spacetime dev</code><a href="#interactive-development-with-spacetime-dev" class="hash-link" aria-label="Direct link to interactive-development-with-spacetime-dev" title="Direct link to interactive-development-with-spacetime-dev" translate="no">​</a></h2>
+<p>The fastest way to get started developing a database module is with <code>spacetime dev</code>. This interactive command guides you through creating a new SpacetimeDB project with hot-reloading - whenever you save changes to your module code, SpacetimeDB automatically rebuilds and republishes your module.</p>
+<div class="theme-admonition theme-admonition-caution admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</div><div class="admonitionContent_STxx"><p><code>spacetime dev</code> is currently an unstable command and may change in the future.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="getting-started">Getting Started<a href="#getting-started" class="hash-link" aria-label="Direct link to Getting Started" title="Direct link to Getting Started" translate="no">​</a></h3>
+<p>Run the command from your terminal:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> dev</span></span></code></pre>
+<p><strong>First Time Setup</strong></p>
+<p>If no SpacetimeDB project is found in the current directory, you&#x27;ll be guided through creating a new one:</p>
+<p><strong>Step 1: Project Name</strong>
+Enter a name for your project (e.g., <code>my-project</code>)</p>
+<p><strong>Step 2: Project Path</strong>
+Choose where to create the project files (defaults to <code>./<project-name></code>)</p>
+<p><strong>Step 3: Select a Client Type</strong>
+Choose how you want to develop:</p>
+\<ul\>
+<li class=""><strong>React</strong> - React web app with TypeScript server (recommended for web apps)</li>
+<li class=""><strong>Use Template</strong> - Choose from built-in templates or clone from GitHub</li>
+<li class=""><strong>None</strong> - Server module only</li>
+</ul>
+<p><strong>Existing Projects</strong></p>
+<p>If you run <code>spacetime dev</code> in a directory with an existing SpacetimeDB project (containing a <code>spacetimedb/</code> directory), it will skip setup and enter development mode directly, connecting to your database and watching for file changes.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="client-type-options">Client Type Options<a href="#client-type-options" class="hash-link" aria-label="Direct link to Client Type Options" title="Direct link to Client Type Options" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="react">React<a href="#react" class="hash-link" aria-label="Direct link to React" title="Direct link to React" translate="no">​</a></h4>
+<p>Creates a full-stack React web application with:</p>
+\<ul\>
+<li class="">TypeScript server module</li>
+<li class="">React frontend with SpacetimeDB client SDK</li>
+<li class="">Pre-configured hot-reloading for both client and server</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="use-template">Use Template<a href="#use-template" class="hash-link" aria-label="Direct link to Use Template" title="Direct link to Use Template" translate="no">​</a></h4>
+<p>Choose from several built-in templates:</p>
+\<ul\>
+<li class=""><code>basic-ts</code> - Basic TypeScript client and server stubs</li>
+<li class=""><code>basic-cs</code> - Basic C# client and server stubs</li>
+<li class=""><code>basic-rs</code> - Basic Rust client and server stubs</li>
+<li class=""><code>basic-cpp</code> - Basic C++ server stubs</li>
+<li class=""><code>react-ts</code> - React web app with TypeScript server</li>
+<li class=""><code>chat-console-rs</code> - Complete Rust chat implementation</li>
+<li class=""><code>chat-console-cs</code> - Complete C# chat implementation</li>
+<li class=""><code>chat-react-ts</code> - Complete TypeScript chat implementation</li>
+</ul>
+<p>You can also clone an existing project by entering a GitHub repository (<code>owner/repo</code>) or git URL.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="none">None<a href="#none" class="hash-link" aria-label="Direct link to None" title="Direct link to None" translate="no">​</a></h4>
+<p>Creates a server module only, without any client code. You&#x27;ll choose your server language:</p>
+\<ul\>
+<li class=""><strong>TypeScript</strong> - Server module in TypeScript</li>
+<li class=""><strong>Rust</strong> - Server module in Rust</li>
+<li class=""><strong>C#</strong> - Server module in C#</li>
+<li class=""><strong>C++</strong> - Server module in C++</li>
+</ul>
+<p>The server code will be created in a <code>spacetimedb/</code> subdirectory within your project.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="what-happens-next">What Happens Next<a href="#what-happens-next" class="hash-link" aria-label="Direct link to What Happens Next" title="Direct link to What Happens Next" translate="no">​</a></h3>
+<p>After completing setup, <code>spacetime dev</code>:</p>
+\<ul\>
+<li class="">Starts a local SpacetimeDB server</li>
+<li class="">Creates a new database</li>
+<li class="">Builds and publishes your module to the database</li>
+<li class="">Watches your source files for changes</li>
+<li class="">Automatically rebuilds and republishes when you save changes</li>
+<li class=""><strong>Runs your client development server</strong> (if configured)</li>
+</ul>
+<p>Your database will be available at <code>https://maincloud.spacetimedb.com</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="client-development-server">Client Development Server<a href="#client-development-server" class="hash-link" aria-label="Direct link to Client Development Server" title="Direct link to Client Development Server" translate="no">​</a></h3>
+<p><code>spacetime dev</code> can automatically run your client&#x27;s development server alongside the SpacetimeDB module. This is configured via the <code>spacetime.json</code> file in your project root:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#8BE9FE">  "</span><span style="color:#8BE9FD">dev</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#8BE9FE">    "</span><span style="color:#8BE9FD">run</span><span style="color:#8BE9FE">"</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">npm run dev</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The client command can be:</p>
+\<ul\>
+<li class="">Auto-detected from your project (package.json, Cargo.toml, .csproj)</li>
+<li class="">Configured in <code>spacetime.json</code></li>
+<li class="">Overridden via CLI flag: <code>spacetime dev --run "yarn dev"</code></li>
+<li class="">Disabled with: <code>spacetime dev --server-only</code></li>
+</ul>
+<p>When you run <code>spacetime init</code> with a client template, a default client command is automatically configured in <code>spacetime.json</code> based on your project type.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="project-structure">Project Structure<a href="#project-structure" class="hash-link" aria-label="Direct link to Project Structure" title="Direct link to Project Structure" translate="no">​</a></h3>
+<p>After initialization, your project will contain:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span>my-project/</span></span>
+<span class="line"><span>├── spacetimedb/            # Server module code</span></span>
+<span class="line"><span>│   ├── package.json</span></span>
+<span class="line"><span>│   ├── tsconfig.json</span></span>
+<span class="line"><span>│   └── src/</span></span>
+<span class="line"><span>│       └── index.ts</span></span>
+<span class="line"><span>├── src/                    # Client code</span></span>
+<span class="line"><span>│   └── module_bindings/    # Generated client bindings</span></span>
+<span class="line"><span>├── package.json</span></span>
+<span class="line"><span>├── tsconfig.json</span></span>
+<span class="line"><span>├── spacetime.json          # SpacetimeDB configuration</span></span>
+<span class="line"><span>└── README.md</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span>my-project/</span></span>
+<span class="line"><span>├── spacetimedb/            # Server module code</span></span>
+<span class="line"><span>│   ├── StdbModule.csproj</span></span>
+<span class="line"><span>│   └── Lib.cs</span></span>
+<span class="line"><span>├── module_bindings/        # Generated client bindings</span></span>
+<span class="line"><span>├── client.csproj</span></span>
+<span class="line"><span>├── Program.cs</span></span>
+<span class="line"><span>├── spacetime.json          # SpacetimeDB configuration</span></span>
+<span class="line"><span>└── README.md</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span>my-project/</span></span>
+<span class="line"><span>├── spacetimedb/            # Server module code</span></span>
+<span class="line"><span>│   ├── Cargo.toml</span></span>
+<span class="line"><span>│   └── src/</span></span>
+<span class="line"><span>│       └── lib.rs</span></span>
+<span class="line"><span>├── src/                    # Client code</span></span>
+<span class="line"><span>│   └── module_bindings/    # Generated client bindings</span></span>
+<span class="line"><span>├── Cargo.toml</span></span>
+<span class="line"><span>├── spacetime.json          # SpacetimeDB configuration</span></span>
+<span class="line"><span>├── .gitignore</span></span>
+<span class="line"><span>└── README.md</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span>my-project/</span></span>
+<span class="line"><span>├── spacetimedb/            # Server module code (C++)</span></span>
+<span class="line"><span>│   ├── CMakeLists.txt</span></span>
+<span class="line"><span>│   └── src/</span></span>
+<span class="line"><span>│       └── lib.cpp</span></span>
+<span class="line"><span>└── README.md</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="alternative-manual-project-creation">Alternative: Manual Project Creation<a href="#alternative-manual-project-creation" class="hash-link" aria-label="Direct link to Alternative: Manual Project Creation" title="Direct link to Alternative: Manual Project Creation" translate="no">​</a></h2>
+<p>If you prefer more control over the development workflow, you can create a database module project manually and use the standard build and publish workflow.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="create-a-new-project-with-spacetime-init">Create a New Project with <code>spacetime init</code><a href="#create-a-new-project-with-spacetime-init" class="hash-link" aria-label="Direct link to create-a-new-project-with-spacetime-init" title="Direct link to create-a-new-project-with-spacetime-init" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> typescript</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> ./my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span></code></pre><p>This creates a new TypeScript project with:</p>\<ul\>
+<li class="">A <code>package.json</code> configured for SpacetimeDB</li>
+<li class="">A <code>src/index.ts</code> with a sample module</li>
+<li class="">Sample table and reducer definitions</li>
+</ul></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> ./my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span></code></pre><p>This creates a new C# project with:</p>\<ul\>
+<li class="">A <code>StdbModule.csproj</code> configured for SpacetimeDB</li>
+<li class="">A <code>Lib.cs</code> with a sample module</li>
+<li class="">Sample table and reducer definitions</li>
+</ul></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> rust</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> ./my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span></code></pre><p>This creates a new Rust project with:</p>\<ul\>
+<li class="">A <code>Cargo.toml</code> configured for SpacetimeDB</li>
+<li class="">A <code>src/lib.rs</code> with a sample module</li>
+<li class="">Sample table and reducer definitions</li>
+</ul></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> cpp</span><span style="color:#BD93F9"> --project-path</span><span style="color:#F1FA8C"> ./my-project</span><span style="color:#F1FA8C"> my-project</span></span>
+<span class="line"><span style="color:#8BE9FD">cd</span><span style="color:#F1FA8C"> my-project</span></span></code></pre><p>This creates a new C++ project with:</p>\<ul\>
+<li class="">A <code>CMakeLists.txt</code> configured for SpacetimeDB</li>
+<li class="">A <code>src/lib.cpp</code> with a sample module</li>
+<li class="">Sample table and reducer definitions</li>
+</ul></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+<p>After creating your database module:</p>
+\<ul\>
+<li class="">Learn about <a class="" href="/docs/tables">Tables</a>, <a class="" href="/docs/functions/reducers">Reducers</a>, and <a class="" href="/docs/functions/procedures">Procedures</a></li>
+<li class=""><a class="" href="/docs/databases/building-publishing">Build and publish your module</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00100-databases/00200-spacetime-dev.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/databases/transactions-atomicity"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Transactions and Atomicity</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/databases/building-publishing"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">spacetime publish</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#prerequisites" class="table-of-contents__link toc-highlight">Prerequisites</a></li>\<li\><a href="#interactive-development-with-spacetime-dev" class="table-of-contents__link toc-highlight">Interactive Development with <code>spacetime dev</code></a>\<ul\>\<li\><a href="#getting-started" class="table-of-contents__link toc-highlight">Getting Started</a></li>\<li\><a href="#client-type-options" class="table-of-contents__link toc-highlight">Client Type Options</a></li>\<li\><a href="#what-happens-next" class="table-of-contents__link toc-highlight">What Happens Next</a></li>\<li\><a href="#client-development-server" class="table-of-contents__link toc-highlight">Client Development Server</a></li>\<li\><a href="#project-structure" class="table-of-contents__link toc-highlight">Project Structure</a></li></ul></li>\<li\><a href="#alternative-manual-project-creation" class="table-of-contents__link toc-highlight">Alternative: Manual Project Creation</a>\<ul\>\<li\><a href="#create-a-new-project-with-spacetime-init" class="table-of-contents__link toc-highlight">Create a New Project with <code>spacetime init</code></a></li></ul></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

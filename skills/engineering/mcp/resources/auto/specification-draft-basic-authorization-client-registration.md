@@ -50,7 +50,7 @@ Key requirements include:
 * **SHOULD** cache metadata respecting HTTP cache headers
 * **MUST** validate redirect URIs presented in an authorization request against those in the metadata document
 * **MUST** validate the document structure is valid JSON and contains required fields
-* **SHOULD** follow the security considerations in [Section 6 of Client ID Metadata Document](https://www.ietf.org/archive/id/draft-ietf-oauth-client-id-metadata-document-00.html#section-6) and in [Client ID Metadata Document Security](https://modelcontextprotocol.io/specification/draft/basic/authorization/security-considerations#client-id-metadata-document-security)
+* **SHOULD** follow the security considerations in [Section 6 of Client ID Metadata Document](https://www.ietf.org/archive/id/draft-ietf-oauth-client-id-metadata-document-00.html#section-6) and in [Client ID Metadata Document Security](/specification/draft/basic/authorization/security-considerations#client-id-metadata-document-security)
 
 ### Example Metadata Document
 
@@ -62,7 +62,7 @@ Key requirements include:
   "logo_uri": "https://app.example.com/logo.png",
   "redirect_uris": [
     "http://127.0.0.1:3000/callback",
-    "http://localhost:3000/callback"
+    "http://[::1]:3000/callback"
   ],
   "grant_types": ["authorization_code"],
   "response_types": ["code"],
@@ -85,7 +85,7 @@ sequenceDiagram
     Note over Client,Metadata: Client hosts metadata at<br/>https://app.example.com/oauth/metadata.json
 
     User->>Client: Initiates connection to MCP Server
-    Client->>Server: Authorization Request<br/>client_id=https://app.example.com/oauth/metadata.json<br/>redirect_uri=http://localhost:3000/callback
+    Client->>Server: Authorization Request<br/>client_id=https://app.example.com/oauth/metadata.json<br/>redirect_uri=http://127.0.0.1:3000/callback
 
     Server->>User: Authentication prompt
     User->>Server: Provides credentials
@@ -187,7 +187,7 @@ Registration, **MUST** associate those
 credentials with the specific authorization server that issued them,
 keyed by the authorization server's `issuer` identifier. When the
 authorization server changes (detected via updated
-[protected resource metadata](https://modelcontextprotocol.io/specification/draft/basic/authorization/authorization-server-discovery#authorization-server-location)),
+[protected resource metadata](/specification/draft/basic/authorization/authorization-server-discovery#authorization-server-location)),
 clients **MUST NOT** reuse client credentials
 from a different authorization server and **MUST** re-register
 with the new authorization server.
@@ -202,3 +202,4 @@ Client IDs based on Client ID Metadata Documents are portable
 across authorization servers, since they are self-hosted HTTPS URLs
 resolved by the authorization server on demand. No re-registration
 is needed when the authorization server changes.
+

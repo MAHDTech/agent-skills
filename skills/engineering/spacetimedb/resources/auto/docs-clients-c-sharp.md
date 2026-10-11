@@ -1,1366 +1,596 @@
-Version: 2.0.0
-
-On this page
-
-The SpacetimeDB client for C# contains all the tools you need to build
-native clients for SpacetimeDB modules using C#.
-
-## Server module quick reference
-
-If you are **writing a SpacetimeDB module** (tables and reducers), use
-these patterns:
-
-- **Module class**: `public static partial class Module`
-- **Tables**:
-  `[SpacetimeDB.Table(Accessor = "TableName", Public = true)]` on
-  `partial struct` (or `partial class`) — `Accessor` controls generated
-  API names, and canonical SQL names are derived unless `Name` is
-  explicitly set
-- **Primary key**: Define `[SpacetimeDB.PrimaryKey]` on one column when
-  you need key-based lookups or updates
-- **Reducers**: `[SpacetimeDB.Reducer]` on static methods with
-  `ReducerContext ctx` as first parameter
-- **Required**: `using SpacetimeDB;` and `partial` on all table structs
-  and the Module class
-- **Index**: Always use `SpacetimeDB.Index.BTree` (never bare `Index`).
-  Bare `Index` is ambiguous with `System.Index`. For multi-column:
-  `Columns = new[] { nameof(Col1), nameof(Col2) }`, not collection
-  expressions `[nameof(X)]`
-- **Sum types**: Use `TaggedEnum<(VariantA A, VariantB B)>` with
-  `partial record`, not `partial class`
-- **Scheduled tables**: `ScheduledAt` should reference a field of type
-  `ScheduleAt` in the schedule table
-
-See [Tables](https://spacetimedb.com/docs/tables), [Reducers](https://spacetimedb.com/docs/functions/reducers), and
-[Column Types](https://spacetimedb.com/docs/tables/column-types) for full server-side
-documentation. The rest of this page covers the **client SDK**
-(connections, subscriptions, callbacks).
-
-------------------------------------------------------------------------
-
-Before diving into the reference, you may want to review:
-
-- [Generating Client Bindings](https://spacetimedb.com/docs/clients/codegen) - How to generate
-  C# bindings from your module
-- [Connecting to SpacetimeDB](https://spacetimedb.com/docs/clients/connection) - Establishing
-  and managing connections (important: C# requires manual connection
-  advancement!)
-- [SDK API Reference](https://spacetimedb.com/docs/clients/api) - Core concepts that apply
-  across all SDKs
-
-| Name | Description |
-|----|----|
-| [Project setup](#project-setup) | Configure a C# project to use the SpacetimeDB C# client SDK. |
-| [Generate module bindings](#generate-module-bindings) | Use the SpacetimeDB CLI to generate module-specific types and interfaces. |
-| [`DbConnection` type](#type-dbconnection) | A connection to a remote database. |
-| [`IDbContext` interface](#interface-idbcontext) | Methods for interacting with the remote database. |
-| [`EventContext` type](#type-eventcontext) | Implements [`IDbContext`](#interface-idbcontext) for [row callbacks](#callback-oninsert). |
-| [`ReducerEventContext` type](#type-reducereventcontext) | Implements [`IDbContext`](#interface-idbcontext) for [reducer callbacks](#observe-and-invoke-reducers). |
-| [`SubscriptionEventContext` type](#type-subscriptioneventcontext) | Implements [`IDbContext`](#interface-idbcontext) for [subscription callbacks](#subscribe-to-queries). |
-| [`ErrorContext` type](#type-errorcontext) | Implements [`IDbContext`](#interface-idbcontext) for subscription error callbacks. |
-| [Query Builder API](#query-builder-api) | Type-safe query builder for typed subscription queries. |
-| [Access the client cache](#access-the-client-cache) | Access to your local view of the database. |
-| [Observe and invoke reducers](#observe-and-invoke-reducers) | Send requests to the database to run reducers, and register callbacks to run when notified of reducers. |
-| [Identify a client](#identify-a-client) | Types for identifying users and client connections. |
-
-## Project setup
-
-### Using the `dotnet` CLI tool
-
-If you would like to create a console application using .NET, you can
-create a new project using `dotnet new console` and add the SpacetimeDB
-SDK to your dependencies:
-
-``` codeBlockStandalone_LlrK
-dotnet add package SpacetimeDB.ClientSDK
-```
-
-(See also the [CSharp Quickstart](https://spacetimedb.com/docs/quickstarts/c-sharp) for an
-in-depth example of such a console application.)
-
-### Using Unity
-
-Add the SpacetimeDB Unity Package using the Package Manager. Open the
-Package Manager window by clicking on Window -\> Package Manager. Click
-on the + button in the top left corner of the window and select "Add
-package from git URL". Enter the following URL and click Add.
-
-``` codeBlockStandalone_LlrK
-https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk.git
-```
-
-(See also the [Unity Tutorial](https://spacetimedb.com/docs/tutorials/unity/part-1))
-
-The Unity package includes a `SpacetimeDBNetworkManager` component. Add
-one instance to a scene GameObject if you want the SDK to advance active
-connections from Unity's `Update` loop automatically. If you do not use
-the manager, call [`FrameTick`](#method-frametick) yourself every frame.
-
-## Generate module bindings
-
-Each SpacetimeDB client depends on some bindings specific to your
-module. Create a `module_bindings` directory in your project's directory
-and generate the C# interface files using the Spacetime CLI. From your
-project directory, run:
-
-``` codeBlockStandalone_LlrK
-mkdir -p module_bindings
-spacetime generate --lang csharp --out-dir module_bindings --module-path PATH-TO-MODULE-DIRECTORY
-```
-
-Replace `PATH-TO-MODULE-DIRECTORY` with the path to your SpacetimeDB
-module.
-
-## Type `DbConnection`
-
-A connection to a remote database is represented by the `DbConnection`
-class. This class is generated per module and contains information about
-the types, tables, and reducers defined by your module.
-
-| Name | Description |
-|----|----|
-| [Connect to a database](#connect-to-a-database) | Construct a `DbConnection` instance. |
-| [Advance the connection](#advance-the-connection-and-process-messages) | Poll the `DbConnection` or run it in the background. |
-| [Access tables and reducers](#access-tables-and-reducers) | Access the client cache, request reducer invocations, and register callbacks. |
-
-### Connect to a database
-
-``` codeBlockStandalone_LlrK
-class DbConnection
-{
-    public static DbConnectionBuilder<DbConnection> Builder();
-}
-```
-
-Construct a `DbConnection` by calling `DbConnection.Builder()`, chaining
-configuration methods, and finally calling `.Build()`. At a minimum, you
-must specify `WithUri` to provide the URI of the SpacetimeDB instance,
-and `WithDatabaseName` to specify the database's name or identity.
-
-| Name | Description |
-|----|----|
-| [WithUri method](#method-withuri) | Set the URI of the SpacetimeDB instance hosting the remote database. |
-| [WithDatabaseName method](#method-withdatabasename) | Set the name or identity of the remote database. |
-| [WithConfirmedReads method](#method-withconfirmedreads) | Enable or disable confirmed reads. |
-| [OnConnect callback](#callback-onconnect) | Register a callback to run when the connection is successfully established. |
-| [OnConnectError callback](#callback-onconnecterror) | Register a callback to run if the connection is rejected or the host is unreachable. |
-| [OnDisconnect callback](#callback-ondisconnect) | Register a callback to run when the connection ends. |
-| [WithToken method](#method-withtoken) | Supply a token to authenticate with the remote database. |
-| [Build method](#method-build) | Finalize configuration and open the connection. |
-
-#### Method `WithUri`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnectionBuilder<DbConnection> WithUri(string uri);
-}
-```
-
-Configure the URI of the SpacetimeDB instance or cluster which hosts the
-remote module and database.
-
-#### Method `WithDatabaseName`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder
-{
-    public DbConnectionBuilder<DbConnection> WithDatabaseName(string nameOrIdentity);
-}
-```
-
-Configure the SpacetimeDB domain name or `Identity` of the remote
-database which identifies it within the SpacetimeDB instance or cluster.
-
-#### Method `WithConfirmedReads`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder
-{
-    public DbConnectionBuilder<DbConnection> WithConfirmedReads(bool confirmedReads);
-}
-```
-
-Configure the connection to request confirmed reads.
-
-When enabled, the server will send query results only after they are
-confirmed to be durable, i.e. persisted to disk on one or more replicas
-depending on the replication settings of the database. When set to
-`false`, the server will send results as soon as transactions are
-committed in memory.
-
-If this method is not called, the server chooses the default.
-
-#### Callback `OnConnect`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnectionBuilder<DbConnection> OnConnect(Action<DbConnection, Identity, string> callback);
-}
-```
-
-Chain a call to `.OnConnect(callback)` to your builder to register a
-callback to run when your new `DbConnection` successfully initiates its
-connection to the remote database. The callback accepts three arguments:
-a reference to the `DbConnection`, the `Identity` by which SpacetimeDB
-identifies this connection, and a private access token which can be
-saved and later passed to [`WithToken`](#method-withtoken) to
-authenticate the same user in future connections.
-
-#### Callback `OnConnectError`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnectionBuilder<DbConnection> OnConnectError(Action<Exception> callback);
-}
-```
-
-Chain a call to `.OnConnectError(callback)` to your builder to register
-a callback to run when your connection fails.
-
-#### Callback `OnDisconnect`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnectionBuilder<DbConnection> OnDisconnect(Action<DbConnection, Exception?> callback);
-}
-```
-
-Chain a call to `.OnDisconnect(callback)` to your builder to register a
-callback to run when your `DbConnection` disconnects from the remote
-database, either as a result of a call to
-[`Disconnect`](#method-disconnect) or due to an error.
-
-#### Method `WithToken`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnectionBuilder<DbConnection> WithToken(string? token);
-}
-```
-
-Chain a call to `.WithToken(token)` to your builder to provide an OpenID
-Connect compliant JSON Web Token to authenticate with, or to explicitly
-select an anonymous connection. If this method is not called or `null`
-is passed, SpacetimeDB will generate a new `Identity` and sign a new
-private access token for the connection.
-
-#### Method `Build`
-
-``` codeBlockStandalone_LlrK
-class DbConnectionBuilder<DbConnection>
-{
-    public DbConnection Build();
-}
-```
-
-After configuring the connection and registering callbacks, attempt to
-open the connection.
-
-### Advance the connection and process messages
-
-In the interest of supporting a wide variety of client applications with
-different execution strategies, the SpacetimeDB SDK allows you to choose
-when the `DbConnection` spends compute time and processes messages. If
-you do not arrange for the connection to advance by calling one of these
-methods, the `DbConnection` will never advance, and no callbacks will
-ever be invoked.
-
-| Name | Description |
-|----|----|
-| [`FrameTick` method](#method-frametick) | Process messages on the main thread without blocking. |
-
-#### Method `FrameTick`
-
-``` codeBlockStandalone_LlrK
-class DbConnection {
-    public void FrameTick();
-}
-```
-
-`FrameTick` will advance the connection until no work remains or until
-it is disconnected, then return rather than blocking. Games might
-arrange for this message to be called every frame.
-
-In Unity projects, a `SpacetimeDBNetworkManager` component can call
-`FrameTick` for active connections automatically. Use either the manager
-or your own update loop; without one of them, callbacks will not be
-invoked.
-
-It is not advised to run `FrameTick` on a background thread, since it
-modifies [`dbConnection.Db`](#property-db). If main thread code is also
-accessing the `Db`, it may observe data races when `FrameTick` runs on
-another thread.
-
-(Note that the SDK already does most of the work for parsing messages on
-a background thread. `FrameTick()` does the minimal amount of work
-needed to apply updates to the `Db`.)
-
-### Access tables and reducers
-
-#### Property `Db`
-
-``` codeBlockStandalone_LlrK
-class DbConnection
-{
-    public RemoteTables Db;
-    /* other members */
-}
-```
-
-The `Db` property of the `DbConnection` provides access to the
-subscribed view of the remote database's tables. See [Access the client
-cache](#access-the-client-cache).
-
-#### Property `Reducers`
-
-``` codeBlockStandalone_LlrK
-class DbConnection
-{
-    public RemoteReducers Reducers;
-    /* other members */
-}
-```
-
-The `Reducers` field of the `DbConnection` provides access to reducers
-exposed by the module of the remote database. See [Observe and invoke
-reducers](#observe-and-invoke-reducers).
-
-### Interface `IDbContext`
-
-``` codeBlockStandalone_LlrK
-interface IDbContext<DbView, RemoteReducers, ..>
-{
-    /* methods */
-}
-```
-
-[`DbConnection`](#type-dbconnection),
-[`EventContext`](#type-eventcontext),
-[`ReducerEventContext`](#type-reducereventcontext),
-[`SubscriptionEventContext`](#type-subscriptioneventcontext) and
-[`ErrorContext`](#type-errorcontext) all implement `IDbContext`.
-`IDbContext` has methods for inspecting and configuring your connection
-to the remote database.
-
-The `IDbContext` interface is implemented by connections and contexts to
-*every* module - hence why it takes [`DbView`](#method-db) and
-[`RemoteReducers`](#method-reducers) as type parameters.
-
-| Name | Description |
-|----|----|
-| [`IRemoteDbContext` interface](#interface-iremotedbcontext) | Module-specific `IDbContext`. |
-| [`Db` method](#method-db) | Provides access to the subscribed view of the remote database's tables. |
-| [`Reducers` method](#method-reducers) | Provides access to reducers exposed by the remote module. |
-| [`Disconnect` method](#method-disconnect) | End the connection. |
-| [Subscribe to queries](#subscribe-to-queries) | Register subscription queries to receive updates about matching rows. |
-| [Read connection metadata](#read-connection-metadata) | Access the connection's `Identity` and `ConnectionId` |
-
-### Interface `IRemoteDbContext`
-
-Each module's `module_bindings` exports an interface `IRemoteDbContext`
-which inherits from `IDbContext`, with the type parameters `DbView` and
-`RemoteReducers` bound to the types defined for that module. This can be
-more convenient when creating functions that can be called from any
-callback for a specific module, but which access the database or invoke
-reducers, and so must know the type of the `DbView` or `Reducers`.
-
-#### Method `Db`
-
-``` codeBlockStandalone_LlrK
-interface IRemoteDbContext
-{
-    public DbView Db { get; }
-}
-```
-
-`Db` will have methods to access each table defined by the module.
-
-##### Example
-
-``` codeBlockStandalone_LlrK
-var conn = ConnectToDB();
-
-// Get a handle to the User table
-var tableHandle = conn.Db.User;
-```
-
-#### Method `Reducers`
-
-``` codeBlockStandalone_LlrK
-interface IRemoteDbContext
-{
-    public RemoteReducers Reducers { get; }
-}
-```
-
-`Reducers` will have methods to invoke each reducer defined by the
-module, plus events for observing the result of reducer calls made by
-this connection.
-
-##### Example
-
-``` codeBlockStandalone_LlrK
-var conn = ConnectToDB();
-
-// Register a callback to observe the result of SendMessage calls made by this connection.
-conn.Reducers.OnSendMessage += Reducer_OnSendMessageEvent;
-```
-
-#### Method `Disconnect`
-
-``` codeBlockStandalone_LlrK
-interface IRemoteDbContext
-{
-    public void Disconnect();
-}
-```
-
-Gracefully close the `DbConnection`. Throws an error if the connection
-is already closed.
-
-### Subscribe to queries
-
-| Name | Description |
-|----|----|
-| [`SubscriptionBuilder` type](#type-subscriptionbuilder) | Builder-pattern constructor to register subscribed queries. |
-| [`TypedSubscriptionBuilder` type](#type-typedsubscriptionbuilder) | Builder for typed query subscriptions. |
-| [`SubscriptionHandle` type](#type-subscriptionhandle) | Manage an active subscription. |
-
-#### Type `SubscriptionBuilder`
-
-| Name | Description |
-|----|----|
-| [`ctx.SubscriptionBuilder()` constructor](#constructor-ctxsubscriptionbuilder) | Begin configuring a new subscription. |
-| [`OnApplied` callback](#callback-onapplied) | Register a callback to run when matching rows become available. |
-| [`OnError` callback](#callback-onerror) | Register a callback to run if the subscription fails. |
-| [`Subscribe` method](#method-subscribe) | Finish configuration and subscribe to one or more queries. |
-| [`AddQuery` method](#method-addquery) | Build a typed subscription query without writing query strings. |
-| [`SubscribeToAllTables` method](#method-subscribetoalltables) | Convenience method to subscribe to the entire database. |
-
-##### Constructor `ctx.SubscriptionBuilder()`
-
-``` codeBlockStandalone_LlrK
-interface IRemoteDbContext
-{
-    public SubscriptionBuilder SubscriptionBuilder();
-}
-```
-
-Subscribe to queries by calling `ctx.SubscriptionBuilder()` and chaining
-configuration methods, then calling `.Subscribe(queries)`.
-
-##### Callback `OnApplied`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionBuilder
-{
-    public SubscriptionBuilder OnApplied(Action<SubscriptionEventContext> callback);
-}
-```
-
-Register a callback to run when the subscription is applied and the
-matching rows are inserted into the client cache.
-
-##### Callback `OnError`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionBuilder
-{
-    public SubscriptionBuilder OnError(Action<ErrorContext, Exception> callback);
-}
-```
-
-Register a callback to run if the subscription is rejected or
-unexpectedly terminated by the server. This is most frequently caused by
-passing an invalid query to [`Subscribe`](#method-subscribe).
-
-##### Method `Subscribe`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionBuilder
-{
-    public SubscriptionHandle Subscribe(string[] querySqls);
-}
-```
-
-Subscribe to a set of queries. `queries` should be an array of SQL query
-strings.
-
-See [the SpacetimeDB SQL Reference](https://spacetimedb.com/docs/reference/sql#subscriptions)
-for information on the queries SpacetimeDB supports as subscriptions.
-
-For typed query subscriptions, use [`AddQuery`](#method-addquery).
-
-##### Method `AddQuery`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionBuilder
-{
-    public TypedSubscriptionBuilder AddQuery<TRow>(
-        Func<QueryBuilder, IQuery<TRow>> build
-    );
-}
-```
-
-Start a typed query subscription. Once a typed query is added, continue
-with typed queries on `TypedSubscriptionBuilder` and finish with
-`Subscribe()`.
-
-``` codeBlockStandalone_LlrK
-var handle = conn
-    .SubscriptionBuilder()
-    .AddQuery(q => q.From.User())
-    .AddQuery(q => q.From.Message())
-    .Subscribe();
-```
-
-##### Method `SubscribeToAllTables`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionBuilder
-{
-    public void SubscribeToAllTables();
-}
-```
-
-Subscribe to all rows from all public tables, including public event
-tables. This method is provided as a convenience for simple clients. The
-subscription initiated by `SubscribeToAllTables` cannot be canceled
-after it is initiated. You should [`subscribe` to specific
-queries](#method-subscribe) if you need fine-grained control over the
-lifecycle of your subscriptions.
-
-#### Type `TypedSubscriptionBuilder`
-
-| Name | Description |
-|----|----|
-| [`AddQuery` method](#method-addquery-typedsubscriptionbuilder) | Add another typed query to the same subscription. |
-| [`Subscribe` method](#method-subscribe-typedsubscriptionbuilder) | Subscribe to all typed queries added so far. |
-
-##### Method `AddQuery` (TypedSubscriptionBuilder)
-
-``` codeBlockStandalone_LlrK
-class TypedSubscriptionBuilder
-{
-    public TypedSubscriptionBuilder AddQuery<TRow>(
-        Func<QueryBuilder, IQuery<TRow>> build
-    );
-}
-```
-
-Add another typed query. This keeps all added queries grouped under one
-returned `SubscriptionHandle`.
-
-##### Method `Subscribe` (TypedSubscriptionBuilder)
-
-``` codeBlockStandalone_LlrK
-class TypedSubscriptionBuilder
-{
-    public SubscriptionHandle Subscribe();
-}
-```
-
-Subscribe to the set of typed queries that were added to the builder.
-
-## Query Builder API
-
-The C# SDK provides a type-safe query builder for subscriptions. You use
-it through `SubscriptionBuilder.AddQuery(...)` and
-`TypedSubscriptionBuilder.AddQuery(...)`.
-
-### Entry Point
-
-Typed query builders are created from generated table accessors under
-`QueryBuilder.From`.
-
-``` codeBlockStandalone_LlrK
-var handle = conn
-    .SubscriptionBuilder()
-    .AddQuery(q => q.From.User())
-    .Subscribe();
-```
-
-### Building Queries with `Where` / `Filter`
-
-Each generated table accessor supports both `Where(...)` and
-`Filter(...)`. They are equivalent. Chaining multiple `Where`/`Filter`
-calls combines conditions with logical `AND`.
-
-``` codeBlockStandalone_LlrK
-// All users
-q.From.User()
-
-// Filtered users
-q.From.User().Where(u => u.Online.Eq(true))
-q.From.User().Filter(u => u.Name.Neq("Anonymous"))
-
-// Chained filters (AND semantics)
-q.From.User()
-    .Where(u => u.Score.Gte(1000UL))
-    .Filter(u => u.Level.Gte(10U))
-```
-
-### Comparison Operators
-
-| Operator | Description              | Example               |
-|----------|--------------------------|-----------------------|
-| `Eq`     | Equal to                 | `u.Online.Eq(true)`   |
-| `Neq`    | Not equal to             | `u.Name.Neq("BOT")`   |
-| `Lt`     | Less than                | `u.Level.Lt(10U)`     |
-| `Lte`    | Less than or equal to    | `u.Level.Lte(10U)`    |
-| `Gt`     | Greater than             | `u.Score.Gt(1000UL)`  |
-| `Gte`    | Greater than or equal to | `u.Score.Gte(1000UL)` |
-
-### Boolean Combinators
-
-Combine conditions with `And`, `Or`, and `Not`:
-
-``` codeBlockStandalone_LlrK
-q.From.User().Where(u => u.Level.Gte(5U).And(u.Level.Lt(10U)))
-q.From.User().Where(u => u.Online.Eq(true).Or(u.Name.Eq("Admin")))
-q.From.User().Where(u => u.Banned.Eq(true).Not())
-```
-
-### Semijoins
-
-Semijoins match rows across two tables and return rows from one side:
-
-- `LeftSemijoin(...)` returns rows from the left side that match at
-  least one row on the right.
-- `RightSemijoin(...)` returns rows from the right side that match at
-  least one row on the left.
-- The join predicate uses indexed columns (`IxCols`) and must compare
-  one indexed column from each side with `Eq`.
-- Filters before a semijoin apply to the pre-join source side. Filters
-  after a semijoin apply to the returned side.
-
-``` codeBlockStandalone_LlrK
-var handle = conn
-    .SubscriptionBuilder()
-    .AddQuery(q => q.From.Player()
-        .Where(p => p.Score.Gte(1000UL))
-        .LeftSemijoin(q.From.PlayerLevel(), (p, pl) => p.Id.Eq(pl.PlayerId))
-        .Where(p => p.Online.Eq(true)))
-    .AddQuery(q => q.From.Player()
-        .Where(p => p.Score.Gte(1000UL))
-        .RightSemijoin(q.From.PlayerLevel(), (p, pl) => p.Id.Eq(pl.PlayerId))
-        .Where(pl => pl.Level.Gte(10U)))
-    .Subscribe();
-```
-
-### Using Query Builders with Subscriptions
-
-`AddQuery` accepts a builder function that returns an `IQuery<TRow>`.
-You can add multiple typed queries and subscribe once.
-
-``` codeBlockStandalone_LlrK
-var handle = conn
-    .SubscriptionBuilder()
-    .AddQuery(q => q.From.User().Where(u => u.Online.Eq(true)))
-    .AddQuery(q => q.From.Message().Where(m => m.ChannelId.Eq(1U)))
-    .Subscribe();
-```
-
-#### Type `SubscriptionHandle`
-
-A `SubscriptionHandle` represents a subscribed query or a group of
-subscribed queries.
-
-The `SubscriptionHandle` does not contain or provide access to the
-subscribed rows. Subscribed rows of all subscriptions by a connection
-are contained within that connection's [`ctx.Db`](#property-db). See
-[Access the client cache](#access-the-client-cache).
-
-| Name | Description |
-|----|----|
-| [`IsEnded` property](#property-isended) | Determine whether the subscription has ended. |
-| [`IsActive` property](#property-isactive) | Determine whether the subscription is active and its matching rows are present in the client cache. |
-| [`Unsubscribe` method](#method-unsubscribe) | Discard a subscription. |
-| [`UnsubscribeThen` method](#method-unsubscribethen) | Discard a subscription, and register a callback to run when its matching rows are removed from the client cache. |
-
-##### Property `IsEnded`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionHandle
-{
-    public bool IsEnded;
-}
-```
-
-True if this subscription has been terminated due to an unsubscribe call
-or an error.
-
-##### Property `IsActive`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionHandle
-{
-    public bool IsActive;
-}
-```
-
-True if this subscription has been applied and has not yet been
-unsubscribed.
-
-##### Method `Unsubscribe`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionHandle
-{
-    public void Unsubscribe();
-}
-```
-
-Terminate this subscription, causing matching rows to be removed from
-the client cache. Any rows removed from the client cache this way will
-have [`OnDelete` callbacks](#callback-ondelete) run for them.
-
-Unsubscribing is an asynchronous operation. Matching rows are not
-removed from the client cache immediately. Use
-[`UnsubscribeThen`](#method-unsubscribethen) to run a callback once the
-unsubscribe operation is completed.
-
-Returns an error if the subscription has already ended, either due to a
-previous call to `Unsubscribe` or
-[`UnsubscribeThen`](#method-unsubscribethen), or due to an error.
-
-##### Method `UnsubscribeThen`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionHandle
-{
-    public void UnsubscribeThen(Action<SubscriptionEventContext>? onEnded);
-}
-```
-
-Terminate this subscription, and run the `onEnded` callback when the
-subscription is ended and its matching rows are removed from the client
-cache. Any rows removed from the client cache this way will have
-[`OnDelete` callbacks](#callback-ondelete) run for them.
-
-Returns an error if the subscription has already ended, either due to a
-previous call to [`Unsubscribe`](#method-unsubscribe) or
-`UnsubscribeThen`, or due to an error.
-
-### Read connection metadata
-
-#### Property `Identity`
-
-``` codeBlockStandalone_LlrK
-interface IDbContext
-{
-    public Identity? Identity { get; }
-}
-```
-
-Get the `Identity` with which SpacetimeDB identifies the connection.
-This method returns null if the connection was initiated anonymously and
-the newly-generated `Identity` has not yet been received, i.e. if called
-before the [`OnConnect` callback](#callback-onconnect) is invoked.
-
-#### Property `ConnectionId`
-
-``` codeBlockStandalone_LlrK
-interface IDbContext
-{
-    public ConnectionId ConnectionId { get; }
-}
-```
-
-Get the [`ConnectionId`](#type-connectionid) with which SpacetimeDB
-identifies the connection.
-
-#### Property `IsActive`
-
-``` codeBlockStandalone_LlrK
-interface IDbContext
-{
-    public bool IsActive { get; }
-}
-```
-
-`true` if the connection has not yet disconnected. Note that a
-connection `IsActive` when it is constructed, before its [`OnConnect`
-callback](#callback-onconnect) is invoked.
-
-## Type `EventContext`
-
-An `EventContext` is an [`IDbContext`](#interface-idbcontext) augmented
-with an [`Event`](#record-event) property. `EventContext`s are passed as
-the first argument to row callbacks [`OnInsert`](#callback-oninsert),
-[`OnDelete`](#callback-ondelete) and [`OnUpdate`](#callback-onupdate).
-
-| Name | Description |
-|----|----|
-| [`Event` property](#property-event) | Enum describing the cause of the current row callback. |
-| [`Db` property](#property-db) | Provides access to the client cache. |
-| [`Reducers` property](#property-reducers) | Allows requesting reducers run on the remote database. |
-| [`Event` record](#record-event) | Possible events which can cause a row callback to be invoked. |
-
-### Property `Event`
-
-``` codeBlockStandalone_LlrK
-class EventContext {
-    public readonly Event<Reducer> Event;
-    /* other fields */
-}
-```
-
-The [`Event`](#record-event) contained in the `EventContext` describes
-what happened to cause the current row callback to be invoked.
-
-### Property `Db`
-
-``` codeBlockStandalone_LlrK
-class EventContext {
-    public RemoteTables Db;
-    /* other fields */
-}
-```
-
-The `Db` property of the context provides access to the subscribed view
-of the remote database's tables. See [Access the client
-cache](#access-the-client-cache).
-
-### Field `Reducers`
-
-``` codeBlockStandalone_LlrK
-class EventContext {
-    public RemoteReducers Reducers;
-    /* other fields */
-}
-```
-
-The `Reducers` property of the context provides access to reducers
-exposed by the remote module. See [Observe and invoke
-reducers](#observe-and-invoke-reducers).
-
-### Record `Event`
-
-| Name | Description |
-|----|----|
-| [`Reducer` variant](#variant-reducer) | A reducer ran in the remote database. |
-| [`SubscribeApplied` variant](#variant-subscribeapplied) | A new subscription was applied to the client cache. |
-| [`UnsubscribeApplied` variant](#variant-unsubscribeapplied) | A previous subscription was removed from the client cache after a call to [`Unsubscribe`](#method-unsubscribe). |
-| [`SubscribeError` variant](#variant-subscribeerror) | A previous subscription was removed from the client cache due to an error. |
-| [`UnknownTransaction` variant](#variant-unknowntransaction) | A transaction ran in the remote database, but was not attributed to a known reducer. |
-| [`ReducerEvent` record](#record-reducerevent) | Metadata about a reducer run. Contained in a [`Reducer` event](#variant-reducer) and [`ReducerEventContext`](#type-reducereventcontext). |
-| [`Status` record](#record-status) | Completion status of a reducer run. |
-| [`Reducer` record](#record-reducer) | Module-specific generated record with a variant for each reducer defined by the module. |
-
-#### Variant `Reducer`
-
-``` codeBlockStandalone_LlrK
-record Event<R>
-{
-    public record Reducer(ReducerEvent<R> ReducerEvent) : Event<R>;
-}
-```
-
-Event when we are notified of the result of a reducer call made by this
-connection. The [`ReducerEvent`](#record-reducerevent) contains metadata
-about the reducer run, including its arguments and termination
-[`Status`](#record-status).
-
-For changes caused by other clients' reducer calls, use table row
-callbacks or event tables rather than reducer callbacks. The server does
-not broadcast reducer arguments globally.
-
-#### Variant `SubscribeApplied`
-
-``` codeBlockStandalone_LlrK
-record Event<R>
-{
-    public record SubscribeApplied : Event<R>;
-}
-```
-
-Event when our subscription is applied and its rows are inserted into
-the client cache.
-
-This event is passed to [row `OnInsert` callbacks](#callback-oninsert)
-resulting from the new subscription.
-
-#### Variant `UnsubscribeApplied`
-
-``` codeBlockStandalone_LlrK
-record Event<R>
-{
-    public record UnsubscribeApplied : Event<R>;
-}
-```
-
-Event when our subscription is removed after a call to
-[`SubscriptionHandle.Unsubscribe`](#method-unsubscribe) or
-[`SubscriptionHandle.UnsubscribeTthen`](#method-unsubscribethen) and its
-matching rows are deleted from the client cache.
-
-This event is passed to [row `OnDelete` callbacks](#callback-ondelete)
-resulting from the subscription ending.
-
-#### Variant `SubscribeError`
-
-``` codeBlockStandalone_LlrK
-record Event<R>
-{
-    public record SubscribeError(Exception Exception) : Event<R>;
-}
-```
-
-Event when a subscription ends unexpectedly due to an error.
-
-This event is passed to [row `OnDelete` callbacks](#callback-ondelete)
-resulting from the subscription ending.
-
-#### Variant `UnknownTransaction`
-
-``` codeBlockStandalone_LlrK
-record Event<R>
-{
-    public record UnknownTransaction : Event<R>;
-}
-```
-
-Event when we are notified of a transaction in the remote database which
-we cannot associate with a known reducer. This may be an ad-hoc SQL
-query or a reducer for which we do not have bindings.
-
-This event is passed to [row callbacks](#callback-oninsert) resulting
-from modifications by the transaction.
-
-### Record `ReducerEvent`
-
-``` codeBlockStandalone_LlrK
-record ReducerEvent<R>(
-    Timestamp Timestamp,
-    Status Status,
-    Identity CallerIdentity,
-    ConnectionId? CallerConnectionId,
-    U128? EnergyConsumed,
-    R Reducer
-)
-```
-
-A `ReducerEvent` contains metadata about a reducer run.
-
-### Record `Status`
-
-``` codeBlockStandalone_LlrK
-record Status : TaggedEnum<(
-    Unit Committed,
-    string Failed,
-    Unit OutOfEnergy
-)>;
-```
-
-| Name | Description |
-|----|----|
-| [`Committed` variant](#variant-committed) | The reducer ran successfully. |
-| [`Failed` variant](#variant-failed) | The reducer errored. |
-| [`OutOfEnergy` variant](#variant-outofenergy) | The reducer was aborted due to insufficient energy. |
-
-#### Variant `Committed`
-
-The reducer returned successfully and its changes were committed into
-the database state. An [`Event.Reducer`](#variant-reducer) passed to a
-row callback must have this status in its
-[`ReducerEvent`](#record-reducerevent).
-
-#### Variant `Failed`
-
-The reducer returned an error, panicked, or threw an exception. The
-record payload is the stringified error message. Formatting of the error
-message is unstable and subject to change, so clients should use it only
-as a human-readable diagnostic, and in particular should not attempt to
-parse the message.
-
-#### Variant `OutOfEnergy`
-
-The reducer was aborted due to insufficient energy balance of the module
-owner.
-
-### Record `Reducer`
-
-The module bindings contains an record `Reducer` with a variant for each
-reducer defined by the module. Each variant has a payload containing the
-arguments to the reducer.
-
-## Type `ReducerEventContext`
-
-A `ReducerEventContext` is an [`IDbContext`](#interface-idbcontext)
-augmented with an [`Event`](#record-reducerevent) property.
-`ReducerEventContext`s are passed as the first argument to [reducer
-callbacks](#observe-and-invoke-reducers).
-
-| Name | Description |
-|----|----|
-| [`Event` property](#property-event) | [`ReducerEvent`](#record-reducerevent) containing reducer metadata. |
-| [`Db` property](#property-db) | Provides access to the client cache. |
-| [`Reducers` property](#property-reducers) | Allows requesting reducers run on the remote database. |
-
-### Property `Event`
-
-``` codeBlockStandalone_LlrK
-class ReducerEventContext {
-    public readonly ReducerEvent<Reducer> Event;
-    /* other fields */
-}
-```
-
-The [`ReducerEvent`](#record-reducerevent) contained in the
-`ReducerEventContext` has metadata about the reducer which ran.
-
-### Property `Db`
-
-``` codeBlockStandalone_LlrK
-class ReducerEventContext {
-    public RemoteTables Db;
-    /* other fields */
-}
-```
-
-The `Db` property of the context provides access to the subscribed view
-of the remote database's tables. See [Access the client
-cache](#access-the-client-cache).
-
-### Property `Reducers`
-
-``` codeBlockStandalone_LlrK
-class ReducerEventContext {
-    public RemoteReducers Reducers;
-    /* other fields */
-}
-```
-
-The `Reducers` property of the context provides access to reducers
-exposed by the remote module. See [Observe and invoke
-reducers](#observe-and-invoke-reducers).
-
-## Type `SubscriptionEventContext`
-
-A `SubscriptionEventContext` is an
-[`IDbContext`](#interface-idbcontext). Unlike the other context types,
-`SubscriptionEventContext` doesn't have an `Event` property.
-`SubscriptionEventContext`s are passed to subscription
-[`OnApplied`](#callback-onapplied) and
-[`UnsubscribeThen`](#method-unsubscribethen) callbacks.
-
-| Name | Description |
-|----|----|
-| [`Db` property](#property-db) | Provides access to the client cache. |
-| [`Reducers` property](#property-reducers) | Allows requesting reducers run on the remote database. |
-
-### Property `Db`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionEventContext {
-    public RemoteTables Db;
-    /* other fields */
-}
-```
-
-The `Db` property of the context provides access to the subscribed view
-of the remote database's tables. See [Access the client
-cache](#access-the-client-cache).
-
-### Property `Reducers`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionEventContext {
-    public RemoteReducers Reducers;
-    /* other fields */
-}
-```
-
-The `Reducers` property of the context provides access to reducers
-exposed by the remote module. See [Observe and invoke
-reducers](#observe-and-invoke-reducers).
-
-## Type `ErrorContext`
-
-An `ErrorContext` is an [`IDbContext`](#interface-idbcontext) augmented
-with an `Event` property. `ErrorContext`s are passed to subscriptions'
-[`OnError`](#callback-onerror) callbacks.
-
-| Name | Description |
-|----|----|
-| [`Event` property](#property-event) | The error which caused the current error callback. |
-| [`Db` property](#property-db) | Provides access to the client cache. |
-| [`Reducers` property](#property-reducers) | Allows requesting reducers run on the remote database. |
-
-### Property `Event`
-
-``` codeBlockStandalone_LlrK
-class SubscriptionEventContext {
-    public readonly Exception Event;
-    /* other fields */
-}
-```
-
-### Property `Db`
-
-``` codeBlockStandalone_LlrK
-class ErrorContext {
-    public RemoteTables Db;
-    /* other fields */
-}
-```
-
-The `Db` property of the context provides access to the subscribed view
-of the remote database's tables. See [Access the client
-cache](#access-the-client-cache).
-
-### Property `Reducers`
-
-``` codeBlockStandalone_LlrK
-class ErrorContext {
-    public RemoteReducers Reducers;
-    /* other fields */
-}
-```
-
-The `Reducers` property of the context provides access to reducers
-exposed by the remote database. See [Observe and invoke
-reducers](#observe-and-invoke-reducers).
-
-## Access the client cache
-
-All [`IDbContext`](#interface-idbcontext) implementors, including
-[`DbConnection`](#type-dbconnection) and
-[`EventContext`](#type-eventcontext), have `.Db` properties, which in
-turn have methods for accessing tables in the client cache.
-
-Each table defined by a module has an accessor method on this `.Db`
-property, generated from the table accessor name using C# naming
-conventions (for example, `player_score` becomes `PlayerScore`). The
-table accessor methods return table handles which inherit from
-[`RemoteTableHandle`](#type-remotetablehandle) and have methods for
-searching by index.
-
-| Name | Description |
-|----|----|
-| [`RemoteTableHandle`](#type-remotetablehandle) | Provides access to subscribed rows of a specific table within the client cache. |
-| [Unique constraint index access](#unique-constraint-index-access) | Seek a subscribed row by the value in its unique or primary key column. |
-| [BTree index access](#btree-index-access) | Seek subscribed rows by the value in its indexed column. |
-
-### Type `RemoteTableHandle`
-
-Implemented by all table handles.
-
-| Name | Description |
-|----|----|
-| [`Row` type parameter](#type-row) | The type of rows in the table. |
-| [`Count` property](#property-count) | The number of subscribed rows in the table. |
-| [`Iter` method](#method-iter) | Iterate over all subscribed rows in the table. |
-| [`OnInsert` callback](#callback-oninsert) | Register a callback to run whenever a row is inserted into the client cache. |
-| [`OnDelete` callback](#callback-ondelete) | Register a callback to run whenever a row is deleted from the client cache. |
-| [`OnUpdate` callback](#callback-onupdate) | Register a callback to run whenever a subscribed row is replaced with a new version. |
-
-#### Type `Row`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle<EventContext, Row>
-{
-    /* members */
-}
-```
-
-The type of rows in the table.
-
-#### Property `Count`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle
-{
-    public int Count;
-}
-```
-
-The number of rows of this table resident in the client cache, i.e. the
-total number which match any subscribed query.
-
-#### Method `Iter`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle
-{
-    public IEnumerable<Row> Iter();
-}
-```
-
-An iterator over all the subscribed rows in the client cache, i.e. those
-which match any subscribed query.
-
-#### Callback `OnInsert`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle
-{
-    public delegate void RowEventHandler(EventContext context, Row row);
-    public event RowEventHandler? OnInsert;
-}
-```
-
-The `OnInsert` callback runs whenever a new row is inserted into the
-client cache, either when applying a subscription or being notified of a
-transaction. The passed [`EventContext`](#type-eventcontext) contains an
-[`Event`](#record-event) which can identify the change which caused the
-insertion, and also allows the callback to interact with the connection,
-inspect the client cache and invoke reducers. Newly registered or
-canceled callbacks do not take effect until the following event.
-
-See [the quickstart](https://spacetimedb.com/docs/quickstarts/c-sharp) for examples of
-registering and unregistering row callbacks.
-
-#### Callback `OnDelete`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle
-{
-    public delegate void RowEventHandler(EventContext context, Row row);
-    public event RowEventHandler? OnDelete;
-}
-```
-
-The `OnDelete` callback runs whenever a previously-resident row is
-deleted from the client cache. Newly registered or canceled callbacks do
-not take effect until the following event.
-
-See [the quickstart](https://spacetimedb.com/docs/quickstarts/c-sharp) for examples of
-registering and unregistering row callbacks.
-
-#### Callback `OnUpdate`
-
-``` codeBlockStandalone_LlrK
-class RemoteTableHandle
-{
-    public delegate void RowEventHandler(EventContext context, Row row);
-    public event RowEventHandler? OnUpdate;
-}
-```
-
-The `OnUpdate` callback runs whenever an already-resident row in the
-client cache is updated, i.e. replaced with a new row that has the same
-primary key. The handle must have a known primary key for callbacks to
-be triggered. This includes tables with primary keys, query builder
-views with inferred primary keys, and procedural views declared with
-`PrimaryKey`. Newly registered or canceled callbacks do not take effect
-until the following event.
-
-See [the quickstart](https://spacetimedb.com/docs/quickstarts/c-sharp) for examples of
-registering and unregistering row callbacks.
-
-### Unique constraint index access
-
-For each unique constraint on a table, its table handle has a property
-which is a unique index handle and whose name is the unique column name.
-This unique index handle has a method `.Find(Column value)`. If a `Row`
-with `value` in the unique column is resident in the client cache,
-`.Find` returns it. Otherwise it returns null.
-
-#### Example
-
-Given the following module-side `User` definition:
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "User", Public = true)]
-public partial class User
-{
-    [Unique] // Or [PrimaryKey]
-    public Identity Identity;
-    ..
-}
-```
-
-a client would lookup a user as follows:
-
-``` codeBlockStandalone_LlrK
-User? FindUser(RemoteTables tables, Identity id) => tables.User.Identity.Find(id);
-```
-
-### BTree index access
-
-For each btree index defined on a remote table, its corresponding table
-handle has a property which is a btree index handle and whose name is
-the name of the index. This index handle has a method
-`IEnumerable\<Row\> Filter(Column value)` which will return `Row`s with
-`value` in the indexed `Column`, if there are any in the cache.
-
-#### Example
-
-Given the following module-side `Player` definition:
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "Player", Public = true)]
-public partial class Player
-{
-    [PrimaryKey]
-    public Identity id;
-
-    [SpacetimeDB.Index.BTree(Accessor = "Level")]
-    public uint level;
-    ..
-}
-```
-
-a client would count the number of `Player`s at a certain level as
-follows:
-
-``` codeBlockStandalone_LlrK
-int CountPlayersAtLevel(RemoteTables tables, uint level) => tables.Player.Level.Filter(level).Count();
-```
-
-## Observe and invoke reducers
-
-All [`IDbContext`](#interface-idbcontext) implementors, including
-[`DbConnection`](#type-dbconnection) and
-[`EventContext`](#type-eventcontext), have a `.Reducers` property.
-Generated module bindings expose one invoke method and one result event
-for each reducer.
-
-For a reducer named `send_message`, generated C# bindings use PascalCase
-names:
-
-- An invoke method, like `SendMessage(...)`. This requests that the
-  module run the reducer.
-- A result event, like `OnSendMessage`. This event fires on the calling
-  connection when SpacetimeDB reports that reducer call's result,
-  including committed, failed, and out-of-energy statuses.
-
-Subscribe to reducer result events with `+=` and unsubscribe with `-=`,
-as with any C# event.
-
-Reducer result events are not global notifications. They are for reducer
-calls made by this connection. To notify other clients that something
-happened, write to a public table or event table and subscribe to it.
-
-## Identify a client
-
-### Type `Identity`
-
-A unique public identifier for a client connected to a database. See the
-[module docs](https://spacetimedb.com/docs/intro/key-architecture#identity) for more details.
-
-### Type `ConnectionId`
-
-An opaque identifier for a client connection to a database, intended to
-differentiate between connections from the same
-[`Identity`](#type-identity). See the [module
-docs](https://spacetimedb.com/docs/intro/key-architecture#connectionid) for more details.
-
-### Type `Timestamp`
-
-A point in time, measured in microseconds since the Unix epoch. See the
-[module docs](https://spacetimedb.com/docs/tables/column-types) for more details.
-
-### Type `TaggedEnum`
-
-A [tagged union](https://en.wikipedia.org/wiki/Tagged_union) type. When
-defining TaggedEnum types in a module, use `partial record`, not
-`partial class`. See the [module docs](https://spacetimedb.com/docs/tables/column-types) for
-more details.
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/clients/csharp-reference" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">C# Reference | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/clients/c-sharp"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="C# Reference | SpacetimeDB docs"><meta data-rh="true" name="description" content="The SpacetimeDB client for C# contains all the tools you need to build native clients for SpacetimeDB modules using C#."><meta data-rh="true" property="og:description" content="The SpacetimeDB client for C# contains all the tools you need to build native clients for SpacetimeDB modules using C#."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/clients/c-sharp"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/c-sharp" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/c-sharp" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Clients","item":"https://spacetimedb.com/docs/clients"},{"@type":"ListItem","position":2,"name":"C# Reference","item":"https://spacetimedb.com/docs/clients/c-sharp"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/clients/c-sharp">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/clients/c-sharp">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Collapse sidebar category &#x27;Clients&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/codegen"><span title="Generating Client Bindings" class="linkLabel_UvDg">Generating Client Bindings</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/connection"><span title="Connecting to SpacetimeDB" class="linkLabel_UvDg">Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/api"><span title="SDK API Overview" class="linkLabel_UvDg">SDK API Overview</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/clients/subscriptions"><span title="Subscriptions" class="categoryLinkLabel_HATI">Subscriptions</span></a><button aria-label="Expand sidebar category &#x27;Subscriptions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/rust"><span title="Rust Reference" class="linkLabel_UvDg">Rust Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/clients/c-sharp"><span title="C# Reference" class="linkLabel_UvDg">C# Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/typescript"><span title="TypeScript Reference" class="linkLabel_UvDg">TypeScript Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/unreal"><span title="Unreal Reference" class="linkLabel_UvDg">Unreal Reference</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/clients"><span>Clients</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">C# Reference</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>C# Reference</h1></header><p>The SpacetimeDB client for C# contains all the tools you need to build native clients for SpacetimeDB modules using C#.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="server-module-quick-reference">Server module quick reference<a href="#server-module-quick-reference" class="hash-link" aria-label="Direct link to Server module quick reference" title="Direct link to Server module quick reference" translate="no">​</a></h2>
+<p>If you are <strong>writing a SpacetimeDB module</strong> (tables and reducers), use these patterns:</p>
+\<ul\>
+<li class=""><strong>Module class</strong>: <code>public static partial class Module</code></li>
+<li class=""><strong>Tables</strong>: <code>[SpacetimeDB.Table(Accessor = "TableName", Public = true)]</code> on <code>partial struct</code> (or <code>partial class</code>) — <code>Accessor</code> controls generated API names, and canonical SQL names are derived unless <code>Name</code> is explicitly set</li>
+<li class=""><strong>Primary key</strong>: Define <code>[SpacetimeDB.PrimaryKey]</code> on one column when you need key-based lookups or updates</li>
+<li class=""><strong>Reducers</strong>: <code>[SpacetimeDB.Reducer]</code> on static methods with <code>ReducerContext ctx</code> as first parameter</li>
+<li class=""><strong>Required</strong>: <code>using SpacetimeDB;</code> and <code>partial</code> on all table structs and the Module class</li>
+<li class=""><strong>Index</strong>: Always use <code>SpacetimeDB.Index.BTree</code> (never bare <code>Index</code>). Bare <code>Index</code> is ambiguous with <code>System.Index</code>. For multi-column: <code>Columns = new[] { nameof(Col1), nameof(Col2) }</code>, not collection expressions <code>[nameof(X)]</code></li>
+<li class=""><strong>Sum types</strong>: Use <code>TaggedEnum<(VariantA A, VariantB B)></code> with <code>partial record</code>, not <code>partial class</code></li>
+<li class=""><strong>Scheduled tables</strong>: <code>ScheduledAt</code> should reference a field of type <code>ScheduleAt</code> in the schedule table</li>
+</ul>
+<p>See <a class="" href="/docs/tables">Tables</a>, <a class="" href="/docs/functions/reducers">Reducers</a>, and <a class="" href="/docs/tables/column-types">Column Types</a> for full server-side documentation. The rest of this page covers the <strong>client SDK</strong> (connections, subscriptions, callbacks).</p>
+\<hr\>
+<p>Before diving into the reference, you may want to review:</p>
+\<ul\>
+<li class=""><a class="" href="/docs/clients/codegen">Generating Client Bindings</a> - How to generate C# bindings from your module</li>
+<li class=""><a class="" href="/docs/clients/connection">Connecting to SpacetimeDB</a> - Establishing and managing connections (important: C# requires manual connection advancement!)</li>
+<li class=""><a class="" href="/docs/clients/api">SDK API Reference</a> - Core concepts that apply across all SDKs</li>
+</ul>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#project-setup" class="">Project setup</a></td><td>Configure a C# project to use the SpacetimeDB C# client SDK.</td></tr><tr><td><a href="#generate-module-bindings" class="">Generate module bindings</a></td><td>Use the SpacetimeDB CLI to generate module-specific types and interfaces.</td></tr><tr><td><a href="#type-dbconnection" class=""><code>DbConnection</code> type</a></td><td>A connection to a remote database.</td></tr><tr><td><a href="#interface-idbcontext" class=""><code>IDbContext</code> interface</a></td><td>Methods for interacting with the remote database.</td></tr><tr><td><a href="#type-eventcontext" class=""><code>EventContext</code> type</a></td><td>Implements <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> for <a href="#callback-oninsert" class="">row callbacks</a>.</td></tr><tr><td><a href="#type-reducereventcontext" class=""><code>ReducerEventContext</code> type</a></td><td>Implements <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> for <a href="#observe-and-invoke-reducers" class="">reducer callbacks</a>.</td></tr><tr><td><a href="#type-subscriptioneventcontext" class=""><code>SubscriptionEventContext</code> type</a></td><td>Implements <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> for <a href="#subscribe-to-queries" class="">subscription callbacks</a>.</td></tr><tr><td><a href="#type-errorcontext" class=""><code>ErrorContext</code> type</a></td><td>Implements <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> for subscription error callbacks.</td></tr><tr><td><a href="#query-builder-api" class="">Query Builder API</a></td><td>Type-safe query builder for typed subscription queries.</td></tr><tr><td><a href="#access-the-client-cache" class="">Access the client cache</a></td><td>Access to your local view of the database.</td></tr><tr><td><a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a></td><td>Send requests to the database to run reducers, and register callbacks to run when notified of reducers.</td></tr><tr><td><a href="#identify-a-client" class="">Identify a client</a></td><td>Types for identifying users and client connections.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="project-setup">Project setup<a href="#project-setup" class="hash-link" aria-label="Direct link to Project setup" title="Direct link to Project setup" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-the-dotnet-cli-tool">Using the <code>dotnet</code> CLI tool<a href="#using-the-dotnet-cli-tool" class="hash-link" aria-label="Direct link to using-the-dotnet-cli-tool" title="Direct link to using-the-dotnet-cli-tool" translate="no">​</a></h3>
+<p>If you would like to create a console application using .NET, you can create a new project using <code>dotnet new console</code> and add the SpacetimeDB SDK to your dependencies:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">dotnet</span><span style="color:#F1FA8C"> add</span><span style="color:#F1FA8C"> package</span><span style="color:#F1FA8C"> SpacetimeDB.ClientSDK</span></span></code></pre>
+<p>(See also the <a class="" href="/docs/quickstarts/c-sharp">CSharp Quickstart</a> for an in-depth example of such a console application.)</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-unity">Using Unity<a href="#using-unity" class="hash-link" aria-label="Direct link to Using Unity" title="Direct link to Using Unity" translate="no">​</a></h3>
+<p>Add the SpacetimeDB Unity Package using the Package Manager. Open the Package Manager window by clicking on Window -> Package Manager. Click on the + button in the top left corner of the window and select "Add package from git URL". Enter the following URL and click Add.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">https://github.com/clockworklabs/com.clockworklabs.spacetimedbsdk.git</span></span></code></pre>
+<p>(See also the <a class="" href="/docs/tutorials/unity/part-1">Unity Tutorial</a>)</p>
+<p>The Unity package includes a <code>SpacetimeDBNetworkManager</code> component. Add one instance to a scene GameObject if you want the SDK to advance active connections from Unity&#x27;s <code>Update</code> loop automatically. If you do not use the manager, call <a href="#method-frametick" class=""><code>FrameTick</code></a> yourself every frame.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="generate-module-bindings">Generate module bindings<a href="#generate-module-bindings" class="hash-link" aria-label="Direct link to Generate module bindings" title="Direct link to Generate module bindings" translate="no">​</a></h2>
+<p>Each SpacetimeDB client depends on some bindings specific to your module. Create a <code>module_bindings</code> directory in your project&#x27;s directory and generate the C# interface files using the Spacetime CLI. From your project directory, run:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">mkdir</span><span style="color:#BD93F9"> -p</span><span style="color:#F1FA8C"> module_bindings</span></span>
+<span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> module_bindings</span><span style="color:#BD93F9"> --module-path</span><span style="color:#F1FA8C"> PATH-TO-MODULE-DIRECTORY</span></span></code></pre>
+<p>Replace <code>PATH-TO-MODULE-DIRECTORY</code> with the path to your SpacetimeDB module.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-dbconnection">Type <code>DbConnection</code><a href="#type-dbconnection" class="hash-link" aria-label="Direct link to type-dbconnection" title="Direct link to type-dbconnection" translate="no">​</a></h2>
+<p>A connection to a remote database is represented by the <code>DbConnection</code> class. This class is generated per module and contains information about the types, tables, and reducers defined by your module.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#connect-to-a-database" class="">Connect to a database</a></td><td>Construct a <code>DbConnection</code> instance.</td></tr><tr><td><a href="#advance-the-connection-and-process-messages" class="">Advance the connection</a></td><td>Poll the <code>DbConnection</code> or run it in the background.</td></tr><tr><td><a href="#access-tables-and-reducers" class="">Access tables and reducers</a></td><td>Access the client cache, request reducer invocations, and register callbacks.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connect-to-a-database">Connect to a database<a href="#connect-to-a-database" class="hash-link" aria-label="Direct link to Connect to a database" title="Direct link to Connect to a database" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnection</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Construct a <code>DbConnection</code> by calling <code>DbConnection.Builder()</code>, chaining configuration methods, and finally calling <code>.Build()</code>. At a minimum, you must specify <code>WithUri</code> to provide the URI of the SpacetimeDB instance, and <code>WithDatabaseName</code> to specify the database&#x27;s name or identity.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#method-withuri" class="">WithUri method</a></td><td>Set the URI of the SpacetimeDB instance hosting the remote database.</td></tr><tr><td><a href="#method-withdatabasename" class="">WithDatabaseName method</a></td><td>Set the name or identity of the remote database.</td></tr><tr><td><a href="#method-withconfirmedreads" class="">WithConfirmedReads method</a></td><td>Enable or disable confirmed reads.</td></tr><tr><td><a href="#method-withcompression" class="">WithCompression method</a></td><td>Set the compression method for WebSocket messages.</td></tr><tr><td><a href="#callback-onconnect" class="">OnConnect callback</a></td><td>Register a callback to run when the connection is successfully established.</td></tr><tr><td><a href="#callback-onconnecterror" class="">OnConnectError callback</a></td><td>Register a callback to run if the connection is rejected or the host is unreachable.</td></tr><tr><td><a href="#callback-ondisconnect" class="">OnDisconnect callback</a></td><td>Register a callback to run when the connection ends.</td></tr><tr><td><a href="#method-withtoken" class="">WithToken method</a></td><td>Supply a token to authenticate with the remote database.</td></tr><tr><td><a href="#method-build" class="">Build method</a></td><td>Finalize configuration and open the connection.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-withuri">Method <code>WithUri</code><a href="#method-withuri" class="hash-link" aria-label="Direct link to method-withuri" title="Direct link to method-withuri" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> uri</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Configure the URI of the SpacetimeDB instance or cluster which hosts the remote module and database.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-withdatabasename">Method <code>WithDatabaseName</code><a href="#method-withdatabasename" class="hash-link" aria-label="Direct link to method-withdatabasename" title="Direct link to method-withdatabasename" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> nameOrIdentity</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Configure the SpacetimeDB domain name or <code>Identity</code> of the remote database which identifies it within the SpacetimeDB instance or cluster.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-withconfirmedreads">Method <code>WithConfirmedReads</code><a href="#method-withconfirmedreads" class="hash-link" aria-label="Direct link to method-withconfirmedreads" title="Direct link to method-withconfirmedreads" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">WithConfirmedReads</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">bool</span><span style="color:#FFB86C;font-style:italic"> confirmedReads</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Configure the connection to request confirmed reads.</p>
+<p>When enabled, the server will send query results only after they are confirmed to be durable, i.e. persisted to disk on one or more replicas depending on the replication settings of the database. When set to <code>false</code>, the server will send results as soon as transactions are committed in memory.</p>
+<p>If this method is not called, the server chooses the default.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-withcompression">Method <code>WithCompression</code><a href="#method-withcompression" class="hash-link" aria-label="Direct link to method-withcompression" title="Direct link to method-withcompression" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">WithCompression</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Compression</span><span style="color:#FFB86C;font-style:italic"> compression</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Configure compression for WebSocket messages. Available options are <code>Compression.Brotli</code>, <code>Compression.Gzip</code>, and <code>Compression.None</code>.</p>
+<p>If this method is not called, the SDK uses <code>Compression.Brotli</code>. Use <code>Compression.None</code> only when you need to debug raw message sizes or avoid compression overhead for very small local test payloads.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-onconnect">Callback <code>OnConnect</code><a href="#callback-onconnect" class="hash-link" aria-label="Direct link to callback-onconnect" title="Direct link to callback-onconnect" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">OnConnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">callback</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Chain a call to <code>.OnConnect(callback)</code> to your builder to register a callback to run when your new <code>DbConnection</code> successfully initiates its connection to the remote database. The callback accepts three arguments: a reference to the <code>DbConnection</code>, the <code>Identity</code> by which SpacetimeDB identifies this connection, and a private access token which can be saved and later passed to <a href="#method-withtoken" class=""><code>WithToken</code></a> to authenticate the same user in future connections.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-onconnecterror">Callback <code>OnConnectError</code><a href="#callback-onconnecterror" class="hash-link" aria-label="Direct link to callback-onconnecterror" title="Direct link to callback-onconnecterror" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">OnConnectError</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">callback</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Chain a call to <code>.OnConnectError(callback)</code> to your builder to register a callback to run when your connection fails.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-ondisconnect">Callback <code>OnDisconnect</code><a href="#callback-ondisconnect" class="hash-link" aria-label="Direct link to callback-ondisconnect" title="Direct link to callback-ondisconnect" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">OnDisconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#F8F8F2">?> </span><span style="color:#FFB86C;font-style:italic">callback</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Chain a call to <code>.OnDisconnect(callback)</code> to your builder to register a callback to run when your <code>DbConnection</code> disconnects from the remote database, either as a result of a call to <a href="#method-disconnect" class=""><code>Disconnect</code></a> or due to an error.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-withtoken">Method <code>WithToken</code><a href="#method-withtoken" class="hash-link" aria-label="Direct link to method-withtoken" title="Direct link to method-withtoken" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">WithToken</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#F8F8F2">? </span><span style="color:#FFB86C;font-style:italic">token</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Chain a call to <code>.WithToken(token)</code> to your builder to provide an OpenID Connect compliant JSON Web Token to authenticate with, or to explicitly select an anonymous connection. If this method is not called or <code>null</code> is passed, SpacetimeDB will generate a new <code>Identity</code> and sign a new private access token for the connection.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-build">Method <code>Build</code><a href="#method-build" class="hash-link" aria-label="Direct link to method-build" title="Direct link to method-build" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnectionBuilder</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbConnection</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#50FA7B"> Build</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>After configuring the connection and registering callbacks, attempt to open the connection.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="advance-the-connection-and-process-messages">Advance the connection and process messages<a href="#advance-the-connection-and-process-messages" class="hash-link" aria-label="Direct link to Advance the connection and process messages" title="Direct link to Advance the connection and process messages" translate="no">​</a></h3>
+<p>In the interest of supporting a wide variety of client applications with different execution strategies, the SpacetimeDB SDK allows you to choose when the <code>DbConnection</code> spends compute time and processes messages. If you do not arrange for the connection to advance by calling one of these methods, the <code>DbConnection</code> will never advance, and no callbacks will ever be invoked.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#method-frametick" class=""><code>FrameTick</code> method</a></td><td>Process messages on the main thread without blocking.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-frametick">Method <code>FrameTick</code><a href="#method-frametick" class="hash-link" aria-label="Direct link to method-frametick" title="Direct link to method-frametick" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnection</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> FrameTick</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p><code>FrameTick</code> will advance the connection until no work remains or until it is disconnected, then return rather than blocking. Games might arrange for this message to be called every frame.</p>
+<p>In Unity projects, a <code>SpacetimeDBNetworkManager</code> component can call <code>FrameTick</code> for active connections automatically. Use either the manager or your own update loop; without one of them, callbacks will not be invoked.</p>
+<p>It is not advised to run <code>FrameTick</code> on a background thread, since it modifies <a href="#property-db" class=""><code>dbConnection.Db</code></a>. If main thread code is also accessing the <code>Db</code>, it may observe data races when <code>FrameTick</code> runs on another thread.</p>
+<p>(Note that the SDK already does most of the work for parsing messages on a background thread. <code>FrameTick()</code> does the minimal amount of work needed to apply updates to the <code>Db</code>.)</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="access-tables-and-reducers">Access tables and reducers<a href="#access-tables-and-reducers" class="hash-link" aria-label="Direct link to Access tables and reducers" title="Direct link to Access tables and reducers" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-db">Property <code>Db</code><a href="#property-db" class="hash-link" aria-label="Direct link to property-db" title="Direct link to property-db" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnection</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteTables</span><span style="color:#F8F8F2"> Db;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other members */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Db</code> property of the <code>DbConnection</code> provides access to the subscribed view of the remote database&#x27;s tables. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-reducers">Property <code>Reducers</code><a href="#property-reducers" class="hash-link" aria-label="Direct link to property-reducers" title="Direct link to property-reducers" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> DbConnection</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other members */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Reducers</code> field of the <code>DbConnection</code> provides access to reducers exposed by the module of the remote database. See <a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="interface-idbcontext">Interface <code>IDbContext</code><a href="#interface-idbcontext" class="hash-link" aria-label="Direct link to interface-idbcontext" title="Direct link to interface-idbcontext" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IDbContext</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">DbView</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">RemoteReducers</span><span style="color:#F8F8F2">, ..></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    /* methods */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p><a href="#type-dbconnection" class=""><code>DbConnection</code></a>, <a href="#type-eventcontext" class=""><code>EventContext</code></a>, <a href="#type-reducereventcontext" class=""><code>ReducerEventContext</code></a>, <a href="#type-subscriptioneventcontext" class=""><code>SubscriptionEventContext</code></a> and <a href="#type-errorcontext" class=""><code>ErrorContext</code></a> all implement <code>IDbContext</code>. <code>IDbContext</code> has methods for inspecting and configuring your connection to the remote database.</p>
+<p>The <code>IDbContext</code> interface is implemented by connections and contexts to <em>every</em> module - hence why it takes <a href="#method-db" class=""><code>DbView</code></a> and <a href="#method-reducers" class=""><code>RemoteReducers</code></a> as type parameters.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#interface-iremotedbcontext" class=""><code>IRemoteDbContext</code> interface</a></td><td>Module-specific <code>IDbContext</code>.</td></tr><tr><td><a href="#method-db" class=""><code>Db</code> method</a></td><td>Provides access to the subscribed view of the remote database&#x27;s tables.</td></tr><tr><td><a href="#method-reducers" class=""><code>Reducers</code> method</a></td><td>Provides access to reducers exposed by the remote module.</td></tr><tr><td><a href="#method-disconnect" class=""><code>Disconnect</code> method</a></td><td>End the connection.</td></tr><tr><td><a href="#subscribe-to-queries" class="">Subscribe to queries</a></td><td>Register subscription queries to receive updates about matching rows.</td></tr><tr><td><a href="#read-connection-metadata" class="">Read connection metadata</a></td><td>Access the connection&#x27;s <code>Identity</code> and <code>ConnectionId</code></td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="interface-iremotedbcontext">Interface <code>IRemoteDbContext</code><a href="#interface-iremotedbcontext" class="hash-link" aria-label="Direct link to interface-iremotedbcontext" title="Direct link to interface-iremotedbcontext" translate="no">​</a></h3>
+<p>Each module&#x27;s <code>module_bindings</code> exports an interface <code>IRemoteDbContext</code> which inherits from <code>IDbContext</code>, with the type parameters <code>DbView</code> and <code>RemoteReducers</code> bound to the types defined for that module. This can be more convenient when creating functions that can be called from any callback for a specific module, but which access the database or invoke reducers, and so must know the type of the <code>DbView</code> or <code>Reducers</code>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-db">Method <code>Db</code><a href="#method-db" class="hash-link" aria-label="Direct link to method-db" title="Direct link to method-db" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IRemoteDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbView</span><span style="color:#F8F8F2"> Db { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p><code>Db</code> will have methods to access each table defined by the module.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="example">Example<a href="#example" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> ConnectToDB</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Get a handle to the User table</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> tableHandle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.Db.User;</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-reducers">Method <code>Reducers</code><a href="#method-reducers" class="hash-link" aria-label="Direct link to method-reducers" title="Direct link to method-reducers" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IRemoteDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p><code>Reducers</code> will have methods to invoke each reducer defined by the module,
+plus events for observing the result of reducer calls made by this connection.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-1">Example<a href="#example-1" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> ConnectToDB</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Register a callback to observe the result of SendMessage calls made by this connection.</span></span>
+<span class="line"><span style="color:#F8F8F2">conn.Reducers.OnSendMessage </span><span style="color:#FF79C6">+=</span><span style="color:#F8F8F2"> Reducer_OnSendMessageEvent;</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-disconnect">Method <code>Disconnect</code><a href="#method-disconnect" class="hash-link" aria-label="Direct link to method-disconnect" title="Direct link to method-disconnect" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IRemoteDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Disconnect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Gracefully close the <code>DbConnection</code>. Throws an error if the connection is already closed.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="subscribe-to-queries">Subscribe to queries<a href="#subscribe-to-queries" class="hash-link" aria-label="Direct link to Subscribe to queries" title="Direct link to Subscribe to queries" translate="no">​</a></h3>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#type-subscriptionbuilder" class=""><code>SubscriptionBuilder</code> type</a></td><td>Builder-pattern constructor to register subscribed queries.</td></tr><tr><td><a href="#type-typedsubscriptionbuilder" class=""><code>TypedSubscriptionBuilder</code> type</a></td><td>Builder for typed query subscriptions.</td></tr><tr><td><a href="#type-subscriptionhandle" class=""><code>SubscriptionHandle</code> type</a></td><td>Manage an active subscription.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-subscriptionbuilder">Type <code>SubscriptionBuilder</code><a href="#type-subscriptionbuilder" class="hash-link" aria-label="Direct link to type-subscriptionbuilder" title="Direct link to type-subscriptionbuilder" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#constructor-ctxsubscriptionbuilder" class=""><code>ctx.SubscriptionBuilder()</code> constructor</a></td><td>Begin configuring a new subscription.</td></tr><tr><td><a href="#callback-onapplied" class=""><code>OnApplied</code> callback</a></td><td>Register a callback to run when matching rows become available.</td></tr><tr><td><a href="#callback-onerror" class=""><code>OnError</code> callback</a></td><td>Register a callback to run if the subscription fails.</td></tr><tr><td><a href="#method-subscribe" class=""><code>Subscribe</code> method</a></td><td>Finish configuration and subscribe to one or more queries.</td></tr><tr><td><a href="#method-addquery" class=""><code>AddQuery</code> method</a></td><td>Build a typed subscription query without writing query strings.</td></tr><tr><td><a href="#method-subscribetoalltables" class=""><code>SubscribeToAllTables</code> method</a></td><td>Convenience method to subscribe to the entire database.</td></tr></tbody></table>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="constructor-ctxsubscriptionbuilder">Constructor <code>ctx.SubscriptionBuilder()</code><a href="#constructor-ctxsubscriptionbuilder" class="hash-link" aria-label="Direct link to constructor-ctxsubscriptionbuilder" title="Direct link to constructor-ctxsubscriptionbuilder" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IRemoteDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> SubscriptionBuilder</span><span style="color:#50FA7B"> SubscriptionBuilder</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Subscribe to queries by calling <code>ctx.SubscriptionBuilder()</code> and chaining configuration methods, then calling <code>.Subscribe(queries)</code>.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-onapplied">Callback <code>OnApplied</code><a href="#callback-onapplied" class="hash-link" aria-label="Direct link to callback-onapplied" title="Direct link to callback-onapplied" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> SubscriptionBuilder</span><span style="color:#50FA7B"> OnApplied</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">SubscriptionEventContext</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">callback</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Register a callback to run when the subscription is applied and the matching rows are inserted into the client cache.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-onerror">Callback <code>OnError</code><a href="#callback-onerror" class="hash-link" aria-label="Direct link to callback-onerror" title="Direct link to callback-onerror" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> SubscriptionBuilder</span><span style="color:#50FA7B"> OnError</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">ErrorContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">callback</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Register a callback to run if the subscription is rejected or unexpectedly terminated by the server. This is most frequently caused by passing an invalid query to <a href="#method-subscribe" class=""><code>Subscribe</code></a>.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-subscribe">Method <code>Subscribe</code><a href="#method-subscribe" class="hash-link" aria-label="Direct link to method-subscribe" title="Direct link to method-subscribe" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> SubscriptionHandle</span><span style="color:#50FA7B"> Subscribe</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">string</span><span style="color:#F8F8F2">[] </span><span style="color:#FFB86C;font-style:italic">querySqls</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Subscribe to a set of queries. <code>queries</code> should be an array of SQL query strings.</p>
+<p>See <a class="" href="/docs/reference/sql#subscriptions">the SpacetimeDB SQL Reference</a> for information on the queries SpacetimeDB supports as subscriptions.</p>
+<p>For typed query subscriptions, use <a href="#method-addquery" class=""><code>AddQuery</code></a>.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-addquery">Method <code>AddQuery</code><a href="#method-addquery" class="hash-link" aria-label="Direct link to method-addquery" title="Direct link to method-addquery" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> TypedSubscriptionBuilder</span><span style="color:#50FA7B"> AddQuery</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">TRow</span><span style="color:#F8F8F2">>(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Func</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">QueryBuilder</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">IQuery</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">TRow</span><span style="color:#F8F8F2">>> </span><span style="color:#FFB86C;font-style:italic">build</span></span>
+<span class="line"><span style="color:#F8F8F2">    );</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Start a typed query subscription. Once a typed query is added, continue with typed queries on <code>TypedSubscriptionBuilder</code> and finish with <code>Subscribe()</code>.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">Message</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-subscribetoalltables">Method <code>SubscribeToAllTables</code><a href="#method-subscribetoalltables" class="hash-link" aria-label="Direct link to method-subscribetoalltables" title="Direct link to method-subscribetoalltables" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> SubscribeToAllTables</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Subscribe to all rows from all public tables, including public event tables. This method is provided as a convenience for simple clients. The subscription initiated by <code>SubscribeToAllTables</code> cannot be canceled after it is initiated. You should <a href="#method-subscribe" class=""><code>subscribe</code> to specific queries</a> if you need fine-grained control over the lifecycle of your subscriptions.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-typedsubscriptionbuilder">Type <code>TypedSubscriptionBuilder</code><a href="#type-typedsubscriptionbuilder" class="hash-link" aria-label="Direct link to type-typedsubscriptionbuilder" title="Direct link to type-typedsubscriptionbuilder" translate="no">​</a></h4>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#method-addquery-typedsubscriptionbuilder" class=""><code>AddQuery</code> method</a></td><td>Add another typed query to the same subscription.</td></tr><tr><td><a href="#method-subscribe-typedsubscriptionbuilder" class=""><code>Subscribe</code> method</a></td><td>Subscribe to all typed queries added so far.</td></tr></tbody></table>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-addquery-typedsubscriptionbuilder">Method <code>AddQuery</code> (TypedSubscriptionBuilder)<a href="#method-addquery-typedsubscriptionbuilder" class="hash-link" aria-label="Direct link to method-addquery-typedsubscriptionbuilder" title="Direct link to method-addquery-typedsubscriptionbuilder" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> TypedSubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> TypedSubscriptionBuilder</span><span style="color:#50FA7B"> AddQuery</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">TRow</span><span style="color:#F8F8F2">>(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">        Func</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">QueryBuilder</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">IQuery</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">TRow</span><span style="color:#F8F8F2">>> </span><span style="color:#FFB86C;font-style:italic">build</span></span>
+<span class="line"><span style="color:#F8F8F2">    );</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Add another typed query. This keeps all added queries grouped under one returned <code>SubscriptionHandle</code>.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-subscribe-typedsubscriptionbuilder">Method <code>Subscribe</code> (TypedSubscriptionBuilder)<a href="#method-subscribe-typedsubscriptionbuilder" class="hash-link" aria-label="Direct link to method-subscribe-typedsubscriptionbuilder" title="Direct link to method-subscribe-typedsubscriptionbuilder" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> TypedSubscriptionBuilder</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> SubscriptionHandle</span><span style="color:#50FA7B"> Subscribe</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Subscribe to the set of typed queries that were added to the builder.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="query-builder-api">Query Builder API<a href="#query-builder-api" class="hash-link" aria-label="Direct link to Query Builder API" title="Direct link to Query Builder API" translate="no">​</a></h2>
+<p>The C# SDK provides a type-safe query builder for subscriptions. You use it through <code>SubscriptionBuilder.AddQuery(...)</code> and <code>TypedSubscriptionBuilder.AddQuery(...)</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="entry-point">Entry Point<a href="#entry-point" class="hash-link" aria-label="Direct link to Entry Point" title="Direct link to Entry Point" translate="no">​</a></h3>
+<p>Typed query builders are created from generated table accessors under <code>QueryBuilder.From</code>.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">())</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="building-queries-with-where--filter">Building Queries with <code>Where</code> / <code>Filter</code><a href="#building-queries-with-where--filter" class="hash-link" aria-label="Direct link to building-queries-with-where--filter" title="Direct link to building-queries-with-where--filter" translate="no">​</a></h3>
+<p>Each generated table accessor supports both <code>Where(...)</code> and <code>Filter(...)</code>. They are equivalent. Chaining multiple <code>Where</code>/<code>Filter</code> calls combines conditions with logical <code>AND</code>.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// All users</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Filtered users</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Online.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Name.</span><span style="color:#50FA7B">Neq</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Anonymous</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Chained filters (AND semantics)</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Score.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000UL</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Level.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10U</span><span style="color:#F8F8F2">))</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="comparison-operators">Comparison Operators<a href="#comparison-operators" class="hash-link" aria-label="Direct link to Comparison Operators" title="Direct link to Comparison Operators" translate="no">​</a></h3>
+<table><thead><tr><th>Operator</th><th>Description</th><th>Example</th></tr></thead>\<tbody\><tr><td><code>Eq</code></td><td>Equal to</td><td><code>u.Online.Eq(true)</code></td></tr><tr><td><code>Neq</code></td><td>Not equal to</td><td><code>u.Name.Neq("BOT")</code></td></tr><tr><td><code>Lt</code></td><td>Less than</td><td><code>u.Level.Lt(10U)</code></td></tr><tr><td><code>Lte</code></td><td>Less than or equal to</td><td><code>u.Level.Lte(10U)</code></td></tr><tr><td><code>Gt</code></td><td>Greater than</td><td><code>u.Score.Gt(1000UL)</code></td></tr><tr><td><code>Gte</code></td><td>Greater than or equal to</td><td><code>u.Score.Gte(1000UL)</code></td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="boolean-combinators">Boolean Combinators<a href="#boolean-combinators" class="hash-link" aria-label="Direct link to Boolean Combinators" title="Direct link to Boolean Combinators" translate="no">​</a></h3>
+<p>Combine conditions with <code>And</code>, <code>Or</code>, and <code>Not</code>:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Level.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">5U</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">And</span><span style="color:#F8F8F2">(u.Level.</span><span style="color:#50FA7B">Lt</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10U</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Online.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">Or</span><span style="color:#F8F8F2">(u.Name.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Admin</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Banned.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">).</span><span style="color:#50FA7B">Not</span><span style="color:#F8F8F2">())</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="semijoins">Semijoins<a href="#semijoins" class="hash-link" aria-label="Direct link to Semijoins" title="Direct link to Semijoins" translate="no">​</a></h3>
+<p>Semijoins match rows across two tables and return rows from one side:</p>
+\<ul\>
+<li class=""><code>LeftSemijoin(...)</code> returns rows from the left side that match at least one row on the right.</li>
+<li class=""><code>RightSemijoin(...)</code> returns rows from the right side that match at least one row on the left.</li>
+<li class="">The join predicate uses indexed columns (<code>IxCols</code>) and must compare one indexed column from each side with <code>Eq</code>.</li>
+<li class="">Filters before a semijoin apply to the pre-join source side. Filters after a semijoin apply to the returned side.</li>
+</ul>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">Player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> p.Score.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000UL</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">LeftSemijoin</span><span style="color:#F8F8F2">(q.From.</span><span style="color:#50FA7B">PlayerLevel</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">pl</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> p.Id.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(pl.PlayerId))</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> p.Online.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">Player</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> p.Score.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1000UL</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">RightSemijoin</span><span style="color:#F8F8F2">(q.From.</span><span style="color:#50FA7B">PlayerLevel</span><span style="color:#F8F8F2">(), (</span><span style="color:#FFB86C;font-style:italic">p</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">pl</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> p.Id.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(pl.PlayerId))</span></span>
+<span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">pl</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> pl.Level.</span><span style="color:#50FA7B">Gte</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">10U</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="using-query-builders-with-subscriptions">Using Query Builders with Subscriptions<a href="#using-query-builders-with-subscriptions" class="hash-link" aria-label="Direct link to Using Query Builders with Subscriptions" title="Direct link to Using Query Builders with Subscriptions" translate="no">​</a></h3>
+<p><code>AddQuery</code> accepts a builder function that returns an <code>IQuery<TRow></code>. You can add multiple typed queries and subscribe once.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> handle </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">User</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">u</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> u.Online.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">AddQuery</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">q</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> q.From.</span><span style="color:#50FA7B">Message</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">Where</span><span style="color:#F8F8F2">(</span><span style="color:#FFB86C;font-style:italic">m</span><span style="color:#FF79C6"> =></span><span style="color:#F8F8F2"> m.ChannelId.</span><span style="color:#50FA7B">Eq</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">1U</span><span style="color:#F8F8F2">)))</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Subscribe</span><span style="color:#F8F8F2">();</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-subscriptionhandle">Type <code>SubscriptionHandle</code><a href="#type-subscriptionhandle" class="hash-link" aria-label="Direct link to type-subscriptionhandle" title="Direct link to type-subscriptionhandle" translate="no">​</a></h4>
+<p>A <code>SubscriptionHandle</code> represents a subscribed query or a group of subscribed queries.</p>
+<p>The <code>SubscriptionHandle</code> does not contain or provide access to the subscribed rows. Subscribed rows of all subscriptions by a connection are contained within that connection&#x27;s <a href="#property-db" class=""><code>ctx.Db</code></a>. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#property-isended" class=""><code>IsEnded</code> property</a></td><td>Determine whether the subscription has ended.</td></tr><tr><td><a href="#property-isactive" class=""><code>IsActive</code> property</a></td><td>Determine whether the subscription is active and its matching rows are present in the client cache.</td></tr><tr><td><a href="#method-unsubscribe" class=""><code>Unsubscribe</code> method</a></td><td>Discard a subscription.</td></tr><tr><td><a href="#method-unsubscribethen" class=""><code>UnsubscribeThen</code> method</a></td><td>Discard a subscription, and register a callback to run when its matching rows are removed from the client cache.</td></tr></tbody></table>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-isended">Property <code>IsEnded</code><a href="#property-isended" class="hash-link" aria-label="Direct link to property-isended" title="Direct link to property-isended" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> bool</span><span style="color:#F8F8F2"> IsEnded;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>True if this subscription has been terminated due to an unsubscribe call or an error.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-isactive">Property <code>IsActive</code><a href="#property-isactive" class="hash-link" aria-label="Direct link to property-isactive" title="Direct link to property-isactive" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> bool</span><span style="color:#F8F8F2"> IsActive;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>True if this subscription has been applied and has not yet been unsubscribed.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-unsubscribe">Method <code>Unsubscribe</code><a href="#method-unsubscribe" class="hash-link" aria-label="Direct link to method-unsubscribe" title="Direct link to method-unsubscribe" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Unsubscribe</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Terminate this subscription, causing matching rows to be removed from the client cache. Any rows removed from the client cache this way will have <a href="#callback-ondelete" class=""><code>OnDelete</code> callbacks</a> run for them.</p>
+<p>Unsubscribing is an asynchronous operation. Matching rows are not removed from the client cache immediately. Use <a href="#method-unsubscribethen" class=""><code>UnsubscribeThen</code></a> to run a callback once the unsubscribe operation is completed.</p>
+<p>Returns an error if the subscription has already ended, either due to a previous call to <code>Unsubscribe</code> or <a href="#method-unsubscribethen" class=""><code>UnsubscribeThen</code></a>, or due to an error.</p>
+<h5 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-unsubscribethen">Method <code>UnsubscribeThen</code><a href="#method-unsubscribethen" class="hash-link" aria-label="Direct link to method-unsubscribethen" title="Direct link to method-unsubscribethen" translate="no">​</a></h5>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> UnsubscribeThen</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Action</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">SubscriptionEventContext</span><span style="color:#F8F8F2">>? </span><span style="color:#FFB86C;font-style:italic">onEnded</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Terminate this subscription, and run the <code>onEnded</code> callback when the subscription is ended and its matching rows are removed from the client cache. Any rows removed from the client cache this way will have <a href="#callback-ondelete" class=""><code>OnDelete</code> callbacks</a> run for them.</p>
+<p>Returns an error if the subscription has already ended, either due to a previous call to <a href="#method-unsubscribe" class=""><code>Unsubscribe</code></a> or <code>UnsubscribeThen</code>, or due to an error.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="read-connection-metadata">Read connection metadata<a href="#read-connection-metadata" class="hash-link" aria-label="Direct link to Read connection metadata" title="Direct link to Read connection metadata" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-identity">Property <code>Identity</code><a href="#property-identity" class="hash-link" aria-label="Direct link to property-identity" title="Direct link to property-identity" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">? Identity { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Get the <code>Identity</code> with which SpacetimeDB identifies the connection. This method returns null if the connection was initiated anonymously and the newly-generated <code>Identity</code> has not yet been received, i.e. if called before the <a href="#callback-onconnect" class=""><code>OnConnect</code> callback</a> is invoked.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-connectionid">Property <code>ConnectionId</code><a href="#property-connectionid" class="hash-link" aria-label="Direct link to property-connectionid" title="Direct link to property-connectionid" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> ConnectionId</span><span style="color:#F8F8F2"> ConnectionId { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Get the <a href="#type-connectionid" class=""><code>ConnectionId</code></a> with which SpacetimeDB identifies the connection.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-isactive-1">Property <code>IsActive</code><a href="#property-isactive-1" class="hash-link" aria-label="Direct link to property-isactive-1" title="Direct link to property-isactive-1" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">interface</span><span style="color:#8BE9FD;font-style:italic"> IDbContext</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> bool</span><span style="color:#F8F8F2"> IsActive { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p><code>true</code> if the connection has not yet disconnected. Note that a connection <code>IsActive</code> when it is constructed, before its <a href="#callback-onconnect" class=""><code>OnConnect</code> callback</a> is invoked.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-eventcontext">Type <code>EventContext</code><a href="#type-eventcontext" class="hash-link" aria-label="Direct link to type-eventcontext" title="Direct link to type-eventcontext" translate="no">​</a></h2>
+<p>An <code>EventContext</code> is an <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> augmented with an <a href="#record-event" class=""><code>Event</code></a> property. <code>EventContext</code>s are passed as the first argument to row callbacks <a href="#callback-oninsert" class=""><code>OnInsert</code></a>, <a href="#callback-ondelete" class=""><code>OnDelete</code></a> and <a href="#callback-onupdate" class=""><code>OnUpdate</code></a>.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#property-event" class=""><code>Event</code> property</a></td><td>Enum describing the cause of the current row callback.</td></tr><tr><td><a href="#property-db" class=""><code>Db</code> property</a></td><td>Provides access to the client cache.</td></tr><tr><td><a href="#property-reducers" class=""><code>Reducers</code> property</a></td><td>Allows requesting reducers run on the remote database.</td></tr><tr><td><a href="#record-event" class=""><code>Event</code> record</a></td><td>Possible events which can cause a row callback to be invoked.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-event">Property <code>Event</code><a href="#property-event" class="hash-link" aria-label="Direct link to property-event" title="Direct link to property-event" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> EventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> readonly</span><span style="color:#8BE9FD;font-style:italic"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">> Event;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <a href="#record-event" class=""><code>Event</code></a> contained in the <code>EventContext</code> describes what happened to cause the current row callback to be invoked.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-db-1">Property <code>Db</code><a href="#property-db-1" class="hash-link" aria-label="Direct link to property-db-1" title="Direct link to property-db-1" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> EventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteTables</span><span style="color:#F8F8F2"> Db;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Db</code> property of the context provides access to the subscribed view of the remote database&#x27;s tables. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="field-reducers">Field <code>Reducers</code><a href="#field-reducers" class="hash-link" aria-label="Direct link to field-reducers" title="Direct link to field-reducers" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> EventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Reducers</code> property of the context provides access to reducers exposed by the remote module. See <a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="record-event">Record <code>Event</code><a href="#record-event" class="hash-link" aria-label="Direct link to record-event" title="Direct link to record-event" translate="no">​</a></h3>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#variant-reducer" class=""><code>Reducer</code> variant</a></td><td>A reducer ran in the remote database.</td></tr><tr><td><a href="#variant-subscribeapplied" class=""><code>SubscribeApplied</code> variant</a></td><td>A new subscription was applied to the client cache.</td></tr><tr><td><a href="#variant-unsubscribeapplied" class=""><code>UnsubscribeApplied</code> variant</a></td><td>A previous subscription was removed from the client cache after a call to <a href="#method-unsubscribe" class=""><code>Unsubscribe</code></a>.</td></tr><tr><td><a href="#variant-subscribeerror" class=""><code>SubscribeError</code> variant</a></td><td>A previous subscription was removed from the client cache due to an error.</td></tr><tr><td><a href="#variant-unknowntransaction" class=""><code>UnknownTransaction</code> variant</a></td><td>A transaction ran in the remote database, but was not attributed to a known reducer.</td></tr><tr><td><a href="#record-reducerevent" class=""><code>ReducerEvent</code> record</a></td><td>Metadata about a reducer run. Contained in a <a href="#variant-reducer" class=""><code>Reducer</code> event</a> and <a href="#type-reducereventcontext" class=""><code>ReducerEventContext</code></a>.</td></tr><tr><td><a href="#record-status" class=""><code>Status</code> record</a></td><td>Completion status of a reducer run.</td></tr><tr><td><a href="#record-reducer" class=""><code>Reducer</code> record</a></td><td>Module-specific generated record with a variant for each reducer defined by the module.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-reducer">Variant <code>Reducer</code><a href="#variant-reducer" class="hash-link" aria-label="Direct link to variant-reducer" title="Direct link to variant-reducer" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> Reducer</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerEvent</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">> </span><span style="color:#FFB86C;font-style:italic">ReducerEvent</span><span style="color:#F8F8F2">) : </span><span style="color:#8BE9FD;font-style:italic">Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">>;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Event when we are notified of the result of a reducer call made by this connection. The <a href="#record-reducerevent" class=""><code>ReducerEvent</code></a> contains metadata about the reducer run, including its arguments and termination <a href="#record-status" class=""><code>Status</code></a>.</p>
+<p>For changes caused by other clients&#x27; reducer calls, use table row callbacks or event tables rather than reducer callbacks. The server does not broadcast reducer arguments globally.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-subscribeapplied">Variant <code>SubscribeApplied</code><a href="#variant-subscribeapplied" class="hash-link" aria-label="Direct link to variant-subscribeapplied" title="Direct link to variant-subscribeapplied" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> SubscribeApplied</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">>;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Event when our subscription is applied and its rows are inserted into the client cache.</p>
+<p>This event is passed to <a href="#callback-oninsert" class="">row <code>OnInsert</code> callbacks</a> resulting from the new subscription.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-unsubscribeapplied">Variant <code>UnsubscribeApplied</code><a href="#variant-unsubscribeapplied" class="hash-link" aria-label="Direct link to variant-unsubscribeapplied" title="Direct link to variant-unsubscribeapplied" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> UnsubscribeApplied</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">>;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Event when our subscription is removed after a call to <a href="#method-unsubscribe" class=""><code>SubscriptionHandle.Unsubscribe</code></a> or <a href="#method-unsubscribethen" class=""><code>SubscriptionHandle.UnsubscribeTthen</code></a> and its matching rows are deleted from the client cache.</p>
+<p>This event is passed to <a href="#callback-ondelete" class="">row <code>OnDelete</code> callbacks</a> resulting from the subscription ending.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-subscribeerror">Variant <code>SubscribeError</code><a href="#variant-subscribeerror" class="hash-link" aria-label="Direct link to variant-subscribeerror" title="Direct link to variant-subscribeerror" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> SubscribeError</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#FFB86C;font-style:italic"> Exception</span><span style="color:#F8F8F2">) : </span><span style="color:#8BE9FD;font-style:italic">Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">>;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Event when a subscription ends unexpectedly due to an error.</p>
+<p>This event is passed to <a href="#callback-ondelete" class="">row <code>OnDelete</code> callbacks</a> resulting from the subscription ending.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-unknowntransaction">Variant <code>UnknownTransaction</code><a href="#variant-unknowntransaction" class="hash-link" aria-label="Direct link to variant-unknowntransaction" title="Direct link to variant-unknowntransaction" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Event</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> record</span><span style="color:#8BE9FD"> UnknownTransaction</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">Event</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">R</span><span style="color:#F8F8F2">>;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Event when we are notified of a transaction in the remote database which we cannot associate with a known reducer. This may be an ad-hoc SQL query or a reducer for which we do not have bindings.</p>
+<p>This event is passed to <a href="#callback-oninsert" class="">row callbacks</a> resulting from modifications by the transaction.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="record-reducerevent">Record <code>ReducerEvent</code><a href="#record-reducerevent" class="hash-link" aria-label="Direct link to record-reducerevent" title="Direct link to record-reducerevent" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> ReducerEvent</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">R</span><span style="color:#F8F8F2">>(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Timestamp</span><span style="color:#FFB86C;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Status</span><span style="color:#FFB86C;font-style:italic"> Status</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Identity</span><span style="color:#FFB86C;font-style:italic"> CallerIdentity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    ConnectionId</span><span style="color:#F8F8F2">? </span><span style="color:#FFB86C;font-style:italic">CallerConnectionId</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    U128</span><span style="color:#F8F8F2">? </span><span style="color:#FFB86C;font-style:italic">EnergyConsumed</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    R</span><span style="color:#FFB86C;font-style:italic"> Reducer</span></span>
+<span class="line"><span style="color:#F8F8F2">)</span></span></code></pre>
+<p>A <code>ReducerEvent</code> contains metadata about a reducer run.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="record-status">Record <code>Status</code><a href="#record-status" class="hash-link" aria-label="Direct link to record-status" title="Direct link to record-status" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">record</span><span style="color:#8BE9FD"> Status</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">TaggedEnum</span><span style="color:#F8F8F2"><(</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Unit</span><span style="color:#F8F8F2"> Committed,</span></span>
+<span class="line"><span style="color:#FF79C6">    string</span><span style="color:#F8F8F2"> Failed,</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Unit</span><span style="color:#F8F8F2"> OutOfEnergy</span></span>
+<span class="line"><span style="color:#F8F8F2">)>;</span></span></code></pre>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#variant-committed" class=""><code>Committed</code> variant</a></td><td>The reducer ran successfully.</td></tr><tr><td><a href="#variant-failed" class=""><code>Failed</code> variant</a></td><td>The reducer errored.</td></tr><tr><td><a href="#variant-outofenergy" class=""><code>OutOfEnergy</code> variant</a></td><td>The reducer was aborted due to insufficient energy.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-committed">Variant <code>Committed</code><a href="#variant-committed" class="hash-link" aria-label="Direct link to variant-committed" title="Direct link to variant-committed" translate="no">​</a></h4>
+<p>The reducer returned successfully and its changes were committed into the database state. An <a href="#variant-reducer" class=""><code>Event.Reducer</code></a> passed to a row callback must have this status in its <a href="#record-reducerevent" class=""><code>ReducerEvent</code></a>.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-failed">Variant <code>Failed</code><a href="#variant-failed" class="hash-link" aria-label="Direct link to variant-failed" title="Direct link to variant-failed" translate="no">​</a></h4>
+<p>The reducer returned an error, panicked, or threw an exception. The record payload is the stringified error message. Formatting of the error message is unstable and subject to change, so clients should use it only as a human-readable diagnostic, and in particular should not attempt to parse the message.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="variant-outofenergy">Variant <code>OutOfEnergy</code><a href="#variant-outofenergy" class="hash-link" aria-label="Direct link to variant-outofenergy" title="Direct link to variant-outofenergy" translate="no">​</a></h4>
+<p>The reducer was aborted due to insufficient energy balance of the module owner.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="record-reducer">Record <code>Reducer</code><a href="#record-reducer" class="hash-link" aria-label="Direct link to record-reducer" title="Direct link to record-reducer" translate="no">​</a></h3>
+<p>The module bindings contains an record <code>Reducer</code> with a variant for each reducer defined by the module. Each variant has a payload containing the arguments to the reducer.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-reducereventcontext">Type <code>ReducerEventContext</code><a href="#type-reducereventcontext" class="hash-link" aria-label="Direct link to type-reducereventcontext" title="Direct link to type-reducereventcontext" translate="no">​</a></h2>
+<p>A <code>ReducerEventContext</code> is an <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> augmented with an <a href="#record-reducerevent" class=""><code>Event</code></a> property. <code>ReducerEventContext</code>s are passed as the first argument to <a href="#observe-and-invoke-reducers" class="">reducer callbacks</a>.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#property-event" class=""><code>Event</code> property</a></td><td><a href="#record-reducerevent" class=""><code>ReducerEvent</code></a> containing reducer metadata.</td></tr><tr><td><a href="#property-db" class=""><code>Db</code> property</a></td><td>Provides access to the client cache.</td></tr><tr><td><a href="#property-reducers" class=""><code>Reducers</code> property</a></td><td>Allows requesting reducers run on the remote database.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-event-1">Property <code>Event</code><a href="#property-event-1" class="hash-link" aria-label="Direct link to property-event-1" title="Direct link to property-event-1" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> ReducerEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> readonly</span><span style="color:#8BE9FD;font-style:italic"> ReducerEvent</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">> Event;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <a href="#record-reducerevent" class=""><code>ReducerEvent</code></a> contained in the <code>ReducerEventContext</code> has metadata about the reducer which ran.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-db-2">Property <code>Db</code><a href="#property-db-2" class="hash-link" aria-label="Direct link to property-db-2" title="Direct link to property-db-2" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> ReducerEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteTables</span><span style="color:#F8F8F2"> Db;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Db</code> property of the context provides access to the subscribed view of the remote database&#x27;s tables. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-reducers-1">Property <code>Reducers</code><a href="#property-reducers-1" class="hash-link" aria-label="Direct link to property-reducers-1" title="Direct link to property-reducers-1" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> ReducerEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Reducers</code> property of the context provides access to reducers exposed by the remote module. See <a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-subscriptioneventcontext">Type <code>SubscriptionEventContext</code><a href="#type-subscriptioneventcontext" class="hash-link" aria-label="Direct link to type-subscriptioneventcontext" title="Direct link to type-subscriptioneventcontext" translate="no">​</a></h2>
+<p>A <code>SubscriptionEventContext</code> is an <a href="#interface-idbcontext" class=""><code>IDbContext</code></a>. Unlike the other context types, <code>SubscriptionEventContext</code> doesn&#x27;t have an <code>Event</code> property. <code>SubscriptionEventContext</code>s are passed to subscription <a href="#callback-onapplied" class=""><code>OnApplied</code></a> and <a href="#method-unsubscribethen" class=""><code>UnsubscribeThen</code></a> callbacks.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#property-db" class=""><code>Db</code> property</a></td><td>Provides access to the client cache.</td></tr><tr><td><a href="#property-reducers" class=""><code>Reducers</code> property</a></td><td>Allows requesting reducers run on the remote database.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-db-3">Property <code>Db</code><a href="#property-db-3" class="hash-link" aria-label="Direct link to property-db-3" title="Direct link to property-db-3" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteTables</span><span style="color:#F8F8F2"> Db;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Db</code> property of the context provides access to the subscribed view of the remote database&#x27;s tables. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-reducers-2">Property <code>Reducers</code><a href="#property-reducers-2" class="hash-link" aria-label="Direct link to property-reducers-2" title="Direct link to property-reducers-2" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Reducers</code> property of the context provides access to reducers exposed by the remote module. See <a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-errorcontext">Type <code>ErrorContext</code><a href="#type-errorcontext" class="hash-link" aria-label="Direct link to type-errorcontext" title="Direct link to type-errorcontext" translate="no">​</a></h2>
+<p>An <code>ErrorContext</code> is an <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> augmented with an <code>Event</code> property. <code>ErrorContext</code>s are passed to subscriptions&#x27; <a href="#callback-onerror" class=""><code>OnError</code></a> callbacks.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#property-event" class=""><code>Event</code> property</a></td><td>The error which caused the current error callback.</td></tr><tr><td><a href="#property-db" class=""><code>Db</code> property</a></td><td>Provides access to the client cache.</td></tr><tr><td><a href="#property-reducers" class=""><code>Reducers</code> property</a></td><td>Allows requesting reducers run on the remote database.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-event-2">Property <code>Event</code><a href="#property-event-2" class="hash-link" aria-label="Direct link to property-event-2" title="Direct link to property-event-2" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> SubscriptionEventContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> readonly</span><span style="color:#8BE9FD;font-style:italic"> Exception</span><span style="color:#F8F8F2"> Event;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-db-4">Property <code>Db</code><a href="#property-db-4" class="hash-link" aria-label="Direct link to property-db-4" title="Direct link to property-db-4" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> ErrorContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteTables</span><span style="color:#F8F8F2"> Db;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Db</code> property of the context provides access to the subscribed view of the remote database&#x27;s tables. See <a href="#access-the-client-cache" class="">Access the client cache</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-reducers-3">Property <code>Reducers</code><a href="#property-reducers-3" class="hash-link" aria-label="Direct link to property-reducers-3" title="Direct link to property-reducers-3" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> ErrorContext</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> RemoteReducers</span><span style="color:#F8F8F2"> Reducers;</span></span>
+<span class="line"><span style="color:#6272A4">    /* other fields */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>Reducers</code> property of the context provides access to reducers exposed by the remote database. See <a href="#observe-and-invoke-reducers" class="">Observe and invoke reducers</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="access-the-client-cache">Access the client cache<a href="#access-the-client-cache" class="hash-link" aria-label="Direct link to Access the client cache" title="Direct link to Access the client cache" translate="no">​</a></h2>
+<p>All <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> implementors, including <a href="#type-dbconnection" class=""><code>DbConnection</code></a> and <a href="#type-eventcontext" class=""><code>EventContext</code></a>, have <code>.Db</code> properties, which in turn have methods for accessing tables in the client cache.</p>
+<p>Each table defined by a module has an accessor method on this <code>.Db</code> property, generated from the table accessor name using C# naming conventions (for example, <code>player_score</code> becomes <code>PlayerScore</code>). The table accessor methods return table handles which inherit from <a href="#type-remotetablehandle" class=""><code>RemoteTableHandle</code></a> and have methods for searching by index.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#type-remotetablehandle" class=""><code>RemoteTableHandle</code></a></td><td>Provides access to subscribed rows of a specific table within the client cache.</td></tr><tr><td><a href="#unique-constraint-index-access" class="">Unique constraint index access</a></td><td>Seek a subscribed row by the value in its unique or primary key column.</td></tr><tr><td><a href="#btree-index-access" class="">BTree index access</a></td><td>Seek subscribed rows by the value in its indexed column.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-remotetablehandle">Type <code>RemoteTableHandle</code><a href="#type-remotetablehandle" class="hash-link" aria-label="Direct link to type-remotetablehandle" title="Direct link to type-remotetablehandle" translate="no">​</a></h3>
+<p>Implemented by all table handles.</p>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead>\<tbody\><tr><td><a href="#type-row" class=""><code>Row</code> type parameter</a></td><td>The type of rows in the table.</td></tr><tr><td><a href="#property-count" class=""><code>Count</code> property</a></td><td>The number of subscribed rows in the table.</td></tr><tr><td><a href="#method-iter" class=""><code>Iter</code> method</a></td><td>Iterate over all subscribed rows in the table.</td></tr><tr><td><a href="#callback-oninsert" class=""><code>OnInsert</code> callback</a></td><td>Register a callback to run whenever a row is inserted into the client cache.</td></tr><tr><td><a href="#callback-ondelete" class=""><code>OnDelete</code> callback</a></td><td>Register a callback to run whenever a row is deleted from the client cache.</td></tr><tr><td><a href="#callback-onupdate" class=""><code>OnUpdate</code> callback</a></td><td>Register a callback to run whenever a subscribed row is replaced with a new version.</td></tr></tbody></table>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-row">Type <code>Row</code><a href="#type-row" class="hash-link" aria-label="Direct link to type-row" title="Direct link to type-row" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span><span style="color:#F8F8F2"><</span><span style="color:#FFB86C;font-style:italic">EventContext</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">Row</span><span style="color:#F8F8F2">></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#6272A4">    /* members */</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The type of rows in the table.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="property-count">Property <code>Count</code><a href="#property-count" class="hash-link" aria-label="Direct link to property-count" title="Direct link to property-count" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> Count;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The number of rows of this table resident in the client cache, i.e. the total number which match any subscribed query.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="method-iter">Method <code>Iter</code><a href="#method-iter" class="hash-link" aria-label="Direct link to method-iter" title="Direct link to method-iter" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> IEnumerable</span><span style="color:#F8F8F2"><</span><span style="color:#8BE9FD;font-style:italic">Row</span><span style="color:#F8F8F2">> </span><span style="color:#50FA7B">Iter</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>An iterator over all the subscribed rows in the client cache, i.e. those which match any subscribed query.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-oninsert">Callback <code>OnInsert</code><a href="#callback-oninsert" class="hash-link" aria-label="Direct link to callback-oninsert" title="Direct link to callback-oninsert" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> delegate</span><span style="color:#FF79C6"> void</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Row</span><span style="color:#FFB86C;font-style:italic"> row</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> event</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">? OnInsert;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>OnInsert</code> callback runs whenever a new row is inserted into the client cache, either when applying a subscription or being notified of a transaction. The passed <a href="#type-eventcontext" class=""><code>EventContext</code></a> contains an <a href="#record-event" class=""><code>Event</code></a> which can identify the change which caused the insertion, and also allows the callback to interact with the connection, inspect the client cache and invoke reducers. Newly registered or canceled callbacks do not take effect until the following event.</p>
+<p>See <a class="" href="/docs/quickstarts/c-sharp">the quickstart</a> for examples of registering and unregistering row callbacks.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-ondelete">Callback <code>OnDelete</code><a href="#callback-ondelete" class="hash-link" aria-label="Direct link to callback-ondelete" title="Direct link to callback-ondelete" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> delegate</span><span style="color:#FF79C6"> void</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Row</span><span style="color:#FFB86C;font-style:italic"> row</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> event</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">? OnDelete;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>OnDelete</code> callback runs whenever a previously-resident row is deleted from the client cache. Newly registered or canceled callbacks do not take effect until the following event.</p>
+<p>See <a class="" href="/docs/quickstarts/c-sharp">the quickstart</a> for examples of registering and unregistering row callbacks.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="callback-onupdate">Callback <code>OnUpdate</code><a href="#callback-onupdate" class="hash-link" aria-label="Direct link to callback-onupdate" title="Direct link to callback-onupdate" translate="no">​</a></h4>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">class</span><span style="color:#8BE9FD"> RemoteTableHandle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> delegate</span><span style="color:#FF79C6"> void</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Row</span><span style="color:#FFB86C;font-style:italic"> row</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> event</span><span style="color:#8BE9FD;font-style:italic"> RowEventHandler</span><span style="color:#F8F8F2">? OnUpdate;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>The <code>OnUpdate</code> callback runs whenever an already-resident row in the client cache is updated, i.e. replaced with a new row that has the same primary key. The handle must have a known primary key for callbacks to be triggered. This includes tables with primary keys, query builder views with inferred primary keys, and procedural views declared with <code>PrimaryKey</code>. Newly registered or canceled callbacks do not take effect until the following event.</p>
+<p>See <a class="" href="/docs/quickstarts/c-sharp">the quickstart</a> for examples of registering and unregistering row callbacks.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="unique-constraint-index-access">Unique constraint index access<a href="#unique-constraint-index-access" class="hash-link" aria-label="Direct link to Unique constraint index access" title="Direct link to Unique constraint index access" translate="no">​</a></h3>
+<p>For each unique constraint on a table, its table handle has a property which is a unique index handle and whose name is the unique column name. This unique index handle has a method <code>.Find(Column value)</code>. If a <code>Row</code> with <code>value</code> in the unique column is resident in the client cache, <code>.Find</code> returns it. Otherwise it returns null.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-2">Example<a href="#example-2" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example" translate="no">​</a></h4>
+<p>Given the following module-side <code>User</code> definition:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">User</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> User</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">] </span><span style="color:#6272A4">// Or [PrimaryKey]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ..</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>a client would lookup a user as follows:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#8BE9FD;font-style:italic">User</span><span style="color:#F8F8F2">? </span><span style="color:#50FA7B">FindUser</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">RemoteTables</span><span style="color:#FFB86C;font-style:italic"> tables</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#FFB86C;font-style:italic"> id</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> tables.User.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(id);</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="btree-index-access">BTree index access<a href="#btree-index-access" class="hash-link" aria-label="Direct link to BTree index access" title="Direct link to BTree index access" translate="no">​</a></h3>
+<p>For each btree index defined on a remote table, its corresponding table handle has a property which is a btree index handle and whose name is the name of the index. This index handle has a method <code>IEnumerable\<Row\> Filter(Column value)</code> which will return <code>Row</code>s with <code>value</code> in the indexed <code>Column</code>, if there are any in the cache.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="example-3">Example<a href="#example-3" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example" translate="no">​</a></h4>
+<p>Given the following module-side <code>Player</code> definition:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Level</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> level;</span></span>
+<span class="line"><span style="color:#F8F8F2">    ..</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>a client would count the number of <code>Player</code>s at a certain level as follows:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">int</span><span style="color:#50FA7B"> CountPlayersAtLevel</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">RemoteTables</span><span style="color:#FFB86C;font-style:italic"> tables</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">uint</span><span style="color:#FFB86C;font-style:italic"> level</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> tables.Player.Level.</span><span style="color:#50FA7B">Filter</span><span style="color:#F8F8F2">(level).</span><span style="color:#50FA7B">Count</span><span style="color:#F8F8F2">();</span></span></code></pre>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="observe-and-invoke-reducers">Observe and invoke reducers<a href="#observe-and-invoke-reducers" class="hash-link" aria-label="Direct link to Observe and invoke reducers" title="Direct link to Observe and invoke reducers" translate="no">​</a></h2>
+<p>All <a href="#interface-idbcontext" class=""><code>IDbContext</code></a> implementors, including <a href="#type-dbconnection" class=""><code>DbConnection</code></a> and <a href="#type-eventcontext" class=""><code>EventContext</code></a>, have a <code>.Reducers</code> property. Generated module bindings expose one invoke method and one result event for each reducer.</p>
+<p>For a reducer named <code>send_message</code>, generated C# bindings use PascalCase names:</p>
+\<ul\>
+<li class="">An invoke method, like <code>SendMessage(...)</code>. This requests that the module run the reducer.</li>
+<li class="">A result event, like <code>OnSendMessage</code>. This event fires on the calling connection when SpacetimeDB reports that reducer call&#x27;s result, including committed, failed, and out-of-energy statuses.</li>
+</ul>
+<p>Subscribe to reducer result events with <code>+=</code> and unsubscribe with <code>-=</code>, as with any C# event.</p>
+<p>Reducer result events are not global notifications. They are for reducer calls made by this connection. To notify other clients that something happened, write to a public table or event table and subscribe to it.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="identify-a-client">Identify a client<a href="#identify-a-client" class="hash-link" aria-label="Direct link to Identify a client" title="Direct link to Identify a client" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-identity">Type <code>Identity</code><a href="#type-identity" class="hash-link" aria-label="Direct link to type-identity" title="Direct link to type-identity" translate="no">​</a></h3>
+<p>A unique public identifier for a client connected to a database.
+See the <a class="" href="/docs/intro/key-architecture#identity">module docs</a> for more details.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-connectionid">Type <code>ConnectionId</code><a href="#type-connectionid" class="hash-link" aria-label="Direct link to type-connectionid" title="Direct link to type-connectionid" translate="no">​</a></h3>
+<p>An opaque identifier for a client connection to a database, intended to differentiate between connections from the same <a href="#type-identity" class=""><code>Identity</code></a>.
+See the <a class="" href="/docs/intro/key-architecture#connectionid">module docs</a> for more details.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-timestamp">Type <code>Timestamp</code><a href="#type-timestamp" class="hash-link" aria-label="Direct link to type-timestamp" title="Direct link to type-timestamp" translate="no">​</a></h3>
+<p>A point in time, measured in microseconds since the Unix epoch.
+See the <a class="" href="/docs/tables/column-types">module docs</a> for more details.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="type-taggedenum">Type <code>TaggedEnum</code><a href="#type-taggedenum" class="hash-link" aria-label="Direct link to type-taggedenum" title="Direct link to type-taggedenum" translate="no">​</a></h3>
+<p>A <a href="https://en.wikipedia.org/wiki/Tagged_union" target="_blank" rel="noopener noreferrer" class="">tagged union</a> type. When defining TaggedEnum types in a module, use <code>partial record</code>, not <code>partial class</code>.
+See the <a class="" href="/docs/tables/column-types">module docs</a> for more details.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00600-clients/00600-csharp-reference.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/clients/rust"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Rust Reference</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/clients/typescript"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">TypeScript Reference</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#server-module-quick-reference" class="table-of-contents__link toc-highlight">Server module quick reference</a></li>\<li\><a href="#project-setup" class="table-of-contents__link toc-highlight">Project setup</a>\<ul\>\<li\><a href="#using-the-dotnet-cli-tool" class="table-of-contents__link toc-highlight">Using the <code>dotnet</code> CLI tool</a></li>\<li\><a href="#using-unity" class="table-of-contents__link toc-highlight">Using Unity</a></li></ul></li>\<li\><a href="#generate-module-bindings" class="table-of-contents__link toc-highlight">Generate module bindings</a></li>\<li\><a href="#type-dbconnection" class="table-of-contents__link toc-highlight">Type <code>DbConnection</code></a>\<ul\>\<li\><a href="#connect-to-a-database" class="table-of-contents__link toc-highlight">Connect to a database</a>\<ul\>\<li\><a href="#method-withuri" class="table-of-contents__link toc-highlight">Method <code>WithUri</code></a></li>\<li\><a href="#method-withdatabasename" class="table-of-contents__link toc-highlight">Method <code>WithDatabaseName</code></a></li>\<li\><a href="#method-withconfirmedreads" class="table-of-contents__link toc-highlight">Method <code>WithConfirmedReads</code></a></li>\<li\><a href="#method-withcompression" class="table-of-contents__link toc-highlight">Method <code>WithCompression</code></a></li>\<li\><a href="#callback-onconnect" class="table-of-contents__link toc-highlight">Callback <code>OnConnect</code></a></li>\<li\><a href="#callback-onconnecterror" class="table-of-contents__link toc-highlight">Callback <code>OnConnectError</code></a></li>\<li\><a href="#callback-ondisconnect" class="table-of-contents__link toc-highlight">Callback <code>OnDisconnect</code></a></li>\<li\><a href="#method-withtoken" class="table-of-contents__link toc-highlight">Method <code>WithToken</code></a></li>\<li\><a href="#method-build" class="table-of-contents__link toc-highlight">Method <code>Build</code></a></li></ul></li>\<li\><a href="#advance-the-connection-and-process-messages" class="table-of-contents__link toc-highlight">Advance the connection and process messages</a>\<ul\>\<li\><a href="#method-frametick" class="table-of-contents__link toc-highlight">Method <code>FrameTick</code></a></li></ul></li>\<li\><a href="#access-tables-and-reducers" class="table-of-contents__link toc-highlight">Access tables and reducers</a>\<ul\>\<li\><a href="#property-db" class="table-of-contents__link toc-highlight">Property <code>Db</code></a></li>\<li\><a href="#property-reducers" class="table-of-contents__link toc-highlight">Property <code>Reducers</code></a></li></ul></li>\<li\><a href="#interface-idbcontext" class="table-of-contents__link toc-highlight">Interface <code>IDbContext</code></a></li>\<li\><a href="#interface-iremotedbcontext" class="table-of-contents__link toc-highlight">Interface <code>IRemoteDbContext</code></a>\<ul\>\<li\><a href="#method-db" class="table-of-contents__link toc-highlight">Method <code>Db</code></a>\<ul\>\<li\><a href="#example" class="table-of-contents__link toc-highlight">Example</a></li></ul></li>\<li\><a href="#method-reducers" class="table-of-contents__link toc-highlight">Method <code>Reducers</code></a>\<ul\>\<li\><a href="#example-1" class="table-of-contents__link toc-highlight">Example</a></li></ul></li>\<li\><a href="#method-disconnect" class="table-of-contents__link toc-highlight">Method <code>Disconnect</code></a></li></ul></li>\<li\><a href="#subscribe-to-queries" class="table-of-contents__link toc-highlight">Subscribe to queries</a>\<ul\>\<li\><a href="#type-subscriptionbuilder" class="table-of-contents__link toc-highlight">Type <code>SubscriptionBuilder</code></a>\<ul\>\<li\><a href="#constructor-ctxsubscriptionbuilder" class="table-of-contents__link toc-highlight">Constructor <code>ctx.SubscriptionBuilder()</code></a></li>\<li\><a href="#callback-onapplied" class="table-of-contents__link toc-highlight">Callback <code>OnApplied</code></a></li>\<li\><a href="#callback-onerror" class="table-of-contents__link toc-highlight">Callback <code>OnError</code></a></li>\<li\><a href="#method-subscribe" class="table-of-contents__link toc-highlight">Method <code>Subscribe</code></a></li>\<li\><a href="#method-addquery" class="table-of-contents__link toc-highlight">Method <code>AddQuery</code></a></li>\<li\><a href="#method-subscribetoalltables" class="table-of-contents__link toc-highlight">Method <code>SubscribeToAllTables</code></a></li></ul></li>\<li\><a href="#type-typedsubscriptionbuilder" class="table-of-contents__link toc-highlight">Type <code>TypedSubscriptionBuilder</code></a>\<ul\>\<li\><a href="#method-addquery-typedsubscriptionbuilder" class="table-of-contents__link toc-highlight">Method <code>AddQuery</code> (TypedSubscriptionBuilder)</a></li>\<li\><a href="#method-subscribe-typedsubscriptionbuilder" class="table-of-contents__link toc-highlight">Method <code>Subscribe</code> (TypedSubscriptionBuilder)</a></li></ul></li></ul></li></ul></li>\<li\><a href="#query-builder-api" class="table-of-contents__link toc-highlight">Query Builder API</a>\<ul\>\<li\><a href="#entry-point" class="table-of-contents__link toc-highlight">Entry Point</a></li>\<li\><a href="#building-queries-with-where--filter" class="table-of-contents__link toc-highlight">Building Queries with <code>Where</code> / <code>Filter</code></a></li>\<li\><a href="#comparison-operators" class="table-of-contents__link toc-highlight">Comparison Operators</a></li>\<li\><a href="#boolean-combinators" class="table-of-contents__link toc-highlight">Boolean Combinators</a></li>\<li\><a href="#semijoins" class="table-of-contents__link toc-highlight">Semijoins</a></li>\<li\><a href="#using-query-builders-with-subscriptions" class="table-of-contents__link toc-highlight">Using Query Builders with Subscriptions</a>\<ul\>\<li\><a href="#type-subscriptionhandle" class="table-of-contents__link toc-highlight">Type <code>SubscriptionHandle</code></a>\<ul\>\<li\><a href="#property-isended" class="table-of-contents__link toc-highlight">Property <code>IsEnded</code></a></li>\<li\><a href="#property-isactive" class="table-of-contents__link toc-highlight">Property <code>IsActive</code></a></li>\<li\><a href="#method-unsubscribe" class="table-of-contents__link toc-highlight">Method <code>Unsubscribe</code></a></li>\<li\><a href="#method-unsubscribethen" class="table-of-contents__link toc-highlight">Method <code>UnsubscribeThen</code></a></li></ul></li></ul></li>\<li\><a href="#read-connection-metadata" class="table-of-contents__link toc-highlight">Read connection metadata</a>\<ul\>\<li\><a href="#property-identity" class="table-of-contents__link toc-highlight">Property <code>Identity</code></a></li>\<li\><a href="#property-connectionid" class="table-of-contents__link toc-highlight">Property <code>ConnectionId</code></a></li>\<li\><a href="#property-isactive-1" class="table-of-contents__link toc-highlight">Property <code>IsActive</code></a></li></ul></li></ul></li>\<li\><a href="#type-eventcontext" class="table-of-contents__link toc-highlight">Type <code>EventContext</code></a>\<ul\>\<li\><a href="#property-event" class="table-of-contents__link toc-highlight">Property <code>Event</code></a></li>\<li\><a href="#property-db-1" class="table-of-contents__link toc-highlight">Property <code>Db</code></a></li>\<li\><a href="#field-reducers" class="table-of-contents__link toc-highlight">Field <code>Reducers</code></a></li>\<li\><a href="#record-event" class="table-of-contents__link toc-highlight">Record <code>Event</code></a>\<ul\>\<li\><a href="#variant-reducer" class="table-of-contents__link toc-highlight">Variant <code>Reducer</code></a></li>\<li\><a href="#variant-subscribeapplied" class="table-of-contents__link toc-highlight">Variant <code>SubscribeApplied</code></a></li>\<li\><a href="#variant-unsubscribeapplied" class="table-of-contents__link toc-highlight">Variant <code>UnsubscribeApplied</code></a></li>\<li\><a href="#variant-subscribeerror" class="table-of-contents__link toc-highlight">Variant <code>SubscribeError</code></a></li>\<li\><a href="#variant-unknowntransaction" class="table-of-contents__link toc-highlight">Variant <code>UnknownTransaction</code></a></li></ul></li>\<li\><a href="#record-reducerevent" class="table-of-contents__link toc-highlight">Record <code>ReducerEvent</code></a></li>\<li\><a href="#record-status" class="table-of-contents__link toc-highlight">Record <code>Status</code></a>\<ul\>\<li\><a href="#variant-committed" class="table-of-contents__link toc-highlight">Variant <code>Committed</code></a></li>\<li\><a href="#variant-failed" class="table-of-contents__link toc-highlight">Variant <code>Failed</code></a></li>\<li\><a href="#variant-outofenergy" class="table-of-contents__link toc-highlight">Variant <code>OutOfEnergy</code></a></li></ul></li>\<li\><a href="#record-reducer" class="table-of-contents__link toc-highlight">Record <code>Reducer</code></a></li></ul></li>\<li\><a href="#type-reducereventcontext" class="table-of-contents__link toc-highlight">Type <code>ReducerEventContext</code></a>\<ul\>\<li\><a href="#property-event-1" class="table-of-contents__link toc-highlight">Property <code>Event</code></a></li>\<li\><a href="#property-db-2" class="table-of-contents__link toc-highlight">Property <code>Db</code></a></li>\<li\><a href="#property-reducers-1" class="table-of-contents__link toc-highlight">Property <code>Reducers</code></a></li></ul></li>\<li\><a href="#type-subscriptioneventcontext" class="table-of-contents__link toc-highlight">Type <code>SubscriptionEventContext</code></a>\<ul\>\<li\><a href="#property-db-3" class="table-of-contents__link toc-highlight">Property <code>Db</code></a></li>\<li\><a href="#property-reducers-2" class="table-of-contents__link toc-highlight">Property <code>Reducers</code></a></li></ul></li>\<li\><a href="#type-errorcontext" class="table-of-contents__link toc-highlight">Type <code>ErrorContext</code></a>\<ul\>\<li\><a href="#property-event-2" class="table-of-contents__link toc-highlight">Property <code>Event</code></a></li>\<li\><a href="#property-db-4" class="table-of-contents__link toc-highlight">Property <code>Db</code></a></li>\<li\><a href="#property-reducers-3" class="table-of-contents__link toc-highlight">Property <code>Reducers</code></a></li></ul></li>\<li\><a href="#access-the-client-cache" class="table-of-contents__link toc-highlight">Access the client cache</a>\<ul\>\<li\><a href="#type-remotetablehandle" class="table-of-contents__link toc-highlight">Type <code>RemoteTableHandle</code></a>\<ul\>\<li\><a href="#type-row" class="table-of-contents__link toc-highlight">Type <code>Row</code></a></li>\<li\><a href="#property-count" class="table-of-contents__link toc-highlight">Property <code>Count</code></a></li>\<li\><a href="#method-iter" class="table-of-contents__link toc-highlight">Method <code>Iter</code></a></li>\<li\><a href="#callback-oninsert" class="table-of-contents__link toc-highlight">Callback <code>OnInsert</code></a></li>\<li\><a href="#callback-ondelete" class="table-of-contents__link toc-highlight">Callback <code>OnDelete</code></a></li>\<li\><a href="#callback-onupdate" class="table-of-contents__link toc-highlight">Callback <code>OnUpdate</code></a></li></ul></li>\<li\><a href="#unique-constraint-index-access" class="table-of-contents__link toc-highlight">Unique constraint index access</a>\<ul\>\<li\><a href="#example-2" class="table-of-contents__link toc-highlight">Example</a></li></ul></li>\<li\><a href="#btree-index-access" class="table-of-contents__link toc-highlight">BTree index access</a>\<ul\>\<li\><a href="#example-3" class="table-of-contents__link toc-highlight">Example</a></li></ul></li></ul></li>\<li\><a href="#observe-and-invoke-reducers" class="table-of-contents__link toc-highlight">Observe and invoke reducers</a></li>\<li\><a href="#identify-a-client" class="table-of-contents__link toc-highlight">Identify a client</a>\<ul\>\<li\><a href="#type-identity" class="table-of-contents__link toc-highlight">Type <code>Identity</code></a></li>\<li\><a href="#type-connectionid" class="table-of-contents__link toc-highlight">Type <code>ConnectionId</code></a></li>\<li\><a href="#type-timestamp" class="table-of-contents__link toc-highlight">Type <code>Timestamp</code></a></li>\<li\><a href="#type-taggedenum" class="table-of-contents__link toc-highlight">Type <code>TaggedEnum</code></a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

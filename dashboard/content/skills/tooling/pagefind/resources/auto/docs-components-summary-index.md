@@ -12,7 +12,7 @@ skill_name = "pagefind"
 > accessibility and customization.** Full component guide:
 > https://pagefind.app/llms-component-ui.txt
 
-# \<pagefind-summary\>
+# <pagefind-summary>
 
 
 Displays search status and result count. Shows messages like "12 results for 'search term'".
@@ -47,3 +47,5 @@ The summary displays different messages based on search state:
 | Error | `Error: {message}` |
 
 These messages are automatically translated to match the language of the website.
+
+

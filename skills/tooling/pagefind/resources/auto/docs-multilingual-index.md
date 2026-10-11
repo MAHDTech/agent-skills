@@ -16,7 +16,7 @@ The Pagefind UI itself is translated into a range of languages, and will adapt a
 
 ## Opting out of multilingual search
 
-Setting the [force language](https://pagefind.app/docs/config-options/#force-language) option when indexing will opt out of this feature and create one index for the site as a whole.
+Setting the [force language](/docs/config-options/#force-language) option when indexing will opt out of this feature and create one index for the site as a whole.
 
 ## Language support
 
@@ -86,3 +86,4 @@ Currently when indexing, Pagefind does not support stemming for specialized lang
 In practice, this means that on a page tagged as a `zh-` language, `每個月都` will be indexed as the words `每個`, `月`, and `都`.
 
 When searching in the browser, searching for `每個`, `月`, or `都` individually will work. Searching `每個月都` will segment the query into words and return results containing each word. Additionally, searching `每個 月 都` will return results containing each word in any order, and searching `"每個 月 都"` in quotes will match `每個月都` exactly.
+

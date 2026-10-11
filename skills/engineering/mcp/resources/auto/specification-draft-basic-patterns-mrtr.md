@@ -21,7 +21,7 @@
   `io.modelcontextprotocol/clientInfo`, and
   `io.modelcontextprotocol/clientCapabilities`). Every request **MUST** include
   the required `_meta` fields; see
-  [`_meta`](https://modelcontextprotocol.io/specification/draft/basic/index#meta).
+  [`_meta`](/specification/draft/basic/index#meta).
 </Note>
 
 ## Multi Round-Trip Requests
@@ -59,9 +59,9 @@ This flow is implemented in MCP using the following Types.
 
 #### InputRequests
 
-An [`InputRequests`](https://modelcontextprotocol.io/specification/draft/schema#inputrequests) object is a map of server-client requests.
+An [`InputRequests`](/specification/draft/schema#inputrequests) object is a map of server-client requests.
 Keys are server-assigned string identifiers;
-values are request objects (e.g., [`ElicitRequest`](https://modelcontextprotocol.io/specification/draft/schema#elicitrequest), [`CreateMessageRequest`](https://modelcontextprotocol.io/specification/draft/schema#createmessagerequest), or [`ListRootsRequest`](https://modelcontextprotocol.io/specification/draft/schema#listrootsrequest)).
+values are request objects (e.g., [`ElicitRequest`](/specification/draft/schema#elicitrequest), [`CreateMessageRequest`](/specification/draft/schema#createmessagerequest), or [`ListRootsRequest`](/specification/draft/schema#listrootsrequest)).
 
 ```json theme={null}
 {
@@ -100,8 +100,8 @@ values are request objects (e.g., [`ElicitRequest`](https://modelcontextprotocol
 
 #### InputResponses
 
-An [`InputResponses`](https://modelcontextprotocol.io/specification/draft/schema#inputresponses) object is a map of client responses to the server requests.
-Keys correspond to the keys in the `InputRequests` map; values are the client's result for each request (e.g., [`ElicitResult`](https://modelcontextprotocol.io/specification/draft/schema#elicitresult), [`CreateMessageResult`](https://modelcontextprotocol.io/specification/draft/schema#createmessageresult), or [`ListRootsResult`](https://modelcontextprotocol.io/specification/draft/schema#listrootsresult)).
+An [`InputResponses`](/specification/draft/schema#inputresponses) object is a map of client responses to the server requests.
+Keys correspond to the keys in the `InputRequests` map; values are the client's result for each request (e.g., [`ElicitResult`](/specification/draft/schema#elicitresult), [`CreateMessageResult`](/specification/draft/schema#createmessageresult), or [`ListRootsResult`](/specification/draft/schema#listrootsresult)).
 
 ```json theme={null}
 {
@@ -125,10 +125,10 @@ Keys correspond to the keys in the `InputRequests` map; values are the client's 
 
 #### InputRequiredResult
 
-An [`InputRequiredResult`](https://modelcontextprotocol.io/specification/draft/schema#inputrequiredresult) is a type of [`Result`](https://modelcontextprotocol.io/specification/draft/basic#responses),
+An [`InputRequiredResult`](/specification/draft/schema#inputrequiredresult) is a type of [`Result`](/specification/draft/basic#responses),
 indicating that additional input is needed before the request can be completed.
 
-* `inputRequests` *(optional)*: An [`InputRequests`](https://modelcontextprotocol.io/specification/draft/schema#inputrequests) map of server-initiated requests that the client must fulfill.
+* `inputRequests` *(optional)*: An [`InputRequests`](/specification/draft/schema#inputrequests) map of server-initiated requests that the client must fulfill.
 * `requestState` *(optional)*: An opaque string meaningful only to the server. Clients **MUST NOT** inspect, parse, modify, or make any assumptions about its contents.
 
 ```json theme={null}
@@ -185,11 +185,11 @@ indicating that additional input is needed before the request can be completed.
 
 Servers **MAY** send `InputRequiredResult` responses on the following client requests:
 
-| Client Request                                                              | Supports InputRequiredResult |
-| --------------------------------------------------------------------------- | ---------------------------- |
-| [`prompts/get`](https://modelcontextprotocol.io/specification/draft/server/prompts#getting-a-prompt)       | Yes                          |
-| [`resources/read`](https://modelcontextprotocol.io/specification/draft/server/resources#reading-resources) | Yes                          |
-| [`tools/call`](https://modelcontextprotocol.io/specification/draft/server/tools#calling-tools)             | Yes                          |
+| Client Request | Supports InputRequiredResult |
+| - | - |
+| [`prompts/get`](/specification/draft/server/prompts#getting-a-prompt) | Yes |
+| [`resources/read`](/specification/draft/server/resources#reading-resources) | Yes |
+| [`tools/call`](/specification/draft/server/tools#calling-tools) | Yes |
 
 Servers **MUST NOT** send `InputRequiredResult` responses on any other client requests.
 
@@ -229,7 +229,7 @@ what is directly present in the retry request.
 
 2. The `InputRequiredResult` **MAY** include an `inputRequests` field.
    * `inputRequests` keys are server assigned identifiers and **MUST** be unique within the scope of the request.
-   * `inputRequests` values are request objects that **MUST** be one of [`ElicitRequest`](https://modelcontextprotocol.io/specification/draft/schema#elicitrequest), [`CreateMessageRequest`](https://modelcontextprotocol.io/specification/draft/schema#createmessagerequest), or [`ListRootsRequest`](https://modelcontextprotocol.io/specification/draft/schema#listrootsrequest)
+   * `inputRequests` values are request objects that **MUST** be one of [`ElicitRequest`](/specification/draft/schema#elicitrequest), [`CreateMessageRequest`](/specification/draft/schema#createmessagerequest), or [`ListRootsRequest`](/specification/draft/schema#listrootsrequest)
 
 3. The `InputRequiredResult` **MAY** include a `requestState` field. If specified, this field is an opaque string meaningful only to the server. Servers are free to encode the state in any format (e.g. base64-encoded JSON, encrypted JWT, serialized binary).
 
@@ -277,3 +277,4 @@ the server **SHOULD** respond with a new `InputRequiredResult` requesting the mi
 
 Because `requestState` passes through the client, malicious or compromised clients could attempt to modify it to alter server behavior,
 bypass authorization checks, or corrupt server logic. Servers **MUST** validate request state as described in the [server requirements](#server-requirements-basic-workflow) above.
+

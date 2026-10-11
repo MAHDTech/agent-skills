@@ -21,7 +21,7 @@ Author(s): [@benbrandt](https://github.com/benbrandt)
 
 ACP v2 should use a single `sessionUpdate: "tool_call_update"` notification for both creating and updating tool calls. The payload is an upsert keyed by `toolCallId`: if the Client has not seen the ID before, it creates a new displayed tool call; otherwise, it patches the existing tool call.
 
-ACP v2 should also add `sessionUpdate: "tool_call_content_chunk"` for streaming discrete tool-call content items. Chunks are keyed by `toolCallId` and append one `ToolCallContent` item to the current content for that tool call. The separate [Terminal Output](@/skills/engineering/acp/resources/auto/rfds-v2-terminal-output.md) RFD defines byte chunks for a referenced terminal.
+ACP v2 should also add `sessionUpdate: "tool_call_content_chunk"` for streaming discrete tool-call content items. Chunks are keyed by `toolCallId` and append one `ToolCallContent` item to the current content for that tool call. The separate [Terminal Output](./terminal-output.mdx) RFD defines byte chunks for a referenced terminal.
 
 ## Status quo
 
@@ -68,7 +68,7 @@ The v2 `ToolCallUpdate` payload has the following semantics:
 * For a new `toolCallId`, omitted fields use Client defaults.
 * Agents **SHOULD** include `title` the first time they report a `toolCallId`.
 
-The `session/request_permission` method should also carry this same `ToolCallUpdate` shape for tool-call permissions. In v2, [permission requests](@/skills/engineering/acp/resources/auto/rfds-v2-permission-requests.md) use an optional `subject` tagged union; tool-call permissions set `subject.type: "tool_call"` and carry the update in the subject's `toolCall` field, so the permission UI receives the same patch/upsert payload shape as session updates while leaving room for future permission subjects.
+The `session/request_permission` method should also carry this same `ToolCallUpdate` shape for tool-call permissions. In v2, [permission requests](./permission-requests.mdx) use an optional `subject` tagged union; tool-call permissions set `subject.type: "tool_call"` and carry the update in the subject's `toolCall` field, so the permission UI receives the same patch/upsert payload shape as session updates while leaving room for future permission subjects.
 
 Permission-specific prompt text should be carried by the request's common required `title` and optional `description` fields instead of `ToolCallUpdate.title` or `ToolCallUpdate.content`. That keeps a permission prompt from accidentally replacing displayed tool-call state.
 
@@ -133,3 +133,6 @@ Tool-call updates need both operations. Omission means "I am not changing this f
 * 2026-07-02: Updated permission requests to carry tool-call updates through an optional `subject` tagged union and to use separate `title` and `description` fields for permission-specific prompt text.
 * 2026-06-09: Added `tool_call_content_chunk` for streaming tool-call content.
 * 2026-06-08: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

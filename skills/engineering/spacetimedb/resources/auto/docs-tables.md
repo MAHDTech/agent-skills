@@ -1,617 +1,283 @@
-Version: 2.0.0
-
-On this page
-
-Tables are the way to store data in SpacetimeDB. All data in SpacetimeDB
-is stored in memory for extremely low latency and high throughput
-access. SpacetimeDB also automatically persists all data to disk.
-
-## Why Tables
-
-Tables are the fundamental unit of data organization in SpacetimeDB,
-just as files are the fundamental unit in Unix. However, tables possess
-greater generality than files. Unix requires a separate *filesystem*
-concept to organize and describe files. SpacetimeDB, by contrast,
-describes itself: it stores the representation of tables and their
-schemas in tables called **system tables** (such as `st_table` and
-`st_column`).
-
-You can query these system tables directly:
-
-``` codeBlockStandalone_LlrK
-SELECT * FROM st_table;
-SELECT * FROM st_column;
-```
-
-warning
-
-You can query system tables, but you should not modify them directly.
-Make schema changes through the normal definition mechanisms in your
-module code.
-
-### Tables and Data-Oriented Design
-
-The relational model underlying tables represents the logical endpoint
-of [data-oriented
-design](https://spacetimedb.com/blog/databases-and-data-oriented-design).
-Patterns such as Entity Component Systems (ECS) implement a strict
-subset of relational capabilities. Tables give you the full power of
-relational theory: over fifty years of proven techniques for organizing
-and querying data efficiently.
-
-The central principle of data-oriented design holds that **the purpose
-of any program is to transform data from one form to another**. Tables
-provide a principled, universal representation for that data, giving
-you:
-
-- **Efficient access patterns** through indexes
-- **Data integrity** through constraints
-- **Flexible queries** through relational operations
-- **Real-time synchronization** through subscriptions
-
-For further discussion of this philosophy, see [The Zen of
-SpacetimeDB](https://spacetimedb.com/docs/intro/zen).
-
-### Physical and Logical Independence
-
-A core goal of the relational model is separating *logical* access
-patterns from *physical* data representation. When you write a
-subscription query, you express *what* data you need, not *how* the
-database should retrieve it. This separation allows SpacetimeDB to
-change the physical representation of your data for performance reasons
-without requiring you to rewrite your queries.
-
-The clearest example is indexing. When you add an index to a column, you
-change how SpacetimeDB physically organizes that data. It builds an
-additional data structure to accelerate lookups. But your subscription
-queries continue to work unchanged. The same query that previously
-scanned the entire table now uses the index automatically. You improve
-performance by modifying the schema, not the queries.
-
-This independence extends beyond indexes. SpacetimeDB can change
-internal storage formats, memory layouts, and access algorithms across
-versions. Your queries remain stable because they operate at the logical
-level (rows and columns) rather than the physical level of bytes and
-pointers.
-
-### Table Decomposition
-
-A common concern when designing relational schemas is whether to
-consolidate data into fewer large tables or distribute it across many
-smaller ones. In traditional SQL databases, joins require verbose query
-syntax and incur significant execution cost. This friction pushes
-developers toward denormalized schemas with fewer, wider tables.
-
-SpacetimeDB operates under different constraints. Your reducers interact
-with tables through programmatic APIs rather than SQL strings. A join
-operation reduces to an index lookup: you retrieve a row from one table,
-extract a key value, and use that key to find related rows in another
-table. With all data resident in memory, these lookups often complete in
-nanoseconds.
-
-Consider the following schema for a game application:
-
-**Consolidated approach (not recommended):**
-
-``` prism-code
-Player
-├── id
-├── name
-├── position_x, position_y, velocity_x, velocity_y  (updates: 60Hz)
-├── health, max_health, mana, max_mana              (updates: occasional)
-├── total_kills, total_deaths, play_time            (updates: rare)
-└── audio_volume, graphics_quality                  (updates: very rare)
-```
-
-**Decomposed approach (recommended):**
-
-``` prism-code
-Player          PlayerState         PlayerStats         PlayerSettings
-├── id     ←──  ├── player_id       ├── player_id       ├── player_id
-└── name        ├── position_x      ├── total_kills     ├── audio_volume
-                ├── position_y      ├── total_deaths    └── graphics_quality
-                ├── velocity_x      └── play_time
-                └── velocity_y
-
-PlayerResources
-├── player_id
-├── health
-├── max_health
-├── mana
-└── max_mana
-```
-
-The decomposed approach yields several advantages:
-
-1.  **Reduced bandwidth**: Clients subscribing to player positions do
-    not receive updates when settings change. For an application with
-    1000 concurrent players updating positions at 60Hz, this reduction
-    is substantial.
-
-2.  **Cache efficiency**: Data with similar update frequencies resides
-    in contiguous memory. Updating a player's position does not require
-    loading or invalidating cache lines containing lifetime statistics.
-
-3.  **Semantic clarity**: Each table maintains a single responsibility.
-    `PlayerState` handles the performance-critical gameplay loop.
-    `PlayerStats` serves leaderboard queries. `PlayerSettings` supports
-    the options interface.
-
-4.  **Schema evolution**: You can add columns to `PlayerStats` without
-    affecting the structure or performance characteristics of
-    `PlayerState`.
-
-The guiding principle: **organize data by access pattern, not by the
-entity it describes**. Keep data you read together in the same table.
-Separate data you read at different times or frequencies.
-
-## Defining Tables
-
-Tables are defined in your module code with a name, columns, and
-optional configuration.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-Use the `table` function to declare a new table:
-
-``` codeBlockStandalone_LlrK
-import { schema, table, t } from 'spacetimedb/server';
-
-const people = table(
-  { name: 'people', public: true },
-  {
-    id: t.u32().primaryKey().autoInc(),
-    name: t.string().index('btree'),
-    email: t.string().unique(),
-  }
-);
-
-const spacetimedb = schema({ people });
-export default spacetimedb;
-```
-
-The first argument to `table()` defines table options, and the second
-defines columns. Pass your tables to `schema()` as an object:
-`schema({ people })` or `schema({ table1, table2 })`. Never use
-`schema(table)` or `schema(t1, t2, t3)`.
-
-Use the `[SpacetimeDB.Table]` attribute on a `partial struct` or
-`partial class`:
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "Person", Public = true)]
-public partial struct Person
-{
-    [SpacetimeDB.PrimaryKey]
-    [SpacetimeDB.AutoInc]
-    public uint Id;
-
-    [SpacetimeDB.Index.BTree]
-    public string Name;
-
-    [SpacetimeDB.Unique]
-    public string Email;
-}
-```
-
-The `partial` modifier is required to allow code generation.
-
-Use the `#[spacetimedb::table]` macro on a struct:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = person, public)]
-pub struct Person {
-    #[primary_key]
-    #[auto_inc]
-    id: u32,
-    #[index(btree)]
-    name: String,
-    #[unique]
-    email: String,
-}
-```
-
-Rust Visibility vs SpacetimeDB Visibility
-
-The `pub` modifier on the struct follows normal Rust visibility rules
-and has no meaning to SpacetimeDB. It controls whether the struct is
-accessible from other Rust modules in your crate, not whether the table
-is public to clients. Use the `public` attribute in
-`#[spacetimedb::table]` to control client visibility.
-
-Register the struct with `SPACETIMEDB_STRUCT`, the table with
-`SPACETIMEDB_TABLE`, then add field constraints:
-
-``` codeBlockStandalone_LlrK
-struct Person {
-    uint32_t id;
-    std::string name;
-    std::string email;
-};
-SPACETIMEDB_STRUCT(Person, id, name, email)
-SPACETIMEDB_TABLE(Person, person, Public)
-FIELD_PrimaryKeyAutoInc(person, id)
-FIELD_Index(person, name)
-FIELD_Unique(person, email)
-```
-
-### Creating the schema (TypeScript)
-
-After defining tables, pass them to `schema()` as a single object. The
-object keys become the accessor names in `ctx.db`:
-
-``` codeBlockStandalone_LlrK
-const people = table({ name: 'people', public: true }, { /* columns */ });
-const products = table({ name: 'products', public: true }, { /* columns */ });
-
-const spacetimedb = schema({ people, products });
-export default spacetimedb;
-```
-
-Use `schema({ table1 })` or `schema({ t1, t2 })`. Never use
-`schema(table)` or `schema(t1, t2, t3)`.
-
-For a compact list of TypeScript gotchas, see the [cheat
-sheet](https://spacetimedb.com/docs/databases/cheat-sheet#common-mistakes).
-
-## Table Naming and Accessors
-
-The table name you specify determines how you access the table in your
-code and in SQL. Understanding this relationship is essential for
-writing correct SpacetimeDB modules.
-
-Table names in SQL
-
-The table `name` in your schema is used **verbatim** in SQL queries and
-subscriptions. There is no automatic pluralization or case conversion.
-If you define `name: 'position'`, SQL uses `position`; if you define
-`name: 'positions'`, SQL uses `positions`. Ensure your schema names
-match what your SQL queries expect.
-
-### How Accessor Names Are Derived
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-The accessor is the key passed to `schema({...})`, verbatim. By
-convention the key matches the table `name`:
-
-``` codeBlockStandalone_LlrK
-// Table definition
-const player_scores = table(
-  { name: 'player_scores', public: true },
-  { /* columns */ }
-);
-
-const spacetimedb = schema({ player_scores });
-
-// Accessor is the schema key, verbatim
-ctx.db.player_scores.insert({ /* ... */ });
-```
-
-| Schema Key      | Accessor               |
-|-----------------|------------------------|
-| `user`          | `ctx.db.user`          |
-| `player_scores` | `ctx.db.player_scores` |
-| `game_session`  | `ctx.db.game_session`  |
-
-The accessor name **exactly matches** the `Accessor` attribute value:
-
-``` codeBlockStandalone_LlrK
-// Table definition
-[SpacetimeDB.Table(Accessor = "Player", Public = true)]
-public partial struct Player { /* columns */ }
-
-// Accessor matches Accessor value exactly
-ctx.Db.Player.Insert(new Player { /* ... */ });
-```
-
-| Accessor        | API Accessor         | SQL Table Name (when Name omitted) |
-|-----------------|----------------------|------------------------------------|
-| `"User"`        | `ctx.Db.User`        | `User`                             |
-| `"Player"`      | `ctx.Db.Player`      | `Player`                           |
-| `"GameSession"` | `ctx.Db.GameSession` | `GameSession`                      |
-
-Case Sensitivity
-
-The accessor is case-sensitive and must match the `Accessor` value
-exactly. `Accessor = "user"` produces `ctx.Db.user`, not `ctx.Db.User`.
-
-C# Convention
-
-Pick a stable accessor style for your project and use it consistently
-(for example, `User`, `user`, or `player_score`). Accessor names are
-case-sensitive.
-
-The accessor name **exactly matches** the `name` attribute value:
-
-``` codeBlockStandalone_LlrK
-// Table definition
-#[spacetimedb::table(accessor = player, public)]
-pub struct Player { /* columns */ }
-
-// Accessor matches name exactly
-ctx.db.player().insert(Player { /* ... */ });
-```
-
-| name Attribute        | Accessor                |
-|-----------------------|-------------------------|
-| `name = user`         | `ctx.db.user()`         |
-| `name = player`       | `ctx.db.player()`       |
-| `name = game_session` | `ctx.db.game_session()` |
-
-The accessor name matches the table identifier you pass to
-`SPACETIMEDB_TABLE`:
-
-``` codeBlockStandalone_LlrK
-struct PlayerScores {
-  uint64_t id;
-};
-SPACETIMEDB_STRUCT(PlayerScores, id)
-SPACETIMEDB_TABLE(PlayerScores, player_scores, Public)
-FIELD_PrimaryKeyAutoInc(player_scores, id)
-
-// Accessor matches the table identifier
-ctx.db[player_scores].insert(PlayerScores{ /* ... */ });
-```
-
-| Table Identifier | Accessor                |
-|------------------|-------------------------|
-| `user`           | `ctx.db[user]`          |
-| `player_scores`  | `ctx.db[player_scores]` |
-| `game_session`   | `ctx.db[game_session]`  |
-
-### Recommended Naming Conventions
-
-Use idiomatic naming conventions for each language:
-
-| Language | Convention | Example Table | Example Accessor |
-|----|----|----|----|
-| **TypeScript** | snake_case | `'player_score'` | `ctx.db.player_score` |
-| **C#** | PascalCase | `Accessor = "PlayerScore"` | `ctx.Db.PlayerScore` |
-| **Rust** | lower_snake_case | `name = player_score` | `ctx.db.player_score()` |
-| **C++** | lower_snake_case | `player_score` | `ctx.db[player_score]` |
-
-These conventions align with each language's standard style guides and
-make your code feel natural within its ecosystem.
-
-## Table Visibility
-
-Tables can be **private** (default) or **public**:
-
-- **Private tables**: Visible only to
-  [reducers](https://spacetimedb.com/docs/functions/reducers) and the database owner. Clients
-  cannot access them.
-- **Public tables**: Exposed for client read access through
-  [subscriptions](https://spacetimedb.com/docs/clients/subscriptions). Writes still occur only
-  through reducers.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-const publicTable = table({ name: 'user', public: true }, { /* ... */ });
-const privateTable = table({ name: 'secret', public: false }, { /* ... */ });
-```
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "User", Public = true)]
-public partial struct User { /* ... */ }
-
-[SpacetimeDB.Table(Accessor = "Secret", Public = false)]
-public partial struct Secret { /* ... */ }
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = user, public)]
-pub struct User { /* ... */ }
-
-#[spacetimedb::table(accessor = secret)]
-pub struct Secret { /* ... */ }
-```
-
-``` codeBlockStandalone_LlrK
-struct User {
-  uint64_t id;
-};
-SPACETIMEDB_STRUCT(User, id)
-SPACETIMEDB_TABLE(User, user, Public)
-FIELD_PrimaryKeyAutoInc(user, id)
-
-struct Secret {
-  uint64_t id;
-};
-SPACETIMEDB_STRUCT(Secret, id)
-SPACETIMEDB_TABLE(Secret, secret, Private)
-FIELD_PrimaryKeyAutoInc(secret, id)
-```
-
-For more fine-grained access control, you can use [view
-functions](https://spacetimedb.com/docs/functions/views) to expose computed subsets of your
-data to clients. Views allow you to filter rows, select specific
-columns, or join data from multiple tables before exposing it.
-
-See [Access Permissions](https://spacetimedb.com/docs/tables/access-permissions) for complete
-details on table visibility and access patterns.
-
-## Multiple Tables for the Same Type
-
-You can create multiple tables that share the same row type by applying
-multiple table attributes to a single struct. Each table stores its own
-independent set of rows, but all tables share the same schema.
-
-- TypeScript
-- C#
-- Rust
-- C++
-
-In TypeScript, define separate table variables that share the same
-column schema:
-
-``` codeBlockStandalone_LlrK
-import { table, t } from 'spacetimedb/server';
-
-// Define the shared column schema
-const playerColumns = {
-  identity: t.identity().primaryKey(),
-  playerId: t.i32().unique().autoInc(),
-  name: t.string(),
-};
-
-// Create two tables with the same schema
-const player = table({ name: 'player', public: true }, playerColumns);
-const loggedOutPlayer = table({ name: 'logged_out_player' }, playerColumns);
-```
-
-Apply multiple `[Table]` attributes to the same struct:
-
-``` codeBlockStandalone_LlrK
-[SpacetimeDB.Table(Accessor = "Player", Public = true)]
-[SpacetimeDB.Table(Accessor = "LoggedOutPlayer")]
-public partial struct Player
-{
-    [PrimaryKey]
-    public Identity Identity;
-    [Unique, AutoInc]
-    public int PlayerId;
-    public string Name;
-}
-```
-
-Each table gets its own accessor:
-
-``` codeBlockStandalone_LlrK
-// Insert into different tables
-ctx.Db.Player.Insert(new Player { /* ... */ });
-ctx.Db.LoggedOutPlayer.Insert(new Player { /* ... */ });
-
-// Move a row between tables
-var player = ctx.Db.LoggedOutPlayer.Identity.Find(ctx.Sender);
-if (player != null)
-{
-    ctx.Db.Player.Insert(player.Value);
-    ctx.Db.LoggedOutPlayer.Identity.Delete(player.Value.Identity);
-}
-```
-
-Apply multiple `#[spacetimedb::table]` attributes to the same struct:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = player, public)]
-#[spacetimedb::table(accessor = logged_out_player)]
-pub struct Player {
-    #[primary_key]
-    identity: Identity,
-    #[unique]
-    #[auto_inc]
-    player_id: i32,
-    name: String,
-}
-```
-
-Each table gets its own accessor:
-
-``` codeBlockStandalone_LlrK
-// Insert into different tables
-ctx.db.player().insert(Player { /* ... */ });
-ctx.db.logged_out_player().insert(Player { /* ... */ });
-
-// Move a row between tables
-if let Some(player) = ctx.db.logged_out_player().identity().find(&ctx.sender()) {
-    ctx.db.player().insert(player.clone());
-    ctx.db.logged_out_player().identity().delete(&player.identity);
-}
-```
-
-Apply multiple `SPACETIMEDB_TABLE` macros to the same struct:
-
-``` codeBlockStandalone_LlrK
-struct Player {
-  Identity identity;
-  int32_t player_id;
-  std::string name;
-};
-SPACETIMEDB_STRUCT(Player, identity, player_id, name)
-SPACETIMEDB_TABLE(Player, player, Public)
-SPACETIMEDB_TABLE(Player, logged_out_player, Private)
-FIELD_PrimaryKey(player, identity)
-FIELD_PrimaryKey(logged_out_player, identity)
-FIELD_UniqueAutoInc(player, player_id)
-FIELD_UniqueAutoInc(logged_out_player, player_id)
-
-// Move a row between tables
-auto maybe_logged_out = ctx.db[logged_out_player_identity].find(ctx.sender());
-if (maybe_logged_out) {
-  ctx.db[player].insert(*maybe_logged_out);
-  ctx.db[logged_out_player_identity].delete_by_key(ctx.sender());
-}
-```
-
-This pattern is useful for:
-
-- **State management**: Separate active users from inactive users,
-  online players from offline players
-- **Archiving**: Move old records to an archive table while keeping the
-  same schema
-- **Staging**: Hold pending records in one table before moving them to a
-  main table
-
-Shared Constraints
-
-Column attributes like `[PrimaryKey]`, `[Unique]`, `[AutoInc]`, and
-`[Index]` apply to **all tables** defined on the type. Each table will
-have its own independent primary key, unique constraints, and indexes
-with the same structure.
-
-## Constraints
-
-Tables support several constraints to enforce data integrity:
-
-- **Primary keys** uniquely identify each row and define how updates and
-  deletes work
-- **Unique constraints** ensure no two rows share the same value for a
-  column
-
-See [Constraints](https://spacetimedb.com/docs/tables/constraints) for details.
-
-## Auto-Increment
-
-Auto-increment columns automatically generate unique integer values for
-new rows. SpacetimeDB implements auto-increment using sequences, which
-provide crash-safe value generation with configurable parameters.
-
-See [Auto-Increment](https://spacetimedb.com/docs/tables/auto-increment) for details.
-
-## Schedule Tables
-
-Tables can trigger reducers at specific times by including a scheduling
-column. This allows you to schedule future actions like sending
-reminders, expiring content, or running periodic maintenance.
-
-See [Schedule Tables](https://spacetimedb.com/docs/tables/schedule-tables) for details.
-
-## Next Steps
-
-- [Column Types](https://spacetimedb.com/docs/tables/column-types) - Supported column types and
-  performance considerations
-- [Constraints](https://spacetimedb.com/docs/tables/constraints) - Primary keys and unique
-  constraints
-- [Auto-Increment](https://spacetimedb.com/docs/tables/auto-increment) - Automatic ID
-  generation with sequences
-- [Default Values](https://spacetimedb.com/docs/tables/default-values) - Schema evolution with
-  column defaults
-- [Indexes](https://spacetimedb.com/docs/tables/indexes) - Speed up queries with single and
-  multi-column indexes
-- [Access Permissions](https://spacetimedb.com/docs/tables/access-permissions) - Public vs
-  private tables
-- [Schedule Tables](https://spacetimedb.com/docs/tables/schedule-tables) - Time-based reducer
-  execution
-- [Performance](https://spacetimedb.com/docs/tables/performance) - Best practices for table
-  design
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/tables" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Tables | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tables"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Tables | SpacetimeDB docs"><meta data-rh="true" name="description" content="Tables are the way to store data in SpacetimeDB. All data in SpacetimeDB is stored in memory for extremely low latency and high throughput access. SpacetimeDB also automatically persists all data to disk."><meta data-rh="true" property="og:description" content="Tables are the way to store data in SpacetimeDB. All data in SpacetimeDB is stored in memory for extremely low latency and high throughput access. SpacetimeDB also automatically persists all data to disk."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tables"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tables" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tables","item":"https://spacetimedb.com/docs/tables"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tables">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tables">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/tables">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible menu__list-item-collapsible--active"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" aria-current="page" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Collapse sidebar category &#x27;Tables&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/column-types"><span title="Column Types" class="linkLabel_UvDg">Column Types</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/file-storage"><span title="File Storage" class="linkLabel_UvDg">File Storage</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/auto-increment"><span title="Auto-Increment" class="linkLabel_UvDg">Auto-Increment</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/constraints"><span title="Constraints" class="linkLabel_UvDg">Constraints</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/default-values"><span title="Default Values" class="linkLabel_UvDg">Default Values</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/indexes"><span title="Indexes" class="linkLabel_UvDg">Indexes</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/access-permissions"><span title="Table Access Permissions" class="linkLabel_UvDg">Table Access Permissions</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/schedule-tables"><span title="Schedule Tables" class="linkLabel_UvDg">Schedule Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/event-tables"><span title="Event Tables" class="linkLabel_UvDg">Event Tables</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tables/performance"><span title="Performance Best Practices" class="linkLabel_UvDg">Performance Best Practices</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Tables</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Tables</h1></header><p>Tables are the way to store data in SpacetimeDB. All data in SpacetimeDB is stored in memory for extremely low latency and high throughput access. SpacetimeDB also automatically persists all data to disk.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="why-tables">Why Tables<a href="#why-tables" class="hash-link" aria-label="Direct link to Why Tables" title="Direct link to Why Tables" translate="no">​</a></h2>
+<p>Tables are the fundamental unit of data organization in SpacetimeDB, just as files are the fundamental unit in Unix. However, tables possess greater generality than files. Unix requires a separate <em>filesystem</em> concept to organize and describe files. SpacetimeDB, by contrast, describes itself: it stores the representation of tables and their schemas in tables called <strong>system tables</strong> (such as <code>st_table</code> and <code>st_column</code>).</p>
+<p>You can query these system tables directly:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">SELECT</span><span style="color:#FF79C6"> *</span><span style="color:#FF79C6"> FROM</span><span style="color:#F8F8F2"> st_table;</span></span>
+<span class="line"><span style="color:#FF79C6">SELECT</span><span style="color:#FF79C6"> *</span><span style="color:#FF79C6"> FROM</span><span style="color:#F8F8F2"> st_column;</span></span></code></pre>
+<div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>You can query system tables, but you should not modify them directly. Make schema changes through the normal definition mechanisms in your module code.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="tables-and-data-oriented-design">Tables and Data-Oriented Design<a href="#tables-and-data-oriented-design" class="hash-link" aria-label="Direct link to Tables and Data-Oriented Design" title="Direct link to Tables and Data-Oriented Design" translate="no">​</a></h3>
+<p>The relational model underlying tables represents the logical endpoint of <a href="https://spacetimedb.com/blog/databases-and-data-oriented-design" target="_blank" rel="noopener noreferrer" class="">data-oriented design</a>. Patterns such as Entity Component Systems (ECS) implement a strict subset of relational capabilities. Tables give you the full power of relational theory: over fifty years of proven techniques for organizing and querying data efficiently.</p>
+<p>The central principle of data-oriented design holds that <strong>the purpose of any program is to transform data from one form to another</strong>. Tables provide a principled, universal representation for that data, giving you:</p>
+\<ul\>
+<li class=""><strong>Efficient access patterns</strong> through indexes</li>
+<li class=""><strong>Data integrity</strong> through constraints</li>
+<li class=""><strong>Flexible queries</strong> through relational operations</li>
+<li class=""><strong>Real-time synchronization</strong> through subscriptions</li>
+</ul>
+<p>For further discussion of this philosophy, see <a class="" href="/docs/intro/zen">The Zen of Spacetime</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="physical-and-logical-independence">Physical and Logical Independence<a href="#physical-and-logical-independence" class="hash-link" aria-label="Direct link to Physical and Logical Independence" title="Direct link to Physical and Logical Independence" translate="no">​</a></h3>
+<p>A core goal of the relational model is separating <em>logical</em> access patterns from <em>physical</em> data representation. When you write a subscription query, you express <em>what</em> data you need, not <em>how</em> the database should retrieve it. This separation allows SpacetimeDB to change the physical representation of your data for performance reasons without requiring you to rewrite your queries.</p>
+<p>The clearest example is indexing. When you add an index to a column, you change how SpacetimeDB physically organizes that data. It builds an additional data structure to accelerate lookups. But your subscription queries continue to work unchanged. The same query that previously scanned the entire table now uses the index automatically. You improve performance by modifying the schema, not the queries.</p>
+<p>This independence extends beyond indexes. SpacetimeDB can change internal storage formats, memory layouts, and access algorithms across versions. Your queries remain stable because they operate at the logical level (rows and columns) rather than the physical level of bytes and pointers.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="table-decomposition">Table Decomposition<a href="#table-decomposition" class="hash-link" aria-label="Direct link to Table Decomposition" title="Direct link to Table Decomposition" translate="no">​</a></h3>
+<p>A common concern when designing relational schemas is whether to consolidate data into fewer large tables or distribute it across many smaller ones. In traditional SQL databases, joins require verbose query syntax and incur significant execution cost. This friction pushes developers toward denormalized schemas with fewer, wider tables.</p>
+<p>SpacetimeDB operates under different constraints. Your reducers interact with tables through programmatic APIs rather than SQL strings. A join operation reduces to an index lookup: you retrieve a row from one table, extract a key value, and use that key to find related rows in another table. With all data resident in memory, these lookups often complete in nanoseconds.</p>
+<p>Consider the following schema for a game application:</p>
+<p><strong>Consolidated approach (not recommended):</strong></p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Player</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── id</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── name</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── position_x, position_y, velocity_x, velocity_y  (updates: 60Hz)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── health, max_health, mana, max_mana              (updates: occasional)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── total_kills, total_deaths, play_time            (updates: rare)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── audio_volume, graphics_quality                  (updates: very rare)</span><br></span></code></pre></div></div>
+<p><strong>Decomposed approach (recommended):</strong></p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Player          PlayerState         PlayerStats         PlayerSettings</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── id     ←──  ├── player_id       ├── player_id       ├── player_id</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── name        ├── position_x      ├── total_kills     ├── audio_volume</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">                ├── position_y      ├── total_deaths    └── graphics_quality</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">                ├── velocity_x      └── play_time</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">                └── velocity_y</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">PlayerResources</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── player_id</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── health</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── max_health</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── mana</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── max_mana</span><br></span></code></pre></div></div>
+<p>The decomposed approach yields several advantages:</p>
+\<ol\>
+<li class="">
+<p><strong>Reduced bandwidth</strong>: Clients subscribing to player positions do not receive updates when settings change. For an application with 1000 concurrent players updating positions at 60Hz, this reduction is substantial.</p>
+</li>
+<li class="">
+<p><strong>Cache efficiency</strong>: Data with similar update frequencies resides in contiguous memory. Updating a player&#x27;s position does not require loading or invalidating cache lines containing lifetime statistics.</p>
+</li>
+<li class="">
+<p><strong>Semantic clarity</strong>: Each table maintains a single responsibility. <code>PlayerState</code> handles the performance-critical gameplay loop. <code>PlayerStats</code> serves leaderboard queries. <code>PlayerSettings</code> supports the options interface.</p>
+</li>
+<li class="">
+<p><strong>Schema evolution</strong>: You can add columns to <code>PlayerStats</code> without affecting the structure or performance characteristics of <code>PlayerState</code>.</p>
+</li>
+</ol>
+<p>The guiding principle: <strong>organize data by access pattern, not by the entity it describes</strong>. Keep data you read together in the same table. Separate data you read at different times or frequencies.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="defining-tables">Defining Tables<a href="#defining-tables" class="hash-link" aria-label="Direct link to Defining Tables" title="Direct link to Defining Tables" translate="no">​</a></h2>
+<p>Tables are defined in your module code with a name, columns, and optional configuration.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>Use the <code>table</code> function to declare a new table:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { schema, table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> people </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">people</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  {</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">u32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">index</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">btree</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#F8F8F2">    email</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">unique</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ people });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span></code></pre><p>The first argument to <code>table()</code> defines table options, and the second defines columns. Pass your tables to <code>schema()</code> as an object: <code>schema({ people })</code> or <code>schema({ table1, table2 })</code>. Never use <code>schema(table)</code> or <code>schema(t1, t2, t3)</code>.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Use the <code>[SpacetimeDB.Table]</code> attribute on a <code>partial struct</code> or <code>partial class</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Person</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Person</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> uint</span><span style="color:#F8F8F2"> Id;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Email;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>partial</code> modifier is required to allow code generation.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Use the <code>#[spacetimedb::table]</code> macro on a struct:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> person, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Person</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    email</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Rust Visibility vs SpacetimeDB Visibility</div><div class="admonitionContent_STxx"><p>The <code>pub</code> modifier on the struct follows normal Rust visibility rules and has no meaning to SpacetimeDB. It controls whether the struct is accessible from other Rust modules in your crate, not whether the table is public to clients. Use the <code>public</code> attribute in <code>#[spacetimedb::table]</code> to control client visibility.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Register the struct with <code>SPACETIMEDB_STRUCT</code>, the table with <code>SPACETIMEDB_TABLE</code>, then add field constraints:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Person</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    uint32_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string email;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Person, id, name, email)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Person, person, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(person, id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(person, name)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Unique</span><span style="color:#F8F8F2">(person, email)</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="creating-the-schema-typescript">Creating the schema (TypeScript)<a href="#creating-the-schema-typescript" class="hash-link" aria-label="Direct link to Creating the schema (TypeScript)" title="Direct link to Creating the schema (TypeScript)" translate="no">​</a></h3>
+<p>After defining tables, pass them to <code>schema()</code> as a single object. The object keys become the accessor names in <code>ctx.db</code>:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> people </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">people</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, { </span><span style="color:#6272A4">/* columns */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> products </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">products</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, { </span><span style="color:#6272A4">/* columns */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ people, products });</span></span>
+<span class="line"><span style="color:#FF79C6">export</span><span style="color:#FF79C6"> default</span><span style="color:#F8F8F2"> spacetimedb;</span></span></code></pre>
+<p>Use <code>schema({ table1 })</code> or <code>schema({ t1, t2 })</code>. Never use <code>schema(table)</code> or <code>schema(t1, t2, t3)</code>.</p>
+<p>For a compact list of TypeScript gotchas, see the <a class="" href="/docs/databases/cheat-sheet#common-mistakes">cheat sheet</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="table-naming-and-accessors">Table Naming and Accessors<a href="#table-naming-and-accessors" class="hash-link" aria-label="Direct link to Table Naming and Accessors" title="Direct link to Table Naming and Accessors" translate="no">​</a></h2>
+<p>The table name you specify determines how you access the table in your code and in SQL. Understanding this relationship is essential for writing correct SpacetimeDB modules.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Table names in SQL</div><div class="admonitionContent_STxx"><p>The table <code>name</code> in your schema is used <strong>verbatim</strong> in SQL queries and subscriptions. There is no automatic pluralization or case conversion. If you define <code>name: &#x27;position&#x27;</code>, SQL uses <code>position</code>; if you define <code>name: &#x27;positions&#x27;</code>, SQL uses <code>positions</code>. Ensure your schema names match what your SQL queries expect.</p></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="how-accessor-names-are-derived">How Accessor Names Are Derived<a href="#how-accessor-names-are-derived" class="hash-link" aria-label="Direct link to How Accessor Names Are Derived" title="Direct link to How Accessor Names Are Derived" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>The accessor is the key passed to <code>schema({...})</code>, verbatim. By convention the key matches the table <code>name</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Table definition</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> playerScores </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">(</span></span>
+<span class="line"><span style="color:#F8F8F2">  { name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player_scores</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> },</span></span>
+<span class="line"><span style="color:#F8F8F2">  { </span><span style="color:#6272A4">/* columns */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"><span style="color:#F8F8F2">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> spacetimedb </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> schema</span><span style="color:#F8F8F2">({ playerScores });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Accessor is the schema key, verbatim</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.db.playerScores.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">({ </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre><table><thead><tr><th>Schema Key</th><th>Accessor</th></tr></thead>\<tbody\><tr><td><code>user</code></td><td><code>ctx.db.user</code></td></tr><tr><td><code>player_scores</code></td><td><code>ctx.db.player_scores</code></td></tr><tr><td><code>game_session</code></td><td><code>ctx.db.game_session</code></td></tr></tbody></table></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>The accessor name <strong>exactly matches</strong> the <code>Accessor</code> attribute value:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Table definition</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* columns */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Accessor matches Accessor value exactly</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Db.Player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre><table><thead><tr><th>Accessor</th><th>API Accessor</th><th>SQL Table Name (when Name omitted)</th></tr></thead>\<tbody\><tr><td><code>"User"</code></td><td><code>ctx.Db.User</code></td><td><code>User</code></td></tr><tr><td><code>"Player"</code></td><td><code>ctx.Db.Player</code></td><td><code>Player</code></td></tr><tr><td><code>"GameSession"</code></td><td><code>ctx.Db.GameSession</code></td><td><code>GameSession</code></td></tr></tbody></table><div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Case Sensitivity</div><div class="admonitionContent_STxx"><p>The accessor is case-sensitive and must match the <code>Accessor</code> value exactly. <code>Accessor = "user"</code> produces <code>ctx.Db.user</code>, not <code>ctx.Db.User</code>.</p></div></div><div class="theme-admonition theme-admonition-tip admonition_Ph9R alert alert--success"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>C# Convention</div><div class="admonitionContent_STxx"><p>Pick a stable accessor style for your project and use it consistently (for example, <code>User</code>, <code>user</code>, or <code>player_score</code>). Accessor names are case-sensitive.</p></div></div></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>The accessor name <strong>exactly matches</strong> the <code>name</code> attribute value:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Table definition</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* columns */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Accessor matches name exactly</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre><table><thead><tr><th>name Attribute</th><th>Accessor</th></tr></thead>\<tbody\><tr><td><code>name = user</code></td><td><code>ctx.db.user()</code></td></tr><tr><td><code>name = player</code></td><td><code>ctx.db.player()</code></td></tr><tr><td><code>name = game_session</code></td><td><code>ctx.db.game_session()</code></td></tr></tbody></table></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>The accessor name matches the table identifier you pass to <code>SPACETIMEDB_TABLE</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> PlayerScores</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(PlayerScores, id)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(PlayerScores, player_scores, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(player_scores, id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Accessor matches the table identifier</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.db[player_scores].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(PlayerScores{</span><span style="color:#6272A4"> /* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre><table><thead><tr><th>Table Identifier</th><th>Accessor</th></tr></thead>\<tbody\><tr><td><code>user</code></td><td><code>ctx.db[user]</code></td></tr><tr><td><code>player_scores</code></td><td><code>ctx.db[player_scores]</code></td></tr><tr><td><code>game_session</code></td><td><code>ctx.db[game_session]</code></td></tr></tbody></table></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="recommended-naming-conventions">Recommended Naming Conventions<a href="#recommended-naming-conventions" class="hash-link" aria-label="Direct link to Recommended Naming Conventions" title="Direct link to Recommended Naming Conventions" translate="no">​</a></h3>
+<p>Use idiomatic naming conventions for each language:</p>
+<table><thead><tr><th>Language</th><th>Convention</th><th>Example Table</th><th>Example Accessor</th></tr></thead>\<tbody\><tr><td><strong>TypeScript</strong></td><td>snake_case</td><td><code>&#x27;player_score&#x27;</code></td><td><code>ctx.db.player_score</code></td></tr><tr><td><strong>C#</strong></td><td>PascalCase</td><td><code>Accessor = "PlayerScore"</code></td><td><code>ctx.Db.PlayerScore</code></td></tr><tr><td><strong>Rust</strong></td><td>lower_snake_case</td><td><code>name = player_score</code></td><td><code>ctx.db.player_score()</code></td></tr><tr><td><strong>C++</strong></td><td>lower_snake_case</td><td><code>player_score</code></td><td><code>ctx.db[player_score]</code></td></tr></tbody></table>
+<p>These conventions align with each language&#x27;s standard style guides and make your code feel natural within its ecosystem.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="table-visibility">Table Visibility<a href="#table-visibility" class="hash-link" aria-label="Direct link to Table Visibility" title="Direct link to Table Visibility" translate="no">​</a></h2>
+<p>Tables can be <strong>private</strong> (default) or <strong>public</strong>:</p>
+\<ul\>
+<li class=""><strong>Private tables</strong>: Visible only to <a class="" href="/docs/functions/reducers">reducers</a> and the database owner. Clients cannot access them.</li>
+<li class=""><strong>Public tables</strong>: Exposed for client read access through <a class="" href="/docs/clients/subscriptions">subscriptions</a>. Writes still occur only through reducers.</li>
+</ul>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> publicTable </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">user</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> privateTable </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">secret</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2"> }, { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">User</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Secret</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> false</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Secret</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> user, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> secret)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Secret</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> }</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> User</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(User, id)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(User, user, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(user, id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Secret</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">  uint64_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Secret, id)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Secret, secret, Private)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(secret, id)</span></span></code></pre></div></div></div>
+<p>For more fine-grained access control, you can use <a class="" href="/docs/functions/views">view functions</a> to expose computed subsets of your data to clients. Views allow you to filter rows, select specific columns, or join data from multiple tables before exposing it.</p>
+<p>See <a class="" href="/docs/tables/access-permissions">Access Permissions</a> for complete details on table visibility and access patterns.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="multiple-tables-for-the-same-type">Multiple Tables for the Same Type<a href="#multiple-tables-for-the-same-type" class="hash-link" aria-label="Direct link to Multiple Tables for the Same Type" title="Direct link to Multiple Tables for the Same Type" translate="no">​</a></h2>
+<p>You can create multiple tables that share the same row type by applying multiple table attributes to a single struct. Each table stores its own independent set of rows, but all tables share the same schema.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><p>In TypeScript, define separate table variables that share the same column schema:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { table, t } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Define the shared column schema</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> playerColumns </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  identity</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">primaryKey</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  playerId</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">i32</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">unique</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">autoInc</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">  name</span><span style="color:#FF79C6">:</span><span style="color:#F8F8F2"> t.</span><span style="color:#50FA7B">string</span><span style="color:#F8F8F2">(),</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Create two tables with the same schema</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">, public</span><span style="color:#FF79C6">:</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2"> }, playerColumns);</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> loggedOutPlayer </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> table</span><span style="color:#F8F8F2">({ name</span><span style="color:#FF79C6">:</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">logged_out_player</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2"> }, playerColumns);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Apply multiple <code>[Table]</code> attributes to the same struct:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">Player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">LoggedOutPlayer</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> Identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> PlayerId;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> Name;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Each table gets its own accessor:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Insert into different tables</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Db.Player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx.Db.LoggedOutPlayer.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">new</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Move a row between tables</span></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> player </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.Db.LoggedOutPlayer.Identity.</span><span style="color:#50FA7B">Find</span><span style="color:#F8F8F2">(ctx.Sender);</span></span>
+<span class="line"><span style="color:#FF79C6">if</span><span style="color:#F8F8F2"> (player </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.Player.</span><span style="color:#50FA7B">Insert</span><span style="color:#F8F8F2">(player.Value);</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx.Db.LoggedOutPlayer.Identity.</span><span style="color:#50FA7B">Delete</span><span style="color:#F8F8F2">(player.Value.Identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Apply multiple <code>#[spacetimedb::table]</code> attributes to the same struct:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> logged_out_player)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Each table gets its own accessor:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Insert into different tables</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Player</span><span style="color:#F8F8F2"> { </span><span style="color:#6272A4">/* ... */</span><span style="color:#F8F8F2"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Move a row between tables</span></span>
+<span class="line"><span style="color:#FF79C6">if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(player) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">()) {</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(player</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">clone</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">    ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">logged_out_player</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">identity</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">delete</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">&</span><span style="color:#F8F8F2">player</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">identity);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Apply multiple <code>SPACETIMEDB_TABLE</code> macros to the same struct:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">  Identity identity;</span></span>
+<span class="line"><span style="color:#FF79C6">  int32_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">  std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, identity, player_id, name)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public)</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, logged_out_player, Private)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(player, identity)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(logged_out_player, identity)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_UniqueAutoInc</span><span style="color:#F8F8F2">(player, player_id)</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_UniqueAutoInc</span><span style="color:#F8F8F2">(logged_out_player, player_id)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Move a row between tables</span></span>
+<span class="line"><span style="color:#FF79C6">auto</span><span style="color:#F8F8F2"> maybe_logged_out </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx.db[logged_out_player_identity].</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">if</span><span style="color:#F8F8F2"> (maybe_logged_out) {</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[player].</span><span style="color:#50FA7B">insert</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">maybe_logged_out);</span></span>
+<span class="line"><span style="color:#F8F8F2">  ctx.db[logged_out_player_identity].</span><span style="color:#50FA7B">delete_by_key</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>This pattern is useful for:</p>
+\<ul\>
+<li class=""><strong>State management</strong>: Separate active users from inactive users, online players from offline players</li>
+<li class=""><strong>Archiving</strong>: Move old records to an archive table while keeping the same schema</li>
+<li class=""><strong>Staging</strong>: Hold pending records in one table before moving them to a main table</li>
+</ul>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Shared Constraints</div><div class="admonitionContent_STxx"><p>Column attributes like <code>[PrimaryKey]</code>, <code>[Unique]</code>, <code>[AutoInc]</code>, and <code>[Index]</code> apply to <strong>all tables</strong> defined on the type. Each table will have its own independent primary key, unique constraints, and indexes with the same structure.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="constraints">Constraints<a href="#constraints" class="hash-link" aria-label="Direct link to Constraints" title="Direct link to Constraints" translate="no">​</a></h2>
+<p>Tables support several constraints to enforce data integrity:</p>
+\<ul\>
+<li class=""><strong>Primary keys</strong> uniquely identify each row and define how updates and deletes work</li>
+<li class=""><strong>Unique constraints</strong> ensure no two rows share the same value for a column</li>
+</ul>
+<p>See <a class="" href="/docs/tables/constraints">Constraints</a> for details.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="auto-increment">Auto-Increment<a href="#auto-increment" class="hash-link" aria-label="Direct link to Auto-Increment" title="Direct link to Auto-Increment" translate="no">​</a></h2>
+<p>Auto-increment columns automatically generate unique integer values for new rows. SpacetimeDB implements auto-increment using sequences, which provide crash-safe value generation with configurable parameters.</p>
+<p>See <a class="" href="/docs/tables/auto-increment">Auto-Increment</a> for details.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="schedule-tables">Schedule Tables<a href="#schedule-tables" class="hash-link" aria-label="Direct link to Schedule Tables" title="Direct link to Schedule Tables" translate="no">​</a></h2>
+<p>Tables can trigger reducers at specific times by including a scheduling column. This allows you to schedule future actions like sending reminders, expiring content, or running periodic maintenance.</p>
+<p>See <a class="" href="/docs/tables/schedule-tables">Schedule Tables</a> for details.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+\<ul\>
+<li class=""><a class="" href="/docs/tables/column-types">Column Types</a> - Supported column types and performance considerations</li>
+<li class=""><a class="" href="/docs/tables/constraints">Constraints</a> - Primary keys and unique constraints</li>
+<li class=""><a class="" href="/docs/tables/auto-increment">Auto-Increment</a> - Automatic ID generation with sequences</li>
+<li class=""><a class="" href="/docs/tables/default-values">Default Values</a> - Schema evolution with column defaults</li>
+<li class=""><a class="" href="/docs/tables/indexes">Indexes</a> - Speed up queries with single and multi-column indexes</li>
+<li class=""><a class="" href="/docs/tables/access-permissions">Access Permissions</a> - Public vs private tables</li>
+<li class=""><a class="" href="/docs/tables/schedule-tables">Schedule Tables</a> - Time-based reducer execution</li>
+<li class=""><a class="" href="/docs/tables/performance">Performance</a> - Best practices for table design</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00300-tables.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/functions/http-handlers"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">HTTP Handlers</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tables/column-types"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Column Types</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#why-tables" class="table-of-contents__link toc-highlight">Why Tables</a>\<ul\>\<li\><a href="#tables-and-data-oriented-design" class="table-of-contents__link toc-highlight">Tables and Data-Oriented Design</a></li>\<li\><a href="#physical-and-logical-independence" class="table-of-contents__link toc-highlight">Physical and Logical Independence</a></li>\<li\><a href="#table-decomposition" class="table-of-contents__link toc-highlight">Table Decomposition</a></li></ul></li>\<li\><a href="#defining-tables" class="table-of-contents__link toc-highlight">Defining Tables</a>\<ul\>\<li\><a href="#creating-the-schema-typescript" class="table-of-contents__link toc-highlight">Creating the schema (TypeScript)</a></li></ul></li>\<li\><a href="#table-naming-and-accessors" class="table-of-contents__link toc-highlight">Table Naming and Accessors</a>\<ul\>\<li\><a href="#how-accessor-names-are-derived" class="table-of-contents__link toc-highlight">How Accessor Names Are Derived</a></li>\<li\><a href="#recommended-naming-conventions" class="table-of-contents__link toc-highlight">Recommended Naming Conventions</a></li></ul></li>\<li\><a href="#table-visibility" class="table-of-contents__link toc-highlight">Table Visibility</a></li>\<li\><a href="#multiple-tables-for-the-same-type" class="table-of-contents__link toc-highlight">Multiple Tables for the Same Type</a></li>\<li\><a href="#constraints" class="table-of-contents__link toc-highlight">Constraints</a></li>\<li\><a href="#auto-increment" class="table-of-contents__link toc-highlight">Auto-Increment</a></li>\<li\><a href="#schedule-tables" class="table-of-contents__link toc-highlight">Schedule Tables</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

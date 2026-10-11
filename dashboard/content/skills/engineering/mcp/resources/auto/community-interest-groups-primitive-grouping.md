@@ -21,7 +21,7 @@ skill_name = "mcp"
 
 ## Mission Statement
 
-The Primitive Grouping Interest Group explores how MCP Primitives (Tools, Resources, Prompts, Tasks) might be organized, beyond the flat lists maintained by the protocol, and how such organization might benefit both MCP servers and clients. The group documents diverse requirements from clients, servers, and gateways, supports reference extensions of varied organization strategies, and feeds recommendations into the [SEP process](https://modelcontextprotocol.io/community/sep-guidelines) rather than picking a single canonical pattern early.
+The Primitive Grouping Interest Group explores how MCP Primitives (Tools, Resources, Prompts, Tasks) might be organized, beyond the flat lists maintained by the protocol, and how such organization might benefit both MCP servers and clients. The group documents diverse requirements from clients, servers, and gateways, supports reference extensions of varied organization strategies, and feeds recommendations into the [SEP process](/community/sep-guidelines) rather than picking a single canonical pattern early.
 
 ## Scope
 
@@ -38,10 +38,10 @@ The Primitive Grouping Interest Group explores how MCP Primitives (Tools, Resour
 
 ### Related Groups
 
-* **[Tool Annotations IG](https://modelcontextprotocol.io/community/interest-groups/tool-annotations)** - annotation-based filtering and selection of primitives intersects with how primitives are organized and surfaced
-* **[Skills Over MCP WG](https://modelcontextprotocol.io/community/working-groups/skills-over-mcp)** - the MCP-and-Skills effort is evaluating how capabilities are discovered and organized, which overlaps with grouping
-* **[Registry WG](https://modelcontextprotocol.io/community/working-groups/registry)** - organizing MCP servers (beyond this group's mandate) is evaluated here
-* **[Security IG](https://modelcontextprotocol.io/community/interest-groups/security)** - organizing and disclosing primitives by privilege level is a security concern outside this group's scope
+* **[Tool Annotations IG](/community/interest-groups/tool-annotations)** - annotation-based filtering and selection of primitives intersects with how primitives are organized and surfaced
+* **[Skills Over MCP WG](/community/working-groups/skills-over-mcp)** - maintains the published [Skills extension](/extensions/skills/overview); skill discovery and progressive disclosure overlap with grouping
+* **[Registry WG](/community/working-groups/registry)** - organizing MCP servers (beyond this group's mandate) is evaluated here
+* **[Security IG](/community/interest-groups/security)** - organizing and disclosing primitives by privilege level is a security concern outside this group's scope
 
 ## Problem Statement
 
@@ -56,7 +56,7 @@ Flat lists of MCP primitives can be long and cumbersome to work with for several
 **Beyond Scope**
 
 * **Organization for security** - organizing and disclosing primitives to clients based on their privilege level is an important problem but beyond this group's mandate
-* **Organizing MCP servers** - the MCP Registry and MCP-and-Skills groups are evaluating how different servers should be organized to improve the client experience
+* **Organizing MCP servers** - server discovery and registry schema decisions belong to the [Registry WG](/community/working-groups/registry), with skill-distribution requirements contributed by the Skills Over MCP WG
 
 ## Goals
 
@@ -76,36 +76,36 @@ See [Approaches](https://github.com/modelcontextprotocol/experimental-ext-groupi
 
 ## Leadership
 
-| Role        | Name        | Organization             | GitHub                                               | Term    |
-| ----------- | ----------- | ------------------------ | ---------------------------------------------------- | ------- |
-| Facilitator | Tapan Chugh | University of Washington | [@chughtapan](https://github.com/chughtapan)         | Initial |
-| Facilitator | Sam Morrow  | GitHub                   | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | Initial |
+| Role | Name | Organization | GitHub | Term |
+| - | - | - | - | - |
+| Facilitator | Tapan Chugh | University of Washington | [@chughtapan](https://github.com/chughtapan) | Initial |
+| Facilitator | Sam Morrow | GitHub | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | Initial |
 
 ## Membership
 
-| Name        | Organization             | GitHub                                               | Discord | Level       |
-| ----------- | ------------------------ | ---------------------------------------------------- | ------- | ----------- |
-| Tapan Chugh | University of Washington | [@chughtapan](https://github.com/chughtapan)         |         | Facilitator |
-| Sam Morrow  | GitHub                   | [@SamMorrowDrums](https://github.com/SamMorrowDrums) |         | Facilitator |
-| Cliff Hall  | Futurescale              | [@cliffhall](https://github.com/cliffhall)           |         | Maintainer  |
+| Name | Organization | GitHub | Discord | Level |
+| - | - | - | - | - |
+| Tapan Chugh | University of Washington | [@chughtapan](https://github.com/chughtapan) | | Facilitator |
+| Sam Morrow | GitHub | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | | Facilitator |
+| Cliff Hall | Futurescale | [@cliffhall](https://github.com/cliffhall) | | Maintainer |
 
 ## Operations
 
-| Meeting    | Frequency | Duration | Purpose                                                        |
-| ---------- | --------- | -------- | -------------------------------------------------------------- |
-| Discussion | TBD       | TBD      | Requirements alignment, approach review, experimental findings |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
+| Discussion | TBD | TBD | Requirements alignment, approach review, experimental findings |
 
-Open to anyone. Join the [#primitive-grouping-ig](https://discord.com/channels/1358869848138059966/1425903819186770064) channel on the [MCP Contributors Discord](https://modelcontextprotocol.io/community/communication#discord).
+Open to anyone. Join the [#primitive-grouping-ig](https://discord.com/channels/1358869848138059966/1425903819186770064) channel on the [MCP Contributors Discord](/community/communication#discord).
 
 ## Discussion Topics
 
 The following items form the IG's current work agenda. This list is not exhaustive and will evolve as the group identifies new areas of interest.
 
-| Item                               | Status      | Champion         | Notes                                                             |
-| ---------------------------------- | ----------- | ---------------- | ----------------------------------------------------------------- |
-| Requirements alignment             | In Progress | All facilitators | Review approaches, identify common requirements and gaps          |
-| Experimental findings repo section | Proposed    | TBD              | Dedicated repo section for implementations and evaluation results |
-| MCP Grouping Convention v0.1       | Proposed    | TBD              | Documented pattern (not spec) for grouping of primitives          |
+| Item | Status | Champion | Notes |
+| - | - | - | - |
+| Requirements alignment | In Progress | All facilitators | Review approaches, identify common requirements and gaps |
+| Experimental findings repo section | Proposed | TBD | Dedicated repo section for implementations and evaluation results |
+| MCP Grouping Convention v0.1 | Proposed | TBD | Documented pattern (not spec) for grouping of primitives |
 
 ## Lifecycle
 
@@ -137,6 +137,8 @@ This IG may propose becoming a Working Group if:
 
 ## Changelog
 
-| Date       | Change          |
-| ---------- | --------------- |
+| Date | Change |
+| - | - |
 | 2026-06-18 | Initial charter |
+
+

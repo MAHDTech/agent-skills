@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 994                                                                             |
-| **Title**     | Shared Communication Practices/Guidelines                                       |
-| **Status**    | Final                                                                           |
-| **Type**      | Process                                                                         |
-| **Created**   | 2025-07-17                                                                      |
-| **Author(s)** | [@localden](https://github.com/localden)                                        |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1002](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1002) |
+| Field | Value |
+| - | - |
+| **SEP** | 994 |
+| **Title** | Shared Communication Practices/Guidelines |
+| **Status** | Final |
+| **Type** | Process |
+| **Created** | 2025-07-17 |
+| **Author(s)** | [@localden](https://github.com/localden) |
+| **Sponsor** | None |
+| **PR** | [#1002](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1002) |
 
 ***
 
@@ -144,3 +144,5 @@ This SEP establishes new processes and does not affect existing protocol functio
 ## Reference Implementation
 
 The communication guidelines are published at: [https://modelcontextprotocol.io/community/communication](https://modelcontextprotocol.io/community/communication)
+
+

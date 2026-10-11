@@ -49,7 +49,7 @@ All maintainers are expected to have a strong bias towards ACP's design philosop
 
 ### Channels
 
-Technical Governance is facilitated through shared [communication channels](https://agentclientprotocol.com/community/communication) of all **maintainers, core maintainers** and **lead maintainers**. Each maintainer group can choose additional communication channels, but all decisions and their supporting discussions must be recorded and made transparently available in one of the main communication channels.
+Technical Governance is facilitated through shared [communication channels](/community/communication) of all **maintainers, core maintainers** and **lead maintainers**. Each maintainer group can choose additional communication channels, but all decisions and their supporting discussions must be recorded and made transparently available in one of the main communication channels.
 
 ### Contributors
 
@@ -57,7 +57,7 @@ Anyone who submits code, documentation or other improvements is counted as a con
 
 ### Maintainers
 
-Maintainers are responsible for [Working or Interest Groups](https://agentclientprotocol.com/community/working-interest-groups) within the ACP project. These generally are independent repositories such as language-specific SDKs, but can also extend to subdirectories of a repository, such as the ACP documentation. Maintainers may adopt their own rules and procedures for making decisions. Maintainers are expected to make decisions for their respective projects independently, but can defer or escalate to the core maintainers when needed.
+Maintainers are responsible for [Working or Interest Groups](/community/working-interest-groups) within the ACP project. These generally are independent repositories such as language-specific SDKs, but can also extend to subdirectories of a repository, such as the ACP documentation. Maintainers may adopt their own rules and procedures for making decisions. Maintainers are expected to make decisions for their respective projects independently, but can defer or escalate to the core maintainers when needed.
 
 Maintainers are responsible for the:
 
@@ -116,7 +116,7 @@ Core and lead maintainers are responsible for all aspects of Agent Client Protoc
 
 ### Working and Interest Groups
 
-ACP collaboration and contributions are organized around two structures: [Working Groups and Interest Groups](https://agentclientprotocol.com/community/working-interest-groups).
+ACP collaboration and contributions are organized around two structures: [Working Groups and Interest Groups](/community/working-interest-groups).
 
 Interest Groups are responsible for identifying and articulating problems that ACP should address, primarily by facilitating open discussions within the community. In contrast, Working Groups focus on developing concrete solutions by collaboratively producing deliverables, such as RFDs or community-owned implementations of the specification. While input from Interest Groups can help justify the formation of a Working Group, it is not a strict requirement. Similarly, contributions from either Interest Groups or Working Groups are encouraged, but not mandatory, when submitting RFDs or other community proposals.
 
@@ -138,7 +138,7 @@ They must:
 Projects and working groups without specified processes default to:
 
 * GitHub pull requests and issues for contributions
-* A public channel in the official [ACP Contributor Zulip](https://agentclientprotocol.com/community/communication#zulip)
+* A public channel in the official [ACP Contributor Zulip](/community/communication#zulip)
 
 ### Maintenance Responsibilities
 
@@ -154,7 +154,7 @@ The core maintainer group meets on a bi-weekly basis to discuss proposals and th
 
 ### Public Chat
 
-The ACP project maintains a [public Zulip Chat](https://agentclientprotocol.com/community/communication#zulip) with open chats for different groups. The ACP project may have private channels for certain communications.
+The ACP project maintains a [public Zulip Chat](/community/communication#zulip) with open chats for different groups. The ACP project may have private channels for certain communications.
 
 ## Nominating, Confirming and Removing Maintainers
 
@@ -207,3 +207,6 @@ Refer to [the maintainer list](https://github.com/agentclientprotocol/agent-clie
 * This project does not require a Contributor License Agreement (CLA). Instead, contributions are accepted under the following terms:
 
 > By contributing to this project, you agree that your contributions will be licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). You affirm that you have the legal right to submit your work, that you are not including code you do not have rights to, and that you understand contributions are made without requiring a Contributor License Agreement (CLA).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

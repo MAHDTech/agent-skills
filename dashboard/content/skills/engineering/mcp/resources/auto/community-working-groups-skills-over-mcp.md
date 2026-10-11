@@ -28,22 +28,27 @@ emerged from discussion on [SEP-2076 — Agent Skills as a First-Class MCP Primi
 which raised open questions about whether existing MCP primitives suffice or what
 conventions to standardize. The WG produces specification extensions, reference
 implementations, and coordination artifacts because solutions touch the protocol spec,
-registry schema, SDK implementations, and client behavior. The WG's current direction
-is captured in [SEP-2640 — Skills Extension](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2640)
-(Resources-based, Extensions Track).
+registry schema, SDK implementations, and client behavior.
+
+[SEP-2640 — Skills Extension](/seps/2640-skills-extension) is Final. The WG maintains
+the official [Skills extension](/extensions/skills/overview)
+(`io.modelcontextprotocol/skills`) in
+[modelcontextprotocol/ext-skills](https://github.com/modelcontextprotocol/ext-skills).
+Current work focuses on implementation support, interoperability, and evolution
+of the published extension.
 
 ## Scope
 
 ### In Scope
 
-* **Specification Work**: SEPs defining how skills are represented, discovered, and
-  consumed within MCP — including the Skills Extension (Extensions Track) and related
-  protocol changes
+* **Specification Work**: Maintain and evolve the Skills extension, with changes
+  tracked in the [decision log](https://github.com/modelcontextprotocol/ext-skills/blob/main/docs/decisions.md);
+  propose related core protocol changes through the SEP process
 * **Reference Implementations**: SDK components and reference servers demonstrating
   skill discovery and consumption patterns
 * **Cross-Cutting Concerns**: Coordination with Registry WG (skills discovery/distribution,
   registry schema changes), Agents WG (skill activation, server metadata consumption),
-  Primitive Grouping WG (progressive disclosure patterns), and external projects including
+  Primitive Grouping IG (progressive disclosure patterns), and external projects including
   the [Agent Skills](https://agentskills.io/) spec (content format and well-known URI
   discovery), FastMCP, and PydanticAI
 * **Documentation**: Specification sections and guidance covering skill authoring,
@@ -63,54 +68,56 @@ is captured in [SEP-2640 — Skills Extension](https://github.com/modelcontextpr
 
 * **Agents WG** — How agents consume server metadata, skill activation
 * **Registry WG** — Skills discovery/distribution, registry schema changes
-* **Primitive Grouping WG** — Progressive disclosure patterns
+* **Primitive Grouping IG** — Progressive disclosure patterns
 
 ## Leadership
 
-| Role | Name            | Organization                | GitHub                                   | Term    |
-| ---- | --------------- | --------------------------- | ---------------------------------------- | ------- |
-| Lead | Ola Hungerford  | Nordstrom / MCP Maintainer  | [@olaservo](https://github.com/olaservo) | Initial |
-| Lead | Peter Alexander | Anthropic / Core Maintainer | [@pja-ant](https://github.com/pja-ant)   | Initial |
+| Role | Name | Organization | GitHub | Term |
+| - | - | - | - | - |
+| Lead | Ola Hungerford | Nordstrom / MCP Maintainer | [@olaservo](https://github.com/olaservo) | Initial |
+| Lead | Peter Alexander | Anthropic / Core Maintainer | [@pja-ant](https://github.com/pja-ant) | Initial |
+| Lead | Sambhav Kothari | Bloomberg / MCP Maintainer | [@sambhav](https://github.com/sambhav) | Initial |
 
 ## Authority & Decision Rights
 
-| Decision Type                       | Authority Level                                        |
-| ----------------------------------- | ------------------------------------------------------ |
-| Meeting logistics & scheduling      | WG Leads (autonomous)                                  |
-| Proposal prioritization within WG   | WG Leads (autonomous)                                  |
-| SEP triage & closure (in scope)     | WG Leads (autonomous, with documented rationale)       |
-| Technical design within scope       | WG consensus                                           |
-| Spec changes (additive)             | WG consensus → Core Maintainer approval                |
+| Decision Type | Authority Level |
+| - | - |
+| Meeting logistics & scheduling | WG Leads (autonomous) |
+| Proposal prioritization within WG | WG Leads (autonomous) |
+| SEP triage & closure (in scope) | WG Leads (autonomous, with documented rationale) |
+| Technical design within scope | WG consensus |
+| Spec changes (additive) | WG consensus → Core Maintainer approval |
 | Spec changes (breaking/fundamental) | WG consensus → Core Maintainer approval + wider review |
-| Scope expansion                     | Core Maintainer approval required                      |
-| WG Member approval                  | WG Member sponsors                                     |
+| Scope expansion | Core Maintainer approval required |
+| WG Member approval | WG Member sponsors |
 
 ## Membership
 
-| Name                     | Organization                    | GitHub                                                 | Discord | Level       |
-| ------------------------ | ------------------------------- | ------------------------------------------------------ | ------- | ----------- |
-| Ola Hungerford           | Nordstrom / MCP Maintainer      | [@olaservo](https://github.com/olaservo)               |         | Lead        |
-| Peter Alexander          | Anthropic / Core Maintainer     | [@pja-ant](https://github.com/pja-ant)                 |         | Lead        |
-| Yu Yi                    | Google                          | [@erain](https://github.com/erain)                     |         | Participant |
-| Sunish Sheth             | Databricks                      | [@sunishsheth2009](https://github.com/sunishsheth2009) |         | Participant |
-| Keith A Groves           | Hyix                            | [@keithagroves](https://github.com/keithagroves)       |         | Participant |
-| Peder Holdgaard Pedersen | Saxo Bank / MCP Maintainer      | [@pederhp](https://github.com/pederhp)                 |         | Participant |
-| Sam Morrow               | GitHub                          | [@SamMorrowDrums](https://github.com/SamMorrowDrums)   |         | Participant |
-| Jacob MacDonald          | Google                          | [@jakemac53](https://github.com/jakemac53)             |         | Participant |
-| Jonathan Hefner          | Independent / MCP Maintainer    | [@jonathanhefner](https://github.com/jonathanhefner)   |         | Participant |
-| Luca Chang               | AWS / MCP Maintainer            | [@LucaButBoring](https://github.com/LucaButBoring)     |         | Participant |
-| Bob Dickinson            | TeamSpark.ai / MCP Maintainer   | [@BobDickinson](https://github.com/BobDickinson)       |         | Participant |
-| Radoslav Dimitrov        | Stacklok / MCP Maintainer       | [@rdimitrov](https://github.com/rdimitrov)             |         | Participant |
-| Juan Antonio Osorio      | Stacklok                        | [@JAORMX](https://github.com/JAORMX)                   |         | Participant |
-| Kaxil Naik               | Astronomer / Apache Airflow PMC | [@kaxil](https://github.com/kaxil)                     |         | Participant |
-| Cliff Hall               | Futurescale                     | [@cliffhall](https://github.com/cliffhall)             |         | Participant |
-| Haoyu Wang               | Google                          | [@helloeve](https://github.com/helloeve)               |         | Participant |
-| Sambhav Kothari          | Bloomberg / MCP Maintainer      | [@sambhav](https://github.com/sambhav)                 |         | Participant |
+| Name | Organization | GitHub | Discord | Level |
+| - | - | - | - | - |
+| Ola Hungerford | Nordstrom / MCP Maintainer | [@olaservo](https://github.com/olaservo) | | Lead |
+| Peter Alexander | Anthropic / Core Maintainer | [@pja-ant](https://github.com/pja-ant) | | Lead |
+| Sambhav Kothari | Bloomberg / MCP Maintainer | [@sambhav](https://github.com/sambhav) | | Lead |
+| Yu Yi | Google | [@erain](https://github.com/erain) | | Participant |
+| Sunish Sheth | Databricks | [@sunishsheth2009](https://github.com/sunishsheth2009) | | Participant |
+| Keith A Groves | Hyix | [@keithagroves](https://github.com/keithagroves) | | Participant |
+| Peder Holdgaard Pedersen | Saxo Bank / MCP Maintainer | [@pederhp](https://github.com/pederhp) | | Participant |
+| Sam Morrow | GitHub | [@SamMorrowDrums](https://github.com/SamMorrowDrums) | | Participant |
+| Jacob MacDonald | Google | [@jakemac53](https://github.com/jakemac53) | | Participant |
+| Jonathan Hefner | Independent / MCP Maintainer | [@jonathanhefner](https://github.com/jonathanhefner) | | Participant |
+| Luca Chang | AWS / MCP Maintainer | [@LucaButBoring](https://github.com/LucaButBoring) | | Participant |
+| Bob Dickinson | TeamSpark.ai / MCP Maintainer | [@BobDickinson](https://github.com/BobDickinson) | | Participant |
+| Radoslav Dimitrov | Stacklok / MCP Maintainer | [@rdimitrov](https://github.com/rdimitrov) | | Participant |
+| Juan Antonio Osorio | Stacklok | [@JAORMX](https://github.com/JAORMX) | | Participant |
+| Kaxil Naik | Astronomer / Apache Airflow PMC | [@kaxil](https://github.com/kaxil) | | Participant |
+| Cliff Hall | Futurescale | [@cliffhall](https://github.com/cliffhall) | | Participant |
+| Haoyu Wang | Google | [@helloeve](https://github.com/helloeve) | | Participant |
+| Nate Barbettini | Arcade.dev | [@nbarbettini](https://github.com/nbarbettini) | | Participant |
 
 ## Operations
 
-| Meeting         | Frequency         | Duration   | Purpose                                                                             |
-| --------------- | ----------------- | ---------- | ----------------------------------------------------------------------------------- |
+| Meeting | Frequency | Duration | Purpose |
+| - | - | - | - |
 | Working Session | Weekly (Tuesdays) | 60 minutes | Technical discussion, pattern evaluation, proposal review; open to all participants |
 
 Default start time is 9:00 AM Pacific. Sessions may occasionally be scheduled earlier to better accommodate non-US time zones.
@@ -121,33 +128,40 @@ Discord: [#skills-over-mcp-wg](https://discord.com/channels/1358869848138059966/
 
 ## Resources
 
-* Experimental findings and reference implementations: [modelcontextprotocol/experimental-ext-skills](https://github.com/modelcontextprotocol/experimental-ext-skills)
-* Project board: [Skills Over MCP WG](https://github.com/orgs/modelcontextprotocol/projects/38/views/1)
+* [Skills extension overview](/extensions/skills/overview) and [Final SEP-2640](/seps/2640-skills-extension)
+* Specification and WG documents: [modelcontextprotocol/ext-skills](https://github.com/modelcontextprotocol/ext-skills)
+* [Implementations](https://github.com/modelcontextprotocol/ext-skills/blob/main/docs/implementations.md) and [client support](/extensions/client-matrix)
+* [Decision log](https://github.com/modelcontextprotocol/ext-skills/blob/main/docs/decisions.md) and [archived design work](https://github.com/modelcontextprotocol/ext-skills/tree/main/docs/archive)
 
 ## Deliverables & Success Metrics
 
-### Active Work Items
+### Completed Milestones
 
-Full live tracking is on the [Skills Over MCP WG project board](https://github.com/orgs/modelcontextprotocol/projects/38/views/1). Headline workstreams:
+* [SEP-2640](/seps/2640-skills-extension) is **Final**, merged on September 13, 2026.
+* The official specification is published in [ext-skills](https://github.com/modelcontextprotocol/ext-skills/blob/main/specification/stable/skills.mdx), with a [website overview](/extensions/skills/overview).
+* [Skills conformance scenarios](https://github.com/modelcontextprotocol/conformance/pull/330) were merged on September 11, 2026.
 
-| Item                                                                                                              | Status      | Target Date | Champion                                                                                     |
-| ----------------------------------------------------------------------------------------------------------------- | ----------- | ----------- | -------------------------------------------------------------------------------------------- |
-| [Skills Extension SEP](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2640) (Extensions Track) | In Review   |             | [@pja-ant](https://github.com/pja-ant)                                                       |
-| Skills Extension reference implementation                                                                         | In Review   |             | [@olaservo](https://github.com/olaservo)                                                     |
-| Agent Skills spec coordination                                                                                    | In Progress |             | [@jonathanhefner](https://github.com/jonathanhefner), [@pja-ant](https://github.com/pja-ant) |
-| Registry skills.json proposal                                                                                     | In Progress |             | [@JAORMX](https://github.com/JAORMX)                                                         |
+### Current Work
+
+Track proposals, implementation work, and coordination in
+[ext-skills issues](https://github.com/modelcontextprotocol/ext-skills/issues),
+with links to SDK or client issues where the implementation lives.
+Owners, progress, and priorities are maintained there rather than in this charter.
 
 ### Success Criteria
 
-* **Short-term**: Documented consensus on requirements and evaluation of existing approaches
-* **Medium-term**: Clear recommendation (convention vs. protocol extension vs. both) — the draft Skills Extension SEP represents the WG's current direction: a formal extension using existing Resources primitives
-* **Long-term**: Interoperable skill distribution across MCP servers and clients
+* **Specification**: A published Resources-based Skills extension — achieved with Final SEP-2640.
+* **Implementation**: SDK and host implementations that pass the applicable conformance scenarios.
+* **Interoperability**: Independent MCP servers and clients that discover and load skills consistently.
 
 ## Changelog
 
-| Date       | Change                                                                                                                                                                                                                                                                                                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-04-25 | Linked SEP-2640 in Active Work Items; added @helloeve (Google) as Participant                                                                                                                                                                                                                                    |
-| 2026-04-16 | Converted from Interest Group to Working Group                                                                                                                                                                                                                                                                   |
+| Date | Change |
+| - | - |
+| 2026-09-15 | Added @nbarbettini (Arcade.dev) as Participant |
+| 2026-04-25 | Linked SEP-2640 in Active Work Items; added @helloeve (Google) as Participant |
+| 2026-04-16 | Converted from Interest Group to Working Group |
 | 2026-04-14 | Initial charter (formalized from [experimental-ext-skills](https://github.com/modelcontextprotocol/experimental-ext-skills) repo README, which served as the de facto charter before the charter process was established via [SEP-2149](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2149)) |
-| 2026-02-01 | IG formed; experimental repo created                                                                                                                                                                                                                                                                             |
+| 2026-02-01 | IG formed; experimental repo created |
+
+

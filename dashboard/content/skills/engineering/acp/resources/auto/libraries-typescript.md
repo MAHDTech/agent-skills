@@ -52,3 +52,6 @@ integrations should use the fluent API as shown in the
 ## Users
 
 For a complete, production-ready implementation of an ACP agent, check out [Gemini CLI](https://github.com/google-gemini/gemini-cli/tree/main/packages/cli/src/acp).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

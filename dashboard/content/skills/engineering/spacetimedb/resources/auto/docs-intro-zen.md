@@ -7,165 +7,87 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-SpacetimeDB is built on 5 core principles. As you embrace these simple
-principles, you will find **your troubles simply melt away**. These
-principles guide both how we develop SpacetimeDB and how you should
-think about building applications with it.
-
-## Everything is a Table
-
-Your entire application state lives in tables. Users, messages, game
-entities, sessions—all tables. There's no separate cache layer, no
-Redis, no in-memory state that needs to be synchronized with a database.
-The database *is* your state. All of your state.
-
-This simplifies your mental model dramatically and it makes the
-impossible possible. SpacetimeDB can hot-swap server code without
-disconnecting clients!
-
-When you need to store something, you define a table. When you need to
-query something, you query a table. When you need to update something,
-you update a table. When you want to restrict who can read data, you
-create [a view](https://spacetimedb.com/docs/functions/views) over a table.
-
-``` prism-code
-Traditional stack:        SpacetimeDB:
-┌─────────────────┐       ┌─────────────────┐
-│   Application   │       │                 │
-├─────────────────┤       │                 │
-│      Cache      │  →    │     Tables      │
-├─────────────────┤       │                 │
-│    Database     │       │                 │
-└─────────────────┘       └─────────────────┘
-```
-
-## Everything is Persistent
-
-SpacetimeDB persists everything by default, including the full history
-of any rows that have ever changed.
-
-You will ask, does everything need to be persistent? Won't that be a lot
-of data? Well, you would be surprised! For example, updating 1 million
-player transforms 10 times per second for a year uses roughly 10
-petabytes of data, uncompressed. SpacetimeDB can compress that sort of
-data by about 5-10x, meaning that keeping every position for every
-player for a game with a million concurrent players uses only about 1-2
-petabytes per year. Storing that much data in Amazon S3 would only cost
-you between \$2,300 and \$5,600 per month. A fraction of the cost of a
-single engineer or data scientist!
-
-You can of course choose to delete the historical data, but it should be
-**your choice** to delete data, not the database's. SpacetimeDB gives
-you that choice.
-
-Won't it be slow to persist everything? No. SpacetimeDB is designed so
-that persistence guarantees only ever increase latency and never
-decrease throughput! Modern SSDs can write upwards of 15 GB/s of data to
-disk. DRAM can only do about 4x more. Let's actually use that
-Samsung-given bandwidth.
-
-SpacetimeDB holds all your data in memory for blazing-fast access, but
-automatically persists everything to disk. You get the speed of
-in-memory computing with the durability of a traditional database.
-
-You will be tempted to ask for "ephemeral state". This is a mistake.
-Persistent everything allows your app to recover to the *exact* state it
-was in. In principle, you could even debug your production app in the
-state it was in in the past with a time-traveling debugger.
-
-Write your code as if memory were infinite and permanent. Insert rows
-freely. Query without fear. SpacetimeDB handles the persistence, you
-handle the logic.
-
-## Everything is Real-Time
-
-Think of your client as a **replica** of your server. When you subscribe
-to data, SpacetimeDB mirrors that data to your client and keeps it
-synchronized automatically. You don't poll. You don't fetch. You
-subscribe, and the data flows.
-
-> "The data must flow." - Tyler
-
-``` codeBlockStandalone_LlrK
-// Subscribe once
-const [messages] = useTable(tables.message);
-
-// messages updates automatically when the server state changes
-// No polling. No refetching. Just reactive data.
-```
-
-This changes how you think about client-server communication. Stop
-thinking in terms of requests and responses. Think in terms of
-**synchronized state** updating in real-time.
-
-Your users should never click a refresh button.
-
-## Everything is Transactional
-
-Every reducer runs in a transaction. They are atomic. They either fully
-complete or don't run at all. If something goes wrong, just throw an
-error (or return `Err`). All your changes roll back automatically. No
-partial updates. No corrupted state. No cleanup code.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer]
-fn transfer_funds(ctx: &ReducerContext, from: u64, to: u64, amount: u64) -> Result<(), String> {
-    let sender = ctx.db.account().id().find(from).ok_or("Sender not found")?;
-    if sender.balance < amount {
-        return Err("Insufficient funds".to_string()); // Everything rolls back
-    }
-    // ... rest of transfer
-    Ok(())
-}
-```
-
-This means you can write your business logic boldly. Try things. If they
-fail, the database remains consistent.
-
-Perfect consistency, always.
-
-## Everything is Programmable
-
-SpacetimeDB doesn't limit you to declarative rules or configuration
-files. Your module is real code (Rust, C#, TypeScript, or C++) running
-inside the database. You have the full power of a procedural, normal
-programming language at your disposal.
-
-Need custom authorization logic? Write a function. Need to validate
-complex business rules? Write a function. Need to transform data before
-storing it? Write a function.
-
-Even access control is programmable. While SpacetimeDB provides sensible
-defaults (public vs. private tables), you can implement any access
-pattern you can express in code.
-
-Including the meta permissions to manage and control the application's
-deployment itself.
-
-> "Enterprise clients require increasingly granular permissions,
-> fractal-like in nature." - Tyler
-
-All programmable means all powerful.
-
-Never settle for less than Turing complete.
-
-------------------------------------------------------------------------
-
-## The Result
-
-When you embrace these principles, building real-time applications
-becomes remarkably simple:
-
-- **No backend servers to deploy** - your logic runs in the database
-- **No caching layer to manage** - the database is already in memory
-- **No sync code to write** - subscriptions handle it automatically
-- **No rollback logic to maintain** - transactions handle it
-  automatically
-- **No limitations on your logic** - it's just code
-
-This is the Zen of SpacetimeDB: a simpler way to build and live.
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-intro/getting-started/zen-of-spacetimedb" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">The Zen of Spacetime | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/intro/zen"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="The Zen of Spacetime | SpacetimeDB docs"><meta data-rh="true" name="description" content="Spacetime is built on 5 core principles. As you embrace these simple principles, you will find your troubles simply melt away. These principles guide both how we develop Spacetime and how you should think about building applications with it."><meta data-rh="true" property="og:description" content="Spacetime is built on 5 core principles. As you embrace these simple principles, you will find your troubles simply melt away. These principles guide both how we develop Spacetime and how you should think about building applications with it."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/intro/zen"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/intro/zen" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/intro/zen" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"The Zen of Spacetime","item":"https://spacetimedb.com/docs/intro/zen"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/intro/zen">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/intro/zen">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/intro/zen">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">The Zen of Spacetime</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>The Zen of Spacetime</h1></header><p>Spacetime is built on 5 core principles. As you embrace these simple principles, you will find <strong>your troubles simply melt away</strong>. These principles guide both how we develop Spacetime and how you should think about building applications with it.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="everything-is-a-table">Everything is a Table<a href="#everything-is-a-table" class="hash-link" aria-label="Direct link to Everything is a Table" title="Direct link to Everything is a Table" translate="no">​</a></h2>
+<p>Your entire application state lives in tables. Users, messages, game entities, sessions—all tables. There&#x27;s no separate cache layer, no Redis, no in-memory state that needs to be synchronized with a database. The database <em>is</em> your state. All of your state.</p>
+<p>You don&#x27;t have to work out which copy of the data is right, or remember to update three copies when one value changes. Spacetime can even hot-swap server code without disconnecting clients!</p>
+<p>When you need to store something, you define a table. When you need to query something, you query a table. When you need to update something, you update a table. When you want to restrict who can read data, you create <a class="" href="/docs/functions/views">a view</a> over a table.</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Traditional stack:        Spacetime:</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">┌─────────────────┐       ┌─────────────────┐</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   Application   │       │                 │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├─────────────────┤       │                 │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│      Cache      │  →    │     Tables      │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├─────────────────┤       │                 │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│    Database     │       │                 │</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└─────────────────┘       └─────────────────┘</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="everything-is-persistent">Everything is Persistent<a href="#everything-is-persistent" class="hash-link" aria-label="Direct link to Everything is Persistent" title="Direct link to Everything is Persistent" translate="no">​</a></h2>
+<p>Spacetime persists everything by default, including the full history of any rows that have ever changed.</p>
+<p>The nice thing about making everything persistent is that you stop having to decide what deserves to be saved. That decision tends to look different after you&#x27;ve lost something.</p>
+<p>You will ask, does everything need to be persistent? Won&#x27;t that be a lot of data? Well, you would be surprised! For example, updating 1 million player transforms 10 times per second for a year uses roughly 10 petabytes of data, uncompressed. Spacetime can compress that sort of data by about 5-10x, meaning that keeping every position for every player for a game with a million concurrent players uses only about 1-2 petabytes per year. Storing that much data in Amazon S3 would only cost you between $2,300 and $5,600 per month. A fraction of the cost of a single engineer or data scientist!</p>
+<p>You can of course choose to delete the historical data, but it should be <strong>your choice</strong> to delete data, not the database&#x27;s. Spacetime gives you that choice.</p>
+<p>Won&#x27;t it be slow to persist everything? No. Spacetime is designed so that persistence guarantees only ever increase latency and never decrease throughput! Modern SSDs can write upwards of 15 GB/s of data to disk. DRAM can only do about 4x more. Let&#x27;s actually use that Samsung-given bandwidth.</p>
+<p>Spacetime holds all your data in memory for blazing-fast access, but automatically persists everything to disk. You get the speed of in-memory computing with the durability of a traditional database.</p>
+<p>You will be tempted to ask for "ephemeral state". This is a mistake. Persistent everything allows your app to recover to the <em>exact</em> state it was in. In principle, you could even debug your production app in the state it was in in the past with a time-traveling debugger.</p>
+<p>Write your code as if memory were infinite and permanent. Insert rows freely. Query without fear. Spacetime handles the persistence, you handle the logic.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="everything-is-reactive">Everything is Reactive<a href="#everything-is-reactive" class="hash-link" aria-label="Direct link to Everything is Reactive" title="Direct link to Everything is Reactive" translate="no">​</a></h2>
+<p>If you use React, this should feel familiar. You change state, and the UI updates. Spacetime extends that idea to the server and database. Your components subscribe to tables, and reducers change the data. When a change comes from another user, it reaches your components through the same subscription. You don&#x27;t have to build a separate system to make shared state feel like ordinary application state.</p>
+<p>Think of your client as a <strong>replica</strong> of your server. When you subscribe to data, Spacetime mirrors that data to your client and keeps it synchronized automatically. You don&#x27;t poll. You don&#x27;t fetch. You subscribe, and the data flows.</p>
+<blockquote>
+<p>"The data must flow." - Tyler</p>
+</blockquote>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Subscribe once</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> [messages] </span><span style="color:#FF79C6">=</span><span style="color:#50FA7B"> useTable</span><span style="color:#F8F8F2">(tables.message);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// messages updates automatically when the server state changes</span></span>
+<span class="line"><span style="color:#6272A4">// No polling. No refetching. Just reactive data.</span></span></code></pre>
+<p>Stop thinking in terms of requests and responses. Think in terms of <strong>synchronized state</strong> updating in real-time.</p>
+<p>When you add another way to change a row, you shouldn&#x27;t have to remember every screen that displays it. Those screens already subscribe to the data they need.</p>
+<p>Your users should never click a refresh button.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="everything-is-transactional">Everything is Transactional<a href="#everything-is-transactional" class="hash-link" aria-label="Direct link to Everything is Transactional" title="Direct link to Everything is Transactional" translate="no">​</a></h2>
+<p>Every reducer runs in a transaction. They are atomic. They either fully complete or don&#x27;t run at all. If something goes wrong, just throw an error (or return <code>Err</code>). All your changes roll back automatically. No partial updates. No corrupted state. No cleanup code.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">fn</span><span style="color:#50FA7B"> transfer_funds</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, from</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">, to</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">, amount</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> u64</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> sender </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">db</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">account</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">id</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">find</span><span style="color:#F8F8F2">(from)</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">ok_or</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Sender not found"</span><span style="color:#F8F8F2">)</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> sender</span><span style="color:#FF79C6">.</span><span style="color:#F8F8F2">balance </span><span style="color:#FF79C6"><</span><span style="color:#F8F8F2"> amount {</span></span>
+<span class="line"><span style="color:#FF79C6">        return</span><span style="color:#8BE9FD;font-style:italic"> Err</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Insufficient funds"</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">()); </span><span style="color:#6272A4">// Everything rolls back</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#6272A4">    // ... rest of transfer</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>You can add another step to a reducer without figuring out how to undo all the previous database changes if it fails. This gets more valuable as your application grows.</p>
+<p>This means you can write your business logic boldly. Try things. If they fail, the database remains consistent.</p>
+<p>Perfect consistency, always.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="everything-is-programmable">Everything is Programmable<a href="#everything-is-programmable" class="hash-link" aria-label="Direct link to Everything is Programmable" title="Direct link to Everything is Programmable" translate="no">​</a></h2>
+<p>Spacetime doesn&#x27;t limit you to declarative rules or configuration files. Your module is real code (Rust, C#, TypeScript, or C++) running inside the database.</p>
+<p>Need custom authorization logic? Write a function. Need to validate complex business rules? Write a function. Need to transform data before storing it? Write a function.</p>
+<p>Even access control is programmable. While Spacetime provides sensible defaults (public vs. private tables), you can implement any access pattern you can express in code.</p>
+<p>Including the meta permissions to manage and control the application&#x27;s deployment itself.</p>
+<blockquote>
+<p>"Enterprise clients require increasingly granular permissions, fractal-like in nature." - Tyler</p>
+</blockquote>
+<p>All programmable means all powerful.</p>
+<p>Never settle for less than Turing complete.</p>
+\<hr\>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="the-result">The Result<a href="#the-result" class="hash-link" aria-label="Direct link to The Result" title="Direct link to The Result" translate="no">​</a></h2>
+<p>Here&#x27;s what that takes off your plate:</p>
+\<ul\>
+<li class=""><strong>No backend servers to deploy</strong> - your logic runs in the database</li>
+<li class=""><strong>No caching layer to manage</strong> - the database is already in memory</li>
+<li class=""><strong>No sync code to write</strong> - subscriptions handle it automatically</li>
+<li class=""><strong>No rollback logic to maintain</strong> - transactions handle it automatically</li>
+<li class=""><strong>No limitations on your logic</strong> - it&#x27;s just code</li>
+</ul>
+<p>Each of these properties is useful on its own. But you get to stop thinking about them when you can count on them together. You write a reducer, change some tables, and the change is saved and sent to the subscribed clients that need it. Everything just works.</p>
+<p>This is the Zen of Spacetime: a simpler way to build and live.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00100-intro/00100-getting-started/00250-zen-of-spacetimedb.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/intro/what-is-spacetimedb"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">What is SpacetimeDB?</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/intro/language-support"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Language Support</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#everything-is-a-table" class="table-of-contents__link toc-highlight">Everything is a Table</a></li>\<li\><a href="#everything-is-persistent" class="table-of-contents__link toc-highlight">Everything is Persistent</a></li>\<li\><a href="#everything-is-reactive" class="table-of-contents__link toc-highlight">Everything is Reactive</a></li>\<li\><a href="#everything-is-transactional" class="table-of-contents__link toc-highlight">Everything is Transactional</a></li>\<li\><a href="#everything-is-programmable" class="table-of-contents__link toc-highlight">Everything is Programmable</a></li>\<li\><a href="#the-result" class="table-of-contents__link toc-highlight">The Result</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

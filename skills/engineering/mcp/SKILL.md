@@ -1,6 +1,6 @@
 ---
 name: mcp
-description: Expert guidance for Model Context Protocol (MCP) server development - designing, building, and debugging MCP servers, implementing tools, resources, and prompts, managing JSON-RPC 2.0 protocol lifecycles, configuring stdio and Streamable HTTP transports, and using official SDKs (TypeScript, Python, Kotlin, Go). Use when implementing or testing MCP servers, defining tool schemas, managing resource subscriptions, or debugging with the MCP Inspector.
+description: Design, build, and debug Model Context Protocol (MCP) servers - implementing tools, resources, and prompts, managing JSON-RPC 2.0 protocol lifecycles, configuring stdio and Streamable HTTP transports, and using official SDKs (TypeScript, Python, Kotlin, Go). Use when implementing or testing MCP servers, defining tool schemas, managing resource subscriptions, or debugging with the MCP Inspector.
 resources:
   - https://modelcontextprotocol.io/llms.txt
 ---
@@ -11,7 +11,7 @@ resources:
 
 The **Model Context Protocol (MCP)** is an open standard protocol based on JSON-RPC 2.0 that allows AI clients and host applications (such as Claude Desktop, OpenCode, Goose, and IDEs) to securely discover and invoke tools, read contextual resources, and load prompt templates exposed by an **MCP Server**.
 
-This skill provides expert guidance for **building and architecting MCP servers** (not client hosts).
+Guidance for **building and architecting MCP servers** (not client hosts).
 
 ---
 
@@ -481,7 +481,7 @@ def get_app_config() -> str:
 @mcp.prompt()
 def audit_prompt(service_name: str) -> str:
     """Generate a prompt template for auditing a service."""
-    return f"Perform a comprehensive security audit for {service_name}."
+    return f"Perform a security audit for {service_name}."
 
 # 5. Run Server via stdio
 if __name__ == "__main__":

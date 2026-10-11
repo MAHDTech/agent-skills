@@ -134,10 +134,10 @@ For prompts or URI templates with multiple arguments, clients should include pre
 
 The protocol supports two types of completion references:
 
-| Type           | Description                 | Example                                             |
-| -------------- | --------------------------- | --------------------------------------------------- |
-| `ref/prompt`   | References a prompt by name | `{"type": "ref/prompt", "name": "code_review"}`     |
-| `ref/resource` | References a resource URI   | `{"type": "ref/resource", "uri": "file:///{path}"}` |
+| Type | Description | Example |
+| - | - | - |
+| `ref/prompt` | References a prompt by name | `{"type": "ref/prompt", "name": "code_review"}` |
+| `ref/resource` | References a resource URI | `{"type": "ref/resource", "uri": "file:///{path}"}` |
 
 ### Completion Results
 
@@ -211,3 +211,5 @@ Implementations **MUST**:
 * Implement appropriate rate limiting
 * Control access to sensitive suggestions
 * Prevent completion-based information disclosure
+
+

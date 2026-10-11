@@ -247,3 +247,6 @@ To avoid locking in confusing semantics, the proposal currently keeps `auth/stat
 * 2026-03-10: Rename `getAuthState` to `auth/status`, nest capability under `agentCapabilities.auth`
 * 2026-03-07: Address review feedback on auth state structure
 * 2026-03-05: Initial draft — preliminary proposal to start discussion
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

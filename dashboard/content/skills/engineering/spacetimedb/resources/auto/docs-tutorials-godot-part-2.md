@@ -7,1036 +7,434 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-Need help with the tutorial? [Join our Discord
-server](https://discord.gg/spacetimedb)!
-
-This progressive tutorial is continued from [part
-1](https://spacetimedb.com/docs/tutorials/godot/part-1).
-
-## Project Structure
-
-Now that we have our client project setup we can configure the module
-directory. Regardless of what language you choose, your module will
-always go into a `spacetimedb` directory within your client directory
-like this:
-
-``` prism-code
-blackholio/                     # This is the directory where your Godot project lives
-├── blackholio.csproj
-├── module_bindings/            # This directory contains the client logic to communicate with the module
-├── ...                         # rest of the Godot files                
-└── blackholio-server/
-    └── spacetimedb/            # This is where your server module lives
-```
-
-Your `module_bindings` directory can go wherever you want as long as it
-is inside of `res://` in your Godot project. We'll configure this in a
-later step. For now we will create a new module in the `blackholio`
-directory which will generate the `spacetimedb` directory for us.
-
-## Create a Server Module
-
-If you have not already installed the `spacetime` CLI, check out our
-[Getting Started](https://spacetimedb.com/docs/) guide for instructions on how to install.
-
-In the same directory that contains your `blackholio` project, run the
-following command to initialize the SpacetimeDB server module project
-with your desired language:
-
-warning
-
-The `blackholio` directory specified here is the same `blackholio`
-directory you created during part 1.
-
-- C#
-- Rust
-- C++
-
-Run the following command to initialize the SpacetimeDB server module
-project with C# as the language:
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang csharp --server-only blackholio
-```
-
-Use `blackholio-server` for the project path and `blackholio` for the
-database name.
-
-This command creates a new folder named `blackholio-server` inside of
-your Godot project `blackholio` directory. Inside, there's a
-`spacetimedb` folder that contains the SpacetimeDB server project with
-C# as the programming language.
-
-Run the following command to initialize the SpacetimeDB server module
-project with Rust as the language:
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang rust --server-only blackholio
-```
-
-Use `blackholio-server` for the project path and `blackholio` for the
-database name.
-
-This command creates a new folder named `blackholio-server` inside of
-your Godot project `blackholio` directory. Inside, there's a
-`spacetimedb` folder that contains the SpacetimeDB server project with
-Rust as the programming language.
-
-Run the following command to initialize the SpacetimeDB server module
-project with C++ as the language:
-
-``` codeBlockStandalone_LlrK
-spacetime init --lang cpp --server-only blackholio
-```
-
-Use `blackholio-server` for the project path and `blackholio` for the
-database name.
-
-This command creates a new folder named `blackholio-server` inside of
-your Godot project `blackholio` directory. Inside, there's a
-`spacetimedb` folder that contains the SpacetimeDB server project with
-C++ as the programming language.
-
-### SpacetimeDB Tables
-
-- C#
-- Rust
-- C++
-
-In this section we'll be making some edits to the file
-`blackholio-server/spacetimedb/Lib.cs`. We recommend you open up this
-file in an IDE like VSCode or Rider.
-
-**Important: Open the `blackholio-server/spacetimedb/Lib.cs` file and
-delete its contents. We will be writing it from scratch here.**
-
-In this section we'll be making some edits to the file
-`blackholio-server/spacetimedb/src/lib.rs`. We recommend you open up
-this file in an IDE like VSCode or RustRover.
-
-**Important: Open the `blackholio-server/spacetimedb/src/lib.rs` file
-and delete its contents. We will be writing it from scratch here.**
-
-In this section we'll be making some edits to the file
-`blackholio-server/spacetimedb/src/lib.cpp`. We recommend you open up
-this file in an IDE like VSCode or Rider.
-
-**Important: Open the `blackholio-server/spacetimedb/src/lib.cpp` file
-and delete its contents. We will be writing it from scratch here.**
-
-First we need to add some imports at the top of the file. Some will
-remain unused for now.
-
-- C#
-- Rust
-- C++
-
-**Copy and paste into Lib.cs:**
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-public static partial class Module
-{
-
-}
-```
-
-**Copy and paste into lib.rs:**
-
-``` codeBlockStandalone_LlrK
-use std::time::Duration;
-use spacetimedb::{rand::Rng, Identity, SpacetimeType, ReducerContext, ScheduleAt, Table, Timestamp};
-```
-
-**Copy and paste into lib.cpp:**
-
-``` codeBlockStandalone_LlrK
-#include "spacetimedb.h"
-
-using namespace SpacetimeDB;
-```
-
-We are going to start by defining a SpacetimeDB *table*. A *table* in
-SpacetimeDB is a relational database table which stores rows, similar to
-something you might find in SQL. SpacetimeDB tables differ from normal
-relational database tables in that they are stored fully in memory, are
-blazing fast to access, and are defined in your module code, rather than
-in SQL.
-
-- C#
-- Rust
-- C++
-
-Each row in a SpacetimeDB table is associated with a `struct` type in
-C#.
-
-Let's start by defining the `Config` table. This is a simple table which
-will store some metadata about our game's state. Add the following code
-inside the `Module` class in `Lib.cs`.
-
-``` codeBlockStandalone_LlrK
-// We're using this table as a singleton, so in this table
-// there will only be one element where the `id` is 0.
-[Table(Accessor = "config", Public = true)]
-public partial struct Config
-{
-    [PrimaryKey]
-    public int id;
-    public long world_size;
-}
-```
-
-Let's break down this code. This defines a normal C# `struct` with two
-fields: `id` and `world_size`. We have added the
-`[Table(Accessor = "config", Public = true)]` attribute the struct. This
-attribute signals to SpacetimeDB that it should create a new SpacetimeDB
-table with the row type defined by the `Config` type's fields.
-
-> Although we're using `lower_snake_case` for our column names to have
-> consistent column names across languages in this tutorial, you can
-> also use `camelCase` or `PascalCase` if you prefer. See
-> [\#2168](https://github.com/clockworklabs/SpacetimeDB/issues/2168) for
-> more information.
-
-The `Table` attribute takes two parameters, an `Accessor` which is the
-name of the table and what you will use to query the table in SQL, and a
-`Public` visibility modifier which ensures that the rows of this table
-are visible to everyone.
-
-The `[PrimaryKey]` attribute, specifies that the `id` field should be
-used as the primary key of the table.
-
-Each row in a SpacetimeDB table is associated with a `struct` type in
-Rust.
-
-Let's start by defining the `Config` table. This is a simple table which
-will store some metadata about our game's state. Add the following code
-to `lib.rs`.
-
-``` codeBlockStandalone_LlrK
-// We're using this table as a singleton, so in this table
-// there only be one element where the `id` is 0.
-#[spacetimedb::table(accessor = config, public)]
-pub struct Config {
-    #[primary_key]
-    pub id: i32,
-    pub world_size: i64,
-}
-```
-
-Let's break down this code. This defines a normal Rust `struct` with two
-fields: `id` and `world_size`. We have decorated the struct with the
-`spacetimedb::table` macro. This procedural Rust macro signals to
-SpacetimeDB that it should create a new SpacetimeDB table with the row
-type defined by the `Config` type's fields.
-
-The `spacetimedb::table` macro takes two parameters, an `accessor` which
-is the name of the table and what you will use to query the table in
-SQL, and a `public` visibility modifier which ensures that the rows of
-this table are visible to everyone.
-
-The `#[primary_key]` attribute, specifies that the `id` field should be
-used as the primary key of the table.
-
-Each row in a SpacetimeDB table is associated with a `struct` type in
-C++.
-
-Let's start by defining the `Config` table. This is a simple table which
-will store some metadata about our game's state. Add the following code
-to `lib.cpp`.
-
-``` codeBlockStandalone_LlrK
-// We're using this table as a singleton, so in this table
-// there will only be one element where the `id` is 0.
-struct Config {
-    int32_t id;
-    int64_t world_size;
-};
-SPACETIMEDB_STRUCT(Config, id, world_size);
-SPACETIMEDB_TABLE(Config, config, Public);
-FIELD_PrimaryKey(config, id);
-```
-
-Let's break down this code. This defines a normal C++ `struct` with two
-fields: `id` and `world_size`. We use the `SPACETIMEDB_STRUCT` macro to
-register the struct for serialization, listing all field names. Then
-`SPACETIMEDB_TABLE` registers it as a table with the name `config` and
-`Public` visibility.
-
-The `SPACETIMEDB_TABLE` macro takes three parameters: the struct type,
-the table name (which you'll use to access the table in code), and a
-visibility modifier (`Public` or `Private`) which determines whether
-rows are synced to clients.
-
-The `FIELD_PrimaryKey` macro specifies that the `id` field should be
-used as the primary key of the table.
-
-> NOTE: The primary key of a row defines the "identity" of the row. A
-> change to a row which doesn't modify the primary key is considered an
-> update, but if you change the primary key, then you have deleted the
-> old row and inserted a new one.
-
-Learn more about defining tables, including indexes, constraints, and
-column types, in our [Tables documentation](https://spacetimedb.com/docs/tables).
-
-### Creating Entities
-
-- C#
-- Rust
-- C++
-
-Next, we're going to define a new `SpacetimeType` called `DbVector2`
-which we're going to use to store positions. The difference between a
-`[SpacetimeDB.Type]` and a `[SpacetimeDB.Table]` is that tables actually
-store data, whereas the deriving `SpacetimeType` just allows you to
-create a new column of that type in a SpacetimeDB table. Therefore,
-`DbVector2` is only a type, and does not define a table.
-
-**Append to the bottom of Lib.cs:**
-
-``` codeBlockStandalone_LlrK
-// This allows us to store 2D points in tables.
-[Type]
-public partial struct DbVector2
-{
-    public float x;
-    public float y;
-
-    public DbVector2(float x, float y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-}
-```
-
-Let's create a few tables to represent entities in our game by adding
-the following to the end of the `Module` class.
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "entity", Public = true)]
-public partial struct Entity
-{
-    [PrimaryKey, AutoInc]
-    public int entity_id;
-    public DbVector2 position;
-    public int mass;
-}
-
-[Table(Accessor = "circle", Public = true)]
-public partial struct Circle
-{
-    [PrimaryKey]
-    public int entity_id;
-    [SpacetimeDB.Index.BTree]
-    public int player_id;
-    public DbVector2 direction;
-    public float speed;
-    public Timestamp last_split_time;
-}
-
-[Table(Accessor = "food", Public = true)]
-public partial struct Food
-{
-    [PrimaryKey]
-    public int entity_id;
-}
-```
-
-Next, we're going to define a new `SpacetimeType` called `DbVector2`
-which we're going to use to store positions. The difference between a
-`#[derive(SpacetimeType)]` and a `#[spacetimedb(table)]` is that tables
-actually store data, whereas the deriving `SpacetimeType` just allows
-you to create a new column of that type in a SpacetimeDB table.
-Therefore, `DbVector2` is only a type, and does not define a table.
-
-**Append to the bottom of lib.rs:**
-
-``` codeBlockStandalone_LlrK
-// This allows us to store 2D points in tables.
-#[derive(SpacetimeType, Clone, Debug)]
-pub struct DbVector2 {
-    pub x: f32,
-    pub y: f32,
-}
-```
-
-Let's create a few tables to represent entities in our game.
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = entity, public)]
-#[derive(Debug, Clone)]
-pub struct Entity {
-    // The `auto_inc` attribute indicates to SpacetimeDB that
-    // this value should be determined by SpacetimeDB on insert.
-    #[auto_inc]
-    #[primary_key]
-    pub entity_id: i32,
-    pub position: DbVector2,
-    pub mass: i32,
-}
-
-#[spacetimedb::table(accessor = circle, public)]
-pub struct Circle {
-    #[primary_key]
-    pub entity_id: i32,
-    #[index(btree)]
-    pub player_id: i32,
-    pub direction: DbVector2,
-    pub speed: f32,
-    pub last_split_time: Timestamp,
-}
-
-#[spacetimedb::table(accessor = food, public)]
-pub struct Food {
-    #[primary_key]
-    pub entity_id: i32,
-}
-```
-
-Next, we're going to define a new `SpacetimeType` called `DbVector2`
-which we're going to use to store positions. The difference between a
-regular struct registered with `SPACETIMEDB_STRUCT` and one registered
-with `SPACETIMEDB_TABLE` is that tables actually store data, whereas
-registering a struct alone just allows you to use it as a column type in
-a SpacetimeDB table. Therefore, `DbVector2` is only a type, and does not
-define a table.
-
-**Append to the bottom of lib.cpp:**
-
-``` codeBlockStandalone_LlrK
-// This allows us to store 2D points in tables.
-struct DbVector2 {
-    float x;
-    float y;
-};
-SPACETIMEDB_STRUCT(DbVector2, x, y);
-```
-
-Let's create a few tables to represent entities in our game.
-
-``` codeBlockStandalone_LlrK
-struct Entity {
-    // The `FIELD_PrimaryKeyAutoInc` constraint indicates to SpacetimeDB that
-    // this value should be determined by SpacetimeDB on insert.
-    int32_t entity_id;
-    DbVector2 position;
-    int32_t mass;
-};
-SPACETIMEDB_STRUCT(Entity, entity_id, position, mass);
-SPACETIMEDB_TABLE(Entity, entity, Public);
-FIELD_PrimaryKeyAutoInc(entity, entity_id);
-
-struct Circle {
-    int32_t entity_id;
-    int32_t player_id;
-    DbVector2 direction;
-    float speed;
-    Timestamp last_split_time;
-};
-SPACETIMEDB_STRUCT(Circle, entity_id, player_id, direction, speed, last_split_time);
-SPACETIMEDB_TABLE(Circle, circle, Public);
-FIELD_PrimaryKey(circle, entity_id);
-FIELD_Index(circle, player_id);
-
-struct Food {
-    int32_t entity_id;
-};
-SPACETIMEDB_STRUCT(Food, entity_id);
-SPACETIMEDB_TABLE(Food, food, Public);
-FIELD_PrimaryKey(food, entity_id);
-```
-
-The first table we defined is the `entity` table. An entity represents
-an object in our game world. We have decided, for convenience, that all
-entities in our game should share some common fields, namely `position`
-and `mass`.
-
-We can create different types of entities with additional data by
-creating new tables with additional fields that have an `entity_id`
-which references a row in the `entity` table.
-
-We've created two types of entities in our game world: `Food` and
-`Circle`. `Food` does not have any additional fields beyond the
-attributes in the `entity` table, so the `food` table simply represents
-the set of `entity_id`s that we want to recognize as food.
-
-The `Circle` table, however, represents an entity that is controlled by
-a player. We've added a few additional fields to a `Circle` like
-`player_id` so that we know which player that circle belongs to.
-
-### Representing Players
-
-Next, let's create a table to store our player data.
-
-- C#
-- Rust
-- C++
-
-``` codeBlockStandalone_LlrK
-[Table(Accessor = "player", Public = true)]
-public partial struct Player
-{
-    [PrimaryKey]
-    public Identity identity;
-    [Unique, AutoInc]
-    public int player_id;
-    public string name;
-}
-```
-
-There are a few new concepts we should touch on. First of all, we are
-using the `[Unique]` attribute on the `player_id` field. This attribute
-adds a constraint to the table that ensures that only one row in the
-player table has a particular `player_id`. We are also using the
-`[AutoInc]` attribute on the `player_id` field, which indicates "this
-field should get automatically assigned an auto-incremented value".
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::table(accessor = player, public)]
-#[derive(Debug, Clone)]
-pub struct Player {
-    #[primary_key]
-    identity: Identity,
-    #[unique]
-    #[auto_inc]
-    player_id: i32,
-    name: String,
-}
-```
-
-There's a few new concepts we should touch on. First of all, we are
-using the `#[unique]` attribute on the `player_id` field. This attribute
-adds a constraint to the table that ensures that only one row in the
-player table has a particular `player_id`.
-
-``` codeBlockStandalone_LlrK
-struct Player {
-    Identity identity;
-    int32_t player_id;
-    std::string name;
-};
-SPACETIMEDB_STRUCT(Player, identity, player_id, name);
-SPACETIMEDB_TABLE(Player, player, Public);
-FIELD_PrimaryKey(player, identity);
-FIELD_UniqueAutoInc(player, player_id);
-```
-
-There's a few new concepts we should touch on. First of all, we are
-using the `FIELD_UniqueAutoInc` macro on the `player_id` field. This
-macro combines two constraints: it ensures that only one row in the
-player table has a particular `player_id`, and it indicates that this
-field should get automatically assigned an auto-incremented value.
-
-We also have an `identity` field which uses the `Identity` type. The
-`Identity` type is an identifier that SpacetimeDB uses to uniquely
-assign and authenticate SpacetimeDB users.
-
-### Writing a Reducer
-
-Next, we write our very first reducer. A reducer is a module function
-which can be called by clients. Let's write a simple debug reducer to
-see how they work.
-
-- C#
-- Rust
-- C++
-
-Add this function to the `Module` class in `Lib.cs`:
-
-``` codeBlockStandalone_LlrK
-[Reducer]
-public static void Debug(ReducerContext ctx)
-{
-    Log.Info($"This reducer was called by {ctx.Sender}");
-}
-```
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer]
-pub fn debug(ctx: &ReducerContext) -> Result<(), String> {
-    log::debug!("This reducer was called by {}.", ctx.sender());
-    Ok(())
-}
-```
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_REDUCER(debug, ReducerContext ctx) {
-    LOG_INFO("This reducer was called by " + ctx.sender().to_string());
-    return Ok();
-}
-```
-
-This reducer doesn't update any tables, it just prints out the
-`Identity` of the client that called it.
-
-------------------------------------------------------------------------
-
-**SpacetimeDB Reducers**
-
-"Reducer" is a term coined by Clockwork Labs that refers to a function
-which when executed "reduces" a set of inserts and deletes into the
-database state. The term derives from functional programming and is
-closely related to [similarly named
-concepts](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#reducers)
-in other frameworks like React Redux. Reducers can be called remotely
-using the CLI, client SDK or can be scheduled to be called at some
-future time from another reducer call.
-
-All reducers execute *transactionally* and *atomically*, meaning that
-from within the reducer it will appear as though all changes are being
-applied to the database immediately, however from the outside changes
-made in a reducer will only be applied to the database once the reducer
-completes successfully. If you return an error from a reducer or panic
-within a reducer, all changes made to the database will be rolled back,
-as if the function had never been called. If you're unfamiliar with
-atomic transactions, it may not be obvious yet just how useful and
-important this feature is, but once you build a somewhat complex
-application it will become clear just how invaluable this feature is.
-
-------------------------------------------------------------------------
-
-### Publishing the Module
-
-Now that we have some basic functionality, let's publish the module to
-SpacetimeDB and call our debug reducer.
-
-In a new terminal window, run a local version of SpacetimeDB with the
-command:
-
-``` codeBlockStandalone_LlrK
-spacetime start
-```
-
-This following log output indicates that SpacetimeDB is successfully
-running on your machine.
-
-``` prism-code
-Starting SpacetimeDB listening on 127.0.0.1:3000
-```
-
-Now that SpacetimeDB is running we can publish our module to the
-SpacetimeDB host. In a separate terminal window, navigate to the
-`blackholio-server/spacetimedb` directory.
-
-If you are not already logged in to the `spacetime` CLI, run the
-`spacetime login` command to log in to your SpacetimeDB website account.
-Once you are logged in, run
-`spacetime publish --server local blackholio`. This will publish our
-Blackholio server logic to SpacetimeDB.
-
-If the publish completed successfully, you will see something like the
-following in the logs:
-
-``` prism-code
-Build finished successfully.
-Uploading to local => http://127.0.0.1:3000
-Publishing module...
-Created new database with name: blackholio, identity: c200d2c69b4524292b91822afac8ab016c15968ac993c28711f68c6bc40b89d5
-```
-
-> If you sign into `spacetime login` via GitHub, the token you get will
-> be issued by `auth.spacetimedb.com`. This will also ensure that you
-> can recover your identity in case you lose it. On the other hand, if
-> you do `spacetime login --server-issued-login local`, you will get an
-> identity which is issued directly by your local server. Do note,
-> however, that `--server-issued-login` tokens are not recoverable if
-> lost, and are only recognized by the server that issued them.
-
-- C#
-- Rust
-- C++
-
-Next, use the `spacetime` command to call our newly defined `Debug`
-reducer:
-
-``` codeBlockStandalone_LlrK
-spacetime call --server local blackholio debug
-```
-
-Next, use the `spacetime` command to call our newly defined `debug`
-reducer:
-
-``` codeBlockStandalone_LlrK
-spacetime call --server local blackholio debug
-```
-
-Next, use the `spacetime` command to call our newly defined `debug`
-reducer:
-
-``` codeBlockStandalone_LlrK
-spacetime call --server local blackholio debug
-```
-
-If the call completed successfully, that command will have no output,
-but we can see the debug logs by running:
-
-``` codeBlockStandalone_LlrK
-spacetime logs --server local blackholio
-```
-
-You should see something like the following output:
-
-``` codeBlockStandalone_LlrK
-2025-01-09T16:08:38.144299Z  INFO: spacetimedb: Creating table `circle`
-2025-01-09T16:08:38.144438Z  INFO: spacetimedb: Creating table `config`
-2025-01-09T16:08:38.144451Z  INFO: spacetimedb: Creating table `entity`
-2025-01-09T16:08:38.144470Z  INFO: spacetimedb: Creating table `food`
-2025-01-09T16:08:38.144479Z  INFO: spacetimedb: Creating table `player`
-2025-01-09T16:08:38.144841Z  INFO: spacetimedb: Database initialized
-2025-01-09T16:08:47.306823Z  INFO: src/lib.rs:68: This reducer was called by c200e1a6494dbeeb0bbf49590b8778abf94fae4ea26faf9769c9a8d69a3ec348.
-```
-
-### Connecting our Client
-
-- C#
-- Rust
-- C++
-
-Next let's connect our client to our database. Let's start by modifying
-our `Debug` reducer. Rename the reducer to be called `Connect` and add
-`ReducerKind.ClientConnected` in parentheses after `Reducer`. The end
-result should look like this:
-
-``` codeBlockStandalone_LlrK
-[Reducer(ReducerKind.ClientConnected)]
-public static void Connect(ReducerContext ctx)
-{
-    Log.Info($"{ctx.Sender} just connected.");
-}
-```
-
-The `ReducerKind.ClientConnected` argument to the `SpacetimeDB.Reducer`
-attribute indicates to SpacetimeDB that this is a special reducer. This
-reducer is only ever called by SpacetimeDB itself when a client connects
-to your database.
-
-> SpacetimeDB gives you the ability to define custom reducers that
-> automatically trigger when certain events occur.
->
-> - `ReducerKind.Init` - Called the first time you publish your module
->   and anytime you clear the database with
->   `spacetime publish --server local \<name\> --delete-data`.
-> - `ReducerKind.ClientConnected` - Called when a user connects to the
->   SpacetimeDB database. Their identity can be found in the `Sender`
->   value of the `ReducerContext`.
-> - `ReducerKind.ClientDisconnected` - Called when a user disconnects
->   from the SpacetimeDB database.
-
-Next let's connect our client to our database. Let's start by modifying
-our `debug` reducer. Rename the reducer to be called `connect` and add
-`client_connected` in parentheses after `spacetimedb::reducer`. The end
-result should look like this:
-
-``` codeBlockStandalone_LlrK
-#[spacetimedb::reducer(client_connected)]
-pub fn connect(ctx: &ReducerContext) -> Result<(), String> {
-    log::debug!("{} just connected.", ctx.sender());
-    Ok(())
-}
-```
-
-The `client_connected` argument to the `spacetimedb::reducer` macro
-indicates to SpacetimeDB that this is a special reducer. This reducer is
-only ever called by SpacetimeDB itself when a client connects to your
-database.
-
-> SpacetimeDB gives you the ability to define custom reducers that
-> automatically trigger when certain events occur.
->
-> - `init` - Called the first time you publish your module and anytime
->   you clear the database with
->   `spacetime publish --server local \<name\> --delete-data`.
-> - `client_connected` - Called when a user connects to the SpacetimeDB
->   database. Their identity can be found in the `sender` value of the
->   `ReducerContext`.
-> - `client_disconnected` - Called when a user disconnects from the
->   SpacetimeDB database.
-
-Next let's connect our client to our database. Let's start by modifying
-our `debug` reducer. Rename the reducer to be called `connect` and
-change `SPACETIMEDB_REDUCER` to `SPACETIMEDB_CLIENT_CONNECTED`. The end
-result should look like this:
-
-``` codeBlockStandalone_LlrK
-SPACETIMEDB_CLIENT_CONNECTED(connect, ReducerContext ctx) {
-    LOG_INFO(ctx.sender().to_string() + " just connected.");
-    return Ok();
-}
-```
-
-The `SPACETIMEDB_CLIENT_CONNECTED` macro indicates to SpacetimeDB that
-this is a special reducer. This reducer is only ever called by
-SpacetimeDB itself when a client connects to your database.
-
-> SpacetimeDB gives you the ability to define custom reducers that
-> automatically trigger when certain events occur.
->
-> - `SPACETIMEDB_INIT` - Called the first time you publish your module
->   and anytime you clear the database with
->   `spacetime publish --server local \<name\> --delete-data`.
-> - `SPACETIMEDB_CLIENT_CONNECTED` - Called when a user connects to the
->   SpacetimeDB database. Their identity can be found in the `sender`
->   value of the `ReducerContext`.
-> - `SPACETIMEDB_CLIENT_DISCONNECTED` - Called when a user disconnects
->   from the SpacetimeDB database.
-
-Publish your module again by running:
-
-``` codeBlockStandalone_LlrK
-spacetime publish --server local blackholio
-```
-
-### Generating the Client
-
-The `spacetime` CLI has built in functionality to let us generate C#
-types that correspond to our tables, types, and reducers that we can use
-from our Godot client.
-
-Let's generate our types for our module. In the
-`blackholio-server/spacetimedb` directory run the following command:
-
-``` codeBlockStandalone_LlrK
-spacetime generate --lang csharp --out-dir ../../module_bindings
-```
-
-This will generate a set of files in the `module_bindings` directory
-(inside your Godot `blackholio` project directory) which contain the
-code generated types and reducer functions that are defined in your
-module, but usable on the client.
-
-``` prism-code
-├── Reducers
-├── Tables
-│   ├── Circle.g.cs
-│   ├── Config.g.cs
-│   ├── Entity.g.cs
-│   ├── Food.g.cs
-│   └── Player.g.cs
-├── Types
-│   ├── Circle.g.cs
-│   ├── Config.g.cs
-│   ├── DbVector2.g.cs
-│   ├── Entity.g.cs
-│   ├── Food.g.cs
-│   └── Player.g.cs
-└── SpacetimeDBClient.g.cs
-```
-
-This will also generate a file `module_bindings/SpacetimeDBClient.g.cs`
-with a type aware `DbConnection` class. We will use this class to
-connect to your database from Godot.
-
-### Connecting to the Database
-
-At this point we can connect your Godot client to the server. Replace
-your imports at the top of the `GameManager.cs` file with:
-
-``` codeBlockStandalone_LlrK
-using System;
-using System.Collections.Generic;
-using SpacetimeDB;
-using SpacetimeDB.Types;
-using Godot;
-```
-
-Replace the implementation of the `GameManager` class with the
-following.
-
-``` codeBlockStandalone_LlrK
-public partial class GameManager : Node
-{
-    public static event Action OnConnected;
-    public static event Action OnSubscriptionApplied;
-    
-    [Export]    
-    private string ServerUrl { get; set; } = "http://127.0.0.1:3000";
-    
-    [Export]
-    private string DatabaseName { get; set; } = "blackholio";
-
-    [Export]
-    private Color BackgroundColor { get; set; } = Colors.MidnightBlue;
-
-    [Export]
-    private float BorderThickness { get; set; } = 5.0f;
-
-    [Export]
-    private Color BorderColor { get; set; } = Colors.Goldenrod;
-
-    [Export]
-    private string DefaultPlayerName { get; set; } = "3Blave";
-
-    private static GameManager Instance { get; set; }
-    public static Identity LocalIdentity { get; private set; }
-    public static DbConnection Conn { get; private set; }
-
-    public GameManager()
-    {
-        var builder = DbConnection.Builder()
-            .OnConnect(HandleConnect)
-            .OnConnectError(HandleConnectError)
-            .OnDisconnect(HandleDisconnect)
-            .WithUri(ServerUrl)
-            .WithDatabaseName(DatabaseName);
-
-        if (AuthToken.TryGetToken(out var authToken))
-        {
-            builder = builder.WithToken(authToken);
-        }
-
-        Conn = builder.Build();
-        STDBUpdateManager.Add(Conn);
-    }
-
-    public override void _EnterTree()
-    {
-        Instance = this;
-    }
-
-    public override void _ExitTree()
-    {
-        Disconnect();
-
-        if (Instance == this)
-        {
-            Instance = null;
-        }
-    }
-
-    public static bool IsConnected() => Conn != null && Conn.IsActive;
-
-    private void Disconnect()
-    {
-        STDBUpdateManager.Remove(Conn, true);
-        Conn = null;
-    }
-
-    // Called when we connect to SpacetimeDB and receive our client identity
-    private void HandleConnect(DbConnection conn, Identity identity, string token)
-    {
-        GD.Print("Connected.");
-        AuthToken.SaveToken(token);
-        LocalIdentity = identity;
-
-        OnConnected?.Invoke();
-
-        // Request all tables
-        Conn.SubscriptionBuilder()
-            .OnApplied(HandleSubscriptionApplied)
-            .SubscribeToAllTables();
-    }
-
-    private void HandleConnectError(Exception ex)
-    {
-        GD.PrintErr($"Connection error: {ex}");
-    }
-
-    private void HandleDisconnect(DbConnection _conn, Exception ex)
-    {
-        GD.Print("Disconnected.");
-        if (ex != null)
-        {
-            GD.PrintErr(ex);
-        }
-    }
-
-    private void HandleSubscriptionApplied(SubscriptionEventContext ctx)
-    {
-        GD.Print("Subscription applied!");
-        OnSubscriptionApplied?.Invoke();
-    }
-}
-```
-
-Here we configure the connection to the database, by passing it some
-callbacks in addition to providing the `ServerUrl` and `DatabaseName` to
-the connection. We add the connection to `STDBUpdateManager`, a simple
-script that hooks into Godot's update loop in order to drive the sending
-and processing of messages between your client and SpacetimeDB.
-
-When the client connects, the SpacetimeDB SDK will call the
-`HandleConnect` method, allowing us to start up the game.
-
-In our `HandleConnect` callback we build a subscription and call
-`Subscribe`, subscribing to all data in the database. This causes
-SpacetimeDB to synchronize the state of all your tables with your Godot
-client's SDK client cache.
-
-------------------------------------------------------------------------
-
-**SDK Client Cache**
-
-The "SDK client cache" is a client-side view of the database defined by
-the supplied queries to the `Subscribe` function. SpacetimeDB ensures
-that the results of subscription queries are automatically updated and
-pushed to the client cache as they change which allows efficient access
-without unnecessary server queries.
-
-------------------------------------------------------------------------
-
-There's only one thing left to do before being able to connect the
-client and server. Because our SpacetimeDB C# project lives nested in
-our Godot's project directory, we need to force exclude
-`blackholio-server` from Godot's C# `.csproj`. Open `Blackholio.csproj`
-with any text editor and add the following line at the end of the
-`<PropertyGroup>`:
-
-``` prism-code
-<DefaultItemExcludes>$(DefaultItemExcludes);blackholio-server/**</DefaultItemExcludes>
-```
-
-Your `Blackholio.csproj` should look similar to this one:
-
-``` prism-code
-<Project Sdk="Godot.NET.Sdk/4.6.2">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
-    <DefaultItemExcludes>$(DefaultItemExcludes);blackholio-server/**</DefaultItemExcludes>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="SpacetimeDB.ClientSDK" Version="2.1.0" />
-  </ItemGroup>
-</Project>
-```
-
-Now we're ready. Press the play button in Godot.
-
-If all went well you should see the below output in your Godot logs.
-
-``` prism-code
-SpacetimeDBClient: Connecting to ws://127.0.0.1:3000 blackholio
-Connected.
-Subscription applied!
-```
-
-Subscription applied indicates that the SpacetimeDB SDK has evaluated
-your subscription queries and synchronized your local cache with your
-database's tables.
-
-We can also see that the server has logged the connection as well.
-
-``` codeBlockStandalone_LlrK
-spacetime logs --server local blackholio
-...
-2025-01-10T03:51:02.078700Z DEBUG: src/lib.rs:63: c200fb5be9524bfb8289c351516a1d9ea800f70a17a9a6937f11c0ed3854087d just connected.
-```
-
-### Next Steps
-
-You've learned how to setup a Godot project with the SpacetimeDB SDK,
-write a basic SpacetimeDB server module, and how to connect your Godot
-client to SpacetimeDB. That's pretty much all there is to the setup.
-You're now ready to start building the game.
-
-In the [next part](https://spacetimedb.com/docs/tutorials/Godot/part-3), we'll build out the
-functionality of the game and you'll learn how to access your table data
-and call reducers in Godot.
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-intro/tutorials/godot-tutorial/part-2" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">2 - Connecting to SpacetimeDB | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/tutorials/godot/part-2"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="2 - Connecting to SpacetimeDB | SpacetimeDB docs"><meta data-rh="true" name="description" content="Need help with the tutorial? Join our Discord server!"><meta data-rh="true" property="og:description" content="Need help with the tutorial? Join our Discord server!"><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/tutorials/godot/part-2"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/godot/part-2" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/tutorials/godot/part-2" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Tutorials","item":"https://spacetimedb.com/docs/tutorials/chat-app"},{"@type":"ListItem","position":2,"name":"Godot Tutorial","item":"https://spacetimedb.com/docs/tutorials/godot"},{"@type":"ListItem","position":3,"name":"2 - Connecting to SpacetimeDB","item":"https://spacetimedb.com/docs/tutorials/godot/part-2"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/tutorials/godot/part-2">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/tutorials/godot/part-2">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Collapse sidebar category &#x27;Tutorials&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/chat-app"><span title="Chat App Tutorial" class="linkLabel_UvDg">Chat App Tutorial</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/unity"><span title="Unity Tutorial" class="categoryLinkLabel_HATI">Unity Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Unity Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/tutorials/unreal"><span title="Unreal Tutorial" class="categoryLinkLabel_HATI">Unreal Tutorial</span></a><button aria-label="Expand sidebar category &#x27;Unreal Tutorial&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/tutorials/godot"><span title="Godot Tutorial" class="categoryLinkLabel_HATI">Godot Tutorial</span></a><button aria-label="Collapse sidebar category &#x27;Godot Tutorial&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/godot/part-1"><span title="1 - Setup" class="linkLabel_UvDg">1 - Setup</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/tutorials/godot/part-2"><span title="2 - Connecting to SpacetimeDB" class="linkLabel_UvDg">2 - Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/godot/part-3"><span title="3 - Gameplay" class="linkLabel_UvDg">3 - Gameplay</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/tutorials/godot/part-4"><span title="4 - Moving and Colliding" class="linkLabel_UvDg">4 - Moving and Colliding</span></a></li></ul></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/chat-app"><span>Tutorials</span></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/tutorials/godot"><span>Godot Tutorial</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">2 - Connecting to SpacetimeDB</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>2 - Connecting to SpacetimeDB</h1></header><p>Need help with the tutorial? <a href="https://discord.gg/spacetimedb" target="_blank" rel="noopener noreferrer" class="">Join our Discord server</a>!</p>
+<p>This progressive tutorial is continued from <a class="" href="/docs/tutorials/godot/part-1">part 1</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="project-structure">Project Structure<a href="#project-structure" class="hash-link" aria-label="Direct link to Project Structure" title="Direct link to Project Structure" translate="no">​</a></h2>
+<p>Now that we have our client project setup we can configure the module directory. Regardless of what language you choose, your module will always go into a <code>spacetimedb</code> directory within your client directory like this:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">blackholio/                     # This is the directory where your Godot project lives</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── blackholio.csproj</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── module_bindings/            # This directory contains the client logic to communicate with the module</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── ...                         # rest of the Godot files                </span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── blackholio-server/</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    └── spacetimedb/            # This is where your server module lives</span><br></span></code></pre></div></div>
+<p>Your <code>module_bindings</code> directory can go wherever you want as long as it is inside of <code>res://</code> in your Godot project. We&#x27;ll configure this in a later step. For now we will create a new module in the <code>blackholio</code> directory which will generate the <code>spacetimedb</code> directory for us.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="create-a-server-module">Create a Server Module<a href="#create-a-server-module" class="hash-link" aria-label="Direct link to Create a Server Module" title="Direct link to Create a Server Module" translate="no">​</a></h2>
+<p>If you have not already installed the <code>spacetime</code> CLI, check out our <a class="" href="/docs/">Getting Started</a> guide for instructions on how to install.</p>
+<p>In the same directory that contains your <code>blackholio</code> project, run the following command to initialize the SpacetimeDB server module project with your desired language:</p>
+<div class="theme-admonition theme-admonition-warning admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_STxx"><p>The <code>blackholio</code> directory specified here is the same <code>blackholio</code> directory you created during part 1.</p></div></div>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Run the following command to initialize the SpacetimeDB server module project with C# as the language:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --server-only</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre><p>Use <code>blackholio-server</code> for the project path and <code>blackholio</code> for the database name.</p><p>This command creates a new folder named <code>blackholio-server</code> inside of your Godot project <code>blackholio</code> directory. Inside, there&#x27;s a <code>spacetimedb</code> folder that contains the SpacetimeDB server project with C# as the programming language.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>Run the following command to initialize the SpacetimeDB server module project with Rust as the language:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> rust</span><span style="color:#BD93F9"> --server-only</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre><p>Use <code>blackholio-server</code> for the project path and <code>blackholio</code> for the database name.</p><p>This command creates a new folder named <code>blackholio-server</code> inside of your Godot project <code>blackholio</code> directory. Inside, there&#x27;s a <code>spacetimedb</code> folder that contains the SpacetimeDB server project with Rust as the programming language.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Run the following command to initialize the SpacetimeDB server module project with C++ as the language:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> init</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> cpp</span><span style="color:#BD93F9"> --server-only</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre><p>Use <code>blackholio-server</code> for the project path and <code>blackholio</code> for the database name.</p><p>This command creates a new folder named <code>blackholio-server</code> inside of your Godot project <code>blackholio</code> directory. Inside, there&#x27;s a <code>spacetimedb</code> folder that contains the SpacetimeDB server project with C++ as the programming language.</p></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="spacetimedb-tables">SpacetimeDB Tables<a href="#spacetimedb-tables" class="hash-link" aria-label="Direct link to SpacetimeDB Tables" title="Direct link to SpacetimeDB Tables" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>In this section we&#x27;ll be making some edits to the file <code>blackholio-server/spacetimedb/Lib.cs</code>. We recommend you open up this file in an IDE like VSCode or Rider.</p><p><strong>Important: Open the <code>blackholio-server/spacetimedb/Lib.cs</code> file and delete its contents. We will be writing it from scratch here.</strong></p></div><div role="tabpanel" class="tabItem_w6aI"><p>In this section we&#x27;ll be making some edits to the file <code>blackholio-server/spacetimedb/src/lib.rs</code>. We recommend you open up this file in an IDE like VSCode or RustRover.</p><p><strong>Important: Open the <code>blackholio-server/spacetimedb/src/lib.rs</code> file and delete its contents. We will be writing it from scratch here.</strong></p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>In this section we&#x27;ll be making some edits to the file <code>blackholio-server/spacetimedb/src/lib.cpp</code>. We recommend you open up this file in an IDE like VSCode or Rider.</p><p><strong>Important: Open the <code>blackholio-server/spacetimedb/src/lib.cpp</code> file and delete its contents. We will be writing it from scratch here.</strong></p></div></div></div>
+<p>First we need to add some imports at the top of the file. Some will remain unused for now.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p><strong>Copy and paste into Lib.cs:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> Module</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p><strong>Copy and paste into lib.rs:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">time</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Duration</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">{rand</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">Rng</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">ScheduleAt</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Timestamp</span><span style="color:#F8F8F2">};</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p><strong>Copy and paste into lib.cpp:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">spacetimedb.h</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#FF79C6"> namespace</span><span style="color:#F8F8F2"> SpacetimeDB;</span></span></code></pre></div></div></div>
+<p>We are going to start by defining a SpacetimeDB <em>table</em>. A <em>table</em> in SpacetimeDB is a relational database table which stores rows, similar to something you might find in SQL. SpacetimeDB tables differ from normal relational database tables in that they are stored fully in memory, are blazing fast to access, and are defined in your module code, rather than in SQL.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Each row in a SpacetimeDB table is associated with a <code>struct</code> type in C#.</p><p>Let&#x27;s start by defining the <code>Config</code> table. This is a simple table which will store some metadata about our game&#x27;s state. Add the following code inside the <code>Module</code> class in <code>Lib.cs</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// We&#x27;re using this table as a singleton, so in this table</span></span>
+<span class="line"><span style="color:#6272A4">// there will only be one element where the `id` is 0.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">config</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Config</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> long</span><span style="color:#F8F8F2"> world_size;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Let&#x27;s break down this code. This defines a normal C# <code>struct</code> with two fields: <code>id</code> and <code>world_size</code>. We have added the <code>[Table(Accessor = "config", Public = true)]</code> attribute the struct. This attribute signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the <code>Config</code> type&#x27;s fields.</p><blockquote>
+<p>Although we&#x27;re using <code>lower_snake_case</code> for our column names to have consistent column names across languages in this tutorial, you can also use <code>camelCase</code> or <code>PascalCase</code> if you prefer. See <a href="https://github.com/clockworklabs/SpacetimeDB/issues/2168" target="_blank" rel="noopener noreferrer" class="">#2168</a> for more information.</p>
+</blockquote><p>The <code>Table</code> attribute takes two parameters, an <code>Accessor</code> which is the name of the table and what you will use to query the table in SQL, and a <code>Public</code> visibility modifier which ensures that the rows of this table are visible to everyone.</p><p>The <code>[PrimaryKey]</code> attribute, specifies that the <code>id</code> field should be used as the primary key of the table.</p></div><div role="tabpanel" class="tabItem_w6aI"><p>Each row in a SpacetimeDB table is associated with a <code>struct</code> type in Rust.</p><p>Let&#x27;s start by defining the <code>Config</code> table. This is a simple table which will store some metadata about our game&#x27;s state. Add the following code to <code>lib.rs</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// We&#x27;re using this table as a singleton, so in this table</span></span>
+<span class="line"><span style="color:#6272A4">// there only be one element where the `id` is 0.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> config, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> world_size</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i64</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Let&#x27;s break down this code. This defines a normal Rust <code>struct</code> with two fields: <code>id</code> and <code>world_size</code>. We have decorated the struct with the <code>spacetimedb::table</code> macro. This procedural Rust macro signals to SpacetimeDB that it should create a new SpacetimeDB table with the row type defined by the <code>Config</code> type&#x27;s fields.</p><p>The <code>spacetimedb::table</code> macro takes two parameters, an <code>accessor</code> which is the name of the table and what you will use to query the table in SQL, and a <code>public</code> visibility modifier which ensures that the rows of this table are visible to everyone.</p><p>The <code>#[primary_key]</code> attribute, specifies that the <code>id</code> field should be used as the primary key of the table.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Each row in a SpacetimeDB table is associated with a <code>struct</code> type in C++.</p><p>Let&#x27;s start by defining the <code>Config</code> table. This is a simple table which will store some metadata about our game&#x27;s state. Add the following code to <code>lib.cpp</code>.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// We&#x27;re using this table as a singleton, so in this table</span></span>
+<span class="line"><span style="color:#6272A4">// there will only be one element where the `id` is 0.</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Config</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> id;</span></span>
+<span class="line"><span style="color:#FF79C6">    int64_t</span><span style="color:#F8F8F2"> world_size;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Config, id, world_size);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Config, config, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(config, id);</span></span></code></pre><p>Let&#x27;s break down this code. This defines a normal C++ <code>struct</code> with two fields: <code>id</code> and <code>world_size</code>. We use the <code>SPACETIMEDB_STRUCT</code> macro to register the struct for serialization, listing all field names. Then <code>SPACETIMEDB_TABLE</code> registers it as a table with the name <code>config</code> and <code>Public</code> visibility.</p><p>The <code>SPACETIMEDB_TABLE</code> macro takes three parameters: the struct type, the table name (which you&#x27;ll use to access the table in code), and a visibility modifier (<code>Public</code> or <code>Private</code>) which determines whether rows are synced to clients.</p><p>The <code>FIELD_PrimaryKey</code> macro specifies that the <code>id</code> field should be used as the primary key of the table.</p></div></div></div>
+<blockquote>
+<p>NOTE: The primary key of a row defines the "identity" of the row. A change to a row which doesn&#x27;t modify the primary key is considered an update, but if you change the primary key, then you have deleted the old row and inserted a new one.</p>
+</blockquote>
+<p>Learn more about defining tables, including indexes, constraints, and column types, in our <a class="" href="/docs/tables">Tables documentation</a>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="creating-entities">Creating Entities<a href="#creating-entities" class="hash-link" aria-label="Direct link to Creating Entities" title="Direct link to Creating Entities" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, we&#x27;re going to define a new <code>SpacetimeType</code> called <code>DbVector2</code> which we&#x27;re going to use to store positions. The difference between a <code>[SpacetimeDB.Type]</code> and a <code>[SpacetimeDB.Table]</code> is that tables actually store data, whereas the deriving <code>SpacetimeType</code> just allows you to create a new column of that type in a SpacetimeDB table. Therefore, <code>DbVector2</code> is only a type, and does not define a table.</p><p><strong>Append to the bottom of Lib.cs:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// This allows us to store 2D points in tables.</span></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Type</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#50FA7B"> DbVector2</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> x</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> y</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        this</span><span style="color:#F8F8F2">.x </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#BD93F9;font-style:italic">        this</span><span style="color:#F8F8F2">.y </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Let&#x27;s create a few tables to represent entities in our game by adding the following to the end of the <code>Module</code> class.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">entity</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Entity</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> position;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">circle</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Circle</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Index</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">BTree</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> direction;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> speed;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2"> last_split_time;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">food</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Food</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Next, we&#x27;re going to define a new <code>SpacetimeType</code> called <code>DbVector2</code> which we&#x27;re going to use to store positions. The difference between a <code>#[derive(SpacetimeType)]</code> and a <code>#[spacetimedb(table)]</code> is that tables actually store data, whereas the deriving <code>SpacetimeType</code> just allows you to create a new column of that type in a SpacetimeDB table. Therefore, <code>DbVector2</code> is only a type, and does not define a table.</p><p><strong>Append to the bottom of lib.rs:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// This allows us to store 2D points in tables.</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">SpacetimeType</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Clone</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> x</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> y</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>Let&#x27;s create a few tables to represent entities in our game.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> entity, public)]</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Clone</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // The `auto_inc` attribute indicates to SpacetimeDB that</span></span>
+<span class="line"><span style="color:#6272A4">    // this value should be determined by SpacetimeDB on insert.</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> entity_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> position</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> mass</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> circle, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Circle</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> entity_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[index(btree)]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> direction</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> speed</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> f32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> last_split_time</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Timestamp</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> food, public)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Food</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#FF79C6">    pub</span><span style="color:#F8F8F2"> entity_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, we&#x27;re going to define a new <code>SpacetimeType</code> called <code>DbVector2</code> which we&#x27;re going to use to store positions. The difference between a regular struct registered with <code>SPACETIMEDB_STRUCT</code> and one registered with <code>SPACETIMEDB_TABLE</code> is that tables actually store data, whereas registering a struct alone just allows you to use it as a column type in a SpacetimeDB table. Therefore, <code>DbVector2</code> is only a type, and does not define a table.</p><p><strong>Append to the bottom of lib.cpp:</strong></p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// This allows us to store 2D points in tables.</span></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> DbVector2</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> x;</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> y;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(DbVector2, x, y);</span></span></code></pre><p>Let&#x27;s create a few tables to represent entities in our game.</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Entity</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#6272A4">    // The `FIELD_PrimaryKeyAutoInc` constraint indicates to SpacetimeDB that</span></span>
+<span class="line"><span style="color:#6272A4">    // this value should be determined by SpacetimeDB on insert.</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    DbVector2 position;</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> mass;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Entity, entity_id, position, mass);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Entity, entity, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKeyAutoInc</span><span style="color:#F8F8F2">(entity, entity_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Circle</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    DbVector2 direction;</span></span>
+<span class="line"><span style="color:#FF79C6">    float</span><span style="color:#F8F8F2"> speed;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Timestamp last_split_time;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Circle, entity_id, player_id, direction, speed, last_split_time);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Circle, circle, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(circle, entity_id);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_Index</span><span style="color:#F8F8F2">(circle, player_id);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Food</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> entity_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Food, entity_id);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Food, food, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(food, entity_id);</span></span></code></pre></div></div></div>
+<p>The first table we defined is the <code>entity</code> table. An entity represents an object in our game world. We have decided, for convenience, that all entities in our game should share some common fields, namely <code>position</code> and <code>mass</code>.</p>
+<p>We can create different types of entities with additional data by creating new tables with additional fields that have an <code>entity_id</code> which references a row in the <code>entity</code> table.</p>
+<p>We&#x27;ve created two types of entities in our game world: <code>Food</code> and <code>Circle</code>. <code>Food</code> does not have any additional fields beyond the attributes in the <code>entity</code> table, so the <code>food</code> table simply represents the set of <code>entity_id</code>s that we want to recognize as food.</p>
+<p>The <code>Circle</code> table, however, represents an entity that is controlled by a player. We&#x27;ve added a few additional fields to a <code>Circle</code> like <code>player_id</code> so that we know which player that circle belongs to.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="representing-players">Representing Players<a href="#representing-players" class="hash-link" aria-label="Direct link to Representing Players" title="Direct link to Representing Players" translate="no">​</a></h3>
+<p>Next, let&#x27;s create a table to store our player data.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Table</span><span style="color:#F8F8F2">(Accessor </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">player</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">, Public </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> true</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">PrimaryKey</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> identity;</span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Unique</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">AutoInc</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> int</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> name;</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>There are a few new concepts we should touch on. First of all, we are using the <code>[Unique]</code> attribute on the <code>player_id</code> field. This attribute adds a constraint to the table that ensures that only one row in the player table has a particular <code>player_id</code>. We are also using the <code>[AutoInc]</code> attribute on the <code>player_id</code> field, which indicates "this field should get automatically assigned an auto-incremented value".</p></div><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">table(accessor </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> player, public)]</span></span>
+<span class="line"><span style="color:#F8F8F2">#[derive(</span><span style="color:#8BE9FD;font-style:italic">Debug</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Clone</span><span style="color:#F8F8F2">)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[primary_key]</span></span>
+<span class="line"><span style="color:#F8F8F2">    identity</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[unique]</span></span>
+<span class="line"><span style="color:#F8F8F2">    #[auto_inc]</span></span>
+<span class="line"><span style="color:#F8F8F2">    player_id</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> i32</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">    name</span><span style="color:#FF79C6">:</span><span style="color:#8BE9FD;font-style:italic"> String</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>There&#x27;s a few new concepts we should touch on. First of all, we are using the <code>#[unique]</code> attribute on the <code>player_id</code> field. This attribute adds a constraint to the table that ensures that only one row in the player table has a particular <code>player_id</code>.</p></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">struct</span><span style="color:#8BE9FD;font-style:italic"> Player</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    Identity identity;</span></span>
+<span class="line"><span style="color:#FF79C6">    int32_t</span><span style="color:#F8F8F2"> player_id;</span></span>
+<span class="line"><span style="color:#F8F8F2">    std</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">string name;</span></span>
+<span class="line"><span style="color:#F8F8F2">};</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_STRUCT</span><span style="color:#F8F8F2">(Player, identity, player_id, name);</span></span>
+<span class="line"><span style="color:#50FA7B">SPACETIMEDB_TABLE</span><span style="color:#F8F8F2">(Player, player, Public);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_PrimaryKey</span><span style="color:#F8F8F2">(player, identity);</span></span>
+<span class="line"><span style="color:#50FA7B">FIELD_UniqueAutoInc</span><span style="color:#F8F8F2">(player, player_id);</span></span></code></pre><p>There&#x27;s a few new concepts we should touch on. First of all, we are using the <code>FIELD_UniqueAutoInc</code> macro on the <code>player_id</code> field. This macro combines two constraints: it ensures that only one row in the player table has a particular <code>player_id</code>, and it indicates that this field should get automatically assigned an auto-incremented value.</p></div></div></div>
+<p>We also have an <code>identity</code> field which uses the <code>Identity</code> type. The <code>Identity</code> type is an identifier that SpacetimeDB uses to uniquely assign and authenticate SpacetimeDB users.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="writing-a-reducer">Writing a Reducer<a href="#writing-a-reducer" class="hash-link" aria-label="Direct link to Writing a Reducer" title="Direct link to Writing a Reducer" translate="no">​</a></h3>
+<p>Next, we write our very first reducer. A reducer is a module function which can be called by clients. Let&#x27;s write a simple debug reducer to see how they work.</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Add this function to the <code>Module</code> class in <code>Lib.cs</code>:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Debug</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">This reducer was called by </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ctx</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Sender</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> debug</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">debug!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"This reducer was called by {}."</span><span style="color:#F8F8F2">, ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_REDUCER</span><span style="color:#F8F8F2">(debug, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">This reducer was called by </span><span style="color:#E9F284">"</span><span style="color:#FF79C6"> +</span><span style="color:#F8F8F2"> ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>This reducer doesn&#x27;t update any tables, it just prints out the <code>Identity</code> of the client that called it.</p>
+\<hr\>
+<p><strong>SpacetimeDB Reducers</strong></p>
+<p>"Reducer" is a term coined by Clockwork Labs that refers to a function which when executed "reduces" a set of inserts and deletes into the database state. The term derives from functional programming and is closely related to <a href="https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#reducers" target="_blank" rel="noopener noreferrer" class="">similarly named concepts</a> in other frameworks like React Redux. Reducers can be called remotely using the CLI, client SDK or can be scheduled to be called at some future time from another reducer call.</p>
+<p>All reducers execute <em>transactionally</em> and <em>atomically</em>, meaning that from within the reducer it will appear as though all changes are being applied to the database immediately, however from the outside changes made in a reducer will only be applied to the database once the reducer completes successfully. If you return an error from a reducer or panic within a reducer, all changes made to the database will be rolled back, as if the function had never been called. If you&#x27;re unfamiliar with atomic transactions, it may not be obvious yet just how useful and important this feature is, but once you build a somewhat complex application it will become clear just how invaluable this feature is.</p>
+\<hr\>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="publishing-the-module">Publishing the Module<a href="#publishing-the-module" class="hash-link" aria-label="Direct link to Publishing the Module" title="Direct link to Publishing the Module" translate="no">​</a></h3>
+<p>Now that we have some basic functionality, let&#x27;s publish the module to SpacetimeDB and call our debug reducer.</p>
+<p>In a new terminal window, run a local version of SpacetimeDB with the command:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> start</span></span></code></pre>
+<p>This following log output indicates that SpacetimeDB is successfully running on your machine.</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Starting SpacetimeDB listening on 127.0.0.1:3000</span><br></span></code></pre></div></div>
+<p>Now that SpacetimeDB is running we can publish our module to the SpacetimeDB host. In a separate terminal window, navigate to the <code>blackholio-server/spacetimedb</code> directory.</p>
+<p>If you are not already logged in to the <code>spacetime</code> CLI, run the <code>spacetime login</code> command to log in to your SpacetimeDB website account. Once you are logged in, run <code>spacetime publish --server local blackholio</code>. This will publish our Blackholio server logic to SpacetimeDB.</p>
+<p>If the publish completed successfully, you will see something like the following in the logs:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">Build finished successfully.</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Uploading to local => http://127.0.0.1:3000</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Publishing module...</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Created new database with name: blackholio, identity: c200d2c69b4524292b91822afac8ab016c15968ac993c28711f68c6bc40b89d5</span><br></span></code></pre></div></div>
+<blockquote>
+<p>If you sign into <code>spacetime login</code> via GitHub, the token you get will be issued by <code>auth.spacetimedb.com</code>. This will also ensure that you can recover your identity in case you lose it. On the other hand, if you do <code>spacetime login --server-issued-login local</code>, you will get an identity which is issued directly by your local server. Do note, however, that <code>--server-issued-login</code> tokens are not recoverable if lost, and are only recognized by the server that issued them.</p>
+</blockquote>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, use the <code>spacetime</code> command to call our newly defined <code>Debug</code> reducer:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span><span style="color:#F1FA8C"> debug</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI"><p>Next, use the <code>spacetime</code> command to call our newly defined <code>debug</code> reducer:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span><span style="color:#F1FA8C"> debug</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next, use the <code>spacetime</code> command to call our newly defined <code>debug</code> reducer:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> call</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span><span style="color:#F1FA8C"> debug</span></span></code></pre></div></div></div>
+<p>If the call completed successfully, that command will have no output, but we can see the debug logs by running:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre>
+<p>You should see something like the following output:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144299Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Creating</span><span style="color:#F1FA8C"> table</span><span style="color:#F1FA8C"> `</span><span style="color:#50FA7B">circle</span><span style="color:#F1FA8C">`</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144438Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Creating</span><span style="color:#F1FA8C"> table</span><span style="color:#F1FA8C"> `</span><span style="color:#50FA7B">config</span><span style="color:#F1FA8C">`</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144451Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Creating</span><span style="color:#F1FA8C"> table</span><span style="color:#F1FA8C"> `</span><span style="color:#50FA7B">entity</span><span style="color:#F1FA8C">`</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144470Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Creating</span><span style="color:#F1FA8C"> table</span><span style="color:#F1FA8C"> `</span><span style="color:#50FA7B">food</span><span style="color:#F1FA8C">`</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144479Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Creating</span><span style="color:#F1FA8C"> table</span><span style="color:#F1FA8C"> `</span><span style="color:#50FA7B">player</span><span style="color:#F1FA8C">`</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:38.144841Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> spacetimedb:</span><span style="color:#F1FA8C"> Database</span><span style="color:#F1FA8C"> initialized</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-09T16:08:47.306823Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> src/lib.rs:68:</span><span style="color:#F1FA8C"> This</span><span style="color:#F1FA8C"> reducer</span><span style="color:#F1FA8C"> was</span><span style="color:#F1FA8C"> called</span><span style="color:#F1FA8C"> by</span><span style="color:#F1FA8C"> c200e1a6494dbeeb0bbf49590b8778abf94fae4ea26faf9769c9a8d69a3ec348.</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connecting-our-client">Connecting our Client<a href="#connecting-our-client" class="hash-link" aria-label="Direct link to Connecting our Client" title="Direct link to Connecting our Client" translate="no">​</a></h3>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next let&#x27;s connect our client to our database. Let&#x27;s start by modifying our <code>Debug</code> reducer. Rename the reducer to be called <code>Connect</code> and add <code>ReducerKind.ClientConnected</code> in parentheses after <code>Reducer</code>. The end result should look like this:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">[</span><span style="color:#8BE9FD;font-style:italic">Reducer</span><span style="color:#F8F8F2">(ReducerKind.ClientConnected)]</span></span>
+<span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Connect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Log.</span><span style="color:#50FA7B">Info</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ctx</span><span style="color:#F1FA8C">.</span><span style="color:#F8F8F2">Sender</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C"> just connected.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>ReducerKind.ClientConnected</code> argument to the <code>SpacetimeDB.Reducer</code> attribute indicates to SpacetimeDB that this is a special reducer. This reducer is only ever called by SpacetimeDB itself when a client connects to your database.</p><blockquote>
+<p>SpacetimeDB gives you the ability to define custom reducers that automatically trigger when certain events occur.</p>
+\<ul\>
+<li class=""><code>ReducerKind.Init</code> - Called the first time you publish your module and anytime you clear the database with <code>spacetime publish --server local \<name\> --delete-data</code>.</li>
+<li class=""><code>ReducerKind.ClientConnected</code> - Called when a user connects to the SpacetimeDB database. Their identity can be found in the <code>Sender</code> value of the <code>ReducerContext</code>.</li>
+<li class=""><code>ReducerKind.ClientDisconnected</code> - Called when a user disconnects from the SpacetimeDB database.</li>
+</ul>
+</blockquote></div><div role="tabpanel" class="tabItem_w6aI"><p>Next let&#x27;s connect our client to our database. Let&#x27;s start by modifying our <code>debug</code> reducer. Rename the reducer to be called <code>connect</code> and add <code>client_connected</code> in parentheses after <code>spacetimedb::reducer</code>. The end result should look like this:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">#[spacetimedb</span><span style="color:#FF79C6">::</span><span style="color:#F8F8F2">reducer(client_connected)]</span></span>
+<span class="line"><span style="color:#FF79C6">pub</span><span style="color:#FF79C6"> fn</span><span style="color:#50FA7B"> connect</span><span style="color:#F8F8F2">(ctx</span><span style="color:#FF79C6">:</span><span style="color:#FF79C6"> &</span><span style="color:#8BE9FD;font-style:italic">ReducerContext</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">-></span><span style="color:#8BE9FD;font-style:italic"> Result</span><span style="color:#F8F8F2"><(), </span><span style="color:#8BE9FD;font-style:italic">String</span><span style="color:#F8F8F2">> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    log</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">debug!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"{} just connected."</span><span style="color:#F8F8F2">, ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#8BE9FD;font-style:italic">    Ok</span><span style="color:#F8F8F2">(())</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>client_connected</code> argument to the <code>spacetimedb::reducer</code> macro indicates to SpacetimeDB that this is a special reducer. This reducer is only ever called by SpacetimeDB itself when a client connects to your database.</p><blockquote>
+<p>SpacetimeDB gives you the ability to define custom reducers that automatically trigger when certain events occur.</p>
+\<ul\>
+<li class=""><code>init</code> - Called the first time you publish your module and anytime you clear the database with <code>spacetime publish --server local \<name\> --delete-data</code>.</li>
+<li class=""><code>client_connected</code> - Called when a user connects to the SpacetimeDB database. Their identity can be found in the <code>sender</code> value of the <code>ReducerContext</code>.</li>
+<li class=""><code>client_disconnected</code> - Called when a user disconnects from the SpacetimeDB database.</li>
+</ul>
+</blockquote></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><p>Next let&#x27;s connect our client to our database. Let&#x27;s start by modifying our <code>debug</code> reducer. Rename the reducer to be called <code>connect</code> and change <code>SPACETIMEDB_REDUCER</code> to <code>SPACETIMEDB_CLIENT_CONNECTED</code>. The end result should look like this:</p><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">SPACETIMEDB_CLIENT_CONNECTED</span><span style="color:#F8F8F2">(connect, ReducerContext ctx) {</span></span>
+<span class="line"><span style="color:#50FA7B">    LOG_INFO</span><span style="color:#F8F8F2">(ctx.</span><span style="color:#50FA7B">sender</span><span style="color:#F8F8F2">().</span><span style="color:#50FA7B">to_string</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">+</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C"> just connected.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre><p>The <code>SPACETIMEDB_CLIENT_CONNECTED</code> macro indicates to SpacetimeDB that this is a special reducer. This reducer is only ever called by SpacetimeDB itself when a client connects to your database.</p><blockquote>
+<p>SpacetimeDB gives you the ability to define custom reducers that automatically trigger when certain events occur.</p>
+\<ul\>
+<li class=""><code>SPACETIMEDB_INIT</code> - Called the first time you publish your module and anytime you clear the database with <code>spacetime publish --server local \<name\> --delete-data</code>.</li>
+<li class=""><code>SPACETIMEDB_CLIENT_CONNECTED</code> - Called when a user connects to the SpacetimeDB database. Their identity can be found in the <code>sender</code> value of the <code>ReducerContext</code>.</li>
+<li class=""><code>SPACETIMEDB_CLIENT_DISCONNECTED</code> - Called when a user disconnects from the SpacetimeDB database.</li>
+</ul>
+</blockquote></div></div></div>
+<p>Publish your module again by running:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> publish</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="generating-the-client">Generating the Client<a href="#generating-the-client" class="hash-link" aria-label="Direct link to Generating the Client" title="Direct link to Generating the Client" translate="no">​</a></h3>
+<p>The <code>spacetime</code> CLI has built in functionality to let us generate C# types that correspond to our tables, types, and reducers that we can use from our Godot client.</p>
+<p>Let&#x27;s generate our types for our module. In the <code>blackholio-server/spacetimedb</code> directory run the following command:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> generate</span><span style="color:#BD93F9"> --lang</span><span style="color:#F1FA8C"> csharp</span><span style="color:#BD93F9"> --out-dir</span><span style="color:#F1FA8C"> ../../module_bindings</span></span></code></pre>
+<p>This will generate a set of files in the <code>module_bindings</code> directory (inside your Godot <code>blackholio</code> project directory) which contain the code generated types and reducer functions that are defined in your module, but usable on the client.</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── Reducers</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── Tables</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Circle.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Config.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Entity.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Food.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── Player.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── Types</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Circle.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Config.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── DbVector2.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Entity.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── Food.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── Player.g.cs</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── SpacetimeDBClient.g.cs</span><br></span></code></pre></div></div>
+<p>This will also generate a file <code>module_bindings/SpacetimeDBClient.g.cs</code> with a type aware <code>DbConnection</code> class. We will use this class to connect to your database from Godot.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connecting-to-the-database">Connecting to the Database<a href="#connecting-to-the-database" class="hash-link" aria-label="Direct link to Connecting to the Database" title="Direct link to Connecting to the Database" translate="no">​</a></h3>
+<p>At this point we can connect your Godot client to the server. Replace your imports at the top of the <code>GameManager.cs</code> file with:</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> System</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Collections</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Generic</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">.</span><span style="color:#8BE9FD;font-style:italic">Types</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> Godot</span><span style="color:#F8F8F2">;</span></span></code></pre>
+<p>Replace the implementation of the <code>GameManager</code> class with the following.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">public</span><span style="color:#FF79C6"> partial</span><span style="color:#FF79C6"> class</span><span style="color:#8BE9FD"> GameManager</span><span style="color:#F8F8F2"> : </span><span style="color:#8BE9FD;font-style:italic">Node</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> event</span><span style="color:#8BE9FD;font-style:italic"> Action</span><span style="color:#F8F8F2"> OnConnected;</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> event</span><span style="color:#8BE9FD;font-style:italic"> Action</span><span style="color:#F8F8F2"> OnSubscriptionApplied;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]    </span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> ServerUrl { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">http://127.0.0.1:3000</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    </span></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> DatabaseName { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">blackholio</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> Color</span><span style="color:#F8F8F2"> BackgroundColor { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Colors.MidnightBlue;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> float</span><span style="color:#F8F8F2"> BorderThickness { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> 5.0f</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#8BE9FD;font-style:italic"> Color</span><span style="color:#F8F8F2"> BorderColor { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Colors.Goldenrod;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">    [</span><span style="color:#8BE9FD;font-style:italic">Export</span><span style="color:#F8F8F2">]</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> string</span><span style="color:#F8F8F2"> DefaultPlayerName { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; } </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">3Blave</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> GameManager</span><span style="color:#F8F8F2"> Instance { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">set</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> Identity</span><span style="color:#F8F8F2"> LocalIdentity { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> set</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#F8F8F2"> Conn { </span><span style="color:#FF79C6">get</span><span style="color:#F8F8F2">; </span><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> set</span><span style="color:#F8F8F2">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#50FA7B"> GameManager</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        var</span><span style="color:#F8F8F2"> builder </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">OnConnect</span><span style="color:#F8F8F2">(HandleConnect)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">OnConnectError</span><span style="color:#F8F8F2">(HandleConnectError)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">OnDisconnect</span><span style="color:#F8F8F2">(HandleDisconnect)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(ServerUrl)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(DatabaseName);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (AuthToken.</span><span style="color:#50FA7B">TryGetToken</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">out</span><span style="color:#FF79C6"> var</span><span style="color:#F8F8F2"> authToken))</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            builder </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> builder.</span><span style="color:#50FA7B">WithToken</span><span style="color:#F8F8F2">(authToken);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">        Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> builder.</span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">        STDBUpdateManager.</span><span style="color:#50FA7B">Add</span><span style="color:#F8F8F2">(Conn);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> override</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> _EnterTree</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Instance </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> override</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> _ExitTree</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#50FA7B">        Disconnect</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (Instance </span><span style="color:#FF79C6">==</span><span style="color:#BD93F9;font-style:italic"> this</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Instance </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    public</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> bool</span><span style="color:#50FA7B"> IsConnected</span><span style="color:#F8F8F2">() </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> Conn </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#FF79C6"> &&</span><span style="color:#F8F8F2"> Conn.IsActive;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> Disconnect</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        STDBUpdateManager.</span><span style="color:#50FA7B">Remove</span><span style="color:#F8F8F2">(Conn, </span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        Conn </span><span style="color:#FF79C6">=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">    // Called when we connect to SpacetimeDB and receive our client identity</span></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleConnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#FFB86C;font-style:italic"> conn</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Identity</span><span style="color:#FFB86C;font-style:italic"> identity</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">string</span><span style="color:#FFB86C;font-style:italic"> token</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        GD.</span><span style="color:#50FA7B">Print</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Connected.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        AuthToken.</span><span style="color:#50FA7B">SaveToken</span><span style="color:#F8F8F2">(token);</span></span>
+<span class="line"><span style="color:#F8F8F2">        LocalIdentity </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> identity;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">        OnConnected</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Invoke</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">        // Request all tables</span></span>
+<span class="line"><span style="color:#F8F8F2">        Conn.</span><span style="color:#50FA7B">SubscriptionBuilder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(HandleSubscriptionApplied)</span></span>
+<span class="line"><span style="color:#F8F8F2">            .</span><span style="color:#50FA7B">SubscribeToAllTables</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleConnectError</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#FFB86C;font-style:italic"> ex</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        GD.</span><span style="color:#50FA7B">PrintErr</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Connection error: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">ex</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleDisconnect</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#FFB86C;font-style:italic"> _conn</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Exception</span><span style="color:#FFB86C;font-style:italic"> ex</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        GD.</span><span style="color:#50FA7B">Print</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Disconnected.</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (ex </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            GD.</span><span style="color:#50FA7B">PrintErr</span><span style="color:#F8F8F2">(ex);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    private</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> HandleSubscriptionApplied</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">SubscriptionEventContext</span><span style="color:#FFB86C;font-style:italic"> ctx</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        GD.</span><span style="color:#50FA7B">Print</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Subscription applied!</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        OnSubscriptionApplied</span><span style="color:#FF79C6">?</span><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">Invoke</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>Here we configure the connection to the database, by passing it some callbacks in addition to providing the <code>ServerUrl</code> and <code>DatabaseName</code> to the connection. We add the connection to <code>STDBUpdateManager</code>, a simple script that hooks into Godot&#x27;s update loop in order to drive the sending and processing of messages between your client and SpacetimeDB.</p>
+<p>When the client connects, the SpacetimeDB SDK will call the <code>HandleConnect</code> method, allowing us to start up the game.</p>
+<p>In our <code>HandleConnect</code> callback we build a subscription and call <code>Subscribe</code>, subscribing to all data in the database. This causes SpacetimeDB to synchronize the state of all your tables with your Godot client&#x27;s SDK client cache.</p>
+\<hr\>
+<p><strong>SDK Client Cache</strong></p>
+<p>The "SDK client cache" is a client-side view of the database defined by the supplied queries to the <code>Subscribe</code> function. SpacetimeDB ensures that the results of subscription queries are automatically updated and pushed to the client cache as they change which allows efficient access without unnecessary server queries.</p>
+\<hr\>
+<p>There&#x27;s only one thing left to do before being able to connect the client and server. Because our SpacetimeDB C# project lives nested in our Godot&#x27;s project directory, we need to force exclude <code>blackholio-server</code> from Godot&#x27;s C# <code>.csproj</code>. Open <code>Blackholio.csproj</code> with any text editor and add the following line at the end of the <code>\<PropertyGroup\></code>:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">\<DefaultItemExcludes\>$(DefaultItemExcludes);blackholio-server/**</DefaultItemExcludes></span><br></span></code></pre></div></div>
+<p>Your <code>Blackholio.csproj</code> should look similar to this one:</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain"><Project Sdk="Godot.NET.Sdk/4.6.2"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  \<PropertyGroup\></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    \<TargetFramework\>net8.0</TargetFramework></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    <TargetFramework Condition=" &#x27;$(GodotTargetPlatform)&#x27; == &#x27;android&#x27; ">net9.0</TargetFramework></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    \<EnableDynamicLoading\>true</EnableDynamicLoading></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    \<DefaultItemExcludes\>$(DefaultItemExcludes);blackholio-server/**</DefaultItemExcludes></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </PropertyGroup></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  <ItemGroup></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    <PackageReference Include="SpacetimeDB.ClientSDK" Version="2.1.0" /></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </ItemGroup></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></Project></span><br></span></code></pre></div></div>
+<p>Now we&#x27;re ready. Press the play button in Godot.</p>
+<p>If all went well you should see the below output in your Godot logs.</p>
+<div class="language-text codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_VOyQ"><pre tabindex="0" class="prism-code language-text codeBlock_evfK thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="token-line" style="color:#bfc7d5"><span class="token plain">SpacetimeDBClient: Connecting to ws://127.0.0.1:3000 blackholio</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Connected.</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">Subscription applied!</span><br></span></code></pre></div></div>
+<p>Subscription applied indicates that the SpacetimeDB SDK has evaluated your subscription queries and synchronized your local cache with your database&#x27;s tables.</p>
+<p>We can also see that the server has logged the connection as well.</p>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span><span style="color:#BD93F9"> --server</span><span style="color:#F1FA8C"> local</span><span style="color:#F1FA8C"> blackholio</span></span>
+<span class="line"><span style="color:#8BE9FD">...</span></span>
+<span class="line"><span style="color:#50FA7B">2025-01-10T03:51:02.078700Z</span><span style="color:#F1FA8C"> DEBUG:</span><span style="color:#F1FA8C"> src/lib.rs:63:</span><span style="color:#F1FA8C"> c200fb5be9524bfb8289c351516a1d9ea800f70a17a9a6937f11c0ed3854087d</span><span style="color:#F1FA8C"> just</span><span style="color:#F1FA8C"> connected.</span></span></code></pre>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h3>
+<p>You&#x27;ve learned how to setup a Godot project with the SpacetimeDB SDK, write a basic SpacetimeDB server module, and how to connect your Godot client to SpacetimeDB. That&#x27;s pretty much all there is to the setup. You&#x27;re now ready to start building the game.</p>
+<p>In the <a class="" href="/docs/tutorials/godot/part-3">next part</a>, we&#x27;ll build out the functionality of the game and you&#x27;ll learn how to access your table data and call reducers in Godot.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00100-intro/00300-tutorials/00500-godot-tutorial/00300-part-2.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/tutorials/godot/part-1"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">1 - Setup</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/tutorials/godot/part-3"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">3 - Gameplay</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#project-structure" class="table-of-contents__link toc-highlight">Project Structure</a></li>\<li\><a href="#create-a-server-module" class="table-of-contents__link toc-highlight">Create a Server Module</a>\<ul\>\<li\><a href="#spacetimedb-tables" class="table-of-contents__link toc-highlight">SpacetimeDB Tables</a></li>\<li\><a href="#creating-entities" class="table-of-contents__link toc-highlight">Creating Entities</a></li>\<li\><a href="#representing-players" class="table-of-contents__link toc-highlight">Representing Players</a></li>\<li\><a href="#writing-a-reducer" class="table-of-contents__link toc-highlight">Writing a Reducer</a></li>\<li\><a href="#publishing-the-module" class="table-of-contents__link toc-highlight">Publishing the Module</a></li>\<li\><a href="#connecting-our-client" class="table-of-contents__link toc-highlight">Connecting our Client</a></li>\<li\><a href="#generating-the-client" class="table-of-contents__link toc-highlight">Generating the Client</a></li>\<li\><a href="#connecting-to-the-database" class="table-of-contents__link toc-highlight">Connecting to the Database</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

@@ -38,7 +38,6 @@
 
 ### Extensibility
 - **[Extensions](https://zed.dev/extensions)**: Growing ecosystem of community extensions
-- **[Themes](https://zed.dev/themes)**: Beautiful themes and color schemes
 - **[Language Extensions](https://zed.dev/extensions)**: Zed supports a wide range of languages and frameworks
 - **[MCP Extensions](https://zed.dev/extensions)**: Model Context Protocol support for AI tool integration
 - **[Extension API](https://zed.dev/extensions)**: Build your own extensions
@@ -123,6 +122,6 @@
 - **[Blog](https://zed.dev/blog)**: Technical deep-dives and announcements
 - **[Careers](https://zed.dev/jobs)**: Join the Zed team
 - **[Brand Guidelines](https://zed.dev/brand)**: Logos and brand assets
-- **[Security](https://zed.dev/security)**: Security policies and responsible disclosure
 
 Zed combines the performance of native applications with the intelligence of modern AI and the power of real-time collaboration. It's designed for developers who refuse to compromise on speed, features, or user experience.
+

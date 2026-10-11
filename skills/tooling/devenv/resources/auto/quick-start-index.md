@@ -1,0 +1,182 @@
+# Quick Start
+
+> Get up and running with SecretSpec in minutes
+
+## Installation
+
+Choose your preferred installation method:
+
+* Static Binary
+
+  ```bash
+  $ curl -sSL https://install.secretspec.dev | sh
+  ```
+
+  SecretSpec 0.20+ provides static musl CLI binaries for x64 and arm64 Linux, so the installer works directly on Alpine without a glibc compatibility layer.
+
+  The static installer also installs `secretspec-update`. Run it to install the latest SecretSpec release:
+
+  ```bash
+  $ secretspec-update
+  ```
+
+  If you installed SecretSpec through Nix or another package manager, update it through that package manager instead.
+
+* Brew
+
+  ```powershell
+  brew install secretspec
+  ```
+
+* WinGet
+
+  ```powershell
+  winget install --exact --id Cachix.SecretSpec
+  ```
+
+* Devenv.sh
+
+  Add to your `devenv.nix`:
+
+  ```nix
+  { config, ... }:
+  {
+    # Secrets are automatically populated from secretspec.toml
+    env.DATABASE_URL = config.secretspec.secrets.DATABASE_URL;
+    env.REDIS_URL = config.secretspec.secrets.REDIS_URL;
+  }
+  ```
+
+* Nix
+
+  ```bash
+  $ nix-env -iA secretspec -f https://github.com/NixOS/nixpkgs/tarball/nixpkgs-unstable
+  ```
+
+## Getting started
+
+Start with one project and the system keyring. You will declare the secrets the application expects, store one value, and run the application with that value in its environment.
+
+### 1. Initialize `secretspec.toml`
+
+From your project directory, create a manifest:
+
+```bash
+$ secretspec init
+```
+
+```text
+✓ Created secretspec.toml with 0 secrets
+
+
+Next steps:
+  1. secretspec config global init    # Set up user defaults (0.17+)
+  2. secretspec check                 # Verify all secrets are set
+  3. secretspec run -- your-command   # Run with secrets
+```
+
+This example assumes the project does not have a `.env` file. If one exists, `init` discovers its secret names automatically and reports the number of declarations it created. Review those declarations instead of replacing them in the next step. See [Migration](/migration/) for details.
+
+### 2. Declare your secrets
+
+Edit `secretspec.toml` so it describes what your application expects:
+
+**secretspec.toml**
+
+```toml
+[project]
+name = "my-app"
+revision = "1.0"
+
+
+[profiles.default]
+DATABASE_URL = { description = "PostgreSQL connection string", required = true }
+SENTRY_DSN = { description = "Error reporting endpoint", required = false }
+```
+
+`DATABASE_URL` must be available before the application can run. `SENTRY_DSN` is optional, so leaving it unset does not block resolution. The manifest contains declarations, not secret values, and is safe to commit.
+
+### 3. Store and use a secret
+
+Store the required value in your system keyring:
+
+```bash
+$ secretspec set DATABASE_URL --provider keyring
+```
+
+```text
+Enter value for DATABASE_URL (profile: default): ********
+✓ Secret 'DATABASE_URL' saved to keyring (profile: default)
+```
+
+Start your application with the resolved values in its environment:
+
+```bash
+$ secretspec run --provider keyring -- npm start
+```
+
+### 4. Configure your personal defaults
+
+The commands above use `--provider keyring` explicitly. SecretSpec 0.17+ can save your preferred backend and default profile as preferences for your user:
+
+```bash
+$ secretspec config global init  # 0.17+
+? Select your preferred provider backend:
+> keyring: Uses system keychain (Recommended)
+  kdbx: KeePass KDBX databases (0.17+)
+  onepassword: 1Password password manager
+  keeper: Keeper Secrets Manager (0.18+) via official Rust SDK
+  doppler: Doppler secret management (0.21+)
+  dotenv: Traditional .env files
+  file: Plaintext files, one per secret (0.19+)
+  env: Read-only environment variables
+  null: Use defaults, generation, or run prompts without storage (0.19+)
+  systemd-credential: Read-only systemd service credentials (0.17+)
+  fly: Fly.io application secrets via flyctl, write-only (0.20+)
+  cloudflare: Cloudflare Secrets Store, write-only (0.20+)
+  pass: Unix password manager with GPG encryption
+  gopass: Gopass CLI password manager with GPG encryption (0.15+)
+  protonpass: Proton Pass via official pass-cli
+  passbolt: Passbolt self-hosted password manager (0.19+) via go-passbolt-cli
+  lastpass: LastPass password manager
+  dashlane: Dashlane password manager, read-only (0.18+)
+  gcsm: Google Cloud Secret Manager
+  awssm: AWS Secrets Manager
+  awsps: AWS Systems Manager Parameter Store (0.18+)
+  scaleway: Scaleway Secret Manager (0.17+)
+  setec: Tailscale Setec secrets service (0.21+)
+  vault: HashiCorp Vault secret management
+  openbao: OpenBao secret management (0.17+)
+  bw: Bitwarden Password Manager (0.18+)
+  bws: Bitwarden Secrets Manager
+  akv: Azure Key Vault
+  aac: Azure App Configuration (0.20+)
+  infisical: Infisical secret management (0.16+)
+  ejson: EJSON encrypted files, read-only (0.20+)
+  age: age-encrypted file (0.17+)
+  sops: SOPS encrypted files (0.17+)
+  kubernetes: Kubernetes (0.20+)
+? Select your default profile:
+  development
+> default
+  none
+✓ Configuration saved to /home/user/.config/secretspec/config.toml
+```
+
+These preferences are stored in `~/.config/secretspec/config.toml`. They are not written to the project, committed to version control, or shared with other users. They become your personal defaults across projects and can still be overridden by project configuration or command-line options.
+
+You can now omit the provider from everyday commands:
+
+```bash
+$ secretspec set DATABASE_URL
+$ secretspec check
+$ secretspec run -- npm start
+```
+
+## Next Steps
+
+* Continue with the commands in [Basic Usage](/basic-usage/)
+* Bring existing values into SecretSpec with the [Migration guide](/migration/)
+* Learn about [Profiles](/concepts/profiles/) to manage environment-specific configurations
+* Explore different [Providers](/concepts/providers/) for secret storage
+* Choose an [SDK](/sdk/overview/) to resolve secrets from your application

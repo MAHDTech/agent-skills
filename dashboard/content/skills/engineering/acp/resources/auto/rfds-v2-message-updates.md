@@ -40,7 +40,7 @@ ACP v1 primarily reports user, agent, and thought messages as chunks:
 
 Chunks are a natural fit for streaming model output, but they are awkward for session replay, accepted user-message acknowledgments, and cases where the Agent already has the whole message available. Also, there is no way for an agent to *redact* content from a message if needed due to guardrail APIs.
 
-The v2 prompt lifecycle also needs a clear way for Agents to acknowledge or replay accepted user messages. The [Message ID RFD](@/skills/engineering/acp/resources/auto/rfds-message-id.md) keeps message IDs agent-owned, so the Agent needs a session update that can provide both the accepted user-message content and its `messageId`.
+The v2 prompt lifecycle also needs a clear way for Agents to acknowledge or replay accepted user messages. The [Message ID RFD](../message-id.mdx) keeps message IDs agent-owned, so the Agent needs a session update that can provide both the accepted user-message content and its `messageId`.
 
 ## What we propose to do about it
 
@@ -70,6 +70,10 @@ The matching chunk updates remain:
 * `agent_thought_chunk`
 
 Chunks append their single `content` item to the current content of the message with the matching `messageId`.
+
+The [Prompt Lifecycle RFD](./prompt.mdx#correlate-prompts-with-accepted-user-messages) explores acknowledging user-message insertion by returning its agent-generated `messageId` in the prompt response. Live updates and chunks for that user message would use the same ID, as would replay if the agent retains the message. Retaining the message is optional; live-only messages, including locally handled commands, need not appear in later history. The response confirms insertion and establishes the submitting client's association with the message; the corresponding updates report its content and placement. They describe the same insertion, but clients must tolerate updates arriving before or after the response. No additional correlation field or metadata-only update is required for live streaming.
+
+When replay reconstructs a message from its beginning using chunks, the Agent must first send the corresponding `user_message`, `agent_message`, or `agent_thought` update with the same ID and `content: []` to clear retained content before appending the replayed chunks. This rule applies to all message types. A metadata-only update would leave retained content unchanged and duplicate it during replay. A full-content message update can instead replace the retained content directly.
 
 ### Interaction between updates and chunks
 
@@ -173,3 +177,6 @@ The Client appends those chunks to the message for that `messageId`. A later mes
 ## Revision history
 
 * 2026-06-09: Initial draft.
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

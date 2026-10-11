@@ -37,7 +37,7 @@ Now build your site to an output directory — this guide assumes that you're ru
 
 ## Indexing your site
 
-The easiest way to run Pagefind is through one of the official wrapper packages. If you don't have Node or Python installed, or want to install Pagefind another way, see the [Installing Pagefind](https://pagefind.app/docs/installation/) guide.
+The easiest way to run Pagefind is through one of the official wrapper packages. If you don't have Node or Python installed, or want to install Pagefind another way, see the [Installing Pagefind](/docs/installation/) guide.
 
 **npx:**
 
@@ -87,8 +87,10 @@ Loading this in your browser, you should see a search input on your page. Try se
 
 The last required step is to run Pagefind after building your site on your CMS or hosting platform. Set up the npx command above (minus the `--serve` flag) to run after your site build — the end goal is that Pagefind will run after every build of your site before it is deployed.
 
-For many use cases, you can stop here and mark it as complete. Or, you can dive deeper into Pagefind and configure it to your liking — check out [Configuring the index](https://pagefind.app/docs/indexing/) for some next steps.
+For many use cases, you can stop here and mark it as complete. Or, you can dive deeper into Pagefind and configure it to your liking — check out [Configuring the index](/docs/indexing/) for some next steps.
 
 ## Notes
 
-> For optimal performance, ensure the `lang` attribute is set on your `html` element. See [Multilingual Search](https://pagefind.app/docs/multilingual/) for more details.
+> For optimal performance, ensure the `lang` attribute is set on your `html` element. See [Multilingual Search](/docs/multilingual/) for more details.
+
+

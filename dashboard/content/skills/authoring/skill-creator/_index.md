@@ -1,6 +1,6 @@
 +++
 title = "skill-creator"
-description = "Use when creating a new skill or editing an existing one in this repo - how to name it, place it in the right category, write its frontmatter and description, and structure it with progressive disclosure. Covers model-invoked vs user-invoked skills, the six skill failure modes, and the lint/sync workflow to run after adding or renaming a skill."
+description = "Use when creating a new skill or editing an existing one in this repo - how to name it, place it in the right category, write its frontmatter and description, and structure it with progressive disclosure. Covers model-invoked vs user-invoked skills, anti-slop conventions, failure modes, and the lint/sync workflow to run after adding or renaming a skill."
 sort_by = "title"
 template = "skill.html"
 [extra]
@@ -85,6 +85,7 @@ description: [1. Capability verb phrase]. Use when [2. Explicit triggers, sympto
 - **Front-load the skill's leading word** - the description is where it does its invocation work.
 - **One trigger per branch.** Synonyms that rename a single branch are **duplication** - collapse them and keep only genuinely distinct branches.
 - **Cut identity already stated in the body.** Keep the description to triggers plus any "when another skill needs..." reach clause.
+- **No frontmatter slop or puffery.** Never begin descriptions with "This skill provides...", "Expert guidance for...", "Expert reference...", or "Comprehensive guide...". Lead immediately with the capability verb phrase (e.g. `Build...`, `Audit...`, `Deploy...`). Avoid buzzwords like "comprehensive", "robust", or "seamless". `ask skills lint` checks for these forbidden patterns.
 - **No em-dashes.** Never use em-dashes (Unicode U+2014) in skill names, frontmatter descriptions, or skill bodies; use standard hyphens (`-`), colons, commas, or restructure sentences. `ask skills lint --fix` can automatically sanitize em-dashes.
 
 ## Structure and progressive disclosure
@@ -114,6 +115,8 @@ Never place a file directly in `resources/`: every resource lives under `auto/` 
 - **Code fence language tags (MD040)**: Never use bare triple backticks. Always declare a language tag (` ```bash `, ` ```json `, ` ```text `, ` ```rust `).
 - **Blank lines around fences (MD031)**: Every code block must be preceded and followed by a blank line, including when nested inside lists.
 - **No absolute file links**: Never use `file:///` URLs referencing local paths. Always use relative repository paths (e.g. `../../review/code-review/SKILL.md`).
+- **Heading formatting**: Headings must use plain text sentence case without bold markup (e.g. `### 1. Audit environment`, never `### 1. **Phase 1: Initial Assessment**`). Bold markup inside headings is prohibited and flagged by `ask skills lint`.
+- **No tautological list items**: Never use bold list lead-ins that merely repeat the item name (e.g. `- **Performance:** Optimize performance...`). State concrete details or use direct prose.
 
 **Branching** is the disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A pointer's _wording_, not its target, decides when and how reliably the agent follows it - a must-have behind a weak pointer is a variance bug, so sharpen the wording before pulling material back inline.
 
@@ -137,6 +140,15 @@ Hunt for restatements a leading word retires: a triad spelled out three times, o
 ## Prompt the positive
 
 State the target behaviour, not the banned one. **Negation** backfires: _don't think of an elephant_ names the elephant and makes it more available. Describe what to do ("write one-line comments") so the forbidden pattern is never spoken. Keep a prohibition only as a hard guardrail you cannot phrase positively - and even then pair it with the positive target.
+
+## Voice and anti-slop discipline
+
+A skill is an operational manual for an agent, not a corporate marketing deck, tutorial, or textbook. Keep instructions dense, procedural, and falsifiable:
+
+- **Concrete mechanisms over vague qualifiers.** Ban lazy modifiers like "proper", "properly", "appropriate", or "thorough" unless paired with an exact invariant, command, or threshold. Instead of "Ensure proper error handling", specify "Return an explicit fallback error and log the response status code on network timeouts".
+- **Eliminate AI crutch vocabulary.** Avoid buzzwords like "utilize", "leverage", "seamlessly", "furthermore", "delve", "testament to", "pivotal", or "evolving landscape". Prefer plain words: "use", "if", "because", or name the exact mechanism.
+- **No corporate roadmap padding.** Omit fake roadmaps ("Immediate Next Steps within 48 hours / 1 week / 1 month"), generic "Best Practices" lists filled with platitudes, or hypothetical Q&A sections. Replace them with concrete verification steps and unambiguous completion criteria.
+- **The copy-paste test.** If a sentence or bullet could appear in an unrelated project without changing a word, it contains zero specific signal. Delete it or anchor it to exact codebase paths, data models, and tools.
 
 ## Stay host-agnostic
 
@@ -185,17 +197,24 @@ Diagnose a misbehaving skill against these:
 - **Trigger ambiguity** - overly broad descriptions triggering on unrelated queries, or overly narrow descriptions that fail natural user prompts.
 - **Host leakage** - baking host-specific tools, internal agent built-ins, or absolute paths into general skills.
 - **Verification absence** - omitting runnable test or lint commands in completion criteria.
+- **AI slop and puffery** - inflating procedural instructions with corporate, marketing, or academic filler ("comprehensive guidance", "robust frameworks", bolded slide-deck headings).
+- **Tautological labeling** - bold list lead-ins that merely repeat the item name instead of adding distinct operational signal.
+- **Generic filler** - boilerplate roadmaps or platitudinous checklists that apply to any project.
 
-| Failure Mode             | Bad Pattern (Anti-Pattern)                                       | Good Pattern (Remedy)                                                                                                                                                                                                                    |
-| :----------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Premature Completion** | "Make sure all files are properly formatted."                    | "Run `cargo fmt --check` and verify exit code is 0 before proceeding."                                                                                                                                                                   |
-| **Negation**             | "Do not use unwrap() or leave errors unhandled."                 | "Handle every Result branch explicitly using `match` or `?`."                                                                                                                                                                            |
-| **No-Op**                | "Be thorough and pay close attention to detail."                 | "Inspect every caller across the workspace with search tools before changing the signature."                                                                                                                                             |
-| **Duplication**          | Defining the same review checklist in three different sub-steps. | Extract the checklist into `resources/manual/CHECKLIST.md` and link via a context pointer.                                                                                                                                               |
-| **Sediment**             | Leaving references to deprecated tools or dead directories.      | Audit every line against current tooling; delete stale references aggressively.                                                                                                                                                          |
-| **Trigger Ambiguity**    | `description: Helps with tests.`                                 | `description: Write test-first unit and integration tests using red-green-refactor. Use when building a new feature test-first or fixing a bug with regression tests. Do not use for legacy untested code; use /characterization-tests.` |
-| **Host Leakage**         | "Run the OpenCode subagent tool with argument X."                | "Delegate the subtask to your agent's subagent mechanism."                                                                                                                                                                               |
-| **Verification Absence** | "Finish the task and notify the user."                           | "Run `devenv --no-tui test` and `ask skills lint`; confirm zero failures before reporting."                                                                                                                                              |
+| Failure Mode              | Bad Pattern (Anti-Pattern)                                           | Good Pattern (Remedy)                                                                                                                                                                                                                    |
+| :------------------------ | :------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Premature Completion**  | "Make sure all files are properly formatted."                        | "Run `cargo fmt --check` and verify exit code is 0 before proceeding."                                                                                                                                                                   |
+| **Negation**              | "Do not use unwrap() or leave errors unhandled."                     | "Handle every Result branch explicitly using `match` or `?`."                                                                                                                                                                            |
+| **No-Op**                 | "Be thorough and pay close attention to detail."                     | "Inspect every caller across the workspace with search tools before changing the signature."                                                                                                                                             |
+| **Duplication**           | Defining the same review checklist in three different sub-steps.     | Extract the checklist into `resources/manual/CHECKLIST.md` and link via a context pointer.                                                                                                                                               |
+| **Sediment**              | Leaving references to deprecated tools or dead directories.          | Audit every line against current tooling; delete stale references aggressively.                                                                                                                                                          |
+| **Trigger Ambiguity**     | `description: Helps with tests.`                                     | `description: Write test-first unit and integration tests using red-green-refactor. Use when building a new feature test-first or fixing a bug with regression tests. Do not use for legacy untested code; use /characterization-tests.` |
+| **Host Leakage**          | "Run the OpenCode subagent tool with argument X."                    | "Delegate the subtask to your agent's subagent mechanism."                                                                                                                                                                               |
+| **Verification Absence**  | "Finish the task and notify the user."                               | "Run `devenv --no-tui test` and `ask skills lint`; confirm zero failures before reporting."                                                                                                                                              |
+| **AI Slop / Puffery**     | `description: Expert guidance for developing robust, scalable apps.` | `description: Build and test scalable web services. Use when configuring...`                                                                                                                                                             |
+| **Heading Bloat**         | `### 1. **Phase 1: Comprehensive Initial Discovery**`                | `### 1. Discover existing schema`                                                                                                                                                                                                        |
+| **Tautological Labeling** | `- **Security:** Implement proper security measures.`                | `- **Security:** Sanitize inputs and restrict CORS origins to authorized hosts.`                                                                                                                                                         |
+| **Generic Filler**        | Adding a 20-line 48-hour checklist of generic development steps.     | Define checkable invariants, command executions, and exact exit criteria.                                                                                                                                                                |
 
 Prune sentence by sentence: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive - most prose that fails should go, not be rewritten.
 
@@ -203,12 +222,17 @@ Prune sentence by sentence: run the no-op test on each sentence in isolation, an
 
 Regenerate derived artifacts, verify conventions, and update the router:
 
-1. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and `policy`.
-2. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, placement, links, and formatting (run with `--fix` to sanitize em-dashes).
-3. `devenv --no-tui shell -- ask skills sync` - update machine target symlinks and synchronize repository catalogs.
-4. `devenv --no-tui shell -- ask dashboard build` - compile markdown, generate search indexes, and update dashboard artifacts.
-5. Update the `/skill-router` index so the new or renamed skill is reachable.
-6. `devenv --no-tui shell -- prek run --all-files` - run git pre-commit hooks (managed via `prek`, never standalone `pre-commit`).
+1. **Self-audit with the unslop lens**:
+   - Check description: does it lead with an active verb without "This skill provides..." or "Expert guidance"?
+   - Check headings: are all headings plain sentence case without bold markup (`**` or `__`)?
+   - Check vocabulary: are AI crutch words like "comprehensive", "utilize", "seamlessly", "furthermore", or "properly" absent?
+   - Check advice: does every rule name a concrete mechanism or verifiable invariant rather than a vague platitude?
+2. Create or update `agents/openai.yaml` with valid `display_name`, `short_description` (25-64 chars), and `policy`.
+3. `devenv --no-tui shell -- ask skills lint` - validate frontmatter, naming, placement, links, formatting, and anti-slop rules (run with `--fix` to sanitize em-dashes).
+4. `devenv --no-tui shell -- ask skills sync` - update machine target symlinks and synchronize repository catalogs.
+5. `devenv --no-tui shell -- ask dashboard build` - compile markdown, generate search indexes, and update dashboard artifacts.
+6. Update the `/skill-router` index so the new or renamed skill is reachable.
+7. `devenv --no-tui shell -- prek run --all-files` - run git pre-commit hooks (managed via `prek`, never standalone `pre-commit`).
 
 Done when lint passes, sync leaves no further diff, and the router names the skill.
 

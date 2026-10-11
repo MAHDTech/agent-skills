@@ -23,7 +23,7 @@ Some changes do not require an RFD:
 
 ### 1. Propose by opening a PR
 
-[Fork the repo](https://github.com/agentclientprotocol/agent-client-protocol) and copy `docs/rfds/TEMPLATE.md` to `docs/rfds/my-feature.md` (using kebab-case naming). The RFD can start minimal - just an elevator pitch and status quo are enough to begin dialog. Pull requests become the discussion forum where ideas get refined through collaborative iteration.
+[Fork the repo](https://github.com/agentclientprotocol/agent-client-protocol) and copy `docs/rfds/TEMPLATE` to `docs/rfds/my-feature.mdx` (using kebab-case naming). The RFD can start minimal - just an elevator pitch and status quo are enough to begin dialog. Pull requests become the discussion forum where ideas get refined through collaborative iteration.
 
 ### 2. Merge to "Draft" when championed
 
@@ -62,9 +62,18 @@ Preview RFDs don't have to be completed. They may also go back to draft to await
 * **To be removed (yet?)**: Decided against for now, but preserved for future consideration
 * **Completed**: Implementation finished and merged
 
+### Ordering RFD lists
+
+Keep the RFD navigation in `docs/docs.json` and overview lists ordered from oldest to newest within each lifecycle stage. Preserve subgroups such as v2, and apply the same ordering within them:
+
+* For Draft, Active, and Preview, use the merge that first introduced the proposal.
+* For Completed, use the completion or stabilization merge.
+
+Later edits do not change an RFD's position. Keep [RFD Updates](/rfds/updates) newest first by lifecycle event date.
+
 ## Governance
 
-The project currently has a design team with the [Zed team as the lead (BDFL)](community-governance.md). Champions from the core team guide RFDs through the process, but final decisions rest with the team lead. This structure maintains velocity while anticipating future governance expansion.
+The project currently has a design team with the [Zed team as the lead (BDFL)](../community/governance). Champions from the core team guide RFDs through the process, but final decisions rest with the team lead. This structure maintains velocity while anticipating future governance expansion.
 
 ## Discussion and Moderation
 
@@ -75,3 +84,6 @@ Detailed discussions often happen on [Zulip](https://agentclientprotocol.zulipch
 All RFDs are licensed under Apache 2.0. The project remains open source.
 
 ##
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

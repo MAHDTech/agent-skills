@@ -22,11 +22,11 @@ When a `$/cancel_request` notification is received by a supporting implementatio
 * **MAY** finish sending any pending notifications before responding
 * **MUST** send one of these responses for the original request:
   * A valid response with appropriate data (such as partial results or cancellation marker)
-  * An error response with code [`-32800` (Request Cancelled)](https://agentclientprotocol.com/protocol/v1/schema#errorcode)
+  * An error response with code [`-32800` (Request Cancelled)](/protocol/v1/schema#errorcode)
 
 The calling side **MAY** implement graceful cancellation processing by waiting for the response from the remote side.
 
-Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of a [prompt turn](https://agentclientprotocol.com/protocol/v1/prompt-turn#cancellation).
+Cancellation **MAY** also be done explicitly on a per-feature basis within the protocol to cover specific scenarios, such as cancellation of a [prompt turn](/protocol/v1/prompt-turn#cancellation).
 
 ## Internal Cancellation
 
@@ -69,3 +69,6 @@ sequenceDiagram
     Note over Client,Agent: 6. Agent completes prompt cancellation
     Agent->>Client: response to id=1 (stopReason: "cancelled")
 ```
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

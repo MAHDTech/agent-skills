@@ -78,3 +78,6 @@ We considered making newText nullable, but that would break existing clients.
 ## Revision history
 
 2026-02-20: Initial draft
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

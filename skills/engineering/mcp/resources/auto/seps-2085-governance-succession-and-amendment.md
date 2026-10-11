@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 2085                                                                            |
-| **Title**     | Governance Succession and Amendment Procedures                                  |
-| **Status**    | Final                                                                           |
-| **Type**      | Process                                                                         |
-| **Created**   | 2025-12-05                                                                      |
-| **Author(s)** | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant))                      |
-| **Sponsor**   | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant))                      |
-| **PR**        | [#2085](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2085) |
+| Field | Value |
+| - | - |
+| **SEP** | 2085 |
+| **Title** | Governance Succession and Amendment Procedures |
+| **Status** | Final |
+| **Type** | Process |
+| **Created** | 2025-12-05 |
+| **Author(s)** | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant)) |
+| **Sponsor** | David Soria Parra ([@dsp-ant](https://github.com/dsp-ant)) |
+| **PR** | [#2085](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2085) |
 
 ***
 
@@ -115,3 +115,4 @@ This SEP has no direct security implications. However, clear succession procedur
 Upon acceptance, this SEP will be implemented by adding the Succession and Amendment sections to `docs/community/governance.mdx`. The new sections will be inserted after the "Lead Maintainers (BDFL)" section and before the "Decision Process" section.
 
 A draft pull request implementing these changes will be linked here once available.
+

@@ -8,7 +8,7 @@
 
 In this tutorial, you'll learn how to build an LLM-powered chatbot client that connects to MCP servers.
 
-Before you begin, it helps to have gone through our [Build an MCP Server](https://modelcontextprotocol.io/docs/draft/develop/build-server) tutorial so you can understand how clients and servers communicate.
+Before you begin, it helps to have gone through our [Build an MCP Server](/docs/draft/develop/build-server) tutorial so you can understand how clients and servers communicate.
 
 \<Tabs\>
   <Tab title="Python">
@@ -379,7 +379,7 @@ Before you begin, it helps to have gone through our [Build an MCP Server](https:
        * Be cautious with tool permissions
 
     4. **Tool Names**
-       * Tool names can be validated according to the format specified [here](https://modelcontextprotocol.io/specification/draft/server/tools#tool-names)
+       * Tool names can be validated according to the format specified [here](/specification/draft/server/tools#tool-names)
        * If a tool name conforms to the specified format, it should not fail validation by an MCP client
 
     ## Troubleshooting
@@ -1997,7 +1997,7 @@ Before you begin, it helps to have gone through our [Build an MCP Server](https:
        * Be cautious with tool permissions
 
     4. **Tool Names**
-       * Tool names can be validated according to the format specified [here](https://modelcontextprotocol.io/specification/draft/server/tools#tool-names)
+       * Tool names can be validated according to the format specified [here](/specification/draft/server/tools#tool-names)
        * If a tool name conforms to the specified format, it should not fail validation by an MCP client
 
     ## Troubleshooting
@@ -2520,3 +2520,4 @@ Before you begin, it helps to have gone through our [Build an MCP Server](https:
     Check out our gallery of official MCP servers and implementations
   </Card>
 </CardGroup>
+

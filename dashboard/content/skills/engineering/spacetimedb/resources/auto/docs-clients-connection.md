@@ -7,436 +7,253 @@ mermaid = false
 skill_name = "spacetimedb"
 +++
 
-Version: 2.0.0
-
-On this page
-
-After [generating client bindings](https://spacetimedb.com/docs/clients/codegen) for your
-module, you can establish a connection to your SpacetimeDB
-[database](https://spacetimedb.com/docs/databases) from your client application. The
-`DbConnection` type provides a persistent WebSocket connection that
-enables real-time communication with the server.
-
-## Prerequisites
-
-Before connecting, ensure you have:
-
-1.  [Generated client bindings](https://spacetimedb.com/docs/clients/codegen) for your module
-2.  A published database running on SpacetimeDB (local or on
-    [MainCloud](https://spacetimedb.com/docs/how-to/deploy/maincloud))
-3.  The database's URI and name or identity
-
-## Basic Connection
-
-Create a connection using the `DbConnection` builder pattern:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-import { DbConnection } from './module_bindings';
-
-const conn = DbConnection.builder()
-    .withUri("https://maincloud.spacetimedb.com")
-    .withDatabaseName("my_database")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-using SpacetimeDB;
-
-var conn = DbConnection.Builder()
-    .WithUri("https://maincloud.spacetimedb.com")
-    .WithDatabaseName("my_database")
-    .Build();
-```
-
-``` codeBlockStandalone_LlrK
-use module_bindings::DbConnection;
-
-let conn = DbConnection::builder()
-    .with_uri("https://maincloud.spacetimedb.com")
-    .with_database_name("my_database")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-#include "ModuleBindings/DbConnection.h"
-
-UDbConnection* Conn = UDbConnection::Builder()
-    ->WithUri(TEXT("https://maincloud.spacetimedb.com"))
-    ->WithDatabaseName(TEXT("my_database"))
-    ->Build();
-```
-
-Replace `"https://maincloud.spacetimedb.com"` with your SpacetimeDB host
-URI, and `"my_database"` with your database's name or identity.
-
-### Connecting to MainCloud
-
-To connect to a database hosted on MainCloud:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-const conn = DbConnection.builder()
-    .withUri("https://maincloud.spacetimedb.com")
-    .withDatabaseName("my_database")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-var conn = DbConnection.Builder()
-    .WithUri("https://maincloud.spacetimedb.com")
-    .WithDatabaseName("my_database")
-    .Build();
-```
-
-``` codeBlockStandalone_LlrK
-let conn = DbConnection::builder()
-    .with_uri("https://maincloud.spacetimedb.com")
-    .with_database_name("my_database")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-UDbConnection* Conn = UDbConnection::Builder()
-    ->WithUri(TEXT("https://maincloud.spacetimedb.com"))
-    ->WithDatabaseName(TEXT("my_database"))
-    ->Build();
-```
-
-## Authentication with Tokens
-
-To authenticate with a token (for example, from
-[SpacetimeAuth](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/)),
-provide it when building the connection:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-const conn = DbConnection.builder()
-    .withUri("https://maincloud.spacetimedb.com")
-    .withDatabaseName("my_database")
-    .withToken("your_auth_token_here")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-var conn = DbConnection.Builder()
-    .WithUri("https://maincloud.spacetimedb.com")
-    .WithDatabaseName("my_database")
-    .WithToken("your_auth_token_here")
-    .Build();
-```
-
-``` codeBlockStandalone_LlrK
-let conn = DbConnection::builder()
-    .with_uri("https://maincloud.spacetimedb.com")
-    .with_database_name("my_database")
-    .with_token("your_auth_token_here")
-    .build();
-```
-
-``` codeBlockStandalone_LlrK
-UDbConnection* Conn = UDbConnection::Builder()
-    ->WithUri(TEXT("https://maincloud.spacetimedb.com"))
-    ->WithDatabaseName(TEXT("my_database"))
-    ->WithToken(TEXT("your_auth_token_here"))
-    ->Build();
-```
-
-The token is sent to the server during connection and validates your
-identity. See the [SpacetimeAuth
-documentation](https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/) for
-details on obtaining and managing tokens.
-
-## Advancing the Connection
-
-Critical: C#, Unity, and Unreal Users
-
-In C# (including Unity), you **must** manually advance the connection to
-process incoming messages. In Unreal Engine, you must either manually
-advance the connection or enable automatic ticking. If the connection is
-not advanced, it will not process messages.
-
-Call `FrameTick()` in your game loop or update method:
-
-- C#
-- Unreal
-
-``` codeBlockStandalone_LlrK
-// In Unity, call this in your Update() method
-void Update()
-{
-    conn.FrameTick();
-}
-
-// Or in a console application, call this in your main loop
-while (running)
-{
-    conn.FrameTick();
-    // Your application logic...
-}
-```
-
-``` codeBlockStandalone_LlrK
-// Option 1: call FrameTick() from your Actor's Tick() method
-void AMyActor::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
-
-    if (Conn)
-    {
-        Conn->FrameTick();
-    }
-}
-
-// Option 2: enable automatic ticking once after building the connection
-Conn = Builder->Build();
-Conn->SetAutoTicking(true);
-```
-
-Failure to advance the connection means your client will not receive any
-updates from the server, including subscription data, reducer callbacks,
-or connection events.
-
-In Rust and TypeScript, the connection processes messages automatically
-via the browser's event loop or Node.js's event loop. No manual polling
-is required.
-
-## Connection Lifecycle
-
-### Connection Callbacks
-
-Register callbacks to observe connection state changes:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-const HOST = "https://maincloud.spacetimedb.com";
-const DB_NAME = "my_database";
-const TOKEN_KEY = `${HOST}/${DB_NAME}/auth_token`;
-
-const conn = DbConnection.builder()
-    .withUri(HOST)
-    .withDatabaseName(DB_NAME)
-    .onConnect((conn, identity, token) => {
-        console.log(`Connected! Identity: ${identity.toHexString()}`);
-        // Save token for reconnection — keyed per server/database
-        localStorage.setItem(TOKEN_KEY, token);
-    })
-    .onConnectError((_ctx, error) => {
-        console.error(`Connection failed:`, error);
-    })
-    .onDisconnect(() => {
-        console.log('Disconnected from SpacetimeDB');
-    });
-```
-
-``` codeBlockStandalone_LlrK
-var conn = DbConnection.Builder()
-    .WithUri("https://maincloud.spacetimedb.com")
-    .WithDatabaseName("my_database")
-    .OnConnect((conn, identity, token) =>
-    {
-        Console.WriteLine($"Connected! Identity: {identity}");
-        // Save token for reconnection
-    })
-    .OnConnectError((error) =>
-    {
-        Console.WriteLine($"Connection failed: {error}");
-    })
-    .OnDisconnect((conn, error) =>
-    {
-        if (error != null)
-        {
-            Console.WriteLine($"Disconnected with error: {error}");
-        }
-        else
-        {
-            Console.WriteLine("Disconnected normally");
-        }
-    })
-    .Build();
-```
-
-``` codeBlockStandalone_LlrK
-let conn = DbConnection::builder()
-    .with_uri("https://maincloud.spacetimedb.com")
-    .with_database_name("my_database")
-    .on_connect(|_ctx, _identity, token| {
-        println!("Connected! Saving token...");
-        // Save token for reconnection
-    })
-    .on_connect_error(|_ctx, error| {
-        eprintln!("Connection failed: {}", error);
-    })
-    .on_disconnect(|_ctx, error| {
-        if let Some(err) = error {
-            eprintln!("Disconnected with error: {}", err);
-        } else {
-            println!("Disconnected normally");
-        }
-    })
-    .build()
-    .expect("Failed to connect");
-```
-
-``` codeBlockStandalone_LlrK
-// Create delegates
-FOnConnectDelegate ConnectDelegate;
-BIND_DELEGATE_SAFE(ConnectDelegate, this, AMyActor, OnConnected);
-
-FOnConnectErrorDelegate ErrorDelegate;
-BIND_DELEGATE_SAFE(ErrorDelegate, this, AMyActor, OnConnectError);
-
-FOnDisconnectDelegate DisconnectDelegate;
-BIND_DELEGATE_SAFE(DisconnectDelegate, this, AMyActor, OnDisconnected);
-
-// Build connection with callbacks
-UDbConnection* Conn = UDbConnection::Builder()
-    ->WithUri(TEXT("https://maincloud.spacetimedb.com"))
-    ->WithDatabaseName(TEXT("my_database"))
-    ->OnConnect(ConnectDelegate)
-    ->OnConnectError(ErrorDelegate)
-    ->OnDisconnect(DisconnectDelegate)
-    ->Build();
-
-// Callback functions (must be UFUNCTION)
-UFUNCTION()
-void OnConnected(UDbConnection* Connection, FSpacetimeDBIdentity Identity, const FString& Token)
-{
-    UE_LOG(LogTemp, Log, TEXT("Connected! Identity: %s"), *Identity.ToHexString());
-    // Save token for reconnection
-}
-
-UFUNCTION()
-void OnConnectError(const FString& Error)
-{
-    UE_LOG(LogTemp, Error, TEXT("Connection failed: %s"), *Error);
-}
-
-UFUNCTION()
-void OnDisconnected(UDbConnection* Connection, const FString& Error)
-{
-    UE_LOG(LogTemp, Warning, TEXT("Disconnected from SpacetimeDB: %s"), *Error);
-}
-```
-
-### Disconnecting
-
-Explicitly close the connection when you're done:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-conn.disconnect();
-```
-
-``` codeBlockStandalone_LlrK
-conn.Disconnect();
-```
-
-``` codeBlockStandalone_LlrK
-conn.disconnect();
-```
-
-``` codeBlockStandalone_LlrK
-Conn->Disconnect();
-```
-
-### Reconnection Behavior
-
-Reconnection behavior
-
-Lower-level `DbConnection` objects do not reconnect themselves. If you
-create a `DbConnection` directly and the connection is interrupted,
-create a new `DbConnection` to re-establish connectivity. We recommend
-implementing reconnection logic in your application if reliable
-connectivity is critical.
-
-The TypeScript React, Solid, and Svelte providers manage their
-connections through the SDK's shared connection manager. While a
-provider is mounted, that manager automatically rebuilds unexpectedly
-closed connections with exponential backoff and re-checks connection
-liveness when the page becomes visible, regains focus, returns online,
-or is restored from the back-forward cache.
-
-## Connection Identity
-
-Every connection receives a unique
-[identity](https://spacetimedb.com/docs/intro/key-architecture#identity) from the server.
-Access it through the `on_connect` callback:
-
-- TypeScript
-- C#
-- Rust
-- Unreal
-
-``` codeBlockStandalone_LlrK
-.onConnect((conn, identity, token) => {
-    console.log(`Identity: ${identity.toHexString()}, ConnectionId: ${conn.connectionId}`);
-})
-```
-
-``` codeBlockStandalone_LlrK
-.OnConnect((conn, identity, token) =>
-{
-    var connectionId = conn.ConnectionId;
-    Console.WriteLine($"Identity: {identity}, ConnectionId: {connectionId}");
-})
-```
-
-``` codeBlockStandalone_LlrK
-.on_connect(|ctx, identity, token| {
-    let connection_id = ctx.connection_id();
-    println!("Identity: {:?}, ConnectionId: {:?}", identity, connection_id);
-})
-```
-
-``` codeBlockStandalone_LlrK
-UFUNCTION()
-void OnConnected(UDbConnection* Connection, FSpacetimeDBIdentity Identity, const FString& Token)
-{
-    FSpacetimeDBConnectionId ConnectionId = Connection->GetConnectionId();
-    UE_LOG(LogTemp, Log, TEXT("Identity: %s, ConnectionId: %s"),
-        *Identity.ToHexString(), *ConnectionId.ToHexString());
-}
-```
-
-The [identity](https://spacetimedb.com/docs/intro/key-architecture#identity) persists across
-connections and represents the user, while the [connection
-ID](https://spacetimedb.com/docs/intro/key-architecture#connectionid) is unique to each
-connection session.
-
-## Next Steps
-
-Now that you have a connection established, you can:
-
-- [Use the SDK API](https://spacetimedb.com/docs/clients/api) to interact with tables, invoke
-  reducers, and subscribe to data
-- Register callbacks for observing database changes
-- Call reducers and procedures on the server
-
-For language-specific details, see:
-
-- [Rust SDK Reference](https://spacetimedb.com/docs/clients/rust)
-- [C# SDK Reference](https://spacetimedb.com/docs/clients/c-sharp)
-- [TypeScript SDK Reference](https://spacetimedb.com/docs/clients/typescript)
-- [Unreal SDK Reference](https://spacetimedb.com/docs/clients/unreal)
-
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-core-concepts/clients/connection" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Connecting to SpacetimeDB | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/clients/connection"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Connecting to SpacetimeDB | SpacetimeDB docs"><meta data-rh="true" name="description" content="After generating client bindings for your module, you can establish a connection to your SpacetimeDB database from your client application. The DbConnection type provides a persistent WebSocket connection that enables real-time communication with the server."><meta data-rh="true" property="og:description" content="After generating client bindings for your module, you can establish a connection to your SpacetimeDB database from your client application. The DbConnection type provides a persistent WebSocket connection that enables real-time communication with the server."><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/clients/connection"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/connection" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/clients/connection" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Clients","item":"https://spacetimedb.com/docs/clients"},{"@type":"ListItem","position":2,"name":"Connecting to SpacetimeDB","item":"https://spacetimedb.com/docs/clients/connection"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/clients/connection">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/clients/connection">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Collapse sidebar category &#x27;Clients&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/codegen"><span title="Generating Client Bindings" class="linkLabel_UvDg">Generating Client Bindings</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/clients/connection"><span title="Connecting to SpacetimeDB" class="linkLabel_UvDg">Connecting to SpacetimeDB</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/api"><span title="SDK API Overview" class="linkLabel_UvDg">SDK API Overview</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" tabindex="0" href="/docs/clients/subscriptions"><span title="Subscriptions" class="categoryLinkLabel_HATI">Subscriptions</span></a><button aria-label="Expand sidebar category &#x27;Subscriptions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/rust"><span title="Rust Reference" class="linkLabel_UvDg">Rust Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/c-sharp"><span title="C# Reference" class="linkLabel_UvDg">C# Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/typescript"><span title="TypeScript Reference" class="linkLabel_UvDg">TypeScript Reference</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/clients/unreal"><span title="Unreal Reference" class="linkLabel_UvDg">Unreal Reference</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/clients"><span>Clients</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Connecting to SpacetimeDB</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Connecting to SpacetimeDB</h1></header><p>After <a class="" href="/docs/clients/codegen">generating client bindings</a> for your module, you can establish a connection to your SpacetimeDB <a class="" href="/docs/databases">database</a> from your client application. The <code>DbConnection</code> type provides a persistent WebSocket connection that enables real-time communication with the server.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h2>
+<p>Before connecting, ensure you have:</p>
+\<ol\>
+<li class=""><a class="" href="/docs/clients/codegen">Generated client bindings</a> for your module</li>
+<li class="">A published database running on SpacetimeDB (local or on <a class="" href="/docs/how-to/deploy/maincloud">MainCloud</a>)</li>
+<li class="">The database&#x27;s URI and name or identity</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="basic-connection">Basic Connection<a href="#basic-connection" class="hash-link" aria-label="Direct link to Basic Connection" title="Direct link to Basic Connection" translate="no">​</a></h2>
+<p>Create a connection using the <code>DbConnection</code> builder pattern:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { DbConnection } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">./module_bindings</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> SpacetimeDB</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">use</span><span style="color:#F8F8F2"> module_bindings</span><span style="color:#FF79C6">::</span><span style="color:#8BE9FD;font-style:italic">DbConnection</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://maincloud.spacetimedb.com"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_database_name</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"my_database"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">#include</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">ModuleBindings/DbConnection.h</span><span style="color:#E9F284">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> UDbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div></div></div>
+<p>Replace <code>"https://maincloud.spacetimedb.com"</code> with your SpacetimeDB host URI, and <code>"my_database"</code> with your database&#x27;s name or identity.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connecting-to-maincloud">Connecting to MainCloud<a href="#connecting-to-maincloud" class="hash-link" aria-label="Direct link to Connecting to MainCloud" title="Direct link to Connecting to MainCloud" translate="no">​</a></h3>
+<p>To connect to a database hosted on MainCloud:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://maincloud.spacetimedb.com"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_database_name</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"my_database"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> UDbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="authentication-with-tokens">Authentication with Tokens<a href="#authentication-with-tokens" class="hash-link" aria-label="Direct link to Authentication with Tokens" title="Direct link to Authentication with Tokens" translate="no">​</a></h2>
+<p>To authenticate with a token (for example, from <a class="" href="/docs/core-concepts/authentication/spacetimeauth/">SpacetimeAuth</a>), provide it when building the connection:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withToken</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">your_auth_token_here</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithToken</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">your_auth_token_here</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://maincloud.spacetimedb.com"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_database_name</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"my_database"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_token</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"your_auth_token_here"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> UDbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithToken</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">your_auth_token_here</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div></div></div>
+<p>The token is sent to the server during connection and validates your identity. See the <a class="" href="/docs/core-concepts/authentication/spacetimeauth/">SpacetimeAuth documentation</a> for details on obtaining and managing tokens.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="advancing-the-connection">Advancing the Connection<a href="#advancing-the-connection" class="hash-link" aria-label="Direct link to Advancing the Connection" title="Direct link to Advancing the Connection" translate="no">​</a></h2>
+<div class="theme-admonition theme-admonition-danger admonition_Ph9R alert alert--danger"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Critical: C#, Unity, and Unreal Users</div><div class="admonitionContent_STxx"><p>In C# (including Unity), you <strong>must</strong> manually advance the connection to process incoming messages. In Unreal Engine, you must either manually advance the connection or enable automatic ticking. If the connection is not advanced, it will not process messages.</p><p>Call <code>FrameTick()</code> in your game loop or update method:</p><div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// In Unity, call this in your Update() method</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> Update</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.</span><span style="color:#50FA7B">FrameTick</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Or in a console application, call this in your main loop</span></span>
+<span class="line"><span style="color:#FF79C6">while</span><span style="color:#F8F8F2"> (running)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    conn.</span><span style="color:#50FA7B">FrameTick</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#6272A4">    // Your application logic...</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Option 1: call FrameTick() from your Actor&#x27;s Tick() method</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#F8F8F2"> AMyActor</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Tick</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">float</span><span style="color:#FFB86C;font-style:italic"> DeltaTime</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    Super</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Tick</span><span style="color:#F8F8F2">(DeltaTime);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">    if</span><span style="color:#F8F8F2"> (Conn)</span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Conn</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">FrameTick</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">    }</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Option 2: enable automatic ticking once after building the connection</span></span>
+<span class="line"><span style="color:#F8F8F2">Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Builder</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#F8F8F2">Conn</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">SetAutoTicking</span><span style="color:#F8F8F2">(</span><span style="color:#BD93F9">true</span><span style="color:#F8F8F2">);</span></span></code></pre></div></div></div><p>Failure to advance the connection means your client will not receive any updates from the server, including subscription data, reducer callbacks, or connection events.</p></div></div>
+<p>In Rust and TypeScript, the connection processes messages automatically via the browser&#x27;s event loop or Node.js&#x27;s event loop. No manual polling is required.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="connection-lifecycle">Connection Lifecycle<a href="#connection-lifecycle" class="hash-link" aria-label="Direct link to Connection Lifecycle" title="Direct link to Connection Lifecycle" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="connection-callbacks">Connection Callbacks<a href="#connection-callbacks" class="hash-link" aria-label="Direct link to Connection Callbacks" title="Direct link to Connection Callbacks" translate="no">​</a></h3>
+<p>Register callbacks to observe connection state changes:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> HOST </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> DB_NAME </span><span style="color:#FF79C6">=</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> TOKEN_KEY </span><span style="color:#FF79C6">=</span><span style="color:#F1FA8C"> `</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">HOST</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">/</span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">DB_NAME</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">/auth_token`</span><span style="color:#F8F8F2">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF79C6">const</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withUri</span><span style="color:#F8F8F2">(HOST)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">withDatabaseName</span><span style="color:#F8F8F2">(DB_NAME)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">onConnect</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">conn</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">identity</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">token</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Connected! Identity: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">identity.</span><span style="color:#50FA7B">toHexString</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#6272A4">        // Save token for reconnection — keyed per server/database</span></span>
+<span class="line"><span style="color:#F8F8F2">        localStorage.</span><span style="color:#50FA7B">setItem</span><span style="color:#F8F8F2">(TOKEN_KEY, token);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">onConnectError</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">_ctx</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">error</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">error</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Connection failed:`</span><span style="color:#F8F8F2">, error);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">onDisconnect</span><span style="color:#F8F8F2">(() </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">        console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">&#x27;</span><span style="color:#F1FA8C">Disconnected from SpacetimeDB</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    });</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">var</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> DbConnection.</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">OnConnect</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">conn</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">identity</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">token</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Connected! Identity: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">identity</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#6272A4">        // Save token for reconnection</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">OnConnectError</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">error</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#F8F8F2">        Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Connection failed: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">error</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">OnDisconnect</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">conn</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">error</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">    {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#F8F8F2"> (error </span><span style="color:#FF79C6">!=</span><span style="color:#BD93F9"> null</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Disconnected with error: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">error</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#FF79C6">        else</span></span>
+<span class="line"><span style="color:#F8F8F2">        {</span></span>
+<span class="line"><span style="color:#F8F8F2">            Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Disconnected normally</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#F8F8F2">    .</span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">let</span><span style="color:#F8F8F2"> conn </span><span style="color:#FF79C6">=</span><span style="color:#8BE9FD;font-style:italic"> DbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_uri</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"https://maincloud.spacetimedb.com"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">with_database_name</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"my_database"</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">on_connect</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">_ctx, _identity, token</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Connected! Saving token..."</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#6272A4">        // Save token for reconnection</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">on_connect_error</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">_ctx, error</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">        eprintln!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Connection failed: {}"</span><span style="color:#F8F8F2">, error);</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">on_disconnect</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">_ctx, error</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">        if</span><span style="color:#FF79C6"> let</span><span style="color:#8BE9FD;font-style:italic"> Some</span><span style="color:#F8F8F2">(err) </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> error {</span></span>
+<span class="line"><span style="color:#50FA7B">            eprintln!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Disconnected with error: {}"</span><span style="color:#F8F8F2">, err);</span></span>
+<span class="line"><span style="color:#F8F8F2">        } </span><span style="color:#FF79C6">else</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#50FA7B">            println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Disconnected normally"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">        }</span></span>
+<span class="line"><span style="color:#F8F8F2">    })</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">build</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    .</span><span style="color:#50FA7B">expect</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Failed to connect"</span><span style="color:#F8F8F2">);</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#6272A4">// Create delegates</span></span>
+<span class="line"><span style="color:#F8F8F2">FOnConnectDelegate ConnectDelegate;</span></span>
+<span class="line"><span style="color:#50FA7B">BIND_DELEGATE_SAFE</span><span style="color:#F8F8F2">(ConnectDelegate, </span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, AMyActor, OnConnected);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">FOnConnectErrorDelegate ErrorDelegate;</span></span>
+<span class="line"><span style="color:#50FA7B">BIND_DELEGATE_SAFE</span><span style="color:#F8F8F2">(ErrorDelegate, </span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, AMyActor, OnConnectError);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F8F8F2">FOnDisconnectDelegate DisconnectDelegate;</span></span>
+<span class="line"><span style="color:#50FA7B">BIND_DELEGATE_SAFE</span><span style="color:#F8F8F2">(DisconnectDelegate, </span><span style="color:#BD93F9;font-style:italic">this</span><span style="color:#F8F8F2">, AMyActor, OnDisconnected);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Build connection with callbacks</span></span>
+<span class="line"><span style="color:#F8F8F2">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2"> Conn </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> UDbConnection</span><span style="color:#FF79C6">::</span><span style="color:#50FA7B">Builder</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithUri</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">https://maincloud.spacetimedb.com</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">WithDatabaseName</span><span style="color:#F8F8F2">(</span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">my_database</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">))</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">OnConnect</span><span style="color:#F8F8F2">(ConnectDelegate)</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">OnConnectError</span><span style="color:#F8F8F2">(ErrorDelegate)</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">OnDisconnect</span><span style="color:#F8F8F2">(DisconnectDelegate)</span></span>
+<span class="line"><span style="color:#FF79C6">    -></span><span style="color:#50FA7B">Build</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6272A4">// Callback functions (must be UFUNCTION)</span></span>
+<span class="line"><span style="color:#50FA7B">UFUNCTION</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> OnConnected</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#FFB86C;font-style:italic"> Connection</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">FSpacetimeDBIdentity</span><span style="color:#FFB86C;font-style:italic"> Identity</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> FString</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> Token</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Log, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Connected! Identity: </span><span style="color:#BD93F9">%s</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">Identity.</span><span style="color:#50FA7B">ToHexString</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#6272A4">    // Save token for reconnection</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">UFUNCTION</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> OnConnectError</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> FString</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> Error</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Error, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Connection failed: </span><span style="color:#BD93F9">%s</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">Error);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#50FA7B">UFUNCTION</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> OnDisconnected</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#FFB86C;font-style:italic"> Connection</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> FString</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> Error</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#50FA7B">    UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Warning, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Disconnected from SpacetimeDB: </span><span style="color:#BD93F9">%s</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">), </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">Error);</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="disconnecting">Disconnecting<a href="#disconnecting" class="hash-link" aria-label="Direct link to Disconnecting" title="Direct link to Disconnecting" translate="no">​</a></h3>
+<p>Explicitly close the connection when you&#x27;re done:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn.</span><span style="color:#50FA7B">disconnect</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn.</span><span style="color:#50FA7B">Disconnect</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">conn</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">disconnect</span><span style="color:#F8F8F2">();</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">Conn</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">Disconnect</span><span style="color:#F8F8F2">();</span></span></code></pre></div></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="reconnection-behavior">Reconnection Behavior<a href="#reconnection-behavior" class="hash-link" aria-label="Direct link to Reconnection Behavior" title="Direct link to Reconnection Behavior" translate="no">​</a></h3>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Reconnection behavior</div><div class="admonitionContent_STxx"><p>Lower-level <code>DbConnection</code> objects do not reconnect themselves. If you create a <code>DbConnection</code> directly and the connection is interrupted, create a new <code>DbConnection</code> to re-establish connectivity. We recommend implementing reconnection logic in your application if reliable connectivity is critical.</p><p>The TypeScript React, Solid, and Svelte providers manage their connections through the SDK&#x27;s shared connection manager. While a provider is mounted, that manager automatically rebuilds unexpectedly closed connections with exponential backoff and re-checks connection liveness when the page becomes visible, regains focus, returns online, or is restored from the back-forward cache.</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="connection-identity">Connection Identity<a href="#connection-identity" class="hash-link" aria-label="Direct link to Connection Identity" title="Direct link to Connection Identity" translate="no">​</a></h2>
+<p>Every connection receives a unique <a class="" href="/docs/intro/key-architecture#identity">identity</a> from the server. Access it through the <code>on_connect</code> callback:</p>
+<div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">TypeScript</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">Unreal</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI"><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">onConnect</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">conn</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">identity</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">token</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#F8F8F2">    console.</span><span style="color:#50FA7B">log</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">`Identity: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">identity.</span><span style="color:#50FA7B">toHexString</span><span style="color:#F8F8F2">()</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">, ConnectionId: </span><span style="color:#FF79C6">${</span><span style="color:#F8F8F2">conn.connectionId</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">`</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">})</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#F8F8F2">.</span><span style="color:#50FA7B">OnConnect</span><span style="color:#F8F8F2">((</span><span style="color:#FFB86C;font-style:italic">conn</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">identity</span><span style="color:#F8F8F2">, </span><span style="color:#FFB86C;font-style:italic">token</span><span style="color:#F8F8F2">) </span><span style="color:#FF79C6">=></span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#FF79C6">    var</span><span style="color:#F8F8F2"> connectionId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> conn.ConnectionId;</span></span>
+<span class="line"><span style="color:#F8F8F2">    Console.</span><span style="color:#50FA7B">WriteLine</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">$"</span><span style="color:#F1FA8C">Identity: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">identity</span><span style="color:#FF79C6">}</span><span style="color:#F1FA8C">, ConnectionId: </span><span style="color:#FF79C6">{</span><span style="color:#F8F8F2">connectionId</span><span style="color:#FF79C6">}</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">);</span></span>
+<span class="line"><span style="color:#F8F8F2">})</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">.</span><span style="color:#50FA7B">on_connect</span><span style="color:#F8F8F2">(</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2">ctx, identity, token</span><span style="color:#FF79C6">|</span><span style="color:#F8F8F2"> {</span></span>
+<span class="line"><span style="color:#FF79C6">    let</span><span style="color:#F8F8F2"> connection_id </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> ctx</span><span style="color:#FF79C6">.</span><span style="color:#50FA7B">connection_id</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#50FA7B">    println!</span><span style="color:#F8F8F2">(</span><span style="color:#F1FA8C">"Identity: {:?}, ConnectionId: {:?}"</span><span style="color:#F8F8F2">, identity, connection_id);</span></span>
+<span class="line"><span style="color:#F8F8F2">})</span></span></code></pre></div><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">UFUNCTION</span><span style="color:#F8F8F2">()</span></span>
+<span class="line"><span style="color:#FF79C6">void</span><span style="color:#50FA7B"> OnConnected</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">UDbConnection</span><span style="color:#FF79C6">*</span><span style="color:#FFB86C;font-style:italic"> Connection</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">FSpacetimeDBIdentity</span><span style="color:#FFB86C;font-style:italic"> Identity</span><span style="color:#F8F8F2">, </span><span style="color:#FF79C6">const</span><span style="color:#8BE9FD;font-style:italic"> FString</span><span style="color:#FF79C6">&</span><span style="color:#FFB86C;font-style:italic"> Token</span><span style="color:#F8F8F2">)</span></span>
+<span class="line"><span style="color:#F8F8F2">{</span></span>
+<span class="line"><span style="color:#F8F8F2">    FSpacetimeDBConnectionId ConnectionId </span><span style="color:#FF79C6">=</span><span style="color:#F8F8F2"> Connection</span><span style="color:#FF79C6">-></span><span style="color:#50FA7B">GetConnectionId</span><span style="color:#F8F8F2">();</span></span>
+<span class="line"><span style="color:#50FA7B">    UE_LOG</span><span style="color:#F8F8F2">(LogTemp, Log, </span><span style="color:#50FA7B">TEXT</span><span style="color:#F8F8F2">(</span><span style="color:#E9F284">"</span><span style="color:#F1FA8C">Identity: </span><span style="color:#BD93F9">%s</span><span style="color:#F1FA8C">, ConnectionId: </span><span style="color:#BD93F9">%s</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">),</span></span>
+<span class="line"><span style="color:#FF79C6">        *</span><span style="color:#F8F8F2">Identity.</span><span style="color:#50FA7B">ToHexString</span><span style="color:#F8F8F2">(), </span><span style="color:#FF79C6">*</span><span style="color:#F8F8F2">ConnectionId.</span><span style="color:#50FA7B">ToHexString</span><span style="color:#F8F8F2">());</span></span>
+<span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
+<p>The <a class="" href="/docs/intro/key-architecture#identity">identity</a> persists across connections and represents the user, while the <a class="" href="/docs/intro/key-architecture#connectionid">connection ID</a> is unique to each connection session.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+<p>Now that you have a connection established, you can:</p>
+\<ul\>
+<li class=""><a class="" href="/docs/clients/api">Use the SDK API</a> to interact with tables, invoke reducers, and subscribe to data</li>
+<li class="">Register callbacks for observing database changes</li>
+<li class="">Call reducers and procedures on the server</li>
+</ul>
+<p>For language-specific details, see:</p>
+\<ul\>
+<li class=""><a class="" href="/docs/clients/rust">Rust SDK Reference</a></li>
+<li class=""><a class="" href="/docs/clients/c-sharp">C# SDK Reference</a></li>
+<li class=""><a class="" href="/docs/clients/typescript">TypeScript SDK Reference</a></li>
+<li class=""><a class="" href="/docs/clients/unreal">Unreal SDK Reference</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00200-core-concepts/00600-clients/00300-connection.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/clients/codegen"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Generating Client Bindings</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/clients/api"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">SDK API Overview</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#prerequisites" class="table-of-contents__link toc-highlight">Prerequisites</a></li>\<li\><a href="#basic-connection" class="table-of-contents__link toc-highlight">Basic Connection</a>\<ul\>\<li\><a href="#connecting-to-maincloud" class="table-of-contents__link toc-highlight">Connecting to MainCloud</a></li></ul></li>\<li\><a href="#authentication-with-tokens" class="table-of-contents__link toc-highlight">Authentication with Tokens</a></li>\<li\><a href="#advancing-the-connection" class="table-of-contents__link toc-highlight">Advancing the Connection</a></li>\<li\><a href="#connection-lifecycle" class="table-of-contents__link toc-highlight">Connection Lifecycle</a>\<ul\>\<li\><a href="#connection-callbacks" class="table-of-contents__link toc-highlight">Connection Callbacks</a></li>\<li\><a href="#disconnecting" class="table-of-contents__link toc-highlight">Disconnecting</a></li>\<li\><a href="#reconnection-behavior" class="table-of-contents__link toc-highlight">Reconnection Behavior</a></li></ul></li>\<li\><a href="#connection-identity" class="table-of-contents__link toc-highlight">Connection Identity</a></li>\<li\><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

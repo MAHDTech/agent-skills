@@ -127,11 +127,11 @@ to indicate it is ready to begin normal operations:
 ```
 
 * The client **SHOULD NOT** send requests other than
-  [pings](https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/ping) before the server has responded to the
+  [pings](/specification/2025-03-26/basic/utilities/ping) before the server has responded to the
   `initialize` request.
 * The server **SHOULD NOT** send requests other than
-  [pings](https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/ping) and
-  [logging](https://modelcontextprotocol.io/specification/2025-03-26/server/utilities/logging) before receiving the `initialized`
+  [pings](/specification/2025-03-26/basic/utilities/ping) and
+  [logging](/specification/2025-03-26/server/utilities/logging) before receiving the `initialized`
   notification.
 
 #### Version Negotiation
@@ -153,17 +153,17 @@ available during the session.
 
 Key capabilities include:
 
-| Category | Capability     | Description                                                                               |
-| -------- | -------------- | ----------------------------------------------------------------------------------------- |
-| Client   | `roots`        | Ability to provide filesystem [roots](https://modelcontextprotocol.io/specification/2025-03-26/client/roots)             |
-| Client   | `sampling`     | Support for LLM [sampling](https://modelcontextprotocol.io/specification/2025-03-26/client/sampling) requests            |
-| Client   | `experimental` | Describes support for non-standard experimental features                                  |
-| Server   | `prompts`      | Offers [prompt templates](https://modelcontextprotocol.io/specification/2025-03-26/server/prompts)                       |
-| Server   | `resources`    | Provides readable [resources](https://modelcontextprotocol.io/specification/2025-03-26/server/resources)                 |
-| Server   | `tools`        | Exposes callable [tools](https://modelcontextprotocol.io/specification/2025-03-26/server/tools)                          |
-| Server   | `logging`      | Emits structured [log messages](https://modelcontextprotocol.io/specification/2025-03-26/server/utilities/logging)       |
-| Server   | `completions`  | Supports argument [autocompletion](https://modelcontextprotocol.io/specification/2025-03-26/server/utilities/completion) |
-| Server   | `experimental` | Describes support for non-standard experimental features                                  |
+| Category | Capability | Description |
+| - | - | - |
+| Client | `roots` | Ability to provide filesystem [roots](/specification/2025-03-26/client/roots) |
+| Client | `sampling` | Support for LLM [sampling](/specification/2025-03-26/client/sampling) requests |
+| Client | `experimental` | Describes support for non-standard experimental features |
+| Server | `prompts` | Offers [prompt templates](/specification/2025-03-26/server/prompts) |
+| Server | `resources` | Provides readable [resources](/specification/2025-03-26/server/resources) |
+| Server | `tools` | Exposes callable [tools](/specification/2025-03-26/server/tools) |
+| Server | `logging` | Emits structured [log messages](/specification/2025-03-26/server/utilities/logging) |
+| Server | `completions` | Supports argument [autocompletion](/specification/2025-03-26/server/utilities/completion) |
+| Server | `experimental` | Describes support for non-standard experimental features |
 
 Capability objects can describe sub-capabilities like:
 
@@ -189,7 +189,7 @@ mechanism should be used to signal connection termination:
 
 #### stdio
 
-For the stdio [transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports), the client **SHOULD** initiate
+For the stdio [transport](/specification/2025-03-26/basic/transports), the client **SHOULD** initiate
 shutdown by:
 
 1. First, closing the input stream to the child process (the server)
@@ -202,7 +202,7 @@ exiting.
 
 #### HTTP
 
-For HTTP [transports](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports), shutdown is indicated by closing the
+For HTTP [transports](/specification/2025-03-26/basic/transports), shutdown is indicated by closing the
 associated HTTP connection(s).
 
 ## Timeouts
@@ -210,14 +210,14 @@ associated HTTP connection(s).
 Implementations **SHOULD** establish timeouts for all sent requests, to prevent hung
 connections and resource exhaustion. When the request has not received a success or error
 response within the timeout period, the sender **SHOULD** issue a [cancellation
-notification](https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/cancellation) for that request and stop waiting for
+notification](/specification/2025-03-26/basic/utilities/cancellation) for that request and stop waiting for
 a response.
 
 SDKs and other middleware **SHOULD** allow these timeouts to be configured on a
 per-request basis.
 
 Implementations **MAY** choose to reset the timeout clock when receiving a [progress
-notification](https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/progress) corresponding to the request, as this
+notification](/specification/2025-03-26/basic/utilities/progress) corresponding to the request, as this
 implies that work is actually happening. However, implementations **SHOULD** always
 enforce a maximum timeout, regardless of progress notifications, to limit the impact of a
 misbehaving client or server.
@@ -246,3 +246,5 @@ Example initialization error:
   }
 }
 ```
+
+

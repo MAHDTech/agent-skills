@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1577                                                                            |
-| **Title**     | Sampling With Tools                                                             |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-09-30                                                                      |
-| **Author(s)** | Olivier Chafik ([@ochafik](https://github.com/ochafik))                         |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1577](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1577) |
+| Field | Value |
+| - | - |
+| **SEP** | 1577 |
+| **Title** | Sampling With Tools |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-09-30 |
+| **Author(s)** | Olivier Chafik ([@ochafik](https://github.com/ochafik)) |
+| **Sponsor** | None |
+| **PR** | [#1577](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1577) |
 
 ***
 
@@ -406,3 +406,5 @@ interface CreateMessageRequest {
     }
   }
 ```
+
+

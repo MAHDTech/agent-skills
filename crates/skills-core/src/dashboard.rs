@@ -21,7 +21,7 @@ use crate::parser::SkillParser;
 // Domain Models
 // -----------------------------------------------------------------------------
 
-/// Comprehensive telemetry summary across the entire skill catalog.
+/// Telemetry summary across the entire skill catalog.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TypedBuilder)]
 pub struct DashboardSummary {
     /// Total number of skills discovered in the catalog.

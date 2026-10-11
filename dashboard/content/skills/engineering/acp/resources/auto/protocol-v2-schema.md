@@ -498,6 +498,14 @@ See protocol docs: [Creating a Session](https://agentclientprotocol.com/protocol
   See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
 </ResponseField>
 
+<ResponseField name="availableCommands" type={<a href="#availablecommand">AvailableCommand[]</a>}>
+  Initial commands the agent can execute in this session.
+
+  Optional. Omitted or empty means no initial commands are advertised.
+  Senders MUST use an array, not `null`; receivers treat `null` like omission.
+  Later `available_commands_update` notifications replace this list.
+</ResponseField>
+
 <ResponseField name="configOptions" type={<a href="#sessionconfigoption">SessionConfigOption[]</a>}>
   Initial session configuration options.
 </ResponseField>
@@ -514,14 +522,18 @@ See protocol docs: [Creating a Session](https://agentclientprotocol.com/protocol
 
 Processes a user prompt within a session.
 
-This request accepts the prompt:
+Acceptance means insertion into the ACP conversation:
 
 * Receives user messages with optional context (files, images, etc.)
-* Returns once the prompt is accepted
+* Returns the inserted user message's ID without waiting for processing to finish
 
-After acceptance, the Agent reports the accepted user message,
-processing state, output, tool calls, and completion through
-`session/update` notifications.
+The Agent reports the user message with the same ID through `session/update`;
+this notification may arrive before or after the response. Processing state,
+output, tool calls, and completion are also reported through session updates.
+
+An error response means the user message was not inserted. Once it is
+inserted, the Agent MUST NOT answer with an error, even if the work fails
+before the response is sent; it ends that work with the `error` stop reason.
 
 See protocol docs: [Prompt Lifecycle](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle)
 
@@ -567,9 +579,10 @@ See protocol docs: [User Message](https://agentclientprotocol.com/protocol/v2/pr
 
 #### <span class="font-mono">PromptResponse</span>
 
-Response acknowledging that a user prompt was accepted.
+Response acknowledging that a user prompt was inserted into the ACP conversation.
 
-This response does not indicate that the agent has finished processing.
+This response does not indicate that the prompt was merely received or queued, nor that the
+agent has finished processing it.
 Processing and completion are reported through `state_update` session updates.
 
 See protocol docs: [Prompt Accepted](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#2-prompt-accepted)
@@ -586,6 +599,16 @@ See protocol docs: [Prompt Accepted](https://agentclientprotocol.com/protocol/v2
   See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
 </ResponseField>
 
+<ResponseField name="messageId" type={<a href="#messageid">MessageId</a>} required>
+  Identifies the user message inserted into the ACP conversation.
+
+  Required and non-null. Omission and explicit `null` are both invalid.
+
+  The corresponding user-message session update carries this same identifier and may arrive
+  before or after this response. Agents must echo the message during the live session, but are
+  not required to retain it. If retained and replayed, the message keeps this identifier.
+</ResponseField>
+
 <a id="session-resume" />
 
 ### <span class="font-mono">session/resume</span>
@@ -594,13 +617,13 @@ Resumes an existing session.
 
 The agent should resume the session context, allowing the conversation
 to continue. If `replayFrom` is set, the agent should replay
-conversation history before responding.
+retained conversation history before responding.
 
 #### <span class="font-mono">ResumeSessionRequest</span>
 
 Request parameters for resuming an existing session.
 
-Resumes an existing session and optionally replays prior conversation
+Resumes an existing session and optionally replays retained conversation
 history according to `replayFrom`.
 
 **Type:** Object
@@ -638,8 +661,8 @@ history according to `replayFrom`.
   Optional. Omitted or `null` both mean the Agent should resume without
   replaying previous conversation history. Replay cursors are inclusive:
   replay includes the position identified by the cursor. Supplying
-  `\{ "type": "start" \}` means the Agent should replay the whole
-  conversation before responding.
+  `\{ "type": "start" \}` means the Agent should replay all retained
+  conversation history before responding.
 </ResponseField>
 
 <ResponseField name="sessionId" type={<a href="#sessionid">SessionId</a>} required>
@@ -660,6 +683,14 @@ Response from resuming an existing session.
   these keys.
 
   See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+</ResponseField>
+
+<ResponseField name="availableCommands" type={<a href="#availablecommand">AvailableCommand[]</a>}>
+  Initial commands the agent can execute in this session.
+
+  Optional. Omitted or empty means no initial commands are advertised.
+  Senders MUST use an array, not `null`; receivers treat `null` like omission.
+  Later `available_commands_update` notifications replace this list.
 </ResponseField>
 
 <ResponseField name="configOptions" type={<a href="#sessionconfigoption">SessionConfigOption[]</a>}>
@@ -742,7 +773,7 @@ Request parameters for setting a session configuration option.
       future ACP variants.
     </ResponseField>
 
-    <ResponseField name="value" type={"object"} required>
+    <ResponseField name="value" type={"any"} required>
       Raw value payload for the custom or future value type.
     </ResponseField>
   </Expandable>
@@ -854,6 +885,36 @@ Elicitations are tied to a session (optionally a tool call) or a request.
       A JSON Schema describing the form fields to present to the user.
     </ResponseField>
   </Expandable>
+
+  **Alternatives (`anyOf`):**
+
+  <ResponseField name="Session">
+    Tied to a session, optionally to a specific tool call within that session.
+
+    <Expandable title="Properties">
+      <ResponseField name="sessionId" type={<a href="#sessionid">SessionId</a>} required>
+        The session this elicitation is tied to.
+      </ResponseField>
+
+      <ResponseField name="toolCallId" type={<><span><a href="#toolcallid">ToolCallId</a></span><span> | null</span></>}>
+        Optional tool call within the session.
+
+        Optional. Omitted and `null` are equivalent and mean the elicitation is scoped to the
+        session without a specific tool call.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="Request">
+    Tied to a specific JSON-RPC request outside of a session
+    (e.g., during auth/configuration phases before any session is started).
+
+    <Expandable title="Properties">
+      <ResponseField name="requestId" type={<a href="#requestid">RequestId</a>} required>
+        The request this elicitation is tied to.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
 </ResponseField>
 
 <ResponseField name="url" type="object">
@@ -874,6 +935,36 @@ Elicitations are tied to a session (optionally a tool call) or a request.
       * Format: `uri`
     </ResponseField>
   </Expandable>
+
+  **Alternatives (`anyOf`):**
+
+  <ResponseField name="Session">
+    Tied to a session, optionally to a specific tool call within that session.
+
+    <Expandable title="Properties">
+      <ResponseField name="sessionId" type={<a href="#sessionid">SessionId</a>} required>
+        The session this elicitation is tied to.
+      </ResponseField>
+
+      <ResponseField name="toolCallId" type={<><span><a href="#toolcallid">ToolCallId</a></span><span> | null</span></>}>
+        Optional tool call within the session.
+
+        Optional. Omitted and `null` are equivalent and mean the elicitation is scoped to the
+        session without a specific tool call.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="Request">
+    Tied to a specific JSON-RPC request outside of a session
+    (e.g., during auth/configuration phases before any session is started).
+
+    <Expandable title="Properties">
+      <ResponseField name="requestId" type={<a href="#requestid">RequestId</a>} required>
+        The request this elicitation is tied to.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
 </ResponseField>
 
 <ResponseField name="other" type="object">
@@ -896,6 +987,36 @@ Elicitations are tied to a session (optionally a tool call) or a request.
       future ACP variants.
     </ResponseField>
   </Expandable>
+
+  **Alternatives (`anyOf`):**
+
+  <ResponseField name="Session">
+    Tied to a session, optionally to a specific tool call within that session.
+
+    <Expandable title="Properties">
+      <ResponseField name="sessionId" type={<a href="#sessionid">SessionId</a>} required>
+        The session this elicitation is tied to.
+      </ResponseField>
+
+      <ResponseField name="toolCallId" type={<><span><a href="#toolcallid">ToolCallId</a></span><span> | null</span></>}>
+        Optional tool call within the session.
+
+        Optional. Omitted and `null` are equivalent and mean the elicitation is scoped to the
+        session without a specific tool call.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="Request">
+    Tied to a specific JSON-RPC request outside of a session
+    (e.g., during auth/configuration phases before any session is started).
+
+    <Expandable title="Properties">
+      <ResponseField name="requestId" type={<a href="#requestid">RequestId</a>} required>
+        The request this elicitation is tied to.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
 </ResponseField>
 
 #### <span class="font-mono">CreateElicitationResponse</span>
@@ -1324,9 +1445,9 @@ Optional annotations for the client. The client can use annotations to inform ho
   Relative importance of this content when clients choose what to surface.
 
   | Constraint | Value |
-  | ---------- | ----- |
-  | Minimum    | `0`   |
-  | Maximum    | `1`   |
+  | - | - |
+  | Minimum | `0` |
+  | Maximum | `1` |
 </ResponseField>
 
 ## <span class="font-mono">AudioContent</span>
@@ -1826,6 +1947,105 @@ Permission request details for a command.
 
 <ResponseField name="toolCallId" type={<><span><a href="#toolcallid">ToolCallId</a></span><span> | null</span></>}>
   The associated tool call, when known. Omitted and `null` are equivalent.
+</ResponseField>
+
+## <span class="font-mono">CompactionId</span>
+
+Unique identifier for a context compaction within a session.
+
+**Type:** `string`
+
+## <span class="font-mono">CompactionStatus</span>
+
+Lifecycle state of a context compaction.
+
+**Type:** Union
+
+<ResponseField name="in_progress" type="string">
+  Compaction has started and has not finished.
+</ResponseField>
+
+<ResponseField name="completed" type="string">
+  Compaction finished successfully.
+</ResponseField>
+
+<ResponseField name="failed" type="string">
+  Compaction finished unsuccessfully.
+</ResponseField>
+
+<ResponseField name="cancelled" type="string">
+  Compaction was cancelled before it finished.
+</ResponseField>
+
+<ResponseField name="other" type="string">
+  Custom or future compaction status.
+
+  Values beginning with `_` are reserved for implementation-specific
+  extensions. Other unknown values are reserved for future ACP statuses.
+</ResponseField>
+
+## <span class="font-mono">CompactionSummaryChunk</span>
+
+A content block appended to a compaction's summary. A first-seen ID creates
+an in-progress compaction. Chunks append in receive order.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  Metadata scoped to this chunk. Omission and `null` both mean absent.
+</ResponseField>
+
+<ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
+  ID of the compaction whose summary receives this content.
+</ResponseField>
+
+<ResponseField name="content" type={<a href="#contentblock">ContentBlock</a>} required>
+  One content block to append.
+</ResponseField>
+
+## <span class="font-mono">CompactionUpdate</span>
+
+A context compaction upsert. The first notification fixes the compaction's
+timeline position. Later updates with the same ID patch that entity in place.
+
+`summary`, `error`, and `_meta` have patch semantics: omission leaves the
+stored value unchanged, `null` clears it, and a concrete value replaces it.
+`summary: []` also clears the summary.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  Extensible metadata patch for this compaction.
+</ResponseField>
+
+<ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
+  The Agent-owned ID of this compaction, unique within the session.
+</ResponseField>
+
+<ResponseField name="error" type={"string | null"}>
+  Human-readable error details for the compaction.
+</ResponseField>
+
+<ResponseField name="status" type={<a href="#compactionstatus">CompactionStatus</a>} required>
+  Current lifecycle status.
+</ResponseField>
+
+<ResponseField
+  name="summary"
+  type={
+<>
+  <span>
+    <a href="#contentblock">ContentBlock[]</a>
+  </span>
+  <span> | null</span>
+</>
+}
+>
+  Complete replacement user-displayable summary content for the compaction.
 </ResponseField>
 
 ## <span class="font-mono">ConfigOptionUpdate</span>
@@ -3247,6 +3467,21 @@ and use the reserved range (-32000 to -32099) for protocol-specific errors.
   Other undefined error code.
 </ResponseField>
 
+## <span class="font-mono">ErrorStopReason</span>
+
+Details of a failure that ended active work.
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
+  The failure, as a JSON-RPC error object.
+
+  Optional. Omitted or `null` both mean the agent is not reporting failure details.
+  Agents SHOULD include it.
+</ResponseField>
+
 ## <span class="font-mono">ExtNotification</span>
 
 Allows the Agent to send an arbitrary notification that is not part of the ACP spec.
@@ -3351,9 +3586,13 @@ Theme an icon is designed for.
 
 The agent is ready to process a new prompt.
 
-**Type:** Object
+Agents SHOULD include a `stopReason` when the idle transition ends foreground
+work. An omitted, `null`, or malformed `stopReason` means the agent is not
+reporting one.
 
-**Properties:**
+**Type:** Union
+
+**Shared properties:**
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
@@ -3363,11 +3602,117 @@ The agent is ready to process a new prompt.
   See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
 </ResponseField>
 
-<ResponseField name="stopReason" type={<><span><a href="#stopreason">StopReason</a></span><span> | null</span></>}>
-  Indicates why foreground work stopped.
+<ResponseField name="stopReason" type={"string | null"}>
+  Why foreground work stopped. The value selects one of this type's variants, which may add fields of their own.
 
-  Optional. Omitted or `null` both mean the agent is not reporting a stop reason.
-  Agents SHOULD include this when the idle transition ends foreground work.
+  Optional. Omitted or `null` both mean the agent is not reporting a stop reason; a malformed value is treated the same way.
+
+  See protocol docs: [Stop Reasons](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#stop-reasons)
+</ResponseField>
+
+**Variants:**
+
+<ResponseField name="end_turn" type="object">
+  The active work ended successfully.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"end_turn"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="max_tokens" type="object">
+  The active work ended because the agent reached the maximum number of tokens.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"max_tokens"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="max_turn_requests" type="object">
+  The active work ended because the agent reached the maximum number of
+  allowed agent requests before returning idle.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"max_turn_requests"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="refusal" type="object">
+  The active work ended because the agent refused to continue. The user
+  prompt and everything that comes after it won't be included in the next
+  prompt, so this should be reflected in the UI.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"refusal"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cancelled" type="object">
+  Active session work was cancelled by the client via `session/cancel`.
+
+  Agents should report this stop reason on an idle `state_update` session update
+  when cancellation succeeds, even if cancellation causes exceptions in
+  underlying operations.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"cancelled"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="error" type="object">
+  The active work ended because something failed.
+
+  For work started by a prompt, this covers failures after the user message
+  was inserted; earlier failures are an error response to `session/prompt`.
+
+  <Expandable title="Properties">
+    <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
+      The failure, as a JSON-RPC error object.
+
+      Optional. Omitted or `null` both mean the agent is not reporting failure details.
+      Agents SHOULD include it.
+    </ResponseField>
+
+    <ResponseField name="stopReason" type={"string"} required>
+      The discriminator value. Must be `"error"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="other" type="object">
+  Custom or future stop reason.
+
+  Values beginning with `_` are reserved for implementation-specific
+  extensions. Unknown values that do not begin with `_` are reserved for
+  future ACP variants.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"string"} required>
+      Custom or future stop reason.
+
+      Values beginning with `_` are reserved for implementation-specific
+      extensions. Unknown values that do not begin with `_` are reserved for
+      future ACP variants.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="none" type="object">
+  No stop reason: `stopReason` is omitted or `null`.
+
+  <Expandable title="Properties">
+    <ResponseField name="stopReason" type={"null"} />
+  </Expandable>
 </ResponseField>
 
 ## <span class="font-mono">ImageContent</span>
@@ -3728,7 +4073,11 @@ An Internet media type identifying the format of protocol content.
 
 ## <span class="font-mono">MessageId</span>
 
-Unique identifier for a message within a session.
+Identifier for a message, unique among messages of the same type within a session.
+
+Each message type, such as user messages, agent messages, and agent thoughts,
+has its own ID space: messages of different types may share an ID and remain
+distinct messages.
 
 **Type:** `string`
 
@@ -3850,6 +4199,67 @@ Schema for multi-select (array) properties in an elicitation form.
   Optional title for the property.
 
   Optional. Omitted and `null` are equivalent and mean no title is provided.
+</ResponseField>
+
+## <span class="font-mono">Notice</span>
+
+Fire-and-forget information for the user.
+
+Notices are live events rather than session history. Agents must not rely on
+a notice being received, displayed, or seen by the user.
+No Client capability is required, and unsupported Clients may ignore notices.
+
+See RFD: [Session Notices](https://agentclientprotocol.com/rfds/session-notices)
+
+**Type:** Object
+
+**Properties:**
+
+<ResponseField name="_meta" type={"object | null"}>
+  Metadata scoped to this notice.
+
+  Omitted and `null` are equivalent and mean no metadata was supplied.
+</ResponseField>
+
+<ResponseField name="description" type={"string | null"}>
+  Optional plain-text detail or guidance.
+
+  Omitted and `null` are equivalent and mean no description was supplied.
+</ResponseField>
+
+<ResponseField name="severity" type={<a href="#noticeseverity">NoticeSeverity</a>} required>
+  Presentation severity hint.
+</ResponseField>
+
+<ResponseField name="title" type={"string"} required>
+  Required non-empty plain-text title that can stand alone.
+
+  * Min length: `1`
+</ResponseField>
+
+## <span class="font-mono">NoticeSeverity</span>
+
+Severity hint for a session notice.
+
+**Type:** Union
+
+<ResponseField name="info" type="string">
+  Informational notice.
+</ResponseField>
+
+<ResponseField name="warning" type="string">
+  Warning notice.
+</ResponseField>
+
+<ResponseField name="error" type="string">
+  Error notice.
+</ResponseField>
+
+<ResponseField name="other" type="string">
+  Custom or future notice severity.
+
+  Values beginning with `_` are reserved for implementation-specific
+  extensions. Other unknown values are reserved for future ACP severities.
 </ResponseField>
 
 ## <span class="font-mono">NumberPropertySchema</span>
@@ -4290,10 +4700,10 @@ Non-breaking changes should be introduced via capabilities.
 
 **Type:** `integer (uint16)`
 
-| Constraint | Value   |
-| ---------- | ------- |
-| Minimum    | `0`     |
-| Maximum    | `65535` |
+| Constraint | Value |
+| - | - |
+| Minimum | `0` |
+| Maximum | `65535` |
 
 ## <span class="font-mono">ReplayFrom</span>
 
@@ -4304,7 +4714,7 @@ Replay includes the position identified by the cursor.
 **Type:** Union
 
 <ResponseField name="start" type="object">
-  Replay the whole conversation from its first replayable entry.
+  Replay all retained conversation history from its first replayable entry.
 
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
@@ -4353,7 +4763,7 @@ Replay includes the position identified by the cursor.
 
 ## <span class="font-mono">ReplayFromStart</span>
 
-Inclusive replay cursor requesting replay from the start of the conversation.
+Inclusive replay cursor requesting replay from the start of retained conversation history.
 
 **Type:** Object
 
@@ -5287,6 +5697,193 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
       The discriminator value. Must be `"state_update"`.
     </ResponseField>
   </Expandable>
+
+  **Alternatives (`anyOf`):**
+
+  <ResponseField name="running" type="object">
+    Foreground work is in progress.
+
+    <Expandable title="Properties">
+      <ResponseField name="_meta" type={"object | null"}>
+        The \_meta property is reserved by ACP to allow clients and agents to attach additional
+        metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        these keys.
+
+        See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      </ResponseField>
+
+      <ResponseField name="state" type={"string"} required>
+        The discriminator value. Must be `"running"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="idle" type="object">
+    The agent is ready to process a new prompt.
+
+    <Expandable title="Properties">
+      <ResponseField name="_meta" type={"object | null"}>
+        The \_meta property is reserved by ACP to allow clients and agents to attach additional
+        metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        these keys.
+
+        See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      </ResponseField>
+
+      <ResponseField name="state" type={"string"} required>
+        The discriminator value. Must be `"idle"`.
+      </ResponseField>
+
+      <ResponseField name="stopReason" type={"string | null"}>
+        Why foreground work stopped. The value selects one of this type's variants, which may add fields of their own.
+
+        Optional. Omitted or `null` both mean the agent is not reporting a stop reason; a malformed value is treated the same way.
+
+        See protocol docs: [Stop Reasons](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#stop-reasons)
+      </ResponseField>
+    </Expandable>
+
+    **Alternatives (`anyOf`):**
+
+    <ResponseField name="end_turn" type="object">
+      The active work ended successfully.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"end_turn"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="max_tokens" type="object">
+      The active work ended because the agent reached the maximum number of tokens.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"max_tokens"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="max_turn_requests" type="object">
+      The active work ended because the agent reached the maximum number of
+      allowed agent requests before returning idle.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"max_turn_requests"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="refusal" type="object">
+      The active work ended because the agent refused to continue. The user
+      prompt and everything that comes after it won't be included in the next
+      prompt, so this should be reflected in the UI.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"refusal"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="cancelled" type="object">
+      Active session work was cancelled by the client via `session/cancel`.
+
+      Agents should report this stop reason on an idle `state_update` session update
+      when cancellation succeeds, even if cancellation causes exceptions in
+      underlying operations.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"cancelled"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="error" type="object">
+      The active work ended because something failed.
+
+      For work started by a prompt, this covers failures after the user message
+      was inserted; earlier failures are an error response to `session/prompt`.
+
+      <Expandable title="Properties">
+        <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
+          The failure, as a JSON-RPC error object.
+
+          Optional. Omitted or `null` both mean the agent is not reporting failure details.
+          Agents SHOULD include it.
+        </ResponseField>
+
+        <ResponseField name="stopReason" type={"string"} required>
+          The discriminator value. Must be `"error"`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="other" type="object">
+      Custom or future stop reason.
+
+      Values beginning with `_` are reserved for implementation-specific
+      extensions. Unknown values that do not begin with `_` are reserved for
+      future ACP variants.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"string"} required>
+          Custom or future stop reason.
+
+          Values beginning with `_` are reserved for implementation-specific
+          extensions. Unknown values that do not begin with `_` are reserved for
+          future ACP variants.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="none" type="object">
+      No stop reason: `stopReason` is omitted or `null`.
+
+      <Expandable title="Properties">
+        <ResponseField name="stopReason" type={"null"} />
+      </Expandable>
+    </ResponseField>
+  </ResponseField>
+
+  <ResponseField name="requires_action" type="object">
+    Foreground work is blocked on user action.
+
+    <Expandable title="Properties">
+      <ResponseField name="_meta" type={"object | null"}>
+        The \_meta property is reserved by ACP to allow clients and agents to attach additional
+        metadata to their interactions. Implementations MUST NOT make assumptions about values at
+        these keys.
+
+        See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      </ResponseField>
+
+      <ResponseField name="state" type={"string"} required>
+        The discriminator value. Must be `"requires_action"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="other" type="object">
+    Custom or future session state.
+
+    Values beginning with `_` are reserved for implementation-specific
+    extensions. Unknown values that do not begin with `_` are reserved for
+    future ACP variants.
+
+    <Expandable title="Properties">
+      <ResponseField name="state" type={"string"} required>
+        Custom or future session state.
+
+        Values beginning with `_` are reserved for implementation-specific
+        extensions. Unknown values that do not begin with `_` are reserved for
+        future ACP variants.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
 </ResponseField>
 
 <ResponseField name="tool_call_content_chunk" type="object">
@@ -5339,6 +5936,15 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
     <ResponseField name="locations" type={<><span><a href="#toolcalllocation">ToolCallLocation[]</a></span><span> | null</span></>}>
       File locations affected by this tool call.
       Enables "follow-along" features in clients.
+    </ResponseField>
+
+    <ResponseField name="name" type={"string | null"}>
+      Programmatic name of the tool being invoked.
+
+      This field is optional and has patch semantics. Omission means no
+      change, `null` clears the name, and a string replaces it. For a tool
+      call ID the client has not seen before, omission or `null` means that no
+      tool name is available.
     </ResponseField>
 
     <ResponseField name="rawInput" type={"object"}>
@@ -5563,6 +6169,103 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   </Expandable>
 </ResponseField>
 
+<ResponseField name="notice" type="object">
+  Information for the user that is not part of session history.
+
+  No Client capability is required. Clients that do not understand or
+  present notices may ignore them.
+
+  <Expandable title="Properties">
+    <ResponseField name="_meta" type={"object | null"}>
+      Metadata scoped to this notice.
+
+      Omitted and `null` are equivalent and mean no metadata was supplied.
+    </ResponseField>
+
+    <ResponseField name="description" type={"string | null"}>
+      Optional plain-text detail or guidance.
+
+      Omitted and `null` are equivalent and mean no description was supplied.
+    </ResponseField>
+
+    <ResponseField name="sessionUpdate" type={"string"} required>
+      The discriminator value. Must be `"notice"`.
+    </ResponseField>
+
+    <ResponseField name="severity" type={<a href="#noticeseverity">NoticeSeverity</a>} required>
+      Presentation severity hint.
+    </ResponseField>
+
+    <ResponseField name="title" type={"string"} required>
+      Required non-empty plain-text title that can stand alone.
+
+      * Min length: `1`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="compaction_update" type="object">
+  A context compaction has been created or updated.
+
+  <Expandable title="Properties">
+    <ResponseField name="_meta" type={"object | null"}>
+      Extensible metadata patch for this compaction.
+    </ResponseField>
+
+    <ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
+      The Agent-owned ID of this compaction, unique within the session.
+    </ResponseField>
+
+    <ResponseField name="error" type={"string | null"}>
+      Human-readable error details for the compaction.
+    </ResponseField>
+
+    <ResponseField name="sessionUpdate" type={"string"} required>
+      The discriminator value. Must be `"compaction_update"`.
+    </ResponseField>
+
+    <ResponseField name="status" type={<a href="#compactionstatus">CompactionStatus</a>} required>
+      Current lifecycle status.
+    </ResponseField>
+
+    <ResponseField
+      name="summary"
+      type={
+<>
+  <span>
+    <a href="#contentblock">ContentBlock[]</a>
+  </span>
+  <span> | null</span>
+</>
+}
+    >
+      Complete replacement user-displayable summary content for the compaction.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="compaction_summary_chunk" type="object">
+  A content block appended to a context compaction's retained summary.
+
+  <Expandable title="Properties">
+    <ResponseField name="_meta" type={"object | null"}>
+      Metadata scoped to this chunk. Omission and `null` both mean absent.
+    </ResponseField>
+
+    <ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
+      ID of the compaction whose summary receives this content.
+    </ResponseField>
+
+    <ResponseField name="content" type={<a href="#contentblock">ContentBlock</a>} required>
+      One content block to append.
+    </ResponseField>
+
+    <ResponseField name="sessionUpdate" type={"string"} required>
+      The discriminator value. Must be `"compaction_summary_chunk"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="other" type="object">
   Custom or future session update.
 
@@ -5628,13 +6331,119 @@ while `idle`. Those notifications do not change this state.
       The discriminator value. Must be `"idle"`.
     </ResponseField>
 
-    <ResponseField name="stopReason" type={<><span><a href="#stopreason">StopReason</a></span><span> | null</span></>}>
-      Indicates why foreground work stopped.
+    <ResponseField name="stopReason" type={"string | null"}>
+      Why foreground work stopped. The value selects one of this type's variants, which may add fields of their own.
 
-      Optional. Omitted or `null` both mean the agent is not reporting a stop reason.
-      Agents SHOULD include this when the idle transition ends foreground work.
+      Optional. Omitted or `null` both mean the agent is not reporting a stop reason; a malformed value is treated the same way.
+
+      See protocol docs: [Stop Reasons](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#stop-reasons)
     </ResponseField>
   </Expandable>
+
+  **Alternatives (`anyOf`):**
+
+  <ResponseField name="end_turn" type="object">
+    The active work ended successfully.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"end_turn"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="max_tokens" type="object">
+    The active work ended because the agent reached the maximum number of tokens.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"max_tokens"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="max_turn_requests" type="object">
+    The active work ended because the agent reached the maximum number of
+    allowed agent requests before returning idle.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"max_turn_requests"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="refusal" type="object">
+    The active work ended because the agent refused to continue. The user
+    prompt and everything that comes after it won't be included in the next
+    prompt, so this should be reflected in the UI.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"refusal"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="cancelled" type="object">
+    Active session work was cancelled by the client via `session/cancel`.
+
+    Agents should report this stop reason on an idle `state_update` session update
+    when cancellation succeeds, even if cancellation causes exceptions in
+    underlying operations.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"cancelled"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="error" type="object">
+    The active work ended because something failed.
+
+    For work started by a prompt, this covers failures after the user message
+    was inserted; earlier failures are an error response to `session/prompt`.
+
+    <Expandable title="Properties">
+      <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
+        The failure, as a JSON-RPC error object.
+
+        Optional. Omitted or `null` both mean the agent is not reporting failure details.
+        Agents SHOULD include it.
+      </ResponseField>
+
+      <ResponseField name="stopReason" type={"string"} required>
+        The discriminator value. Must be `"error"`.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="other" type="object">
+    Custom or future stop reason.
+
+    Values beginning with `_` are reserved for implementation-specific
+    extensions. Unknown values that do not begin with `_` are reserved for
+    future ACP variants.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"string"} required>
+        Custom or future stop reason.
+
+        Values beginning with `_` are reserved for implementation-specific
+        extensions. Unknown values that do not begin with `_` are reserved for
+        future ACP variants.
+      </ResponseField>
+    </Expandable>
+  </ResponseField>
+
+  <ResponseField name="none" type="object">
+    No stop reason: `stopReason` is omitted or `null`.
+
+    <Expandable title="Properties">
+      <ResponseField name="stopReason" type={"null"} />
+    </Expandable>
+  </ResponseField>
 </ResponseField>
 
 <ResponseField name="requires_action" type="object">
@@ -5671,49 +6480,6 @@ while `idle`. Those notifications do not change this state.
       future ACP variants.
     </ResponseField>
   </Expandable>
-</ResponseField>
-
-## <span class="font-mono">StopReason</span>
-
-Reasons why an agent stops active session work.
-
-See protocol docs: [Stop Reasons](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#stop-reasons)
-
-**Type:** Union
-
-<ResponseField name="end_turn" type="string">
-  The active work ended successfully.
-</ResponseField>
-
-<ResponseField name="max_tokens" type="string">
-  The active work ended because the agent reached the maximum number of tokens.
-</ResponseField>
-
-<ResponseField name="max_turn_requests" type="string">
-  The active work ended because the agent reached the maximum number of allowed
-  agent requests before returning idle.
-</ResponseField>
-
-<ResponseField name="refusal" type="string">
-  The active work ended because the agent refused to continue. The user prompt
-  and everything that comes after it won't be included in the next prompt, so
-  this should be reflected in the UI.
-</ResponseField>
-
-<ResponseField name="cancelled" type="string">
-  Active session work was cancelled by the client via `session/cancel`.
-
-  Agents should report this stop reason on an idle `state_update` session update
-  when cancellation succeeds, even if cancellation causes exceptions in
-  underlying operations.
-</ResponseField>
-
-<ResponseField name="other" type="string">
-  Custom or future stop reason.
-
-  Values beginning with `_` are reserved for implementation-specific
-  extensions. Unknown values that do not begin with `_` are reserved for
-  future ACP variants.
 </ResponseField>
 
 ## <span class="font-mono">StringFormat</span>
@@ -6389,6 +7155,15 @@ See protocol docs: [Tool Calls](https://agentclientprotocol.com/protocol/v2/tool
   Enables "follow-along" features in clients.
 </ResponseField>
 
+<ResponseField name="name" type={"string | null"}>
+  Programmatic name of the tool being invoked.
+
+  This field is optional and has patch semantics. Omission means no
+  change, `null` clears the name, and a string replaces it. For a tool
+  call ID the client has not seen before, omission or `null` means that no
+  tool name is available.
+</ResponseField>
+
 <ResponseField name="rawInput" type={"object"}>
   Raw input parameters sent to the tool.
 </ResponseField>
@@ -6535,3 +7310,6 @@ content.
 <ResponseField name="messageId" type={<a href="#messageid">MessageId</a>} required>
   A unique identifier for the message.
 </ResponseField>
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

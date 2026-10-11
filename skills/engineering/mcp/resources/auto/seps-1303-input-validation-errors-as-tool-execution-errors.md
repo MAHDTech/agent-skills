@@ -20,20 +20,20 @@
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                           |
-| ------------- | ------------------------------------------------------------------------------- |
-| **SEP**       | 1303                                                                            |
-| **Title**     | Input Validation Errors as Tool Execution Errors                                |
-| **Status**    | Final                                                                           |
-| **Type**      | Standards Track                                                                 |
-| **Created**   | 2025-08-05                                                                      |
-| **Author(s)** | [@fredericbarthelet](https://github.com/fredericbarthelet)                      |
-| **Sponsor**   | None                                                                            |
-| **PR**        | [#1303](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1303) |
+| Field | Value |
+| - | - |
+| **SEP** | 1303 |
+| **Title** | Input Validation Errors as Tool Execution Errors |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-08-05 |
+| **Author(s)** | [@fredericbarthelet](https://github.com/fredericbarthelet) |
+| **Sponsor** | None |
+| **PR** | [#1303](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1303) |
 
 ***
 
@@ -207,3 +207,4 @@ Servers implementing the clarified behavior will provide better model self-recov
 * [MCP Tools Error Handling Specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools#error-handling)
 * [Better MCP tools/call Error Responses: Help Your AI Recover Gracefully](https://dev.to/alpic/better-mcp-toolscall-error-responses-help-your-ai-recover-gracefully-15c7)
 * Related Issue: [https://github.com/modelcontextprotocol/typescript-sdk/pull/824](https://github.com/modelcontextprotocol/typescript-sdk/pull/824)
+

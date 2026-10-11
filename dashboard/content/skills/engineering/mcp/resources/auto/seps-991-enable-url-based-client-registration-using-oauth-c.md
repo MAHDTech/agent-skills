@@ -29,20 +29,20 @@ skill_name = "mcp"
   This SEP has reached Final status and is preserved as a historical record of
   the design as accepted. Changes made to the protocol after finalization are
   not reflected here. Refer to the [current
-  specification](https://modelcontextprotocol.io/specification/latest) and its changelog for authoritative
+  specification](/specification/latest) and its changelog for authoritative
   requirements.
 </Note>
 
-| Field         | Value                                                                                                             |
-| ------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **SEP**       | 991                                                                                                               |
-| **Title**     | Enable URL-based Client Registration using OAuth Client ID Metadata Documents                                     |
-| **Status**    | Final                                                                                                             |
-| **Type**      | Standards Track                                                                                                   |
-| **Created**   | 2025-07-07                                                                                                        |
+| Field | Value |
+| - | - |
+| **SEP** | 991 |
+| **Title** | Enable URL-based Client Registration using OAuth Client ID Metadata Documents |
+| **Status** | Final |
+| **Type** | Standards Track |
+| **Created** | 2025-07-07 |
 | **Author(s)** | Paul Carleton ([@pcarleton](https://github.com/pcarleton)) Aaron Parecki ([@aaronpk](https://github.com/aaronpk)) |
-| **Sponsor**   | None                                                                                                              |
-| **PR**        | [#991](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/991)                                     |
+| **Sponsor** | None |
+| **PR** | [#991](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/991) |
 
 ***
 
@@ -314,3 +314,5 @@ A prototype implementation is available [here](https://github.com/modelcontextpr
 * [RFC 7591 - OAuth 2.0 Dynamic Client Registration](https://www.rfc-editor.org/rfc/rfc7591.html)
 * [MCP Specification - Authorization](https://modelcontextprotocol.org/docs/spec/authorization)
 * [Evolving OAuth Client Registration in the Model Context Protocol](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1027/)
+
+

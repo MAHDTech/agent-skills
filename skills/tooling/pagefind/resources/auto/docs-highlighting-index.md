@@ -45,4 +45,5 @@ To opt-in, import `/pagefind/pagefind-highlight.js` on all pages of your site an
 
 Ensure that the `highlightParam` configured here matches the `highlightParam` given to Pagefind when searching.
 
-To see all options available to PagefindHighlight, see [Highlight Config](https://pagefind.app/docs/highlight-config/).
+To see all options available to PagefindHighlight, see [Highlight Config](/docs/highlight-config/).
+

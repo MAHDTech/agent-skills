@@ -1,192 +1,109 @@
-Version: 2.0.0
-
-On this page
-
-A local database instance (as started by `spacetime start`) can be
-configured in `{data-dir}/config.toml`, where `{data-dir}` is the
-database's data directory. This directory is printed when you run
-`spacetime start`:
-
-``` shiki
-spacetimedb-standalone version: 1.0.0
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-resources/reference/cli-reference/standalone-config" data-has-hydrated="false">
+\<head\>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Standalone Configuration | SpacetimeDB docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://spacetimedb.com/docs/cli-reference/standalone-config"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Standalone Configuration | SpacetimeDB docs"><meta data-rh="true" name="description" content="A local database instance (as started by spacetime start) can be configured in /config.toml, where {data-dir} is the database&#x27;s data directory. This directory is printed when you run spacetime start:"><meta data-rh="true" property="og:description" content="A local database instance (as started by spacetime start) can be configured in /config.toml, where {data-dir} is the database&#x27;s data directory. This directory is printed when you run spacetime start:"><link data-rh="true" rel="icon" href="https://spacetimedb.com/favicon-32x32.png"><link data-rh="true" rel="canonical" href="https://spacetimedb.com/docs/cli-reference/standalone-config"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/cli-reference/standalone-config" hreflang="en"><link data-rh="true" rel="alternate" href="https://spacetimedb.com/docs/cli-reference/standalone-config" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"CLI Reference","item":"https://spacetimedb.com/docs/cli-reference"},{"@type":"ListItem","position":2,"name":"Standalone Configuration","item":"https://spacetimedb.com/docs/cli-reference/standalone-config"}]}</script><link rel="alternate" type="text/markdown" title="SpacetimeDB docs for agents" href="/docs/llms.txt">
+<link rel="alternate" type="text/markdown" title="Full SpacetimeDB docs for agents" href="/docs/llms-full.txt">
+<link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
+<link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
+<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
+<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;">\<defs\>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+\<script\>document.documentElement.setAttribute("data-theme","light"),document.documentElement.setAttribute("data-theme-choice","light"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_M6kL" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a href="https://spacetimedb.com" target="_self" rel="noopener noreferrer" class="navbar__brand"><div class="navbar__logo"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--light_Du4S" height="32" width="133"><img src="https://spacetimedb.com/images/brand.svg" alt="Spacetime Logo" class="themedComponent_J5mh themedComponent--dark_W6YC" height="32" width="133"></div></a><div class="navbarSearchContainer_NRqO"><div id="inkeep-shadowradix-:Rnb5a5:" style="display:contents"></div><span></span></div><div class="navbar__item dropdown dropdown--hoverable"><a aria-current="page" class="navbar__link active" aria-haspopup="true" aria-expanded="false" role="button" href="/docs/cli-reference/standalone-config">2.0.0</a><ul class="dropdown__menu">\<li\><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/cli-reference/standalone-config">2.0.0</a></li>\<li\><a class="dropdown__link" href="/docs/1.12.0/cli-reference/standalone-config">1.12.0</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://spacetimedb.com/install" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Install</a><a href="https://spacetimedb.com/pricing" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Pricing</a><a href="https://spacetimedb.com/blog" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Blog</a><a href="https://spacetimedb.com/community" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Community</a><a href="https://spacetimedb.com/space-race" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Referrals</a><a href="https://spacetimedb.com/login" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link navbar__button">Login</a></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_zieo"><div class="docsWrapper_LRYd"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_uRlU" type="button"></button><div class="docRoot_xHAI"><aside class="theme-doc-sidebar-container docSidebarContainer_izyX"><div class="sidebarViewport_fAk8"><div class="sidebar_mXBm"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_xs3F"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item sidebar-ask-ai"><a class="menu__link" href="/docs/ask-ai/ask-ai"><span title="Ask AI Chat" class="linkLabel_UvDg">Ask AI Chat</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><div class="spacetime-menu-header">Intro</div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/"><span title="Getting Started" class="linkLabel_UvDg">Getting Started</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/what-is-spacetimedb"><span title="What is SpacetimeDB?" class="linkLabel_UvDg">What is SpacetimeDB?</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/zen"><span title="The Zen of Spacetime" class="linkLabel_UvDg">The Zen of Spacetime</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/language-support"><span title="Language Support" class="linkLabel_UvDg">Language Support</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/key-architecture"><span title="Key Architecture" class="linkLabel_UvDg">Key Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/intro/faq"><span title="FAQ" class="linkLabel_UvDg">FAQ</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/quickstarts/react"><span title="Quickstarts" class="categoryLinkLabel_HATI">Quickstarts</span></a><button aria-label="Expand sidebar category &#x27;Quickstarts&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tutorials/chat-app"><span title="Tutorials" class="categoryLinkLabel_HATI">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/core-concepts"><span title="Core Concepts" class="linkLabel_UvDg">Core Concepts</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/databases"><span title="Databases" class="categoryLinkLabel_HATI">Databases</span></a><button aria-label="Expand sidebar category &#x27;Databases&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/functions"><span title="Functions" class="categoryLinkLabel_HATI">Functions</span></a><button aria-label="Expand sidebar category &#x27;Functions&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/tables"><span title="Tables" class="categoryLinkLabel_HATI">Tables</span></a><button aria-label="Expand sidebar category &#x27;Tables&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/core-concepts/authentication"><span title="Authentication" class="categoryLinkLabel_HATI">Authentication</span></a><button aria-label="Expand sidebar category &#x27;Authentication&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist" href="/docs/clients"><span title="Clients" class="categoryLinkLabel_HATI">Clients</span></a><button aria-label="Expand sidebar category &#x27;Clients&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item spacetime-menu-header-link"><a class="menu__link" href="/docs/resources"><span title="Developer Resources" class="linkLabel_UvDg">Developer Resources</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/troubleshooting"><span title="Basic troubleshooting" class="linkLabel_UvDg">Basic troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/upgrade"><span title="Migrating from 1.0 to 2.0" class="linkLabel_UvDg">Migrating from 1.0 to 2.0</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/docs/troubleshooting"><span title="How To" class="categoryLinkLabel_HATI">How To</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/docs/cli-reference"><span title="References" class="categoryLinkLabel_HATI">References</span></a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/cli-reference"><span title="CLI Reference" class="categoryLinkLabel_HATI">CLI Reference</span></a><button aria-label="Collapse sidebar category &#x27;CLI Reference&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/cli-reference/standalone-config"><span title="Standalone Configuration" class="linkLabel_UvDg">Standalone Configuration</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-3 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/cli-reference/spacetime-json"><span title="spacetime.json" class="linkLabel_UvDg">spacetime.json</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/resources/mcp"><span title="MCP Reference" class="linkLabel_UvDg">MCP Reference</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/http/authorization"><span title="HTTP API" class="categoryLinkLabel_HATI">HTTP API</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_iWzw menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/webassembly-abi"><span title="Internals" class="categoryLinkLabel_HATI">Internals</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/reference/sql"><span title="SQL Reference" class="linkLabel_UvDg">SQL Reference</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_dsjb"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_TFty"><div class="docItemContainer_LO0A">\<article\><nav class="theme-doc-breadcrumbs breadcrumbsContainer_EWVV" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_i5pl"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">References</span></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/cli-reference"><span>CLI Reference</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Standalone Configuration</span></li></ul></nav><span class="theme-doc-version-badge badge badge--secondary">Version: 2.0.0</span><div class="tocCollapsible_ldQs theme-doc-toc-mobile tocMobile_xBih"><button type="button" class="clean-btn tocCollapsibleButton_Dk1U">On this page</button></div><div class="theme-doc-markdown markdown">\<header\>\<h1\>Standalone Configuration</h1></header><p>A local database instance (as started by <code>spacetime start</code>) can be configured in <code>{data-dir}/config.toml</code>, where <code>{data-dir}</code> is the database&#x27;s data directory. This directory is printed when you run <code>spacetime start</code>:</p>
+<pre class="shiki"><span>spacetimedb-standalone version: 1.0.0
 spacetimedb-standalone path: /home/user/.local/share/spacetime/bin/1.0.0/spacetimedb-standalone
-database running in data directory /home/user/.local/share/spacetime/data
-```
-
-On Linux and macOS, this directory is by default
-`~/.local/share/spacetime/data`. On Windows, it's
-`%LOCALAPPDATA%\SpacetimeDB\data`.
-
-## `config.toml`
-
-- [`certificate-authority`](#certificate-authority)
-
-- [`logs`](#logs)
-
-- [`module-http`](#module-http)
-
-- [`commitlog`](#commitlog)
-
-- [`websocket`](#websocket)
-
-### `certificate-authority`
-
-``` codeBlockStandalone_LlrK
-[certificate-authority]
-jwt-priv-key-path = "/path/to/id_ecdsas"
-jwt-pub-key-path = "/path/to/id_ecdsas.pub"
-```
-
-The `certificate-authority` table lets you configure the public and
-private keys used by the database to sign tokens.
-
-### `module-http`
-
-``` codeBlockStandalone_LlrK
-[module-http]
-enabled = false
-```
-
-The `module-http` table controls outbound HTTP requests initiated by
-database modules. Requests are enabled by default. Setting `enabled` to
-`false` blocks outbound requests from procedures and module HTTP
-handlers. Inbound HTTP handlers remain unaffected. Changing this setting
-requires restarting the server.
-
-### `logs`
-
-``` codeBlockStandalone_LlrK
-[logs]
-level = "error"
-directives = [
-    "spacetimedb=warn",
-    "spacetimedb_standalone=info",
-]
-```
-
-#### `logs.level`
-
-Can be one of `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`, or
-`"off"`, case-insensitive. Only log messages of the specified level or
-higher will be output; e.g. if set to `warn`, only `error` and
-`warn`-level messages will be logged.
-
-#### `logs.directives`
-
-A list of filtering directives controlling what messages get logged,
-which overwrite the global [`logs.level`](#logslevel). See
-[`tracing documentation`](https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/filter/struct.EnvFilter.html#directives)
-for syntax. Note that this is primarily intended as a debugging tool,
-and log message fields and targets are not considered stable.
-
-### `commitlog`
-
-``` codeBlockStandalone_LlrK
-[commitlog]
-log-format-version = 1
-max-segment-size = 1073741824 # 1GiB
-offset-index-interval-bytes = 4096
-offset-index-require-segment-fsync = true
-preallocate-segments = false
-write-buffer-size = 131072 # 128KiB
-```
-
-The `commitlog` table configures local durability. These settings are
-advanced and may affect recovery behavior, disk usage, memory usage, and
-write throughput. Omitted fields use the server's built-in defaults.
-
-#### `commitlog.log-format-version`
-
-The maximum supported commitlog format version, also used for writing.
-
-caution
-
-This setting should not normally be changed from the commitlog crate's
-default. A reason to change it could be to make the server accept an
-older, incompatible commitlog.
-
-#### `commitlog.max-segment-size`
-
-The maximum size in bytes to which commitlog segments should be allowed
-to grow.
-
-#### `commitlog.offset-index-interval-bytes`
-
-Number of bytes written to the commitlog after which an entry is added
-to the offset index.
-
-#### `commitlog.offset-index-require-segment-fsync`
-
-If `true`, require that the segment must be synced to disk before an
-index entry is added.
-
-Setting this to `false` will update the index every
-`offset-index-interval-bytes`, even if the commitlog was not synced.
-This means that the index could contain non-existent entries in the
-event of a crash.
-
-Setting this to `true` will update the index when the commitlog is
-synced, and `offset-index-interval-bytes` have been written. This means
-that the index could contain fewer index entries than strictly every
-`offset-index-interval-bytes`.
-
-note
-
-The commitlog operates correctly under both settings, but the choice can
-have performance implications.
-
-#### `commitlog.preallocate-segments`
-
-If `true`, preallocate disk space for commitlog segments up to
-`commitlog.max-segment-size`. This has no effect unless commitlog
-fallocate support is enabled.
-
-#### `commitlog.write-buffer-size`
-
-Size in bytes of the memory buffer holding commit data before flushing
-to storage.
-
-### `websocket`
-
-``` codeBlockStandalone_LlrK
-[websocket]
-ping-interval = "15s"
-idle-timeout = "30s"
-close-handshake-timeout = "250ms"
-incoming-queue-length = 2048
-```
-
-#### `websocket.ping-interval`
-
-Interval at which the server will send `Ping` frames to keep the
-connection alive. Should be smaller than `websocket.idle-timeout` to be
-effective.
-
-Values are strings of any format the
-[`humantime`](https://crates.io/crates/humantime) crate can parse.
-
-#### `websocket.idle-timeout`
-
-If the server hasn't received any data from the client (including `Pong`
-responses to previous `Ping`s it sent), it will consider the client
-unresponsive and close the connection. Should be greater than
-`websocket.ping-interval` to be effective.
-
-Values are strings of any format the
-[`humantime`](https://crates.io/crates/humantime) crate can parse.
-
-#### `websocket.close-handshake-timeout`
-
-Time the server waits for the client to respond to a graceful connection
-close. If the client doesn't respond within this timeout, the connection
-is dropped.
-
-Values are strings of any format the
-[`humantime`](https://crates.io/crates/humantime) crate can parse.
-
-#### `websocket.incoming-queue-length`
-
-Maximum number of client messages the server will queue up in case it is
-not able to process them quickly enough. When the queue length exceeds
-this value, the server will start disconnecting clients. Note that the
-limit is per client, not across all clients of a particular database.
+database running in data directory <b>/home/user/.local/share/spacetime/data</b></span></pre>
+<p>On Linux and macOS, this directory is by default <code>~/.local/share/spacetime/data</code>. On Windows, it&#x27;s <code>%LOCALAPPDATA%\SpacetimeDB\data</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="configtoml"><code>config.toml</code><a href="#configtoml" class="hash-link" aria-label="Direct link to configtoml" title="Direct link to configtoml" translate="no">​</a></h2>
+\<ul\>
+<li class="">
+<p><a href="#certificate-authority" class=""><code>certificate-authority</code></a></p>
+</li>
+<li class="">
+<p><a href="#logs" class=""><code>logs</code></a></p>
+</li>
+<li class="">
+<p><a href="#module-http" class=""><code>module-http</code></a></p>
+</li>
+<li class="">
+<p><a href="#commitlog" class=""><code>commitlog</code></a></p>
+</li>
+<li class="">
+<p><a href="#websocket" class=""><code>websocket</code></a></p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="certificate-authority"><code>certificate-authority</code><a href="#certificate-authority" class="hash-link" aria-label="Direct link to certificate-authority" title="Direct link to certificate-authority" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">certificate-authority</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">jwt-priv-key-path</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">/path/to/id_ecdsas</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">jwt-pub-key-path</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">/path/to/id_ecdsas.pub</span><span style="color:#E9F284">"</span></span></code></pre>
+<p>The <code>certificate-authority</code> table lets you configure the public and private keys used by the database to sign tokens.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="module-http"><code>module-http</code><a href="#module-http" class="hash-link" aria-label="Direct link to module-http" title="Direct link to module-http" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">module-http</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">enabled</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> false</span></span></code></pre>
+<p>The <code>module-http</code> table controls outbound HTTP requests initiated by database modules. Requests are enabled by default.
+Setting <code>enabled</code> to <code>false</code> blocks outbound requests from procedures and module HTTP handlers. Inbound HTTP handlers remain unaffected.
+Changing this setting requires restarting the server.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="logs"><code>logs</code><a href="#logs" class="hash-link" aria-label="Direct link to logs" title="Direct link to logs" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">logs</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">level</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">error</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">directives</span><span style="color:#FF79C6"> =</span><span style="color:#F8F8F2"> [</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">spacetimedb=warn</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#E9F284">    "</span><span style="color:#F1FA8C">spacetimedb_standalone=info</span><span style="color:#E9F284">"</span><span style="color:#F8F8F2">,</span></span>
+<span class="line"><span style="color:#F8F8F2">]</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="logslevel"><code>logs.level</code><a href="#logslevel" class="hash-link" aria-label="Direct link to logslevel" title="Direct link to logslevel" translate="no">​</a></h4>
+<p>Can be one of <code>"error"</code>, <code>"warn"</code>, <code>"info"</code>, <code>"debug"</code>, <code>"trace"</code>, or <code>"off"</code>, case-insensitive. Only log messages of the specified level or higher will be output; e.g. if set to <code>warn</code>, only <code>error</code> and <code>warn</code>-level messages will be logged.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="logsdirectives"><code>logs.directives</code><a href="#logsdirectives" class="hash-link" aria-label="Direct link to logsdirectives" title="Direct link to logsdirectives" translate="no">​</a></h4>
+<p>A list of filtering directives controlling what messages get logged, which overwrite the global <a href="#logslevel" class=""><code>logs.level</code></a>. See <a href="https://docs.rs/tracing-subscriber/0.3/tracing_subscriber/filter/struct.EnvFilter.html#directives" target="_blank" rel="noopener noreferrer" class=""><code>tracing documentation</code></a> for syntax. Note that this is primarily intended as a debugging tool, and log message fields and targets are not considered stable.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlog"><code>commitlog</code><a href="#commitlog" class="hash-link" aria-label="Direct link to commitlog" title="Direct link to commitlog" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">commitlog</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">log-format-version</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 1</span></span>
+<span class="line"><span style="color:#8BE9FD">max-segment-size</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 1073741824</span><span style="color:#6272A4"> # 1GiB</span></span>
+<span class="line"><span style="color:#8BE9FD">offset-index-interval-bytes</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 4096</span></span>
+<span class="line"><span style="color:#8BE9FD">offset-index-require-segment-fsync</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> true</span></span>
+<span class="line"><span style="color:#8BE9FD">preallocate-segments</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> false</span></span>
+<span class="line"><span style="color:#8BE9FD">write-buffer-size</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 131072</span><span style="color:#6272A4"> # 128KiB</span></span></code></pre>
+<p>The <code>commitlog</code> table configures local durability. These settings are advanced and may affect recovery behavior, disk usage, memory usage, and write throughput. Omitted fields use the server&#x27;s built-in defaults.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitloglog-format-version"><code>commitlog.log-format-version</code><a href="#commitloglog-format-version" class="hash-link" aria-label="Direct link to commitloglog-format-version" title="Direct link to commitloglog-format-version" translate="no">​</a></h4>
+<p>The maximum supported commitlog format version, also used for writing.</p>
+<div class="theme-admonition theme-admonition-caution admonition_Ph9R alert alert--warning"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</div><div class="admonitionContent_STxx"><p>This setting should not normally be changed from the commitlog crate&#x27;s default. A reason to change it could be to make the server accept an older, incompatible commitlog.</p></div></div>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlogmax-segment-size"><code>commitlog.max-segment-size</code><a href="#commitlogmax-segment-size" class="hash-link" aria-label="Direct link to commitlogmax-segment-size" title="Direct link to commitlogmax-segment-size" translate="no">​</a></h4>
+<p>The maximum size in bytes to which commitlog segments should be allowed to grow.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlogoffset-index-interval-bytes"><code>commitlog.offset-index-interval-bytes</code><a href="#commitlogoffset-index-interval-bytes" class="hash-link" aria-label="Direct link to commitlogoffset-index-interval-bytes" title="Direct link to commitlogoffset-index-interval-bytes" translate="no">​</a></h4>
+<p>Number of bytes written to the commitlog after which an entry is added to the offset index.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlogoffset-index-require-segment-fsync"><code>commitlog.offset-index-require-segment-fsync</code><a href="#commitlogoffset-index-require-segment-fsync" class="hash-link" aria-label="Direct link to commitlogoffset-index-require-segment-fsync" title="Direct link to commitlogoffset-index-require-segment-fsync" translate="no">​</a></h4>
+<p>If <code>true</code>, require that the segment must be synced to disk before an index entry is added.</p>
+<p>Setting this to <code>false</code> will update the index every <code>offset-index-interval-bytes</code>, even if the commitlog was not synced. This means that the index could contain non-existent entries in the event of a crash.</p>
+<p>Setting this to <code>true</code> will update the index when the commitlog is synced, and <code>offset-index-interval-bytes</code> have been written. This means that the index could contain fewer index entries than strictly every <code>offset-index-interval-bytes</code>.</p>
+<div class="theme-admonition theme-admonition-note admonition_Ph9R alert alert--secondary"><div class="admonitionHeading_kG9t"><span class="admonitionIcon_VA_f"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_STxx"><p>The commitlog operates correctly under both settings, but the choice can have performance implications.</p></div></div>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlogpreallocate-segments"><code>commitlog.preallocate-segments</code><a href="#commitlogpreallocate-segments" class="hash-link" aria-label="Direct link to commitlogpreallocate-segments" title="Direct link to commitlogpreallocate-segments" translate="no">​</a></h4>
+<p>If <code>true</code>, preallocate disk space for commitlog segments up to <code>commitlog.max-segment-size</code>. This has no effect unless commitlog fallocate support is enabled.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="commitlogwrite-buffer-size"><code>commitlog.write-buffer-size</code><a href="#commitlogwrite-buffer-size" class="hash-link" aria-label="Direct link to commitlogwrite-buffer-size" title="Direct link to commitlogwrite-buffer-size" translate="no">​</a></h4>
+<p>Size in bytes of the memory buffer holding commit data before flushing to storage.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="websocket"><code>websocket</code><a href="#websocket" class="hash-link" aria-label="Direct link to websocket" title="Direct link to websocket" translate="no">​</a></h3>
+<pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">[</span><span style="color:#8BE9FD">websocket</span><span style="color:#FF79C6">]</span></span>
+<span class="line"><span style="color:#8BE9FD">ping-interval</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">15s</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">idle-timeout</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">30s</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">close-handshake-timeout</span><span style="color:#FF79C6"> =</span><span style="color:#E9F284"> "</span><span style="color:#F1FA8C">250ms</span><span style="color:#E9F284">"</span></span>
+<span class="line"><span style="color:#8BE9FD">incoming-queue-length</span><span style="color:#FF79C6"> =</span><span style="color:#BD93F9"> 2048</span></span></code></pre>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="websocketping-interval"><code>websocket.ping-interval</code><a href="#websocketping-interval" class="hash-link" aria-label="Direct link to websocketping-interval" title="Direct link to websocketping-interval" translate="no">​</a></h4>
+<p>Interval at which the server will send <code>Ping</code> frames to keep the connection alive.
+Should be smaller than <code>websocket.idle-timeout</code> to be effective.</p>
+<p>Values are strings of any format the <a href="https://crates.io/crates/humantime" target="_blank" rel="noopener noreferrer" class=""><code>humantime</code></a> crate can parse.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="websocketidle-timeout"><code>websocket.idle-timeout</code><a href="#websocketidle-timeout" class="hash-link" aria-label="Direct link to websocketidle-timeout" title="Direct link to websocketidle-timeout" translate="no">​</a></h4>
+<p>If the server hasn&#x27;t received any data from the client (including <code>Pong</code> responses to previous <code>Ping</code>s it sent), it will consider the client unresponsive and close the connection.
+Should be greater than <code>websocket.ping-interval</code> to be effective.</p>
+<p>Values are strings of any format the <a href="https://crates.io/crates/humantime" target="_blank" rel="noopener noreferrer" class=""><code>humantime</code></a> crate can parse.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="websocketclose-handshake-timeout"><code>websocket.close-handshake-timeout</code><a href="#websocketclose-handshake-timeout" class="hash-link" aria-label="Direct link to websocketclose-handshake-timeout" title="Direct link to websocketclose-handshake-timeout" translate="no">​</a></h4>
+<p>Time the server waits for the client to respond to a graceful connection close. If the client doesn&#x27;t respond within this timeout, the connection is dropped.</p>
+<p>Values are strings of any format the <a href="https://crates.io/crates/humantime" target="_blank" rel="noopener noreferrer" class=""><code>humantime</code></a> crate can parse.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Y_NL" id="websocketincoming-queue-length"><code>websocket.incoming-queue-length</code><a href="#websocketincoming-queue-length" class="hash-link" aria-label="Direct link to websocketincoming-queue-length" title="Direct link to websocketincoming-queue-length" translate="no">​</a></h4>
+<p>Maximum number of client messages the server will queue up in case it is not able to process them quickly enough. When the queue length exceeds this value, the server will start disconnecting clients.
+Note that the limit is per client, not across all clients of a particular database.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_OLXC"><a href="https://github.com/clockworklabs/SpacetimeDB/edit/master/docs/docs/00300-resources/00200-reference/00100-cli-reference/00200-standalone-config.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_kIlO" aria-hidden="true">\<g\><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_XxEB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/cli-reference"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">CLI Reference</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/cli-reference/spacetime-json"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">spacetime.json</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_jOhJ thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border">\<li\><a href="#configtoml" class="table-of-contents__link toc-highlight"><code>config.toml</code></a>\<ul\>\<li\><a href="#certificate-authority" class="table-of-contents__link toc-highlight"><code>certificate-authority</code></a></li>\<li\><a href="#module-http" class="table-of-contents__link toc-highlight"><code>module-http</code></a></li>\<li\><a href="#logs" class="table-of-contents__link toc-highlight"><code>logs</code></a></li>\<li\><a href="#commitlog" class="table-of-contents__link toc-highlight"><code>commitlog</code></a></li>\<li\><a href="#websocket" class="table-of-contents__link toc-highlight"><code>websocket</code></a></li></ul></li></ul></div></div></div></div></main></div></div></div><div id="inkeep-shadowradix-:Rp:" style="display:contents"></div><span></span></div>
+</body>
+</html>

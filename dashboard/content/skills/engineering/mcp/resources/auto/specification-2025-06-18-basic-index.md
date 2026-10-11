@@ -105,7 +105,7 @@ The receiver **MUST NOT** send a response.
 
 ## Auth
 
-MCP provides an [Authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) framework for use with HTTP.
+MCP provides an [Authorization](/specification/2025-06-18/basic/authorization) framework for use with HTTP.
 Implementations using an HTTP-based transport **SHOULD** conform to this specification,
 whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
 and instead retrieve credentials from the environment.
@@ -156,3 +156,5 @@ may reserve particular names for purpose-specific metadata, as declared in those
 
 * Unless empty, MUST begin and end with an alphanumeric character (`[a-z0-9A-Z]`).
 * MAY contain hyphens (`-`), underscores (`_`), dots (`.`), and alphanumerics in between.
+
+

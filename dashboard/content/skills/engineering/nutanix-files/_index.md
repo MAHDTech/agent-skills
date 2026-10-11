@@ -1,6 +1,6 @@
 +++
 title = "nutanix-files"
-description = "Expert guidance, CLI commands, architecture reference, file server & share management, SMB/NFS protocols, directory services, smart tiering, disaster recovery, analytics, performance tuning, and troubleshooting for Nutanix Files (v5.0). Use when working with Nutanix Files, SMB/NFS file shares, file analytics, Smart Tiering, Metro Availability, Files REST APIs, or file server performance optimization."
+description = "CLI commands, architecture reference, file server & share management, SMB/NFS protocols, directory services, smart tiering, disaster recovery, analytics, performance tuning, and troubleshooting for Nutanix Files (v5.0). Use when working with Nutanix Files, SMB/NFS file shares, file analytics, Smart Tiering, Metro Availability, Files REST APIs, or file server performance optimization."
 sort_by = "title"
 template = "skill.html"
 [extra]
