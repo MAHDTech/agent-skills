@@ -4,7 +4,7 @@
 
 Working on my _skill issues_.
 
-![skill issues](./docs/images/skill-issues.png)
+<img src="./docs/images/skill-issues.png" alt="skill issues" width="400">
 
 These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.
 

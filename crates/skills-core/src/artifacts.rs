@@ -321,7 +321,7 @@ impl ArtifactsEngine {
             "# Agent Skills\n\n\
             [![skills.sh](https://skills.sh/b/{source})](https://skills.sh/{source})\n\n\
             Working on my _skill issues_.\n\n\
-            ![skill issues](./docs/images/skill-issues.png)\n\n\
+            <img src=\"./docs/images/skill-issues.png\" alt=\"skill issues\" width=\"400\">\n\n\
             These are my personal agent skills and attempt to be cross-compatible with Antigravity, Claude Code, Goose and OpenCode.\n\n\
             ## Status\n\n\
             [![CI][badge-ci]][workflow-ci]\n\
