@@ -9,16 +9,36 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 
+[*.md]
+indent_style = unset
+indent_size = unset
+
+[*.html]
+indent_size = unset
+
 [*.rs]
 indent_style = space
 indent_size = 4
+
+[crates/skills-core/tests/*.rs]
+indent_size = unset
 
 [*.css]
 indent_style = space
 indent_size = 4
 
+[dashboard/css/input.css]
+indent_size = unset
+
+[dashboard/static/styles/tailwind.css]
+indent_style = unset
+indent_size = unset
+
 [*.{sh,bash}]
 indent_style = tab
+
+[scripts/codeql-run.sh]
+indent_size = unset
 
 [*.{js,jsx,ts,tsx}]
 indent_style = space
@@ -27,3 +47,6 @@ indent_size = 4
 [*.py]
 indent_style = space
 indent_size = 4
+
+[dashboard/static/CNAME]
+insert_final_newline = false
