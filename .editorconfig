@@ -38,7 +38,7 @@ indent_size = unset
 indent_style = tab
 
 [scripts/codeql-run.sh]
-indent_size = unset
+indent_style = unset
 
 [*.{js,jsx,ts,tsx}]
 indent_style = space
