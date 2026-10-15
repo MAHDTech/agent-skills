@@ -1173,4 +1173,53 @@ mod tests {
         let guard = TerminalGuard::new();
         drop(guard);
     }
+
+    #[test]
+    fn test_app_linter_diagnostics_clean_on_nested_four_backtick_fences() {
+        let file_url = format!("{}///tmp/test", "file:");
+        let body = format!(
+            "\
+# Nested Fence Skill
+
+````markdown
+```bash
+echo nested
+```
+See {file_url}
+# **Bold**
+````
+"
+        );
+        let raw = format!(
+            "---\nname: nested-skill\ndescription: Build and verify nested fence skills.\n---\n{body}"
+        );
+        let skill = Skill::builder()
+            .path(PathBuf::from("skills/engineering/nested-skill/SKILL.md"))
+            .dir_name("nested-skill")
+            .category(SkillCategory::Engineering)
+            .promoted(true)
+            .frontmatter(
+                SkillFrontmatter::builder()
+                    .name("nested-skill")
+                    .description("Build and verify nested fence skills.")
+                    .build(),
+            )
+            .content(body)
+            .raw(raw)
+            .build();
+
+        let mut app = App::with_skills(vec![skill]);
+        assert!(
+            app.linter_diagnostics.is_empty(),
+            "Expected zero diagnostics on App::with_skills, got: {:?}",
+            app.linter_diagnostics
+        );
+
+        app.refresh_linter_diagnostics();
+        assert!(
+            app.linter_diagnostics.is_empty(),
+            "Expected zero diagnostics on refresh_linter_diagnostics, got: {:?}",
+            app.linter_diagnostics
+        );
+    }
 }

@@ -6,7 +6,7 @@ use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Paragraph, Row, Table};
 use skills_core::models::Skill;
-use skills_core::parser::SkillParser;
+use skills_core::parser::{CodeFenceTracker, FenceTransition, SkillParser};
 
 use crate::app::App;
 
@@ -241,7 +241,7 @@ pub fn is_target_supported(skill: &Skill, target_id: &str) -> bool {
 #[must_use]
 pub fn parse_markdown_lines(content: &str) -> Vec<Line<'static>> {
     let mut lines = Vec::new();
-    let mut in_code_block = false;
+    let mut fence_tracker = CodeFenceTracker::new();
 
     let code_style = Style::default()
         .fg(Color::LightGreen)
@@ -249,18 +249,19 @@ pub fn parse_markdown_lines(content: &str) -> Vec<Line<'static>> {
     let fence_style = Style::default().fg(Color::DarkGray);
 
     for raw_line in content.lines() {
+        match fence_tracker.observe_line(raw_line) {
+            FenceTransition::Opened { .. } | FenceTransition::Closed { .. } => {
+                lines.push(Line::from(Span::styled(raw_line.to_string(), fence_style)));
+                continue;
+            }
+            FenceTransition::Inside => {
+                lines.push(Line::from(Span::styled(raw_line.to_string(), code_style)));
+                continue;
+            }
+            FenceTransition::Outside => {}
+        }
+
         let trimmed = raw_line.trim_start();
-
-        if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-            in_code_block = !in_code_block;
-            lines.push(Line::from(Span::styled(raw_line.to_string(), fence_style)));
-            continue;
-        }
-
-        if in_code_block {
-            lines.push(Line::from(Span::styled(raw_line.to_string(), code_style)));
-            continue;
-        }
 
         if raw_line.trim().is_empty() {
             lines.push(Line::from(""));
@@ -495,5 +496,42 @@ Normal paragraph";
         assert!(content.contains("Agent Target Support"));
         assert!(content.contains("Template Parameters"));
         assert!(content.contains("Instructions Preview (demo)"));
+    }
+
+    #[test]
+    fn test_markdown_preview_nested_four_backtick_fence_styling() {
+        let content = "\
+````markdown
+```rust
+fn inner() {}
+```
+# Inner Heading
+````
+# Real Heading";
+
+        let lines = parse_markdown_lines(content);
+        assert_eq!(lines.len(), 7);
+
+        // Outer opening fence
+        assert_eq!(lines[0].spans[0].content, "````markdown");
+        assert_eq!(lines[0].spans[0].style.fg, Some(Color::DarkGray));
+
+        // Inner lines (including inner fences and inner heading) styled as code
+        assert_eq!(lines[1].spans[0].content, "```rust");
+        assert_eq!(lines[1].spans[0].style.fg, Some(Color::LightGreen));
+        assert_eq!(lines[2].spans[0].content, "fn inner() {}");
+        assert_eq!(lines[2].spans[0].style.fg, Some(Color::LightGreen));
+        assert_eq!(lines[3].spans[0].content, "```");
+        assert_eq!(lines[3].spans[0].style.fg, Some(Color::LightGreen));
+        assert_eq!(lines[4].spans[0].content, "# Inner Heading");
+        assert_eq!(lines[4].spans[0].style.fg, Some(Color::LightGreen));
+
+        // Outer closing fence
+        assert_eq!(lines[5].spans[0].content, "````");
+        assert_eq!(lines[5].spans[0].style.fg, Some(Color::DarkGray));
+
+        // Heading after outer closing fence styled as H1
+        assert_eq!(lines[6].spans[0].content, "Real Heading");
+        assert_eq!(lines[6].spans[0].style.fg, Some(Color::Yellow));
     }
 }
