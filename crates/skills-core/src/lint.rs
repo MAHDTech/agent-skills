@@ -9,7 +9,7 @@ use walkdir::WalkDir;
 
 use crate::error::Result;
 use crate::models::{LintIssue, LintReport, LintSeverity, Skill, SkillCategory, SkillTree};
-use crate::parser::SkillParser;
+use crate::parser::{CodeFenceTracker, FenceTransition, SkillParser};
 
 /// Configurable static analysis and linting engine for Agent Skills.
 #[derive(Debug, Clone, Default, TypedBuilder)]
@@ -395,35 +395,27 @@ impl SkillLinter {
     }
 
     fn check_code_blocks(skill: &Skill, report: &mut LintReport) {
-        let mut in_fence = false;
+        let mut fence_tracker = CodeFenceTracker::new();
 
         for (line_num, line) in (1..).zip(skill.content.split('\n')) {
-            let trimmed = line.trim();
-
-            if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-                let fence_marker = &trimmed[..3];
-                let rest = trimmed[3..].trim();
-
-                if in_fence {
-                    // Closing fence
-                    in_fence = false;
-                } else {
-                    // Opening fence
-                    if rest.is_empty() {
-                        report.add(
-                            LintIssue::builder()
-                                .file(skill.path.clone())
-                                .line(Some(line_num))
-                                .rule("fenced-code-blocks")
-                                .message(format!(
-                                    "Fenced code block opening with '{fence_marker}' is missing a language identifier"
-                                ))
-                                .severity(LintSeverity::Warning)
-                                .build(),
-                        );
-                    }
-                    in_fence = true;
-                }
+            if let FenceTransition::Opened {
+                marker,
+                info_string,
+                ..
+            } = fence_tracker.observe_line(line)
+                && info_string.is_empty()
+            {
+                report.add(
+                    LintIssue::builder()
+                        .file(skill.path.clone())
+                        .line(Some(line_num))
+                        .rule("fenced-code-blocks")
+                        .message(format!(
+                            "Fenced code block opening with '{marker}' is missing a language identifier"
+                        ))
+                        .severity(LintSeverity::Warning)
+                        .build(),
+                );
             }
         }
     }
@@ -644,18 +636,13 @@ impl SkillLinter {
                 continue;
             }
 
-            let mut in_fence = false;
+            let mut fence_tracker = CodeFenceTracker::new();
 
             for (line_idx, raw_line) in source.content.lines().enumerate() {
                 let line_num = line_idx + 1;
-                let trimmed = raw_line.trim();
 
-                // Skip fenced code blocks (``` or ~~~)
-                if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-                    in_fence = !in_fence;
-                    continue;
-                }
-                if in_fence {
+                // Skip fenced code blocks
+                if fence_tracker.observe_line(raw_line) != FenceTransition::Outside {
                     continue;
                 }
 
@@ -1037,17 +1024,10 @@ impl SkillLinter {
 
     fn strip_code_blocks(content: &str) -> String {
         let mut result = String::with_capacity(content.len());
-        let mut in_fence = false;
+        let mut fence_tracker = CodeFenceTracker::new();
 
         for line in content.split('\n') {
-            let trimmed = line.trim();
-            if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-                in_fence = !in_fence;
-                result.push('\n');
-                continue;
-            }
-
-            if in_fence {
+            if fence_tracker.observe_line(line) != FenceTransition::Outside {
                 result.push('\n');
                 continue;
             }
@@ -1071,5 +1051,166 @@ impl SkillLinter {
         }
 
         result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::SkillFrontmatter;
+
+    fn make_skill(name: &str, body: &str) -> Skill {
+        let raw = format!("---\nname: {name}\ndescription: Build and verify {name}.\n---\n{body}");
+        Skill::builder()
+            .path(PathBuf::from(format!("skills/engineering/{name}/SKILL.md")))
+            .dir_name(name)
+            .category(SkillCategory::Engineering)
+            .promoted(true)
+            .tree(SkillTree::Live)
+            .frontmatter(
+                SkillFrontmatter::builder()
+                    .name(name)
+                    .description(format!("Build and verify {name}."))
+                    .build(),
+            )
+            .content(body.to_string())
+            .raw(raw)
+            .build()
+    }
+
+    #[test]
+    fn test_check_code_blocks_nested_four_backticks_no_false_positive() {
+        let body = "\
+# Nested Example
+
+````markdown
+Here is an inner code block:
+
+```rust
+fn main() {}
+```
+
+And markdown text between inner blocks.
+
+```bash
+echo ok
+```
+````
+";
+        let skill = make_skill("nested-example", body);
+        let linter = SkillLinter::builder()
+            .check_relative_links(false)
+            .check_resources(false)
+            .build();
+        let report = linter.lint_skill(&skill);
+        assert!(
+            report.issues.is_empty(),
+            "Expected zero lint issues for nested 4-backtick code block, got: {:?}",
+            report.issues
+        );
+    }
+
+    #[test]
+    fn test_check_code_blocks_bare_four_backtick_and_tilde_warns_full_marker() {
+        let body = "\
+# Bare Fences
+
+````
+inside four backticks
+````
+
+~~~~
+inside four tildes
+~~~~
+";
+        let skill = make_skill("bare-fences", body);
+        let linter = SkillLinter::builder()
+            .check_relative_links(false)
+            .check_resources(false)
+            .build();
+        let report = linter.lint_skill(&skill);
+        let code_issues: Vec<_> = report
+            .issues
+            .iter()
+            .filter(|i| i.rule == "fenced-code-blocks")
+            .collect();
+        assert_eq!(code_issues.len(), 2);
+        assert!(
+            code_issues[0]
+                .message
+                .contains("opening with '````' is missing a language identifier")
+        );
+        assert!(
+            code_issues[1]
+                .message
+                .contains("opening with '~~~~' is missing a language identifier")
+        );
+    }
+
+    #[test]
+    fn test_strip_code_blocks_and_downstream_rules_with_nested_fences() {
+        let file_url = format!("{}///tmp/example.md", "file:");
+        let body = format!(
+            "\
+# Clean Outer Skill
+
+````markdown
+```rust
+let x = 1;
+```
+
+# **Bold Heading Inside Outer Fence**
+See [local]({file_url}) and [missing](./does-not-exist.md).
+This line has seamlessly and delve and /other-skill and [other](../other-skill/SKILL.md).
+````
+"
+        );
+        let skill = make_skill("source-skill", &body);
+        let other = make_skill("other-skill", "# Other\nContent.");
+        let linter = SkillLinter::builder()
+            .check_relative_links(true)
+            .check_resources(false)
+            .build();
+        let report = linter.lint_all(&[skill, other]);
+        assert!(
+            report.issues.is_empty(),
+            "Expected zero downstream false positives inside 4-backtick block, got: {:?}",
+            report.issues
+        );
+    }
+
+    #[test]
+    fn test_mismatched_fence_chars_and_info_string_on_closing_fence() {
+        let file_url = format!("{}///tmp/inside.md", "file:");
+        let body = format!(
+            "\
+# Fence Rules
+
+~~~bash
+echo start
+```
+# **Still Inside Tilde Block**
+{file_url}
+~~~
+
+```rust
+let a = 1;
+```other
+# **Still Inside Backtick Block Because Closing Fence Has Info String**
+{file_url}
+```
+"
+        );
+        let skill = make_skill("fence-rules", &body);
+        let linter = SkillLinter::builder()
+            .check_relative_links(false)
+            .check_resources(false)
+            .build();
+        let report = linter.lint_skill(&skill);
+        assert!(
+            report.issues.is_empty(),
+            "Expected mismatched fence char and closing info string not to close block, got: {:?}",
+            report.issues
+        );
     }
 }

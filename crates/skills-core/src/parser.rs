@@ -217,6 +217,98 @@ impl ParsedSkill {
     }
 }
 
+/// Tracks CommonMark fenced code block state across sequential markdown lines.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct CodeFenceTracker {
+    active_fence: Option<(char, usize)>,
+}
+
+/// Line classification produced by [`CodeFenceTracker::observe_line`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FenceTransition<'a> {
+    /// Line is outside any fenced code block.
+    Outside,
+    /// Line opens a new fenced code block.
+    Opened {
+        /// Fence delimiter character (`'`'` or `'~'`).
+        fence_char: char,
+        /// Number of consecutive opening delimiter characters (`>= 3`).
+        fence_len: usize,
+        /// Slice of the opening fence delimiter run.
+        marker: &'a str,
+        /// Trimmed info string following the opening fence delimiter run.
+        info_string: &'a str,
+    },
+    /// Line is inside an active fenced code block (including inner nested fence lines).
+    Inside,
+    /// Line closes the active fenced code block.
+    Closed {
+        /// Fence delimiter character (`'`'` or `'~'`).
+        fence_char: char,
+        /// Number of consecutive closing delimiter characters (`>= open_len`).
+        fence_len: usize,
+        /// Slice of the closing fence delimiter run.
+        marker: &'a str,
+    },
+}
+
+impl CodeFenceTracker {
+    /// Creates a new tracker initially outside any fenced code block.
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { active_fence: None }
+    }
+
+    /// Returns `true` if the tracker is currently inside an open fenced code block.
+    #[must_use]
+    pub const fn is_in_fence(&self) -> bool {
+        self.active_fence.is_some()
+    }
+
+    /// Observes a single markdown line and updates the active fence state.
+    pub fn observe_line<'a>(&mut self, line: &'a str) -> FenceTransition<'a> {
+        let trimmed = line.trim();
+        let (fence_char, fence_len) = match trimmed.chars().next() {
+            Some(c @ ('`' | '~')) => {
+                let len = trimmed.chars().take_while(|&ch| ch == c).count();
+                (c, len)
+            }
+            _ => ('\0', 0),
+        };
+
+        if let Some((open_char, open_len)) = self.active_fence {
+            if fence_char == open_char
+                && fence_len >= open_len
+                && trimmed[fence_len..].trim().is_empty()
+            {
+                self.active_fence = None;
+                FenceTransition::Closed {
+                    fence_char: open_char,
+                    fence_len,
+                    marker: &trimmed[..fence_len],
+                }
+            } else {
+                FenceTransition::Inside
+            }
+        } else if fence_len >= 3 {
+            let marker = &trimmed[..fence_len];
+            let info_string = trimmed[fence_len..].trim();
+            if fence_char == '`' && info_string.contains('`') {
+                return FenceTransition::Outside;
+            }
+            self.active_fence = Some((fence_char, fence_len));
+            FenceTransition::Opened {
+                fence_char,
+                fence_len,
+                marker,
+                info_string,
+            }
+        } else {
+            FenceTransition::Outside
+        }
+    }
+}
+
 /// Skill markdown parser and directory discovery engine.
 #[derive(Debug, Clone, Default, TypedBuilder)]
 pub struct SkillParser {
@@ -428,17 +520,14 @@ impl SkillParser {
     pub fn extract_sections(body: &str) -> Vec<MarkdownSection> {
         let mut sections = Vec::new();
         let mut current_section: Option<MarkdownSection> = None;
-        let mut in_code_fence = false;
+        let mut fence_tracker = CodeFenceTracker::new();
         let mut line_num = 1;
 
         for line in body.split('\n') {
             let trimmed = line.trim();
+            let transition = fence_tracker.observe_line(line);
 
-            if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-                in_code_fence = !in_code_fence;
-            }
-
-            if !in_code_fence && trimmed.starts_with('#') {
+            if transition == FenceTransition::Outside && trimmed.starts_with('#') {
                 let mut level = 0;
                 for c in trimmed.chars() {
                     if c == '#' {
@@ -898,5 +987,132 @@ impl SkillParser {
 
         skills.sort_by(|a, b| a.path.cmp(&b.path));
         Ok(skills)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_code_fence_tracker_nested_four_backtick_and_tilde_fences() {
+        let mut tracker = CodeFenceTracker::new();
+        assert!(!tracker.is_in_fence());
+        assert_eq!(
+            tracker.observe_line("normal text"),
+            FenceTransition::Outside
+        );
+
+        // Single-line triple-backtick inline span remains Outside
+        assert_eq!(
+            tracker.observe_line("```inline code```"),
+            FenceTransition::Outside
+        );
+        assert!(!tracker.is_in_fence());
+
+        // Outer 4-backtick fence opens
+        assert_eq!(
+            tracker.observe_line("````markdown"),
+            FenceTransition::Opened {
+                fence_char: '`',
+                fence_len: 4,
+                marker: "````",
+                info_string: "markdown",
+            }
+        );
+        assert!(tracker.is_in_fence());
+
+        // Inner 3-backtick fence remains Inside
+        assert_eq!(tracker.observe_line("```rust"), FenceTransition::Inside);
+        assert_eq!(
+            tracker.observe_line("fn main() {}"),
+            FenceTransition::Inside
+        );
+        assert_eq!(tracker.observe_line("```"), FenceTransition::Inside);
+        assert_eq!(
+            tracker.observe_line("# Heading between inner blocks"),
+            FenceTransition::Inside
+        );
+
+        // Closing fence with trailing info string remains Inside
+        assert_eq!(
+            tracker.observe_line("````markdown"),
+            FenceTransition::Inside
+        );
+
+        // Mismatched tilde fence remains Inside
+        assert_eq!(tracker.observe_line("~~~~"), FenceTransition::Inside);
+
+        // Matching 4-backtick closing fence closes the block
+        assert_eq!(
+            tracker.observe_line("````"),
+            FenceTransition::Closed {
+                fence_char: '`',
+                fence_len: 4,
+                marker: "````",
+            }
+        );
+        assert!(!tracker.is_in_fence());
+
+        // Tilde fence wrapping backtick fence, closed by longer tilde fence
+        assert_eq!(
+            tracker.observe_line("~~~bash"),
+            FenceTransition::Opened {
+                fence_char: '~',
+                fence_len: 3,
+                marker: "~~~",
+                info_string: "bash",
+            }
+        );
+        assert_eq!(tracker.observe_line("```"), FenceTransition::Inside);
+        assert_eq!(tracker.observe_line("~~~extra"), FenceTransition::Inside);
+        assert_eq!(
+            tracker.observe_line("~~~~"),
+            FenceTransition::Closed {
+                fence_char: '~',
+                fence_len: 4,
+                marker: "~~~~",
+            }
+        );
+        assert!(!tracker.is_in_fence());
+    }
+
+    #[test]
+    fn test_extract_sections_ignores_headings_inside_nested_four_backtick_fences() {
+        let body = "\
+# Overview
+
+````markdown
+# Fake Heading Outside Inner Fence
+
+```bash
+# Fake Heading Inside Inner Fence
+echo hello
+```
+
+## Another Fake Heading After Inner Fence
+````
+
+## Next Section
+
+Real section content.";
+
+        let sections = SkillParser::extract_sections(body);
+        assert_eq!(sections.len(), 2);
+        assert_eq!(sections[0].level, 1);
+        assert_eq!(sections[0].title, "Overview");
+        assert!(
+            sections[0]
+                .content
+                .contains("# Fake Heading Inside Inner Fence")
+        );
+        assert!(
+            sections[0]
+                .content
+                .contains("## Another Fake Heading After Inner Fence")
+        );
+        assert_eq!(sections[1].level, 2);
+        assert_eq!(sections[1].title, "Next Section");
+        assert_eq!(sections[1].content.trim(), "Real section content.");
     }
 }
