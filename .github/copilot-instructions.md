@@ -8,7 +8,7 @@ The project follows the "Agent Skills" pattern: Markdown files with YAML frontma
 
 ```text
 agents/                       # Global agent instructions (AGENTS.md is auto-generated, MEMORIES.md)
-bin/                          # Core scripts (skills/, dashboard/)
+crates/                       # Rust workspace (ask-cli, skills-core, skills-tui)
 dashboard/                    # Zola source for the skills dashboard
   content/                    # Automatically generated from skills/
   themes/tars-dashboards/     # Custom Zola theme with Tailwind CSS v4
@@ -17,15 +17,17 @@ skills/                       # Skill directories grouped by category
   <category>/                 # engineering, planning, review, github, reflection, writing, authoring, game-development, tooling
     <skill-name>/
       SKILL.md                # Main skill definition
-      resources/              # Optional skill-specific resources (documentation, assets, scripts, etc.)
+      resources/              # Optional skill-specific resources (no files directly in resources/)
+        auto/                 # Downloader-owned resources fetched via ask skills download-resources
+        manual/               # Hand-authored resources, scripts, and assets
   in-progress/                # Lifecycle bucket for work in progress
-  deprecated/                 # Lifecycle bucket for retired skills
+skills-archive/               # Retired skills (<category>/<skill-name>/)
 .github/workflows/            # GitHub Actions pipelines
 ```
 
 ## Technology Stack
 
-- **Runtime**: Bun (use `bun` not `npm`)
+- **Runtime & CLI**: Rust toolchain via `devenv`; native `ask` CLI in `crates/ask-cli` (`ask` or `cargo run -p ask-cli --`)
 - **Dashboard**: Zola (Rust-based static site generator)
 - **Styling**: Tailwind CSS v4
 - **Dev environment**: `devenv` (Nix). Always run commands inside the shell or via `devenv --no-tui shell -- <cmd>`
@@ -34,12 +36,12 @@ skills/                       # Skill directories grouped by category
 ## Quick Commands
 
 ```bash
-bun run skills --action install         # Symlink the working tree into your agents (idempotent)
-bun run skills --action uninstall       # Remove every symlink this repo owns
-bun run skills --action sync            # Relink AND regenerate README, agents/AGENTS.md, dashboard, skills.sh.json
-bun run skills --action lint            # Verify skill frontmatter and structure
-bun run dashboard --action build        # Sync content, build CSS, and generate the Zola site
-bun run dashboard --action serve        # Build once, then serve locally with live reload
+ask skills --action install         # Symlink the working tree into your agents (idempotent)
+ask skills --action uninstall       # Remove every symlink this repo owns
+ask skills sync                     # Relink AND regenerate README, agents/AGENTS.md, dashboard, skills.sh.json
+ask skills lint                     # Verify skill frontmatter and structure
+ask dashboard build                 # Sync content, build CSS, and generate the Zola site
+ask dashboard serve                 # Build once, then serve locally with live reload
 ```
 
 ## Skill Standards
@@ -69,4 +71,4 @@ Do NOT use the legacy `custom:`, `triggers:`, `category:`, or `type:` fields. Ca
 
 Conventional commits, enforced with convco: `type(scope): description`
 Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
-Scope examples: `skills`, `dashboard`, `ci`, `bin`
+Scope examples: `skills`, `dashboard`, `ci`, `cli`
