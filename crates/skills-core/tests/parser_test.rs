@@ -293,3 +293,192 @@ description: Emojis and multi-byte characters 🚀 💡.
             .contains("ルール 1: 正確に実行すること。")
     );
 }
+
+#[test]
+fn test_extract_frontmatter_trailing_text_on_opening_delimiter() {
+    let trailing_text = "---extra\nname: acp\ndescription: foo\n---\n# Body";
+    match SkillParser::extract_frontmatter(trailing_text) {
+        Err(SkillError::FrontmatterValidation { path, message }) => {
+            assert_eq!(path, PathBuf::new());
+            assert_eq!(
+                message,
+                "Unexpected characters after opening '---' delimiter"
+            );
+        }
+        other => panic!("Expected FrontmatterValidation error, got {other:?}"),
+    }
+
+    match SkillParser::parse_str(trailing_text) {
+        Err(SkillError::FrontmatterValidation { message, .. }) => {
+            assert_eq!(
+                message,
+                "Unexpected characters after opening '---' delimiter"
+            );
+        }
+        other => panic!("Expected FrontmatterValidation error, got {other:?}"),
+    }
+
+    let trailing_whitespace = "---   \nname: acp\ndescription: foo\n---\n# Body";
+    let (yaml, body) = SkillParser::extract_frontmatter(trailing_whitespace).unwrap();
+    assert!(yaml.contains("name: acp"));
+    assert!(body.contains("# Body"));
+}
+
+#[test]
+fn test_extract_frontmatter_and_parse_utf8_bom() {
+    // cspell:ignore FEFF
+    let bom_doc = "\u{FEFF}---\nname: bom-skill\ndescription: Skill starting with UTF-8 BOM.\n---\n# BOM Skill\n\nBody text.\n";
+
+    let (yaml, body) = SkillParser::extract_frontmatter(bom_doc).unwrap();
+    assert!(yaml.contains("name: bom-skill"));
+    assert!(body.contains("# BOM Skill"));
+
+    let parsed = SkillParser::parse_str(bom_doc).unwrap();
+    assert_eq!(parsed.name(), "bom-skill");
+    assert_eq!(parsed.description(), "Skill starting with UTF-8 BOM.");
+    assert_eq!(parsed.title(), Some("BOM Skill"));
+    assert!(parsed.body.contains("Body text."));
+}
+
+#[test]
+fn test_parse_str_missing_mandatory_fields() {
+    let missing_name = "---\ndescription: Skill without a name field.\n---\n# Body\n";
+    match SkillParser::parse_str(missing_name) {
+        Err(SkillError::Yaml { path, source }) => {
+            assert_eq!(path, PathBuf::from("SKILL.md"));
+            assert!(source.to_string().contains("missing field `name`"));
+        }
+        other => panic!("Expected Yaml error for missing name, got {other:?}"),
+    }
+
+    let missing_desc = "---\nname: valid-skill\n---\n# Body\n";
+    match SkillParser::parse_str(missing_desc) {
+        Err(SkillError::Yaml { path, source }) => {
+            assert_eq!(path, PathBuf::from("SKILL.md"));
+            assert!(source.to_string().contains("missing field `description`"));
+        }
+        other => panic!("Expected Yaml error for missing description, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_parse_str_empty_mandatory_fields() {
+    let empty_name = "---\nname: \"\"\ndescription: Valid description.\n---\n# Body\n";
+    let whitespace_name = "---\nname: \"   \"\ndescription: Valid description.\n---\n# Body\n";
+
+    for input in [empty_name, whitespace_name] {
+        match SkillParser::parse_str(input) {
+            Err(SkillError::FrontmatterValidation { path, message }) => {
+                assert_eq!(path, PathBuf::new());
+                assert_eq!(message, "Missing required frontmatter field 'name'");
+            }
+            other => panic!("Expected FrontmatterValidation for empty name, got {other:?}"),
+        }
+    }
+
+    let empty_desc = "---\nname: valid-skill\ndescription: \"\"\n---\n# Body\n";
+    let whitespace_desc = "---\nname: valid-skill\ndescription: \"   \"\n---\n# Body\n";
+
+    for input in [empty_desc, whitespace_desc] {
+        match SkillParser::parse_str(input) {
+            Err(SkillError::FrontmatterValidation { path, message }) => {
+                assert_eq!(path, PathBuf::new());
+                assert_eq!(message, "Missing required frontmatter field 'description'");
+            }
+            other => panic!("Expected FrontmatterValidation for empty description, got {other:?}"),
+        }
+    }
+}
+
+#[test]
+fn test_parse_str_malformed_yaml() {
+    let malformed_yaml = "---\nname: [unclosed-sequence\ndescription: broken yaml\n---\n# Body\n";
+
+    match SkillParser::parse_str(malformed_yaml) {
+        Err(SkillError::Yaml { path, .. }) => {
+            assert_eq!(path, PathBuf::from("SKILL.md"));
+        }
+        other => panic!("Expected Yaml error, got {other:?}"),
+    }
+
+    match SkillParser::parse_str_with_path(malformed_yaml, "skills/engineering/bad/SKILL.md") {
+        Err(SkillError::Yaml { path, .. }) => {
+            assert_eq!(path, PathBuf::from("skills/engineering/bad/SKILL.md"));
+        }
+        other => panic!("Expected Yaml error with custom path, got {other:?}"),
+    }
+}
+
+#[test]
+fn test_lenient_parser_fallback_modes() {
+    let dir = tempdir().unwrap();
+    let lenient_parser = SkillParser::builder().lenient(true).build();
+
+    // Branch A: frontmatter extraction failure fallback
+    let no_fm_dir = dir.path().join("skills/engineering/no-frontmatter");
+    fs::create_dir_all(&no_fm_dir).unwrap();
+    let no_fm_path = no_fm_dir.join("SKILL.md");
+    fs::write(
+        &no_fm_path,
+        "# No Frontmatter Heading\n\nRaw body content.\n",
+    )
+    .unwrap();
+
+    assert!(matches!(
+        SkillParser::parse_file(&no_fm_path),
+        Err(SkillError::FrontmatterValidation { .. })
+    ));
+
+    let skill_a = lenient_parser.parse_file_with_options(&no_fm_path).unwrap();
+    assert_eq!(skill_a.name(), "unknown");
+    assert_eq!(skill_a.description(), "Lenient parse fallback");
+    assert_eq!(skill_a.dir_name, "no-frontmatter");
+    assert_eq!(skill_a.category, SkillCategory::Engineering);
+    assert!(skill_a.content.contains("# No Frontmatter Heading"));
+
+    // Branch B: YAML deserialization failure fallback
+    let broken_yaml_dir = dir.path().join("skills/engineering/broken-yaml");
+    fs::create_dir_all(&broken_yaml_dir).unwrap();
+    let broken_yaml_path = broken_yaml_dir.join("SKILL.md");
+    fs::write(
+        &broken_yaml_path,
+        "---\nname: [broken-yaml\n---\n# Body After Broken YAML\n",
+    )
+    .unwrap();
+
+    assert!(matches!(
+        SkillParser::parse_file(&broken_yaml_path),
+        Err(SkillError::Yaml { .. })
+    ));
+
+    let skill_b = lenient_parser
+        .parse_file_with_options(&broken_yaml_path)
+        .unwrap();
+    assert_eq!(skill_b.name(), "unknown");
+    assert_eq!(skill_b.description(), "Lenient YAML error");
+    assert_eq!(skill_b.dir_name, "broken-yaml");
+    assert!(skill_b.content.contains("# Body After Broken YAML"));
+
+    // Branch C: semantic frontmatter validation bypass
+    let empty_fields_dir = dir.path().join("skills/engineering/empty-fields");
+    fs::create_dir_all(&empty_fields_dir).unwrap();
+    let empty_fields_path = empty_fields_dir.join("SKILL.md");
+    fs::write(
+        &empty_fields_path,
+        "---\nname: \"\"\ndescription: \"\"\n---\n# Invalid Fields Body\n",
+    )
+    .unwrap();
+
+    assert!(matches!(
+        SkillParser::parse_file(&empty_fields_path),
+        Err(SkillError::FrontmatterValidation { .. })
+    ));
+
+    let skill_c = lenient_parser
+        .parse_file_with_options(&empty_fields_path)
+        .unwrap();
+    assert_eq!(skill_c.name(), "");
+    assert_eq!(skill_c.description(), "");
+    assert_eq!(skill_c.dir_name, "empty-fields");
+    assert!(skill_c.content.contains("# Invalid Fields Body"));
+}
