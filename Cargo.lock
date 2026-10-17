@@ -271,9 +271,9 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
 name = "cargo-crap"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "094ab6fb5099b9456c9f61deec62976a50453068e7bbc5aa4b97ca0ca447ceee"
+checksum = "fa42b07138f640734efb21c7553d60f87a55b4503574879fd191c59c287adae2"
 dependencies = [
  "anyhow",
  "clap",
@@ -291,6 +291,7 @@ dependencies = [
  "serde_json",
  "syn 2.0.119",
  "toml",
+ "unicode-width",
 ]
 
 [[package]]
