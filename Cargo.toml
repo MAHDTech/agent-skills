@@ -53,7 +53,7 @@ anyhow = "1.0.87"
 # Filesystem and System Utilities
 walkdir = "2.5.0"
 dirs = "7.0.0"
-sha2 = "0.10.8"
+sha2 = "0.11.1"
 
 # Test and Development Dependencies
 assert_cmd = "2.0.16"
