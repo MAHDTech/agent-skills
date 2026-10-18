@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jujutsu (jj) Version Control"
+  short_description: "Operate Jujutsu (jj) version control, revsets, bookmarks, conflicts, and Git workflows"
+  default_prompt: "Use $jj to manage Jujutsu (jj) version control, revsets, bookmarks, conflict resolution, and GitHub workflows."

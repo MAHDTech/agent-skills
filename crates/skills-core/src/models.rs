@@ -60,6 +60,7 @@ pub enum SkillCategory {
     Writing,
     Authoring,
     Tooling,
+    Tars,
     InProgress,
     #[serde(untagged)]
     Custom(String),
@@ -79,6 +80,7 @@ impl SkillCategory {
             Self::Writing => "writing",
             Self::Authoring => "authoring",
             Self::Tooling => "tooling",
+            Self::Tars => "tars",
             Self::InProgress => "in-progress",
             Self::Custom(s) => s.as_str(),
         }
@@ -97,6 +99,7 @@ impl SkillCategory {
             Self::Writing => "Writing",
             Self::Authoring => "Authoring",
             Self::Tooling => "Tooling",
+            Self::Tars => "TARS",
             Self::InProgress => "In Progress",
             Self::Custom(s) => s.as_str(),
         }
@@ -115,6 +118,7 @@ impl SkillCategory {
             Self::Writing => "Proofreading and documentation polish.",
             Self::Authoring => "Create and maintain the skills themselves.",
             Self::Tooling => "Environments, CLIs, and agent conventions.",
+            Self::Tars => "Autonomous software factory and persistent goal workflows.",
             Self::InProgress => "Drafts not yet promoted.",
             Self::Custom(_) => "Custom user-defined category.",
         }
@@ -145,6 +149,7 @@ impl SkillCategory {
             Self::Writing,
             Self::Authoring,
             Self::Tooling,
+            Self::Tars,
         ]
     }
 
@@ -175,6 +180,7 @@ impl FromStr for SkillCategory {
             "writing" => Self::Writing,
             "authoring" => Self::Authoring,
             "tooling" => Self::Tooling,
+            "tars" => Self::Tars,
             "in-progress" => Self::InProgress,
             other => Self::Custom(other.to_string()),
         })

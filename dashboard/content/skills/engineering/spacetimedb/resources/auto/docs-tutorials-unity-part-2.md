@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -422,8 +422,9 @@ skill_name = "spacetimedb"
 <span class="line"><span style="color:#F8F8F2">    }</span></span>
 <span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
 <blockquote>
-<p>Unity WebGL needs one extra precaution here. Browser WebSocket APIs cannot set an <code>Authorization</code> header, so reconnecting with a saved server-issued token may yield a short-lived WebSocket token in <code>HandleConnect</code>. The <code>#if UNITY_WEBGL</code> guard keeps the original saved token instead of overwriting it during reconnect.</p>
+<p>This example uses the default connection behavior, without automatic reconnect. On Unity WebGL, a new connection using a saved server-issued token may yield a short-lived WebSocket token in <code>HandleConnect</code>. The <code>#if UNITY_WEBGL</code> guard keeps the original saved token instead of overwriting it. With <code>.WithAutomaticReconnect()</code> enabled, <code>HandleConnect</code> receives the retained authentication token on the initial connection, and <code>OnAutomaticReconnect</code> receives the retained or refreshed token after recovery. Both can be saved directly.</p>
 </blockquote>
+<p>To add <a class="" href="/docs/clients/c-sharp#method-withautomaticreconnect">automatic reconnect</a>, call <code>.WithAutomaticReconnect()</code> on the builder. <code>HandleConnect</code>, registered through <code>OnConnect</code>, runs only on the first connection, so its subscription setup can stay as written. The SDK replays existing subscriptions after recovery. Register a separate <code>OnAutomaticReconnect</code> callback for recovery-specific work, such as saving a refreshed token; do not create subscriptions there. Keep <code>SpacetimeDBNetworkManager</code> active, or call <code>FrameTick()</code> every frame even during an outage. The callback overloads with <code>NextReconnect?</code> distinguish scheduled retries from a terminal disconnect. For expiring credentials, also configure <a class="" href="/docs/clients/c-sharp#method-withtokenprovider"><code>.WithTokenProvider(() => RefreshTokenAsync())</code></a>. Subscription <code>OnApplied</code> runs after every successful replay, so separate initial game setup from data-readiness handling.</p>
 <p>Here we configure the connection to the database, by passing it some callbacks in addition to providing the <code>SERVER_URL</code> and <code>DATABASE_NAME</code> to the connection. When the client connects, the SpacetimeDB SDK will call the <code>HandleConnect</code> method, allowing us to start up the game.</p>
 <p>In our <code>HandleConnect</code> callback we build a subscription and call <code>Subscribe</code>, subscribing to all data in the database. This causes SpacetimeDB to synchronize the state of all your tables with your Unity client&#x27;s SDK client cache.</p>
 \<hr\>

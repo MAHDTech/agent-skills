@@ -24,10 +24,10 @@ Every skill is a directory holding a `SKILL.md`, placed by what it does:
 skills/<category>/<name>/SKILL.md
 ```
 
-- **`<category>`** is one of the nine topic buckets: `engineering`, `game-development`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`. Category comes from the directory - never from a frontmatter key.
+- **`<category>`** is one of the ten topic buckets: `engineering`, `game-development`, `planning`, `review`, `github`, `reflection`, `writing`, `authoring`, `tooling`, `tars`. Category comes from the directory - never from a frontmatter key.
 - One **lifecycle bucket** sits inside the tree: `in-progress/` holds drafts. Retired skills leave `skills/` entirely for the top-level **archive**, `skills-archive/<category>/<name>/`, which keeps the original category.
 
-**Promotion** is the payoff of living in a topic bucket: only skills under the nine categories appear in the generated README, index, and installer. A skill in `in-progress/` is deliberately excluded - move it into a topic bucket to promote it. To retire one, use `/skill-archive`, which moves it to `skills-archive/` where it stays readable on the dashboard but is never installed.
+**Promotion** is the payoff of living in a topic bucket: only skills under the ten categories appear in the generated README, index, and installer. A skill in `in-progress/` is deliberately excluded - move it into a topic bucket to promote it. To retire one, use `/skill-archive`, which moves it to `skills-archive/` where it stays readable on the dashboard but is never installed.
 
 ## Naming
 

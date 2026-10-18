@@ -4115,6 +4115,14 @@ We have a rule that new features need to come with documentation and tests (`dev
 * `cargo fmt` - Format code.
 * `cargo clippy` - Lint code.
 
+The flake package must also evaluate without import-from-derivation, including when evaluating a Darwin package on Linux. Check this without building packages:
+
+```sh
+nix eval --raw .#packages.aarch64-darwin.devenv.drvPath \
+  --option allow-import-from-derivation false \
+  --option builders "" --option max-jobs 0 --option substitute false
+```
+
 ## Adding changelogs for breaking and behavior changes
 
 When making breaking changes or important behavior changes that affect users, add a changelog entry so they are informed after running `devenv update`.
@@ -8810,6 +8818,16 @@ pkgs.csharp-ls
 
 # elixir
 
+Enable Elixir with:
+
+```nix
+languages.elixir.enable = true;
+```
+
+Since devenv 2.4.1, this also provides `erl`, `erlc`, and `escript` from the Erlang runtime used to build your selected Elixir package. Selecting a different `languages.elixir.package` automatically selects its matching runtime.
+
+For custom packages that do not expose their Erlang dependency, set `languages.elixir.erlang.package` explicitly to the runtime used to build that package.
+
 ## Options
 
 ### languages.elixir.enable
@@ -8844,6 +8862,22 @@ Which Elixir package to use.
 
 ```nix
 pkgs.beamPackages.elixir
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/elixir.nix>
+
+### languages.elixir.erlang.package
+
+The Erlang runtime to include in the environment alongside Elixir. Defaults to the runtime used to build the selected Elixir package. Set this explicitly for custom packages that do not expose their Erlang dependency.
+
+*Type:* package
+
+*Default:*
+
+```nix
+the Erlang runtime used to build languages.elixir.package
 ```
 
 *Declared by:*
@@ -13280,6 +13314,12 @@ For more control over versions and features, use the `stable`, `beta`, or `night
 }
 ```
 
+### Custom toolchain packages
+
+Set `languages.rust.toolchainPackage` to supply an aggregate toolchain built elsewhere. Since devenv 2.4.1, custom packages and `toolchainFile` profiles use the selected compiler’s sysroot for standard-library source discovery instead of injecting sources from another toolchain. Include `rust-src` in these toolchains for standard-library navigation in rust-analyzer.
+
+If your sources are installed separately, set `env.RUST_SRC_PATH` to the matching standard-library source directory. This setting also overrides the default source path for component-based toolchains.
+
 ## Examples
 
 ### Basic setup with latest stable
@@ -13582,7 +13622,7 @@ The Rust language server package to use.
 
 * `nixpkgs` channel: `pkgs.rust-analyzer`.
 * non-nixpkgs channel: the `rust-analyzer` component from the rust-overlay toolchain, with a fallback to `pkgs.rust-analyzer` if not present in the manifest.
-* `toolchainFile`: the aggregated toolchain package derived from the file.
+* `toolchainFile`: the aggregated toolchain package if it contains rust-analyzer, otherwise `pkgs.rust-analyzer`.
 
 *Declared by:*
 
@@ -13827,6 +13867,10 @@ false
 *Declared by:*
 
 * <https://github.com/cachix/devenv/blob/main/src/modules/languages/rust.nix>
+
+### Language server with toolchain files
+
+Since devenv 2.4.1, toolchain files that omit `rust-analyzer`, including minimal profiles, use the standalone `pkgs.rust-analyzer` language server by default. If the file includes rust-analyzer, devenv uses the server from that toolchain instead. To keep the server tied to a pinned compiler version, list `rust-analyzer` in the file’s components. Set `languages.rust.lsp.package` to select another server, or disable it with `languages.rust.lsp.enable = false`.
 
 # scala
 

@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -38,6 +38,7 @@ skill_name = "spacetimedb"
 <span class="line"><span style="color:#50FA7B">sudo</span><span style="color:#F1FA8C"> chown</span><span style="color:#BD93F9"> -R</span><span style="color:#F1FA8C"> spacetimedb:spacetimedb</span><span style="color:#F1FA8C"> /stdb</span></span></code></pre>
 <p>Install SpacetimeDB as the new user:</p>
 <pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">sudo</span><span style="color:#BD93F9"> -u</span><span style="color:#F1FA8C"> spacetimedb</span><span style="color:#F1FA8C"> bash</span><span style="color:#BD93F9"> -c</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">curl -sSf https://install.spacetimedb.com | sh -s -- --root-dir /stdb --yes</span><span style="color:#E9F284">&#x27;</span></span></code></pre>
+<p>Because this installation uses <code>--root-dir /stdb</code>, include <code>--root-dir /stdb</code> when invoking <code>spacetime</code> for this installation. Otherwise, the CLI looks in its default directories rather than <code>/stdb</code>. The service and update commands below include the option for this reason.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="step-2-create-a-systemd-service-for-spacetimedb">Step 2: Create a Systemd Service for SpacetimeDB<a href="#step-2-create-a-systemd-service-for-spacetimedb" class="hash-link" aria-label="Direct link to Step 2: Create a Systemd Service for SpacetimeDB" title="Direct link to Step 2: Create a Systemd Service for SpacetimeDB" translate="no">​</a></h2>
 <p>To ensure SpacetimeDB runs on startup, create a systemd service file:</p>
 <pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#50FA7B">sudo</span><span style="color:#F1FA8C"> nano</span><span style="color:#F1FA8C"> /etc/systemd/system/spacetimedb.service</span></span></code></pre>

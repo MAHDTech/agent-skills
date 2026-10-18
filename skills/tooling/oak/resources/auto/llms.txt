@@ -1,0 +1,86 @@
+# Oak
+
+> Oak is the agentic substrate for software development: the version-control and storage layer autonomous coding agents build on. Mount remote repositories without a full clone, run a branch per task in parallel, snapshot up to 95% faster than git, and skip the per-commit message tax. Bring your own agent (Claude Code, Codex, Cursor): Oak is the version control system those agents push to, and it makes no AI calls of its own.
+
+Oak keeps a familiar surface — repos, branches, PR-style merges, push/pull, webhooks, large-file support — on a Rust engine with content-addressed storage, content-defined chunking (BLAKE3 + FastCDC), and lazy filesystem mounts. It is designed for how agents actually work: high branch volume, constant snapshots, parallel sessions, and large files.
+
+## Key facts
+
+- Install: `curl -fsSL https://oak.space/install | sh` (macOS, Linux) or `irm https://oak.space/install.ps1 | iex` (Windows PowerShell), then `oak login` and `oak init`. Or hand your agent the prompt from the homepage install section **"Copy prompt"** button (full setup + docs; not the install-only Copy button) and let it install itself.
+- Platforms: macOS (Apple Silicon and Intel), Linux (x86_64), and Windows (x86_64). Lazy mounts use FSKit on macOS, FUSE on Linux, and ProjFS on Windows. Linux ARM64 binaries are published on the GitHub releases page but the installer does not select them yet.
+- Pricing: Oak is free while it is in beta. Every organization gets 100GB of storage, with unlimited repositories, open branches, and organization members. Paid plans will return later; email zach@oak.space if you need more than 100GB in the meantime.
+- Branch model: you always work on a feature branch locally; `main` exists only on the server; `oak merge` is a server-side squash; intermediate commits carry no message; the branch description is the source of truth and becomes the squash-commit message.
+- CI: Oak runs CI on your own machines. Register them as self-hosted runners (the stock open-source `gitea-runner`) under an organization's Settings → Runners; workflows live at `.oak/workflows/\<name\>.yml` in GitHub Actions syntax (`runs-on` names runner labels; `needs:`, static matrices, `uses:` actions, and expressions work) and fire on branch pushes and merges (`push`, `pull_request`) or manually (`workflow_dispatch`). Per-repo CI secrets are encrypted at rest and masked in logs. CI is the merge gate: a squash-merge onto main is refused while the branch head's CI is red or in flight; `oak merge --wait` rides it out and `oak merge --force` overrides it.
+- Path permissions: declared in the repo as `.oak/PERMISSIONS` (CODEOWNERS-shaped, read from the `main` tip, last matching entry wins). Principals are `@user`, `@group/slug`, `*` (every repo reader), `@public` (the world), or none (org owners/admins only). For a repo reader the file narrows — restricted file names and sizes stay visible while their bytes are withheld. For an outsider `@public` widens instead, so a private repo can publish an open-source subtree; outsiders read it over the web UI or the read-only git snapshot, never `oak clone`/`pull`/`mount`.
+- Performance: median (p50) latency is up to 95% lower than git on initial snapshots, dirty snapshots, large-binary diff/status, and agent setup workflows. git is faster on cold repo initialization and process spawn (one-time fixed costs).
+- Data portability: `oak export \<dest\>` replays full branch history into a standard git repository, preserving author, email, and timestamp. A read-only git Smart-HTTP endpoint also serves the current `main` tree to stock `git clone`.
+- Privacy: Oak does not train machine-learning models on your code and makes no AI calls on your behalf. Any coding agent you run alongside Oak is its own separate integration.
+
+## Pages
+
+- [Homepage](https://oak.space/): the pitch, the case against git for agents, benchmarks, and FAQ.
+- [Docs](https://oak.space/docs): one page per topic; every page is also available as Markdown at `/docs/\<page\>.md`, and all of them in one file at [/docs/llms-full.txt](https://oak.space/docs/llms-full.txt).
+  - [Install and sign in](https://oak.space/docs/install)
+  - [Quickstart](https://oak.space/docs/quickstart)
+  - [Coming from Git](https://oak.space/docs/coming-from-git)
+  - [Making changes](https://oak.space/docs/making-changes)
+  - [Branches and descriptions](https://oak.space/docs/branches)
+  - [Merging and conflicts](https://oak.space/docs/merging)
+  - [Reviewing branches](https://oak.space/docs/reviewing)
+  - [History and inspection](https://oak.space/docs/history)
+  - [Working with agents](https://oak.space/docs/agents)
+  - [Example: a fleet of agents](https://oak.space/docs/example-session)
+  - [Lazy mounts](https://oak.space/docs/mounts)
+  - [Agent spaces](https://oak.space/docs/spaces)
+  - [Sparse clones](https://oak.space/docs/sparse-clones)
+  - [Continuous integration](https://oak.space/docs/ci)
+  - [Workflow file reference](https://oak.space/docs/ci-workflows)
+  - [Self-hosted runners](https://oak.space/docs/ci-runners)
+  - [Environments](https://oak.space/docs/ci-environments)
+  - [Organizations and access](https://oak.space/docs/organizations)
+  - [Path permissions](https://oak.space/docs/path-permissions)
+  - [API keys and tokens](https://oak.space/docs/api-keys)
+  - [Plans and limits](https://oak.space/docs/limits)
+  - [Git import, export, and interop](https://oak.space/docs/git)
+  - [Webhooks](https://oak.space/docs/webhooks)
+  - [Sites](https://oak.space/docs/sites)
+  - [CLI reference](https://oak.space/docs/cli)
+  - [Files and environment variables](https://oak.space/docs/configuration)
+  - [HTTP API reference](https://oak.space/docs/api)
+  - [How Oak works](https://oak.space/docs/internals)
+- [Pricing](https://oak.space/pricing): what Oak costs (nothing, during the beta) and the limits that apply.
+- [Blog](https://oak.space/blog): how and why Oak is built.
+- [Why I'm building Oak](https://oak.space/blog/git-is-forever): the founding note.
+- [Dev log #1](https://oak.space/blog/dev-log-1): what shipped in the six weeks after launch.
+- [Dev log #2](https://oak.space/blog/dev-log-2): what shipped from August to October 2026.
+
+## CLI quickstart
+
+- `oak init [path]` — initialize a repository and create a personal feature branch parented on `main`.
+- `oak clone [owner/repo] [dest]` — clone an Oak repo, or run without an argument to pick interactively. Use `--branch \<name\>` to clone a branch and `--shallow` to fetch only the latest default-branch commit.
+- `oak mount \<owner\>/\<repo\> ./task` — project a repo into a working tree without a full clone; files stream in on first read.
+- `oak switch -c <branch>` — start a feature branch for a task.
+- `oak desc "\<summary\>"` — set the branch description (this becomes the commit message on merge).
+- `oak commit` — local checkpoint on the feature branch (no per-commit message needed; does not publish).
+- `oak commit --push` — checkpoint, then explicitly publish the current branch.
+- `oak push --repo \<owner\>/\<name\>` — link and push a brand-new repo (owner must be an existing org slug).
+- `oak pull` — fetch current-branch commits from the remote, then merge the parent branch into your branch.
+- `oak fetch` — refresh local `main` from the remote without touching the working tree.
+- `oak status --json --compact` and `oak agent state --json --compact` — stable, bounded machine-readable state for agents.
+- `oak branch review <branch> --merge-preview --json` — checkout-free review evidence, changed-file summaries, triage detail, and merge prediction.
+- `oak conflict status|show|take --json` — inspect or mechanically resolve in-progress merge, pull, or mount conflicts.
+- `oak finish --desc-file \<file\> --json` — preflight, describe, checkpoint if needed, publish, and report the finalization phase.
+- `oak merge` — server-side squash onto `main`. Add `--wait` to ride out the CI gate, `--force` to override it after reading the failure. Merge API responses: 200 = landed (the squash is main's head); 412 = CI gate; 409 with `conflict_paths` = overlapping edits; 409 with `"code":"main_moved"` or `"code":"branch_moved"` (`"retryable":true`) = main or the branch moved during the merge and nothing was merged — retry; 400 "already closed" = already merged or closed.
+- `oak ci status|runs|logs <id>|rerun <id>` — the CI gate's visibility and recovery surface. `oak ci status` exits 0 on pass, 1 on fail, 3 while running.
+- `oak skill install` — install the bundled `oak-vcs` agent skill into `.claude/skills/` (or `--global`), so an agent drives Oak correctly instead of reaching for git.
+- `oak feedback -m "\<text\>" --json` — file a feature request or bug from the terminal; returns a tracking reference (`fb-N`).
+- `oak export \<dest\>` — replay full history into a fresh git repo.
+
+## CLI command surface
+
+Documented command groups: start a repo (`init`, `clone`), snapshot changes (`status`, `info`, `agent state`, `conflict`, `diff`, `commit`, `restore`, `reset`), history (`log` incl. `-S`/`-G` pickaxe search, `hash`, `rev-parse --short HEAD` compatibility), branches (`branch list/show/diff/review/triage/rename`, `switch`, `desc`, `finish`, `close`, `split`, `merge`), server sync (`login`, `logout`, `whoami`, `push`, `pull`, `fetch`), CI (`ci status/runs/logs/rerun`), mounts and spaces (`mount` incl. `--branch` to mount an existing remote branch, `mount list/finish/end/forget`, `space new/repos/clean`), partial checkouts (`sparse list/set/add/disable`), sites (`site enable/disable/show/list`), local tooling (`export`, `archive`, `open`, `upgrade`, `maintenance compact`, `serve`, `skill install`, `completions`, `feedback`), plus `auth status`, `repo list`, `branch train`, `ci wait/trigger/cancel`, `file/tree/refs inspect`, `change capture/export`, `space inventory`, `environment`, and `doctor`. Full reference: https://oak.space/docs/cli.
+
+## HTTP API surface
+
+The JSON API is rooted at `https://oak.space/api` and uses bearer API keys. Public docs cover auth (`/auth/*`, `/whoami`, GitHub OAuth/App connect callbacks), repositories (`/repos`, `/{owner}/{name}`, visibility, transfer, push/pull protocol, size), branches (list/create/show/merge/sync/close/reopen/rename), content and chunk storage (`commits/info`, `tree`, `raw`, `blobs/*`, `chunks/*`), CI (`ci/runs`, run detail, cancel, `ci/secrets`), path permissions (`path-permissions` and its propose endpoint), organizations, groups and audit, webhooks, organization sites, live import streams, and CLI release distribution endpoints. Full route details are on https://oak.space/docs/api.
+

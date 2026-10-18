@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -1002,7 +1002,8 @@ skill_name = "spacetimedb"
 <span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(HandleSubscriptionApplied)</span></span>
 <span class="line"><span style="color:#F8F8F2">        .</span><span style="color:#50FA7B">SubscribeToAllTables</span><span style="color:#F8F8F2">();</span></span>
 <span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
-<p>Keep the same WebGL guard from Part 2 here as well. On Unity WebGL, a reconnect can surface a short-lived WebSocket token in <code>HandleConnect</code>, so you should not overwrite an already-saved long-lived server-issued token.</p>
+<p>Keep the same WebGL guard from Part 2 while using the default connection behavior. A new connection using a saved token can return a short-lived WebSocket token, which should not overwrite the saved authentication token. With <a class="" href="/docs/clients/c-sharp#method-withautomaticreconnect">automatic reconnect</a> enabled, <code>HandleConnect</code> receives the retained authentication token on the initial connection. Save retained or refreshed tokens from <code>OnAutomaticReconnect</code> after recovery as well.</p>
+<p>If you enable automatic reconnect, <code>HandleConnect</code>, registered through <code>OnConnect</code>, still runs only once, so the row-callback registrations, initial <code>OnConnected</code> setup, and subscription creation above can stay as written. Use a separate <code>OnAutomaticReconnect</code> callback for recovery-specific work. Existing callbacks and subscriptions survive; do not register them again. The SDK updates the cache and emits net row changes after replay; use subscription <code>OnApplied</code> to mark the data ready again.</p>
 <p>Next add the following implementations for those callbacks to the <code>GameManager</code> class.</p>
 <pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">private</span><span style="color:#FF79C6"> static</span><span style="color:#FF79C6"> void</span><span style="color:#50FA7B"> CircleOnInsert</span><span style="color:#F8F8F2">(</span><span style="color:#8BE9FD;font-style:italic">EventContext</span><span style="color:#FFB86C;font-style:italic"> context</span><span style="color:#F8F8F2">, </span><span style="color:#8BE9FD;font-style:italic">Circle</span><span style="color:#FFB86C;font-style:italic"> insertedValue</span><span style="color:#F8F8F2">)</span></span>
 <span class="line"><span style="color:#F8F8F2">{</span></span>

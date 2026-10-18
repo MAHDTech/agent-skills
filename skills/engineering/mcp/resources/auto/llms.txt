@@ -348,6 +348,7 @@
 - [Infrastructure Charter](https://modelcontextprotocol.io/community/working-groups/infrastructure.md): Charter for the MCP Infrastructure Working Group.
 - [Inspector V2 Working Group Charter](https://modelcontextprotocol.io/community/working-groups/inspector-v2.md): Charter for the Inspector V2 Working Group, a Working Group of the Model Context Protocol community.
 - [Interceptors Charter](https://modelcontextprotocol.io/community/working-groups/interceptors.md): Charter for the MCP Interceptors Working Group.
+- [Progressive Disclosure Charter](https://modelcontextprotocol.io/community/working-groups/progressive-disclosure.md): Charter for the MCP Progressive Disclosure Working Group.
 - [Registry Charter](https://modelcontextprotocol.io/community/working-groups/registry.md): Charter for the MCP Registry Working Group.
 - [SDK Working Group Charter](https://modelcontextprotocol.io/community/working-groups/sdk.md): Charter for the MCP SDK Working Group.
 - [Server Card Charter](https://modelcontextprotocol.io/community/working-groups/server-card.md): Charter for the MCP Server Card Working Group.
@@ -358,7 +359,6 @@
 - [Enterprise Interest Group Charter](https://modelcontextprotocol.io/community/interest-groups/enterprise.md): Charter for the MCP Enterprise Interest Group.
 - [Enterprise-Managed Authorization Charter](https://modelcontextprotocol.io/community/interest-groups/enterprise-managed-authorization.md): Charter for the MCP Enterprise-Managed Authorization Interest Group.
 - [Financial Services Charter](https://modelcontextprotocol.io/community/interest-groups/financial-services.md): Charter for the MCP Financial Services Interest Group.
-- [Primitive Grouping Charter](https://modelcontextprotocol.io/community/interest-groups/primitive-grouping.md): Charter for the MCP Primitive Grouping Interest Group.
 - [Scientific Computing Charter](https://modelcontextprotocol.io/community/interest-groups/scientific-computing.md): Charter for the MCP Scientific Computing Interest Group.
 - [Security Charter](https://modelcontextprotocol.io/community/interest-groups/security.md): Charter for the MCP Security Interest Group.
 - [Tool Annotations Charter](https://modelcontextprotocol.io/community/interest-groups/tool-annotations.md): Charter for the MCP Tool Annotations Interest Group.

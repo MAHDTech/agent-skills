@@ -348,7 +348,7 @@ See the [CLI reference](/docs/cli-reference/) for the complete command and optio
 
 > Install Herdr instructions for Claude Code or another coding agent.
 
-Herdr ships a reusable agent skill file at [`skills/herdr/SKILL.md`](https://github.com/herdrdev/herdr/blob/v0.9.3/skills/herdr/SKILL.md).
+Herdr ships a reusable agent skill file at [`skills/herdr/SKILL.md`](https://github.com/herdrdev/herdr/blob/v0.9.5/skills/herdr/SKILL.md).
 
 Install that file into any coding agent that supports reusable skills or custom instructions. The skill teaches the agent how to control Herdr from inside a Herdr pane.
 
@@ -387,7 +387,7 @@ The `-g` flag installs it globally for supported agents. Omit `-g` to install it
 Use the repository copy as the manual fallback and source of truth:
 
 ```text
-https://github.com/herdrdev/herdr/blob/v0.9.3/skills/herdr/SKILL.md
+https://github.com/herdrdev/herdr/blob/v0.9.5/skills/herdr/SKILL.md
 ```
 
 For agents with a skill system, install that file as a skill named `herdr`. For agents without a skill system, paste the file into the agent’s project or user instructions.
@@ -417,7 +417,7 @@ The full command guide lives in the skill file itself. It covers pane IDs, `pane
 
 Read the source file here:
 
-[Open `SKILL.md` on GitHub →](https://github.com/herdrdev/herdr/blob/v0.9.3/skills/herdr/SKILL.md)
+[Open `SKILL.md` on GitHub →](https://github.com/herdrdev/herdr/blob/v0.9.5/skills/herdr/SKILL.md)
 
 # Agents
 
@@ -503,11 +503,13 @@ Some restricted Linux runtimes do not expose a terminal foreground process group
 
 [Section titled “Blocked state”](#blocked-state)
 
-Blocked detection is deliberately strict for screen-manifest agents. Herdr only marks `blocked` when the live bottom-buffer snapshot matches known visible approval, question, or permission UI. If no manifest rule matches for a known agent other than Codex, Herdr falls back to `idle` and labels that fallback as `default_known_agent_idle_fallback` in explain output. Codex falls back to `unknown` because its title and composer can look the same during an active turn and after a response.
+Blocked detection is deliberately strict for screen-manifest agents. Herdr only marks `blocked` when the live bottom-buffer snapshot matches known visible approval, question, or permission UI. If no manifest rule matches for a known agent, Herdr falls back to `idle` and labels that fallback as `default_known_agent_idle_fallback` in explain output.
 
-For those other agents, unusual new prompts may initially show as `idle` instead of `blocked` until Herdr learns that screen shape. The misclassification affects only the visible status and waits. It should not make Herdr send input or take destructive action.
+Unusual new agent prompts may initially show as `idle` instead of `blocked` until Herdr learns that screen shape. Detection itself does not send input, but automation that trusts a mistaken idle state can type into an approval dialog. Inspect unexpected prompts before sending more input; idle status is not authorization to approve an action.
 
-For Codex, a visible spinner or live activity timer can establish `working`, and a visible approval prompt can establish `blocked`. When Codex’s terminal title shows no spinner, Herdr reports `idle`. Codex stays `unknown` only when no rule matches, for example when Codex sets no terminal title, and waits for `idle` or completion may then time out. Managed startup uses the initial composer only to determine when it can accept a prompt; that observation does not change turn status.
+Antigravity and Grok count as idle once they return to their prompt, even if background tasks, monitors, or subagents are still running. `agent wait` and `agent prompt --wait` observe the agent’s state, not completion of those jobs.
+
+Suspending an agent with Ctrl+Z preserves its name, session reference, and hook authority while the exact process remains alive behind the shell or another non-agent command. Returning with `fg` keeps that identity. This does not cover another recognized agent taking over the foreground. A retained identity does not mean the agent can receive input while suspended; inspect the pane before prompting it.
 
 ## Detection manifests
 
@@ -826,7 +828,7 @@ herdr tab close <tab_id>
 
 A tab is another terminal layout inside a workspace. Without `--workspace`, `tab create` uses the active workspace and fails if none exists. Its JSON response exposes `.result.tab.tab_id` and `.result.root_pane.pane_id`. Closing a workspace’s last tab also closes the workspace, matching the TUI close-tab action. If `confirm_close` is enabled and closing the tab would also close a whole worktree group, `tab close` returns a `confirmation_required` error instead.
 
-With `ui.confirm_close` enabled, the TUI asks for confirmation before closing a workspace’s last tab from a keybinding or the tab menu. Ordinary CLI/API tab closes remain immediate.
+With `ui.confirm_close` enabled, the TUI asks for confirmation before closing a workspace’s last tab or its only pane from a keybinding or the tab/pane menu. Ordinary pane closes and CLI/API closes remain immediate.
 
 Workspace and tab creation, and pane splitting, leave focus unchanged by default. `--focus` selects the new layout; `--no-focus` states the default explicitly. Without `--cwd`, new terminals follow the configured `terminal.new_cwd` policy, which follows the source pane or workspace by default. Each `--env KEY=VALUE` adds or replaces that variable in the new root shell.
 
@@ -1070,13 +1072,14 @@ Install, list, and remove plugins:
 
 ```bash
 herdr plugin install <owner>/<repo>[/subdir...] [--ref REF] [--yes]
+herdr plugin update [<plugin_id|owner/repo[/subdir...]>...] [--yes]
 herdr plugin list [--plugin ID] [--json]
 herdr plugin uninstall <plugin_id|owner/repo[/subdir...]>
 herdr plugin enable <plugin_id>
 herdr plugin disable <plugin_id>
 ```
 
-`plugin install` accepts GitHub shorthand only, such as `ogulcancelik/herdr-plugin-examples/worktree-bootstrap`. It uses `git`, shows a trust preview in interactive terminals, runs supported manifest build commands, and stores GitHub installs in a Herdr-managed directory. Use `--yes` for noninteractive installs. Reinstalling a GitHub-managed plugin replaces that managed checkout. Installing over a locally linked plugin is refused. Plugin manifests must declare `min_herdr_version`; install and link fail when the plugin requires a newer Herdr binary. `plugin list` is human-readable by default; pass `--json` for the raw API response.
+`plugin install` accepts GitHub shorthand only, such as `ogulcancelik/herdr-plugin-examples/worktree-bootstrap`. It uses `git`, shows a trust preview in interactive terminals, runs supported manifest build commands, and stores GitHub installs in a Herdr-managed directory. Use `--yes` for noninteractive installs. `plugin update` refreshes every GitHub-managed plugin when no targets are given, or only the listed plugin ids or GitHub sources. It preserves each install’s requested ref, skips unchanged commits and ignores locally linked plugins during bulk updates. Reinstalling a GitHub-managed plugin creates a new installation directory. Running plugins keep their original files; new invocations use the new installation. Installing over a locally linked plugin is refused. Plugin manifests must declare `min_herdr_version`; install and link fail when the plugin requires a newer Herdr binary. `plugin list` is human-readable by default; pass `--json` for the raw API response.
 
 Plugin installation and enabled state are global to the current user. A plugin installed, linked, enabled, or disabled through one Herdr session is immediately available with the same state in every session.
 
@@ -1087,7 +1090,7 @@ herdr plugin link <path> [--disabled]
 herdr plugin unlink <plugin_id>
 ```
 
-`plugin link` accepts a plugin directory containing `herdr-plugin.toml` or a direct manifest path. Use it while authoring or testing a plugin from a local checkout. `plugin unlink` unregisters the plugin and leaves files alone. `plugin uninstall` unregisters a plugin and also removes Herdr-managed GitHub checkout files. For GitHub installs, uninstall accepts either the plugin id or the same `owner/repo[/subdir...]` shorthand used by install. Actions, event hooks, panes, and link handlers are declared in the manifest; runtime action registration is not part of v1.
+`plugin link` accepts a plugin directory containing `herdr-plugin.toml` or a direct manifest path. Use it while authoring or testing a plugin from a local checkout. `plugin unlink` and `plugin uninstall` unregister the plugin and leave files in place so running plugins can finish. Updates and reinstalls also retain previous installations; new invocations use the replacement without a config reload. A later successful installation/update or server startup removes obsolete managed installations after the servers using them have exited. Config reload does not release old installations. Plugins must stop detached background processes before their parent command or pane exits; processes surviving server exit are not protected from cleanup. Legacy installations without cleanup tracking and locally linked files are retained. For GitHub installs, uninstall accepts either the plugin id or the same `owner/repo[/subdir...]` shorthand used by install. Actions, event hooks, panes, and link handlers are declared in the manifest; runtime action registration is not part of v1.
 
 Config directory:
 
@@ -1122,7 +1125,7 @@ herdr plugin pane close <pane_id>
 
 `plugin pane open` requires the plugin to be linked, enabled, and compatible with the current platform. It starts a manifest-declared `[[panes]]` command as a Herdr-managed terminal pane. The manifest default is `overlay`, which opens a temporary zoomed overlay over the active pane. It can also open as a split, a new tab, a zoomed pane, or a session-modal `popup` that does not change the tab layout. `--width` and `--height` set the outer popup dimensions in terminal cells or percentages such as `80%`; omitted dimensions default to half the terminal size, and values smaller than the popup minimum are clamped. A popup is not a Herdr pane, does not export `HERDR_PANE_ID`, and does not participate in pane or agent APIs. Native non-terminal plugin panes are outside plugin v1.
 
-New panes identify as `TERM_PROGRAM=herdr`, with `TERM_PROGRAM_VERSION` set to Herdr’s version. They keep `TERM=xterm-256color` and `COLORTERM=truecolor`. Herdr removes inherited outer-terminal session markers (iTerm2, WezTerm, Kitty, Windows Terminal, tmux, screen, and Zellij), iTerm2’s `LC_TERMINAL` identity, and known Claude Code, Codex, and OMP session markers before applying explicit launch environment values. This prevents new panes from claiming the terminal or agent session that originally started the server. Ordinary environment variables, including API keys and display settings, remain inherited rather than being replaced with the attaching client’s environment. SSH-agent forwarding has its own reconnect handling. Existing pane processes are unchanged by this cleanup.
+New panes identify as `TERM_PROGRAM=herdr`, with `TERM_PROGRAM_VERSION` set to Herdr’s version. They keep `TERM=xterm-256color` and `COLORTERM=truecolor`. They also get `fish_handle_reflow=0`, because Herdr reflows text on resize; an inherited or explicit `fish_handle_reflow` value is kept. Herdr removes inherited outer-terminal session markers (iTerm2, WezTerm, Kitty, Windows Terminal, tmux, screen, and Zellij), iTerm2’s `LC_TERMINAL` identity, and known Claude Code, Codex, and OMP session markers before applying explicit launch environment values. This prevents new panes from claiming the terminal or agent session that originally started the server. Ordinary environment variables, including API keys and display settings, remain inherited rather than being replaced with the attaching client’s environment. SSH-agent forwarding has its own reconnect handling. Existing pane processes are unchanged by this cleanup.
 
 `--env KEY=VALUE` can be repeated on process-launching commands. It applies to the newly launched process only. Herdr-managed variables such as `HERDR_SOCKET_PATH`, `HERDR_BIN_PATH`, `HERDR_ENV`, `HERDR_WORKSPACE_ID`, `HERDR_TAB_ID`, `HERDR_PANE_ID`, `HERDR_PLUGIN_ID`, `HERDR_PLUGIN_ROOT`, `HERDR_PLUGIN_CONFIG_DIR`, `HERDR_PLUGIN_STATE_DIR`, `HERDR_PLUGIN_ENTRYPOINT_ID`, and `HERDR_PLUGIN_CONTEXT_JSON` stay authoritative when they conflict with caller-provided env.
 
@@ -1277,7 +1280,7 @@ Custom command bindings (`[[keys.command]]`) are user-defined tables and are not
 
 filter keys, e.g. sidebar, prefix, sound…
 
-210 keys
+211 keys
 
 ## General
 
@@ -1286,6 +1289,10 @@ filter keys, e.g. sidebar, prefix, sound…
   Show first-run setup on startup. Missing or true shows onboarding; continuing from onboarding writes onboarding = false.
 
 ## Server
+
+* `server.allow_unelevated_clients` boolean default `false`
+
+  Windows only: allow ordinary clients from the same account to control an elevated server and its administrator panes. Applies at server startup and requires a restart; config reload does not change access. The --allow-unelevated-clients startup flag enables sharing even when this setting is false.
 
 * `server.headless_cols` integer default `120`
 
@@ -2670,6 +2677,8 @@ Choose `herdr` for an in-app toast, `terminal` for an outer-terminal notificatio
 
 On macOS, `system` tries `terminal-notifier` first and falls back to `/usr/bin/osascript` when it is unavailable or fails. The fallback appears as Script Editor in Notification Center and cannot activate the hosting terminal. Install `terminal-notifier` with `brew install terminal-notifier`. For a supported, detected terminal, it can activate the terminal app when you click the notification. Alternatively, choose `terminal` to let a supported outer terminal own the notification.
 
+On Windows, `system` notifications remain in Notification Center. Clicking one selects its originating pane in the running Herdr client and brings its terminal window forward when Windows exposes that window. A click cannot reopen a closed client or select a pane from a restarted server. Windows Terminal can bring the owning window forward, but cannot reliably select a different outer terminal tab.
+
 ## Sound
 
 [Section titled “Sound”](#sound)
@@ -3723,6 +3732,12 @@ The full keymap and the binding syntax live in the [keybinding reference](/docs/
 
 The Goto picker (`prefix+g`) lists each agent or terminal on its own row, grouped by workspace. Split tabs never hide their panes behind another row. Click a row or press Enter to jump directly to it. Press `/` to search names, agent kinds, tabs, workspaces, branches, or paths; use Up/Down or `j/k` to move between rows when not typing a search. Left/Right jumps to the first agent or terminal in the previous/next workspace section, without wrapping. While editing a search, Left/Right moves the text cursor instead. Outside search, `b/w/i/d` filter blocked, working, idle, or done agents, and `a` shows all terminals again. The selected destination’s location and path appear below the list. When the list overflows, use the mouse wheel, click the scrollbar track, or drag its thumb to scroll without opening a destination.
 
+Press Esc or Ctrl+\[ to leave workspace navigation. In the Go To picker, `/` also opens search on layouts that require Shift to type it.
+
+Pane input follows the keyboard modes requested by the app. Plain shells receive Ctrl+Shift+letter as its control byte; Super, Hyper, and Meta chords are dropped when the pane cannot represent them. Apps using Kitty keyboard input receive the modifiers and key events they request. Without report-all mode, modified Enter, Tab, and Backspace do not receive release reports. Keypad keys and modifier-only presses are not forwarded.
+
+On non-Latin layouts, Ctrl-only shortcuts such as Ctrl+W can use the physical base key reported by a Kitty-capable host. Latin layout characters, Ctrl+Shift chords, and AltGr keep their layout meaning. Terminals that do not report physical keys cannot provide the same layout-independent shortcuts.
+
 ## Editing text fields
 
 [Section titled “Editing text fields”](#editing-text-fields)
@@ -3854,6 +3869,8 @@ Detach the client with `ctrl+b q`; panes and agents keep running. Reattach by ru
 
 When Herdr starts again after a full server stop, it restores the saved session shape. For what survives detach, server restart, screen history replay, native agent session restore, and live handoff, see [Session state and restore](/docs/session-state/).
 
+On Linux and macOS, the server ignores `SIGHUP`, so a hangup from its launching shell does not stop the panes. To stop it deliberately, use `herdr server stop` or `SIGTERM`; scripts that previously used `SIGHUP` must change. Shutdown logs record the reason.
+
 ## Named sessions
 
 [Section titled “Named sessions”](#named-sessions)
@@ -3897,6 +3914,8 @@ herdr --remote workbox
 herdr --remote ssh://you@server:2222
 ```
 
+Sidebar width, section split, collapsed groups, and agent sorting are saved locally for each remote target and session. Reattaching to the same target and session restores these preferences. Different SSH aliases or sessions have separate preferences.
+
 In this mode, the remote server owns the running panes and sends their terminal content and session state over SSH. Your local Herdr draws the UI, including its sidebar, menus, and theme. Because the client runs locally, Herdr can bridge local desktop features such as image clipboard paste into the remote session by copying the image to a remote temp file and pasting that path.
 
 By default, `herdr --remote` uses your local Herdr keybindings for that attach. This keeps local muscle memory even when the remote server has different config. After editing local keybindings, use the UI’s `reload config` action to apply them without detaching. Use `--remote-keybindings server` when you want the remote server config instead. Local custom command keybindings are not sent, because those commands would run on the remote host.
@@ -3916,7 +3935,7 @@ Then attach with:
 herdr --remote workbox
 ```
 
-Remote attach and saved SSH machines support Linux, macOS, and Windows local clients connecting to Linux or macOS hosts on x86\_64 and aarch64, or Windows hosts on x86\_64. Local and remote versions do not need to match once both support the stable endpoint generation. On Linux and macOS hosts, Herdr prefers a compatible `herdr` already on the remote `PATH`, then checks common direct, Homebrew, mise, and Nix profile install paths. On Windows hosts, Herdr checks `PATH` and the active managed release. If no compatible binary exists, interactive runs prompt to install or update one; non-interactive runs fail instead of modifying the host. Linux and macOS installs use `~/.local/bin/herdr`; Windows installs use the complete Windows package and its app-local ConPTY runtime. If `~/.local/bin` is not on the remote `PATH`, Herdr warns after install.
+Remote attach and saved SSH machines support Linux, macOS, and Windows local clients connecting to Linux or macOS hosts on x86\_64 and aarch64, or Windows hosts on x86\_64. Windows ARM64 hosts are supported on a best-effort basis using the x64 build under Windows emulation; bugs and issues are expected. Explicit remote attach and saved-machine setup display an emulation note when the host reports ARM64. Local and remote versions do not need to match once both support the stable endpoint generation. On Linux and macOS hosts, Herdr prefers a compatible `herdr` already on the remote `PATH`, then checks common direct, Homebrew, mise, and Nix profile install paths. On Windows hosts, Herdr checks `PATH` and the active managed release. If no compatible binary exists, interactive runs prompt to install or update one; non-interactive runs fail instead of modifying the host. Linux and macOS installs use `~/.local/bin/herdr`; Windows installs use the complete Windows package and its app-local ConPTY runtime. If `~/.local/bin` is not on the remote `PATH`, Herdr warns after install.
 
 By default, `herdr --remote` runs remote setup and the bridge through a temporary SSH config that includes your SSH config first, then adds fallback keepalive settings. Existing user keepalive settings win. Linux and macOS clients also use a private per-attach control socket for connection reuse; Windows OpenSSH does not. Set `[remote].manage_ssh_config = false` to use plain `ssh` without Herdr’s generated config or control socket.
 
@@ -4143,6 +4162,7 @@ Install an example plugin:
 
 ```bash
 herdr plugin install ogulcancelik/herdr-plugin-examples/agent-telegram-notify
+herdr plugin update
 herdr plugin config-dir examples.agent-telegram-notify
 herdr plugin list
 herdr plugin action list --plugin examples.agent-telegram-notify
@@ -4159,9 +4179,9 @@ herdr plugin pane open --plugin example.layout --entrypoint board
 herdr plugin log list --plugin example.layout
 ```
 
-`plugin install` accepts GitHub shorthand only, such as `owner/repo/subdir`. It clones with `git`, shows a preview in interactive terminals, runs supported build commands, then stores the checkout under Herdr-managed plugin data and registers it. Use `--yes` for noninteractive installs. Reinstalling a GitHub-managed plugin replaces that managed checkout. Installed and linked plugins, including their enabled state, are global to the current user and available in every Herdr session. Both `plugin install` and `plugin link` can register plugins while no Herdr server is running. Plugins installed only in a named session on Herdr 0.7.3 must be installed or linked again. Existing plugin config and state remain in place. Installing over a locally linked plugin is refused; unlink or uninstall the local plugin first. `plugin install` and `plugin link` create the plugin’s config and state directories, and `plugin config-dir <id>` prints the config directory for setup docs and shell scripts.
+`plugin install` accepts GitHub shorthand only, such as `owner/repo/subdir`. It clones with `git`, shows a preview in interactive terminals, builds in a new Herdr-managed installation directory, and registers it. Use `--yes` for noninteractive installs. Updates and reinstalls leave the previous installation in place: running commands and panes keep their original files, while new invocations use the new installation without a config reload. Existing processes are not restarted, and startup hooks run at the next server startup as usual. `plugin update` refreshes every GitHub-managed plugin when called without a target, or only the listed plugin ids or GitHub sources. It refetches the ref recorded during install, skips unchanged commits, and ignores locally linked plugins during bulk updates. Use `--yes` for noninteractive updates. Installed and linked plugins, including their enabled state, are global to the current user and available in every Herdr session. Both `plugin install` and `plugin link` can register plugins while no Herdr server is running. Plugins installed only in a named session on Herdr 0.7.3 must be installed or linked again. Existing plugin config and state remain in place. Installing over a locally linked plugin is refused; unlink or uninstall the local plugin first. `plugin install` and `plugin link` create the plugin’s config and state directories, and `plugin config-dir <id>` prints the config directory for setup docs and shell scripts.
 
-`plugin uninstall <id-or-source>` unregisters the plugin. For GitHub-managed installs it also removes the managed checkout, and it accepts either the plugin id or the same `owner/repo[/subdir...]` shorthand used by install. `plugin unlink <id>` only unregisters a plugin and leaves files alone, which is useful for local development. There is no separate `plugin update` in v1; reinstall from GitHub to refresh a managed plugin.
+`plugin uninstall <id-or-source>` unregisters the plugin and accepts either the plugin id or the same `owner/repo[/subdir...]` shorthand used by install. Installation files are retained after updates, reinstalls, and uninstall so running plugins can finish. A later successful installation/update or server startup automatically removes obsolete managed installations once the servers using them have exited. Reloading config does not release old installations. Stop plugin work before shutting down its server: processes surviving server exit are not protected from cleanup. Plugins must stop detached background processes before their parent command or pane exits. Legacy installations without cleanup tracking are retained. Config and state are preserved. `plugin unlink <id>` only unregisters a plugin and leaves files alone, which is useful for local development.
 
 The example cookbook repo is `ogulcancelik/herdr-plugin-examples`. It contains separate example plugins in subdirectories, including `agent-telegram-notify`, `github-link-preview`, and `dev-layout-bootstrap`. Use them as examples to copy; Herdr does not maintain them as official plugins.
 
@@ -4240,6 +4260,8 @@ description = "apply layout"
 
 Use `[[link_handlers]]` to route modified clicks on matching terminal URLs to a plugin action instead of opening the URL in the browser. The modified-click modifier is Control on every platform, including macOS, because captured terminal mouse reports do not expose Command/Super separately from a plain click. `pattern` is a Rust regular expression matched against the clicked URL, and `action` must name an action declared by the same plugin. Link handler actions receive `invocation_source = "link_click"`, `clicked_url`, and `link_handler_id` in `HERDR_PLUGIN_CONTEXT_JSON`; shell plugins can also read `HERDR_PLUGIN_CLICKED_URL` and `HERDR_PLUGIN_LINK_HANDLER_ID`. Handlers are checked in manifest order inside each plugin.
 
+Link clicks invoke plugins only while `ui.mouse_capture` is enabled. Matching handlers run first. A launch failure shows an error and stops. Without a matching handler, only HTTP(S) links open externally. When capture is disabled, the outer terminal handles explicit hyperlinks using its own shortcuts and warnings. See [mouse controls](/docs/quick-start/#use-the-mouse) for the Windows Terminal URL detection caveat.
+
 ## Storage
 
 [Section titled “Storage”](#storage)
@@ -4278,7 +4300,13 @@ When a session has no workspaces, Herdr opens one automatically. A workspace is 
 
 Herdr is mouse-native, so start by clicking panes, tabs, workspaces, and agents to focus them. Drag split borders to resize. Right-click for context menus, including splitting panes and creating tabs. Drag-select text to copy it to your clipboard. Double-click a token to select it, or hold the second press and drag to extend the selection by whole words. Both gestures copy when you release the mouse. Copying does not require Ctrl+C.
 
-Ctrl-click opens pane links when your terminal sends the modified click to Herdr. This works for OSC 8 hyperlinks and `http://` or `https://` URLs, including wrapped links whose beginning or end is outside the visible area. Hold Ctrl and move the pointer over a link to underline its visible segments. Hover highlighting clears when you move away, the pane content changes, or Herdr receives a Ctrl-release event; some terminals only report modifier changes with mouse movement. On macOS, use Ctrl-click for Herdr-handled pane links while mouse capture is enabled; Cmd-click is only available through the terminal-native bypass path, such as Shift-Cmd-click or `ui.mouse_capture = false`.
+Ctrl-click opens pane links when your terminal sends the modified click to Herdr. This works for OSC 8 hyperlinks and `http://` or `https://` URLs, including wrapped links whose beginning or end is outside the visible area. Hold Ctrl and move the pointer over a link to underline its visible segments. Hover highlighting clears when you move away, the pane content changes, or Herdr receives a Ctrl-release event; some terminals only report modifier changes with mouse movement.
+
+With `ui.mouse_capture = true` (the default), Herdr handles Ctrl-clicks. Matching enabled plugins run first. A handler launch failure shows an error and stops. Unmatched `http://` and `https://` links open in the default browser on the machine running the Herdr client. Other links need a matching plugin. Explicit hyperlinks are not advertised to the outer terminal in this mode, so native bypass clicks on labeled links are unavailable, including Command-click on macOS.
+
+With `ui.mouse_capture = false`, explicit hyperlinks are passed to the outer terminal. Use its normal link shortcuts and warnings. These clicks do not invoke Herdr plugins. Disabling capture also disables Herdr’s mouse controls, including clicking tabs and dragging split borders.
+
+Windows Terminal can still intercept URLs it detects in visible text. For reliable plugin priority on those URLs, set `"experimental.detectURLs": false` in Windows Terminal’s `settings.json`. This setting applies to all Windows Terminal profiles. Herdr does not change it.
 
 If you configure `ui.right_click_passthrough_modifier`, that modifier plus right-click sends right-click, hold, and drag gestures to mouse-reporting pane apps. To make normal right-click go to one pane app, choose **Send right-clicks to pane** from that pane’s menu or run `herdr pane input --current --right-click pane` inside it. Right-click the pane frame to reopen Herdr’s menu.
 
@@ -4614,6 +4642,8 @@ From the CLI, `herdr api snapshot` prints the live `session.snapshot` response a
 Pane control methods use public pane ids such as `w1:p1`. Methods whose schema makes `pane_id` optional use the server’s active focused pane when it is omitted. `pane.move` always requires the source `pane_id`.
 
 `pane.send_keys` and `pane.send_input.keys` accept Herdr key-combo strings: plain printable keys, special keys like `enter` and `esc`, modifier chords like `ctrl+h`, `control+j`, `alt+x`, and `shift+tab`, function keys like `f1`, and named punctuation like `minus` and `plus`. They do not accept `prefix+` binding strings.
+
+On macOS, `pane.send_input` (used by `pane run`) and `agent.start` check the terminal’s current canonical input limit before accepting a command into the input queue. An oversized encoded line, including Enter, is rejected in full; wait for the shell prompt and retry. Multiple short lines and raw-mode input remain supported. Successful responses still acknowledge queue admission, not command execution. This check covers the current submission only: it cannot inspect an earlier incomplete line or guarantee the terminal mode will remain unchanged while input is queued.
 
 ```json
 {"id":"req_current","method":"pane.current","params":{"caller_pane_id":"w1:p1"}}
@@ -5457,6 +5487,19 @@ For internal testing, `HERDR_MANIFEST_URL` can point the installer at a custom m
 
 Local persistent sessions continue running after the client detaches or its terminal window closes. Servers and pane processes launched through Windows OpenSSH also survive logout; run `herdr` again to reconnect.
 
+Elevated Windows servers require an administrator client by default, including servers started through an elevated SSH login. Ordinary servers accept clients from ordinary and administrator terminals belonging to the same account; attaching never changes the server’s privileges.
+
+To deliberately share elevated sessions with ordinary clients, set:
+
+```toml
+[server]
+allow_unelevated_clients = true
+```
+
+This Windows-only setting is off by default and applies when a new server starts, including automatic startup. Reloading config does not change a running server’s access policy. You can instead enable sharing for one server process from an administrator terminal with `herdr server --allow-unelevated-clients` (or `herdr --session \<name\> server --allow-unelevated-clients` for a named session). The flag enables sharing even when the config setting is false.
+
+Either option allows ordinary local processes belonging to that account to control administrator panes; other accounts remain excluded. The flag must be supplied again after a restart unless sharing is enabled in config. Existing servers retain their previous access policy until stopped and restarted with the updated build; stopping closes their panes. Config and recovery files retain their account-based permissions.
+
 Windows agent process detection scans descendants of the pane shell and recognizes direct agents plus common command wrappers, including npm/Node and Git Bash process chains. It follows Git Bash-launched agents across emulated `exec` boundaries, but it is not the same as Unix foreground process-group detection.
 
 Windows integration installation currently supports Pi, OMP, Claude Code, Codex, GitHub Copilot CLI, Devin CLI, OpenCode, Kilo Code CLI, Droid, Kimi Code CLI, Qoder CLI, and Antigravity CLI. Availability is narrower than on Unix; Herdr hides or rejects integrations whose install format is not supported on Windows.
@@ -5530,6 +5573,8 @@ Windows packages include Microsoft’s current app-local ConPTY runtime because 
 Herdr’s pane text copy works on Windows. Drag-select text inside a pane to copy through Herdr.
 
 For text paste, use `ctrl+shift+v` in Windows Terminal. Multiline text paste is bracketed so shells and agent prompts receive it as one paste instead of submitting each line separately. Hold `shift` and right-click to use the outer terminal paste action instead of sending the click through Herdr.
+
+Windows clients also recover text when WezTerm wraps a complete sequence of Win32 character press/release pairs in raw paste markers. Mixed text and incomplete reports are not decoded by this compatibility rule. Literal clipboard text consisting entirely of matching Win32 reports is indistinguishable from this encoding and is decoded too.
 
 ## Not supported on Windows
 
