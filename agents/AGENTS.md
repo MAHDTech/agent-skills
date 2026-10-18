@@ -43,7 +43,6 @@ description: Single source of truth for agent instructions
 - **prioritize-backlog**: Groom and prioritise a backlog - order, cut, cluster, and sequence a pile of work by value against cost and risk so the next thing to do is obvious. Use when the user wants to prioritise or rank a backlog, decide what to build next, trim or triage a pile of ideas, apply a lens like value-vs-effort, RICE, or cost-of-delay/WSJF, or sequence work around dependencies.
 - **software-factory**: Run a feature through four approval gates - Product, Architecture, Program Design, Slices - so every decision that matters is made and signed off before implementation code exists.
 - **store-plan**: Capture the current conversation's plan, decisions, and action items into a structured, reviewable markdown file in the project's docs/plans/ directory.
-- **tars-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal.
 - **to-spec**: Turn the current conversation into a spec (sometimes called a PRD) and publish it to your project's issue tracker - no interview, just synthesis of what you have already discussed.
 - **to-tickets**: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, and publish them to your project's issue tracker - as one file per ticket locally, or as native blocking links on a real tracker.
 - **wayfinder**: Plan a huge chunk of work - more than one agent session can hold - as a shared map of investigation tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.
@@ -102,6 +101,10 @@ description: Single source of truth for agent instructions
 - **prek**: Run pre-commit hooks using the prek CLI tool. Differentiates between 'pre-commit' (the git hooks concept/lifecycle stage) and 'prek' (the actual binary command; pre-commit CLI is deprecated, use prek). Use when you need to run, configure, check, or troubleshoot git pre-commit hooks.
 - **scratchpad**: Keep one-off, experimental, or temporary scripts and files out of the source tree by writing them to a single, consistent session scratch location, then cleaning them up. Use when creating throwaway, experimental, or temporary scripts/files during a task.
 - **tailwind**: Use when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
-- **tars-run-factory**: Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed.
 - **zed**: Find, search, and manage Zed editor configuration settings, keybindings, and language server configurations. Use when configuring Zed settings, creating or updating ~/.config/zed/settings.json or .zed/settings.json, editing keymap.json, or searching for Zed options and documentation.
 - **zola**: Reference and development guidelines for the Zola static site generator. Use when the user asks to modify, build, serve, or customize Zola sites, themes, templates, shortcodes, or Zola configuration files (such as config.toml).
+
+## TARS
+
+- **tars-goal**: Set or resume a persistent goal and pursue it until every requirement is verified or a blocker prevents further work. Use when the user invokes /tars-goal or explicitly asks to establish or resume a persistent goal.
+- **tars-run-factory**: Run the TARS software factory unattended over one repository's backlog. The agent becomes the foreman: it drives the Antigravity CLI (agy) headlessly through batch runs, peer reviews, and rework until the backlog drains or a human is needed.

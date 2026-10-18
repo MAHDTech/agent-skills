@@ -48,7 +48,6 @@
         "prioritize-backlog",
         "software-factory",
         "store-plan",
-        "tars-goal",
         "to-spec",
         "to-tickets",
         "wayfinder"
@@ -125,9 +124,16 @@
         "prek",
         "scratchpad",
         "tailwind",
-        "tars-run-factory",
         "zed",
         "zola"
+      ]
+    },
+    {
+      "title": "TARS",
+      "description": "Autonomous software factory and persistent goal workflows.",
+      "skills": [
+        "tars-goal",
+        "tars-run-factory"
       ]
     }
   ]

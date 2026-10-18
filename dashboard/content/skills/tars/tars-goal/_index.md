@@ -5,7 +5,7 @@ sort_by = "title"
 template = "skill.html"
 [extra]
 skill = true
-category = "planning"
+category = "tars"
 mermaid = false
 +++
 
