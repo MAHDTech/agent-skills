@@ -119,6 +119,7 @@
         "devenv",
         "herdr",
         "install-skills",
+        "jj",
         "nix-shell",
         "oak",
         "pagefind",

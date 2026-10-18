@@ -33,6 +33,8 @@ clinerules
 clippy
 Codeberg
 codegen
+colocate
+colocated
 colour
 commitlog
 contextlib
@@ -67,7 +69,10 @@ esac
 evals
 evans
 evictable
+evolog
 fastcdc
+fileset
+filesets
 fips
 Fira
 Fire
@@ -98,6 +103,7 @@ IPLD
 iseconds
 jetbrainsmono
 jina
+jujutsu
 Karpathy
 keymap
 keymaps
@@ -182,6 +188,8 @@ reparenting
 reqwest
 respawn
 retrans
+revset
+revsets
 rfds
 rgba
 rootfs
