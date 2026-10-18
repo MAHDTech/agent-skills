@@ -145,7 +145,6 @@ Beyond `/code-review` on the main flow:
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.
 - [/tailwind](../../tooling/tailwind/SKILL.md) - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
-- `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
 - `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
 - `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.

@@ -7,6 +7,8 @@ template = "skill.html"
 skill = true
 category = "tooling"
 mermaid = false
+archived = "2026-10-18"
+source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/tooling/tauri"
 +++
 
 

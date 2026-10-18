@@ -3,6 +3,8 @@ name: tauri
 description: Reference and development guidelines for Tauri v2+ cross-platform desktop and mobile apps. Use when the user mentions Tauri, src-tauri, tauri v2, tauri.conf.json, or capabilities.json, or asks to build, modify, or debug Tauri application settings, IPC commands, or capabilities.
 resources:
   - https://v2.tauri.app/llms.txt
+metadata:
+  archived: "2026-10-18"
 ---
 
 # Tauri Development
