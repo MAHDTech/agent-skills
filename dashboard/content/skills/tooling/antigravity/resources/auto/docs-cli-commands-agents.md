@@ -7,101 +7,735 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-rƶ6۾
->Pgh439{dϱdqI	@@}XJU*I*F~b򬵺R5W^z}_v^Zd>O+pGNUu*Aᛛv2^ssdvv5wFV7pSq$
-Ub+hs{On䏓-?^:Au?90NFг:qGߏ?va'+[VrUeditS;v5|;*ܨ;(yNnOi]uK\;pK:IrfoUT.|rFIꆣإKww=,'qN$~x{}ԉQy8tG=Zwe[{٘YoXyr/^i]`=ѹyAuGGckygQB"V8	d'ku{W01+c!zU T?5z5i8Q?E</V
-+/LuAؠ8;axks
-<"({yq{`B9lK!F^ԛ3r;c-{zg8/rEqF~I*xy!Pqٙ;,^O ne^yw{/j}͋i5gmlfQßf^ǟh|;=?߹?MwU]	q0Jj2#jv5ju\orLKx*]h֍ /j2EnbHYŦr;&n58
-^\w*a\l#-H3N"0ʹM\oiwDhz(s\egpr̽s=>wp׍z1vfcoCɾNen{I/<7.\IEߥ&ip'ؾޱJ*<) Geլk1zX^ry#;phXPbgn_x\6KuvQ8!@SER CHC|)G߿សߔТHҀH{=${SWI
-qQREiWA#;SV!Mr[9n*A1D%1͑k^BO={Yig7ap޲M*$$`B6#Wd1-O*xwg*ha<9|Hn72>3$#+l Gn4uI/(#ФAuޣcYv3$iH
-C:1p)J["+" hq5kqb_t83e'/S}Yk<e\_Jcx{03G訆XmNOYm"}`)ۿ:6F9Akw0!L'Ov>GgvpdqK/wB&p	PhZ8T'|b߸ԇl HU`րW~T|瀸L؊e@`lHjp{-pANn Q</43	]=Um=\?IAx/|Ɋ/%7C,^)cLwV\k5gSOVhZ5Ǵyg>]d5a=3wS*z,
-s֡'&-<sGes7
-JnF'֠Q	Q&j*ƤOvhZFm`yʌB5%&ʳ0xzj]^wMMƜI++'jJͪbOz:F8kM
-W{x凜P_yEo>دsn^][՛Itb}':qs>KЫcm4ĤJxڱ0iscg}SiLJYhuc|*Sx2
-Aլf)b-a)y^J5{^~fbRe{ƾYc@.cƢ>txM5P)l()J69Gخ
-V粣@q{u	O!U|  
-2|ԛ`˚Qojj"$IYY~<41컉k(EI8V@i>ݙ幗яT/ڒ_RhwQ(Z,H>axhFFulBFo2`MhOu8+GhvHh/;rj뷆HӆE'oBc(6(˫[ܷ\QOF@^M}ueDݠ/`;%cπFZA
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-c37k36qc">\<head\>\<style\>
+  html[data-i18n-pending="true"] main,
+  html[data-i18n-pending="true"] footer,
+  html[data-i18n-pending="true"] nav.sidebar,
+  html[data-i18n-pending="true"] .right-sidebar,
+  html[data-i18n-pending="true"] [data-header] nav,
+  html[data-i18n-pending="true"] [data-header] .download-button,
+  html[data-i18n-pending="true"] [data-header] .cta-button,
+  html[data-i18n-pending="true"] .docs-nav-links,
+  html[data-i18n-pending="true"] .header-download-btn,
+  html[data-i18n-pending="true"] .header-cta-btn,
+  html[data-i18n-pending="true"] .rc-pill,
+  html[data-i18n-pending="true"] .subnav-bar,
+  html[data-i18n-pending="true"] site-search button > span {
+    opacity: 0 !important;
+  }
+</style>\<script\>
+  if (window.location.hostname === 'www.antigravity.google') {
+    window.location.replace(
+      `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
+  }
+  try {
+    var __agyLoc = window.localStorage.getItem('antigravity_locale');
+    var __agyNonDefault = [
+      'en-GB', 'en-CA', 'hi', 'ja', 'ko', 'zh-CN', 'zh-TW',
+      'id', 'th', 'de', 'fr-FR', 'it', 'pl', 'pt-BR', 'es-ES', 'es-MX'
+    ];
+    if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
+      document.documentElement.lang = __agyLoc;
+      document.documentElement.setAttribute('data-i18n-pending', 'true');
+      window.__agyI18nTimer = window.setTimeout(function () {
+        document.documentElement.removeAttribute('data-i18n-pending');
+      }, 350);
+    }
+  } catch (e) {}
+</script><script type="module" src="/_astro/HeadOverride.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script><script type="speculationrules">
+  {
+    "prefetch": [
+      {
+        "where": {
+          "and": [
+            { "href_matches": "/*" },
+            { "not": { "href_matches": "/api/*" } },
+            { "not": { "selector_matches": "[download], [target=_blank]" } }
+          ]
+        },
+        "eagerness": "moderate"
+      }
+    ]
+  }
+</script><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>Agents command (/agents) - Antigravity CLI | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/cli/commands/agents/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap" media="print" onload="this.media='all'"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="Agents command (/agents) - Antigravity CLI | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/cli/commands/agents/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Browse, select, and switch between custom agents, or monitor active and completed background subagents directly inside an interactive TUI panel."/><meta property="og:description" content="Browse, select, and switch between custom agents, or monitor active and completed background subagents directly inside an interactive TUI panel."/><meta name="twitter:title" content="Agents command (/agents) - Antigravity CLI | Google Antigravity Docs"/><meta name="twitter:description" content="Browse, select, and switch between custom agents, or monitor active and completed background subagents directly inside an interactive TUI panel."/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agents command (/agents) - Antigravity CLI","description":"Browse, select, and switch between custom agents, or monitor active and completed background subagents directly inside an interactive TUI panel.","url":"https://antigravity.google/docs/cli/commands/agents/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/cli/commands/agents/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/overview/"},{"@type":"ListItem","position":2,"name":"Antigravity CLI","item":"https://antigravity.google/docs/cli/overview/"},{"@type":"ListItem","position":3,"name":"Agents command (/agents)","item":"https://antigravity.google/docs/cli/commands/agents/"}]}]}</script><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'">\<script\>
+  window.dataLayer = window.dataLayer || [];
+  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
+  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
 
-\cc3NYI2\\wHmJ֖0;W;R,iT$2f'=bEY*󛥼;A6ׄ>o9*;O]@WT$j'bZrH4h3~E`d7Y2-8UcXͬ1~L12ⷼrҷp|z ~kL	:&bwi}Cv+sis$A1I$ձ<;aIi6'>\ZwG^T8iV"e6ejeKK"-MlL^hkUNZ3[eEQ׮kl[(/^hp^4Jl^N+`^stPˏfTS?taiւ1VunnB(}hXn=08Pu6{&22|#6H\\S\)^!҂29ך+k07X9Pb0!8ٛ&ĴBʈLP^Kqbg2<RTLᑲByy~aߕ~5
-7waDŹ
-P}ӻZWl4-%æk^aJ
-M-xK	%nжRu՘ZXRW0Ɏfo3s7J驶D֦3U"$e^epcbgx!u,ldG%O,]]!fJۧ?)ϗ#sghG=~~})3wx0d{
-0B>*<Wbͥ-gǍG]T={:2?ZGM1l{^+g`Ť~<A8>>x՟k֙5ØR	e}샵oZeՋOu^%iJi:m;v8:X9W0M(cةԏz c$II=(x@Ǩm߶~TvKn(7U1	֥Uk6o6o6$%6u*ES&Ne(d*3 #
-:~=!o^SمNgy=.+g}1u@l)3(9OhsD;18Y0ۄjvOs4 K]i[~Ij~5CjJ
--^9
-!K%3ڳd(;{R_ji4_&^t}QQԨ'A/EpnwPtNļJ<lV}G<ZQQO΅J&6G-*n^=ߔqUB&Apks]
-&	
-Ny/'_r&0U}20	ڢ`f`
-J}{VRz\=FLFL=qTz`UqTp,OJƊӥ2;~v+m`̟Iϰx-Zb#r#ߵ~-"M0%CFkz"fNc'wRWJ	}[k(]̗)SX~Ŋlz DLh[͖۴Mz5MMo?t6֬ulƻSkJ^b 474[ֺ0Z[VlQyn5i;mݒz4l?Jfc_574R9~#VQA՛Pqxvͷhx6֚VsYݠ01;c~_~3ֲPam(MTM%O&ăll1AD`)x%q׺-VI$FL.fm9mIi:e<kˇ<5xN5/,n	"p)CL?vFz6
-%{ӳ{5o:-ku6,9l2FC֚%`ZPױ7斵欶.lH;'F%æjJU{uzir=VV5W5zacXAa>|r|-#ԴX6ƅZzɝ6:sqw޽m1cOFfSW8vA1fꈋ#ǖoZZ!]N{~ݾDܣW%!VnXFl_Q5۝*6i]~N$B|d+;gJ~S(Nގ+T)(5ĺ+VAj㫕8Sd$UbG.FO`90{֗3k@eK$zpXƦHv)Eƺh;QZ_ɠqt=9b|CK&.Yi7=rl'PxNly4	$gpU3w;)LK	Sj7,E4>L:c[;2@,vl
-@u6ޑw$f1/Fp!(Pj_6UoBb[ip>;;[)6POM.>)"FTYȪ!Aj3@FgxtTft9߆.]|I;-\lGs\ү1aȻ9wMkK|Lӷm,aKk1`DԴ%9y2k4hĬQ2v
-Gs_Fs'sr!cHA1m?`U7NqSaҦ"f|Ih m0]S,ִ>k5XYt(mVڜkb@Dfpjbi`<{4ֳ&*}܄iD5qi[zJ'0wp6?kDb1&pn
-r%s)(fN
-CǏ5ZBj1Hu>+̈8h+uJ|hYUpTw[)]tn%Ipx׆|1G¤!tGbNs8,;=O@&s'FJyB^wANm$m=I5Ξ&?\MPB(EyLz9 ;<I$\qs	ަo}非CL91 )A0"BW8K#<Ք$B!4'+Nyf|$B0~jԬ
-ޯX8nU<'
-Xk[\Ll<L$ZHtxD)su)(@FM8eΤut-5˅p0,q2s	$.)@ߍ0|]AIo*bDvnAnG!Ϊ\=^߼"J֯^oZeiKl^dfu_%QaK]tk|cKFӰw-b6 a11Om^sp|y8!Y0]i}/4 4R8Z]@%X0T`e2IRa23U6<K)pXj/l.m-t>z!Ie۹.6@Ad2SCiFWxR)vV7p:0}=LhcLśa5~M8|tI798{?~w9Xd.i57Q)x[3Ύy?t߿8>6;"38	ǄY:QXU6P`Tss)Z"gI/
-cyUm.m.0hjgb;@ꡛ~xVE--fIا"ho2-)EbTnE{ױJӂV_SAMQ˙/:{{VlZHӂE۶-@FvZ:0 ?2eQ	g.my`Br7MֆY~*9I:h&̖^J*ޑ-6^8)'QsKUu?Z;.RSi6608RsPgg//FoT?xpds4:$d-i-K+?:KHxMv,Hs(?mYByBa3bHg~d E{V0-H+Bط/imDm%489L/%1J~3A2]nfBԫnN{V7rp>n
-XpҙAO?o8k;,N$1(dpvl|.}E5G	t1@0Y]$8,
-%Y.r넰놓smmLh(J IJOA7%	!	J[)~3#A2Qn#7<>EGmA,|9mtLSy"fo`}h)}2E	`ZoePleTӦ,u6Yl|X!PO1XlZ*MTaqr'N3KBDhM&!ZǤ*DH%|-RGC'#Cy^fUyjBg!F.L|f|Jle+}/)	B9(2=)r
-hP$A8Ms-Eo鯯%^7WoQo0#u/ۛR-9[WM47G-kyilp|hpr7^V,(QRR+:u!
-YH<MJ3 0JF$*lpSS-o$Ui-X.
-d~oRXyM +tmI:WpƎ,NYk[i(n`1&S lPeȔ,^@U}Z
-OY[ΪJ"	}f4RKsbC?W%6Dm;,Fb[bc-ReT<8!ԧ`A$}pꀅRWo)஁pZ~b$v`
-|$u#3'BJD]r-sRhtή'D'>w2L_'ϼ:ՕneaOO&'_}e>IǽSQ5Y)	C/bS0̇|ONVn>cfD̍0?I#̟)!Vf[Z|<:[3jS':ND{Nj437#|&ʭʼ )NToFՕx U@\'+ϦO8n<GYԏX̥LzuHT5$}E\xH&jՖ|RWvD,Fqq/,yò}z2{?6-2>pHwGvNLcA2/K7YtPrNP/G;P==GwD4A;#$p<qţ{={5&t3lzlm%o)i!8cDYe6WZlUFheǚJk8%]aK'jGDW?efT6LY`rbe툎2JKH`Y;[QPϐn$9%S@58kJ5r=3`w,7/+xQ[eWuIqXR_pWjch	[SkQ<X@g N#n)*g:I|7VNwq~_"Z\3͋nYMd"SgV@hF6r9+vqq9<;#GYQSYz捒{FcWb5*Ņ]WT?o%	C
-e=Me)N-U|Uc)4K-zBY1E6W FYLNiOzES848aIuߦ%
--[/:BOdcaI)ۜ&RFIr-n\dQ.}HREA@4%'"d@<Bc%ت'%ȕ伤Wj9b$Z-?-"3Ej.OrvhGFK&S4GC\{8Hzj[Nä$+(E'✤KA
+  var __agySegmentMql =
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia(
+          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
+        )
+      : null;
+  var __agyUa =
+    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  var __agyIsFoldableUA =
+    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
+  var __agyIsIpad =
+    /ipad/i.test(__agyUa) ||
+    (typeof navigator !== 'undefined' &&
+      navigator.maxTouchPoints > 0 &&
+      /macintosh/i.test(__agyUa));
+  var __agyOs = 'unknown';
+  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
+  else if (__agyIsIpad) __agyOs = 'ipad';
+  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
+  else if (/android/i.test(__agyUa)) __agyOs = 'android';
+  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
+  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
+  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
 
-iUq&$8DThDGOXD 4c$\=WMB~fj%*H[U9֡ 1j|\]ŝB9'D]E/&]a=%lo	vc995.>e<AQKq}&/uZ\gّmOgJq+3f> 2+(pyF^#(z7!F:	BaR'S@vY9z.0lx/G3CXʯ!M.\%g#` MPD/QtQۇ39BNѦ~|&0lAE1CHu^NFJt.>"6?ps.NG%	i?d.SgJ1sl<iiT ]ݨ3ȶJeYfG08W5=I+h ^4"5(F$ZXA52'Kʀv~yd}wthR4jίS|נ$¦WkS]cb3y$ЩOp̭Buxswʠ+a)(8-L/$MlI7i9@G	ad]<'fh%RB+jiaq,9KoO^7Ddn0LK,FGÐ`KT7w%SCz/~L%1ARN(&-
-&	AԇHt<%)LѺNaL򉘟i;͋B+Pk2ԸaZ)uTݓJF4|T`nBA*Ut.Kv
-m*q73skr4ɸG}쭩	!	4[RQ3YV4,m'2Z 3`:P@MjNWhuCf'uC9Ve>OtMrcLKbc&,żSċAC#^rF%ϹGW=y/FDS<ߩx86V&QhK13%޿M³IeFJ$۷ȅ|/A/~^¦1t?(pRҩ|>-ŀ3XC=2O)YD
-gpd板iHtbX AEˣJrƯI[̳i1H|R^=o_}hx?[˟ZXK/m.8 ,8 i۲;|k;#\#R`ǃ##-qMM-wRHÛ(|21[!qfY6NPRz@veqy[0!$QKrCuK״z2Agnb]t8?rOƹVKEb|]HiԲK.@PJ榄e(6n</K%|4!{x B
-!d/m4kЦPr=ܴ;#_d|mk^r~FGH,K&"HSkrT3\y=Do@L|,蕻<6$6?bDcUle
-?/ĭ^?#ѮODufױD/"=iE!2R,j,qhjE.=	-čS~0-9@tq#)Ĝ,|Yo,^r9|~|K0	]/oiQ`՞Ooal&E.SlH*
-*KJ,MP}\ k\6 }Xٮ
-AҶ"|1w lG3ePvt^9'L[%g9L嗥KqpAh(vT$Z#n/ɯ#*=%w^ֆ?_?,Tw?xv7/?^r);DlƧwA^WZ:Ø6`-L0z x\`G:ѐcĈȃQ	g>ȧZL1DY҉b%cIu̍#
-#%˴?BN@},zْh@U D>6HΡ-3K".xEB%Cv	TbcQcYB!A-Ñ-us(k-9E"A%q稭jMD~򛏘Nc/9RRn)u)z'KS!0XR0RJY.hp%wTw^KY:yBL[X@vXbDm2[))YΗ׽PG̠8,]7susr^u}.2,pޏK<	pQ횛I[(!EaYc6YVM-rvl	DJeI*W؈<ȼNy9O0L~7)Lv/S.ɸ5 |wn1mɲQ8C+m(4|SxB^pp<]rޝS-J2I$"5j"iJM5u>J=YUF|yGJΈ+(RYc0g
-s(9tfFeh-! oy$Ņ^|k͓ӗG$/\"x%G\pj국f>mnk*IU{uzif<Q뢕@As|`^ح,ݴtYvs@A!Mv6~D&vAf_gE	U߸hnJHxy.{<j~N(2&T·G	ɗI.KGRxVE{q"pC&w.E>^tx뉑*Q|k
-IOjuCDYr5prT\="l"q^׎j	W*<HR#zQoqwOwps+WPmFiQM66,߰s~иt]X@^v#kTc̐2nk._ŕN+C7jmQr:^ͯVnw0D%%?BW~#ѼI+%BEU2M|A:2JbLF"n*(Cd̴x
-:ifQ6˜(ooʇ!]zD#_6?!ɵycMJ{,6P)*`ӫ}A6.vO<;Q\ô/j=R*Ds*-/)8.ew|:+0xNؕI[U~$:(pJ^uJPgC&AlNn|l6­7s*,^(P}&ۃS} Nfeqvt='vZאd)Ͻn0nwZ)^4[rlv7dJC8ΛXgǨ(
-&aR_*X@tiҟ	6/]2E{ѨD|ygw2#P25{ϾqˡXe)Ttr(<h$KVsuC>t	Rtnhd9̬!SqMg$frҧx954*Cw=PCxܾ%WT"Yh5,޹Am}F5<+Qոc!T&95P|#N=)j/P5J'e$ZWS_ng&)F)qHg.%QTyE%STRDiSj.l\yI0(qI55nQq)`t:F(2k-Gxe
-|m89+ޒ#@
-OL"{8|I)c3n]~2:r'e.{G#t+>Q?Oh	?;@_`+ܑ6hZ=Kw2孻)rةk뚺RL.0;T$4w	]7$}tpTH@m=H:_}J_^`ނ<\yq.(0/PMRB0uԜAdvs6ǊqN_dWƕsd(t`B2OتЈaG#e-N32>F'k?IO/nE`$N&
-[1`M*2=Nި
+  function __agyDetectViewport() {
+    const width = Math.round(
+      window.innerWidth ||
+        (document.documentElement && document.documentElement.clientWidth) ||
+        1440
+    );
+    const height = Math.round(
+      window.innerHeight ||
+        (document.documentElement && document.documentElement.clientHeight) ||
+        900
+    );
+    const orientation = width >= height ? 'landscape' : 'portrait';
+    const minDim = Math.min(width, height);
+    const maxDim = Math.max(width, height);
+    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
 
-MXhޥuaIE	be0WX5஧mH',K9TDzu<7Kp,\=Po<IM&rtj\"!wobY;WmVG6ר٥Cҳ;`1su'ݿg%tӢ@PÈU[א:5e<)̚n}uϰU[zC)HQ$5)3ݲVnoUn2^4+?~"XV`x|\&U*pL݌!c%Y*;?:. !w90`3}UggX(\pg%9B>?K`͕{H)EwjNI+jMx%?`USX`:G)	Kkܿ^]㧝jc%vpggB9;]lOwh=;m-A7NK8
-Xz;ԛlVrY֊GfgME:J2GahzL<;ONpCPJ1y܍UP7;6a.kP7gaVqXqh_d?jpގ;,wSJ[5?NIΉ'nAq6]~B[Yӡ.>Yeߵ"owR5sƵ2"Z8a66\*$_n	JjЩcԾhf
-Xf"Wƅ)ӹ[ļNdrBY\
-կZ^<=f6^1{=ހJlJ5
-]0i;݅(sX۔	2-БwXSFKU{3zdJ>h۴^4*H{_ahfT0aH߶fNMO+gDӈ,V.+smT
-=NrR4콇Ȁ̻ː^vѨm1`UNXTrU%pR<jw	LdھPZ=LiYQ_EuhT2sZ<xZG$f讀m4ţeC'Y/G>D*eh/s}e<->G-Oœn}%膾+-L\j->kIgZ<ZiQNw.Te۱4Z<G*Ӝ9ssZ|tYs|?=Z?[w?O],sr=_LoEr^.ևcaLn+.2ۧaZGqIE{1YXu*AA4}RaTu667>˗,ɆF)\HN @痣C|^<:4MC2cxCXZ$t*Vʮt0!l|$v~yy\:aԯF%*iH$!qdl1(a*̮嬧HN)GC>WтFa45܎Rjo[-뉭m~ivJ6Й;srrΥn3c~"T;]zQ&E#;QeDO!!ݰǷNO00Iɉn#W!*q|킅M28vޝN=>֋TDTLOa*O&H[ĉـ.pTҶMlH?U#)VO)U}/O(3r@3ǈ!V<6
-|a$ƣN@-ecR\e1P
-]\R|KJ"QPyeyM<2XDJĨy7Uo7LoukXǭ9NmsY׏6m]kG_l2-tlpDx:*gK|BJRl
-%0=cybicJ퍆e[ʘ[jaV/묯Za3V"V6iHQȻ#kkzR
-j\hs\7W_5.'Ըl" k~֝-}h $t駁&"Ob~Qc0Fp2EoyB/VcضF5Ql`o[GV㵴~ͽmo8umX:txIO)#ťä!+:nyac `E8ZRM/2zftnS9>{^AL`@`!bAJ'w?Bln"5m\
-HfmmB<7@Xڳ)R5,+|IEkxSH͵kXʕ{tnO$^Q5ױAnck,䵼ȬMm i23rgWl2B1$DeNJ^ġBd@TOR$Tڏ=7qi6ė(62*CvB\TNQ#qS
-=5!`ON:	+C>!fh̎"!.M2Eя3bK!^f*T&)4բ.H T:s'kf"_e!׍G]K5F9 *D=3ciq2a!Z
-9bW0qi${	K]0
-]ui"GrqGwsTo[%p)9B/('f͋ogOWDDW#2ut?1v#CAaD1nЍzeQ;"Xӣ1'5Pޑ?DbL5(;AP`I1045\}#X.Lu7R%mPȆt}KgNfr__oQmy6&&q(w*&GO<Xa0(EM[<-䫚U]S'Gm-^ƽ,&HnKj'nsAD׏cY1-dBM(ViY0-`bUS,wb]prQ~τCˌf1%~?KH-\HgXCs1CciDY+l|Dyb))pHc(ş܏dCv^=߈߿m8?ǤH-L>K٬f'z&q)).<<m(tf,2QMԶ,kA8 XGJN2I@%4	NCc'C( hRVI+"u˅eE-gmS>)U*YMgmwY۲7gu?1@-(+m6hp#ۂ98a_R/zaaMoViKE!y'םfקa9MCz
-l<	֠ȰƔ`2JQWL`GN	`>i˻t2l{??h%]$MJh:[PAxh$Hs':j/&GP)e@
-:(bob09I(Zpz'D#"Z86KxYHXMΆ&2XfPu:N{"$XSrŌ{K"Sf(`+*B]+2t`"΢YG<A,^loS:)#V|̮[dy͚S'"bÊs<U[upZD,ȭ7xC+S'GAZ4۶}"ipƝБ@TNnS2
-*e]ɶ$x,:+!~	^OG4G$IH-}j}*hD@>	٭#Va`_]Y҈&<߄	|Z-Һ-EהpSi8gT8>fTDr.Rd8Ho<>Vj-8tNZV6pF!*ЅLv67Hҿ=4V	P),):xw[[N4I`sՂNt2RڥFSϠq%*)o[HVNU[֖FۍFsOQU(:RH	y"8>V6̪PrJze>mTÀ(#7-XiJfX!!E =Oh,JE9Сs#eJMR/P4f0ri8aw():FJx*Ov2?f9S2tۉcA܋cio%:}Ul/oWK[}?LNa7	JaȤJƵ`Al\˳.ME~Zk"Yּ3UECbӦnè_rڦ;q)ǍwթJ5&B7ؤ,7ᒙ*B{Zk\ۭWcwdj?!ba_YpK:bp_(KdNg<B T͠{bxG(Ӄh	9Y֔'ۡkQ~Ȳ"a\nn-1aMʥ'8F2ayF!m|Yb囲:ҡ;=	IlHbhָ"q=L\ئGdRUg	,ܝ}<yzeZL=G>[7,O .
-Z8mB#5k~f@<IkPK%i{@`QA~/DagDJ$mt!V,xɷ aWd=hM&IF,$!I	V&4v``dn@C|	3X+wwQ/lʁ{Q,"-Vl?׏ߜ?w%HPi-f|z-n0HR/:qB
-g,-a PU^>YhY?6f=I v*q,"Y$"Ĥ!@LטhKk~eiCWΞ^&xb-O[
-0īYZf@^DQi{TJ[inbt
-J|OPklkA8p*KF'-AzOir<jp#]5bI!;"7Yc:x+ؐlzw65;PG$.C3j>,|hCwڹ0"bO<cp3DF9n)6Gj7rǅ8d9sKMkϷ<H=ϣ52>t{a[ڱG	RhsjuDhLϷ^Zx^֫V\u}i3@f}(sp~]0/Vws܎?y'sjGAE;c~}ycab`۶8SϹPɴ!?j$jyU8!VSS.989I]!蕰jeO(`ӏqĿqʃ"EczEW
-LAVftH+Aqk1E9,J5LoDjWE+$s~^!&pQBq
-G?ŗ,tGVfTiydsf7N8qL.sưaj9u5׆ z!SbT>D&5_%׻r)6=A80MFqD"4-8\@lwA	
-BD9Bة^\C(%t)+u7nK=e*-2,|g+~GXuͩ.I`D;q nb5t8
-gx:Y!Fċ.Dz?v8+ΣMnV'CnJ~p2F+֏S^q# 8쫽({5]d:Lt,CPbӮTcSz?FyC¾6ݭ_G~ƪ~ږbHQ8Î{h{}cLǪ65!0~%EHrbPwޖA:d}bY-k[tP:ZO]X!Fta4;[WX=vFAPgKG)9:s|JǸ]o6hR*&}$XHvs).NnE2<|![<*;='39bym[GD	۰ːr9&B&o5NcɥAyjB_p(/
-7ubSd3QXEMІL^4MM0}FAҭF"s1Ot< &PΙOnH|'h: r285h$-?xuשi/rWO$r>bU-WχW?zګwMr{9&bȌj ɤG^8z>
-l,v{p{IpH	:}yO?EE*)``5DfB(
-ѮK5/q7ɌklU3 >2G&GfR?;ܖ!M(@ISHDR?!iN`ayR
-мх)`RȊbipYudX飽=|tE
-)dN"W\EK_90cFku.GnȭjYloe%	d┃+!q贠3	Op) ؼ\_{"UsW8wջ~ZO/8=(,j	.Itaj
-jT>2ުPyc74V&i.w	Kw?rxt
-3ƹr,:tD\0")[%;|t>i![_)*X?ի$VB wе/tAzJn'ͯC9</_RP3?t9DPVqlbҠ@e_C0'@fz"D^K$4^~Os
-~376YO`	%8X"ʴP^%/dxS9AUw6b1!I9`EN˙#4#KDS T9}J	gBFR 5^Nr;$Ne=8Jy-C)&4Ħ)=q]2JB=%NZGi`bt$BT2,!uFmpO,Y@[8T@ΓBӮ%[ðB	@q8Xgt}m=hfq#ovmsHu`rN{,YT=%S^`.$%'5/KATvIz&M$)/"E\hc"D8cFB7%uB.KLCI!w7&-Xg>9)Ix)zNs;&MNmNrz69U닡wlbU,}\e-݉z	 vh@QkNƎ*IZD,(#SlWhm2qE	Ï1Bh4Up*6#rD\Re"ܹ%}9$3$i.h[T
-N#1
-?ޜW<CJ*[T*226c$i#:nXf֐tzYkA"ZkR5?9QpzZϒM'OY3Jg@JM7Ym!!J 	ZVsu.3z_r/^wSP9#RiJh"/gGmNW	eꑔ\S.ܘt&"Qb@	~2ML(2a1m)I0/m^ fԅHDrk37(}oSpy0$DD5p˚ƈ*	!(nscA#>E=	)2(#(aitYU%-園4)?kя|BӪ*aH
-4]<>EČahb 0Y[Y.qq+Nq(Wb/pKZ\Xz*jlީ]hjHh^88_g3LR8ECLQfo]&-&PQ*-88jJUS(|]hJ
-Buq@D9ΟR>i
+    const hasSegments =
+      Boolean(
+        window.visualViewport &&
+          window.visualViewport.segments &&
+          window.visualViewport.segments.length > 1
+      ) ||
+      Boolean(
+        typeof navigator !== 'undefined' &&
+          navigator.devicePosture &&
+          navigator.devicePosture.type === 'folded'
+      ) ||
+      Boolean(__agySegmentMql && __agySegmentMql.matches);
+    const isFoldableUnfolded =
+      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
+    const isFoldableCover =
+      (width >= 320 &&
+        width <= 368 &&
+        height >= 700 &&
+        height / width >= 2.0) ||
+      (height >= 320 &&
+        height <= 368 &&
+        width >= 700 &&
+        width / height >= 2.0);
+
+    let viewportCategory = 'desktop';
+    if (
+      hasSegments ||
+      __agyIsFoldableUA ||
+      isFoldableUnfolded ||
+      isFoldableCover
+    ) {
+      viewportCategory = 'foldable';
+    } else if (width < 600) {
+      viewportCategory = 'mobile';
+    } else if (width <= 1024 || __agyIsIpad) {
+      viewportCategory = 'tablet';
+    }
+
+    return {
+      viewportCategory: viewportCategory,
+      formFactor: viewportCategory,
+      viewportWidth: width,
+      viewportHeight: height,
+      orientation: orientation,
+      operatingSystem: __agyOs,
+    };
+  }
+
+  function __agyRecordPageView() {
+    const currentPath = window.location.pathname || '/';
+    if (window.__agyLastPageViewPath === currentPath) return;
+
+    if (
+      window.agyAnalytics &&
+      typeof window.agyAnalytics.trackPageView === 'function'
+    ) {
+      window.agyAnalytics.trackPageView();
+      return;
+    }
+
+    window.__agyLastPageViewPath = currentPath;
+    const vp = __agyDetectViewport();
+    const eventParams = {
+      pagePath: currentPath,
+      locale: document.documentElement.lang || 'en-US',
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+    };
+    if (document.title) {
+      eventParams.pageTitle = document.title;
+    }
+    if (document.referrer) {
+      eventParams.referrer = document.referrer;
+    }
+    try {
+      const sp = new URLSearchParams(window.location.search || '');
+      const utmSource = sp.get('utm_source');
+      const utmMedium = sp.get('utm_medium');
+      const utmCampaign = sp.get('utm_campaign');
+      const utmTerm = sp.get('utm_term');
+      const utmContent = sp.get('utm_content');
+      if (utmSource) {
+        eventParams.utm_source = utmSource;
+        eventParams.utmSource = utmSource;
+      }
+      if (utmMedium) {
+        eventParams.utm_medium = utmMedium;
+        eventParams.utmMedium = utmMedium;
+      }
+      if (utmCampaign) {
+        eventParams.utm_campaign = utmCampaign;
+        eventParams.utmCampaign = utmCampaign;
+      }
+      if (utmTerm) {
+        eventParams.utm_term = utmTerm;
+        eventParams.utmTerm = utmTerm;
+      }
+      if (utmContent) {
+        eventParams.utm_content = utmContent;
+        eventParams.utmContent = utmContent;
+      }
+    } catch (_err) {
+      // Ignore URLSearchParams errors
+    }
+
+    const entry = {
+      event: 'page_view',
+      pagePath: currentPath,
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+      eventParams: eventParams,
+    };
+    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
+    if (eventParams.referrer) entry.referrer = eventParams.referrer;
+    if (eventParams.utm_source) {
+      entry.utm_source = eventParams.utm_source;
+      entry.utmSource = eventParams.utmSource;
+    }
+    if (eventParams.utm_medium) {
+      entry.utm_medium = eventParams.utm_medium;
+      entry.utmMedium = eventParams.utmMedium;
+    }
+    if (eventParams.utm_campaign) {
+      entry.utm_campaign = eventParams.utm_campaign;
+      entry.utmCampaign = eventParams.utmCampaign;
+    }
+    if (eventParams.utm_term) {
+      entry.utm_term = eventParams.utm_term;
+      entry.utmTerm = eventParams.utmTerm;
+    }
+    if (eventParams.utm_content) {
+      entry.utm_content = eventParams.utm_content;
+      entry.utmContent = eventParams.utmContent;
+    }
+
+    window.dataLayer.push(entry);
+    window.dataLayer.push({ eventParams: undefined });
+  }
+
+  __agyRecordPageView();
+
+  window.glueCookieNotificationBarLoaded = function () {
+    if (window.__agyGtmLoaded) return;
+    window.__agyGtmLoaded = true;
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js',
+      });
+      const f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
+    __agyRecordPageView();
+  };
+
+  document.addEventListener('astro:page-load', function () {
+    __agyRecordPageView();
+  });
+</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.BtyBE0kN.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.CDMXz1pZ.css">\<style\>@layer starlight.components{svg:where(.astro-jlnlh7vs){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
+</style><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
+</style><script type="module" src="/_astro/page.LAbJoB63.js"></script></head><body class="astro-c37k36qc"><a class="sl-skip-link astro-kgjdphe6" href="#_top">Skip to content</a><div class="page sl-flex astro-mruzmsw7"><header class="header astro-mruzmsw7"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-3woganpc"><img class="light:sl-hidden print:hidden astro-3woganpc" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-3woganpc" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-3woganpc" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search id="doc-search-root" class="agy-hybrid-search" data-i18n-ignore="true" data-index-version="6d6ec5be"><button type="button" data-open-modal id="doc-search-trigger" class="agy-search-trigger" aria-label="Search documentation" aria-keyshortcuts="Control+K Meta+K /"><span class="agy-search-trigger__left"><svg class="agy-search-trigger__icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="agy-search-trigger__text">Search<span class="agy-search-trigger__text-suffix"> docs...</span></span></span><kbd class="agy-search-trigger__kbd" aria-hidden="true">⌘K</kbd></button><dialog id="doc-search-modal" class="agy-search-dialog" aria-label="Search"><div class="dialog-frame sl-flex"><div id="starlight__search" class="agy-search-container"><div class="agy-search-header"><div class="agy-search-input-wrap"><svg class="agy-search-input-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="doc-search-input" class="pagefind-ui__search-input" type="search" placeholder="Search documentation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search documentation" aria-controls="doc-search-results-list"><button type="button" class="agy-search-clear" data-clear-search hidden aria-label="Clear search query" title="Clear search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></button></div><div class="agy-search-header__actions"><button type="button" class="agy-shortcuts-toggle agy-search-help-btn" data-toggle-shortcuts aria-expanded="false" aria-controls="doc-search-shortcuts-panel" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><span aria-hidden="true">?</span></button><button type="button" data-close-modal class="agy-search-close" aria-label="Close search"><span class="agy-search-close__kbd" aria-hidden="true">ESC</span><span class="agy-search-close__touch" aria-hidden="true">Cancel</span></button></div></div><div class="agy-search-filters" role="toolbar" aria-label="Filter results by product surface"><button type="button" class="agy-surface-pill active" data-surface-filter="all" data-surface-label="All" aria-pressed="true"><span class="agy-surface-pill__label">All</span></button><button type="button" class="agy-surface-pill" data-surface-filter="2-0" data-surface-label="Antigravity App" aria-pressed="false"><span class="agy-surface-pill__label">App</span><span class="agy-surface-pill__mute" data-exclude-surface="2-0" aria-hidden="true" title="Exclude Antigravity App from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="cli" data-surface-label="Antigravity CLI" aria-pressed="false"><span class="agy-surface-pill__label">CLI</span><span class="agy-surface-pill__mute" data-exclude-surface="cli" aria-hidden="true" title="Exclude Antigravity CLI from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="antigravity-ide" data-surface-label="Antigravity IDE" aria-pressed="false"><span class="agy-surface-pill__label">IDE</span><span class="agy-surface-pill__mute" data-exclude-surface="antigravity-ide" aria-hidden="true" title="Exclude Antigravity IDE from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="ide" data-surface-label="IDE Extensions" aria-pressed="false"><span class="agy-surface-pill__label">Extensions</span><span class="agy-surface-pill__mute" data-exclude-surface="ide" aria-hidden="true" title="Exclude IDE Extensions from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="sdk" data-surface-label="Antigravity SDK" aria-pressed="false"><span class="agy-surface-pill__label">SDK</span><span class="agy-surface-pill__mute" data-exclude-surface="sdk" aria-hidden="true" title="Exclude Antigravity SDK from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="blog" data-surface-label="Blog" aria-pressed="false"><span class="agy-surface-pill__label">Blog</span><span class="agy-surface-pill__mute" data-exclude-surface="blog" aria-hidden="true" title="Exclude Blog from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="releases" data-surface-label="Releases" aria-pressed="false"><span class="agy-surface-pill__label">Releases</span><span class="agy-surface-pill__mute" data-exclude-surface="releases" aria-hidden="true" title="Exclude Releases from results">×</span></button></div><div id="doc-search-status" class="agy-search-status" data-search-status data-i18n-ignore="true" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="doc-search-results" class="pagefind-ui__results-area agy-search-results-area" data-results-container data-i18n-ignore="true"><div class="agy-search-suggestions" data-search-suggestions><p class="agy-search-suggestions__heading" data-discovery-heading>Explore Antigravity</p><div class="agy-discover-grid" data-discovery-grid><a class="agy-discover-card agy-search-card" data-doc-card="getting-started" href="/docs/getting-started/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Getting Started</span><span class="agy-discover-card__desc agy-search-card-desc">Install & launch your first agent</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="remote-control" href="/docs/remote-control/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Remote Control</span><span class="agy-discover-card__desc agy-search-card-desc">Drive desktop & CLI sessions from any browser</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="skills" href="/docs/skills/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Agent Skills & Rules</span><span class="agy-discover-card__desc agy-search-card-desc">Reusable workflows & workspace instructions</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="subagents" href="/docs/subagents/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Subagents & Teamwork</span><span class="agy-discover-card__desc agy-search-card-desc">Parallel multi-agent orchestration</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="sdk" href="/docs/sdk/overview/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Antigravity SDK</span><span class="agy-discover-card__desc agy-search-card-desc">Build custom Python agents & hooks</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="permissions" href="/docs/permissions/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Permissions & Sandbox</span><span class="agy-discover-card__desc agy-search-card-desc">File access controls & safe execution</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a></div><div class="agy-try-searching"><span class="agy-try-searching__label" data-try-searching-label>Try searching</span><div class="agy-try-searching__chips" data-suggestion-chips><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="Remote Control" data-query="Remote Control">Remote Control</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="agent skills" data-query="agent skills">Agent skills</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="custom subagents" data-query="custom subagents">Custom subagents</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="IDE extensions" data-query="IDE extensions">IDE extensions</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="sandbox permissions" data-query="sandbox permissions">Sandbox permissions</button></div></div></div><ol id="doc-search-results-list" class="pagefind-ui__results agy-search-results-list" data-results-list data-i18n-ignore="true"></ol></div><div class="agy-related-topics" data-related-topics data-i18n-ignore="true" hidden></div><div id="doc-search-shortcuts-panel" class="agy-search-footer agy-search-help-popover" data-shortcuts-panel hidden><div class="agy-search-footer__hints"><span class="agy-footer-hint">\<kbd\>↑</kbd>\<kbd\>↓</kbd><span data-footer-hint="navigate">Navigate</span></span><span class="agy-footer-hint">\<kbd\>↵</kbd> <span data-footer-hint="open">Open</span></span><span class="agy-footer-hint">\<kbd\>esc</kbd> <span data-footer-hint="close">Close</span></span></div></div></div></div></dialog></site-search><script type="module" src="/_astro/SearchOverride.astro_astro_type_script_index_0_lang.B8vV1dU8.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}function l(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),document.addEventListener(`astro:page-load`,()=>{c()})}l();</script></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div><div class="sl-flex print:hidden docs-lang-wrapper astro-mtusqnhg"><div class="language-selector docs-language-selector astro-mtusqnhg astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
+  (function () {
+    try {
+      var valid = [
+        'en-US',
+        'id',
+        'de',
+        'en-CA',
+        'en-GB',
+        'es-ES',
+        'es-MX',
+        'fr-FR',
+        'it',
+        'pl',
+        'pt-BR',
+        'hi',
+        'th',
+        'ja',
+        'zh-CN',
+        'zh-TW',
+        'ko',
+      ];
+      var shortLabels = {
+        'en-US': 'EN',
+        'en-GB': 'EN-GB',
+        'en-CA': 'EN-CA',
+        hi: 'HI',
+        ja: 'JA',
+        ko: 'KO',
+        'zh-CN': 'ZH-CN',
+        'zh-TW': 'ZH-TW',
+        id: 'ID',
+        th: 'TH',
+        de: 'DE',
+        'fr-FR': 'FR',
+        it: 'IT',
+        pl: 'PL',
+        'pt-BR': 'PT',
+        'es-ES': 'ES',
+        'es-MX': 'ES-MX',
+      };
+      var active = window.__agyActiveLocale;
+      if (!active) {
+        var stored = window.localStorage.getItem('antigravity_locale');
+        active = 'en-US';
+        if (stored !== null) {
+          if (valid.indexOf(stored) !== -1) {
+            active = stored;
+          } else {
+            window.localStorage.setItem('antigravity_locale', 'en-US');
+            active = 'en-US';
+          }
+        } else {
+          var langs =
+            navigator.languages && navigator.languages.length
+              ? navigator.languages
+              : [navigator.language || 'en-US'];
+          for (var i = 0; i < langs.length; i++) {
+            var raw = String(langs[i] || '')
+              .trim()
+              .replace(/_/g, '-');
+            if (!raw) continue;
+            var lower = raw.toLowerCase();
+            var exactIdx = -1;
+            for (var j = 0; j < valid.length; j++) {
+              if (valid[j].toLowerCase() === lower) {
+                exactIdx = j;
+                break;
+              }
+            }
+            if (exactIdx !== -1) {
+              active = valid[exactIdx];
+              break;
+            }
+            var parts = lower.split('-');
+            var base = parts[0];
+            var subtag = parts[1] || '';
+            var region = parts[2] || subtag;
+            if (base === 'zh') {
+              active =
+                subtag === 'tw' ||
+                subtag === 'hk' ||
+                subtag === 'mo' ||
+                subtag === 'hant' ||
+                region === 'tw' ||
+                region === 'hk' ||
+                region === 'mo'
+                  ? 'zh-TW'
+                  : 'zh-CN';
+              break;
+            }
+            if (base === 'id' || base === 'in') {
+              active = 'id';
+              break;
+            }
+            if (base === 'th') {
+              active = 'th';
+              break;
+            }
+            if (base === 'it') {
+              active = 'it';
+              break;
+            }
+            if (base === 'pl') {
+              active = 'pl';
+              break;
+            }
+            if (base === 'es') {
+              active = subtag === 'es' ? 'es-ES' : 'es-MX';
+              break;
+            }
+            if (base === 'pt') {
+              active = 'pt-BR';
+              break;
+            }
+            if (base === 'fr') {
+              active = 'fr-FR';
+              break;
+            }
+            if (base === 'de') {
+              active = 'de';
+              break;
+            }
+            if (base === 'ja') {
+              active = 'ja';
+              break;
+            }
+            if (base === 'ko') {
+              active = 'ko';
+              break;
+            }
+            if (base === 'hi') {
+              active = 'hi';
+              break;
+            }
+            if (base === 'en') {
+              active =
+                subtag === 'gb' ||
+                subtag === 'uk' ||
+                subtag === 'au' ||
+                subtag === 'nz' ||
+                subtag === 'ie'
+                  ? 'en-GB'
+                  : subtag === 'ca'
+                    ? 'en-CA'
+                    : 'en-US';
+              break;
+            }
+          }
+          if (active !== 'en-US') {
+            window.localStorage.setItem('antigravity_locale', active);
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'language_auto_detect',
+              eventParams: {
+                locale: active,
+                browserLanguage: langs[0] || '',
+                pagePath: window.location.pathname,
+              },
+            });
+            window.dataLayer.push({ eventParams: undefined });
+          }
+        }
+        window.__agyActiveLocale = active;
+      }
+      if (document.documentElement.lang !== active) {
+        document.documentElement.lang = active;
+      }
+      var selects = document.querySelectorAll('select[data-language-select]');
+      for (var k = 0; k < selects.length; k++) {
+        if (selects[k].value !== active) {
+          selects[k].value = active;
+        }
+      }
+      var codes = document.querySelectorAll('[data-language-code]');
+      var shortCode = shortLabels[active] || 'EN';
+      for (var m = 0; m < codes.length; m++) {
+        if (codes[m].textContent !== shortCode) {
+          codes[m].textContent = shortCode;
+        }
+      }
+    } catch (e) {
+      document.documentElement.lang = 'en-US';
+    }
+  })();
+</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/overview/" class="subnav-pill astro-mtusqnhg">Get Started</a><a href="/docs/features/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav><!-- Row 3: Dismissible Top Banners under Docs Menu --><div class="docs-top-banner-slot print:hidden astro-mtusqnhg" data-docs-announcement-slot="top-banner"><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.kU0csqlr.js"></script><div class="announcement-pill announcement-pill--surface-docs announcement-pill--host-docs announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-mtusqnhg astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="docs" data-pill-host-surface="docs" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_docs" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="docs_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
+        (() => {
+          try {
+            const pills = document.querySelectorAll(
+              '[data-announcement-pill]:not([data-prechecked])',
+            );
+            pills.forEach((pill) => {
+              pill.setAttribute('data-prechecked', 'true');
+              const key = pill.getAttribute('data-pill-storage-key');
+              const fp = pill.getAttribute('data-pill-fingerprint');
+              if (!key) return;
+              const raw = window.localStorage.getItem(key);
+              if (!raw) return;
+              const parsed = JSON.parse(raw);
+              if (
+                parsed &&
+                parsed.fingerprint === fp &&
+                typeof parsed.expiresAt === 'number' &&
+                Date.now() < parsed.expiresAt
+              ) {
+                pill.hidden = true;
+                pill.setAttribute('data-pill-dismissed', 'true');
+              }
+            });
+
+            const homeSlot = document.querySelector('[data-home-banner-slot]');
+            if (homeSlot) {
+              const visibleHome = homeSlot.querySelectorAll(
+                '[data-announcement-pill]:not([hidden])',
+              );
+              if (visibleHome.length === 0) {
+                document.documentElement.style.setProperty(
+                  '--home-banner-offset',
+                  '0px',
+                );
+              } else {
+                const slotHeightPx = Math.ceil(
+                  homeSlot.getBoundingClientRect().height,
+                );
+                if (slotHeightPx > 0) {
+                  document.documentElement.style.setProperty(
+                    '--home-banner-offset',
+                    `${slotHeightPx}px`,
+                  );
+                }
+              }
+            }
+
+            const docsSlot = document.querySelector(
+              '[data-docs-announcement-slot="top-banner"]',
+            );
+            const docsHeader = document.querySelector('header.header');
+            if (docsSlot && docsHeader) {
+              const visibleDocs = docsSlot.querySelectorAll(
+                '[data-announcement-pill]:not([hidden])',
+              );
+              if (visibleDocs.length === 0) {
+                document.documentElement.style.removeProperty(
+                  '--sl-nav-height',
+                );
+              } else {
+                const headerHeightPx = Math.ceil(
+                  docsHeader.getBoundingClientRect().height,
+                );
+                if (headerHeightPx > 0) {
+                  document.documentElement.style.setProperty(
+                    '--sl-nav-height',
+                    `${headerHeightPx}px`,
+                    'important',
+                  );
+                }
+              }
+            }
+          } catch {}
+        })();
+      </script></div></div></header><nav class="sidebar print:hidden astro-mruzmsw7" aria-label="Main"><starlight-menu-button class="print:hidden astro-mwbvl5vk"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-mwbvl5vk"><svg aria-hidden="true" class="open-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-mruzmsw7"><div class="sidebar-content sl-flex astro-mruzmsw7"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="features" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="0jnks46" class="astro-guximn66"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Get Started</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/getting-started/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/install/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Authenticate</span></a></li><li class="astro-stlrkwvc"><a href="/docs/models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Choose a model</span></a></li><li class="astro-stlrkwvc"><a href="/docs/build-with-google/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Build with Google</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">IDE Extensions</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/vscode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio Code</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/visual-studio/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/jetbrains/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">JetBrains IDEs</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/zed/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Zed</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/xcode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Xcode</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI reference</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/reference/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI commands</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI features</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/using/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI settings and tips</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/troubleshooting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI troubleshooting</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/best-practices/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI best practices</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI AI credits</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Migrations</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/gcli-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Gemini CLI</span></a></li><li class="astro-stlrkwvc"><a href="/docs/firebase-studio-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Firebase Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/migration/workflows-to-skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Workflows to Skills</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Resources</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/plans/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plans</span></a></li><li class="astro-stlrkwvc"><a href="/docs/enterprise/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Enterprise Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/faq/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">FAQ</span></a></li></ul></section></div><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/remote-control/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Remote Control</span></a></li><li class="astro-stlrkwvc"><a href="/docs/marketplace/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Marketplace</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plugins/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plugins</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sandbox/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal sandbox</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/review-changes-editor/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Review changes</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Terminal</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/modes/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Execution modes</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/headless/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Headless mode</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line customization</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal title customization</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Browser</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/browser-recordings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser recordings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/allowlist-denylist/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Allowlist and denylist</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/separate-chrome-profile/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Artifacts</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/implementation-plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Implementation plan</span></a></li><li class="astro-stlrkwvc"><a href="/docs/walkthrough/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Walkthrough</span></a></li><li class="astro-stlrkwvc"><a href="/docs/screenshots/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual screenshots</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Projects</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/projects/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/prompting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Prompting and interaction</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/conversations/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Managing conversations</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Permissions</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Editor features</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/tab/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tab completion</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/agent-side-panel/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent side panel</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Task groups</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Settings</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent-settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent settings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/artifact-review/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Artifact review</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/vim-editor-mode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/slash-commands/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/agents/" aria-current="page" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agents (/agents)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/boost/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Boost (/boost)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser (/browser)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/btw/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Side question (/btw)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/changelog/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Changelog (/changelog)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/codesearch/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Code search (/codesearch)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/context/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Context (/context)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">AI credits (/credits)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/diff/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Diff (/diff)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/effort/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reasoning effort (/effort)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/goal/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Goal (/goal)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/learn/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Learn (/learn)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Permissions (/permissions)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plan (/plan)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/resume/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Resume (/resume)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/schedule/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Schedule (/schedule)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line (/statusline)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/teamwork/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Teamwork (/teamwork-preview)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Window title (/title)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/usage/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Model quotas (/usage)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/voice/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Voice dictation (/voice)</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Skills</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/rules/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Rules</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/workflows/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">IDE workflows</span></a></li></ul></details></li><li class="astro-stlrkwvc"><a href="/docs/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Custom subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/hooks/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle hooks</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sidecars/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/sdk/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview and quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/local-models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Local models</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/personas/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Personas</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tools and skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/policies/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Policies</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/structured-output/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Structured output</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/lifecycle/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-vpdi4hhg"><div class="social-icons astro-vpdi4hhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></div></nav><div class="main-frame astro-mruzmsw7"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-ro3y4cfw"><aside class="right-sidebar-container print:hidden astro-ro3y4cfw"><div class="right-sidebar astro-ro3y4cfw"><div class="lg:sl-hidden astro-cnunmcpo"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
+             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
+             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
+             1.002 0 0 0 0-1.42Z
+            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#before-you-begin" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Before you begin</span></a></li><li class="astro-sgnutmzh"><a href="#overview" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#custom-agent-selection-and-discovery" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Custom agent selection and discovery</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#switching-between-agents" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Switching between agents</span></a></li><li class="astro-sgnutmzh"><a href="#creating-custom-agents" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Creating custom agents</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#subagent-monitoring-and-control" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Subagent monitoring and control</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#inspecting-subagent-progress" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Inspecting subagent progress</span></a></li><li class="astro-sgnutmzh"><a href="#terminating-active-subagents" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Terminating active subagents</span></a></li><li class="astro-sgnutmzh"><a href="#inline-tool-approvals" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Inline tool approvals</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#panel-keybindings-reference" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Panel keybindings reference</span></a></li><li class="astro-sgnutmzh"><a href="#common-mistakes" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Common mistakes</span></a></li><li class="astro-sgnutmzh"><a href="#next-steps" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Next steps</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){if(e===this._current)return;this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=this.querySelector(`details`),t=()=>{e&&e.open&&(e.open=!1)};if(e){let n=n=>{e.open&&(e.contains(n.target)||t())},r=n=>{n.key===`Escape`&&e.open&&(t(),e.querySelector(`summary`)?.focus())};window.addEventListener(`click`,n,{passive:!0}),window.addEventListener(`keydown`,r),this._cleanup.push(()=>{window.removeEventListener(`click`,n),window.removeEventListener(`keydown`,r)})}let n=Array.from(this.querySelectorAll(`a`));if(!n.length)return;let r=[],i=new Map,a=document.getElementById(`_top`);if(a){let e=n.find(e=>e.hash===`#_top`);if(e){i.set(`_top`,e);let t=e.closest(`li`);t&&r.push({link:e,li:t,heading:a,tabpanel:null,surfacePane:null})}}n.forEach(e=>{let t=decodeURIComponent(e.hash.slice(1));if(!t||t===`_top`)return;let n=document.getElementById(t),a=e.closest(`li`);if(n&&a){i.set(t,e);let o=n.closest(`[role="tabpanel"]`),s=n.closest(`.surface-pane`);r.push({link:e,li:a,heading:n,tabpanel:o,surfacePane:s})}});let o=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,s=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},c=!1,l=()=>{c||(c=!0,requestAnimationFrame(u))},u=()=>{c=!1;let e=r.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!o(e.tabpanel)&&!s(e.surfacePane));if(!e.length)return;let t=e[0];if(window.scrollY>10)for(let n of e)if(n.heading.getBoundingClientRect().top<=130)t=n;else break;let n=i.get(t.heading.id);n&&(this.current=n)},d=(e=!1)=>{r.forEach(e=>{let t=o(e.tabpanel)||s(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?u():l()},f=e=>{let n=e.target?.closest(`a`);if(!n||!this.contains(n))return;t();let r=decodeURIComponent(n.hash.slice(1));if(!r)return;let i=document.getElementById(r);if(i){let e=i.closest(`.surface-pane[data-surface-pane]`);if(e&&s(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{d()}))}let t=i.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{d()}))}}}};this.addEventListener(`click`,f),this._cleanup.push(()=>{this.removeEventListener(`click`,f)});let p=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(p.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{d()},0)})};this._observer=new MutationObserver(n),p.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=l,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),d(!0)}};customElements.get(`mobile-starlight-toc`)||customElements.define(`mobile-starlight-toc`,e);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-cnunmcpo"><div class="sl-container astro-cnunmcpo"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#before-you-begin"><span>Before you begin</span></a></li>\<li\><a href="#overview"><span>Overview</span></a></li>\<li\><a href="#custom-agent-selection-and-discovery"><span>Custom agent selection and discovery</span></a>\<ul\>\<li\><a href="#switching-between-agents"><span>Switching between agents</span></a></li>\<li\><a href="#creating-custom-agents"><span>Creating custom agents</span></a></li></ul></li>\<li\><a href="#subagent-monitoring-and-control"><span>Subagent monitoring and control</span></a>\<ul\>\<li\><a href="#inspecting-subagent-progress"><span>Inspecting subagent progress</span></a></li>\<li\><a href="#terminating-active-subagents"><span>Terminating active subagents</span></a></li>\<li\><a href="#inline-tool-approvals"><span>Inline tool approvals</span></a></li></ul></li>\<li\><a href="#panel-keybindings-reference"><span>Panel keybindings reference</span></a></li>\<li\><a href="#common-mistakes"><span>Common mistakes</span></a></li>\<li\><a href="#next-steps"><span>Next steps</span></a></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null,surfacePane:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`),s=i.closest(`.surface-pane`);t.push({link:e,li:a,heading:i,tabpanel:o,surfacePane:s})}});let i=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,a=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},o=!1,s=()=>{o||(o=!0,requestAnimationFrame(c))},c=()=>{if(o=!1,window.innerWidth<800||this.offsetParent===null)return;let e=t.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!i(e.tabpanel)&&!a(e.surfacePane));if(!e.length)return;let r=e[0];if(window.scrollY>10)for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let s=n.get(r.heading.id);s&&(this.current=s)},l=(e=!1)=>{window.innerWidth<800||(t.forEach(e=>{let t=i(e.tabpanel)||a(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?c():s())},u=e=>{let t=e.target?.closest(`a`);if(!t||!this.contains(t))return;let n=decodeURIComponent(t.hash.slice(1));if(!n)return;let r=document.getElementById(n);if(r){let e=r.closest(`.surface-pane[data-surface-pane]`);if(e&&a(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{l()}))}let t=r.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{l()}))}}}};this.addEventListener(`click`,u),this._cleanup.push(()=>{this.removeEventListener(`click`,u)});let d=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(d.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{l()},0)})};this._observer=new MutationObserver(n),d.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=s,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),l(!0)}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-ro3y4cfw"><main data-pagefind-body class="astro-c37k36qc" lang="en" dir="ltr"><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="pagefind-search-meta sr-only astro-hkwnjoai" data-i18n-ignore="true"><span data-pagefind-meta="title" class="astro-hkwnjoai">Agents command (/agents) - Antigravity CLI</span><span data-pagefind-meta="surface" class="astro-hkwnjoai">cli</span><span data-pagefind-meta="surfaceLabel" class="astro-hkwnjoai">Antigravity CLI</span><span data-pagefind-meta="section" class="astro-hkwnjoai">Features</span><span data-pagefind-weight="6" class="astro-hkwnjoai">Agents command (/agents) - Antigravity CLI Antigravity CLI Features</span><span data-pagefind-filter="surface:cli" class="astro-hkwnjoai">Antigravity CLI</span></div><div class="breadcrumbs-row astro-hkwnjoai" data-pagefind-ignore><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Features">Features</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Slash commands">Slash commands</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="Agents (/agents)">Agents (/agents)</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/cli/commands/agents/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div><script type="module">function e(){document.querySelectorAll(`.markdown-dropdown-wrapper`).forEach(e=>{if(e.dataset.mdInitialized===`true`)return;e.dataset.mdInitialized=`true`;let t=e.querySelector(`.markdown-trigger-btn, .button`),n=e.querySelector(`[data-md-menu]`),r=e.querySelector(`[data-copy-md]`),i=e.querySelector(`[data-view-md-link]`),a=`${(e.dataset.pathname||window.location.pathname).replace(/\/$/,``)}.md`;i&&(i.href=a),!(!t||!n)&&(t.addEventListener(`click`,e=>{e.stopPropagation(),n.hasAttribute(`hidden`)?(n.removeAttribute(`hidden`),t.setAttribute(`aria-expanded`,`true`)):(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),document.addEventListener(`click`,r=>{n.hasAttribute(`hidden`)||e.contains(r.target)||(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))},{passive:!0}),r&&r.addEventListener(`click`,async e=>{e.stopPropagation();let i=r.querySelector(`.item-label`),o=i?.textContent||`Copy Markdown`;try{i&&(i.textContent=`Fetching...`);let e=await fetch(a);if(!e.ok)throw Error(`Failed to fetch markdown: ${e.status}`);let r=await e.text(),s=new DOMParser().parseFromString(r,`text/html`).querySelector(`pre`),c=s?s.textContent||``:r;await navigator.clipboard.writeText(c),i&&(i.textContent=`Copied!`,setTimeout(()=>{i.textContent=o,n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`)},1200))}catch(e){console.error(`Error copying markdown:`,e),i&&(i.textContent=`Error copying`),setTimeout(()=>{i&&(i.textContent=o)},2e3)}}))})}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,e):e(),document.addEventListener(`astro:page-load`,e);</script></div><div class="surface-chips-row not-content astro-hkwnjoai" data-pagefind-ignore><span class="surface-chips-label astro-hkwnjoai">Available on:</span><div class="surface-chips-list astro-hkwnjoai"><span class="surface-chip surface-chip-cli astro-hkwnjoai"><svg class="surface-chip-icon astro-hkwnjoai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 17 10 11 4 5" class="astro-hkwnjoai"></polyline><line x1="12" y1="19" x2="20" y2="19" class="astro-hkwnjoai"></line></svg><span class="astro-hkwnjoai">Antigravity CLI</span></span></div></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.D8WSbctB.js"></script></div></div><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="agents-command-agents">Agents command (/agents)</h1><a class="sl-anchor-link" href="#agents-command-agents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Agents command (/agents)”</span></a></div>
+<p>Browse, select, and switch between custom agents, or monitor active and completed background subagents directly inside an interactive TUI panel.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="before-you-begin">Before you begin</h2><a class="sl-anchor-link" href="#before-you-begin"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Before you begin”</span></a></div>
+<p>Make sure you meet the following prerequisites:</p>
+\<ul\>
+\<li\><a href="/docs/cli/install">Install Antigravity CLI</a>.</li>
+\<li\>Understand the <a href="/docs/cli/subagents">asynchronous execution model</a>.</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="overview">Overview</h2><a class="sl-anchor-link" href="#overview"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Overview”</span></a></div>
+<p>The <code dir="auto">/agents</code> command opens the interactive <strong>Agent Manager</strong> panel. This interface serves two distinct purposes:</p>
+\<ol\>
+\<li\><strong>Custom agent selection and discovery</strong>: Choose between the default agent and custom workflow-specific agents, or discover where to define new agents locally and globally.</li>
+\<li\><strong>Subagent monitoring and control</strong>: Track, inspect, or terminate background subagents running concurrently during your active session.</li>
+</ol>
+<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p><strong>Subagent specification</strong>: For complete details on subagent lifecycle states, inter-agent communication, and custom Markdown agent specifications (<code dir="auto">.md</code>), refer to the <a href="/docs/subagents">Antigravity App subagents documentation</a> and <a href="/docs/cli/subagents">CLI subagents guide</a>.</p></div></aside>
+<p>To open the panel inside the TUI, type <code dir="auto">/agents</code> and press \<kbd\>Enter</kbd>:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">/agents</span></span></code></pre>
+<p><img src="/assets/image/docs/cli/agents-panel.png" alt="Interactive Agents Panel"></p>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="custom-agent-selection-and-discovery">Custom agent selection and discovery</h2><a class="sl-anchor-link" href="#custom-agent-selection-and-discovery"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Custom agent selection and discovery”</span></a></div>
+<p>Antigravity CLI supports loading custom agent definitions with specialized system instructions and tool permissions. The <strong>Available Agents</strong> section lists all agents currently available to your session.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="switching-between-agents">Switching between agents</h3><a class="sl-anchor-link" href="#switching-between-agents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Switching between agents”</span></a></div>
+<p>To switch between agents in the panel, use the following controls:</p>
+\<ul\>
+\<li\><strong>Select</strong>: Use \<kbd\>↑</kbd>/\<kbd\>↓</kbd> to highlight an agent (<code dir="auto">Default agent</code> or a custom agent) under <strong>Available Agents</strong>, then press \<kbd\>Enter</kbd>.</li>
+\<li\><strong>Status indicator</strong>: A green circle (<code dir="auto">●</code>) indicates the active or prepared agent.</li>
+\<li\><strong>Apply and exit</strong>: Press \<kbd\>Esc</kbd> to close the panel and apply your selection.</li>
+</ul>
+<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p>If you’re currently inside an active conversation, switching custom agents automatically forks your current session (<code dir="auto">[ Switch will fork the current conversation on exit ]</code>) so you don’t lose context. If you start from a fresh session, the switch applies directly (<code dir="auto">[ Switch will create a new conversation on exit ]</code>).</p></div></aside>
+<div class="sl-heading-wrapper level-h3"><h3 id="creating-custom-agents">Creating custom agents</h3><a class="sl-anchor-link" href="#creating-custom-agents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Creating custom agents”</span></a></div>
+<p>The header of the <code dir="auto">/agents</code> panel displays template locations for creating new custom agents:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="text" dir="ltr"><code><span class="line"><span>Create New Agents</span></span>
+<span class="line"><span>  Workspace: {workspace}/.agents/agents/{agent_name}/agent.md</span></span>
+<span class="line"><span>  Global: ~/.gemini/config/agents/{agent_name}/agent.md</span></span></code></pre>
+<p>To create a custom agent that is available across all your workspaces and projects, place it under your global customization directory (<code dir="auto">~/.gemini/config/agents/</code>). Create a directory matching your agent name and add an <code dir="auto">agent.md</code> file with YAML frontmatter:</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">mkdir</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -p</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/.gemini/config/agents/code-reviewer</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">cat</span><span style="color:#D73A49;--shiki-dark:#F97583"> &#x3C;&#x3C;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'EOF'</span><span style="color:#D73A49;--shiki-dark:#F97583"> ></span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ~/.gemini/config/agents/code-reviewer/agent.md</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">---</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">name: code-reviewer</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">description: Rigorous code review specialist focusing on edge cases and security.</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">---</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">You are an expert code reviewer. Analyze diffs carefully and verify edge cases.</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">EOF</span></span></code></pre>
+<p>When you reopen <code dir="auto">/agents</code>, the CLI automatically discovers <code dir="auto">code-reviewer</code> and lists it under <strong>Available Agents</strong>. If you need an agent scoped strictly to a single project repository, place it inside that workspace’s <code dir="auto">.agents/agents/</code> directory (for example, <code dir="auto">/home/user/projects/my-app/.agents/agents/code-reviewer/agent.md</code>). You can also package and distribute custom agents inside <a href="/docs/cli/plugins">plugins</a>.</p>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="subagent-monitoring-and-control">Subagent monitoring and control</h2><a class="sl-anchor-link" href="#subagent-monitoring-and-control"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Subagent monitoring and control”</span></a></div>
+<p>When your primary agent delegates tasks (such as running tests or querying large codebases), the spawned threads appear in the <code dir="auto">/agents</code> panel under <strong>Subagents</strong>, grouped by their triggering prompt.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="inspecting-subagent-progress">Inspecting subagent progress</h3><a class="sl-anchor-link" href="#inspecting-subagent-progress"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Inspecting subagent progress”</span></a></div>
+<p>Use the following controls to monitor subagent status and logs:</p>
+\<ul\>
+\<li\><strong>Group toggling</strong>: Press \<kbd\>Enter</kbd> on a subagent group header (<code dir="auto">▸ Subagents (1 running, 2 done)</code>) to expand or collapse (<code dir="auto">▾</code>) that group.</li>
+\<li\><strong>Status indicators</strong>: Each subagent row displays a live lifecycle state:
+\<ul\>
+\<li\><code dir="auto">running</code>: Actively executing tools or generating reasoning steps.</li>
+\<li\><code dir="auto">done</code>: Completed its assigned background task.</li>
+\<li\><code dir="auto">error</code>: Encountered a terminal failure during execution.</li>
+\<li\><code dir="auto">killed</code>: Terminated manually by you or the parent process.</li>
+</ul>
+</li>
+\<li\><strong>Detail view</strong>: Highlight a specific subagent row and press \<kbd\>Enter</kbd> to open the full-screen <strong>Subagent Detail View</strong>. This view displays the subagent’s complete internal thoughts, tool calls, and execution stdout. Press \<kbd\>Esc</kbd> to return to the list.</li>
+</ul>
+<div class="sl-heading-wrapper level-h3"><h3 id="terminating-active-subagents">Terminating active subagents</h3><a class="sl-anchor-link" href="#terminating-active-subagents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Terminating active subagents”</span></a></div>
+<p>If a background subagent loops or runs longer than needed, you can terminate it immediately without leaving your session:</p>
+\<ol\>
+\<li\>Open <code dir="auto">/agents</code> and highlight the running subagent row.</li>
+\<li\>Press \<kbd\>K</kbd> to terminate the active subagent and all its child threads.</li>
+</ol>
+<div class="sl-heading-wrapper level-h3"><h3 id="inline-tool-approvals">Inline tool approvals</h3><a class="sl-anchor-link" href="#inline-tool-approvals"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Inline tool approvals”</span></a></div>
+<p>If a subagent attempts a protected operation (such as modifying a file or running a shell command in a sandboxed environment), the authorization prompt displays inline in the <code dir="auto">/agents</code> panel. You can press \<kbd\>A</kbd> to approve or \<kbd\>D</kbd> to deny directly from the list.</p>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="panel-keybindings-reference">Panel keybindings reference</h2><a class="sl-anchor-link" href="#panel-keybindings-reference"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Panel keybindings reference”</span></a></div>
+<p>When focused inside the <code dir="auto">/agents</code> panel, the following keyboard shortcuts apply:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Key</th><th align="left">Action</th><th align="left">Behavior</th></tr></thead>\<tbody\><tr><td align="left">\<kbd\>↑</kbd> / \<kbd\>↓</kbd></td><td align="left">Navigate</td><td align="left">Move the cursor between headers, subagents, and available agents.</td></tr><tr><td align="left">\<kbd\>Enter</kbd></td><td align="left">Select / Toggle</td><td align="left">Expand/collapse groups, open Subagent Detail View, or select a custom agent.</td></tr><tr><td align="left">\<kbd\>K</kbd></td><td align="left">Kill Active Subagent</td><td align="left">Instantly cancel (<code dir="auto">CancelSubagent</code>) the highlighted running subagent.</td></tr><tr><td align="left">\<kbd\>Esc</kbd></td><td align="left">Go Back</td><td align="left">Exit the panel, return to the prompt box, and apply any prepared agent switch.</td></tr></tbody></table>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="common-mistakes">Common mistakes</h2><a class="sl-anchor-link" href="#common-mistakes"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Common mistakes”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Mistake</th><th align="left">Why it fails</th><th align="left">Fix</th></tr></thead>\<tbody\><tr><td align="left">Expecting custom agent switches to modify turn history</td><td align="left">Switching agents forks the conversation to preserve historical integrity</td><td align="left">Continue your workflow in the newly forked session</td></tr><tr><td align="left">Placing agent files directly in config root</td><td align="left">Scanner looks specifically inside <code dir="auto">agents/</code> directories</td><td align="left">Move definition to <code dir="auto">.agents/agents/&#x3C;name>/agent.md</code></td></tr><tr><td align="left">Pressing \<kbd\>K</kbd> on completed subagents</td><td align="left">Only targets active (<code dir="auto">running</code>) subagent processes</td><td align="left">Press \<kbd\>Enter</kbd> to inspect completed logs instead</td></tr></tbody></table>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="next-steps">Next steps</h2><a class="sl-anchor-link" href="#next-steps"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Next steps”</span></a></div>
+<p>Explore the following guides to learn more about subagents and permissions:</p>
+\<ul\>
+\<li\><strong><a href="/docs/cli/subagents">Background tasks and subagents</a></strong>: Learn more about the multi-threaded asynchronous execution architecture.</li>
+\<li\><strong><a href="/docs/cli/plugins">Plugins and skills</a></strong>: Discover how to bundle custom agents, skills, and MCP configurations into shareable plugins.</li>
+\<li\><strong><a href="/docs/cli/sandbox">Permissions and sandbox</a></strong>: Configure security guardrails and approval rules for background subagents.</li>
+</ul></div><footer class="sl-flex docs-footer docs-footer-wrapper astro-4mgpquaz" data-pagefind-ignore><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-qs5fwxza" dir="ltr"><a href="/docs/slash-commands/" rel="prev" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-qs5fwxza">Previous<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Overview</span></span></a><a href="/docs/boost/" rel="next" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-qs5fwxza">Next<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Boost (/boost)</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav></footer></div></div></main></div></div></div></div></body></html>

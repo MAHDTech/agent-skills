@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -74,6 +74,9 @@ skill_name = "spacetimedb"
 <span class="line"><span style="color:#50FA7B">spacetime</span><span style="color:#F1FA8C"> logs</span></span>
 <span class="line"><span style="color:#50FA7B">2025-01-13T12:00:00.000000Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> Hello,</span><span style="color:#F1FA8C"> Alice!</span></span>
 <span class="line"><span style="color:#50FA7B">2025-01-13T12:00:00.000000Z</span><span style="color:#F1FA8C">  INFO:</span><span style="color:#F1FA8C"> Hello,</span><span style="color:#F1FA8C"> World!</span></span></code></pre></div></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="reconnect-after-connection-loss">Reconnect after connection loss<a href="#reconnect-after-connection-loss" class="hash-link" aria-label="Direct link to Reconnect after connection loss" title="Direct link to Reconnect after connection loss" translate="no">​</a></h2>
+<p>For browser or Node.js clients, enable <code>.withAutomaticReconnect()</code> on your generated <code>DbConnection</code> builder. Subscriptions and row callbacks survive reconnects; register them once after <code>build()</code> or inside <code>onConnect</code>, which fires once per connection object. Successful automatic reconnects fire <code>onAutomaticReconnect(conn, identity, token)</code> instead. Use this callback for recovery-specific work; wait for subscription <code>onApplied</code> callbacks when you need refreshed data. If your auth tokens expire, also provide an initial token with <code>.withToken(initialToken)</code> and a refresh callback with <code>.withTokenProvider(() => auth.getAccessToken())</code>.</p>
+<p>See <a class="" href="/docs/clients/typescript#method-withautomaticreconnect">automatic reconnection</a> for lifecycle callbacks and framework behavior.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="next-steps">Next steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next steps" title="Direct link to Next steps" translate="no">​</a></h2>
 \<ul\>
 <li class="">See the <a class="" href="/docs/tutorials/chat-app">Chat App Tutorial</a> for a complete example</li>

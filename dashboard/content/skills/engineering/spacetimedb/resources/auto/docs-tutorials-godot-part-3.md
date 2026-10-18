@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -1142,6 +1142,7 @@ skill_name = "spacetimedb"
 <span class="line"><span style="color:#F8F8F2">		.</span><span style="color:#50FA7B">OnApplied</span><span style="color:#F8F8F2">(HandleSubscriptionApplied)</span></span>
 <span class="line"><span style="color:#F8F8F2">		.</span><span style="color:#50FA7B">SubscribeToAllTables</span><span style="color:#F8F8F2">();</span></span>
 <span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
+<p>If you enable <a class="" href="/docs/clients/c-sharp#method-withautomaticreconnect">automatic reconnect</a>, <code>HandleConnect</code>, registered through <code>OnConnect</code>, still runs only once. Its <code>Instantiator</code>, initial <code>OnConnected</code> setup, and subscriptions can stay as written. Use a separate <code>OnAutomaticReconnect</code> callback for recovery-specific work without recreating those objects. The existing <code>Instantiator</code> processes the net cache changes from subscription replay. Use subscription <code>OnApplied</code> to mark the data ready after each recovery.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Y_NL" id="camera-controller">Camera Controller<a href="#camera-controller" class="hash-link" aria-label="Direct link to Camera Controller" title="Direct link to Camera Controller" translate="no">​</a></h3>
 <p>One of the last steps is to create a camera controller to make sure the camera follows the local player around. Create a new script called <code>CameraController.cs</code>. Replace the contents of the file with this:</p>
 <pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">using</span><span style="color:#8BE9FD;font-style:italic"> Godot</span><span style="color:#F8F8F2">;</span></span>

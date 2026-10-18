@@ -1,0 +1,38 @@
+# Delta — A Multiplayer Environment for Coding with Agents
+
+> Build and review software with teammates and agents in shared threads, with every conversation and code change kept in context.
+
+This file helps language models discover the most useful content on this site.
+
+## Home
+
+- [Delta — Blog](https://delta.dev/blog.md): News, product updates, and ideas from the team building Delta.
+- [Delta — Download](https://delta.dev/download.md): Download the Delta desktop app or open shared threads in your browser.
+- [Something went wrong | Delta](https://delta.dev/error.md): An error occurred while using Delta.
+- [Delta — A Multiplayer Environment for Coding with Agents](https://delta.dev/index.md): Build and review software with teammates and agents in shared threads, with every conversation and code change kept in context.
+- [Delta — Pricing](https://delta.dev/pricing.md): Compare Personal and Pro plans for Delta.
+- [Delta — Roadmap](https://delta.dev/roadmap.md): Follow what we're currently working on for Delta and what's up next.
+
+## Blog
+
+- [Beyond Pass Rate: Harness Evals, and Their Blind Spots — Delta Blog](https://delta.dev/blog/beyond-pass-rate.md): Delta keeps pace with native harnesses on public evals.
+- [Escaping the tyranny of worktrees — Delta Blog](https://delta.dev/blog/escaping-the-tyranny-of-worktrees.md): Parallel agent work has outgrown Git worktrees.
+- [DeltaDB: The Future of Version Control — Delta Blog](https://delta.dev/blog/future-of-version-control.md): What if you never had to lose work again?
+- [Your plan.md is missing the conversation — Delta Blog](https://delta.dev/blog/planning-together-in-delta.md): How we plan with agents before generating a line of code.
+- [Please Stop Sending Me Google Docs — Delta Blog](https://delta.dev/blog/please-stop-sending-me-google-docs.md): In Delta, my teammates and I work with the agent together, and it feels so much better.
+- [Posts tagged agents — Delta Blog](https://delta.dev/blog/tagged/agents.md): Delta blog posts tagged agents.
+- [Posts tagged ai — Delta Blog](https://delta.dev/blog/tagged/ai.md): Delta blog posts tagged ai.
+- [Posts tagged collaboration — Delta Blog](https://delta.dev/blog/tagged/collaboration.md): Delta blog posts tagged collaboration.
+- [Posts tagged crdt — Delta Blog](https://delta.dev/blog/tagged/crdt.md): Delta blog posts tagged crdt.
+- [Posts tagged delta — Delta Blog](https://delta.dev/blog/tagged/delta.md): Delta blog posts tagged delta.
+- [Posts tagged deltadb — Delta Blog](https://delta.dev/blog/tagged/deltadb.md): Delta blog posts tagged deltadb.
+- [Posts tagged evals — Delta Blog](https://delta.dev/blog/tagged/evals.md): Delta blog posts tagged evals.
+- [Posts tagged git — Delta Blog](https://delta.dev/blog/tagged/git.md): Delta blog posts tagged git.
+- [Posts tagged product vision — Delta Blog](https://delta.dev/blog/tagged/product-vision.md): Delta blog posts tagged product vision.
+- [Posts tagged the diff — Delta Blog](https://delta.dev/blog/tagged/the-diff.md): Delta blog posts tagged the diff.
+- [The Diff: September 2026 — Delta Blog](https://delta.dev/blog/the-diff-2026-09.md): More provider options, orchestrating threads with threads, and more.
+
+## Documentation
+
+- [Delta Docs](https://delta.dev/docs/llms.txt): Documentation for installing, configuring, and using Delta.
+

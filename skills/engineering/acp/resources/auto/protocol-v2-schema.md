@@ -220,10 +220,12 @@ See protocol docs: [Initialization](https://agentclientprotocol.com/protocol/v2/
 </ResponseField>
 
 <ResponseField name="protocolVersion" type={<a href="#protocolversion">ProtocolVersion</a>} required>
-  The protocol version the client specified if supported by the agent,
-  or the latest protocol version supported by the agent.
+  The highest protocol version supported by the agent that is at or below
+  the version requested by the client. If no such version exists,
+  initialization fails with error code -32022.
 
-  The client should disconnect, if it doesn't support this version.
+  The client must check that it supports this version and should disconnect
+  if it does not.
 </ResponseField>
 
 <a id="session-cancel" />
@@ -235,13 +237,24 @@ Cancels ongoing operations for a session.
 This is a notification sent by the client to cancel active work in a
 session.
 
-Upon receiving this notification, the Agent SHOULD:
+Upon receiving this notification, the Agent SHOULD stop all language model
+requests and all tool call invocations as soon as possible.
 
-* Stop all language model requests as soon as possible
-* Abort all tool call invocations in progress
-* Send any pending `session/update` notifications
-* Report an idle `state_update` with `StopReason::Cancelled` after
-  cancellation succeeds
+After all ongoing operations have been successfully aborted and pending
+updates have been sent, the Agent MUST send an idle `state_update` session
+update with the `cancelled` stop reason if cancellation ended active
+foreground work. No additional completion update is required if no
+foreground work was active.
+
+After cancellation completes, the Agent SHOULD ignore late answers rather
+than use them to resume the cancelled work.
+
+Agents MUST catch errors caused by aborting cancelled work and report the
+`cancelled` stop reason, not `error`.
+
+The Agent MAY send content or tool call updates after receiving
+`session/cancel`, but MUST send them before the idle `state_update` that
+reports cancellation.
 
 See protocol docs: [Cancellation](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation)
 
@@ -283,6 +296,17 @@ Request parameters for closing an active session.
 The agent **must** cancel any ongoing work related to the session (treat it
 as if `session/cancel` was called) and then free up any resources associated
 with the session.
+
+When closing cancels active foreground work, the Agent MUST send the final
+updates for that work and the idle `state_update` with `stopReason: "cancelled"`
+before responding successfully to `session/close`. Closing an idle session
+does not itself require another idle update.
+
+Closing may also cancel pending `session/prompt` requests, including queued
+prompts. If closing prevents a prompt's user message from being inserted, the
+Agent MUST answer that request with `-32800` (Request Cancelled). If the message
+has already been inserted, the Agent MUST respond successfully with its
+`messageId`. Prompt responses need not precede the close response.
 
 **Type:** Object
 
@@ -475,6 +499,10 @@ See protocol docs: [Creating a Session](https://agentclientprotocol.com/protocol
 
 Response from creating a new session.
 
+New sessions default to `idle` until a state update reports otherwise.
+Updates may arrive before or after this response. Clients MUST NOT overwrite
+an already-reported state when the response arrives.
+
 See protocol docs: [Creating a Session](https://agentclientprotocol.com/protocol/v2/session-setup#creating-a-session)
 
 **Type:** Object
@@ -513,18 +541,23 @@ See protocol docs: [Creating a Session](https://agentclientprotocol.com/protocol
 
 Processes a user prompt within a session.
 
-Acceptance means insertion into the ACP conversation:
-
-* Receives user messages with optional context (files, images, etc.)
-* Returns the inserted user message's ID without waiting for processing to finish
+Acceptance means adding a logical user message with an ID and a position
+relative to other messages in the ACP conversation, not receipt or queueing.
+The Agent MUST return the inserted message's ID without waiting for
+processing to finish.
 
 The Agent reports the user message with the same ID through `session/update`;
-this notification may arrive before or after the response. Processing state,
-output, tool calls, and completion are also reported through session updates.
+this notification may arrive before or after the response, but neither may
+precede insertion. Processing state, output, tool calls, and completion are
+also reported through session updates.
 
 An error response means the user message was not inserted. Once it is
 inserted, the Agent MUST NOT answer with an error, even if the work fails
 before the response is sent; it ends that work with the `error` stop reason.
+
+A rejected submission produces no user-message updates. Foreground state
+follows its normal lifecycle independently of the request outcome:
+`running` may precede insertion, and rejection alone does not imply `idle`.
 
 See protocol docs: [Prompt Lifecycle](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle)
 
@@ -575,6 +608,9 @@ Response acknowledging that a user prompt was inserted into the ACP conversation
 This response does not indicate that the prompt was merely received or queued, nor that the
 agent has finished processing it.
 Processing and completion are reported through `state_update` session updates.
+
+Insertion is the logical addition of a user message with a message ID and a position
+relative to other messages in the ACP conversation.
 
 See protocol docs: [Prompt Accepted](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#2-prompt-accepted)
 
@@ -654,6 +690,10 @@ history according to `replayFrom`.
   replay includes the position identified by the cursor. Supplying
   `\{ "type": "start" \}` means the Agent should replay all retained
   conversation history before responding.
+
+  Agents MUST reject unsupported cursor types or malformed cursor values
+  with `-32602` (Invalid params), rather than substituting another cursor
+  or resuming without replay.
 </ResponseField>
 
 <ResponseField name="sessionId" type={<a href="#sessionid">SessionId</a>} required>
@@ -663,6 +703,12 @@ history according to `replayFrom`.
 #### <span class="font-mono">ResumeSessionResponse</span>
 
 Response from resuming an existing session.
+
+The agent MUST send a current `state_update` after any requested history
+replay and before this response, even without replay. The update reports
+foreground state after resuming. The response alone does not imply `idle`.
+
+See protocol docs: [Current-State Synchronization](https://agentclientprotocol.com/protocol/v2/session-setup#current-state-synchronization)
 
 **Type:** Object
 
@@ -810,6 +856,8 @@ See protocol docs: [Elicitation](https://agentclientprotocol.com/protocol/v2/eli
 
 Notification sent by the agent when a URL-based elicitation is complete.
 
+This notification is not a foreground state update.
+
 **Type:** Object
 
 **Properties:**
@@ -843,6 +891,18 @@ Request from the agent to elicit structured user input.
 The agent sends this to the client to request information from the user,
 either via a form or by directing them to a URL.
 Elicitations are tied to a session (optionally a tool call) or a request.
+
+A session-scoped request follows the aggregate foreground-state contract:
+agents SHOULD report `requires_action` when the whole foreground workflow is
+blocked on user action. Once reported, they MUST report `running` when progress
+resumes, or `idle` if work ends without resuming. Independent background requests
+and request-scoped elicitations do not themselves change session state.
+Accepting a URL does not mean the external interaction completed.
+
+Agents SHOULD cancel pending elicitations no longer needed by cancelled work.
+The request's scope alone does not establish that dependency.
+
+See protocol docs: [Elicitation](https://agentclientprotocol.com/protocol/v2/elicitation)
 
 **Type:** Union
 
@@ -1328,8 +1388,9 @@ See protocol docs: [Agent Capabilities](https://agentclientprotocol.com/protocol
 
   Optional. Omitted or `null` both mean the agent does not support the
   `session/*` method surface. Supplying `\{\}` means the agent supports the
-  baseline session methods: `session/new`, `session/prompt`,
-  `session/cancel`, and `session/update`.
+  baseline session methods: `session/new`, `session/list`,
+  `session/resume`, `session/close`, `session/prompt`, `session/cancel`,
+  and `session/update`.
 </ResponseField>
 
 ## <span class="font-mono">AgentMessage</span>
@@ -1354,10 +1415,13 @@ content.
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Implementations MUST NOT make assumptions about values at
-  these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
@@ -1390,10 +1454,13 @@ content.
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Implementations MUST NOT make assumptions about values at
-  these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
@@ -2003,14 +2070,22 @@ timeline position. Later updates with the same ID patch that entity in place.
 
 `summary`, `error`, and `_meta` have patch semantics: omission leaves the
 stored value unchanged, `null` clears it, and a concrete value replaces it.
-`summary: []` also clears the summary.
+`summary: []` also clears the summary. A concrete `_meta` object patches the
+stored metadata by top-level key instead of replacing it.
 
 **Type:** Object
 
 **Properties:**
 
 <ResponseField name="_meta" type={"object | null"}>
-  Extensible metadata patch for this compaction.
+  The \_meta property is reserved by ACP to allow clients and agents to attach additional
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
+
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
@@ -2025,17 +2100,7 @@ stored value unchanged, `null` clears it, and a concrete value replaces it.
   Current lifecycle status.
 </ResponseField>
 
-<ResponseField
-  name="summary"
-  type={
-<>
-  <span>
-    <a href="#contentblock">ContentBlock[]</a>
-  </span>
-  <span> | null</span>
-</>
-}
->
+<ResponseField name="summary" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
   Complete replacement user-displayable summary content for the compaction.
 </ResponseField>
 
@@ -2582,8 +2647,14 @@ Text patch format used by `DiffPatch`.
 <ResponseField name="git_patch" type="string">
   One or more `diff --git` sections in Git's `--patch` (`-p`) text format.
 
-  Paths MUST be absolute. Surrounding commit metadata and email envelopes
-  MUST NOT be included.
+  Unlike Git, which writes paths relative to the repository root, every
+  path MUST be absolute, including in `rename from`, `rename to`,
+  `copy from`, and `copy to` lines, and MUST NOT have a prefix such as
+  Git's default `a/` and `b/`. Otherwise paths follow Git: `/dev/null`
+  names the missing side of an added or deleted file in the `---` and
+  `+++` lines, and paths with unusual characters are quoted as Git quotes
+  them. Surrounding commit metadata and email envelopes MUST NOT be
+  included.
 </ResponseField>
 
 <ResponseField name="other" type="string">
@@ -3454,6 +3525,12 @@ and use the reserved range (-32000 to -32099) for protocol-specific errors.
   **Resource not found**: A given resource, such as a file, was not found.
 </ResponseField>
 
+<ResponseField name="-32022" type="int32">
+  **Unsupported protocol version**: No protocol version supported by the Agent
+  is at or below the requested version. The error data contains the requested
+  version and the Agent's supported versions.
+</ResponseField>
+
 <ResponseField name="Other" type="int32">
   Other undefined error code.
 </ResponseField>
@@ -3575,11 +3652,14 @@ Theme an icon is designed for.
 
 ## <span class="font-mono">IdleStateUpdate</span>
 
-The agent is ready to process a new prompt.
+No foreground work is active. Background activity may continue.
 
 Agents SHOULD include a `stopReason` when the idle transition ends foreground
-work. An omitted, `null`, or malformed `stopReason` means the agent is not
+work. An idle update that does not end foreground work need not include one.
+Receivers treat an omitted, `null`, or malformed `stopReason` as the agent not
 reporting one.
+Repeated or resume snapshots may carry the last stop reason for context.
+They MUST NOT be counted as new completions, cancellations, or additional usage.
 
 **Type:** Union
 
@@ -3605,6 +3685,7 @@ reporting one.
 
 <ResponseField name="end_turn" type="object">
   The active work ended successfully.
+  Includes locally handled commands that required no model call.
 
   <Expandable title="Properties">
     <ResponseField name="stopReason" type={"string"} required>
@@ -3649,9 +3730,10 @@ reporting one.
 <ResponseField name="cancelled" type="object">
   Active session work was cancelled by the client via `session/cancel`.
 
-  Agents should report this stop reason on an idle `state_update` session update
-  when cancellation succeeds, even if cancellation causes exceptions in
-  underlying operations.
+  Agents MUST report this stop reason on an idle `state_update` when
+  cancellation ends active foreground work, even if aborting causes
+  exceptions. Agents MUST catch these errors and report `cancelled`, not
+  `error`.
 
   <Expandable title="Properties">
     <ResponseField name="stopReason" type={"string"} required>
@@ -3663,8 +3745,9 @@ reporting one.
 <ResponseField name="error" type="object">
   The active work ended because something failed.
 
-  For work started by a prompt, this covers failures after the user message
-  was inserted; earlier failures are an error response to `session/prompt`.
+  This includes pre-insertion foreground work. A prompt failure before
+  insertion also requires an error response to `session/prompt`; after
+  insertion, the prompt's response remains successful.
 
   <Expandable title="Properties">
     <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
@@ -4729,9 +4812,10 @@ Replay includes the position identified by the cursor.
   extensions. Unknown values that do not begin with `_` are reserved for
   future ACP variants.
 
-  Receivers that do not understand this cursor should preserve the raw
-  payload when storing, replaying, proxying, or forwarding requests, and
-  otherwise reject the request rather than guessing where to replay from.
+  Intermediaries SHOULD preserve the raw payload when storing, replaying,
+  proxying, or forwarding requests. Agents that do not support this cursor
+  MUST reject the request with `-32602` (Invalid params), rather than
+  substituting another cursor or resuming without replay.
 
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
@@ -4805,7 +4889,8 @@ The outcome of a permission request.
 
   When a client sends a `session/cancel` notification to cancel active
   session work, it MUST respond to all pending `session/request_permission`
-  requests with this `Cancelled` outcome.
+  requests in that session with this `Cancelled` outcome, without answering
+  any request twice. Requests in other sessions are unaffected.
 
   See protocol docs: [Cancellation](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#cancellation)
 
@@ -4940,7 +5025,14 @@ The operation requiring permission.
 
 ## <span class="font-mono">RequiresActionStateUpdate</span>
 
-Foreground work is blocked on user action.
+The foreground workflow as a whole is blocked on user action.
+
+Agents SHOULD report this state when foreground work cannot progress without
+user action. Pending permissions or elicitations alone do not imply this
+state if other foreground work can progress, or if the requests belong only
+to independent background activity. Once reported, agents MUST report
+`running` when progress resumes, or `idle` if the work ends without resuming.
+Responding to one request does not itself imply `running`.
 
 **Type:** Object
 
@@ -5463,7 +5555,8 @@ Agents send this notification to update session information like title or custom
 This allows clients to display dynamic session names and track session state changes.
 
 Omitted fields leave the existing session info unchanged. `null` clears the
-corresponding value.
+corresponding value. A concrete `_meta` object patches the stored metadata by
+top-level key.
 
 **Type:** Object
 
@@ -5471,10 +5564,13 @@ corresponding value.
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Omitted means no metadata update; `null` is an
-  explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="title" type={"string | null"}>
@@ -5542,10 +5638,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Implementations MUST NOT make assumptions about values at
-      these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
@@ -5601,10 +5700,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Implementations MUST NOT make assumptions about values at
-      these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
@@ -5660,10 +5762,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Implementations MUST NOT make assumptions about values at
-      these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
@@ -5681,7 +5786,7 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
 </ResponseField>
 
 <ResponseField name="state_update" type="object">
-  The state of the agent's foreground work has changed.
+  A snapshot of the session's aggregate foreground activity.
 
   <Expandable title="Properties">
     <ResponseField name="sessionUpdate" type={"string"} required>
@@ -5710,7 +5815,7 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   </ResponseField>
 
   <ResponseField name="idle" type="object">
-    The agent is ready to process a new prompt.
+    No foreground work is active. Background activity may continue.
 
     <Expandable title="Properties">
       <ResponseField name="_meta" type={"object | null"}>
@@ -5738,6 +5843,7 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
 
     <ResponseField name="end_turn" type="object">
       The active work ended successfully.
+      Includes locally handled commands that required no model call.
 
       <Expandable title="Properties">
         <ResponseField name="stopReason" type={"string"} required>
@@ -5782,9 +5888,10 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
     <ResponseField name="cancelled" type="object">
       Active session work was cancelled by the client via `session/cancel`.
 
-      Agents should report this stop reason on an idle `state_update` session update
-      when cancellation succeeds, even if cancellation causes exceptions in
-      underlying operations.
+      Agents MUST report this stop reason on an idle `state_update` when
+      cancellation ends active foreground work, even if aborting causes
+      exceptions. Agents MUST catch these errors and report `cancelled`, not
+      `error`.
 
       <Expandable title="Properties">
         <ResponseField name="stopReason" type={"string"} required>
@@ -5796,8 +5903,9 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
     <ResponseField name="error" type="object">
       The active work ended because something failed.
 
-      For work started by a prompt, this covers failures after the user message
-      was inserted; earlier failures are an error response to `session/prompt`.
+      This includes pre-insertion foreground work. A prompt failure before
+      insertion also requires an error response to `session/prompt`; after
+      insertion, the prompt's response remains successful.
 
       <Expandable title="Properties">
         <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
@@ -5909,10 +6017,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Omitted means no metadata update; `null` is an
-      explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="content" type={<><span><a href="#toolcallcontent">ToolCallContent[]</a></span><span> | null</span></>}>
@@ -5970,10 +6081,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Omitted means no metadata update; `null` is an
-      explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="command" type={"string | null"}>
@@ -6104,10 +6218,13 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
       The \_meta property is reserved by ACP to allow clients and agents to attach additional
-      metadata to their interactions. Omitted means no metadata update; `null` is an
-      explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
 
-      See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="sessionUpdate" type={"string"} required>
@@ -6200,7 +6317,14 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
 
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
-      Extensible metadata patch for this compaction.
+      The \_meta property is reserved by ACP to allow clients and agents to attach additional
+      metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+      clears it. An object patches the stored metadata by top-level key: keys it omits are
+      unchanged, a key set to `null` is removed, and any other value replaces that key's
+      stored value without merging nested objects. Beyond this patch rule, implementations
+      MUST NOT make assumptions about values at these keys.
+
+      See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
     </ResponseField>
 
     <ResponseField name="compactionId" type={<a href="#compactionid">CompactionId</a>} required>
@@ -6219,17 +6343,7 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
       Current lifecycle status.
     </ResponseField>
 
-    <ResponseField
-      name="summary"
-      type={
-<>
-  <span>
-    <a href="#contentblock">ContentBlock[]</a>
-  </span>
-  <span> | null</span>
-</>
-}
-    >
+    <ResponseField name="summary" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>
       Complete replacement user-displayable summary content for the compaction.
     </ResponseField>
   </Expandable>
@@ -6281,10 +6395,46 @@ See protocol docs: [Agent Reports Output](https://agentclientprotocol.com/protoc
 
 ## <span class="font-mono">StateUpdate</span>
 
-The state of the agent's foreground work has changed.
+A snapshot of the session's aggregate foreground activity.
+
+Foreground work is the agent's active response or workflow in the session,
+including model processing, tool execution, and waiting for user action needed
+to continue that work. It can start with a prompt or be agent-initiated, for
+example to pursue an ongoing goal or follow up on a completed background task.
+Either way, the agent MUST report `running` when foreground work starts,
+or `requires_action` if it starts blocked on user action, and `idle` when it
+ends. The agent SHOULD include a stop reason on that idle update.
+Agent-initiated work does not require a prompt request or a synthetic user
+message.
+
+`running` may precede user-message insertion, for example during a foreground
+hook. It is not acknowledgment of insertion, and rejecting a prompt does not
+itself end foreground work.
 
 Background activity can continue and emit other `session/update` notifications
-while `idle`. Those notifications do not change this state.
+while `idle`. Those notifications, including a detached task's progress or
+completion, do not by themselves change this state. A permission request only
+warrants `requires_action` when foreground work is blocked on user action.
+
+The agent SHOULD report `requires_action` when the foreground workflow as a
+whole cannot progress without user action, including permissions or elicitations.
+Once reported, it MUST report `running` when progress resumes, or `idle` when
+work ends without resuming.
+If other foreground work can progress, the state remains `running`. Resolving
+one of several requests does not itself change the state. Agents SHOULD ignore
+responses for work that has already ended rather than use them to resume it.
+
+A new session defaults to idle until a state update reports otherwise.
+Resume MUST send a current-state snapshot after any replay and before its
+response. The snapshot reports foreground state after resuming.
+The response alone does not imply idle.
+Repeated snapshots are idempotent, not additional work, completions, or usage.
+A repeated state may carry updated information without another state transition.
+The agent MUST report `idle` when no foreground activity remains. Completing
+an individual activity while other foreground work continues does not require
+an idle boundary. Local commands use the same lifecycle even without model work.
+
+See protocol docs: [Session States](https://agentclientprotocol.com/protocol/v2/prompt-lifecycle#session-states)
 
 **Type:** Union
 
@@ -6307,7 +6457,7 @@ while `idle`. Those notifications do not change this state.
 </ResponseField>
 
 <ResponseField name="idle" type="object">
-  The agent is ready to process a new prompt.
+  No foreground work is active. Background activity may continue.
 
   <Expandable title="Properties">
     <ResponseField name="_meta" type={"object | null"}>
@@ -6335,6 +6485,7 @@ while `idle`. Those notifications do not change this state.
 
   <ResponseField name="end_turn" type="object">
     The active work ended successfully.
+    Includes locally handled commands that required no model call.
 
     <Expandable title="Properties">
       <ResponseField name="stopReason" type={"string"} required>
@@ -6379,9 +6530,10 @@ while `idle`. Those notifications do not change this state.
   <ResponseField name="cancelled" type="object">
     Active session work was cancelled by the client via `session/cancel`.
 
-    Agents should report this stop reason on an idle `state_update` session update
-    when cancellation succeeds, even if cancellation causes exceptions in
-    underlying operations.
+    Agents MUST report this stop reason on an idle `state_update` when
+    cancellation ends active foreground work, even if aborting causes
+    exceptions. Agents MUST catch these errors and report `cancelled`, not
+    `error`.
 
     <Expandable title="Properties">
       <ResponseField name="stopReason" type={"string"} required>
@@ -6393,8 +6545,9 @@ while `idle`. Those notifications do not change this state.
   <ResponseField name="error" type="object">
     The active work ended because something failed.
 
-    For work started by a prompt, this covers failures after the user message
-    was inserted; earlier failures are an error response to `session/prompt`.
+    This includes pre-insertion foreground work. A prompt failure before
+    insertion also requires an error response to `session/prompt`; after
+    insertion, the prompt's response remains successful.
 
     <Expandable title="Properties">
       <ResponseField name="error" type={<><span><a href="#error">Error</a></span><span> | null</span></>}>
@@ -6747,8 +6900,9 @@ An upsert for the stored state of an agent-owned terminal.
 
 Only `TerminalUpdate::terminal_id` is required. Other fields have patch
 semantics: omitted fields leave the stored value unchanged, `null` clears
-it, and concrete values replace it. When the terminal ID is new, omitted
-fields start unknown.
+it, and concrete values replace it. A concrete `_meta` object instead
+patches the stored metadata by top-level key. When the terminal ID is new,
+omitted fields start unknown.
 
 **Type:** Object
 
@@ -6756,10 +6910,13 @@ fields start unknown.
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Omitted means no metadata update; `null` is an
-  explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="command" type={"string | null"}>
@@ -7115,8 +7272,9 @@ Only `ToolCallUpdate::tool_call_id` is required. Other fields have patch semanti
 omitted fields leave the existing tool call value unchanged, `null` clears or
 unsets the value, and concrete values replace the previous value. For
 collection fields, concrete arrays replace the previous collection, and both
-`null` and `[]` clear the collection. When a client receives a tool call ID it
-has not seen before, omitted fields use client defaults.
+`null` and `[]` clear the collection. A concrete `_meta` object instead
+patches the stored metadata by top-level key. When a client receives a tool
+call ID it has not seen before, omitted fields use client defaults.
 
 See protocol docs: [Tool Calls](https://agentclientprotocol.com/protocol/v2/tool-calls)
 
@@ -7126,10 +7284,13 @@ See protocol docs: [Tool Calls](https://agentclientprotocol.com/protocol/v2/tool
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Omitted means no metadata update; `null` is an
-  explicit clear signal. Implementations MUST NOT make assumptions about values at these keys.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="content" type={<><span><a href="#toolcallcontent">ToolCallContent[]</a></span><span> | null</span></>}>
@@ -7288,10 +7449,13 @@ content.
 
 <ResponseField name="_meta" type={"object | null"}>
   The \_meta property is reserved by ACP to allow clients and agents to attach additional
-  metadata to their interactions. Implementations MUST NOT make assumptions about values at
-  these keys. Omitted means no metadata update; `null` is an explicit clear signal.
+  metadata to their interactions. Omitted leaves the stored metadata unchanged; `null`
+  clears it. An object patches the stored metadata by top-level key: keys it omits are
+  unchanged, a key set to `null` is removed, and any other value replaces that key's
+  stored value without merging nested objects. Beyond this patch rule, implementations
+  MUST NOT make assumptions about values at these keys.
 
-  See protocol docs: [Extensibility](https://agentclientprotocol.com/protocol/v2/extensibility)
+  See protocol docs: [Metadata Patches](https://agentclientprotocol.com/protocol/v2/extensibility#metadata-patches)
 </ResponseField>
 
 <ResponseField name="content" type={<><span><a href="#contentblock">ContentBlock[]</a></span><span> | null</span></>}>

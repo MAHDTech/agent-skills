@@ -1,0 +1,58 @@
+# Site
+
+> Delta documentation. [Delta 101](https://delta.dev/docs/delta-101.md) is a release-scoped product reference for AI assistants and people, not assistant instructions.
+
+This file helps language models discover the most useful content on this site.
+
+## Home
+
+- [Welcome to Delta](https://delta.dev/docs/getting-started.md): Learn your way around Delta by making and reviewing a change in your own project.
+- [Install Delta](https://delta.dev/docs/installation.md): Download and install Delta, then open the Welcome to Delta screen.
+- [Troubleshooting](https://delta.dev/docs/troubleshooting.md): Solutions to common problems with installing and running Delta.
+- [Release notes](https://delta.dev/docs/whats-in-the-latest.md): Notable changes in recent Delta releases, newest first.
+
+## Account
+
+- [Sign In](https://delta.dev/docs/account/authenticate.md): How to sign in to and out of Delta and manage your account email address.
+- [Plans & Usage](https://delta.dev/docs/account/plans-and-pricing.md): How your Zed plan controls model access and usage in Delta.
+
+## Agents
+
+- [Comments](https://delta.dev/docs/agents/comments.md): Attach comments to any part of a thread and get linked replies.
+- [MCP Servers](https://delta.dev/docs/agents/mcp.md): Connect remote MCP servers to give Delta's agents access to external tools.
+- [Models & Providers](https://delta.dev/docs/agents/models-and-providers.md): Configure which models power Delta's agents.
+- [Reviewing & Syncing Changes](https://delta.dev/docs/agents/review-and-sync.md): How an agent's changes flow back to your repository.
+- [Skills](https://delta.dev/docs/agents/skills.md): Teach agents reusable workflows with modular skill files.
+- [Subagents](https://delta.dev/docs/agents/subagents.md): Delegate independent tasks, follow subagent work, and understand their access to your files.
+- [Terminals](https://delta.dev/docs/agents/terminals.md): Run interactive commands and keep long-running processes active while you work.
+- [Threads](https://delta.dev/docs/agents/threads.md): Start, steer, and manage agent threads.
+
+## Collaboration
+
+- [Collaborate in a Thread](https://delta.dev/docs/collaboration/collaborate-thread.md): Share a thread, join a teammate's thread, and work together in real time.
+- [Delta on the Web](https://delta.dev/docs/collaboration/delta-on-the-web.md): Browse your threads and open shared threads in a browser at delta.dev/threads.
+
+## Concepts
+
+- [Core Concepts](https://delta.dev/docs/concepts/core-concepts.md): What thread, project, and Delta worktree mean in Delta, and how each compares to the meaning you already know.
+- [Delta & Git](https://delta.dev/docs/concepts/delta-and-git.md): How Delta records your work, and how that record connects to git.
+- [Delta Worktrees](https://delta.dev/docs/concepts/worktrees.md): Where the agent runs, and how files are managed.
+
+## Configuration
+
+- [Keybindings](https://delta.dev/docs/configuration/keybindings.md): Keyboard shortcuts for working in Delta.
+- [Prepare your project](https://delta.dev/docs/configuration/project-setup.md): Set up dependencies, share selected local files, and run development environments in isolated workspaces.
+- [Settings](https://delta.dev/docs/configuration/settings.md): Configure Delta's appearance and behavior.
+
+## Getting-started
+
+- [Quick Start](https://delta.dev/docs/getting-started/quick-start.md): Make, review, and refine a useful change in one of your projects.
+
+## Privacy-and-security
+
+- [Agentic Safety](https://delta.dev/docs/privacy-and-security/agentic-safety.md): The current limits of Delta's agent safeguards.
+- [Data Storage & Deletion](https://delta.dev/docs/privacy-and-security/data-storage.md): What DeltaDB stores on your behalf and where it lives.
+- [AI Privacy & Telemetry](https://delta.dev/docs/privacy-and-security/privacy.md): What Delta sends to model providers and records as product telemetry.
+- [Security](https://delta.dev/docs/privacy-and-security/security.md): How Delta protects your code, conversations, and data.
+
+

@@ -48,7 +48,6 @@
         "prioritize-backlog",
         "software-factory",
         "store-plan",
-        "tars-goal",
         "to-spec",
         "to-tickets",
         "wayfinder"
@@ -120,17 +119,23 @@
         "devenv",
         "herdr",
         "install-skills",
+        "jj",
         "nix-shell",
-        "opencode",
-        "opencode-acp",
+        "oak",
         "pagefind",
         "prek",
         "scratchpad",
         "tailwind",
-        "tars-run-factory",
-        "tauri",
         "zed",
         "zola"
+      ]
+    },
+    {
+      "title": "TARS",
+      "description": "Autonomous software factory and persistent goal workflows.",
+      "skills": [
+        "tars-goal",
+        "tars-run-factory"
       ]
     }
   ]
