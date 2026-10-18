@@ -145,7 +145,7 @@ in
       cspell = {
         enable = true;
         excludes = [
-          "skills/tooling/opencode-acp/.*\\.md$"
+          "skills(-archive)?/tooling/opencode-acp/.*\\.md$"
           "dashboard/content/.*\\.md$"
           "^README\\.md$"
           "^agents/AGENTS\\.md$"

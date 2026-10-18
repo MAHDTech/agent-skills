@@ -1,0 +1,29 @@
++++
+title = "announcements-sdk-1-0-releases"
+[extra]
+skill = false
+category = "tooling"
+mermaid = false
+skill_name = "opencode-acp"
+archived = "2026-10-18"
+source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/tooling/opencode-acp"
++++
+
+> ## Documentation Index
+> Fetch the complete documentation index at: https://agentclientprotocol.com/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Rust and TypeScript SDKs reach 1.0
+
+> Announcement that the Rust and TypeScript ACP SDKs have reached version 1.0.0.
+
+**Published:** June 25, 2026
+
+The [Rust SDK based on SACP RFD](/rfds/rust-sdk-v1) has moved to Completed after both the Rust and TypeScript ACP SDKs reached version 1.0.0.
+
+The Rust SDK's component-based architecture provides explicit message ordering and composable handlers for clients, agents, and protocol adapters. The matching TypeScript milestone demonstrates that the SDK design goals apply across language ecosystems.
+
+The releases are available as [`agent-client-protocol` v1.0.0](https://crates.io/crates/agent-client-protocol/1.0.0) and [`@agentclientprotocol/sdk` v1.0.0](https://www.npmjs.com/package/@agentclientprotocol/sdk/v/1.0.0).
+
+
+This documentation is built and hosted on [Mintlify](https://mintlify.com), a developer documentation platform.

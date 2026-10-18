@@ -9,6 +9,16 @@ skill_name = "devenv"
 
 # elixir
 
+Enable Elixir with:
+
+```nix
+languages.elixir.enable = true;
+```
+
+Since devenv 2.4.1, this also provides `erl`, `erlc`, and `escript` from the Erlang runtime used to build your selected Elixir package. Selecting a different `languages.elixir.package` automatically selects its matching runtime.
+
+For custom packages that do not expose their Erlang dependency, set `languages.elixir.erlang.package` explicitly to the runtime used to build that package.
+
 ## Options
 
 ### languages.elixir.enable
@@ -43,6 +53,22 @@ Which Elixir package to use.
 
 ```nix
 pkgs.beamPackages.elixir
+```
+
+*Declared by:*
+
+* <https://github.com/cachix/devenv/blob/main/src/modules/languages/elixir.nix>
+
+### languages.elixir.erlang.package
+
+The Erlang runtime to include in the environment alongside Elixir. Defaults to the runtime used to build the selected Elixir package. Set this explicitly for custom packages that do not expose their Erlang dependency.
+
+*Type:* package
+
+*Default:*
+
+```nix
+the Erlang runtime used to build languages.elixir.package
 ```
 
 *Declared by:*

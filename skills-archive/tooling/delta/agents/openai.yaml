@@ -1,0 +1,7 @@
+interface:
+  display_name: "Delta & DeltaDB"
+  short_description: "Configure and operate Delta threads, worktrees, and DeltaDB"
+  default_prompt: "Use $delta to configure Delta projects, worktrees, or DeltaDB workflows."
+
+policy:
+  allow_implicit_invocation: true

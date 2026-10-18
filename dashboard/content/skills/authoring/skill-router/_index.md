@@ -72,7 +72,7 @@ Not new features - working on code that already exists:
 
 ## Crossing sessions
 
-- [/tars-goal](@/skills/planning/tars-goal/_index.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
+- [/tars-goal](@/skills/tars/tars-goal/_index.md) - reach for this when the user wants to set or resume a persistent goal, pursue its full scope, and verify completion using native goal tools or a repository file fallback.
 
 - `/handoff` - reach for this when a thread is full or you need to branch off; it compacts the conversation into a document a fresh session can pick up.
 - `/store-plan` - reach for this when the current plan, decisions, and action items should be saved as a markdown file under `docs/plans/` for later.
@@ -139,22 +139,21 @@ Beyond `/code-review` on the main flow:
 - `/antigravity` - reach for this when you need to research or verify Google Antigravity specifications, command-line flags, rules, subagents, or hooks.
 - `/devenv` - reach for this when a repo uses devenv for its shell and dependencies.
 - `/prek` - reach for this when running, configuring, or troubleshooting pre-commit hooks (note: pre-commit CLI is deprecated, use prek).
-- `/opencode` - reach for this when driving the OpenCode CLI: commands, agents, tools, MCP, config.
 - `/herdr` - reach for this when controlling Herdr terminal multiplexer, managing workspaces, tabs, and panes, or coordinating coding agents.
 - [/acp](@/skills/engineering/acp/_index.md) - reach for this when building, integrating, or debugging Agent Client Protocol (ACP) agents, clients, JSON-RPC 2.0 schemas, or SDKs.
 - [/mcp](@/skills/engineering/mcp/_index.md) - reach for this when building Model Context Protocol (MCP) servers, exposing tools, resources, prompts, handling transports, and JSON-RPC 2.0 schemas.
-- `/opencode-acp` - reach for this when controlling OpenCode over the Agent Client Protocol.
 - [/nix-shell](@/skills/tooling/nix-shell/_index.md) - reach for this when running ad-hoc CLI utilities or diagnostic tools in ephemeral Nix shells.
 - [/pagefind](@/skills/tooling/pagefind/_index.md) - reach for this when configuring, indexing, or troubleshooting Pagefind static search for websites.
 - `/scratchpad` - reach for this when temporary or experimental scripts need a gitignored `scratch/` home.
 - `/install-skills` - reach for this when installing, updating, or managing skills from a collection across agent runtimes.
 - [/tailwind](@/skills/tooling/tailwind/_index.md) - reach for this when writing Tailwind CSS utility classes, compiling Tailwind bundles, or configuring Tailwind CSS v4 CSS-first themes and variables.
-- `/tauri` - reach for this when working on Tauri v2+ cross-platform desktop and mobile apps (IPC commands, capabilities configuration, Rust backend lib.rs registration).
 - `/egui` - reach for this when building immediate-mode GUIs in Rust, custom widgets, styling, canvas painters, or eframe apps.
 - `/cargo-doc` - reach for this when generating, querying, or navigating local Rust documentation and docs.rs with zero hallucination.
 - `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
+- [/oak](@/skills/tooling/oak/_index.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
+- [/jj](@/skills/tooling/jj/_index.md) - reach for this when working in a Jujutsu (`jj`) repository (`.jj/`), running `jj` CLI commands, writing revset or fileset expressions, managing bookmarks, resolving conflicts, or syncing with GitHub.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
