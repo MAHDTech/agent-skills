@@ -150,6 +150,7 @@ Beyond `/code-review` on the main flow:
 - `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](../../tooling/zola/SKILL.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](../../tooling/zed/SKILL.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
+- [/oak](../../tooling/oak/SKILL.md) - reach for this when working in an Oak repository (`.oak/`), running `oak` CLI commands, managing change stacks, isolating agents with Oak workspaces, or configuring `.oak/ci/workflows.json`.
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
