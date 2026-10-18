@@ -113,8 +113,11 @@ unchanged when omitted, explicitly clear or unset the value when `null`, and
 replace the previous value when concrete values are sent. For a new
 `toolCallId`, omitted fields use Client defaults. `content` and `locations` are
 replaced as whole arrays; send `[]` or `null` to clear them. For `_meta`, omit
-the field to leave it unchanged or set it to `null` to clear it. Use
-`tool_call_content_chunk` when a tool produces content incrementally and the
+the field to leave it unchanged or set it to `null` to clear it. An object
+patches the stored metadata by top-level key: a key set to `null` is removed,
+any other value replaces that key whole, and keys the object omits are
+unchanged. See [Metadata Patches](/protocol/v2/extensibility#metadata-patches).
+Use `tool_call_content_chunk` when a tool produces content incrementally and the
 Client should append each item instead of replacing the whole `content`
 collection. Display-only terminal bytes use `terminal_output_chunk` instead.
 For `name` specifically, omission leaves the existing name unchanged, `null`
@@ -201,6 +204,8 @@ with `content: []` or `content: null` clears the tool-call content. A
 `tool_call_content_chunk`'s `_meta`, when present, is chunk-scoped.
 
 ## Requesting Permission
+
+Permission requests do not by themselves change the session's foreground state. While foreground work is blocked on a permission response, the Agent **SHOULD** report `requires_action`. Once reported, it **MUST** report `running` when foreground progress resumes, or `idle` if the work ends without resuming. Requests for independent background activity may arrive while the session remains `idle`. See [Waiting for User Action](/protocol/v2/prompt-lifecycle#waiting-for-user-action) for concurrent requests and late answers.
 
 The Agent **MAY** request permission from the user before proceeding with an operation, such as executing a tool call, by calling the `session/request_permission` method:
 
@@ -459,7 +464,9 @@ empty.
   and `null` both mean the value was not provided. Conventional POSIX signal
   names include `SIGTERM`, `SIGKILL`, and `SIGINT`; other platforms may use
   platform-specific names. Terminal exit and tool call status are independent.
-* The top-level `_meta` is terminal-scoped and follows the same patch semantics.
+* The top-level `_meta` is terminal-scoped and follows the same patch semantics,
+  except that an object patches the stored metadata by top-level key. See
+  [Metadata Patches](/protocol/v2/extensibility#metadata-patches).
 
 For example, a process terminated by a POSIX termination signal can report
 `"exitStatus": { "signal": "SIGTERM" }`.
@@ -521,8 +528,20 @@ Clients MUST handle diffs where `patch` is omitted or `null`.
 </ParamField>
 
 <ParamField path="patch.format" type="string" required>
-  Patch format. `git_patch`, the only ACP-defined value, is one or more `diff   --git` sections in Git's `--patch` (`-p`) text format. Paths MUST be absolute.
+  Patch format. `git_patch`, the only ACP-defined value, is one or more `diff   --git` sections in Git's `--patch` (`-p`) text format. Unlike Git, which
+  writes paths relative to the repository root, every path MUST be absolute,
+  including in `rename from`, `rename to`, `copy from`, and `copy to` lines, and
+  MUST NOT have a prefix such as Git's default `a/` and `b/`. Otherwise paths
+  follow Git: `/dev/null` names the missing side of an added or deleted file in
+  the `---` and `+++` lines, and paths with unusual characters are [quoted as Git
+  quotes them](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corequotePath).
   Surrounding commit metadata and email envelopes MUST NOT be included.
+
+  Git can produce most of this. With `$ROOT` set to the repository root,
+  `git diff --src-prefix="$ROOT/" --dst-prefix="$ROOT/"` writes absolute
+  `diff --git`, `---`, and `+++` lines. Git never prefixes `rename from`,
+  `rename to`, `copy from`, or `copy to` paths, so those still need the
+  repository root prepended, with Git's quoting applied to the full path.
 </ParamField>
 
 <ParamField path="patch.text" type="string" required>

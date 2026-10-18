@@ -14,6 +14,18 @@ Oak (`oak.space`) is a developer platform and Git-compatible version control sys
 
 When a repository contains an `.oak/` directory, **always use `oak` commands instead of `git`**. Never run mutating `git` commands (`git commit`, `git checkout`, `git rebase`, `git reset`, `git stash`, `git add`) inside an Oak repository.
 
+## Progressive Disclosure & Reference Resources
+
+Consult the vendored documentation in `resources/auto/` for detailed CLI flags, REST API endpoints, and internals:
+
+- **Full Consolidated Documentation:** See [resources/auto/docs-llms-full.txt](resources/auto/docs-llms-full.txt) and [resources/auto/llms.txt](resources/auto/llms.txt).
+- **Quickstart & Coming from Git:** See [resources/auto/docs-quickstart.md](resources/auto/docs-quickstart.md), [resources/auto/docs-coming-from-git.md](resources/auto/docs-coming-from-git.md), and [resources/auto/docs-git.md](resources/auto/docs-git.md).
+- **Making Changes, Branches, and Merging:** See [resources/auto/docs-making-changes.md](resources/auto/docs-making-changes.md), [resources/auto/docs-branches.md](resources/auto/docs-branches.md), [resources/auto/docs-merging.md](resources/auto/docs-merging.md), and [resources/auto/docs-history.md](resources/auto/docs-history.md).
+- **AI Agents & Parallel Workspaces:** See [resources/auto/docs-agents.md](resources/auto/docs-agents.md) and [resources/auto/docs-path-permissions.md](resources/auto/docs-path-permissions.md).
+- **Mounts, Spaces, and Sparse Clones:** See [resources/auto/docs-mounts.md](resources/auto/docs-mounts.md), [resources/auto/docs-spaces.md](resources/auto/docs-spaces.md), and [resources/auto/docs-sparse-clones.md](resources/auto/docs-sparse-clones.md).
+- **CI Workflows, Environments, and Runners:** See [resources/auto/docs-ci.md](resources/auto/docs-ci.md), [resources/auto/docs-ci-workflows.md](resources/auto/docs-ci-workflows.md), [resources/auto/docs-ci-environments.md](resources/auto/docs-ci-environments.md), and [resources/auto/docs-ci-runners.md](resources/auto/docs-ci-runners.md).
+- **CLI, Configuration, and API Reference:** See [resources/auto/docs-cli.md](resources/auto/docs-cli.md), [resources/auto/docs-configuration.md](resources/auto/docs-configuration.md), and [resources/auto/docs-api.md](resources/auto/docs-api.md).
+
 ## Core Mental Model
 
 | Concept                   | How Oak Works                                                                                                                                                                  |

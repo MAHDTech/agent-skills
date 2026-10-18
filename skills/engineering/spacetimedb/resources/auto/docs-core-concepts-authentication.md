@@ -8,8 +8,8 @@
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -43,6 +43,20 @@ WebSocket token received during reconnect.</li>
 <li class="">Expect this distinction on browser-style transports where WebSocket headers
 are unavailable, such as Unity WebGL builds.</li>
 </ul>
+<p>For C# clients with <code>.WithAutomaticReconnect()</code> enabled, the SDK retains the
+authentication token and reuses it during recovery. <code>OnConnect</code> receives it on
+the initial connection; <code>OnAutomaticReconnect</code> receives the retained or refreshed
+token after each successful recovery. Persist tokens from both callbacks for
+future application sessions. This also applies on Unity WebGL: these callbacks
+receive the authentication token, rather than the transport&#x27;s short-lived token.
+The WebGL precaution above still applies to C# connections without automatic reconnect.</p>
+<p>For expiring credentials, also configure <code>.WithTokenProvider(() => RefreshTokenAsync())</code>.
+Supply the initial token through <code>.WithToken(initialToken)</code>; the provider is only
+used during automatic reconnect. It returns a token for the same identity when
+the retained token is near expiry, its expiry cannot be read, or a reused token
+has been rejected. The SDK does not refresh tokens periodically while connected.
+See the <a class="" href="/docs/clients/c-sharp#method-withtokenprovider">C# token-provider reference</a>
+for refresh timing, rejection handling, and cancellation behavior.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="spacetimeauth">SpacetimeAuth<a href="#spacetimeauth" class="hash-link" aria-label="Direct link to SpacetimeAuth" title="Direct link to SpacetimeAuth" translate="no">​</a></h2>
 <p>To make it easier to get started with authentication, SpacetimeDB offers
 <a class="" href="/docs/core-concepts/authentication/spacetimeauth/">SpacetimeAuth</a>, a fully

@@ -20,11 +20,13 @@ The following projects implement ACP directly, connect ACP agents to other envir
 ## Editors and IDEs
 
 * [Anycode](https://github.com/anycode-ade/anycode) — web-based IDE with Rust backend and React frontend
+* [Athas](https://athas.dev) — lightweight open-source code editor (Tauri, Rust + React) with built-in ACP agent sessions and one-click agent install from the ACP Registry
 * [Chrome ACP](https://github.com/Areo-Joe/chrome-acp) (Chrome extension / PWA)
 * [ACP Sidebar](https://github.com/aganhui/acp-sidepanel) (Chrome extension) — side-panel chat with your local Claude Code, with one-click quoting of selections and full pages
 * Emacs via [agent-shell.el](https://github.com/xenodium/agent-shell)
 * [Exo for VSCode](https://marketplace.visualstudio.com/items?itemName=AntonSubbotin.exo) — A typography-first VS Code client featuring parallel sessions isolated in Git worktrees, native Diff Editor approvals, and a distraction-free, highly polished UI.
 * [JetBrains](https://www.jetbrains.com/help/ai-assistant/acp.html)
+* [necoder](https://necoder.com/en/) — GPUI-native code editor (Rust) that runs ACP agents as color-coded threads tied to a project and branch, with destination chips, an always-visible token meter, and a Fleet view for running several agents in parallel Git worktrees
 * [neovim](https://neovim.io)
   * through the [CodeCompanion](https://github.com/olimorris/codecompanion.nvim) plugin
   * through the [carlos-algms/agentic.nvim](https://github.com/carlos-algms/agentic.nvim) plugin
@@ -73,6 +75,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [AionUi](https://github.com/iOfficeAI/AionUi)
 * [AiRC Orchestration](https://github.com/AiRC-ai/AiRC-Orchestration) — desktop ACP client and agent orchestrator with configurable parallel model teams, MCP tools, persistent project goals and plans, approval controls, and optional supervision across supported local and hosted providers (Windows, macOS, Linux)
 * [aizen](https://aizen.win)
+* [Alchemist Coder](https://github.com/Alekla0126/alchemist-coder) — open-source (AGPL-3.0) desktop app that runs Claude Code and Codex as ACP agents, with a live tree of agents and subagents, inline permissions and diffs, an organization of agents working in their own git worktrees, an Arena where several agents solve the same task, and a searchable history of past sessions (macOS, Windows, Linux)
 * [Bellows](https://bellowsai.app) — desktop workspace for ACP agents with live session sharing: send someone a link to a running session and they watch, suggest or type from a browser, with suggestions held until the host accepts them; shared permission rules and a hash-linked audit trail (Windows, macOS, Linux)
 * [Braide](https://braide.dev) - Parallel sessions, worktrees, personas and interactive agent responses (supports macOS, Windows, Linux)
 * [Capsule](https://github.com/realbakari/Capsule-App) — local-first macOS desktop workspace for ACP coding agents and harnesses (Claude Code, Codex, Grok), with projects, conversations, diffs, and approvals
@@ -91,12 +94,14 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Jockey](https://github.com/recailai/jockey) — open-source multi-agent orchestrator (Tauri + Rust + SolidJS) that coordinates Claude Code, Gemini CLI, and Codex CLI via ACP
 * [Kepler](https://www.gitkraken.com/kepler) — GitKraken’s agentic development environment (ADE) giving you full clarity and control to run parallel agents at scale
 * [Kronos](https://github.com/Reqeique/Kronos) — self-hosted scheduler and orchestration dashboard that runs ACP agent tasks on schedules via a bridge CLI, with Slack channel delivery and a real-time dashboard
+* [littleguys](https://www.littleguys.dev) ([GitHub](https://github.com/herval/littleguys)) — WhatsApp-style app for talking to your agents: each ACP agent, added in one click from the ACP Registry, is a contact with its own chats, streaming replies, tool calls and approve/deny cards for permission requests (macOS)
 * [Lody](https://lody.ai)
 * [Minion Mind](https://minion-mind.nebulame.com/) — through the [Agent Client](https://github.com/RAIT-09/obsidian-agent-client) plugin
 * [Mitto](https://github.com/inercia/mitto)
 * [Ngent](https://github.com/beyond5959/ngent)
 * [OctoShell](https://github.com/savvasioakeim/OctoShell) — Rust/Tauri terminal workspace that runs ACP agents in git worktrees, one per task, each with its own shell and managed dev server, plus a planning round before any code is written and a QA pass over the running app (Windows, macOS)
 * [Outmake](https://outmake.app) - free native Mac app that runs Claude Code, Codex, Gemini CLI and OpenCode over ACP, next to open models running on the Mac itself (macOS)
+* [oxi](https://github.com/maziluiosif/oxi) — native Rust/egui coding-agent desktop app that drives Claude Code, Cursor and Codex over ACP alongside local GGUF models and hosted APIs, with a built-in editor, Git panel and terminal (macOS, Windows, Linux)
 * [Panda](https://github.com/lukaisluka/Panda) — a ready-made UI for your ACP agent: you implement the agent side, Panda ships the streaming chat, tool-call cards, inline permission prompts, diffs and session history (Web with scripted demo; macOS/Windows desktop)
 * [Perch](https://github.com/chenweigao/perch) — native macOS workspace for remote coding agents over SSH; drives ACP agents such as DeepSeek Harness with approval cards, stop, model and reasoning pickers, and session resume through a remote loopback broker (macOS)
 * [Pilion Browser](https://github.com/echoVic/pilion-browser) — desktop browser that connects any ACP agent, local or over SSH, and hands its own tabs to the agent through MCP with approvals, human takeover, and session resume (macOS, Windows, Linux)
@@ -106,6 +111,7 @@ The following projects implement ACP directly, connect ACP agents to other envir
 * [Reemoat](https://github.com/rends-east/reemoat) — self-hosted remote control for any coding agent: run coding agents on your own machines and supervise them from anywhere, end-to-end encrypted
 * [Remote Agent Server](https://github.com/ma-pony/remote-agent-server) — self-hosted ACP agent execution gateway for external systems that runs Codex and Claude Code through an asynchronous Task API, with isolated workspaces, persistent sessions, per-agent MCP and Skills, event history, SSE, and signed Webhooks
 * [RLM Code](https://github.com/SuperagenticAI/rlm-code)
+* [Rovai AI](https://github.com/murray17/rovai-ai) — open-source desktop and web workspace for coding-agent teams, connecting ACP agents such as OpenCode with shared conversations, task handoffs, and execution inspection.
 * [Shellular](https://shellular.dev) ([GitHub](https://github.com/shellular-org))
 * [Sidequery](https://sidequery.dev)
 * [Superlite](https://superlite.dev) - blazing-fast Rust-native desktop client for ACP coding agents with parallel sessions, browser remote, and push notifications (macOS, Windows, Linux, Web)

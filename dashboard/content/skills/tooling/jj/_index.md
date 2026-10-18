@@ -18,6 +18,17 @@ Jujutsu (`jj`) is a Git-compatible version control system where the working copy
 
 When a repository contains a `.jj/` directory (whether standalone or colocated alongside `.git/`), **always use `jj` commands instead of mutating `git` commands**.
 
+## Progressive Disclosure & Reference Resources
+
+Consult the vendored upstream Jujutsu documentation in `resources/auto/` for full syntax and edge cases:
+
+- **Tutorial & Working Copy:** See [resources/auto/jj-vcs-jj-main-docs-tutorial.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-tutorial.md) and [resources/auto/jj-vcs-jj-main-docs-working-copy.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-working-copy.md).
+- **Git Comparison, Command Table & Colocation:** See [resources/auto/jj-vcs-jj-main-docs-git-comparison.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-git-comparison.md), [resources/auto/jj-vcs-jj-main-docs-git-command-table.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-git-command-table.md), and [resources/auto/jj-vcs-jj-main-docs-git-compatibility.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-git-compatibility.md).
+- **Revsets & Filesets:** See [resources/auto/jj-vcs-jj-main-docs-revsets.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-revsets.md) and [resources/auto/jj-vcs-jj-main-docs-filesets.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-filesets.md).
+- **Bookmarks & GitHub Workflows:** See [resources/auto/jj-vcs-jj-main-docs-bookmarks.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-bookmarks.md) and [resources/auto/jj-vcs-jj-main-docs-github.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-github.md).
+- **Conflicts & Operation Log:** See [resources/auto/jj-vcs-jj-main-docs-conflicts.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-conflicts.md) and [resources/auto/jj-vcs-jj-main-docs-operation-log.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-operation-log.md).
+- **CLI Reference & Configuration:** See [resources/auto/jj-vcs-jj-main-docs-cli-reference.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-cli-reference.md) and [resources/auto/jj-vcs-jj-main-docs-config.md](@/skills/tooling/jj/resources/auto/jj-vcs-jj-main-docs-config.md).
+
 ## Core Concepts vs Git
 
 | Concept                         | How Jujutsu (`jj`) Works                                                                                                                                                             |

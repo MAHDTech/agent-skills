@@ -19,6 +19,12 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP announcements, see [Updates](/updates).
 
+<Update label="October 12, 2026" tags={["Draft"]}>
+  ## Client-Provided System Prompt RFD moves to Draft stage
+
+  The RFD for letting Clients provide session-scoped system prompt instructions in ACP v1 and v2 has moved to Draft stage. Please review the [RFD](/rfds/client-system-prompt) for more information and provide feedback on the delivery modes and session lifecycle semantics.
+</Update>
+
 <Update label="October 9, 2026" tags={["Completed"]}>
   ## Session Notices RFD moves to Completed
 
@@ -40,13 +46,21 @@ This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP 
   [RFD](/rfds/session-compaction) for patch, ordering, and replay semantics.
 </Update>
 
+<Update label="September 30, 2026" tags={["Removed"]}>
+  ## Next Edit Suggestions RFD removed
+
+  The Next Edit Suggestions (NES) RFD and its unstable implementation have been
+  removed from ACP v1 and v2. This includes NES methods and capabilities,
+  associated document-event notifications, and position-encoding negotiation.
+</Update>
+
 <Update label="September 30, 2026" tags={["To be removed"]}>
   ## Next Edit Suggestions RFD moves to To be removed
 
-  The Next Edit Suggestions (NES) RFD has moved to "To be removed". The proposal
-  is no longer being pursued. Its draft implementation remains in the codebase
-  pending removal, and the [RFD](/rfds/next-edit-suggestions) is preserved until
-  that cleanup is complete.
+  The Next Edit Suggestions (NES) RFD moved to "To be removed" because the
+  proposal was no longer being pursued. Its draft implementation was scheduled
+  for removal. See the [removal update](#next-edit-suggestions-rfd-removed) for
+  the subsequent cleanup.
 </Update>
 
 <Update label="September 24, 2026" tags={["Preview"]}>
@@ -379,7 +393,7 @@ This page tracks lifecycle changes for ACP Requests for Dialog. For broader ACP 
 <Update label="February 24, 2026" tags={["Draft"]}>
   ## Next Edit Suggestions RFD moves to Draft stage
 
-  The RFD for allowing agents to provide next edit suggestions has been moved to Draft stage. Please review the [RFD](/rfds/next-edit-suggestions) for more information on the current proposal and provide feedback as work on the implementation begins.
+  The RFD for allowing agents to provide next edit suggestions moved to Draft stage. It was subsequently removed; see the [removal update](#next-edit-suggestions-rfd-removed).
 
   ## session/close RFD moves to Draft stage
 

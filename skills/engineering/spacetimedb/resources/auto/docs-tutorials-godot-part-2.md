@@ -8,8 +8,8 @@
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -407,6 +407,7 @@
 <span class="line"><span style="color:#F8F8F2">}</span></span></code></pre>
 <p>Here we configure the connection to the database, by passing it some callbacks in addition to providing the <code>ServerUrl</code> and <code>DatabaseName</code> to the connection. We add the connection to <code>STDBUpdateManager</code>, a simple script that hooks into Godot&#x27;s update loop in order to drive the sending and processing of messages between your client and SpacetimeDB.</p>
 <p>When the client connects, the SpacetimeDB SDK will call the <code>HandleConnect</code> method, allowing us to start up the game.</p>
+<p>This example uses the default connection behavior. To enable <a class="" href="/docs/clients/c-sharp#method-withautomaticreconnect">automatic reconnect</a>, add <code>.WithAutomaticReconnect()</code> to the builder. Keep the connection registered with <code>STDBUpdateManager</code> during outages so <code>FrameTick()</code> continues driving retries. <code>HandleConnect</code>, registered through <code>OnConnect</code>, runs only on the first connection, so its subscription setup can stay as written. The SDK retains and replays existing subscriptions. Register a separate <code>OnAutomaticReconnect</code> callback for recovery-specific work, such as saving a refreshed token; do not create subscriptions there. Use the callback overloads with <code>NextReconnect?</code> to distinguish retries from a terminal disconnect, and keep one-time game setup separate from subscription <code>OnApplied</code>, which runs after every successful replay. For expiring credentials, supply the initial token with <code>WithToken</code> and add <a class="" href="/docs/clients/c-sharp#method-withtokenprovider"><code>.WithTokenProvider(() => RefreshTokenAsync())</code></a>.</p>
 <p>In our <code>HandleConnect</code> callback we build a subscription and call <code>Subscribe</code>, subscribing to all data in the database. This causes SpacetimeDB to synchronize the state of all your tables with your Godot client&#x27;s SDK client cache.</p>
 \<hr\>
 <p><strong>SDK Client Cache</strong></p>

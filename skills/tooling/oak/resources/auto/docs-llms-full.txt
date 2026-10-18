@@ -1,0 +1,3330 @@
+# Oak documentation
+
+> Oak is the agentic substrate: the version-control and storage layer that autonomous coding agents build on. This file is every page of https://oak.space/docs concatenated, for pasting into an agent's context.
+
+
+<!-- https://oak.space/docs -->
+## Introduction
+
+Oak is the **agentic substrate** for software development: the version-control and storage layer that coding agents — and the people directing them — build on. It's where your agent (Claude Code, Codex, Cursor, or anything else) reads, writes, branches, and publishes code and assets.
+
+Oak doesn't run agents. Bring your own; Oak is the version control system they push to. It makes no AI calls on your behalf and never trains on your code.
+
+### The five ideas
+
+Everything in these docs follows from five decisions. If you only read one section, read this one.
+
+1. **A branch is a task.** Not a long-lived line of development — one unit of work, usually one agent session. `oak init` and `oak clone` put you on a fresh personal branch, and branches are cheap enough to make one per task.
+2. **Commits are checkpoints; the branch description is the message.** `oak commit` takes no `-m`. What the change *is* gets written once, on the branch, with `oak desc`.
+3. **`main` lives on the server, and only merges reach it.** You never commit to `main` locally and direct pushes to it are refused. Publishing a branch and merging it are separate steps, and merging is a human's call.
+4. **Merging squashes.** A merged branch becomes exactly one commit on `main`, whose message is the branch description. `main` reads as one line per task.
+5. **You don't have to clone.** `oak mount` puts a working tree on top of a remote repo and fetches files as they're read, so a 20 GB monorepo is editable in seconds — and ten parallel tasks means ten mounts, not ten clones.
+
+Around that core, oak.space adds what a team needs to land changes safely: [native CI](/docs/ci) that gates merges, [path permissions](/docs/path-permissions) declared in the repo, organizations, webhooks, and a JSON API.
+
+### Where to start
+
+| If you want to… | Read |
+|---|---|
+| Install the CLI and sign in | [Install and sign in](/docs/install) |
+| Get a repo onto Oak and merge your first change | [Quickstart](/docs/quickstart) |
+| Translate what you know from Git | [Coming from Git](/docs/coming-from-git) |
+| Point a coding agent at Oak | [Working with agents](/docs/agents) |
+| Run several agents on one big repo | [Example: a fleet of agents](/docs/example-session) |
+| Set up CI | [Continuous integration](/docs/ci) |
+| Look up a command or flag | [CLI reference](/docs/cli) |
+| Script against oak.space | [HTTP API reference](/docs/api) |
+
+### Platforms
+
+The `oak` CLI ships for **macOS** (Apple Silicon and Intel), **Linux x86_64**, and **Windows x86_64**. Lazy mounts use each OS's own virtual-filesystem layer — FSKit on macOS 26+, FUSE on Linux, the Projected File System on Windows. Linux ARM64 binaries are published on the [GitHub releases page](https://github.com/oakdotspace/oak/releases) but the installer doesn't select them yet.
+
+### For agents
+
+Every page has a **Copy page** button and a **.md** link that return its Markdown source. [`/docs/llms-full.txt`](/docs/llms-full.txt) is every page in one file. And `oak skill install` drops an `oak-vcs` skill into your repo so agents pick up the workflow without being told — see [Working with agents](/docs/agents#install-the-agent-skill).
+
+### Your data stays yours
+
+`oak export` replays any Oak repo's full history into an ordinary Git repository — authors, emails, and timestamps intact. It's the documented escape hatch, and it always works. See [Git import, export, and interop](/docs/git).
+
+<!-- https://oak.space/docs/install -->
+## Install and sign in
+
+### Install the CLI
+
+On **macOS** (Apple Silicon or Intel) and **Linux x86_64**:
+
+```bash
+curl -fsSL https://oak.space/install | sh
+```
+
+On **Windows x86_64**, from PowerShell:
+
+```powershell
+irm https://oak.space/install.ps1 | iex
+```
+
+The installer picks the native binary for your machine, verifies its minisign signature, and puts it at `~/.local/bin/oak` (`%USERPROFILE%\.local\bin\oak.exe` on Windows). If that directory isn't on your `PATH`, the installer prints the line to add.
+
+| Installer variable | Effect |
+|---|---|
+| `INSTALL_DIR` | Install somewhere else — e.g. `/usr/local/bin` on a CI image, so the binary is already on `PATH`. |
+| `OAK_NO_LOGIN=1` | Skip the "Log in now?" prompt at the end. (It's skipped automatically when there's no terminal.) |
+
+On macOS the installer also fetches the **Oak Mount** app that lazy mounts need; if it can't, the first `oak mount` installs it instead. See [Setting up mounts](/docs/mounts#setting-up-mounts).
+
+> **Linux ARM64:** binaries are published on the [GitHub releases page](https://github.com/oakdotspace/oak/releases), but the installer doesn't select them yet. Download `oak` for `linux-arm64` from there and put it on your `PATH`.
+
+### Sign in
+
+```bash
+oak login
+oak whoami        # prints the username you're signed in as
+```
+
+`oak login` opens your browser at oak.space, where you sign in however you normally do (password or GitHub), and hands a token back to the CLI over a one-shot local callback. On a machine with no browser — an SSH session, a container — it prints a URL instead: open it on any other device, approve, and paste the one-time code it shows back into the terminal.
+
+The token is saved in `~/.oak/credentials` and lasts 90 days. Run `oak login` again to refresh it, or `oak logout` to remove it.
+
+To check which credential the CLI is actually using — handy when a push 404s on a repo you know exists — run:
+
+```bash
+oak auth status
+```
+
+It reports where the credential came from (never the secret itself), which server, and the identity the server resolves it to.
+
+#### Non-interactive machines and CI
+
+`oak login` needs a human once. For scripts, CI jobs, and long-running agents, use an API key instead and export it:
+
+```bash
+export OAK_API_KEY=oak_...
+```
+
+`OAK_API_KEY` beats every stored credential. Create keys — including narrowly scoped, read-only, or single-repo keys — as described in [API keys and tokens](/docs/api-keys).
+
+#### Self-hosted or staging servers
+
+Every command that talks to a server takes `-r, --remote \<URL\>` (default `https://oak.space`). You can also set `OAK_REMOTE` for a whole shell. Once a checkout is linked to a server, it remembers which one.
+
+### Keep it up to date
+
+```bash
+oak upgrade             # latest stable release
+oak upgrade --canary    # track the rolling pre-release channel
+```
+
+Upgrades are signature-checked like the installer. The CLI checks for a new version at most once a day and prints a one-line notice; set `OAK_NO_UPDATE_CHECK=1` to turn that off.
+
+### Shell completion
+
+```bash
+oak completions zsh  > ~/.zfunc/_oak                                     # zsh
+oak completions bash > ~/.local/share/bash-completion/completions/oak    # bash
+oak completions fish > ~/.config/fish/completions/oak.fish               # fish
+```
+
+`elvish` and `powershell` are supported too.
+
+### Teach your agent
+
+If you use a coding agent, install the bundled skill in each repo you work in:
+
+```bash
+oak skill install            # into ./.claude/skills/ — commit it
+oak skill install --global   # or into ~/.claude/skills/ for every project
+```
+
+More in [Working with agents](/docs/agents).
+
+### Uninstall
+
+Delete the binary (`~/.local/bin/oak`) and, if you want to drop your login and local mount state too, `~/.oak/`. On macOS, also delete **Oak Mount** from `/Applications`. Repositories you've cloned are ordinary directories; each one's Oak metadata lives in its own `.oak/` folder.
+
+Next: [Quickstart](/docs/quickstart).
+
+<!-- https://oak.space/docs/quickstart -->
+## Quickstart
+
+This page takes you from nothing to a change merged on `main`. It assumes you've [installed the CLI and signed in](/docs/install).
+
+### 1. Get a repository
+
+Pick whichever matches where your code is now.
+
+**Start a new repo:**
+
+```bash
+oak init my-app
+cd my-app
+```
+
+**Clone one that's already on Oak:**
+
+```bash
+oak clone acme/web      # or just `oak clone` to pick from a list
+cd web
+```
+
+**Bring a Git repo over:**
+
+```bash
+oak clone https://github.com/acme/web.git     # fetches with git, replays history into Oak
+cd web
+```
+
+…or run `oak init` inside an existing Git checkout and accept the import prompt. [Git import, export, and interop](/docs/git) covers the details, including importing from GitHub in the browser with nothing installed.
+
+**Working against a huge repo?** Skip the clone and [mount](/docs/mounts) it instead — you're editing in seconds.
+
+Whichever way you came in, you're now on a **personal branch** — something like `zdgeier-3f2a8b` — parented onto `main`. You never work on `main` directly; see [Branches and descriptions](/docs/branches).
+
+### 2. Make a change and checkpoint it
+
+Edit some files, then:
+
+```bash
+oak status          # what changed
+oak diff            # the changes themselves (full-screen viewer on a terminal)
+oak commit          # save a local checkpoint
+```
+
+`oak commit` takes no message, on purpose. Commit as often as you like — every checkpoint gets folded into one commit when the branch merges.
+
+### 3. Describe the change
+
+```bash
+oak desc "Add a dark-mode toggle to the settings page"
+```
+
+The **branch description** is the commit message for the whole branch. It becomes the message of the single commit that lands on `main` when you merge, so write it for someone reading `main`'s history later.
+
+### 4. Publish the branch
+
+If you **cloned** the repo, it's already linked to the server:
+
+```bash
+oak push
+```
+
+If you **created** it with `oak init` (or imported from Git), the first push also creates the repo on oak.space, so Oak needs to know which organization owns it. On an interactive terminal, plain `oak push` asks you to pick one. In a script or an agent run, there's no terminal to ask, so name it:
+
+```bash
+oak push --repo acme/my-app
+```
+
+`acme` must be an existing organization you can publish to — every account has a personal one named after its username. The repo itself is created if it doesn't exist. After this first link, plain `oak push` works.
+
+> **Agents:** never guess the owner. If you don't know which organization to publish into, ask. `OAK_REPO=acme/my-app` works in place of the flag.
+
+Your branch now shows up on the repo's **Branches** page at `https://oak.space/acme/my-app/branches`. Open it in a browser with `oak open`.
+
+### 5. Merge it
+
+When the change is ready, bring in anything that's landed on `main` since you started, then merge:
+
+```bash
+oak pull            # merge the latest main into your branch
+oak merge           # squash the branch onto main
+```
+
+Or click **Merge** on the branch's page in the web UI. Either way, `main` gains exactly one commit whose message is your branch description, and the branch is closed.
+
+If the repo has [CI](/docs/ci), the merge waits for it to pass — `oak merge --wait` rides it out for you. If `oak pull` hits a conflict, [Merging and conflicts](/docs/merging) walks through resolving it.
+
+### 6. Start the next task
+
+```bash
+oak switch -c       # new branch off the latest main, with a generated name
+oak switch -c fix-login-redirect   # …or name it yourself
+```
+
+That's the whole loop: **branch → edit → commit → describe → push → merge**.
+
+### Where next
+
+- [Coming from Git](/docs/coming-from-git) — command-by-command translation.
+- [Making changes](/docs/making-changes) — ignore files, hooks, undoing things.
+- [Working with agents](/docs/agents) — set up Claude Code, Codex, or Cursor to follow this loop on its own.
+- [Continuous integration](/docs/ci) — add a workflow file and gate merges on it.
+
+<!-- https://oak.space/docs/coming-from-git -->
+## Coming from Git
+
+Oak will feel familiar — repos, branches, push, pull, diff — but a few of Git's defaults are deliberately turned around. This page is the translation table.
+
+### What's different, in short
+
+- **No staging area.** `oak commit` snapshots the whole working tree (or just the paths you name). There's no `add`.
+- **No commit messages.** Commits are checkpoints. The *branch* carries the message, set with `oak desc`, and it becomes the message of the squash commit on `main`.
+- **No local `main`.** `main` lives on the server. Locally you're always on a feature branch; `oak switch main` is an error, not a checkout.
+- **One kind of merge.** Merging a branch onto `main` always squashes it to a single commit. There's no merge-commit or rebase option to choose between, and no pull-request object — the branch *is* the review unit.
+- **Pull merges, never rebases.** `oak pull` merges the latest `main` into your branch. History on your branch is never rewritten under you.
+- **Clones are optional.** `oak mount` gives you a working tree backed by the server, with files fetched on first read.
+- **Large files are normal files.** Content is chunked and deduplicated (FastCDC + BLAKE3), so there's no LFS to set up.
+
+### Command mapping
+
+| Git | Oak | Notes |
+|---|---|---|
+| `git init` | `oak init` | Also offers to import an existing `.git` history. |
+| `git clone \<url\>` | `oak clone \<org\>/\<repo\>` | A Git URL works too — it's imported. |
+| `git clone --depth 1` | `oak clone --shallow` | |
+| `git sparse-checkout` | `oak clone --path \<dir\>`, `oak sparse` | See [Sparse clones](/docs/sparse-clones). |
+| `git worktree add` | `oak mount \<org\>/\<repo\> \<dir\>` | No clone behind each one. See [Lazy mounts](/docs/mounts). |
+| `git status` | `oak status` | `--short`/`--porcelain` are Git-compatible. |
+| `git diff` | `oak diff` | Opens a full-screen viewer on a terminal; `--print` for plain output. |
+| `git diff main...feature` | `oak diff feature` | Shows what the branch contributes. |
+| `git add -A && git commit -m …` | `oak commit` | `-m` is refused. Describe the branch with `oak desc`. |
+| `git commit --amend -m …` | `oak desc "…"` | Change what the branch says it does. |
+| `git push` | `oak push` | Publishes the current branch. Pushes to `main` are refused. |
+| `git pull` / `git pull --rebase` | `oak pull` | Always merges `main` into your branch. |
+| `git fetch` | `oak fetch` | Refreshes your copy of `main`. |
+| `git switch <b>` / `git checkout <b>` | `oak switch <b>` | Fetches the branch if you don't have it. |
+| `git switch -c <b>` | `oak switch -c [<b>]` | Name is optional; one is generated. |
+| `git checkout \<sha\>` | `oak checkout \<sha\>` / `oak switch -d \<sha\>` | Detached HEAD. |
+| `git branch` | `oak branch` / `oak branch list` | `--remote` reads the server. |
+| `git branch --show-current` | `oak branch --show-current` | |
+| `git branch -d <b>` | `oak close <b>` | Closed branches can be reopened from the web. |
+| `git merge` / "Squash and merge" | `oak merge` | Server-side squash onto `main`. |
+| `git rebase -i` | `oak split` | Reorder, drop, or split a branch's commits into separate branches. |
+| `git restore \<path\>` | `oak restore \<path\>` | `-s \<commit\>` to restore from elsewhere. |
+| `git reset --hard` | `oak reset` | Discards uncommitted changes. |
+| `git log` | `oak log` | `-S` / `-G` pickaxe search work as in Git. |
+| `git rev-parse HEAD` | `oak hash` / `oak rev-parse HEAD` | |
+| `git archive` | `oak archive` | Zip of the working tree. |
+| `.gitignore` | `.oakignore` | Same syntax. Oak falls back to `.gitignore` when there's no `.oakignore`. |
+| `.git/hooks/pre-commit` | `.oak/hooks/pre-commit` | Local only, like Git. |
+| GitHub Actions | `.oak/workflows/*.yml` | [Native CI](/docs/ci), GitHub-Actions-shaped but much smaller. |
+| `CODEOWNERS` | `.oak/PERMISSIONS` | Controls *read access*, not review. See [Path permissions](/docs/path-permissions). |
+
+### Things Git has that Oak doesn't (yet)
+
+Being honest about the gaps:
+
+- **Tags.** There's no tag object; refer to commits by hash.
+- **Issues, pull-request review threads, line comments.** Review happens on the branch page and in the CLI (`oak branch review`), not in comment threads.
+- **Submodules.** Imports skip them.
+- **Push to arbitrary remotes.** You push to an Oak server. To leave, `oak export` writes a complete Git repo you can push anywhere.
+- **Branch rename.** `oak branch rename` is temporarily disabled.
+
+### Using Git tools against an Oak repo
+
+Stock `git` can clone any public Oak repo as a **read-only snapshot of `main`**:
+
+```bash
+git clone https://oak.space/acme/web.git
+```
+
+That's one commit with no history, meant for tooling (package managers, `/plugin marketplace add`, deploy scripts). For full history in Git form, use `oak export`. Both are covered in [Git import, export, and interop](/docs/git).
+
+> **Inside an Oak checkout, don't run `git`.** An Oak repo has a `.oak/` directory and no `.git`. If a tool insists on Git, export or snapshot-clone into a separate directory instead.
+
+<!-- https://oak.space/docs/making-changes -->
+## Making changes
+
+The everyday loop: see what changed, checkpoint it, publish it, and stay in sync with `main`.
+
+### See what changed
+
+```bash
+oak status                 # modified, added, deleted files
+oak status --short         # Git-compatible short format (same as --porcelain)
+oak status --json --compact  # bounded, machine-readable — what agents should use
+```
+
+```bash
+oak diff                   # working tree vs. your last checkpoint
+oak diff src/ README.md    # only these paths
+oak diff --branch          # everything on this branch (commits + uncommitted) vs. where it forked from main
+oak diff --stat            # per-file +/- counts
+oak diff --name-only       # just the paths
+oak diff --print           # plain unified diff to stdout instead of the viewer
+oak diff --check           # whitespace errors and leftover conflict markers; exits 1 if any
+```
+
+On a terminal, `oak diff` opens a full-screen viewer — a file tree beside the diff — that takes arrow keys, `less`/vi keys, and emacs keys. Press `?` inside it for every binding. Piped, or with `--print` / `--json`, it prints instead. Set `OAK_DIFF_TOOL` to use an external diff tool.
+
+`oak diff` can also compare branches and commits without checking anything out — see [Reviewing branches](/docs/reviewing#read-a-diff-without-switching).
+
+### Checkpoint with oak commit
+
+```bash
+oak commit                 # snapshot every change in the working tree
+oak commit src/parser/     # only changes under these paths
+oak commit --push          # checkpoint, then publish the branch
+```
+
+There's no staging area and **no commit message** — `-m` is refused with a pointer to `oak desc`. Commits are checkpoints you can return to; what the branch *does* is written once, as its [description](/docs/branches#descriptions). Commit as often as is useful: they're all squashed into one commit on `main` at merge time.
+
+`oak commit` only writes to your local repo. Nothing leaves your machine until you push.
+
+### Publish with oak push
+
+```bash
+oak push
+```
+
+Pushes the current branch's new commits — and its description — to the server. Only the content chunks the server doesn't already have are uploaded, so re-pushing a large binary with a small change sends only the changed chunks.
+
+| Situation | What to do |
+|---|---|
+| First push of a repo made with `oak init` | `oak push --repo \<org\>/\<name\>` (or answer the prompt on a terminal). See [Quickstart](/docs/quickstart#4-publish-the-branch). |
+| Push was rejected because the remote branch moved | `oak pull`, then push again. |
+| You really mean to overwrite the remote branch | `oak push --force`. |
+| You want to see what would be sent first | `oak push --plan --json` (read-only). |
+
+Pushing to `main` is always refused — `main` only changes by [merging](/docs/merging).
+
+### Stay in sync with oak pull
+
+```bash
+oak pull
+```
+
+`oak pull` does two things: it fetches any new commits on **your** branch from the server (pushed from another machine, or by an agent), then merges the latest **`main`** into your branch. Conflicts surface here, on your branch, where you can take your time — see [Merging and conflicts](/docs/merging#resolving-conflicts).
+
+| Command | What it does |
+|---|---|
+| `oak pull` | Fetch your branch, then merge `main` into it. |
+| `oak pull --branch-only` | Fetch your branch only; skip merging `main`. |
+| `oak fetch` | Refresh your local copy of `main` without touching your branch or working tree. |
+| `oak pull --force` | Throw away local commits the server doesn't have and match the remote branch. |
+
+### Undo things
+
+```bash
+oak restore path/to/file      # put a file back to your last checkpoint
+oak restore -s 3f9fab02 file  # …or to how it was at another commit
+oak reset                     # discard every uncommitted change (asks first; -f to skip)
+oak reset src/                # …or just under a path
+```
+
+To go back to an earlier checkpoint as a starting point, `oak checkout \<hash\>` detaches HEAD there; `oak switch -c` from that state starts a new branch. To reshape a branch's commits — drop one, reorder them, or split them into separate branches — use `oak split` (Oak's answer to `git rebase -i`).
+
+### Ignore files
+
+Put gitignore-syntax patterns in **`.oakignore`** at the repo root. If there's no `.oakignore`, Oak reads `.gitignore` instead — so an imported Git repo keeps working unchanged. (When both exist, only `.oakignore` counts.)
+
+Always ignored, whatever the files say: `.oak/` (except the tracked config files below), `.git/`, and OS clutter such as `.DS_Store`, `._*` AppleDouble files, `Thumbs.db`, and `desktop.ini`.
+
+`oak init` offers a ready-made `.oakignore` when it detects a Godot, Unity, or Unreal project.
+
+### Tracked files under .oak/
+
+The `.oak/` directory holds your local repository database, which is never committed. A few files inside it are ordinary, versioned files that the server reads:
+
+| Path | Purpose |
+|---|---|
+| `.oak/workflows/*.yml` | [CI workflows](/docs/ci-workflows) |
+| `.oak/PERMISSIONS` | [Path permissions](/docs/path-permissions) |
+| `.oak/attributes` | Reserved for per-path attributes |
+
+### Hooks
+
+Executable files at `.oak/hooks/\<event\>` run at fixed points, like Git hooks:
+
+| Hook | When | On failure |
+|---|---|---|
+| `pre-commit` | Before `oak commit` writes anything | Aborts the commit |
+| `post-commit` | After a successful commit | Prints a warning |
+
+Hooks run from the repo root with `OAK_HOOK` set to the event name. They're **local only** — never pushed — so each person chooses what runs on their machine; files ending in `.sample` are ignored. Skip them for one commit with `oak commit --no-verify`. Hooks don't run inside a [mount](/docs/mounts).
+
+A typical Rust `pre-commit`:
+
+```bash
+#!/bin/sh
+set -e
+cargo fmt --all
+cargo clippy --workspace -- -D warnings
+```
+
+### Large files
+
+There's nothing to configure. Every file is split into content-defined chunks and stored once per organization, so large binaries, game assets, and datasets are just files: pushes and pulls move only the chunks that changed, and the same asset in two repos of one org is stored once. A single push can carry up to 25 GiB; see [Plans and limits](/docs/limits).
+
+### Exit codes
+
+Every command uses the same exit codes, so scripts can branch without parsing output — for example `5` means "conflicts" and `3` means "repository locked, retry". The full table is in the [CLI reference](/docs/cli#exit-codes).
+
+<!-- https://oak.space/docs/branches -->
+## Branches and descriptions
+
+In Oak the **branch** is the unit of work, not the commit. A branch is one task — usually one agent session or one change a person wants reviewed — and it ends by being squash-merged onto `main` or closed.
+
+### How branches work
+
+- **`main` exists only on the server.** There's no local `main` to commit to, and the server refuses pushes to it. It only changes when a branch is [merged](/docs/merging).
+- **Every other branch is parented onto `main`.** New branches start from the latest `main` you've fetched, and `oak pull` keeps them current by merging `main` in.
+- **You always have a branch.** `oak init` and `oak clone` create a personal one named `\<you\>-\<6 hex chars\>` (for example `zdgeier-3f2a8b`), so two clones of the same repo never collide on push. Your username comes from your login, or `OAK_AUTHOR`, `USER`, or `USERNAME`.
+- **Branches are cheap.** Make one per task. The open-branch view on oak.space and `oak branch triage` exist precisely because a repo worked on by agents has a lot of them.
+
+### Create and switch
+
+```bash
+oak switch -c                       # new branch off the latest main, generated name
+oak switch -c fix-login-redirect    # …with a name
+oak switch -c --clean               # …and drop uncommitted changes instead of carrying them over
+oak switch fix-login-redirect       # switch to an existing branch (fetched from the server if needed)
+oak switch                          # pick from a list
+oak switch -d 3f9fab02              # detach HEAD at a commit (same as `oak checkout 3f9fab02`)
+```
+
+Uncommitted edits come with you when you create a branch, the way `git checkout -b` works; pass `--clean` to start fresh instead. `oak switch main` is an error — there's no local `main` to switch to.
+
+Inside a [mount](/docs/mounts), `oak switch` is refused: a mount *is* one branch. Mount another branch with `oak mount \<org\>/\<repo\> --branch \<name\>` instead.
+
+### Descriptions
+
+Commits carry no message. The **branch description** says what the whole branch does, and it becomes the commit message of the squash commit on `main` when the branch merges.
+
+```bash
+oak desc "Retry flaky uploads with jittered backoff"
+oak desc --file description.md          # from a file
+git log -1 --format=%B | oak desc --file -   # …or from stdin
+oak desc --append "Also fixes #212."    # add a paragraph to the existing description
+```
+
+`oak desc` saves locally and, if the branch has been pushed, updates the server too; otherwise the next `oak push` carries it. It can be changed any number of times until the branch merges.
+
+Write it for someone reading `main`'s history months from now: what changed and why, not a list of touched files. A first line that works as a title, then a blank line and detail, renders best. If a branch merges without a description, the squash commit's message falls back to the branch name.
+
+`--append` refuses, rather than overwrite, when your local copy of the description is out of date with the server's — it tells you the exact command to refresh with. That makes it safe for several agents to add notes to one branch.
+
+### List and inspect
+
+```bash
+oak branch                      # local branches
+oak branch --show-current       # just the current branch's name
+oak branch list --remote        # every branch on the server
+oak branch list --remote --status open
+oak branch show fix-login-redirect --remote
+oak info                        # repo, branch, parent, remote, and linked-repo details
+```
+
+Add `--json` to any of them for machine-readable output. To compare or review branches without switching to them, see [Reviewing branches](/docs/reviewing).
+
+### Close and reopen
+
+```bash
+oak close                                   # close the current branch
+oak close old-experiment --remote --json    # close a pushed branch without switching to it
+oak close old-experiment --reason "superseded by fix-login-redirect"
+```
+
+Merging closes a branch automatically. Close the ones you're abandoning so they drop off the open-branch view. Closing is idempotent and keeps everything — a closed branch can be **reopened** from its page on oak.space (or via the [API](/docs/api#branches)).
+
+### Reshape a branch with oak split
+
+`oak split` is Oak's `git rebase -i`. It opens a todo list of the branch's commits where you can reorder them, drop some, or send groups of them to new, independent branches — useful when an agent did two unrelated things on one branch.
+
+```bash
+oak split                         # interactive, on the current branch
+oak split --from big-branch       # on another branch
+oak split --plan plan.txt         # apply a plan non-interactively (or --plan - for stdin)
+oak split --dry-run               # print the resulting structure without writing
+```
+
+`oak histedit` is an alias.
+
+### Branch names
+
+Names can't contain whitespace, control characters, `/` or `\`, and `main` is reserved. Mounts and [agent spaces](/docs/spaces) generate names from the task directory plus a short id, like `fix-auth-redirect--a1b2c3d4`.
+
+`oak branch rename` exists but is **temporarily disabled** (the server returns 503) while a storage-integrity issue is fixed. To rename, create a new branch from the old one's work and close the old one.
+
+### Limits
+
+A repo can hold up to 10,000 branches, open and closed. There's no cap on open branches during the beta — see [Plans and limits](/docs/limits).
+
+<!-- https://oak.space/docs/merging -->
+## Merging and conflicts
+
+Merging is how work reaches `main`, and it's the only way. A merge takes a whole branch — every checkpoint on it — and lands it on `main` as **one squash commit** whose message is the [branch description](/docs/branches#descriptions).
+
+Merging is a human decision. Agents should push their branch and stop; a person reviews and merges. (Nothing enforces that — it's the workflow Oak is built around, and what the agent skill teaches.)
+
+### The merge, step by step
+
+```bash
+oak desc "Cache tile lookups in the renderer"   # this becomes the commit message on main
+oak push                                          # publish the branch
+
+oak pull                       # bring main's newer commits into your branch
+oak diff --branch              # last look at everything the branch changes
+oak merge --dry-run --json     # would it merge cleanly? (local prediction, changes nothing)
+
+oak merge                      # squash onto main and close the branch
+```
+
+What each step is for:
+
+- **`oak pull` first.** It merges the current `main` *into your branch*, so conflicts surface on your branch, where you can resolve them calmly — not halfway through landing on `main`.
+- **`oak merge --dry-run`** predicts the merge locally without fetching, pushing, or touching files.
+- **`oak merge`** asks the server to squash the branch onto its parent (`main`) and close it. If the repo has CI, the [merge gate](#the-ci-merge-gate) applies.
+
+You can merge a branch you aren't on: `oak merge fix-login-redirect`. And you can merge from the browser — every branch's page on oak.space has a **Merge** button, and the branches list has **Merge selected** for landing several non-overlapping branches at once. The web merge checks for conflicts before you click.
+
+Merging doesn't run inside a [mount](/docs/mounts). Merge from a regular clone (a [sparse](/docs/sparse-clones) one is fine) or from the web.
+
+### What lands on main
+
+One commit:
+
+- **Message:** the branch description (or the branch name, if it has none).
+- **Contents:** the branch's final tree, merged with `main`.
+- **Ancestry:** the squash commit keeps a pointer (`merge_parent_hash`) to the branch's last checkpoint, so the full pre-squash history stays reachable for tooling, even though `main` shows one line per task.
+
+A merge to `main` fires the `merge` event for [CI](/docs/ci) and [webhooks](/docs/webhooks).
+
+### Resolving conflicts
+
+A conflict can come up during `oak pull` (merging `main` into your branch), during `oak merge`, or during `oak pull` inside a mount. They all work the same way.
+
+```bash
+oak pull
+# CONFLICT in src/render/tiles.rs
+
+oak conflict status              # what's in progress and how much is left
+oak conflict show                # per-file details for every conflicted path
+
+$EDITOR src/render/tiles.rs      # resolve by hand: remove the <<<<<<< ======= >>>>>>> markers
+oak conflict take src/render/tiles.rs --theirs   # …or take one side of every block in a file
+
+oak pull --continue              # finish
+oak pull --abort                 # …or back out; the branch is left as it was
+```
+
+During a merge, the same commands finish or cancel it: `oak merge --continue`, `oak merge --abort`.
+
+- **Markers are line-level.** Oak wraps only the diverging lines, not whole files.
+- **`--ours`** keeps your branch's side; **`--theirs`** keeps `main`'s (or the remote's).
+- **Every `oak conflict` command takes `--json`**, so handing resolution to an agent is a supported path. `oak diff --check` catches markers you forgot to remove.
+- While a conflict is in progress, commands that would change the branch exit with code `5`.
+
+#### When a pushed branch conflicts
+
+If an agent's branch has gone stale against `main`, you don't need to redo the work. [Mount the branch itself](/docs/mounts#continue-an-existing-branch), pull, resolve, and push:
+
+```bash
+oak mount acme/web ./fix-auth --branch fix-auth--a1b2c3d4
+cd fix-auth
+oak pull            # conflicts appear here
+# resolve, or hand the mount to an agent to resolve
+oak pull --continue
+oak commit && oak push
+```
+
+### The CI merge gate
+
+If the repo has [CI workflows](/docs/ci), a merge onto `main` is **refused while the branch head's CI is failing or still running**. Specifically: for the commit at the tip of the branch, the latest run of each workflow must have concluded `success` (or been skipped). A tip with no runs at all isn't gated.
+
+```bash
+oak ci status          # the gate's verdict for your branch head — exit 0 pass, 1 fail, 3 still running
+oak merge --wait       # wait for CI to finish (default 30 min; --wait=60 for longer), then merge if it passed
+oak ci logs <run-id>   # read the failure
+oak ci rerun <run-id>  # re-run it, if the failure was infrastructure rather than code
+oak merge --force      # deliberately override the gate — after you've read why it's red
+```
+
+A forced merge is recorded in the organization's audit log. Over the API, the gate is HTTP **412**, and `?force=1` overrides it — see [the API reference](/docs/api#branches).
+
+### Undoing a merge
+
+Open the commit on oak.space and click **Revert**: Oak lands a new commit on `main` that applies the inverse of that commit's changes, like `git revert`. If any file the commit touched has changed since, the revert is refused rather than guessed at. The API equivalent is `POST /api/{owner}/{name}/commits/{hash}/revert`.
+
+### When a merge is refused
+
+| What you see | Meaning | What to do |
+|---|---|---|
+| CI gate (412) | CI on the branch head is red or still running. | `oak ci status`, `oak merge --wait`, or fix and push. |
+| Conflicts (409 with `conflict_paths`) | The branch and `main` changed the same lines. | `oak pull`, resolve, push, merge again. |
+| `main_moved` / `branch_moved` (409, retryable) | Someone landed on `main`, or pushed to the branch, during the merge. Nothing was merged. | Retry. |
+| "already closed" (400) | The branch was already merged or closed. | Nothing — check `oak branch show \<name\> --remote`. |
+| "Repository isn't linked to an organization yet" | The repo has never been pushed. | `oak push --repo \<org\>/\<name\>` first. |
+
+<!-- https://oak.space/docs/reviewing -->
+## Reviewing branches
+
+When agents do the work, review becomes the bottleneck: ten branches come back, and switching your checkout ten times to read them isn't an option. Everything on this page is **checkout-free** — it reads the server (or your local repo) and prints, without touching your working tree.
+
+### Triage first
+
+```bash
+oak branch triage --remote                    # every open branch, scored
+oak branch triage --remote --only mergeable   # just the ones ready to land
+oak branch triage --remote --json             # for an agent doing the triage
+```
+
+Each row carries:
+
+| Field | Values |
+|---|---|
+| Mergeability | `clean`, `conflicts` |
+| Contribution | `contributes`; or `empty` / `superseded_exact` for a branch that adds nothing `main` doesn't already have |
+| CI | the branch head's [CI](/docs/ci) status |
+| Recommended action | `validate_then_merge`, `resolve`, `close`, `rebuild`, `review`, `do_not_merge` |
+
+`--only mergeable | closable | ambiguous` sorts a fleet before you read a single diff: land the first bucket, close the second (agent runs that produced nothing new), and spend your attention on the third. `--analysis-depth` trades speed for depth, `--limit N` caps how many branches get the deep pass, and `--against <branch>` compares against something other than `main`.
+
+### Review one branch
+
+```bash
+oak branch review fix-auth--a1b2c3d4 --remote --merge-preview
+```
+
+`oak branch review` gathers the evidence for one branch: what it changed, what it's based on, and — with `--merge-preview` — whether it would merge cleanly, plus a merge-safety verdict that flags a prediction which would destroy work already on `main`. Add `--json` for agents.
+
+### Read a diff without switching
+
+```bash
+oak diff fix-auth--a1b2c3d4                     # full-screen viewer: what the branch contributes
+oak branch diff fix-auth--a1b2c3d4 --remote     # summary of changed files
+oak branch diff fix-auth--a1b2c3d4 --remote --print          # the patch, to stdout
+oak branch diff fix-auth--a1b2c3d4 --remote --json --hunks   # the patch, as JSON
+oak diff 3f9fab02 8fcf5aed                      # any two commits
+```
+
+Branch diffs come in three modes, chosen with `--diff-mode` (`oak branch diff`) or `--mode` (`oak diff`):
+
+| Mode | Answers |
+|---|---|
+| `contribution` | What did this branch add since it forked from `main`? The honest "what did the agent do". |
+| `tree` | How do the two heads differ right now? (Default for `oak branch diff`.) |
+| `net-merge` | What would `main` gain if this branch merged now? |
+
+For large branches, `--changed-files-limit` / `--changed-files-offset` page through the file list and `--max-bytes` caps the patch text in JSON output.
+
+### Preview a merge train
+
+```bash
+oak branch train fix-auth--a1b2 add-search--e5f6 bump-tokio--c9d0 --remote
+```
+
+`oak branch train` previews landing several independent branches in order — would each still merge cleanly after the ones before it? — without publishing anything. Up to 32 branches.
+
+### The full-screen viewers
+
+`oak diff` and `oak log` open full-screen on a terminal. Both take the keys you already know:
+
+| Style | Keys |
+|---|---|
+| Arrows | ↑ ↓, PgUp / PgDn, Home / End |
+| less / vi | `j` `k`, Space (page down), `b` (page up), `d` / `u` (half page), `g` / `G`, `/` to search |
+| emacs | `^N` / `^P`, `^V` / `M-v`, `M-<` / `M->`, `^S` to search, `^G` to cancel |
+
+In `oak diff`, Tab or the arrow keys move between the file tree and the diff pane, and Space folds a directory in the tree. Press `?` in either viewer for the complete list. Pipe the output, or pass `--print` / `--json`, to skip the viewer.
+
+### In the browser
+
+The repo's **Branches** page on oak.space lists every open branch with its description and a CI status chip. Each branch opens a detail page with:
+
+- the full diff, file by file;
+- per-workflow CI pills that link to live run logs;
+- a **Seen by** list — opening a branch page records that you've read it;
+- **Merge**, **Update** (merge the latest `main` into the branch), and **Close** / **Reopen** buttons, plus conflict resolution in the browser when a merge would conflict.
+
+Check several branches on the list and **Merge selected** lands them one after another — usually how a fan-out ends when the branches don't overlap.
+
+### Then land it
+
+```bash
+oak switch fix-auth--a1b2c3d4     # fetches it if needed
+oak merge --wait                  # wait for CI, then squash onto main
+```
+
+See [Merging and conflicts](/docs/merging).
+
+<!-- https://oak.space/docs/history -->
+## History and inspection
+
+### The log
+
+```bash
+oak log                        # full-screen viewer on a terminal: commit list + detail pane
+oak log -n 20 --oneline        # the last 20, one per line
+oak log --verbose              # include each commit's changed files
+oak log src/parser/            # only commits touching these paths
+oak log --json                 # machine-readable
+```
+
+On your branch, the log shows your checkpoints. On `main` — `oak log` after `oak switch -d` to a main commit, or the repo's history on oak.space — it's one squash commit per merged branch, each carrying that branch's description as its message.
+
+The viewer takes arrows, `less`/vi, and emacs keys; press `?` for the list. See [the full-screen viewers](/docs/reviewing#the-full-screen-viewers).
+
+#### Search history
+
+```bash
+oak log -S parse_header        # commits that add or remove the literal string (like git log -S)
+oak log -G 'fn parse_\w+'      # commits with an added/removed line matching a regex (like git log -G)
+```
+
+#### Read a remote branch's history without fetching it
+
+```bash
+oak log --remote --json --branch fix-auth--a1b2c3d4 -n 50
+```
+
+A bounded, read-only walk of the branch's history on the server. Each row is hash-verified; when the list is truncated, the output says so and gives a `--from \<hash\>` to continue from. Requires `--json`.
+
+### Where am I?
+
+```bash
+oak hash                       # current HEAD commit
+oak rev-parse --short HEAD     # Git-compatible form, for scripts
+oak branch --show-current      # current branch name
+oak info                       # repo, branch, parent, remote, and linked-repo details
+oak open                       # open this repo on oak.space (--print to just print the URL)
+```
+
+### Inspect files and trees at a commit
+
+These read committed content without changing your working tree — useful for agents that need one file from another commit without a checkout.
+
+```bash
+oak file inspect src/main.rs --at 3f9fab02            # one file at a commit
+oak file inspect src/main.rs --at HEAD --output /tmp/main.rs
+oak file inspect src/main.rs --at <full-hash> --remote   # from the server, no clone needed
+
+oak tree inspect --at HEAD --max-files 500 --json      # a commit's whole tree, bounded
+oak refs inspect --json                                # every local branch and its head
+```
+
+`file inspect` caps output at 16 MiB by default (`--max-bytes` to change it). All three take `--json`.
+
+### Browse files at any commit
+
+`oak checkout \<hash\>` (or `oak switch -d \<hash\>`) puts your working tree at an old commit with a detached HEAD. On oak.space, every commit page has **Browse files at this commit**, and the API serves trees and raw files by commit — `GET /api/{owner}/{name}/tree/{commit}` and `/raw/{commit}/{path}`; see [the API reference](/docs/api#commits-and-content).
+
+### Save uncommitted work without committing
+
+```bash
+oak change capture --json                    # snapshot uncommitted changes as immutable objects
+oak change capture src/ --json               # …or only part of them
+oak change export <capture-id> --output work.zip
+```
+
+`oak change capture` stores your current uncommitted changes durably — like a stash that doesn't touch the working tree or move any branch — and prints a capture id. `oak change export` writes one capture out as a self-contained zip (a manifest plus the changed files) you can hand to someone else.
+
+<!-- https://oak.space/docs/agents -->
+## Working with agents
+
+Oak doesn't run agents — you bring your own: Claude Code, Codex, Cursor, Aider, a script of your own. What Oak gives them is a version-control model that fits how they work, and a CLI built to be driven by a program as well as a person.
+
+### The model
+
+- **One branch per session.** Start each agent run on its own branch (`oak switch -c`, or a fresh [mount](/docs/mounts)). A session you don't like gets closed, and `main` never notices.
+- **The agent writes the description.** Commits carry no message, so the agent's summary of what it did goes in `oak desc` — and becomes the commit message on `main`.
+- **The agent publishes; a person merges.** The agent ends by pushing its branch. You [review](/docs/reviewing) and [merge](/docs/merging).
+- **Mount instead of clone.** For a big repo, or many agents at once, give each agent its own mount. See [Example: a fleet of agents](/docs/example-session).
+
+### Install the agent skill
+
+```bash
+oak skill install            # writes .claude/skills/oak-vcs/ in this repo — commit it
+oak skill install --global   # or ~/.claude/skills/oak-vcs/ for every project on this machine
+```
+
+The `oak-vcs` skill is a `SKILL.md` plus reference files in the open Agent Skills format. It teaches an agent to recognize an Oak repo (a `.oak/` directory and no `.git`), to use `oak` instead of `git`, and the whole workflow on this site — including the traps, like interactive commands that hang without a terminal. Committed to the repo, every collaborator's agent picks it up.
+
+The files are baked into the CLI binary, so the skill always matches the CLI version that wrote it. Re-run `oak skill install` after `oak upgrade`.
+
+For agents that read `AGENTS.md` rather than skills (Codex, Cursor, and others), `oak init` offers to write an `AGENTS.md` explaining Oak, plus a one-line `CLAUDE.md` that points at it.
+
+### Rules to give an agent
+
+If you'd rather put it in your own prompt or `AGENTS.md`, this is the core:
+
+```text
+This repo uses Oak (the `oak` CLI), not git. Never run git commands here.
+- Work on the current feature branch. main lives on the server; never try to push to it.
+- `oak commit` takes no message. Describe the branch once with `oak desc "..."`;
+  it becomes the commit message on main, so write it for a reviewer.
+- Finish every task with: oak desc "...", oak commit, oak push
+  (or `oak finish --desc-file <file> --json`).
+- Do not run `oak merge`. A human merges.
+- Prefer --json output. Commands that open a UI or prompt (bare `oak diff`,
+  `oak switch` with no name, `oak clone` with no repo, `oak split` without --plan)
+  hang without a terminal — use `oak diff --print`/`--stat`/`--json` and pass names.
+- `oak reset` / `oak restore` ask for confirmation; pass -f only after
+  `oak status` shows what you'd discard.
+- First push of a brand-new repo: `oak push --repo <org>/<name>`. Never guess the
+  org — ask if you don't know it.
+- Lost? Run `oak agent state --json --compact`.
+```
+
+### Machine-readable everything
+
+Every command an agent needs takes `--json`, and the results are designed to be acted on:
+
+| Command | Use |
+|---|---|
+| `oak agent state --json --compact` | One document: repo, branch, what's dirty, what's unpushed, and `recommended_next_commands`. The "where am I and what now?" call. |
+| `oak status --json --compact` | Bounded working-tree status. |
+| `oak diff --json --hunks --max-bytes N` | The diff, with a byte budget. |
+| `oak commit --json`, `oak push --json`, `oak pull --json` | Receipts with what happened and what to do next. |
+| `oak finish --desc-file \<file\> --json` | Describe, checkpoint, and publish in one step — see below. |
+| `oak conflict status`, `oak conflict show --json` | Conflict state, file by file. |
+| `oak ci status --json` | The merge gate's verdict (also via exit code). |
+| `oak branch triage --remote --json` | Score every open branch, for an agent doing review. |
+
+Many JSON payloads include `recommended_next_commands`: exact invocations for the natural next step. An agent should run one of those rather than improvise flags.
+
+Exit codes are stable and meaningful — `3` repository locked (retry), `4` dirty working tree, `5` conflicts, `6` network/server/auth — so a wrapper can branch without parsing text. The table is in the [CLI reference](/docs/cli#exit-codes).
+
+### Finishing a task in one command
+
+```bash
+oak finish --desc-file /tmp/desc.md --json
+```
+
+`oak finish` checks it can publish (is a remote linked? is anything blocking?) **before** changing anything, then sets the branch description, checkpoints uncommitted changes, and pushes. Inside a mount it also unmounts — but only once the push has succeeded. If any step fails, nothing is lost: the JSON names the step and the command to run next.
+
+### Credentials for unattended agents
+
+`oak login` needs a browser once. An agent on a server, in CI, or in a container should use an API key instead:
+
+```bash
+export OAK_API_KEY=oak_...
+```
+
+For an agent, prefer a key that can do no more than its job — a **service account** with only `read` and `write` scopes (so it can push but never merge), or a key scoped to a single repo. See [API keys and tokens](/docs/api-keys).
+
+### Running many agents at once
+
+Give each agent its own branch *and* its own working tree, so they can't step on each other. With mounts that costs seconds, not a clone per agent:
+
+```bash
+oak space new acme && cd acme
+oak mount acme/web ./fix-login/web
+oak mount acme/web ./add-search/web
+claude -p "Task fix-login, mounted at ./fix-login/web ..." &
+claude -p "Task add-search, mounted at ./add-search/web ..." &
+wait
+oak branch triage --remote
+```
+
+The [example session](/docs/example-session) walks through this end to end, and [Agent spaces](/docs/spaces) covers the scaffolding.
+
+### Feedback from agents
+
+Agents hit rough edges first. `oak feedback` files a bug or feature request from the terminal and returns a tracking reference (`fb-N`):
+
+```bash
+oak feedback -m "oak pull --json omits parent_head_after on fast-forward" --json
+```
+
+Without `-m` or `--file` it opens your editor on a terminal, and exits with an error (rather than hanging) when there's no terminal.
+
+### Privacy
+
+Oak makes no AI calls on your behalf and doesn't train on your code. Whatever agent you use is its own integration, with its own data policy.
+
+<!-- https://oak.space/docs/example-session -->
+## Example: a fleet of agents
+
+This is the end-to-end shape the rest of the docs assume: one large repo, several agents working on it at once — each on its own mounted branch — and one person reviewing and merging what comes back.
+
+### The shape of it
+
+Five lines, before any commands:
+
+1. **A branch is a task** — one unit of work, usually one agent session.
+2. **A mount is a working copy of that branch.** Files arrive as they're read, so a 20 GB monorepo is editable in seconds, and N tasks means N mounts, not N clones.
+3. **Commits are checkpoints; the branch description is the message.**
+4. **Publishing isn't merging.** Each agent pushes its branch and stops. Nothing reaches `main` until a person merges it.
+5. **Merging squashes.** `main` gets one commit per task, however many checkpoints the agent made.
+
+If you're coming from Git: mounts do what worktrees do, minus the clone behind each one; the branch description does what a PR title and body do, minus the PR; and the squash merge is what "Squash and merge" does, except it's the only merge there is.
+
+### 1. Set up a space
+
+Mounts need a one-time per-machine step first — the Oak Mount app on macOS, `fuse3` on Linux, ProjFS on Windows. See [Setting up mounts](/docs/mounts#setting-up-mounts).
+
+```bash
+curl -fsSL https://oak.space/install | sh
+oak login
+
+oak space new acme        # scaffolding only — nothing is cloned
+cd acme
+oak space repos           # which repos can this space see?
+# acme/monorepo
+# acme/infra
+# acme/docs
+```
+
+That leaves:
+
+```text
+acme/
+├── AGENTS.md              # the workflow, written for the agent
+├── CLAUDE.md              # one-line @AGENTS.md import
+├── .oak-space             # marker recording the org
+└── .claude/settings.json  # pre-approves the oak commands agents need
+```
+
+The `AGENTS.md` isn't a stub. It's the agent's full operating manual for a space: how to pick a task slug, mount per repo, that `oak commit` takes no message, how to finalize a task, and the mount-specific traps (keep `CARGO_TARGET_DIR` and `node_modules` off the mount, don't run whole-tree formatters across it, how to recover a wedged mount). An agent that follows it does the right thing without further prompting. It's a plain file — add your team's conventions and every agent opened in the space picks them up.
+
+### 2. Fan out
+
+One task = one subdirectory = one mount per repo it touches = one branch per mount. Tasks are isolated by construction: separate directories, separate overlays, separate branches, and none of them can touch `main`.
+
+```bash
+# From the space root. Each returns in seconds.
+oak mount acme/monorepo ./fix-auth-redirect/monorepo
+oak mount acme/monorepo ./add-search-index/monorepo
+oak mount acme/monorepo ./bump-tokio/monorepo
+
+oak mount list
+#   ./fix-auth-redirect/monorepo
+#     -> acme/monorepo@8fcf5aed1b2c (virtual branch: fix-auth-redirect--a1b2c3d4)
+#   ./add-search-index/monorepo
+#     -> acme/monorepo@8fcf5aed1b2c (virtual branch: add-search-index--e5f6a7b8)
+#   ./bump-tokio/monorepo
+#     -> acme/monorepo@8fcf5aed1b2c (virtual branch: bump-tokio--c9d0e1f2)
+```
+
+Branch names come from the *task* directory, so they read as work rather than as repo names. A cross-repo task gets one branch per repo — mount `./unify-errors/monorepo` and `./unify-errors/infra` side by side and they share the slug.
+
+Now launch one agent per task, from the space root so each reads `AGENTS.md`. With Claude Code:
+
+```bash
+claude -p "Task slug fix-auth-redirect, mounted at ./fix-auth-redirect/monorepo.
+The OAuth callback drops the ?next= param. Fix it, then finalize per AGENTS.md." &
+
+claude -p "Task slug add-search-index, mounted at ./add-search-index/monorepo.
+Add a trigram index behind the search-index flag. Finalize per AGENTS.md." &
+
+claude -p "Task slug bump-tokio, mounted at ./bump-tokio/monorepo.
+Bump tokio to 1.42 across the workspace and fix the fallout. Finalize per AGENTS.md." &
+
+wait
+```
+
+You can also skip pre-mounting and just name a slug — `AGENTS.md` tells the agent to mount what it needs. Pre-mounting is worth it when you're scripting the fan-out and want mount failures to surface up front rather than inside a transcript.
+
+### 3. Each agent finishes its own branch
+
+Per `AGENTS.md`, each agent ends with:
+
+```bash
+cd ./fix-auth-redirect/monorepo
+oak finish --desc-file /tmp/desc.md --json
+```
+
+One command that checks it can publish, sets the branch description from the file, checkpoints anything uncommitted, pushes, and tears the mount down — only after the push succeeds. If a step fails, the mount stays intact and the JSON names the next command.
+
+Watch the fleet with `oak mount list --json` (dirty and unpushed counts per mount). Pushed branches appear live on the repo's **Branches** page.
+
+### 4. Review what came back
+
+Three branches, no checkouts, and you don't want to switch your working tree three times. Start with triage:
+
+```bash
+oak branch triage --remote                     # every open branch, scored
+oak branch triage --remote --only mergeable
+oak branch triage --remote --only ambiguous
+```
+
+Then read the ones that need you:
+
+```bash
+oak branch review fix-auth-redirect--a1b2c3d4 --remote --merge-preview
+oak diff fix-auth-redirect--a1b2c3d4                       # full-screen, no checkout
+oak branch diff add-search-index--e5f6a7b8 --remote --diff-mode net-merge
+```
+
+Or do it in the browser: the **Branches** page lists every open branch with its CI status, and each one opens to its diff with a **Merge** button. [Reviewing branches](/docs/reviewing) has the details.
+
+### 5. Land them
+
+Merging is a decision, so it happens from somewhere you control — the web UI or a real checkout, not a mount:
+
+```bash
+# In a clone of the repo (a sparse one is fine)
+oak switch fix-auth-redirect--a1b2c3d4
+oak merge --wait                    # wait for CI, then squash onto main
+```
+
+Or check off the clean branches on the **Branches** page and click **Merge selected**.
+
+**When a branch conflicts**, don't re-run the agent from scratch — mount the branch itself and fix it in place:
+
+```bash
+oak mount acme/monorepo ./fix-auth-redirect/monorepo --branch fix-auth-redirect--a1b2c3d4
+cd ./fix-auth-redirect/monorepo
+oak pull                     # merge the new main in; conflicts surface here
+# resolve, or hand this mount to an agent
+oak pull --continue
+oak commit && oak push
+```
+
+A plain `oak mount` starts a fresh branch; `--branch` continues an existing one. That's also how a follow-up prompt keeps working on a branch an agent already pushed.
+
+### 6. Clean up
+
+```bash
+oak space clean                  # tear down every mount with nothing in flight
+oak space clean ./bump-tokio     # or just one task
+```
+
+Mounts with uncommitted or unpushed work are left alone unless you pass `--force`, so a sweep can't eat a session you forgot about.
+
+### All of it at once
+
+```bash
+# once per machine
+curl -fsSL https://oak.space/install | sh && oak login
+
+# once per org
+oak space new acme && cd acme
+
+# fan out
+oak mount acme/monorepo ./fix-auth-redirect/monorepo
+oak mount acme/monorepo ./add-search-index/monorepo
+claude -p "task fix-auth-redirect …" &
+claude -p "task add-search-index …" &
+wait
+oak mount list --json
+
+# review, checkout-free
+oak branch triage --remote --json
+oak branch review <branch> --remote --merge-preview
+
+# land
+oak switch <branch> && oak merge --wait      # or Merge in the web UI
+
+# sweep
+oak space clean
+```
+
+Scaling up is more of the same: more task directories, more mounts, more agents. The two limits worth knowing are the mount's — keep build output and `node_modules` off it — and your own review throughput, which is what `oak branch triage` exists to protect.
+
+<!-- https://oak.space/docs/mounts -->
+## Lazy mounts
+
+`oak mount` puts a working tree on top of a remote repository **without cloning it**. Files are fetched the first time something reads them, so you can be editing a multi-gigabyte monorepo within seconds, and running ten tasks in parallel costs ten mounts, not ten clones.
+
+```bash
+oak mount acme/monorepo                 # mounts at ./monorepo
+oak mount acme/monorepo ./fix-auth      # …or wherever you say
+cd fix-auth
+$EDITOR src/auth/callback.rs            # only the files you touch are downloaded
+oak status && oak commit && oak push
+```
+
+Each mount runs as a background daemon; the command returns as soon as the mount is live. Before your first mount, do the [one-time setup](#setting-up-mounts) for your OS.
+
+### How a mount works
+
+- **A mount is one branch.** By default `oak mount` starts a fresh *virtual branch* off the latest `main`, named after the mount directory plus a short id — mount at `./fix-auth` and you're on `fix-auth--a1b2c3d4`.
+- **Edits stay local until you push.** Changes go into an overlay on your machine — the **active commit**, the one you're amending as you edit. `oak commit` checkpoints it onto the virtual branch and starts a new one; `oak push` publishes the branch like any other.
+- **The normal commands just work.** Inside a mount, `oak status`, `diff`, `commit`, `desc`, `log`, `hash`, `info`, `push`, `pull`, `finish`, `conflict`, and `agent state` all operate on the mount's virtual branch, so a mount feels like a clone.
+
+A few things are different inside a mount:
+
+| Command | Inside a mount |
+|---|---|
+| `oak switch` | Refused — a mount is one branch. Mount another branch elsewhere. |
+| `oak merge` | Doesn't run. Merge from a clone or the web. |
+| `oak reset`, `oak restore` | Don't run. Use `oak diff` / `oak status` to see the overlay, or end the mount with `--force` to discard it. |
+| Hooks | Don't run. |
+| `oak commit --json`, `--push` | Not supported; run `oak commit` then `oak push`. |
+
+### Continue an existing branch
+
+```bash
+oak mount acme/monorepo ./fix-auth --branch fix-auth--a1b2c3d4
+```
+
+`--branch` mounts an existing remote branch instead of starting a fresh one: its history and files become the mount's. Use it to pick up a branch an agent already pushed, give it a follow-up, or [resolve its conflicts](/docs/merging#when-a-pushed-branch-conflicts) without a full clone.
+
+### Finish, end, and list mounts
+
+```bash
+oak mount list                     # every mount, labelled live, stale, or orphaned
+oak mount list --json              # with dirty and unpushed counts — good for watching a fleet
+
+oak finish --desc-file desc.md --json          # inside a mount: describe, commit, push, then unmount
+oak mount finish ./fix-auth --desc-file desc.md --json   # same thing, from outside
+
+oak mount end ./fix-auth           # unmount and delete the directory; refuses if there's unpushed work
+oak mount end ./fix-auth --force   # …discarding uncommitted changes
+oak mount end                      # end every mount under ~/oaktree
+```
+
+`oak finish` / `oak mount finish` check everything they can **before** changing anything, and only unmount once the push has succeeded. If a step fails the mount stays intact and the output names the command to run next — so finishing never silently loses work.
+
+### Setting up mounts
+
+Mounts use your operating system's own virtual-filesystem layer. Each needs a one-time setup per machine; no third-party kernel extension or driver is involved. Everything other than mounting — clone, commit, push, pull — works without it.
+
+#### macOS: the Oak Mount app (macOS 26+)
+
+On macOS the filesystem runs inside a signed FSKit extension, **OakFS**, shipped in the **Oak Mount** app. The app only carries the extension: it must be installed and enabled once, but it doesn't need to be running, and one install serves every mount.
+
+1. Run your first `oak mount`. If the installer didn't already, the CLI downloads Oak Mount, verifies its checksum, installs it in `/Applications` (or `~/Applications`), and opens it once so macOS registers the extension.
+2. Enable it: **System Settings → General → Login Items & Extensions → File System Extensions**, then turn on **OakFS**. The Oak Mount window has a button that takes you there. No restart needed.
+3. Run `oak mount` again. From now on it attaches immediately.
+
+If the extension is ever switched off, `oak mount` says so rather than failing mysteriously. Keep the app in `/Applications`.
+
+**Pick a destination outside `~/Documents`, `~/Desktop`, `~/Downloads`, and iCloud Drive.** macOS requires Full Disk Access for your terminal to mount inside those; somewhere like `~/oaktree` avoids it.
+
+#### Linux: FUSE
+
+1. Install FUSE 3: `sudo apt install fuse3` on Debian and Ubuntu, or your distro's equivalent. Oak mounts through the `fusermount3` helper it provides.
+2. If your agent or editor runs as a different user, or in a sandbox, and needs to see into the mount, uncomment `user_allow_other` in `/etc/fuse.conf`.
+3. On distros that gate FUSE behind a group (often `fuse`), add yourself to it and log in again.
+
+#### Windows: Projected File System
+
+Windows mounts use ProjFS — the same primitive GVFS and Scalar use for huge Git monorepos. Enable it once, from an elevated PowerShell:
+
+```powershell
+Enable-WindowsOptionalFeature -Online -FeatureName Client-ProjFS -NoRestart
+```
+
+Or **Settings → Apps → Optional features → Windows Projected File System**.
+
+#### Check it works
+
+```bash
+oak mount acme/web /tmp/web-test && oak mount list
+oak mount end /tmp/web-test
+```
+
+If the mount doesn't attach, the error almost always points back at one of the steps above.
+
+### Keep build output off the mount
+
+A mount is ideal for reading and editing source and poor for build output and tool caches. Keep those on your real disk:
+
+- **Redirect build directories.** `CARGO_TARGET_DIR=/tmp/fix-auth-target cargo test`; likewise for `dist/`, `build/`, and other generated directories. A build cache on a mount is slow and can produce baffling, wrong errors.
+- **Don't install `node_modules` on a mount.** On Linux, FUSE refuses to create symlinks and hard links (`EPERM`), which package managers rely on. Install outside the mount and point the tool at it.
+- **Don't rewrite the whole tree at once.** A repo-wide formatter run, codemod, or huge `rm -rf` can wedge a mount. Scope formatters to what you changed (`cargo fmt -p \<crate\>`).
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| Commands fail with `os error 22` | The mount is wedged. Commit and push what you can, then `oak mount end --force \<dir\>` and mount again. **`--force` discards uncommitted changes.** |
+| `oak mount list` shows a mount as `stale` after a crash or reboot | Running `oak mount` again for it recovers it from its saved state. |
+| A mount shows as `orphaned` (its directory is gone) | `oak mount forget --orphaned` drops those registrations; their saved state is kept and reported. |
+| A registration won't go away | `oak mount forget \<dir\>` removes it without touching on-disk state (`--force` if it looks live). |
+
+Mount state lives under `~/.oak/mounts/` (override with `OAK_MOUNTS_ROOT`).
+
+### Mounts, clones, or sparse clones?
+
+| | Mount | Clone | Sparse clone |
+|---|---|---|---|
+| Time to first edit on a huge repo | Seconds | Full download | Download of the subtree |
+| Files on disk | Only what's been read | Everything | Only the cone |
+| Needs OS setup | Yes | No | No |
+| Good for builds | Keep output off the mount | Yes | Yes |
+| Can merge from it | No | Yes | Yes |
+
+For a plain on-disk checkout of part of a monorepo, see [Sparse clones](/docs/sparse-clones). To run many agents across an org's repos, see [Agent spaces](/docs/spaces).
+
+<!-- https://oak.space/docs/spaces -->
+## Agent spaces
+
+An **agent space** is a directory where coding agents work across one organization's repos. Each task gets its own subdirectory, and inside it you mount whichever repos the task needs — each on its own branch. It's like a set of Git worktrees, except there's no clone behind any of them, so starting a task takes seconds.
+
+```text
+acme/                          ← the space (one per org)
+├── AGENTS.md
+├── fix-auth-redirect/         ← one task
+│   └── web/                   ← a mount of acme/web, on branch fix-auth-redirect--a1b2c3d4
+└── unify-errors/              ← a cross-repo task
+    ├── web/                   ← mount of acme/web,   branch unify-errors--…
+    └── api/                   ← mount of acme/api,   branch unify-errors--…
+```
+
+Spaces are built on [lazy mounts](/docs/mounts), so the [one-time mount setup](/docs/mounts#setting-up-mounts) applies.
+
+### Create a space
+
+```bash
+oak space new acme              # creates ./acme
+oak space new acme ~/work/acme  # …or somewhere else
+```
+
+This writes:
+
+| File | Purpose |
+|---|---|
+| `AGENTS.md` | The workflow, written for an agent: picking a task slug, mounting, finishing, and the mount traps to avoid. Edit it to add your team's conventions. |
+| `CLAUDE.md` | A one-line `@AGENTS.md` import, for Claude Code. |
+| `.claude/settings.json` | Pre-approves the `oak` commands agents need, and lists mounts when a Claude Code session stops. |
+| `.oak-space` | Marks the directory as a space for the org. |
+
+Nothing is cloned or mounted yet.
+
+### The per-task loop
+
+1. **Pick a slug** — short and kebab-case, like `fix-auth-redirect`. It becomes the task directory and the start of each branch name.
+2. **See what's available:** `oak space repos` lists the org's repos (add `--json` for agents).
+3. **Mount each repo the task needs** under the task directory:
+   ```bash
+   oak mount acme/web ./fix-auth-redirect/web
+   ```
+4. **Work inside each mount.** `oak status`, `diff`, `commit`, and `push` all act on that mount's branch.
+5. **Finish each repo you touched:**
+   ```bash
+   oak mount finish ./fix-auth-redirect/web --desc-file desc.md --json   # from the space root
+   # or, from inside the mount: oak finish --desc-file desc.md --json
+   ```
+   This sets the description, checkpoints, pushes, and unmounts — unmounting only after the push succeeds.
+6. **Sweep up:** `oak space clean` tears down every mount in the space that has nothing uncommitted or unpushed. Add a path to clean one task; `--force` also removes dirty mounts, discarding their changes.
+
+Each repo's mount is independent: describe, commit, and push them separately, even within one cross-repo task.
+
+### Take stock
+
+```bash
+oak space inventory --verify-local --include-ci --json
+```
+
+`oak space inventory` walks a directory tree and reports every Oak checkout and mount it finds. `--verify-local` adds each one's dirty-file and unpushed-commit counts; `--include-ci` adds the CI state of each one's head. It's an observation, not a guarantee — it never certifies that a directory is safe to delete.
+
+### Running agents in a space
+
+Launch agents from the space root so they read `AGENTS.md`, and tell each which task directory is its own. [Example: a fleet of agents](/docs/example-session) walks through fanning out, reviewing, and merging end to end.
+
+<!-- https://oak.space/docs/sparse-clones -->
+## Sparse clones
+
+A **sparse clone** checks out only part of a repository — Perforce-style. Pass one or more path prefixes, and only files under them are downloaded and written to disk:
+
+```bash
+oak clone acme/monorepo --path services/api --path libs/shared
+# or: --path services/api,libs/shared
+```
+
+The set of prefixes is the **cone**.
+
+### How it behaves
+
+- **The directory structure still comes down.** Oak's trees are content-addressed and verified on the client, so the full listing arrives; files outside the cone are listed but their content is never fetched.
+- **Commits carry out-of-cone files forward untouched.** Narrowing a checkout never deletes what it leaves out, and `oak status` never reports those files as missing.
+- **Everything else is normal.** Commit, push, pull, and merge work exactly as in a full clone — including `oak merge`, which a [mount](/docs/mounts) can't do.
+
+### Change the cone
+
+```bash
+oak sparse                       # show the current cone (--json for machines)
+oak sparse set services/web      # replace the cone and re-sync the working tree
+oak sparse add docs/             # widen it
+oak sparse disable               # back to a full checkout
+```
+
+After widening, files that were never downloaded are listed; run `oak pull` to fetch them.
+
+### Sparse clone or mount?
+
+For a very large repo, a [lazy mount](/docs/mounts) is usually the better default: it fetches any path on demand, with no cone to manage. Reach for a sparse clone when you want a plain on-disk checkout of a subtree — for builds, for tools that dislike virtual filesystems, for merging from — without the per-machine setup a mount needs.
+
+Sparse clones and [path permissions](/docs/path-permissions) share a mechanism: both withhold file content while keeping the tree intact. The difference is who decides — a sparse clone is a bandwidth choice you make; path permissions are access control set by the repo's admins.
+
+### Other ways to clone less
+
+| Flag | Effect |
+|---|---|
+| `oak clone --shallow` | Only the latest commit on `main`, no history. |
+| `oak clone --from ../other-checkout` | Reuse content already in another local checkout of the same repo instead of downloading it again. |
+| `oak clone --detached` | Check out `main`'s head without creating a personal branch — for read-only tooling. |
+
+### Recovery switch
+
+If a server is ever in a broken state and a normal clone or pull fails on a missing file, `OAK_ALLOW_PARTIAL_CLONE=1` skips each missing file (and reports it) instead of failing. It's for recovery only — use `--path` when you want part of a repo on purpose.
+
+<!-- https://oak.space/docs/ci -->
+## Continuous integration
+
+Oak runs CI on **your own machines**. Register a computer as a runner for your organization, put a GitHub Actions–style workflow file in the repo, and Oak hands its jobs to your runners when branches are pushed and merged, shows the result on every branch, and refuses to merge a branch whose CI is red.
+
+Runners are the stock open-source [Gitea runner](https://gitea.com/gitea/act_runner) (`gitea-runner`), which speaks Oak's runner API. Oak doesn't host CI compute: a job runs only when one of your runners picks it up.
+
+### Your first workflow
+
+1. **Register a runner.** In your organization's **Settings → Runners**, generate a registration token, then on the machine:
+
+   ```bash
+   gitea-runner register --no-interactive --instance https://oak.space \
+     --token <registration-token> --name my-laptop --labels linux:docker://node:20-bookworm
+   gitea-runner daemon
+   ```
+
+   The full setup — labels, Docker vs. host mode, running it as a service — is in [Self-hosted runners](/docs/ci-runners).
+
+2. **Add a workflow.** Create `.oak/workflows/ci.yml`:
+
+   ```yaml
+   on: [push]
+   jobs:
+     test:
+       runs-on: linux
+       steps:
+         - uses: actions/checkout@v4
+         - run: cargo test --locked
+   ```
+
+   `runs-on: linux` sends the job to a runner carrying the `linux` label.
+
+3. **Push it:**
+
+   ```bash
+   oak commit && oak push
+   ```
+
+That push starts a run. Watch it from the CLI, or on the branch's page on oak.space, where a status chip links to live logs:
+
+```bash
+oak ci status          # the verdict for your branch head
+oak ci runs            # recent runs in this repo
+oak ci logs <run-id>   # a run's step-by-step output
+```
+
+### When workflows run
+
+Oak maps its own events onto the GitHub events a workflow lists in `on:`:
+
+| Oak event | GitHub event a workflow sees | Runs against |
+|---|---|---|
+| A branch is pushed (its first push too) | `push`, or `pull_request` for workflows that only list that | The branch head |
+| A branch is squash-merged onto `main` | `push` to `main` | The new commit on `main` |
+| You trigger it — see [Running a workflow by hand](#running-a-workflow-by-hand) | `workflow_dispatch` | The head of the branch you name |
+
+`branches` / `branches-ignore` and `paths` / `paths-ignore` filters work as on GitHub. Events with no Oak equivalent (`schedule`, `release`, `issues`, …) are accepted and never fire.
+
+Workflow files are read **from the commit being tested**, so a change to a workflow takes effect on the push that makes it. Every file in `.oak/workflows/` whose `on:` matches starts its own run. The full format — and what Oak does differently from GitHub — is in the [Workflow file reference](/docs/ci-workflows).
+
+### What a run looks like
+
+A run is one job per job in the workflow (one per matrix combination). A job waits for the jobs it `needs:` and for a runner whose labels include **every** label in its `runs-on`. On the runner, `actions/checkout` fetches the exact commit under test; steps, `uses:` actions, expressions, `services:` and `container:` all run the way they do on GitHub, because the runner executes them.
+
+A job whose dependency failed is skipped, unless it has its own `if:` (such as `if: always()`). The run fails if any job fails.
+
+### Secrets
+
+Values that mustn't live in the repo — deploy keys, API tokens — go in **CI secrets**, set per repo under **Settings → CI** on oak.space (you need write access).
+
+- Reference them as `${{ secrets.NAME }}`, exactly as on GitHub. The runner masks their values in logs.
+- `${{ secrets.GITHUB_TOKEN }}` is a per-job token that lets that job fetch its repo's source, and stops working when the job ends.
+- Names are letters, digits, and `_`, can't start with a digit, and can't start with `OAK_CI_`. Values can be up to 64 KiB, and multi-line values are passed through exactly.
+- Once saved, a secret's value can't be read back — only replaced or deleted.
+
+There's no per-workflow scoping: a secret is available to every workflow in the repo, on every branch. Anyone who can push a branch can write a workflow that reads it — and runs code on your runners — so treat repo write access as access to its secrets and its runners. For credentials that must not be reachable that way — deploy keys, signing certificates — use an [environment](/docs/ci-environments): its secrets reach only an approved deploy, on runners dedicated to it.
+
+Secrets can also be managed over the API (`GET`/`PUT`/`DELETE /api/{owner}/{name}/ci/secrets`) — see [the API reference](/docs/api#ci).
+
+### The merge gate
+
+CI decides whether a branch can land. A merge onto `main` is **refused while the branch head's CI is failing or still running** — the latest run of every workflow for the head commit must have succeeded. A head with no runs isn't gated.
+
+```bash
+oak ci status          # exit 0 = passed, 1 = failed (or no runs), 3 = still running
+oak merge --wait       # wait for CI to finish, then merge if it passed
+oak merge --force      # override, deliberately, after reading the failure
+```
+
+A job no runner can take blocks the gate until it's picked up — register a runner with its labels, or cancel the run. Oak cancels jobs nobody picked up within 24 hours. The gate applies to every way of merging — CLI, web, batch merge, and API (where it's HTTP 412, overridden with `?force=1`). Forced merges are written to the organization's audit log. More in [Merging and conflicts](/docs/merging#the-ci-merge-gate).
+
+### Watching and managing runs
+
+**In the browser:** there's no separate CI page. Each branch row on the **Branches** page wears a status chip for its head, each branch and commit page shows a pill per workflow with its duration, and every chip opens the run's page — each job with the runner it ran on (or the labels it's waiting for), and logs per step that stream live while it runs.
+
+**From the CLI:**
+
+```bash
+oak ci runs --limit 50                    # recent runs: id, workflow, branch, commit, status, duration
+oak ci status --json                      # gate verdict for the current head
+oak ci status --run 1204                  # one specific run
+oak ci wait --current --timeout 1800      # block until the current head's runs finish
+oak ci wait 1204 1205 --progress          # …or specific runs, printing step transitions
+oak ci logs 1204 --failed                 # only the failing steps' output
+oak ci logs 1204 --summary                # step metadata only, no log output
+oak ci rerun 1204                         # re-run at the same commit (for infrastructure flakes)
+oak ci cancel 1204 --commit <full-hash>   # cancel a push or merge run
+oak ci cancel --superseded --yes          # cancel this branch's in-flight runs for commits that are no longer its head
+```
+
+`oak ci rerun` is for failures that weren't the code's fault — a network blip, a runner that went away. A code fix needs a new commit. Cancelling stops a running job within a few seconds: the runner learns from its next report.
+
+### Running a workflow by hand
+
+```bash
+oak ci trigger --workflow ci --expected-commit <full-hash> --idempotency-key retry-1
+```
+
+`oak ci trigger` starts a run at your branch's head — but only if the head is still exactly `--expected-commit`, so you never test something you didn't mean to. Re-sending the same `--idempotency-key` returns the original run instead of starting another.
+
+Over the API:
+
+```bash
+curl -X POST https://oak.space/api/acme/web/ci/runs \
+  -H "Authorization: Bearer $OAK_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"workflow": "ci", "branch": "main"}'
+```
+
+> **Always name the workflow.** A manual trigger with no `workflow` runs **every** workflow at that head, whether or not it lists `workflow_dispatch` in `on:`. Workflows that deploy to an [environment](/docs/ci-environments) are the exception: they never start this way, only with `oak ci deploy`.
+
+### Limits
+
+CI runs on your machines, so there are no CI minutes and no concurrency caps — a runner takes one job at a time per unit of its `capacity`, and more runners run more jobs at once. A whole run is timed out after **6 hours**; set `timeout-minutes` on a job for a tighter bound (the runner enforces it). A job whose runner stops reporting for 10 minutes fails, and a job no runner picks up within 24 hours is cancelled.
+
+### Bring your own CI
+
+To use an external CI system instead, have it listen to Oak's [webhooks](/docs/webhooks) (`push`, `branch.created`, `merge`), then fetch the code with `oak clone --branch \<name\>` using an [API key](/docs/api-keys). External systems can't yet report status back into Oak's merge gate.
+
+<!-- https://oak.space/docs/ci-workflows -->
+## Workflow file reference
+
+Workflows live in `.oak/workflows/` and use **GitHub Actions syntax**. Oak reads each file to decide *which jobs run and where*; your [runner](/docs/ci-runners) executes them, so steps, `uses:` actions, expressions, `services:`, `container:` and the rest behave as they do on GitHub. This page covers what Oak itself reads, and where it differs from GitHub.
+
+A workflow that fails to parse still produces a run — one that fails immediately and shows the error — so a broken workflow can't silently stop testing anything.
+
+### Files
+
+- **Location:** directly in `.oak/workflows/`, ending in `.yml` or `.yaml`. Subdirectories are ignored. (`.github/workflows/` is not read; copy or move files you want Oak to run.)
+- **Name:** the file name without its extension. `.oak/workflows/ci.yml` is the workflow `ci` — that's the name `oak ci` and the API use.
+- **Size:** at most 256 KiB.
+- **Independence:** each file that matches an event starts its own run, and the [merge gate](/docs/ci#the-merge-gate) checks each one.
+
+### A complete example
+
+```yaml
+# .oak/workflows/ci.yml
+name: CI
+on:
+  push:
+    paths-ignore: ['docs/**']
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux, macos]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: cargo-${{ hashFiles('Cargo.lock') }}
+      - run: cargo test --locked
+
+  deploy-docs:
+    needs: test
+    runs-on: linux
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/publish-docs.sh
+        env:
+          DOCS_TOKEN: ${{ secrets.DOCS_TOKEN }}
+```
+
+### on
+
+Which events start the workflow. As on GitHub, `on:` is an event name, a list, or a map of events to filters:
+
+| You write | Runs when |
+|---|---|
+| `push` | Any branch is pushed — its first push too — and when a branch is merged onto `main` (a push to `main`). |
+| `pull_request` | A branch other than `main` is pushed. An Oak branch is its own pull request against `main`, so `branches:` here filters the *base* branch. A workflow listing both `push` and `pull_request` runs once, as `push`. |
+| `workflow_dispatch` | Someone triggers it with `oak ci trigger` or the API. |
+
+`branches`, `branches-ignore`, `paths`, and `paths-ignore` work as on GitHub: `*` matches within one path segment, `**` crosses directories, a `!` pattern excludes, and the last matching pattern wins. Two Oak-specific rules keep the merge gate honest:
+
+- On a feature branch, "changed" means **the whole branch** — everything that differs from where it left `main` — not just the latest push. Otherwise a docs-only push after a broken code push would leave the head untested, and ungated.
+- A change to the workflow file itself always runs it.
+
+Other events (`schedule`, `release`, `issues`, `workflow_call`, …) are accepted, so a file shared with GitHub keeps working, but never fire on Oak. Oak's original event names still work too: `branch.created` (pushes to branches other than `main`), `merge` (merges onto `main`), and `manual` (`workflow_dispatch`).
+
+### jobs
+
+Oak reads these job keys; everything else (`env`, `container`, `services`, `timeout-minutes`, `outputs`, `continue-on-error`, `defaults`, …) passes through to the runner unchanged.
+
+| Key | Required | What Oak does with it |
+|---|---|---|
+| `runs-on` | yes | The labels a runner must **all** carry to take the job. A string, a list, or `{labels: [...]}`. May use `${{ matrix.* }}` values, and nothing else. |
+| `steps` | yes | Listed on the run page before the runner reports on them. Each step needs `run` or `uses`. |
+| `needs` | no | The job waits until these jobs finish. Must name jobs in this file. |
+| `if` | no | Evaluated by the runner. Without one, a job whose dependency didn't succeed is skipped; with one (`always()`, `failure()`, …) the runner decides. |
+| `environment` | no | The [environment](/docs/ci-environments) the job deploys to: a fixed name, or `{name, url}`. A workflow with such a job never runs on a push or an ordinary trigger, only when someone deploys it with `oak ci deploy`, and must have exactly one job. |
+| `strategy.matrix` | no | Expanded into one job per combination, `include` / `exclude` as on GitHub. The matrix must be written out — one computed by an expression (`fromJSON(...)`) isn't supported. |
+| `name` | no | Display name; `${{ matrix.* }}` values are filled in. |
+
+Not supported: reusable workflows (`jobs.<id>.uses`), and runner groups in `runs-on`. Either is an error.
+
+### What a job sees
+
+The runner gives every job a GitHub-shaped environment:
+
+- **`github` context** — `github.repository` is `owner/name`, `github.ref` is `refs/heads/<branch>`, `github.event_name` is the event above, and `github.server_url` is oak.space.
+- **`github.sha` is a git commit id.** Oak's commit ids are 64 hex characters, which git tooling doesn't accept, so each run's commit is presented as a single-commit git snapshot and `github.sha` names that. Oak's own id is in `$OAK_CI_COMMIT`.
+- **Checkout history is one commit deep.** `actions/checkout` works, but `fetch-depth: 0`, tags, and `git describe` find a single commit with no history.
+- **`OAK_CI_*` variables** in every step: `OAK_CI_RUN_ID`, `OAK_CI_COMMIT` (the Oak commit), and `OAK_CI_BRANCH`. Names starting with `OAK_CI_` are reserved in every `env:`.
+- **`secrets.GITHUB_TOKEN`** authenticates fetching this repo's source, for this job only. It can't call any other API.
+- **`uses:` actions** are fetched from GitHub by the runner. JavaScript actions need Node (or Bun) on host-mode runners — see [Self-hosted runners](/docs/ci-runners#javascript-actions).
+- **Caching:** `actions/cache` works against the runner's own built-in cache server, so a cache is local to the machine that saved it.
+- **Artifacts:** `actions/upload-artifact` and `download-artifact` aren't supported yet. Pass small values between jobs with job `outputs` and `needs.\<job\>.outputs`.
+
+### Differences from GitHub, in one place
+
+| GitHub Actions | On Oak |
+|---|---|
+| `.github/workflows/` | `.oak/workflows/` |
+| GitHub-hosted runners (`ubuntu-latest`) | Your runners; `runs-on` names their labels |
+| `github.sha` is the pushed commit | A single-commit snapshot of the pushed commit; Oak's id is `$OAK_CI_COMMIT` |
+| Full history on checkout | One commit |
+| `pull_request` from forks | Oak branches are pull requests; there are no forks |
+| `schedule`, `release`, … | Accepted, never fire |
+| Reusable workflows, computed matrices | Not supported |
+| Artifacts | Not supported yet |
+| `environment:` jobs run on push and wait for approval | They run only when deployed, on runners dedicated to the environment — see [Environments](/docs/ci-environments) |
+| `GITHUB_TOKEN` calls the GitHub API | It fetches this repo's source only |
+
+<!-- https://oak.space/docs/ci-runners -->
+## Self-hosted runners
+
+A runner is a machine of yours that runs your organization's CI jobs. It's the open-source **Gitea runner** (`gitea-runner`, formerly `act_runner`), unmodified: Oak speaks the same runner protocol Gitea does. A runner *polls* Oak for work over HTTPS, so it can sit behind a firewall, on a laptop, or in a closet — nothing ever connects in to it.
+
+### Add a runner
+
+1. **Install** `gitea-runner` on the machine — a single binary from the [releases page](https://gitea.com/gitea/act_runner/releases) (`gitea-runner-\<version\>-\<os\>-\<arch\>.xz`). It needs `git`; Docker is optional and only needed for container jobs.
+
+   ```bash
+   xz -d gitea-runner-*-darwin-arm64.xz && chmod +x gitea-runner-*-darwin-arm64
+   sudo mv gitea-runner-*-darwin-arm64 /usr/local/bin/gitea-runner
+   ```
+
+2. **Get a registration token** from your organization's **Settings → Runners** (owners and admins). It's shown once; generating a new one replaces it, and runners already registered keep working.
+
+3. **Register** the machine, choosing its labels, then **start** it:
+
+   ```bash
+   gitea-runner register --no-interactive --instance https://oak.space \
+     --token <registration-token> --name build-box --labels linux:docker://node:20-bookworm
+   gitea-runner daemon
+   ```
+
+It appears under **Settings → Runners** as *online* within a few seconds. Registration writes the runner's own credentials to a `.runner` file next to where you ran it; keep that file private.
+
+### Labels
+
+A workflow job says where it runs with `runs-on`; a runner takes a job only if it carries **every** label listed there. Each label also tells the runner *how* to run that job:
+
+| Label | Runs jobs |
+|---|---|
+| `linux:docker://node:20-bookworm` | In a fresh container from that image, one per job. The isolated choice. |
+| `macos:host` | Directly on the machine, in a scratch directory, as the user running `gitea-runner`. |
+
+A runner can carry several, for example `--labels macos:host,arm64:host`. Label names are yours to choose — `linux`, `gpu`, `big-disk`, `oak-ci` — as long as workflows and runners agree.
+
+### Configure it
+
+For anything beyond labels, generate a config file and start the daemon with it:
+
+```bash
+gitea-runner config generate > config.yaml
+gitea-runner daemon --config config.yaml
+```
+
+The settings you're most likely to change:
+
+```yaml
+runner:
+  capacity: 2            # jobs this machine runs at once
+  labels:                # replaces --labels once set here
+    - "linux:docker://node:20-bookworm"
+  timeout: 3h            # hard cap per job, on top of the workflow's timeout-minutes
+cache:
+  enabled: true          # the built-in server behind actions/cache, local to this machine
+container:
+  network: bridge
+host:
+  workdir_parent: /var/lib/gitea-runner/work
+```
+
+### Keep it running
+
+On Linux, a systemd unit:
+
+```ini
+# /etc/systemd/system/gitea-runner.service
+[Unit]
+Description=Oak CI runner
+After=network-online.target docker.service
+
+[Service]
+User=runner
+WorkingDirectory=/var/lib/gitea-runner
+ExecStart=/usr/local/bin/gitea-runner daemon --config /var/lib/gitea-runner/config.yaml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+On macOS, a launchd agent (`~/Library/LaunchAgents/space.oak.runner.plist`) that runs the same command with `KeepAlive` set, loaded with `launchctl load`. Either way, run the daemon from the directory holding its `.runner` file.
+
+### Docker on a Mac
+
+Container labels need a Docker daemon. On macOS, [colima](https://github.com/abiosoft/colima) is the lightest:
+
+```bash
+brew install colima docker
+colima start --cpu 6 --memory 8 --disk 80
+```
+
+The runner itself stays on the Mac, and its jobs run in Linux containers inside colima's VM. Two settings make that work:
+
+1. **Point the runner at colima's socket** with `DOCKER_HOST` when you start it.
+2. **Don't mount that socket into jobs.** By default the runner mounts the Docker socket into every job container, and colima's socket path exists on the Mac but not inside the VM, so every job fails with `error while creating mount source path`. Set `docker_host: "-"` under `container:` in `config.yaml`.
+
+```bash
+gitea-runner config generate > config.yaml
+sed -i '' 's|^  #docker_host: ""|  docker_host: "-"|' config.yaml
+DOCKER_HOST=unix://$HOME/.colima/default/docker.sock gitea-runner daemon --config config.yaml
+```
+
+Register with the same `--config config.yaml`. (Docker Desktop doesn't need either setting.)
+
+### JavaScript actions
+
+`actions/checkout`, `actions/cache`, and most marketplace actions are JavaScript. The runner runs them with `node` from the job's environment:
+
+- **Container jobs** need `node` in the image (the `node:*` images, and Oak's own CI image, have it).
+- **Host jobs** need `node` on the machine's `PATH`. [Bun](https://bun.sh) works in its place: `ln -s "$(command -v bun)" /usr/local/bin/node`.
+
+### Oak's own CI image
+
+oakspace's CI runs on runners carrying the `oak-ci` label, served by an image built from this repo:
+
+```bash
+docker build -t oak-ci:latest infra/ci-runner
+gitea-runner register ... --labels oak-ci:docker://oak-ci:latest
+```
+
+It has Rust (the toolchain the repo pins, with `rustfmt`, `clippy`, `cargo-nextest`), Bun standing in for Node, PostgreSQL, and the C toolchain. Use it as a starting point for your own.
+
+### Security
+
+- **A runner runs code from anyone who can push.** Every repo in the organization with CI on can send jobs to every runner with matching labels, and a job can read the repo's [CI secrets](/docs/ci#secrets). Treat a runner like any machine that builds untrusted pull requests: prefer container labels, don't register a machine whose own files or credentials matter in host mode, and keep separate runners (and labels) for separate trust levels.
+- **Runners belong to one organization.** They only ever receive that organization's jobs, and each job only gets a token for its own repo, valid while the job runs.
+- **Credentials are stored hashed.** Remove a runner under **Settings → Runners** and its credentials stop working at once; reset the registration token if it leaked.
+- **Environment runners.** An [environment](/docs/ci-environments) sends its jobs only to runners bound to it, which the repo's organization owners and admins choose. A bound runner takes no ordinary CI at all, so code from an ordinary branch push never runs on the machine that receives the environment's secrets. Give an environment its own runner (its own machine, ideally) rather than binding the one your everyday CI uses.
+- **Network.** Runners make outbound HTTPS requests to oak.space, and to github.com to fetch `uses:` actions (`runner.github_mirror` in the config points elsewhere).
+
+### Status and failure modes
+
+| You see | Meaning |
+|---|---|
+| Runner *online* | It polled within the last minute and is idle. |
+| Runner *running a job* | Busy; the job is linked on the settings page. |
+| Runner *offline* | Not heard from in a minute — stopped, asleep, or off the network. |
+| Job "waiting for a runner with `linux, x64`" | No online runner carries all those labels. If none in the organization does, the run page says so. |
+| Job failed: "The runner stopped reporting on this job." | Its runner went silent for 10 minutes mid-job (killed, rebooted, removed). Re-run it. |
+| Job cancelled: "No runner picked this job up in time." | Nothing took it for 24 hours. |
+| The runner logs "unregistered" and exits | It was removed, or its `.runner` file belongs to another server. Register it again. |
+
+<!-- https://oak.space/docs/ci-environments -->
+## Environments
+
+An **environment** is a named place your CI deploys to — `production`, `staging`, `app-store` — with its own secrets and its own rules about who can deploy, from which branches, and on which machines. It's how you keep a signing key or a deploy credential away from the rest of your CI.
+
+[CI secrets](/docs/ci#secrets) are available to every workflow on every branch, so anyone who can push can read them. An environment's secrets are much harder to reach. A job receives them only when all of these hold:
+
+- the job declares the environment (`environment: production`),
+- someone allowed to deploy approved that exact commit and workflow,
+- the commit is the current head of a branch the environment allows,
+- and the job runs on a runner dedicated to the environment, which runs nothing else.
+
+Environment workflows never run on a push or a merge. They run when someone deploys them.
+
+### Set one up
+
+Environments are configured by the repository's **managers** (organization owners and admins) in the repo's **Settings → Environments**, or over the [API](#api).
+
+1. **Create it.** A new environment is enabled, requires a reviewer, and allows deploying from `main`.
+
+2. **Add its secrets and variables.** Secret values are encrypted and never shown again; variables are plain values anyone with write access can read.
+
+3. **Add reviewers** — the people who may approve a deploy. They need read access to the repo. (Or turn off **Required reviewers** to let anyone with write access deploy.)
+
+4. **Dedicate a runner.** Register a [runner](/docs/ci-runners) for it, ideally on a machine that holds nothing else, and bind it to the environment. A bound runner takes only that environment's jobs — never ordinary CI — so code from an arbitrary branch never runs where the secrets land.
+
+5. **Point a workflow at it.** Give the job `environment:` and a manual trigger:
+
+   ```yaml
+   # .oak/workflows/release.yml
+   on: [workflow_dispatch]
+   jobs:
+     release:
+       runs-on: release-mac
+       environment: production
+       steps:
+         - uses: actions/checkout@v4
+         - run: ./scripts/release.sh
+           env:
+             SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+   ```
+
+   An environment workflow has exactly one job. `environment:` also takes GitHub's mapping form, `{name: production, url: https://example.com}`. The name must be written out: it can't come from an expression.
+
+6. **Deploy it** (below).
+
+### Deploy
+
+```bash
+oak ci deploy --environment production            # preview, confirm, deploy main's head
+oak ci deploy -e production --workflow release --branch main --yes
+oak ci deploy -e production --dry-run             # just show what would deploy
+```
+
+A deploy has two steps. First Oak shows what would run: the branch head, the workflow and its exact content hash, the environment's current policy version, its reviewers, and anything in the way. Then you approve exactly those values. If anything moves in between, the approval is refused: the branch gets a new commit, the workflow changes, or someone edits the environment. You re-review the new state; nothing runs that you didn't see.
+
+An approval starts one run and is good for 30 minutes. The first runner bound to the environment that polls takes the job. Just before it hands the job over, Oak checks every rule again: environment enabled, same policy, head unchanged, approver still allowed, runner still bound. If anything failed, the run fails and nothing is sent.
+
+The same deploy is available from **Settings → Environments → Deploy**, and over the API as a preview (`GET …/release-preview`) followed by an authorization (`POST …/ci/release-authorizations`) carrying the preview's values. An API key used to deploy must carry the explicit [`release` scope](/docs/api-keys).
+
+### Protection rules
+
+| Rule | Default | What it does |
+|---|---|---|
+| **Enabled** | on | A disabled environment deploys nothing. |
+| **Branches** | `main` | Only the current head of one of these branches can be deployed. |
+| **Required reviewers** | on | Only listed reviewers can approve a deploy. Off: anyone with write access can. Removing the last reviewer doesn't open it up; with this on and nobody listed, nobody can deploy. |
+| **Workflow pins** | none | With no pins, any workflow whose job declares the environment can deploy. Add pins to allow only those workflow files. A pin can also fix the file's exact content hash, so even a merged change to the workflow can't deploy until someone re-pins it. |
+| **Runners** | none | The runners that take this environment's jobs. At least one must be online to approve a deploy. |
+
+Every change to an environment moves its **policy version**, which cancels any approval made against the old settings.
+
+Platform administrators of the Oak instance can also approve deploys.
+
+### What the job sees
+
+- **Secrets:** the environment's secrets, through `${{ secrets.NAME }}` as usual, plus the job's own `GITHUB_TOKEN`. Your repo's ordinary CI secrets are *not* included, so an environment job only ever has what you put in the environment.
+- **Variables:** as environment variables, and as `${{ vars.NAME }}`.
+- **Who and what:** besides the usual `OAK_CI_RUN_ID`, `OAK_CI_COMMIT`, and `OAK_CI_BRANCH`, the job gets `OAK_CI_ENVIRONMENT_NAME`, `OAK_CI_POLICY_VERSION`, `OAK_CI_AUTHORIZATION_ID`, `OAK_CI_WORKFLOW_PATH`, and `OAK_CI_WORKFLOW_HASH`, so a deploy script can record exactly what was approved.
+
+Two rules keep secrets from leaking sideways. A secret and a variable in one environment can't share a name. And an ordinary repo secret with the same name as any environment secret is withheld from ordinary jobs, so deleting a key from your CI secrets and adding it to an environment really moves it. Delete the ordinary copy.
+
+Each line of a secret must be at least 4 characters, so the runner can mask it in logs.
+
+### Who can do what
+
+| | Reader | Writer | Owner / admin |
+|---|---|---|---|
+| See an environment's settings, variables, and secret names | | ✓ | ✓ |
+| Create, change, or delete an environment, its secrets, reviewers, and runners | | | ✓ |
+| Deploy | if a reviewer | if a reviewer, or reviewers aren't required | if a reviewer, or reviewers aren't required |
+
+An API key that changes an environment needs the `admin` scope. One that deploys needs `release`.
+
+### Differences from GitHub
+
+| GitHub Actions | On Oak |
+|---|---|
+| A job with `environment:` runs on push and waits for approval | It runs only when someone deploys it, at a commit they approved |
+| Any runner with matching labels | Only runners bound to the environment, which take no other jobs |
+| Environment secrets plus repo secrets | Environment secrets only |
+| Deployment branch rules, wait timers, custom rules | Branch list, required reviewers, workflow pins; no wait timers yet |
+| A workflow can mix environment and ordinary jobs | An environment workflow has exactly one job |
+| `environment:` from an expression | A fixed name |
+
+### API
+
+All under `/api/{owner}/{name}/ci/`, authenticated like the rest of the [API](/docs/api).
+
+| Method and path | Who | Does |
+|---|---|---|
+| `GET environments` | write access | List environments with their settings, variables, secret names, reviewers, and runners. |
+| `GET environments/{env}` | write access | One environment. |
+| `PUT environments/{env}` | owner/admin | Create it, or change some settings: `{"enabled", "required_reviewers", "branches": [...], "workflows": [{"path", "hash"}]}`. Fields you leave out stay as they are. `201` when created. |
+| `DELETE environments/{env}` | owner/admin | Delete it. Its runners go back to taking ordinary CI. |
+| `PUT` / `DELETE environments/{env}/secrets/{NAME}` | owner/admin | Set (`{"value": "..."}`) or delete a secret. |
+| `PUT` / `DELETE environments/{env}/variables/{NAME}` | owner/admin | Set (`{"value": "..."}`) or delete a variable. |
+| `PUT` / `DELETE environments/{env}/reviewers/{username}` | owner/admin | Add or remove a reviewer. |
+| `PUT` / `DELETE environments/{env}/runners/{runner-uuid}` | owner/admin | Bind or unbind one of the organization's runners. |
+| `GET environments/{env}/release-preview?workflow=&branch=` | read access | What a deploy would carry right now, whether you may approve it, and what's in the way. |
+| `POST release-authorizations` | per the environment | Approve and start one deploy: `{"environment", "branch", "commit", "workflow_path", "workflow_hash", "event": "manual", "policy_version"}`, copied from the preview. Returns `{"authorization_id", "run_id"}`. |
+
+<!-- https://oak.space/docs/organizations -->
+## Organizations and access
+
+### Organizations
+
+Every repository belongs to an **organization**, and its URL is `oak.space/\<organization\>/\<repo\>`. Every account comes with a **personal organization** named after its username; create shared ones for teams and companies from your dashboard (or `POST /api/orgs`).
+
+The organization is also where storage is accounted and **deduplicated**: content is stored once per organization, so the same large asset committed to five of its repos costs one copy. Storage quotas are per organization — see [Plans and limits](/docs/limits) — and so are [CI runners](/docs/ci-runners): an organization's runners take only its repos' jobs, managed under **Settings → Runners**.
+
+A personal organization always has exactly one member. To work with others, create a shared organization and invite them.
+
+### Members and roles
+
+| Role | Can |
+|---|---|
+| **Owner** | Everything, including deleting the organization. |
+| **Admin** | Manage members, groups, repository access, service accounts, and settings. Full access to every repo. |
+| **Member** | Create repos in the organization, and read or write the repos they've been given access to. |
+
+Manage members under **Settings → Members** on the organization's page (`oak.space/\<org\>/settings`). Admins and owners can always read and write every repo in the organization, and are the only people who can change a repo's [path permissions](/docs/path-permissions) once they're set up.
+
+### Who can see a repository
+
+A **public** repo can be read by anyone, signed in or not — on the web, with `oak clone`, and with stock `git clone`. Only people with write access can push branches or merge.
+
+A **private** repo can be read by:
+
+- the organization's **owners and admins**, and
+- people added to that repo as **collaborators**, with either the `reader` or `writer` role.
+
+Note that being a plain **member** of the organization doesn't by itself grant access to its private repos — add members as collaborators on the repos they need. Manage collaborators under the organization's **Settings → Repository access**; invited people get an email.
+
+Change a repo's visibility under the repo's **Settings**, or with `PATCH /api/{owner}/{name}/visibility`.
+
+Inside a repo, [path permissions](/docs/path-permissions) can narrow access to particular directories, or publish parts of a private repo to everyone.
+
+### Groups
+
+A **group** is a named list of an organization's members, such as `sec-team` or `contractors`. Groups exist so that [`.oak/PERMISSIONS`](/docs/path-permissions) can grant access to `@group/sec-team` instead of listing people one by one — membership is managed in one place, here, rather than in every repo's file.
+
+Owners and admins manage groups under **Settings → Groups**, or with the [API](/docs/api#organizations).
+
+### Service accounts
+
+A **service account** (listed as **Agents** in organization settings) is a non-human identity for automation — a deploy bot, a CI system, a long-running coding agent. It gets its own API keys with explicit scopes, and its actions show under its own name in the audit log. See [API keys and tokens](/docs/api-keys#service-accounts).
+
+### Moving and renaming
+
+- **Transfer a repo** to another organization from the repo's **Settings** (or `POST /api/{owner}/{name}/transfer`). Its history, branches, and settings come along.
+- **Rename a repo** from its **Settings**.
+- **Rename an organization's slug** from the organization's **Settings → General**. URLs that use the old slug stop working, so update remotes and links.
+
+### Audit log
+
+Owners and admins can see who did what — membership changes, merges, forced merges past CI, settings changes — at `oak.space/orgs/\<org\>/audit`, or `GET /api/orgs/{slug}/audit`.
+
+### The organization page
+
+`oak.space/\<org\>` is the organization's landing page. Under **Settings → Page** you can give it an About section in Markdown, an image, custom CSS, and choose whether it's public. To serve a whole static site from a repo, see [Sites](/docs/sites).
+
+<!-- https://oak.space/docs/path-permissions -->
+## Path permissions
+
+[Repository access](/docs/organizations#who-can-see-a-repository) decides who can see a repo at all. **Path permissions** change that *inside* the tree, in both directions: hide a directory from most readers, or publish one directory of a private repo to the world.
+
+They're declared in a file in the repo — `.oak/PERMISSIONS`, shaped like `CODEOWNERS` — and always read from the tip of `main`.
+
+### The file
+
+```text
+# Anything not listed is readable by anyone who can read the repo.
+
+infra/secrets/**   @zdgeier @group/sec-team
+scripts/           @group/ops
+scripts/public/    *            # re-opened underneath a locked parent
+vault/                          # no principals = org owners and admins only
+
+[Open source]                   # a label, for the settings UI
+cli/               @public      # published to the world
+```
+
+Each line is a **pattern** followed by the **principals** allowed to read what it matches.
+
+| Principal | Means |
+|---|---|
+| `@alice` | The user `alice`. |
+| `@group/ops` | Every member of the organization's [`ops` group](/docs/organizations#groups). |
+| `*` | Everyone who can already read the repo. |
+| `@public` | Everyone, including people with no access to the repo at all. |
+| *(none)* | Organization owners and admins only. |
+
+Owners and admins always have full access, whatever the file says.
+
+### Matching
+
+Patterns work like `.gitignore`, and **the last matching line wins**.
+
+- `foo/` matches the directory `foo` and everything in it; `foo` matches a file *or* directory named `foo`.
+- A pattern with no `/` matches at any depth — `*.pem` covers `certs/prod.pem`. A pattern containing `/` is anchored to the repo root, as is one starting with `/`.
+- `*` doesn't cross `/`; `**` does.
+- `#` starts a comment; `\#` is a literal `#`, and `\ ` a literal space.
+- `[Section name]` lines just label the entries after them in the UI. They don't affect matching.
+
+Last-match-wins is what makes re-opening read naturally: put the narrower line *after* the one that locks its parent. It also means order matters — moving a broad line below a narrow one changes what the narrow one does.
+
+### Restricting paths
+
+For someone who can read the repo, a path no line matches is readable, and lines take access away.
+
+What a restricted path looks like to someone without access:
+
+- **Contents are withheld; names and sizes stay visible.** Oak's trees are content-addressed and verified by the client, so the server can't hide entries from `oak clone`, `oak pull`, or a mount without breaking that verification. Restricted files arrive empty or absent, and the CLI tells you which were withheld.
+- **The web UI, zip downloads, the `git clone` snapshot, the GitHub mirror, and [Sites](/docs/sites)** leave restricted entries out entirely.
+- **Writes are refused.** A push or revert that changes a restricted path is rejected unless the pusher has access. Merging `main` into your branch with `oak pull` is fine — carrying the restricted files along unchanged isn't a write.
+- If identical content also lives at a path you *can* read, you can read those bytes there.
+
+### Publishing paths with @public
+
+`@public` runs the file the other way, for people who have **no** access to the repo. For them, a path is hidden unless a line grants it to `@public`. That's how one private repo can contain a genuinely open-source subtree — and it fails safe: forget a rule, and too little is published, never too much.
+
+Outsiders can read a published subtree:
+
+- in the web UI (file tree, file view, zip download), and
+- with stock Git: `git clone https://oak.space/\<org\>/\<repo\>.git` returns only the public paths.
+
+They can't use `oak clone`, `oak pull`, or `oak mount` — that protocol has to send whole trees, which would reveal the names and sizes of everything private. Branches, commits, diffs, and CI also stay private. And a private repo with public paths **isn't listed** anywhere; people reach it by direct link.
+
+### Who can change the file
+
+1. The file is read from **`main`**, never from the branch being served — a branch can't grant itself access.
+2. Once a repo has a `.oak/PERMISSIONS`, **only organization owners and admins** can change it. (Before one exists, anyone with write access can create it, so someone can set it up.)
+
+### Editing it
+
+**From the web:** the repo's **Settings → Path permissions** tab shows the server's own reading of the file — every entry, who it grants, any warnings, and whether enforcement is on — and has an editor for people with write access. Saving **proposes a branch** with the change rather than writing `main`, so it lands through a normal merge.
+
+**From the CLI:** it's an ordinary file; commit it, push, and merge like any other change.
+
+> CLI versions up to 0.105.0 skip `.oak/PERMISSIONS` when committing. If `oak status` doesn't show your edit, `oak upgrade`, or make the change from the web editor.
+
+**Over the API:** `GET /api/{owner}/{name}/path-permissions` returns the parsed policy; `POST …/path-permissions/propose` proposes a new file as a branch. See [the API reference](/docs/api#path-permissions).
+
+### When something's wrong with the file
+
+Every failure leans toward denying access:
+
+| Situation | Result |
+|---|---|
+| A pattern can't be parsed | That line is dropped (shown as a warning in Settings). |
+| A user or group doesn't exist | It grants no one. |
+| The file is over 64 KiB or isn't valid UTF-8 | **Everything** is locked to owners and admins. |
+| There's no file | No restrictions. |
+
+### Path permissions and CI
+
+[CI runs](/docs/ci) check out the **whole** tree, restricted paths included — otherwise a repo with a private half couldn't build itself. To keep that safe, a run's logs and status are only visible to people who aren't restricted from anything in the repo. Workflow files are always read in full, even if `.oak/workflows/` is itself restricted.
+
+<!-- https://oak.space/docs/api-keys -->
+## API keys and tokens
+
+Everything that talks to oak.space — the CLI, the [HTTP API](/docs/api), CI jobs, agents — authenticates with a bearer token:
+
+```text
+Authorization: Bearer oak_...
+```
+
+There are three kinds of token.
+
+| Token | Comes from | Lifetime | Use it for |
+|---|---|---|---|
+| **Login session** | `oak login` | 90 days | You, at your own terminal. |
+| **Personal API key** | You create it | Until revoked | Scripts and tools acting as you. |
+| **Service-account key** | An org admin creates it | Until revoked | Bots, CI systems, and agents with their own identity. |
+
+### Personal API keys
+
+Create one under **Settings → API keys** on oak.space, or over the API:
+
+```bash
+curl -X POST https://oak.space/api/api-keys \
+  -H "Authorization: Bearer $OAK_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "release script", "scope": "read", "repo": "acme/web"}'
+```
+
+| Field | Value |
+|---|---|
+| `name` | 1–100 characters, for your own reference. |
+| `scope` | `full` (default) or `read` — a read key can only make read requests. |
+| `repo` | Optional `owner/name`. The key then works only for that one repo. |
+
+**The full key is shown once**, when it's created. After that only its first characters are displayed, so store it somewhere safe. List your keys with `GET /api/api-keys` and revoke one with `DELETE /api/api-keys/{id}`.
+
+A personal key acts as you, with your access — a repo-scoped or read-only key can only do less, never more.
+
+### Service accounts
+
+A **service account** is a non-human identity owned by an organization — a deploy bot, an external CI system, a coding agent that runs unattended. Its actions show up under its own name in the audit log, and its keys carry explicit **scopes**, so you can give it exactly what its job needs.
+
+Organization owners and admins manage them under the organization's **Settings → Agents**, or over the API:
+
+```bash
+# Create the account
+curl -X POST https://oak.space/api/orgs/acme/service-accounts \
+  -H "Authorization: Bearer $OAK_TOKEN" -H "Content-Type: application/json" \
+  -d '{"name": "nightly-agent", "display_name": "Nightly refactor agent"}'
+
+# Give it a key that can push branches but never merge
+curl -X POST https://oak.space/api/orgs/acme/service-accounts/nightly-agent/keys \
+  -H "Authorization: Bearer $OAK_TOKEN" -H "Content-Type: application/json" \
+  -d '{"name": "prod", "scopes": "read,write"}'
+```
+
+| Scope | Allows |
+|---|---|
+| `read` | Every read request: clone, pull, list, view. |
+| `write` | Push branches, create repos and branches, and other changes — except the ones below. |
+| `merge` | Merge branches onto `main`. |
+| `admin` | Organization management (`/api/orgs/...`), and changing a repo's [environments](/docs/ci-environments). |
+| `release` | Deploy to an [environment](/docs/ci-environments) (`oak ci deploy`). Never implied by any other scope, including `admin`. |
+
+Scopes are required on service-account keys. A key can never do more than the person who created it can. A request outside a key's scopes gets a **403** naming the missing scope.
+
+Disable a service account (`PATCH …/service-accounts/{name}` with `{"disabled": true}`) to stop all its keys at once, or delete it. Revoke one key with `DELETE …/service-accounts/{name}/keys/{key_id}`.
+
+> **For coding agents**, a `read,write` service-account key is a good default: the agent can clone, push its branches, and file what it did, but can't merge to `main` — merging stays a human decision.
+
+### Using a key with the CLI
+
+```bash
+export OAK_API_KEY=oak_...
+oak clone acme/web
+oak auth status       # confirms which credential is in use and who it resolves to
+```
+
+The CLI picks its credential in this order:
+
+1. `OAK_API_KEY`, if set.
+2. A key stored in the checkout itself (`oak clone` saves one, bound to the server it came from).
+3. Your `oak login` session for that server, from `~/.oak/credentials`.
+
+If a push or pull unexpectedly says a repo you know exists isn't found, a stale key from step 2 is the usual suspect — `oak auth status` shows which source is winning.
+
+### Using a key with the API
+
+```bash
+curl https://oak.space/api/repos -H "Authorization: Bearer $OAK_API_KEY"
+```
+
+See the [HTTP API reference](/docs/api).
+
+<!-- https://oak.space/docs/limits -->
+## Plans and limits
+
+Oak is **free while it's in beta**. Every organization gets the same generous allowances, and nothing is behind a paywall. Paid plans will come back after the beta; if you need more than what's here in the meantime, email [zach@oak.space](mailto:zach@oak.space).
+
+### Beta allowances
+
+| | Per organization |
+|---|---|
+| Storage | 100 GB |
+| Repositories | Unlimited (up to 1,000) |
+| Members | Unlimited |
+| Open branches | Unlimited |
+| CI runners | Unlimited — your own machines |
+
+### Storage
+
+Storage is counted per organization, after deduplication: content shared between repos — or between versions of a file — is stored and counted once. See an organization's usage on its **Settings** page, or `GET /api/orgs/{slug}/storage`; a single repo's with `GET /api/{owner}/{name}/size`.
+
+The storage quota is enforced: a push that would exceed it is refused. Oak emails the organization's owners as it gets close.
+
+### CI
+
+CI runs on [your own runners](/docs/ci-runners), so there are no CI minutes or concurrency limits: more runners run more jobs at once. A whole run is stopped and marked `timed_out` after **6 hours**; a job whose runner stops reporting for 10 minutes fails; and a job no runner picks up within 24 hours is cancelled.
+
+More in [Continuous integration](/docs/ci#limits).
+
+### Hard limits
+
+These apply on every plan.
+
+| Limit | Value |
+|---|---|
+| Repositories per organization | 1,000 |
+| Branches per repository (open and closed) | 10,000 |
+| Data in a single push | 25 GiB |
+| File versions (blobs) in a single push | 50,000 |
+| Organizations you can own | 10 |
+| Workflow file size | 64 KiB |
+| CI secret value | 64 KiB |
+| CI cache per repository | 10 GiB |
+| `.oak/PERMISSIONS` file | 64 KiB |
+
+If one of these is in your way, [say so](mailto:zach@oak.space).
+
+<!-- https://oak.space/docs/git -->
+## Git import, export, and interop
+
+Oak is designed to be easy to arrive at and easy to leave. This page covers every way code moves between Git and Oak.
+
+| You want to… | Use |
+|---|---|
+| Bring a GitHub repo over, with nothing installed | [Import from GitHub on the web](#import-from-github-on-the-web) |
+| Bring any Git repo over from the terminal | [`oak clone <git-url>`](#import-with-oak-clone) |
+| Convert a Git checkout you already have | [`oak init` in place](#convert-a-checkout-in-place) |
+| Start a repo from a folder in the browser | [Upload a folder](#upload-a-folder) |
+| Get full history back out as Git | [`oak export`](#export-back-to-git) |
+| Let Git tooling read an Oak repo | [`git clone …/.git`](#clone-an-oak-repo-with-git) |
+| Keep a copy on GitHub, or run GitHub Actions | [GitHub mirror](#mirror-to-github) |
+
+### Import from GitHub on the web
+
+No CLI, no Git — oak.space clones and converts the repo on its servers.
+
+1. **Connect GitHub, once:** under **Settings → GitHub**, choose **Connect GitHub** and install Oak's GitHub App on the repositories you want (all, or a selection). For importing, Oak asks only for **read** access and mints a short-lived, single-repo token for each import.
+2. **Pick a repo:** the **Import from GitHub** panel on your dashboard lists the repositories your connection can see.
+3. **Choose what to bring:** the **branch** to import and the **destination organization**; optionally a different name, public visibility, and collaborators to invite. Oak checks the name is free as you type.
+4. **Import:** a progress page streams status and opens the new Oak repo when it's done.
+
+The web importer brings the **one branch you choose** straight onto the server as `main` — there's nothing to push afterwards. Run `oak clone \<org\>/\<repo\>` (or [mount it](/docs/mounts)) to get a working copy.
+
+### Import with oak clone
+
+```bash
+oak clone https://github.com/acme/web.git
+oak clone git@github.com:acme/web.git
+oak clone https://git.example.com/acme/web.git my-dir    # choose the directory
+```
+
+Oak runs your system `git clone` (so `git` must be on your `PATH`, and your Git credentials apply), creates an Oak repo, replays every commit onto `main`, and leaves you on a personal branch at the tip. It then offers to delete the now-redundant `.git` directory — keeping it if you decline or there's no terminal to ask.
+
+**What counts as a Git URL:** anything starting with `git@`, `ssh://`, or `git://`; anything ending in `.git`; and github.com, gitlab.com, and bitbucket.org URLs. For a self-hosted server over HTTPS, make sure the URL ends in `.git` so Oak doesn't read it as an Oak `org/repo`.
+
+Oak-only flags (`--branch`, `--path`, `--detached`, `--from`, `--json`) are rejected with a Git URL — the importer always brings the checked-out history.
+
+### Convert a checkout in place
+
+```bash
+cd my-existing-git-repo
+oak init
+# Detected an existing git repository here. Import its history into oak?
+```
+
+Accept, and Oak replays the Git history onto `main`, puts you on a personal branch at the tip, and offers to remove `.git`. Decline, and your `.git` is untouched — handy if you want to keep using Git alongside for a while. (The prompt needs a terminal.)
+
+### Publish what you imported
+
+A CLI import lives on your machine until you push. The first push names the owner, which creates the repo on oak.space:
+
+```bash
+oak push --repo acme/web
+```
+
+Then merge your branch, or start working — see the [Quickstart](/docs/quickstart).
+
+### What's preserved
+
+**Kept:**
+
+- The full commit graph in order, including both parents of merge commits.
+- Every commit's original author, email, message, and timestamp.
+- File modes: regular, executable, and symlinks.
+
+**Dropped or simplified:**
+
+- **Submodules** are skipped — Oak has no submodule concept.
+- **Octopus merges** (three or more parents) keep their first two parents.
+- **Only one line of history** comes across: the checked-out `HEAD` for CLI imports, or the branch you pick on the web. Other branches and tags aren't recreated.
+
+Your first `oak status` after importing is clean: Oak rewrites the working tree from its own records, so `.gitattributes` smudge filters and leftover submodule directories don't show up as changes. Your `.gitignore` keeps working — Oak reads it when there's no `.oakignore`.
+
+### Upload a folder
+
+When creating a repo on oak.space, you can upload a folder from your computer instead of starting empty. The import dialog has presets for Godot, Unity, and Unreal projects that skip their generated directories. Files can also be uploaded into an existing repo from its page.
+
+### Export back to Git
+
+```bash
+oak export ../web-as-git
+oak export ../web-as-git --branch main --git-branch main
+```
+
+`oak export` replays an Oak branch's history (by default the current one) into a brand-new Git repository, preserving each commit's author, email, and timestamp. Push it anywhere. This is Oak's documented escape hatch: your code and its history are never trapped.
+
+| Flag | Effect |
+|---|---|
+| `-b, --branch` | The Oak branch to export (default: current). |
+| `--git-branch` | Name of the branch in the Git repo (default: same as the Oak branch). |
+| `-f, --force` | Write into a destination that isn't empty. |
+| `--tree-only --at \<commit\>` | Write just one commit's files, without history. |
+
+### Clone an Oak repo with Git
+
+```bash
+git clone https://oak.space/acme/web.git
+```
+
+Every Oak repo can be cloned by stock Git — and anything built on it, like package managers, deploy scripts, or Claude Code's `/plugin marketplace add` — as a **read-only snapshot of `main`**:
+
+- It's a **single commit** containing `main`'s current files, with no history. Use `oak export` for history.
+- It's **fetch-only**; `git push` to it fails.
+- It works for **public repos**, and for the `@public` paths of a private repo. The endpoint doesn't accept API keys or passwords yet, so a private repo answers "not found" to `git` — use `oak clone` or `oak export` for those.
+- [Path permissions](/docs/path-permissions) apply: restricted files are left out, and for outsiders only `@public` paths are included.
+
+### Mirror to GitHub
+
+A repo can keep a copy of `main` on GitHub — as a backup, or to run GitHub Actions or other GitHub-side tooling. Set it up under the repo's **Settings → Export**:
+
+1. Create an **empty** repo on GitHub, and make sure Oak's GitHub App (or your connected GitHub account) can push to it.
+2. Choose it, and the branch to mirror to.
+
+On every merge to `main` (and whenever you click **Sync now**), Oak writes `main`'s current files to that GitHub branch as **a single snapshot commit and force-pushes it**. Like the Git clone endpoint, it's the current state, not a history replay. Because it force-pushes, use a repo or branch dedicated to the mirror; Oak refuses to overwrite a branch whose latest commit it didn't create. Files over 100 MB can't be mirrored (GitHub's limit), and restricted paths are left out.
+
+<!-- https://oak.space/docs/webhooks -->
+## Webhooks
+
+A webhook makes oak.space send an HTTP `POST` to a URL of yours when something happens in a repo — to notify a chat channel, kick off an external build, or update a dashboard.
+
+### Events
+
+| Event | Fires when |
+|---|---|
+| `branch.created` | A branch is pushed for the first time. |
+| `push` | An existing branch gets new commits (including a revert). |
+| `merge` | A branch is squash-merged onto `main`. |
+
+These are the same events [CI workflows](/docs/ci-workflows#on) trigger on.
+
+### Add a webhook
+
+Under the repo's **Settings → Webhooks** (you need write access), enter:
+
+- the **URL** to deliver to — it must resolve to a public address;
+- a **secret**, to sign deliveries (recommended);
+- which **events** to send. Choosing none means all of them.
+
+Or over the API:
+
+```bash
+curl -X POST https://oak.space/api/acme/web/webhooks \
+  -H "Authorization: Bearer $OAK_API_KEY" -H "Content-Type: application/json" \
+  -d '{"url": "https://ci.example.com/oak", "secret": "s3cret", "events": ["push", "branch.created"]}'
+```
+
+List them with `GET /api/{owner}/{name}/webhooks` and remove one with `DELETE /api/{owner}/{name}/webhooks/{id}`.
+
+### Payload
+
+Each delivery is a JSON `POST`:
+
+```http
+POST /oak HTTP/1.1
+Content-Type: application/json
+User-Agent: oak-webhooks/1
+X-Oak-Event: push
+X-Oak-Delivery-Id: 7f3c…
+X-Oak-Signature-256: sha256=5d61…
+
+{
+  "event": "push",
+  "owner": "acme",
+  "repo": "web",
+  "branch": "fix-login-redirect",
+  "commit": "8fcf5aed1b2c…",
+  "pusher": "zdgeier",
+  "timestamp": "2026-10-06T17:04:11.512Z"
+}
+```
+
+| Field | Value |
+|---|---|
+| `event` | `push`, `branch.created`, or `merge`. |
+| `owner`, `repo` | The repository. |
+| `branch` | The branch the event is about. |
+| `commit` | The resulting commit — for `merge`, the new squash commit on `main`. |
+| `pusher` | Who pushed or merged. |
+| `timestamp` | When the event happened (RFC 3339, UTC). |
+
+Fields that don't apply are left out rather than sent as `null`. `X-Oak-Delivery-Id`, when present, is unique per delivery — use it to ignore duplicates.
+
+### Verify the signature
+
+When a webhook has a secret, `X-Oak-Signature-256` is `sha256=` followed by the hex HMAC-SHA256 of the raw request body, keyed with the secret. Compute it over the bytes exactly as received, before parsing the JSON, and compare in constant time:
+
+```python
+import hmac, hashlib
+
+def verify(secret: str, body: bytes, header: str) -> bool:
+    expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, header or "")
+```
+
+```js
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(secret, rawBody, header = "") {
+  const expected = "sha256=" + createHmac("sha256", secret).update(rawBody).digest("hex");
+  return expected.length === header.length && timingSafeEqual(Buffer.from(expected), Buffer.from(header));
+}
+```
+
+### Discord
+
+Paste a Discord channel webhook URL (`https://discord.com/api/webhooks/…`) and Oak recognizes it: instead of the JSON payload, it posts a readable message to the channel. No secret is needed, and no signature is sent.
+
+### Delivery
+
+- Deliveries are best-effort, sent shortly after the event.
+- Oak checks that the URL resolves to a public address both when you add it and again before every delivery, and skips it otherwise — so a webhook can't be pointed at internal networks.
+- Respond quickly with any `2xx`; do slow work after responding.
+
+### Using webhooks for external CI
+
+A webhook is how you'd drive an external CI system: listen for `push` and `branch.created`, then fetch that commit with an [API key](/docs/api-keys) — `oak clone acme/web --branch <branch>`. External systems can't yet report their status into Oak's [merge gate](/docs/merging#the-ci-merge-gate); for that, use [Oak's native CI](/docs/ci).
+
+<!-- https://oak.space/docs/sites -->
+## Sites
+
+Every organization can publish one static website, served from a repo's `main` branch at:
+
+```text
+https://<organization>.oak.space/
+```
+
+Your personal organization's site is `https://\<username\>.oak.space/`. Merge to `main` and the site updates — there's no build or deploy step.
+
+### Turn it on
+
+From inside a checkout of the repo you want to publish:
+
+```bash
+oak site enable                          # serve this repo's main branch from the root
+oak site enable --source public          # …or from a subdirectory
+oak site enable --repo acme/website      # …or name the repo explicitly
+```
+
+Then check it:
+
+```bash
+oak site show
+oak site list         # every site you can see
+oak site disable      # take it down
+```
+
+Over the API: `PUT /api/orgs/{slug}/site` with `{"repo": "website", "source_dir": "public"}`, `GET` to read it, `DELETE` to disable. Managing a site needs admin rights on the organization.
+
+### How files are served
+
+- The URL path maps onto files under the source directory at the tip of `main`.
+- `/` serves `index.html`. A path like `/blog/` serves `blog/index.html`, and `/about` tries `about` and then `about/index.html`.
+- If nothing matches, a `404.html` at the root of the source directory is served (with status 404), if there is one.
+- Content types come from file extensions.
+
+It's purely static: no server-side code, redirects file, or build step. Build your site in CI or locally and commit the output, or commit a site that needs no build.
+
+### Visibility
+
+**A site is public**, even when its repo is private — enabling it is the decision to publish. [Path permissions](/docs/path-permissions) still apply: files restricted in the repo are never served.
+
+### Custom domains
+
+There's no built-in custom-domain support yet. To serve a site at your own domain, put a reverse proxy or CDN in front of `\<organization\>.oak.space`.
+
+<!-- https://oak.space/docs/cli -->
+## CLI reference
+
+Every public `oak` command, grouped by what it's for. Run `oak \<command\> --help` for the same information in your terminal; `oak` with no arguments prints a grouped overview.
+
+### Global options
+
+| Option | Effect |
+|---|---|
+| `--verbose` | Print per-phase timings. Goes **before** the command: `oak --verbose push`. Same as `OAK_VERBOSE=1`. |
+| `-h`, `--help` | Help for any command or subcommand. |
+| `--version` | Print the CLI version. |
+
+Commands that talk to a server take `-r, --remote \<URL\>` (default `https://oak.space`). The server used is: the flag, then `OAK_REMOTE`, then the one the checkout is linked to, then the default.
+
+Most commands take `--json` for machine-readable output. Environment variables are listed in [Files and environment variables](/docs/configuration).
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Success. |
+| `1` | General error. |
+| `2` | Usage error (bad flags or arguments, or an interactive prompt with no terminal). |
+| `3` | Repository locked by another `oak` process — retry. (`oak ci status`: still running.) |
+| `4` | The working tree has uncommitted changes that block the operation. |
+| `5` | Merge or sync conflicts, or a conflict is already in progress. |
+| `6` | Network, server, or authentication failure. |
+| `7` | Merge prediction couldn't be certified. |
+| `8` | An integrity check ran out of budget — inconclusive. |
+
+### Setup and sign-in
+
+#### oak init
+
+```text
+oak init [PATH]
+```
+
+Create a repository in `PATH` (default: the current directory) and put you on a personal branch parented onto `main`. On a terminal it offers to import an existing `.git` history, to write an `.oakignore` for a detected Godot / Unity / Unreal project, and to write an `AGENTS.md` for coding agents. Refuses to run in your home directory.
+
+#### oak clone
+
+```text
+oak clone [ORG/REPO | GIT-URL] [DEST]
+```
+
+Clone a repository and put you on a personal branch. With no argument, pick from a list. A bare `REPO` means your personal organization. A Git URL is imported instead — see [Git import](/docs/git#import-with-oak-clone).
+
+| Flag | Effect |
+|---|---|
+| `--branch \<NAME\>` | Switch to this remote branch after cloning. |
+| `--expected-head \<HASH\>` | With `--branch`: fail unless the branch is open at exactly this commit. |
+| `--shallow` | Only the latest commit on `main`. |
+| `--path \<PREFIX\>` | [Sparse clone](/docs/sparse-clones): only these paths. Repeatable or comma-separated. |
+| `--detached` | Check out `main`'s head with no personal branch. |
+| `--from \<CHECKOUT\>` | Reuse content from another local checkout of the same repo. |
+| `--json` | Print a machine-readable receipt. |
+| `--allow-unverified-integrity` | Continue when the server's integrity proof is inconclusive (otherwise exit 8). |
+| `-r, --remote \<URL\>` | Server to clone from. |
+
+#### oak login / logout / whoami
+
+```text
+oak login  [-r URL]
+oak logout [-r URL]
+oak whoami [-r URL]
+```
+
+`oak login` signs in through your browser (or prints a URL and asks for a one-time code when there's no browser) and saves a token in `~/.oak/credentials`. `whoami` prints the signed-in username. See [Install and sign in](/docs/install#sign-in).
+
+#### oak auth status
+
+```text
+oak auth status [--json] [-r URL]
+```
+
+Show which credential the CLI would use — `OAK_API_KEY`, the checkout's key, or your login — and who the server says it belongs to. Never prints the secret.
+
+#### oak repo list
+
+```text
+oak repo list [--org ORG] [--limit N] [--json] [-r URL]
+```
+
+List repositories you can see (public ones only when signed out). `--limit` defaults to 200.
+
+#### oak skill install
+
+```text
+oak skill install [--global]
+```
+
+Install the bundled `oak-vcs` agent skill into `./.claude/skills/` (or `~/.claude/skills/` with `--global`). Re-run after upgrading. See [Working with agents](/docs/agents#install-the-agent-skill).
+
+#### oak upgrade
+
+```text
+oak upgrade [-f] [--canary]
+```
+
+Upgrade to the latest signed release. `-f` skips the confirmation; `--canary` follows the pre-release channel.
+
+#### oak completions
+
+```text
+oak completions <bash | zsh | fish | elvish | powershell>
+```
+
+Print a shell-completion script.
+
+### Working tree
+
+#### oak status
+
+```text
+oak status [--json [--compact]] [--short | --porcelain] [--reconcile]
+```
+
+Show modified, added, and deleted files. `--short` / `--porcelain` print Git-compatible short rows; `--json --compact` is bounded output for agents; `--reconcile` applies any pending reconciliation after a remote merge first.
+
+#### oak diff
+
+```text
+oak diff [REV [REV]] [PATHS...] [options]
+```
+
+Show changes. With no revision: the working tree against your last checkpoint. One branch name: what that branch contributes, no checkout needed. One commit: that commit against the working tree. Two revisions: between them. On a terminal, opens the full-screen viewer.
+
+| Flag | Effect |
+|---|---|
+| `--branch` | The whole current branch (checkpoints + uncommitted) against where it forked. |
+| `--against <BRANCH>` | Base for a branch endpoint (default: its parent). |
+| `--mode <contribution \| tree \| net-merge>` | Perspective for branch endpoints. See [Reviewing](/docs/reviewing#read-a-diff-without-switching). |
+| `--print` | Print a unified diff instead of opening the viewer. |
+| `--stat` | Per-file added/removed counts. |
+| `--name-only` | Only the changed paths. |
+| `--word-diff` | With `--print`: mark changes within lines. |
+| `-U, --unified \<N\>` | Lines of context. |
+| `--check` | Report whitespace errors and conflict markers; exit 1 if any. |
+| `--exit-code` | Exit 1 if there are differences, 0 if not. |
+| `-a, --text` | Treat large text files as text. |
+| `--json` | Machine-readable summary. Add `--hunks` for patch text, `--max-bytes \<N\>` to cap it, `--changed-files-limit` / `--changed-files-offset` to page. |
+| `--remote \<OLD\> \<NEW\>` | Diff two exact commits on the server, with `--json` or `--print`. |
+
+#### oak commit
+
+```text
+oak commit [PATHS...] [--push] [--no-verify] [--json] [--quiet]
+```
+
+Save a local checkpoint of every change (or only those under `PATHS`). Takes no message: `-m` is refused — describe the branch with `oak desc`. `--push` publishes afterwards; `--no-verify` skips [hooks](/docs/making-changes#hooks).
+
+#### oak restore
+
+```text
+oak restore [PATHS...] [-s COMMIT] [-f]
+```
+
+Restore files (or everything) to the last checkpoint, or to `COMMIT`. Asks first unless `-f`.
+
+#### oak reset
+
+```text
+oak reset [PATH] [-f]
+```
+
+Discard uncommitted changes — everything, or under `PATH`. Asks first unless `-f`.
+
+#### oak change
+
+```text
+oak change capture [PATHS...] [--json]
+oak change export <CAPTURE_ID> --output <FILE> [--json]
+```
+
+Store uncommitted changes as an immutable capture without committing or touching the working tree; export one as a zip. See [History](/docs/history#save-uncommitted-work-without-committing).
+
+### Branches
+
+#### oak switch
+
+```text
+oak switch [NAME] [-c] [--clean] [-d]
+```
+
+Switch to a branch (fetching it if needed). With no name, pick from a list.
+
+| Flag | Effect |
+|---|---|
+| `-c, --create` | Create a branch off the latest `main` and switch to it. The name is optional. |
+| `--clean` | Start from the latest `main` and discard working-tree changes. |
+| `-d, --detach` | Treat `NAME` as a commit and detach HEAD there. |
+
+#### oak checkout
+
+```text
+oak checkout <COMMIT>
+```
+
+Detach HEAD at a commit (full hash or a unique prefix of 4+ characters).
+
+#### oak desc
+
+```text
+oak desc [DESCRIPTION | --file FILE] [--append] [--json]
+```
+
+Set the current branch's description — the commit message it will merge with. `--file -` reads stdin; `--append` adds a paragraph and refuses if your copy is stale. See [Descriptions](/docs/branches#descriptions).
+
+#### oak branch
+
+```text
+oak branch [--show-current] [--json]
+oak branch list [--remote] [--status open|closed] [--json]
+oak branch show <NAME> [--remote] [--json]
+oak branch rename <OLD> <NEW>
+```
+
+List branches, print the current one, or show one branch's details. `--remote` reads the server. `rename` is temporarily disabled.
+
+#### oak close
+
+```text
+oak close [NAME...] [--remote] [--reason TEXT] [--json]
+```
+
+Close a branch (default: the current one). `--remote --json` closes pushed branches without switching to them, several at once.
+
+#### oak split
+
+```text
+oak split [--from BRANCH] [--plan FILE] [--dry-run]
+```
+
+Reorder or drop a branch's commits, or split them into separate branches (`oak histedit` is an alias). `--plan` applies a todo list non-interactively (`-` for stdin).
+
+#### oak finish
+
+```text
+oak finish (--desc TEXT | --desc-file FILE) [--json]
+```
+
+Set the description, checkpoint, and push — after checking it can. Inside a mount, also unmounts once the push succeeds. See [Working with agents](/docs/agents#finishing-a-task-in-one-command).
+
+### Merging and conflicts
+
+#### oak merge
+
+```text
+oak merge [BRANCH] [--wait[=MINUTES]] [--force] [--dry-run] [--json]
+oak merge --continue | --abort
+```
+
+Squash-merge a branch (default: the current one) onto `main` and close it.
+
+| Flag | Effect |
+|---|---|
+| `--wait[=MINUTES]` | Wait for CI to finish (default 30 minutes), then merge if it passed. |
+| `--force` | Merge even though CI is red or running. |
+| `--dry-run` | With `--json`: predict the merge locally; changes nothing. |
+| `--continue` / `--abort` | Finish or cancel a merge after resolving conflicts. |
+
+#### oak conflict
+
+```text
+oak conflict status [--json]
+oak conflict show [--json]
+oak conflict take <PATH> (--ours | --theirs) [--json]
+```
+
+Inspect an in-progress merge, pull, or mount-pull conflict, and resolve a file by taking one side of every conflict block. See [Resolving conflicts](/docs/merging#resolving-conflicts).
+
+#### oak agent
+
+```text
+oak agent state --json [--compact] [--refresh]
+```
+
+One JSON document with the repository's state and `recommended_next_commands`. `--refresh` checks the server first.
+
+### Syncing
+
+#### oak push
+
+```text
+oak push [--repo ORG/REPO] [-f] [--json] [--plan --json] [-r URL]
+```
+
+Publish the current branch. `--repo` (or `OAK_REPO`) links a new repo on its first push without a prompt — the organization must exist; the repo is created. `-f` overwrites a diverged remote branch. `--plan --json` reports what would be sent without sending it.
+
+#### oak pull
+
+```text
+oak pull [--branch-only] [-f] [--json] [-r URL]
+oak pull --continue | --abort
+```
+
+Fetch new commits on your branch, then merge the latest `main` into it. `--branch-only` skips the merge; `-f` discards local commits the server doesn't have.
+
+#### oak fetch
+
+```text
+oak fetch [-r URL]
+```
+
+Refresh your copy of `main` without touching your branch or files.
+
+#### oak sparse
+
+```text
+oak sparse [--json]
+oak sparse set <PREFIX...>
+oak sparse add <PREFIX...>
+oak sparse disable
+```
+
+Show or change a [sparse checkout's](/docs/sparse-clones) cone.
+
+### History and inspection
+
+#### oak log
+
+```text
+oak log [PATHS...] [-n N] [--oneline] [--verbose] [-S TERM | -G REGEX] [--json]
+oak log --remote --json [--branch NAME] [--from HASH] [-n N]
+```
+
+Show history — full-screen on a terminal. `-S` finds commits that add or remove a string, `-G` commits with a changed line matching a regex. `--remote` reads a branch's history from the server without fetching it.
+
+#### oak hash / rev-parse
+
+```text
+oak hash
+oak rev-parse [--short] HEAD
+```
+
+Print the current commit. `rev-parse` exists for Git-compatible scripts and supports only `HEAD`.
+
+#### oak info
+
+```text
+oak info [--json]
+```
+
+Repository, branch, parent, remote, and link details.
+
+#### oak file inspect / tree inspect / refs inspect
+
+```text
+oak file inspect <PATH> --at <HEAD|HASH> [--remote] [--output FILE] [--max-bytes N] [--json]
+oak tree inspect --at <HEAD|HASH> [--max-files N] [--max-bytes N] [--json]
+oak refs inspect [--max-branches N] [--json]
+```
+
+Read a file or tree at a commit, or list local branch heads, without changing anything. See [History and inspection](/docs/history#inspect-files-and-trees-at-a-commit).
+
+#### oak open
+
+```text
+oak open [--print | --json]
+```
+
+Open the repo on oak.space, or just print its URL.
+
+### Reviewing
+
+#### oak branch triage
+
+```text
+oak branch triage [--remote] [--only mergeable|closable|ambiguous] [--against BRANCH]
+                  [--status STATUS] [--analysis-depth DEPTH] [--limit N] [--json]
+```
+
+Score many branches at once — mergeability, contribution, CI, recommended action — without switching.
+
+#### oak branch review
+
+```text
+oak branch review <NAME> [--remote] [--merge-preview] [--json]
+```
+
+Evidence for one branch: what changed, and with `--merge-preview`, whether and how safely it would merge.
+
+#### oak branch diff
+
+```text
+oak branch diff <NAME> [PATHS...] [--remote] [--against BRANCH]
+                [--diff-mode tree|contribution|net-merge] [--print] [--json [--hunks]]
+```
+
+A branch's diff without checking it out. Default mode is `tree`.
+
+#### oak branch train
+
+```text
+oak branch train <NAME...> [--remote] [--against BRANCH] [--json]
+```
+
+Preview merging up to 32 branches in order, without publishing.
+
+### CI
+
+#### oak ci status
+
+```text
+oak ci status [--run ID [--commit HASH]] [--json]
+```
+
+The merge gate's verdict for the current branch head, or one run. Exit `0` passed, `1` failed or no runs, `3` still running.
+
+#### oak ci runs
+
+```text
+oak ci runs [--limit N] [--json]
+```
+
+Recent runs: id, workflow, branch, commit, status, duration.
+
+#### oak ci logs
+
+```text
+oak ci logs <RUN_ID> [--failed] [--summary] [--max-bytes N] [--json]
+```
+
+A run's step output. `--failed` shows only failed steps; `--summary` shows step metadata without logs.
+
+#### oak ci wait
+
+```text
+oak ci wait <RUN_ID...> | --current [--timeout SECONDS] [--progress] [--json [--summary]]
+```
+
+Block until runs finish. `--current` waits for the current head's runs (waiting up to `--dispatch-timeout` for them to start). Default timeout 30 minutes.
+
+#### oak ci trigger
+
+```text
+oak ci trigger --expected-commit <HASH> --idempotency-key <KEY> [--workflow NAME] [--branch NAME] [--json]
+```
+
+Start a run by hand — only if the branch head is still `HASH`. Re-using the key returns the original run. Name the workflow, or every workflow runs.
+
+#### oak ci rerun / cancel
+
+```text
+oak ci rerun <RUN_ID> [--json]
+oak ci cancel <RUN_ID> --commit <HASH> [--json]
+oak ci cancel --superseded [--yes] [--json]
+```
+
+Re-run a run at the same commit (for infrastructure failures), or cancel a push or merge run. `--superseded` lists — or with `--yes`, cancels — the branch's in-flight runs for commits that are no longer its head.
+
+### Mounts and spaces
+
+#### oak mount
+
+```text
+oak mount <ORG/REPO> [DEST] [-b BRANCH] [-r URL]
+oak mount list [--json]
+oak mount finish [DEST] --desc-file FILE [--json]
+oak mount end [DEST] [-f]
+oak mount forget [DEST] [-f] [--orphaned]
+```
+
+Mount a repo without cloning it (default destination `./\<repo\>`), optionally continuing an existing branch. `end` with no `DEST` ends every mount under `~/oaktree`; `-f` discards uncommitted changes. `forget` cleans up stale registrations. See [Lazy mounts](/docs/mounts).
+
+#### oak space
+
+```text
+oak space new <ORG> [DEST]
+oak space repos [ORG] [--json]
+oak space clean [DEST] [-f]
+oak space inventory [ROOT] [--verify-local] [--include-ci] [--max-depth N] [--json]
+```
+
+Scaffold and manage an [agent space](/docs/spaces).
+
+### Sites
+
+```text
+oak site enable [--repo ORG/REPO] [--source PATH]
+oak site show [--organization ORG]
+oak site list
+oak site disable [--organization ORG]
+```
+
+Publish a repo as the organization's [static site](/docs/sites). In this group `-r` means `--repo`; the server is `--remote`.
+
+### Tools
+
+#### oak export
+
+```text
+oak export <DEST> [-b BRANCH] [--git-branch NAME] [-f]
+oak export <DEST> --tree-only --at <HEAD|HASH>
+```
+
+Replay a branch's history into a new Git repo, or write one commit's files. See [Export back to Git](/docs/git#export-back-to-git).
+
+#### oak archive
+
+```text
+oak archive [-o PATH]
+```
+
+Zip the working tree (default `\<directory\>.zip`).
+
+#### oak feedback
+
+```text
+oak feedback [-m TEXT | --file FILE] [--title TITLE] [--email EMAIL] [--json]
+```
+
+Send a bug report or feature request; prints a tracking reference (`fb-N`). Opens your editor on a terminal when no text is given. Alias: `oak feature-request`.
+
+#### oak environment
+
+```text
+oak environment [--json]
+```
+
+List every environment variable Oak reads and its effective value (secrets shown as set/unset only). Alias: `oak env`.
+
+#### oak maintenance compact
+
+Compact the local repository database and reclaim disk space.
+
+#### oak doctor
+
+```text
+oak doctor --repo ORG/REPO [--verify metadata|existence|bytes] [--depth N] [--json]
+```
+
+Check a remote repository's content end to end, from commits down to stored bytes. Exit `0` verified, `6` a problem was found, `8` inconclusive.
+
+#### oak serve
+
+```text
+oak serve [-d DIR] [-p PORT] [--host HOST] [--token TOKEN]
+```
+
+Run a minimal self-hosted Oak server backed by SQLite (default `./oak-data` on `127.0.0.1:8080`) that speaks the push / pull / clone protocol. No organizations or accounts; binding to anything but loopback requires `--token` (or `OAK_SERVE_TOKEN`). For local development and trusted networks.
+
+<!-- https://oak.space/docs/configuration -->
+## Files and environment variables
+
+### In a repository
+
+| Path | Versioned? | Purpose |
+|---|---|---|
+| `.oak/` | — | The local repository: its database (`.oak/oak.db`), in-progress merge state, and hooks. Never committed, except the files below. |
+| `.oak/workflows/*.yml` | Yes | [CI workflows](/docs/ci-workflows). |
+| `.oak/PERMISSIONS` | Yes | [Path permissions](/docs/path-permissions), read from `main`. |
+| `.oak/attributes` | Yes | Reserved for per-path attributes. |
+| `.oak/hooks/pre-commit`, `post-commit` | No | Local [hooks](/docs/making-changes#hooks). |
+| `.oakignore` | Yes | Files Oak should ignore, in `.gitignore` syntax. |
+| `.gitignore` | Yes | Used **only** when there's no `.oakignore`. |
+| `AGENTS.md`, `CLAUDE.md` | Yes | Instructions for coding agents; `oak init` offers to write them. |
+| `.claude/skills/oak-vcs/` | Yes | The agent skill, from `oak skill install`. |
+| `.oak-space` | — | Marks the root of an [agent space](/docs/spaces). |
+
+### In your home directory
+
+| Path | Purpose |
+|---|---|
+| `~/.local/bin/oak` | The CLI, where the installer puts it. |
+| `~/.oak/credentials` | Saved logins, one per server (from `oak login`). |
+| `~/.oak/mounts/` | Mount state and caches. Override with `OAK_MOUNTS_ROOT`. |
+| `~/.oak/version_check` | When the CLI last checked for an update. |
+| `~/.oak/feedback.json` | The contact email `oak feedback` remembers. |
+| `~/oaktree/` | The default parent directory for mounts. |
+| `~/.claude/skills/oak-vcs/` | The agent skill, from `oak skill install --global`. |
+
+### Environment variables
+
+`oak environment` (or `oak env`) prints every variable below with its effective value — secrets as set/unset only.
+
+#### Server and credentials
+
+| Variable | Effect |
+|---|---|
+| `OAK_REMOTE` | Server URL for this invocation, overriding the checkout's linked server. |
+| `OAK_API_KEY` | Token to authenticate with. Beats every stored credential. See [API keys](/docs/api-keys). |
+| `OAK_REPO` | `org/repo` to link on a first push — the same as `oak push --repo`. |
+| `OAK_SERVE_TOKEN` | Bearer token for `oak serve`. |
+
+#### Identity
+
+| Variable | Effect |
+|---|---|
+| `OAK_AUTHOR` | Author name on commits, and the prefix of generated branch names. Defaults to your login, then `USER` / `USERNAME`. |
+| `OAK_EMAIL` | Contact email for `oak feedback`. |
+
+#### Network
+
+| Variable | Effect |
+|---|---|
+| `OAK_NO_UPDATE_CHECK` | Turn off the daily check for a new CLI version. |
+| `OAK_UPLOAD_CONCURRENCY` | Parallel uploads during push. |
+| `OAK_DOWNLOAD_CONCURRENCY` | Parallel downloads during clone and pull (default 32). |
+| `OAK_PROBE_TIMEOUT_SECS` | Timeout for server probes, 1–300 (default 20). |
+| `OAK_ALLOW_PARTIAL_CLONE` | Recovery only: skip files a broken server can't send instead of failing. |
+| `HTTPS_PROXY`, `HTTP_PROXY`, `ALL_PROXY`, `NO_PROXY` | Standard proxy settings (lowercase forms too). |
+
+#### Mounts
+
+| Variable | Effect |
+|---|---|
+| `OAK_MOUNTS_ROOT` | Where mount state lives (default `~/.oak/mounts`). |
+
+#### Output
+
+| Variable | Effect |
+|---|---|
+| `OAK_VERBOSE` | Print per-phase timings, like `--verbose`. |
+| `OAK_LOG` | Log filter for debugging (for example `OAK_LOG=debug`). |
+| `OAK_PROGRESS` | `always`, `never`, or `auto` progress display. |
+| `OAK_SPINNER` | Spinner style: `line`, `pulse`, `arc`, `minimal`, `oak`. |
+| `NO_COLOR`, `CLICOLOR_FORCE` | Disable or force color. |
+| `CI` | When set, progress display is off by default. |
+
+#### Tools
+
+| Variable | Effect |
+|---|---|
+| `OAK_DIFF_TOOL` | External program to use instead of `oak diff`'s viewer. |
+| `PAGER` | Pager for long output. |
+| `VISUAL`, `EDITOR` | Editor for `oak feedback` and `oak split` (falls back to `vi`). |
+
+#### Set by Oak
+
+| Variable | Where |
+|---|---|
+| `OAK_HOOK` | In [hooks](/docs/making-changes#hooks): the event name. |
+| `OAK_CI_RUN_ID`, `OAK_CI_COMMIT`, `OAK_CI_BRANCH` | In [CI steps](/docs/ci-workflows#what-a-job-sees). |
+
+#### Installer
+
+| Variable | Effect |
+|---|---|
+| `INSTALL_DIR` | Where `install.sh` / `install.ps1` put the binary. |
+| `OAK_NO_LOGIN` | Skip the installer's login prompt. |
+
+<!-- https://oak.space/docs/api -->
+## HTTP API reference
+
+oak.space has a JSON API — the same one the `oak` CLI is built on. Use it to script repositories, branches, merges, CI, and organizations, or to wire Oak into your own tools and agents.
+
+### Basics
+
+**Base URL:** `https://oak.space/api`. Paths below are relative to it.
+
+**Authentication:** send a token as a bearer header. Personal API keys, service-account keys, and `oak login` sessions all work — see [API keys and tokens](/docs/api-keys).
+
+```bash
+curl https://oak.space/api/repos -H "Authorization: Bearer $OAK_API_KEY"
+```
+
+Requests without a token can read public resources only.
+
+**Format:** request and response bodies are JSON (`Content-Type: application/json`). `{owner}` is an organization slug (including personal organizations, which are named after their user).
+
+**Errors** use the usual status codes — `400` bad request, `401` not signed in, `403` signed in but not allowed (including a key missing a scope), `404` not found (also returned for things you can't see), `409` conflict, `412` precondition failed (the CI gate), `503` temporarily unavailable — with a body like:
+
+```json
+{ "error": "human-readable message" }
+```
+
+Some errors add a machine-readable `code` and `retryable: true`.
+
+### Account and keys
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/whoami` | The user (or service account) behind the token. |
+| `GET` | `/version` | Server version. |
+| `GET` | `/api-keys` | Your personal API keys (prefixes only). |
+| `POST` | `/api-keys` | Create a key: `{"name", "scope": "full"\|"read", "repo"?: "owner/name"}`. Returns the full key **once**. |
+| `DELETE` | `/api-keys/{id}` | Revoke a key. |
+
+### Repositories
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/repos?sort=name\|updated\|created` | Repositories you can access. |
+| `POST` | `/repos` | Create one: `{"name", "description"?, "is_public"?, "organization_slug"?}`. |
+| `GET` | `/{owner}/{name}` | A repository: name, visibility, head, and more. |
+| `DELETE` | `/{owner}/{name}` | Delete a repository. |
+| `PATCH` | `/{owner}/{name}/visibility` | `{"is_public": true\|false}`. |
+| `POST` | `/{owner}/{name}/transfer` | Move it to another organization: `{"to_organization": "slug"}`. |
+| `GET` | `/{owner}/{name}/size` | Storage the repository uses. |
+
+### Branches
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/{owner}/{name}/branches` | List branches, with descriptions, heads, and status. |
+| `POST` | `/{owner}/{name}/branches` | Create one: `{"name", "description"?, "parent_branch"?}`. |
+| `GET` | `/{owner}/{name}/branches/{branch}` | One branch. Add `?record_read=1` to record that you've read it; the response includes who else has. |
+| `POST` | `/{owner}/{name}/branches/{branch}/merge` | Squash-merge onto the parent. See below. |
+| `POST` | `/{owner}/{name}/branches/{branch}/sync` | Merge the parent into the branch. `409` with `code: "branch_moved"` (retryable) if it received new commits meanwhile. |
+| `POST` | `/{owner}/{name}/branches/{branch}/close` | Close a branch. Idempotent. |
+| `POST` | `/{owner}/{name}/branches/{branch}/reopen` | Reopen a closed branch. |
+| `POST` | `/{owner}/{name}/branches/{branch}/rename` | Temporarily disabled — returns `503`. |
+
+Branch descriptions are set by pushing (`oak desc` then `oak push`); there's no separate endpoint.
+
+#### Merge responses
+
+`POST …/merge` lands one squash commit on `main` whose message is the branch description.
+
+| Status | Meaning |
+|---|---|
+| `200` | Merged. The body has `commit_hash` (the new commit on `main`) and `merge_parent_hash` (the branch tip). |
+| `412` | The [CI gate](/docs/merging#the-ci-merge-gate): CI on the branch head is failing or running. Add `?force=1` to override (recorded in the audit log). |
+| `409` with `conflict_paths` | The branch conflicts with `main`. Sync, resolve, and push. |
+| `409` with `code: "main_moved"` or `"branch_moved"` | `main` or the branch changed during the merge. Nothing was merged; retry. |
+| `400` "already closed" | The branch was already merged or closed. |
+
+### Commits and content
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/{owner}/{name}/commits/info` | Metadata for a list of commit hashes. |
+| `POST` | `/{owner}/{name}/commits/{hash}/revert` | Land a commit that undoes `{hash}` on its branch. `409` if the affected files have changed since. |
+| `GET` | `/{owner}/{name}/tree/{commit}` | The root directory listing at a commit. |
+| `GET` | `/{owner}/{name}/tree/{commit}/{path}` | A subdirectory listing. |
+| `GET` | `/{owner}/{name}/raw/{commit}/{path}` | A file's bytes at a commit. |
+
+Outside the JSON API, `GET https://oak.space/{owner}/{name}/download` returns a zip of `main`, and `git clone https://oak.space/{owner}/{name}.git` a [Git snapshot](/docs/git#clone-an-oak-repo-with-git).
+
+### CI
+
+Reading needs read access to the repo; triggering, cancelling, and secrets need write access.
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/{owner}/{name}/ci/runs?limit=N` | Recent runs (default 50, max 200). |
+| `GET` | `/{owner}/{name}/ci/runs/{id}` | One run, with its jobs, steps, exit codes, and logs. |
+| `POST` | `/{owner}/{name}/ci/runs` | Run workflows at a branch head: `{"workflow"?: "ci", "branch"?: "main"}`. Returns `{"run_ids": [...]}`. **Without `workflow`, every workflow runs.** |
+| `POST` | `/{owner}/{name}/ci/trigger` | Exact-head, idempotent trigger (what `oak ci trigger` uses) — see below. |
+| `POST` | `/{owner}/{name}/ci/runs/{id}/cancel` | Cancel a queued or running run. |
+| `GET` | `/{owner}/{name}/ci/secrets` | Secret names and update times (never values). |
+| `PUT` | `/{owner}/{name}/ci/secrets` | Create or replace one: `{"name", "value"}`. |
+| `DELETE` | `/{owner}/{name}/ci/secrets/{secret}` | Delete one. |
+| `GET` | `/{owner}/{name}/ci/environments[/{env}]` | [Environments](/docs/ci-environments) with their settings (write access). |
+| `PUT` `DELETE` | `/{owner}/{name}/ci/environments/{env}/…` | Configure an environment and its `secrets`, `variables`, `reviewers`, and `runners` (org owners and admins) — see [Environments](/docs/ci-environments#api). |
+| `GET` | `/{owner}/{name}/ci/environments/{env}/release-preview` | What a deploy would carry now, and what's in its way. |
+| `POST` | `/{owner}/{name}/ci/release-authorizations` | Approve and start one deploy with the preview's exact values. Needs the `release` scope on an API key. |
+
+An organization's [runners](/docs/ci-runners) are managed by its owners and admins:
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/orgs/{slug}/ci/runners` | Registered runners: name, labels, version, `status` (`online`, `active`, or `offline`), last seen. |
+| `POST` | `/orgs/{slug}/ci/runners/registration-token` | Generate a new registration token (replacing the old one): `{"token", "instance"}`. The token is only ever returned here. |
+| `DELETE` | `/orgs/{slug}/ci/runners/{id}` | Remove a runner; its credentials stop working at once. |
+
+Runners themselves talk to `/api/actions/…` — Gitea's runner protocol — with their own credentials, not API keys.
+
+The exact-head trigger only runs if the branch head is still the commit you name, and replays instead of duplicating when you retry with the same key:
+
+```json
+{
+  "protocol": "ordinary_trigger_v1",
+  "expected_commit": "<full 64-character hash>",
+  "idempotency_key": "deploy-check-1",
+  "branch": "main",
+  "workflow": "ci"
+}
+```
+
+It returns `{"run_ids", "replayed"}`; `412` if the head moved, `409` if the key was used with a different request, and `503` with `retryable: true` when busy.
+
+Run statuses go `queued` → `running` → `completed`, and a completed run's conclusion is `success`, `failure`, `cancelled`, `timed_out`, or `skipped`.
+
+### Path permissions
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/{owner}/{name}/path-permissions` | The server's parse of `.oak/PERMISSIONS` on `main`: entries, principals, warnings, and whether enforcement is on. |
+| `POST` | `/{owner}/{name}/path-permissions/propose` | Propose a new file as a branch: `{"content": "...", "description"?: "..."}`, or `{"delete": true}`. `403` if you may not change it. |
+
+### Organizations
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/orgs` | Your organizations. |
+| `POST` | `/orgs` | Create one: `{"slug", "name", "description"?}`. |
+| `GET` | `/orgs/{slug}` | One organization. |
+| `PATCH` | `/orgs/{slug}` | Update its name or description. |
+| `DELETE` | `/orgs/{slug}` | Delete it. |
+| `GET` | `/orgs/{slug}/members` | Members and roles. |
+| `POST` | `/orgs/{slug}/members` | Add someone: `{"username", "role"?: "member"\|"admin"\|"owner"}`. |
+| `PATCH` | `/orgs/{slug}/members/{username}` | Change a role: `{"role"}`. |
+| `DELETE` | `/orgs/{slug}/members/{username}` | Remove a member. |
+| `GET` | `/orgs/{slug}/groups` | Groups. |
+| `POST` | `/orgs/{slug}/groups` | Create a group: `{"slug", "description"?}`. |
+| `DELETE` | `/orgs/{slug}/groups/{group}` | Delete a group. |
+| `POST` | `/orgs/{slug}/groups/{group}/members` | Add a member: `{"username"}`. |
+| `DELETE` | `/orgs/{slug}/groups/{group}/members/{username}` | Remove a member. |
+| `GET` | `/orgs/{slug}/storage` | Storage used against the quota. |
+| `GET` | `/orgs/{slug}/audit` | The audit log. |
+
+Managing members, groups, and service accounts needs owner or admin.
+
+#### Service accounts
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/orgs/{slug}/service-accounts` | List them. |
+| `POST` | `/orgs/{slug}/service-accounts` | Create one: `{"name", "display_name"?}`. |
+| `PATCH` | `/orgs/{slug}/service-accounts/{name}` | `{"disabled": true\|false}`. |
+| `DELETE` | `/orgs/{slug}/service-accounts/{name}` | Delete it. |
+| `GET` | `/orgs/{slug}/service-accounts/{name}/keys` | Its keys. |
+| `POST` | `/orgs/{slug}/service-accounts/{name}/keys` | Create a key: `{"name", "scopes": "read,write"}`. Returns the key **once**. |
+| `DELETE` | `/orgs/{slug}/service-accounts/{name}/keys/{key_id}` | Revoke a key. |
+
+Scopes are explained in [API keys and tokens](/docs/api-keys#service-accounts).
+
+### Webhooks
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/{owner}/{name}/webhooks` | A repo's webhooks. |
+| `POST` | `/{owner}/{name}/webhooks` | Create one: `{"url", "secret"?, "events"?: ["push", "branch.created", "merge"]}`. |
+| `DELETE` | `/{owner}/{name}/webhooks/{id}` | Delete one. |
+
+Payloads and signatures: [Webhooks](/docs/webhooks).
+
+### Sites
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/orgs/{slug}/site` | The organization's site settings. |
+| `PUT` | `/orgs/{slug}/site` | Enable or update: `{"repo", "source_dir"?}`. |
+| `DELETE` | `/orgs/{slug}/site` | Disable it. |
+| `GET` | `/sites` | Sites you can see. |
+
+### CLI releases
+
+Public endpoints the installer and `oak upgrade` use to fetch and verify binaries.
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/releases` | Published CLI versions. |
+| `GET` | `/releases/latest` | The latest version. |
+| `GET` | `/releases/{version}/{platform}` | Download a binary. |
+| `GET` | `/releases/{version}/{platform}/sha256` | Its SHA-256. |
+| `GET` | `/releases/{version}/{platform}/minisig` | Its minisign signature. |
+
+### Sync protocol
+
+Push, pull, clone, and mount use content-addressed endpoints under `/{owner}/{name}/` — `push`, `pull`, `blobs/*`, and `chunks/*`. They're built for the CLI, which verifies every hash, and may change between versions; use the CLI rather than calling them directly.
+
+<!-- https://oak.space/docs/internals -->
+## How Oak works
+
+For people who want to know what's under the hood: the object model, the chunking, and how Oak compares to the version control systems that influenced it. Oak is written in Rust; the CLI is a single binary.
+
+### Manifests and commits, like Mercurial
+
+Oak's object model is closer to [Mercurial's](https://www.mercurial-scm.org/wiki/Design) than Git's. Each commit points at a **manifest** — the full snapshot of the tree as a list of `(path, blob hash, mode)` entries — rather than at a hierarchy of tree objects.
+
+Everything is **content-addressed with BLAKE3**: a file's identity is its hash, so storing the same content twice costs nothing. Diffing two commits means walking two manifests and comparing hashes.
+
+Commits on a branch carry no message. The narrative lives on the branch, as its description, and only the squash commit that lands on `main` gets a message — derived from that description. The squash keeps a pointer to the branch's last commit, so the detailed history stays reachable without cluttering `main`.
+
+### Content-defined chunking with FastCDC
+
+Files are split into variable-length chunks with [FastCDC](https://www.usenix.org/system/files/conference/atc16/atc16-paper-xia.pdf). Chunk boundaries are chosen by the content itself rather than at fixed offsets, so inserting a line near the top of a 100 MB file changes only the chunks around the edit, not everything after it.
+
+Git stores each version of a large file as a separate blob and relies on packfile delta compression after the fact. Oak chunks at write time, so deduplication is immediate and works across files: two assets that share a header share those chunks. Each chunk is hashed with BLAKE3, each blob records its ordered chunk list, and push and pull transfer only the chunks the other side is missing. On the server, chunks are deduplicated across every repo in an organization.
+
+### Trust: the client verifies
+
+The client re-derives every commit's manifest hash from the entries the server sends, and rejects a mismatch. That's what makes clones, pulls, and mounts trustworthy — and it's also why [path permissions](/docs/path-permissions) withhold a restricted file's *contents* but can't hide its name: removing an entry would change the hash.
+
+### Lazy mounts
+
+A mount is a virtual filesystem backed by the server: [FSKit](https://developer.apple.com/documentation/fskit) on macOS, FUSE on Linux, and the Projected File System on Windows. Directory listings come from the manifest; a file's chunks are fetched the first time something reads it and cached locally. Writes go to a local overlay — the "active commit" — that `oak commit` turns into a real commit on the mount's branch. Nothing is uploaded until you push.
+
+### Local storage, like Fossil
+
+A local repository is a single SQLite database (`.oak/oak.db`) holding commits, manifests, and branch state, with large content stored as chunks — not a directory of loose objects.
+
+### How Oak differs from Fossil
+
+[Fossil](https://fossil-scm.org) is the closest prior art in philosophy: a single local database file instead of a loose-object store, and a repository you can back up with `cp`. Where they diverge:
+
+- **Large files.** Fossil stores content inline in SQLite, which caps out on large binaries. Oak chunks content and stores chunks by hash, so large assets are first-class rather than a workaround.
+- **Object model.** Fossil uses its own text artifact format. Oak uses flat manifests — path to blob hash — which are simpler to reason about.
+- **Branching.** In Fossil a branch is a tag on a commit in a timeline. Oak has named branches with a parent, and branches are the unit of work.
+- **Scope.** Fossil bundles a wiki, bug tracker, and forum. Oak stays close to version control, plus what gates a change landing — [CI](/docs/ci) from `.oak/workflows/` and access rules from `.oak/PERMISSIONS`, both files in the repo. No wiki, issue tracker, or forum; keep the tools you already use for those.
+- **Agents.** Oak is built for branch-per-agent work: clone or mount, commit on a personal branch, push. There's no separate pull-request object — the branch *is* the review unit, and its description is the change's story.
+
+### The server
+
+oak.space is a single Rust binary (Axum) with PostgreSQL for metadata and object storage for chunks, running in Oregon. The web UI is server-rendered HTML with [htmx](https://htmx.org) for partial updates — no client-side framework or JavaScript bundle. CI runs in isolated Linux containers dispatched by the server.
+
+Questions about the internals, or interested in working on Oak? Email [zach@oak.space](mailto:zach@oak.space) or join the [Discord](/discord).
+

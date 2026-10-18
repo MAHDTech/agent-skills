@@ -8980,7 +8980,7 @@ Expand .\Microsoft.WebView2.FixedVersionRuntime.128.0.2739.42.x64.cab -F:* ./src
   "bundle": {
     "resources": [
       "resources/my-dependency.exe",
-      "resources/another-one.msi
+      "resources/another-one.msi"
     ]
   }
 }
@@ -10594,7 +10594,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   import { Menu } from '@tauri-apps/api/menu';
 
 
-  const menu = await Menu.new({
+  await using menu = await Menu.new({
     items: [
       {
         id: 'quit',
@@ -10626,16 +10626,14 @@ Native application menus can be attached to both to a window or system tray. Ava
 
   // If a window was not created with an explicit menu or had one set explicitly,
   // this menu will be assigned to it.
-  menu.setAsAppMenu().then(async (res) => {
-    console.log('menu set success', res);
+  await menu.setAsAppMenu();
 
 
-    // Update individual menu item text
-    const statusItem = await menu.get('status');
-    if (statusItem) {
-      await statusItem.setText('Status: Ready');
-    }
-  });
+  // Update individual menu item text
+  await using statusItem = await menu.get('status');
+  if (statusItem) {
+    await statusItem.setText('Status: Ready');
+  }
   ```
  * Rust 
   ```rust
@@ -10676,7 +10674,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   import { Menu } from '@tauri-apps/api/menu';
 
 
-  const menu = await Menu.new({
+  await using menu = await Menu.new({
     items: [
       {
         id: 'Open',
@@ -10746,82 +10744,82 @@ Native application menus can be attached to both to a window or system tray. Ava
 
 
   // Will become the application submenu on MacOS
-  const aboutSubmenu = await Submenu.new({
+  await using aboutSubmenu = await Submenu.new({
     text: 'About',
     items: [
-      await MenuItem.new({
+      {
         id: 'quit',
         text: 'Quit',
         action: () => {
           console.log('Quit pressed');
         },
-      }),
+      },
     ],
   });
 
 
-  const fileSubmenu = await Submenu.new({
+  await using fileSubmenu = await Submenu.new({
     text: 'File',
     icon: 'folder', // Optional: Add an icon to the submenu
     items: [
-      await MenuItem.new({
+      {
         id: 'new',
         text: 'New',
         action: () => {
           console.log('New clicked');
         },
-      }),
-      await MenuItem.new({
+      },
+      {
         id: 'open',
         text: 'Open',
         action: () => {
           console.log('Open clicked');
         },
-      }),
-      await MenuItem.new({
+      },
+      {
         id: 'save_as',
         text: 'Save As...',
         action: () => {
           console.log('Save As clicked');
         },
-      }),
+      },
     ],
   });
 
 
-  const editSubmenu = await Submenu.new({
+  await using editSubmenu = await Submenu.new({
     text: 'Edit',
     items: [
-      await MenuItem.new({
+      {
         id: 'undo',
         text: 'Undo',
         action: () => {
           console.log('Undo clicked');
         },
-      }),
-      await MenuItem.new({
+      },
+      {
         id: 'redo',
         text: 'Redo',
         action: () => {
           console.log('Redo clicked');
         },
-      }),
+      },
     ],
   });
 
 
-  const menu = await Menu.new({
+  await using menu = await Menu.new({
     items: [aboutSubmenu, fileSubmenu, editSubmenu],
   });
 
 
-  menu.setAsAppMenu();
+  await menu.setAsAppMenu();
 
 
   // You can also update the submenu icon dynamically
-  fileSubmenu.setIcon('document');
+  await fileSubmenu.setIcon('document');
   // Or set a native icon (only one type applies per platform)
-  fileSubmenu.setNativeIcon('NSFolder');
+  await fileSubmenu.setNativeIcon('NSFolder');
   ```
  * Rust 
   ```rust
@@ -10902,49 +10900,49 @@ Native application menus can be attached to both to a window or system tray. Ava
   import { Menu, PredefinedMenuItem } from '@tauri-apps/api/menu';
 
 
-  const copy = await PredefinedMenuItem.new({
+  await using copy = await PredefinedMenuItem.new({
     text: 'copy-text',
     item: 'Copy',
   });
 
 
-  const separator = await PredefinedMenuItem.new({
+  await using separator = await PredefinedMenuItem.new({
     text: 'separator-text',
     item: 'Separator',
   });
 
 
-  const undo = await PredefinedMenuItem.new({
+  await using undo = await PredefinedMenuItem.new({
     text: 'undo-text',
     item: 'Undo',
   });
 
 
-  const redo = await PredefinedMenuItem.new({
+  await using redo = await PredefinedMenuItem.new({
     text: 'redo-text',
     item: 'Redo',
   });
 
 
-  const cut = await PredefinedMenuItem.new({
+  await using cut = await PredefinedMenuItem.new({
     text: 'cut-text',
     item: 'Cut',
   });
 
 
-  const paste = await PredefinedMenuItem.new({
+  await using paste = await PredefinedMenuItem.new({
     text: 'paste-text',
     item: 'Paste',
   });
 
 
-  const select_all = await PredefinedMenuItem.new({
+  await using select_all = await PredefinedMenuItem.new({
     text: 'select_all-text',
     item: 'SelectAll',
   });
 
 
-  const menu = await Menu.new({
+  await using menu = await Menu.new({
     items: [copy, separator, undo, redo, cut, paste, select_all],
   });
 
@@ -10991,7 +10989,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   let currentLanguage = 'en';
 
 
-  const check_sub_item_en = await CheckMenuItem.new({
+  await using check_sub_item_en = await CheckMenuItem.new({
     id: 'en',
     text: 'English',
     checked: currentLanguage === 'en',
@@ -11004,7 +11002,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   });
 
 
-  const check_sub_item_zh = await CheckMenuItem.new({
+  await using check_sub_item_zh = await CheckMenuItem.new({
     id: 'zh',
     text: 'Chinese',
     checked: currentLanguage === 'zh',
@@ -11019,11 +11017,11 @@ Native application menus can be attached to both to a window or system tray. Ava
 
 
   // Load icon from path
-  const icon = await Image.fromPath('../src/icon.png');
-  const icon2 = await Image.fromPath('../src/icon-2.png');
+  await using icon = await Image.fromPath('../src/icon.png');
+  await using icon2 = await Image.fromPath('../src/icon-2.png');
 
 
-  const icon_item = await IconMenuItem.new({
+  await using icon_item = await IconMenuItem.new({
     id: 'icon_item',
     text: 'Icon Item',
     icon: icon,
@@ -11034,7 +11032,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   });
 
 
-  const text_item = await MenuItem.new({
+  await using text_item = await MenuItem.new({
     id: 'text_item',
     text: 'Text Item',
     action: () => {
@@ -11044,7 +11042,7 @@ Native application menus can be attached to both to a window or system tray. Ava
   });
 
 
-  const menu = await Menu.new({
+  await using menu = await Menu.new({
     items: [
       {
         id: 'change menu',
@@ -11157,12 +11155,32 @@ Native application menus can be attached to both to a window or system tray. Ava
           .expect("error while running tauri application");
   }
   ```
+ ## Prevent JavaScript menu leaks There’re a few gotchas you should be aware of when using the JavaScript menu APIs, mainly because JavaScript does not have any way to run cleanup code when an object is being removed by garbage collection: * The menus will not clean up automatically unless `close` is called or closed by `await using` after the binding variable goes out of scope. * You should close the menu items you got e.g. from `Menu.get`, the `await using` syntax makes it easier, for example: `await using status = menu.get('status')` Be careful with APIs that can return a `Menu` such as `Menu.setAsAppMenu`, you’ll need to close them when you’re done with them or if you don’t plan to use them. * You should close the menu resource whenever you don’t need to access it in JavaScript anymore. For example: * Manual close 
+  ```typescript
+  const copy = await PredefinedMenuItem.new({ item: 'Copy' });
+  const menu = await Menu.new({ items: [copy] });
+  // `copy` is now managed by the `menu` and the JavaScript resource reference can be closed
+  await copy.close();
+
+
+  const prev = await menu.setAsAppMenu();
+  // `menu` is now set as the app menu, we can close the JavaScript resource reference
+  await menu.close();
+  // We don't plan to use the previously set menu, close it here.
+  await prev?.close();
+  ```
+ * await using 
+  ```typescript
+  await using copy = await PredefinedMenuItem.new({ item: 'Copy' });
+  await using menu = await Menu.new({ items: [copy] });
+  await using prev = await menu.setAsAppMenu();
+  ```
 
 # Features & Recipes
 
 > Information on the extensibility of Tauri from built-in Tauri features and functionality to provided plugins and recipes built by the Tauri community
 
-Tauri comes with extensibility in mind. On this page you’ll find: * **[Official Features](#official-features)**: Built-in Tauri features and functionality * **[Community Resources](#community-plugins)**: More plugins and recipes built by the Tauri community. You can also contribute your own on [Awesome Tauri](https://github.com/tauri-apps/awesome-tauri) * **[Support Table](#support-table)**: A compatibility table showing which platforms are supported by each official plugin **Use the search and filter functionality to find features or community resources:** #### Official Features [Autostart](/plugin/autostart/) Automatically launch your app at system startup. [Barcode Scanner](/plugin/barcode-scanner/) Allows your mobile application to use the camera to scan QR codes, EAN-13 and other types of barcodes. [Biometric](/plugin/biometric/) Prompt the user for biometric authentication on Android and iOS. [Clipboard](/plugin/clipboard/) Read and write to the system clipboard. [Command Line Interface (CLI)](/plugin/cli/) Parse arguments from the command line interface. [Deep Linking](/plugin/deep-linking/) Set your Tauri application as the default handler for an URL. [Dialog](/plugin/dialog/) Native system dialogs for opening and saving files along with message dialogs. [File System](/plugin/file-system/) Access the file system. [Geolocation](/plugin/geolocation/) Get and track the device's current position, including information about altitude, heading, and speed (if available). [Global Shortcut](/plugin/global-shortcut/) Register global shortcuts. [Haptics](/plugin/haptics/) Haptic feedback and vibrations on Android and iOS [HTTP Client](/plugin/http-client/) Access the HTTP client written in Rust. [Localhost](/plugin/localhost/) Use a localhost server in production apps. [Logging](/plugin/logging/) Configurable logging. [NFC](/plugin/nfc/) Read and write NFC tags on Android and iOS. [Notifications](/plugin/notification/) Send native notifications to the user. [Opener](/plugin/opener/) Open files and URLs in external applications. [OS Information](/plugin/os-info/) Read information about the operating system. [Persisted Scope](/plugin/persisted-scope/) Persist runtime scope changes on the filesystem. [Positioner](/plugin/positioner/) Move windows to common locations. [Process](/plugin/process/) Access the current process. [Shell](/plugin/shell/) Access the system shell to spawn child processes. [Single Instance](/plugin/single-instance/) Ensure that a single instance of your Tauri app is running at a time. [SQL](/plugin/sql/) Tauri Plugin providing an interface for the frontend to communicate with SQL databases through sqlx. [Store](/plugin/store/) Persistent key value storage. [Stronghold](/plugin/stronghold/) Encrypted, secure database. [Updater](/plugin/updater/) In-app updates for Tauri applications. [Upload](/plugin/upload/) File uploads through HTTP. [Websocket](/plugin/websocket/) Open a WebSocket connection using a Rust client in JavaScript. [Window State](/plugin/window-state/) Persist window sizes and positions. #### Community Plugins [sentry-tauri](https://github.com/timfish/sentry-tauri)Capture JavaScript errors, Rust panics and native crash minidumps to Sentry. [tauri-awesome-rpc](https://github.com/ahkohd/tauri-awesome-rpc)Custom invoke system that leverages WebSocket. [tauri-nspanel](https://github.com/ahkohd/tauri-nspanel)Convert a window to panel. [tauri-nspopover-plugin](https://github.com/freethinkel/tauri-nspopover-plugin)Native NSPopover view for use in the status bar in macOS. [tauri-plugin-android-battery-optimization](https://github.com/NeoHuncho/tauri-plugin-android-battery-optimization)Check and request battery optimization exemptions on Android. [tauri-plugin-android-fs](https://github.com/aiueo13/tauri-plugin-android-fs)Access the file system on Android. [tauri-plugin-aptabase](https://github.com/aptabase/tauri-plugin-aptabase)Privacy-first and minimalist analytics for desktop and mobile apps. [tauri-plugin-auth](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-auth)Auth plugin for iOS that uses ASWebAuthenticationSession for authentication, which allows keychain access. [tauri-plugin-blec](https://github.com/MnlPhlp/tauri-plugin-blec)Cross platform Bluetooth Low Energy client based on btleplug. [tauri-plugin-cache](https://github.com/Taiizor/tauri-plugin-cache)Advanced disk caching solution with memory layer, TTL management, compression support, and cross-platform compatibility for desktop and mobile. [tauri-plugin-clipboard](https://github.com/CrossCopy/tauri-plugin-clipboard)Clipboard plugin for reading/writing clipboard text/image/html/rtf/files, and monitoring clipboard update. [tauri-plugin-context-menu](https://github.com/c2r0b/tauri-plugin-context-menu)Native context menu. [tauri-plugin-desktop-underlay](https://github.com/Charlie-XIAO/tauri-plugin-desktop-underlay)Attach a window to desktop, below icons and above wallpaper. [tauri-plugin-device-info](https://github.com/edisdev/tauri-plugin-device-info)Access comprehensive device information including battery, network, storage, display, and system details across desktop and mobile. [tauri-plugin-dragout](https://github.com/alexqqqqqq777/tauri-plugin-dragout)Native macOS drag-out (file promise) support. [tauri-plugin-drpc](https://github.com/smokingplaya/tauri-plugin-drpc)Discord RPC support. [tauri-plugin-esc-pos](https://github.com/Kosadchiy/tauri-plugin-esc-pos)ESC/POS receipt printer support over USB and TCP. [tauri-plugin-fs-pro](https://github.com/ayangweb/tauri-plugin-fs-pro)Extended with additional methods for files and directories. [tauri-plugin-graphql](https://github.com/JonasKruckenberg/tauri-plugin-graphql)Type-safe IPC for Tauri using GraphQL. [tauri-plugin-iap](https://github.com/Choochmeque/tauri-plugin-iap)Plugin that enables full In-App Purchases flow for Android, macOS, iOS and Windows. [tauri-plugin-iap](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-iap)In-app-purchase plugin for iOS that allows fetching, purchasing, and restoring of products. [tauri-plugin-in-app-review](https://github.com/Gbyte-Group/tauri-plugin-in-app-review)In-app app rating prompts using native platform APIs. [tauri-plugin-ios-photos](https://github.com/Gbyte-Group/tauri-plugin-ios-photos)iOS Photos album and asset management via native APIs. [tauri-plugin-js](https://github.com/HuakunShen/tauri-plugin-js)Give your app Electron-like JS backends with type-safe RPC powered by kkrpc. Supports Bun, Node.js, and Deno. [tauri-plugin-keep-screen-on](https://gitlab.com/cristofa/tauri-plugin-keep-screen-on)Disable screen timeout on Android and iOS. [tauri-plugin-libsql](https://github.com/HuakunShen/tauri-plugin-libsql)libsql/Turso database support with encryption, embedded replicas, and Drizzle ORM integration. [tauri-plugin-macos-permissions](https://github.com/ayangweb/tauri-plugin-macos-permissions)Support for checking and requesting macOS system permissions. [tauri-plugin-mobile-sharetarget](https://github.com/IT-ess/tauri-plugin-mobile-sharetarget)Handle mobile Share Intents with a FIFO queue [tauri-plugin-mqtt](https://github.com/kuyoonjo/tauri-plugin-mqtt)MQTT client support. [tauri-plugin-network](https://github.com/HuakunShen/tauri-plugin-network)Tools for reading network information and scanning network. [tauri-plugin-nosleep](https://github.com/pevers/tauri-plugin-nosleep/)Block the power save functionality in the OS. [tauri-plugin-ota](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-ota)OTA plugin for applications that just want to continuously deliever new JavaScript code based on a manfiest. [tauri-plugin-pinia](https://github.com/ferreira-tb/tauri-store/tree/main/packages/plugin-pinia)Persistent Pinia stores for Vue. [tauri-plugin-prevent-default](https://github.com/ferreira-tb/tauri-plugin-prevent-default)Disable default browser shortcuts. [tauri-plugin-python](https://github.com/marcomq/tauri-plugin-python/)Use python in your backend. [tauri-plugin-screenshots](https://github.com/ayangweb/tauri-plugin-screenshots)Get screenshots of windows and monitors. [tauri-plugin-serialport](https://github.com/deid84/tauri-plugin-serialport)Cross-compatible serialport communication tool. [tauri-plugin-serialplugin](https://github.com/s00d/tauri-plugin-serialplugin)Cross-compatible serialport communication tool. [tauri-plugin-sharesheet](https://github.com/buildyourwebapp/tauri-plugin-sharesheet)Share content to other apps via the Android Sharesheet or iOS Share Pane. [tauri-plugin-svelte](https://github.com/ferreira-tb/tauri-store/tree/main/packages/plugin-svelte)Persistent Svelte stores. [tauri-plugin-system-info](https://github.com/HuakunShen/tauri-plugin-system-info)Detailed system information. [tauri-plugin-tcp](https://github.com/kuyoonjo/tauri-plugin-tcp)TCP socket support. [tauri-plugin-thermal-printer](https://github.com/luis3132/tauri-plugin-thermal-printer)Add support to handle thermal printers. [tauri-plugin-tracing](https://github.com/fltsci/tauri-plugin-tracing)Structured logging with the tracing crate, featuring JS-to-Rust log bridging, file rotation, and flamegraph profiling. [tauri-plugin-udp](https://github.com/kuyoonjo/tauri-plugin-udp)UDP socket support. [tauri-plugin-velesdb](https://github.com/cyberlife-coder/VelesDB)Native vector database plugin. 70µs semantic search, ≥95% recall, hybrid BM25+vector, offline-first, full ecosystem integrations and more. [tauri-plugin-view](https://github.com/ecmel/tauri-plugin-view)View and share files on mobile. [tauri-plugin-widgets](https://github.com/s00d/tauri-plugin-widgets)Cross-platform home-screen widgets with WidgetKit, AppWidgetManager, Adaptive Cards, and desktop webviews. [tauri-remote-ui](https://github.com/DraviaVemal/tauri-remote-ui)Make you web app bundle available as web page for test and development. [taurpc](https://github.com/MatsDK/TauRPC)Typesafe IPC wrapper for Tauri commands and events. #### Community Integrations [Astrodon](https://github.com/astrodon/astrodon)Make Tauri desktop apps with Deno. [axios-tauri-adapter](https://git.kaki87.net/KaKi87/axios-tauri-adapter)axios adapter for the @tauri-apps/api/http module. [axios-tauri-api-adapter](https://github.com/persiliao/axios-tauri-api-adapter)Makes it easy to use Axios in Tauri, axios adapter for the @tauri-apps/api/http module. [Deno in Tauri](https://github.com/typed-sigterm/deno-in-tauri)Run JS/TS code with Deno Core Engine, in Tauri apps. [faynosync-update-server](https://github.com/ku9nov/faynoSync)Self-hosted Dynamic Update Server with statistics, supporting Tauri and other platforms. Flexible features for seamless app updates and insights. [kkrpc](https://github.com/kunkunsh/kkrpc)Seamless RPC communication between a Tauri app and node/deno/bun processes. [ngx-tauri](https://codeberg.org/crapsilon/ngx-tauri)Small lib to wrap around functions from tauri modules, to integrate easier with Angular. [svelte-tauri-filedrop](https://github.com/probablykasper/svelte-tauri-filedrop)File drop handling component for Svelte. [Tauri Specta](https://github.com/oscartbeaumont/tauri-specta)Completely typesafe Tauri commands. [tauri-htmx-extension](https://github.com/ChristianPavilonis/tauri-htmx-extension)Extention for using htmx with Tauri apis. [tauri-macos-menubar-app-example](https://github.com/ahkohd/tauri-macos-menubar-app-example) [tauri-macos-spotlight-example](https://github.com/ahkohd/tauri-macos-spotlight-example) [tauri-mcp-server](https://github.com/hypothesi/mcp-server-tauri)MCP server and plugin for rapid development and debugging. [tauri-update-cloudflare](https://github.com/mackenly/tauri-update-cloudflare)One-click deploy a Tauri Update Server to Cloudflare. [tauri-update-server](https://git.kaki87.net/KaKi87/tauri-update-server)Automatically interface the Tauri updater with git repository releases. [vite-plugin-tauri](https://github.com/amrbashir/vite-plugin-tauri)Integrate Tauri in a Vite project to build cross-platform apps. ## Support Table Hover “\*” to see notes. For more details visit the plugin page | Plugin | Rust Version | android | ios | linux | macos | windows | | -------------------- | ------------ | ------- | --- | ----- | ----- | ------- | | autostart | 1.90 | | | | | | | barcode-scanner | 1.90 | | | | | | | biometric | 1.90 | | | | | | | cli | 1.90 | | | | | | | clipboard-manager | 1.90 | \* | \* | | | | | deep-link | 1.90 | \* | \* | | \* | | | dialog | 1.90 | \* | \* | | | | | fs | 1.90 | \* | \* | \* | \* | \* | | geolocation | 1.90 | | | | | | | global-shortcut | 1.90 | | | | | | | haptics | 1.90 | | | | | | | http | 1.90 | | | | | | | localhost | 1.90 | | | | | | | log | 1.90 | | | | | | | nfc | 1.90 | | | | | | | notification | 1.90 | | | | | \* | | opener | 1.90 | \* | \* | | | | | os | 1.90 | | | | | | | persisted-scope | 1.90 | | | | | | | positioner | 1.90 | | | | | | | process | 1.90 | | | | | | | shell | 1.90 | \* | \* | | | | | single-instance | 1.90 | | | | | | | sql | 1.90 | | | | | | | store | 1.90 | | | | | | | stronghold | 1.90 | | | | | | | updater | 1.90 | | | | | | | upload | 1.90 | | | | | | | websocket | 1.90 | | | | | | | window-state | 1.90 | | | | | | | system-tray | 1.90 | | | | | | | window-customization | 1.90 | | | | | |
+Tauri comes with extensibility in mind. On this page you’ll find: * **[Official Features](#official-features)**: Built-in Tauri features and functionality * **[Community Resources](#community-plugins)**: More plugins and recipes built by the Tauri community. You can also contribute your own on [Awesome Tauri](https://github.com/tauri-apps/awesome-tauri) * **[Support Table](#support-table)**: A compatibility table showing which platforms are supported by each official plugin **Use the search and filter functionality to find features or community resources:** #### Official Features [Autostart](/plugin/autostart/) Automatically launch your app at system startup. [Barcode Scanner](/plugin/barcode-scanner/) Allows your mobile application to use the camera to scan QR codes, EAN-13 and other types of barcodes. [Biometric](/plugin/biometric/) Prompt the user for biometric authentication on Android and iOS. [Clipboard](/plugin/clipboard/) Read and write to the system clipboard. [Command Line Interface (CLI)](/plugin/cli/) Parse arguments from the command line interface. [Deep Linking](/plugin/deep-linking/) Set your Tauri application as the default handler for an URL. [Dialog](/plugin/dialog/) Native system dialogs for opening and saving files along with message dialogs. [File System](/plugin/file-system/) Access the file system. [Geolocation](/plugin/geolocation/) Get and track the device's current position, including information about altitude, heading, and speed (if available). [Global Shortcut](/plugin/global-shortcut/) Register global shortcuts. [Haptics](/plugin/haptics/) Haptic feedback and vibrations on Android and iOS [HTTP Client](/plugin/http-client/) Access the HTTP client written in Rust. [Localhost](/plugin/localhost/) Use a localhost server in production apps. [Logging](/plugin/logging/) Configurable logging. [NFC](/plugin/nfc/) Read and write NFC tags on Android and iOS. [Notifications](/plugin/notification/) Send native notifications to the user. [Opener](/plugin/opener/) Open files and URLs in external applications. [OS Information](/plugin/os-info/) Read information about the operating system. [Persisted Scope](/plugin/persisted-scope/) Persist runtime scope changes on the filesystem. [Positioner](/plugin/positioner/) Move windows to common locations. [Process](/plugin/process/) Access the current process. [Shell](/plugin/shell/) Access the system shell to spawn child processes. [Single Instance](/plugin/single-instance/) Ensure that a single instance of your Tauri app is running at a time. [SQL](/plugin/sql/) Tauri Plugin providing an interface for the frontend to communicate with SQL databases through sqlx. [Store](/plugin/store/) Persistent key value storage. [Stronghold](/plugin/stronghold/) Encrypted, secure database. [Updater](/plugin/updater/) In-app updates for Tauri applications. [Upload](/plugin/upload/) File uploads through HTTP. [Websocket](/plugin/websocket/) Open a WebSocket connection using a Rust client in JavaScript. [Window State](/plugin/window-state/) Persist window sizes and positions. #### Community Plugins [sentry-tauri](https://github.com/timfish/sentry-tauri)Capture JavaScript errors, Rust panics and native crash minidumps to Sentry. [tauri-awesome-rpc](https://github.com/ahkohd/tauri-awesome-rpc)Custom invoke system that leverages WebSocket. [tauri-nspanel](https://github.com/ahkohd/tauri-nspanel)Convert a window to panel. [tauri-nspopover-plugin](https://github.com/freethinkel/tauri-nspopover-plugin)Native NSPopover view for use in the status bar in macOS. [tauri-plugin-android-battery-optimization](https://github.com/NeoHuncho/tauri-plugin-android-battery-optimization)Check and request battery optimization exemptions on Android. [tauri-plugin-android-fs](https://github.com/aiueo13/tauri-plugin-android-fs)Access the file system on Android. [tauri-plugin-aptabase](https://github.com/aptabase/tauri-plugin-aptabase)Privacy-first and minimalist analytics for desktop and mobile apps. [tauri-plugin-auth](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-auth)Auth plugin for iOS that uses ASWebAuthenticationSession for authentication, which allows keychain access. [tauri-plugin-blec](https://github.com/MnlPhlp/tauri-plugin-blec)Cross platform Bluetooth Low Energy client based on btleplug. [tauri-plugin-cache](https://github.com/Taiizor/tauri-plugin-cache)Advanced disk caching solution with memory layer, TTL management, compression support, and cross-platform compatibility for desktop and mobile. [tauri-plugin-clipboard](https://github.com/CrossCopy/tauri-plugin-clipboard)Clipboard plugin for reading/writing clipboard text/image/html/rtf/files, and monitoring clipboard update. [tauri-plugin-context-menu](https://github.com/c2r0b/tauri-plugin-context-menu)Native context menu. [tauri-plugin-desktop-underlay](https://github.com/Charlie-XIAO/tauri-plugin-desktop-underlay)Attach a window to desktop, below icons and above wallpaper. [tauri-plugin-device-info](https://github.com/edisdev/tauri-plugin-device-info)Access comprehensive device information including battery, network, storage, display, and system details across desktop and mobile. [tauri-plugin-dragout](https://github.com/alexqqqqqq777/tauri-plugin-dragout)Native macOS drag-out (file promise) support. [tauri-plugin-drpc](https://github.com/smokingplaya/tauri-plugin-drpc)Discord RPC support. [tauri-plugin-esc-pos](https://github.com/Kosadchiy/tauri-plugin-esc-pos)ESC/POS receipt printer support over USB and TCP. [tauri-plugin-fs-pro](https://github.com/ayangweb/tauri-plugin-fs-pro)Extended with additional methods for files and directories. [tauri-plugin-graphql](https://github.com/JonasKruckenberg/tauri-plugin-graphql)Type-safe IPC for Tauri using GraphQL. [tauri-plugin-iap](https://github.com/Choochmeque/tauri-plugin-iap)Plugin that enables full In-App Purchases flow for Android, macOS, iOS and Windows. [tauri-plugin-iap](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-iap)In-app-purchase plugin for iOS that allows fetching, purchasing, and restoring of products. [tauri-plugin-in-app-review](https://github.com/Gbyte-Group/tauri-plugin-in-app-review)In-app app rating prompts using native platform APIs. [tauri-plugin-ios-photos](https://github.com/Gbyte-Group/tauri-plugin-ios-photos)iOS Photos album and asset management via native APIs. [tauri-plugin-js](https://github.com/HuakunShen/tauri-plugin-js)Give your app Electron-like JS backends with type-safe RPC powered by kkrpc. Supports Bun, Node.js, and Deno. [tauri-plugin-keep-screen-on](https://gitlab.com/cristofa/tauri-plugin-keep-screen-on)Disable screen timeout on Android and iOS. [tauri-plugin-libsql](https://github.com/HuakunShen/tauri-plugin-libsql)libsql/Turso database support with encryption, embedded replicas, and Drizzle ORM integration. [tauri-plugin-macos-permissions](https://github.com/ayangweb/tauri-plugin-macos-permissions)Support for checking and requesting macOS system permissions. [tauri-plugin-mobile-sharetarget](https://github.com/IT-ess/tauri-plugin-mobile-sharetarget)Handle mobile Share Intents with a FIFO queue [tauri-plugin-mqtt](https://github.com/kuyoonjo/tauri-plugin-mqtt)MQTT client support. [tauri-plugin-network](https://github.com/HuakunShen/tauri-plugin-network)Tools for reading network information and scanning network. [tauri-plugin-nosleep](https://github.com/pevers/tauri-plugin-nosleep/)Block the power save functionality in the OS. [tauri-plugin-ota](https://github.com/inKibra/tauri-plugins/tree/main/packages/tauri-plugin-ota)OTA plugin for applications that just want to continuously deliever new JavaScript code based on a manfiest. [tauri-plugin-pinia](https://github.com/ferreira-tb/tauri-store/tree/main/packages/plugin-pinia)Persistent Pinia stores for Vue. [tauri-plugin-prevent-default](https://github.com/ferreira-tb/tauri-plugin-prevent-default)Disable default browser shortcuts. [tauri-plugin-python](https://github.com/marcomq/tauri-plugin-python/)Use python in your backend. [tauri-plugin-screenshots](https://github.com/ayangweb/tauri-plugin-screenshots)Get screenshots of windows and monitors. [tauri-plugin-serialport](https://github.com/deid84/tauri-plugin-serialport)Cross-compatible serialport communication tool. [tauri-plugin-serialplugin](https://github.com/s00d/tauri-plugin-serialplugin)Cross-compatible serialport communication tool. [tauri-plugin-sharesheet](https://github.com/buildyourwebapp/tauri-plugin-sharesheet)Share content to other apps via the Android Sharesheet or iOS Share Pane. [tauri-plugin-svelte](https://github.com/ferreira-tb/tauri-store/tree/main/packages/plugin-svelte)Persistent Svelte stores. [tauri-plugin-system-info](https://github.com/HuakunShen/tauri-plugin-system-info)Detailed system information. [tauri-plugin-tcp](https://github.com/kuyoonjo/tauri-plugin-tcp)TCP socket support. [tauri-plugin-thermal-printer](https://github.com/luis3132/tauri-plugin-thermal-printer)Add support to handle thermal printers. [tauri-plugin-tracing](https://github.com/fltsci/tauri-plugin-tracing)Structured logging with the tracing crate, featuring JS-to-Rust log bridging, file rotation, and flamegraph profiling. [tauri-plugin-udp](https://github.com/kuyoonjo/tauri-plugin-udp)UDP socket support. [tauri-plugin-velesdb](https://github.com/cyberlife-coder/VelesDB)Native vector database plugin. 70µs semantic search, ≥95% recall, hybrid BM25+vector, offline-first, full ecosystem integrations and more. [tauri-plugin-view](https://github.com/ecmel/tauri-plugin-view)View and share files on mobile. [tauri-plugin-widgets](https://github.com/s00d/tauri-plugin-widgets)Cross-platform home-screen widgets with WidgetKit, AppWidgetManager, Adaptive Cards, and desktop webviews. [tauri-remote-ui](https://github.com/DraviaVemal/tauri-remote-ui)Make you web app bundle available as web page for test and development. [taurpc](https://github.com/MatsDK/TauRPC)Typesafe IPC wrapper for Tauri commands and events. #### Community Integrations [Astrodon](https://github.com/astrodon/astrodon)Make Tauri desktop apps with Deno. [axios-tauri-adapter](https://git.kaki87.net/KaKi87/axios-tauri-adapter)axios adapter for the @tauri-apps/api/http module. [axios-tauri-api-adapter](https://github.com/persiliao/axios-tauri-api-adapter)Makes it easy to use Axios in Tauri, axios adapter for the @tauri-apps/api/http module. [Deno in Tauri](https://github.com/typed-sigterm/deno-in-tauri)Run JS/TS code with Deno Core Engine, in Tauri apps. [faynosync-update-server](https://github.com/ku9nov/faynoSync)Self-hosted Dynamic Update Server with statistics, supporting Tauri and other platforms. Flexible features for seamless app updates and insights. [kkrpc](https://github.com/kunkunsh/kkrpc)Seamless RPC communication between a Tauri app and node/deno/bun processes. [ngx-tauri](https://codeberg.org/crapsilon/ngx-tauri)Small lib to wrap around functions from tauri modules, to integrate easier with Angular. [svelte-tauri-filedrop](https://github.com/probablykasper/svelte-tauri-filedrop)File drop handling component for Svelte. [Tauri Specta](https://github.com/oscartbeaumont/tauri-specta)Completely typesafe Tauri commands. [tauri-htmx-extension](https://github.com/ChristianPavilonis/tauri-htmx-extension)Extention for using htmx with Tauri apis. [tauri-macos-menubar-app-example](https://github.com/ahkohd/tauri-macos-menubar-app-example) [tauri-macos-spotlight-example](https://github.com/ahkohd/tauri-macos-spotlight-example) [tauri-mcp-server](https://github.com/hypothesi/mcp-server-tauri)MCP server and plugin for rapid development and debugging. [tauri-update-cloudflare](https://github.com/mackenly/tauri-update-cloudflare)One-click deploy a Tauri Update Server to Cloudflare. [tauri-update-server](https://git.kaki87.net/KaKi87/tauri-update-server)Automatically interface the Tauri updater with git repository releases. [vite-plugin-tauri](https://github.com/amrbashir/vite-plugin-tauri)Integrate Tauri in a Vite project to build cross-platform apps. ## Support Table Hover “\*” to see notes. For more details visit the plugin page | Plugin | Rust Version | android | ios | linux | macos | windows | | -------------------- | ------------ | ------- | --- | ----- | ----- | ------- | | autostart | 1.90 | | | | | | | barcode-scanner | 1.90 | | | | | | | biometric | 1.90 | | | | | | | cli | 1.90 | | | | | | | clipboard-manager | 1.90 | \* | \* | | | | | deep-link | 1.90 | \* | \* | | \* | | | dialog | 1.90 | \* | \* | | | | | fs | 1.90 | \* | \* | \* | \* | \* | | geolocation | 1.90 | | | | | | | global-shortcut | 1.90 | | | | | | | haptics | 1.90 | | | | | | | http | 1.90 | | | | | | | localhost | 1.90 | | | | | | | log | 1.90 | | | | | | | nfc | 1.90 | | | | | | | notification | 1.90 | | | | | \* | | opener | 1.90 | \* | \* | | | | | os | 1.90 | | | | | | | persisted-scope | 1.90 | | | | | | | positioner | 1.90 | | | | | | | process | 1.90 | | | | | | | shell | 1.90 | \* | \* | | | | | single-instance | 1.90 | | | | | | | sql | 1.90 | | | | | | | store | 1.90 | | | | | | | stronghold | 1.90 | | | | | | | torch | 1.90 | | | | | | | updater | 1.90 | | | | | | | upload | 1.90 | | | | | | | websocket | 1.90 | | | | | | | window-state | 1.90 | | | | | | | system-tray | 1.90 | | | | | | | window-customization | 1.90 | | | | | |
 
 # Autostart
 
@@ -11706,7 +11724,7 @@ scan({ windowed: true, formats: [Format.QRCode] });
   +"permissions": ["biometric:default"]
 }
 ```
- ## [Default Permission](#default-permission) This permission set configures which biometric features are by default exposed. #### [Granted Permissions](#granted-permissions) It allows acccess to all biometric commands. #### This default permission set includes the following: * `allow-authenticate` * `allow-status` ## Permission Table | Identifier | Description | | ------------------------------ | ------------------------------------------------------------------ | | `biometric:allow-authenticate` | Enables the authenticate command without any pre-configured scope. | | `biometric:deny-authenticate` | Denies the authenticate command without any pre-configured scope. | | `biometric:allow-status` | Enables the status command without any pre-configured scope. | | `biometric:deny-status` | Denies the status command without any pre-configured scope. |
+ ## [Default Permission](#default-permission) This permission set configures which biometric features are by default exposed. #### [Granted Permissions](#granted-permissions) It allows checking the biometric status and prompting for authentication. Encrypting and decrypting data with `biometric_cipher` is not included and must be enabled explicitly with `biometric:allow-biometric-cipher`. #### This default permission set includes the following: * `allow-authenticate` * `allow-status` ## Permission Table | Identifier | Description | | ---------------------------------- | ----------------------------------------------------------------------- | | `biometric:allow-authenticate` | Enables the authenticate command without any pre-configured scope. | | `biometric:deny-authenticate` | Denies the authenticate command without any pre-configured scope. | | `biometric:allow-biometric-cipher` | Enables the biometric\_cipher command without any pre-configured scope. | | `biometric:deny-biometric-cipher` | Denies the biometric\_cipher command without any pre-configured scope. | | `biometric:allow-status` | Enables the status command without any pre-configured scope. | | `biometric:deny-status` | Denies the status command without any pre-configured scope. |
 
 # Command Line Interface (CLI)
 
@@ -12099,7 +12117,7 @@ scan({ windowed: true, formats: [Format.QRCode] });
   println!("{:?}", content.unwrap());
   // Prints "Tauri is awesome!" to the terminal
   ```
- ## [Default Permission](#default-permission) No features are enabled by default, as we believe the clipboard can be inherently dangerous and it is application specific if read and/or write access is needed. Clipboard interaction needs to be explicitly enabled. ## Permission Table | Identifier | Description | | ------------------------------------- | ------------------------------------------------------------------ | | `clipboard-manager:allow-clear` | Enables the clear command without any pre-configured scope. | | `clipboard-manager:deny-clear` | Denies the clear command without any pre-configured scope. | | `clipboard-manager:allow-read-image` | Enables the read\_image command without any pre-configured scope. | | `clipboard-manager:deny-read-image` | Denies the read\_image command without any pre-configured scope. | | `clipboard-manager:allow-read-text` | Enables the read\_text command without any pre-configured scope. | | `clipboard-manager:deny-read-text` | Denies the read\_text command without any pre-configured scope. | | `clipboard-manager:allow-write-html` | Enables the write\_html command without any pre-configured scope. | | `clipboard-manager:deny-write-html` | Denies the write\_html command without any pre-configured scope. | | `clipboard-manager:allow-write-image` | Enables the write\_image command without any pre-configured scope. | | `clipboard-manager:deny-write-image` | Denies the write\_image command without any pre-configured scope. | | `clipboard-manager:allow-write-text` | Enables the write\_text command without any pre-configured scope. | | `clipboard-manager:deny-write-text` | Denies the write\_text command without any pre-configured scope. |
+ ## [Default Permission](#default-permission) No features are enabled by default, as we believe the clipboard can be inherently dangerous and it is application specific if read and/or write access is needed. Clipboard interaction needs to be explicitly enabled. ## Permission Table | Identifier | Description | | -------------------------------------- | ------------------------------------------------------------------- | | `clipboard-manager:allow-clear` | Enables the clear command without any pre-configured scope. | | `clipboard-manager:deny-clear` | Denies the clear command without any pre-configured scope. | | `clipboard-manager:allow-read-image` | Enables the read\_image command without any pre-configured scope. | | `clipboard-manager:deny-read-image` | Denies the read\_image command without any pre-configured scope. | | `clipboard-manager:allow-read-text` | Enables the read\_text command without any pre-configured scope. | | `clipboard-manager:deny-read-text` | Denies the read\_text command without any pre-configured scope. | | `clipboard-manager:allow-write-html` | Enables the write\_html command without any pre-configured scope. | | `clipboard-manager:deny-write-html` | Denies the write\_html command without any pre-configured scope. | | `clipboard-manager:allow-write-image` | Enables the write\_image command without any pre-configured scope. | | `clipboard-manager:deny-write-image` | Denies the write\_image command without any pre-configured scope. | | `clipboard-manager:allow-write-secret` | Enables the write\_secret command without any pre-configured scope. | | `clipboard-manager:deny-write-secret` | Denies the write\_secret command without any pre-configured scope. | | `clipboard-manager:allow-write-text` | Enables the write\_text command without any pre-configured scope. | | `clipboard-manager:deny-write-text` | Denies the write\_text command without any pre-configured scope. |
 
 # Deep Linking
 
@@ -17142,37 +17160,70 @@ let update = app
   ```sh
   bun add @tauri-apps/plugin-upload
   ```
- ## Usage Once you’ve completed the registration and setup process for the plugin, you can access all of its APIs through the JavaScript guest bindings. Here’s an example of how you can use the plugin to upload and download files: 
+ ## Usage Once you’ve completed the registration and setup process for the plugin, you can access all of its APIs through the JavaScript guest bindings. ### Upload `upload` sends the file as the raw request body (not `multipart/form-data`) and returns the response body as text: 
 ```javascript
 import { upload } from '@tauri-apps/plugin-upload';
 // when using `"withGlobalTauri": true`, you may use
 // const { upload } = window.__TAURI__.upload;
 
 
-upload(
+const response = await upload(
   'https://example.com/file-upload',
-  './path/to/my/file.txt',
-  ({ progress, total }) =>
-    console.log(`Uploaded ${progress} of ${total} bytes`), // a callback that will be called with the upload progress
+  '/path/to/my/file.txt',
+  ({ progressTotal, total }) =>
+    console.log(`Uploaded ${progressTotal} of ${total} bytes`), // a callback that will be called with the upload progress
   { 'Content-Type': 'text/plain' } // optional headers to send with the request
 );
 ```
- 
+ It sends a `POST` request by default. To use `PUT` or `PATCH`, pass an `HttpMethod` as the fifth argument: 
+```javascript
+import { upload, HttpMethod } from '@tauri-apps/plugin-upload';
+
+
+await upload(
+  'https://example.com/file-upload',
+  '/path/to/my/file.txt',
+  undefined, // no progress callback
+  { 'Content-Type': 'text/plain' },
+  HttpMethod.Put
+);
+```
+ ### Download `download` saves the response body to the given file path: 
 ```javascript
 import { download } from '@tauri-apps/plugin-upload';
 // when using `"withGlobalTauri": true`, you may use
 // const { download } = window.__TAURI__.upload;
 
 
-download(
+await download(
   'https://example.com/file-download-link',
-  './path/to/save/my/file.txt',
-  ({ progress, total }) =>
-    console.log(`Downloaded ${progress} of ${total} bytes`), // a callback that will be called with the download progress
-  { 'Content-Type': 'text/plain' } // optional headers to send with the request
+  '/path/to/save/my/file.txt',
+  ({ progressTotal, total }) =>
+    console.log(`Downloaded ${progressTotal} of ${total} bytes`), // a callback that will be called with the download progress
+  { Authorization: 'Bearer \<token\>' } // optional headers to send with the request
 );
 ```
- ## Permissions By default all potentially dangerous plugin commands and scopes are blocked and cannot be accessed. You must modify the permissions in your `capabilities` configuration to enable these. See the [Capabilities Overview](/security/capabilities/) for more information and the [step by step guide](/learn/security/using-plugin-permissions/) to use plugin permissions. src-tauri/capabilities/default.json 
+ It sends a `GET` request by default. If you pass a body as the fifth argument, it sends a `POST` request with that body instead: 
+```javascript
+import { download } from '@tauri-apps/plugin-upload';
+
+
+await download(
+  'https://example.com/export',
+  '/path/to/save/report.csv',
+  undefined, // no progress callback
+  { 'Content-Type': 'application/json' },
+  JSON.stringify({ format: 'csv' })
+);
+```
+ ### Progress The progress callback runs for each chunk and receives: * `progress`: bytes in the last chunk, not the running total * `progressTotal`: bytes transferred so far * `total`: total size in bytes. For downloads this comes from the `Content-Length` header and is `0` if the server doesn’t send it. * `transferSpeed`: approximate speed in bytes per second ### File paths Relative paths are resolved against the app’s working directory, which is different in `tauri dev` and in a bundled app. Use absolute paths instead, for example with the [path API](/reference/javascript/api/namespacepath/): 
+```javascript
+import { appDataDir, join } from '@tauri-apps/api/path';
+
+
+const filePath = await join(await appDataDir(), 'file.txt');
+```
+ When downloading, the parent directory must already exist, and any existing file at that path is overwritten. If the download fails, the partial file is not removed. ### Errors Both functions reject if the file can’t be read or written, the request fails, or the server returns an error status. ## Permissions By default all potentially dangerous plugin commands and scopes are blocked and cannot be accessed. You must modify the permissions in your `capabilities` configuration to enable these. See the [Capabilities Overview](/security/capabilities/) for more information and the [step by step guide](/learn/security/using-plugin-permissions/) to use plugin permissions. src-tauri/capabilities/default.json 
 ```diff
 {
   "permissions": [

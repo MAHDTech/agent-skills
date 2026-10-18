@@ -17,8 +17,8 @@ skill_name = "spacetimedb"
 <link rel="sitemap" type="application/xml" href="/docs/sitemap.xml">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/inter-latin-wght-normal.woff2" crossorigin="anonymous">
 <link rel="preload" as="font" type="font/woff2" href="/docs/fonts/source-code-pro-latin-wght-normal.woff2" crossorigin="anonymous"><link rel="stylesheet" href="/docs/assets/css/styles.4f000462.css">
-<script src="/docs/assets/js/runtime~main.9d2ae6d0.js" defer="defer"></script>
-<script src="/docs/assets/js/main.1a39f187.js" defer="defer"></script>
+<script src="/docs/assets/js/runtime~main.00ab2442.js" defer="defer"></script>
+<script src="/docs/assets/js/main.67c34654.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;">\<defs\>
@@ -154,6 +154,7 @@ Because these are so commonly used, there are helper functions to get them.</p>
 <span class="line"><span style="color:#FF79C6">    return</span><span style="color:#50FA7B"> Ok</span><span style="color:#F8F8F2">();</span></span>
 <span class="line"><span style="color:#F8F8F2">}</span></span></code></pre></div></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Y_NL" id="accessing-custom-claims">Accessing custom claims<a href="#accessing-custom-claims" class="hash-link" aria-label="Direct link to Accessing custom claims" title="Direct link to Accessing custom claims" translate="no">​</a></h2>
+<p>The internal-call shortcut in the examples below applies to host-originated calls such as scheduled reducers, never to HTTP handler transactions.</p>
 <p>If you want to access additional claims that aren&#x27;t available via helper functions, you can parse the full JWT payload. This is useful for handling custom or application-specific claims.</p>
 <p>As an example, let&#x27;s say that your tokens have a "roles" claim, which is a list of priviledges. If you want to make sure that only users with the <code>admin</code> role are able to call a certain reducer, you could do the following:</p>
 <div class="theme-tabs-container tabs-container tabList_duiv"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">TS</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C#</li><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_a1H9 tabs__item--active">Rust</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_a1H9">C++</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_w6aI" hidden=""><pre tabindex="0" class="codeBlockStandalone_LlrK thin-scrollbar codeBlockContainer_hFbQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><code class="codeBlockLines_JqGU"><span class="line"><span style="color:#FF79C6">import</span><span style="color:#F8F8F2"> { SenderError, </span><span style="color:#FF79C6">type</span><span style="color:#F8F8F2"> InferSchema, </span><span style="color:#FF79C6">type</span><span style="color:#F8F8F2"> ReducerCtx } </span><span style="color:#FF79C6">from</span><span style="color:#E9F284"> &#x27;</span><span style="color:#F1FA8C">spacetimedb/server</span><span style="color:#E9F284">&#x27;</span><span style="color:#F8F8F2">;</span></span>
