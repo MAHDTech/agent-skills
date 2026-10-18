@@ -153,7 +153,6 @@ Beyond `/code-review` on the main flow:
 - `/cargo-crap` - reach for this when measuring and gating Change Risk Anti-Patterns (CRAP) metric across Rust codebases by combining cyclomatic complexity with test coverage.
 - [/zola](@/skills/tooling/zola/_index.md) - reach for this when modifying, building, serving, or customizing Zola static sites, themes, templates, or config files.
 - [/zed](@/skills/tooling/zed/_index.md) - reach for this when finding, searching, or managing Zed editor settings, keybindings, LSP, and configuration files.
-- [/delta](@/skills/tooling/delta/_index.md) - reach for this when configuring or operating Delta and DeltaDB (threads, subthreads, subagents, Delta worktrees, checkouts, `.agents/prepare`, `.agents/linked`, Land skills, or CRDT Git remote sync).
 - `/tars-run-factory` - reach for this to run the unattended TARS software factory foreman, driving headless agy batch runs, reviews, and rework until the backlog drains or a human is needed.
 
 > Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
