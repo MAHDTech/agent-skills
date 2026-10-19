@@ -23,7 +23,7 @@ concurrency:
 jobs:
   validate:
     name: CI Validation
-    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
     with:
       job-name: validate
       lint-command: prek run --all-files
