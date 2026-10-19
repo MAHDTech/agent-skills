@@ -20,7 +20,7 @@ permissions:
 jobs:
   candidate:
     name: Resolve Release Candidate
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-candidate.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
+    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-candidate.yaml@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
     with:
       commit-sha: ${{ github.sha }}
 
@@ -36,14 +36,14 @@ jobs:
     steps:
       - id: checkout
         name: Check Out the Exact Consumer Commit and Release History
-        uses: tars-cloud/actions/composite/setup-consumer/scripts/checkout@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
+        uses: tars-cloud/actions/composite/setup-consumer/scripts/checkout@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - id: release
         name: Prepare the Rust Release
-        uses: tars-cloud/actions/composite/release-rust@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
+        uses: tars-cloud/actions/composite/release-rust@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
         with:
           command: prepare
           commit-sha: ${{ github.sha }}
@@ -86,7 +86,7 @@ jobs:
       contents: write
       pull-requests: read
       actions: read
-    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-publish.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
+    uses: tars-cloud/actions/.github/workflows/consumer-rust-release-publish.yaml@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
     with:
       commit-sha: ${{ needs.candidate.outputs.commit-sha }}
       artifact-run-id: ${{ github.run_id }}
