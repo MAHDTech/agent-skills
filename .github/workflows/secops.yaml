@@ -29,7 +29,7 @@ jobs:
   # -------------------------------------------------
   trivy:
     name: Trivy Scan
-    uses: tars-cloud/actions/.github/workflows/consumer-trivy.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+    uses: tars-cloud/actions/.github/workflows/consumer-trivy.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
     with:
       timeout-minutes: 60
       config-file: auto
@@ -39,7 +39,7 @@ jobs:
   # -------------------------------------------------
   codeql:
     name: CodeQL Analysis
-    uses: tars-cloud/actions/.github/workflows/consumer-codeql.yaml@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+    uses: tars-cloud/actions/.github/workflows/consumer-codeql.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
     with:
       type: devenv
       timeout-minutes: 120

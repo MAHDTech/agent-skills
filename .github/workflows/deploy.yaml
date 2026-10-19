@@ -25,13 +25,13 @@ jobs:
     steps:
       - id: setup_consumer
         name: Set Up Consumer
-        uses: tars-cloud/actions/composite/setup-consumer@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+        uses: tars-cloud/actions/composite/setup-consumer@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
         with:
           fetch-depth: 0
 
       - id: build_dashboard
         name: Build Dashboard
-        uses: tars-cloud/actions/composite/run-devenv@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+        uses: tars-cloud/actions/composite/run-devenv@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
         with:
           run: ask dashboard build
 
@@ -48,7 +48,7 @@ jobs:
       - id: report_status
         name: Report Deployment Status
         if: always()
-        uses: tars-cloud/actions/composite/report-status@822009e983b73316cbf67a3606842502c7be4599 # v3.3.0
+        uses: tars-cloud/actions/composite/report-status@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
         with:
           title: Deployment Results
           results: |
