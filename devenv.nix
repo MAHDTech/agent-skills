@@ -8,15 +8,15 @@ let
   isNative = !config.container.isBuilding;
 
   # Packages are installed native and in containers.
-  packages = [
-    pkgs.gh
+  packages = with pkgs; [
+    gh
   ];
 
   # Dev Packages are only installed in native environments.
   devPackages = with pkgs; [
     cargo-audit
-    cargo-edit
     cargo-deny
+    cargo-edit
     cargo-llvm-cov
     cargo-nextest
     cargo-watch
@@ -113,7 +113,6 @@ in
     excludes = [
       ".agents/"
       ".devenv/"
-      ".git/"
       "^.vscode/"
       "^node_modules/"
       "/resources/"
