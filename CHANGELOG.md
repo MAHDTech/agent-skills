@@ -1,16 +1,39 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.50](https://github.com/MAHDTech/agent-skills/compare/v0.1.49...a3f524d3606dac1154938f988ab1f72291e8f6f7) (2026-10-11)
+## [v0.1.51](https://github.com/MAHDTech/agent-skills/compare/v0.1.50...ceabb451b8b0baaef97ed3929a945f9d9ff3d6bb) (2026-10-22)
 
 ### Features
+
+* **skills:** add oak, jj, and delta skills, add tars category, and archive
+retired skills (#232)
+([c9b5019](https://github.com/MAHDTech/agent-skills/commit/c9b5019e5fa0faa1cbb86b44012302ae88552aef)),
+closes [#232](https://github.com/MAHDTech/agent-skills/issues/232)
+* add .editorconfig (#174) (#223)
+([9839403](https://github.com/MAHDTech/agent-skills/commit/98394031d704ccb2864caae256f95ff2259902ea)),
+closes [#174](https://github.com/MAHDTech/agent-skills/issues/174)
+[#223](https://github.com/MAHDTech/agent-skills/issues/223)
+[#174](https://github.com/MAHDTech/agent-skills/issues/174)
+[#174](https://github.com/MAHDTech/agent-skills/issues/174)
+
+### Fixes
+
+* **skills:** track opening code fence char and length for nested fences
+(#156) (#225)
+([8153a08](https://github.com/MAHDTech/agent-skills/commit/8153a0807e387d721201e7bb443534f3c7b6c550)),
+closes [#156](https://github.com/MAHDTech/agent-skills/issues/156)
+[#225](https://github.com/MAHDTech/agent-skills/issues/225)
+
+### [v0.1.50](https://github.com/MAHDTech/agent-skills/compare/v0.1.49...v0.1.50) (2026-10-11)
+
+#### Features
 
 * **skills:** add cargo-crap skill for CRAP metric analysis and quality gates
 (#210)
 ([7deb8de](https://github.com/MAHDTech/agent-skills/commit/7deb8deaf0afbdadc516d1a85f9f019f561054db)),
 closes [#210](https://github.com/MAHDTech/agent-skills/issues/210)
 
-### Fixes
+#### Fixes
 
 * Exclude CHANGELOG.md (#216)
 ([998d519](https://github.com/MAHDTech/agent-skills/commit/998d519f3429b9801969fee2e1e52dc824b91e72)),
