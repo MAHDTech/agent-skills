@@ -59,6 +59,10 @@ skill_name = "acp"
 
 * [use-acp](https://github.com/marimo-team/use-acp)
 
+## Ruby
+
+* [acp-sdk](https://github.com/bottrall/acp-sdk)
+
 ## TypeScript
 
 * [acp-ts-sdk](https://github.com/langwatch/acp-ts-sdk)
