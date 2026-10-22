@@ -61,6 +61,10 @@ source_url = "https://github.com/MAHDTech/agent-skills/tree/main/skills-archive/
 
 * [use-acp](https://github.com/marimo-team/use-acp)
 
+## Ruby
+
+* [acp-sdk](https://github.com/bottrall/acp-sdk)
+
 ## TypeScript
 
 * [acp-ts-sdk](https://github.com/langwatch/acp-ts-sdk)

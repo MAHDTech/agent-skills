@@ -1,147 +1,610 @@
-{I'7S$#jx$S,&,vTUd3b͙NL&t+VntJ+3٬NcHݞsGF>*=3Dn?|寞?x}>:/X=?TFIon{Jύ䓡IGC7#7;7Nlݭmߋ[}Ͱf`OSI4*oˋ0+cGbxN*P荅޻OQiW|Qqr]4׍m j(蝝\IUZkO*8C
-c?sx98ͲհnI%nūܫƽw#}z 3
-n⇁3$pǞtA3[Z+Gdv*bY$z7RW%/0iڲe%љSy=$XF$܁I⍫KD$A,0x(ײK^``fї2KG!}~3w?_^~DL-=zg??~A_>'#LЋG{_rXP޹#b`̲uk7HZft	M+h$Qc]7|%;IOT?IHE_K7?tӤڟ]R=\d cԬy^XfUmF+9`9ȫXqTdC~~ETg_̿}>=l#mu.hxu#DA`yLPD^Lr2"Gx=4421-JgІ[eT&;ʼJ7򺘁f;P~S^'n?q/պe*sx1ca"7*N͑{kunTIެԷcEʱX0H0:;=z6Y~';c&IZ?	NU!V{uQfV:S-O9 m!J
-;Qͼ蜎G>:]A-	t}
-(SƃִydL-;<(b;RBkn6N22bg\r0~Yytgi,^o&XPRR0 tR\1)c-g{zi8rEqB,K6=JԻqܺw#fƇ(n	O>}ba=E8f74kF;1!Vp(cF?r!·xFKYtAGީP<
-	DwhX]MtQkZJ[+Q|Bv!*1X|K9`8rpvGr߃Lі:n8MgMיDċN%YKύXƧ$Hie2d
-uii$i1U#X!4*6nԋyAo"	%Pl
-H-c(&e-޸Xp3?HMq
-؍ΠAa(B=O(sZz/ed{[~ba3L$&O+p/RlX,QX_yKǞ5czRH-\ߺnyA?0pC;AmZacݓ(ބBC%`NuvXQocy,Ok4`:a4*u`k^9wUm^9꛴CԨUH̥xաV!#Ч+d_y3Ӥ~.jw`7~G&⺂w&ÑʍQIlOHW..j)@.t|ԏԥ-}'xbPö@P
-"!&Z2~&fny1R>Mz7|{r//O8P+biW.aDiR#S4ڤ޽^Jf3')Xx].(d|
-{
-͓/1Ra2(?mdz}VؗͰal	ˡׇ-YI,v\Ͳ('+7؈6L	0rqj-׬**Gem+FDݡ/lG`Or3h}b16$8ÑŎl?F=x?7}3|30[aw/Nk'}|j*Hc_ٝ;>3vO_Uy`Cyc)K0IMfQ<m{OR**r\3]9빲n/[.!;
-Mes@`B>L`2
-ct.(7_KD=	iK18|VCÉBLs5aaLRhU~(o'0A*'lYq2A|(p{,rZF	rc
-+,qK|Z["AB\bЌhOcyOdP25˺sʺdO^r.[~{*SWOV9F$`3 G(ϱOݑTP%d8JҿOYg"ՔS@bLE0_?Y6Yfr)q(؇8=*ΣG|s?]oц5kAR\콎Մ팞\@RػiWZ@#J,@+&$ǣL%/&
-1vմf)ؖؔx^WO6%{&.Xð:Jt^(МZEP_a*ydң2hIŐx]Xz#@#>8</4ZdVs2H	Zb,˘+ZRuh.w.}E\,wY娫`n[UH`wc_V*xAs;]C_")=;fa1jdY&e$BAM'o$i[%s"e,G#!)id)4^bK14Ow)'LbY:8wF_X۳>ާwiޝ8\Q3,>qҟ(O#U`tF(kM)GttȖWl@҂8VyLzkSLc^bb;xt1<ͻB)&paց#9Tl?懩.M)iqfiL%wq. W+xEyGyi
-B22G52҂4drV*H'Zg*^͵>]51mUx}ymӀ
-@TrfX,֮ýwwC.~lT+-,֞AidЧsB01"!fpb\3 bIdji<W+᪤ö9)ܜZd/[L/-(ZIeF+JuVZ]A"P\-rpeZ4ʋl<,*D+zUV9|ԛ0"	U\9_֥*C e9M]-r5!j3*TK3miuXzY/aa.e|fe<p#}Vw)zKBlmd!B]Z,EsIլfڗT?PĩAs)a$c5Q=t؋WI"oSLاoc->F>Q}y?8{>y^5^~x|%	,">L
-%X˖:KJPozuJ,z
-W<[RN&^n5,=ѭ~a݇(gׄ2N$^mKX#an)!PM?>y~YէS`<|P	nԦރ0l?=˜-|	v'Ws~=x8yXwrf{Oeqsf- m40
-Si\<F wrd*On9<Y0G1ܲɿ
-!6-1bh֭[Ҟ{hye2ߧW
-hǛzD̨Jф&hhTTe(Ga?cжҲ2glNUꋔ
-M89!KN"uCÀt(s{EqUAZcBFPBzEg{pK9ᴔ^
-ZpKzNĸY,hWԆs삓Iqe~fSu峧/1<Lon:~VP&	
-Ny/q0W>`xYB&%5SPW[SIY%9ǡ7b(Bɺ)[#oA^uG/`Һt.wh>W}<I(L{&AB}xZn@^Sq>@ގp˝JslYi3 <T8@ٸZo|aܥow{Tl;Mo0#."#4Y͖۴Mx%MMo5vW5hƻ4V	&~6F(EwkYeKue5qtjTt6lZ/MFKWc"p|& tt?_a
-{͡mv(OކB-"NZsjn:+l N=f;kf?F5¯k]Ai'mo/D@٠xΙ4{L7Zij2̈7WM%?i4geg5!<[Z[oC|)HL?Vz6
-%{ó;5*o8Mku6,9h2FC[%>ۖ	j@B\p֪:A+#0SwZWǙ)[i\6Wʱ[k7͆sc6<+jq:Pnbl&sepE{%7|1SMwv>7+YHwW$m&XTt{}UI+9mxYUՉ-ߥKAbʾūk./mZĪH_/ȷLAyL	xtEk3=~#.0q:F8.Ec-l)xthsdTCh`"Va:5yyt.{wjOy̋&ibP%vݜZq8{Gw4ΦJsUf>.4]FcUPv'
-]8QdvZS1U[ޑEj1r'xu!zѣ]>m~w;@8϶q!ʂ-Wn՝0	9r|	K@2?ŭ	$k7ȉÇA ڍ2Wm޹NlP1)$q7C${%SVj5ݍoB`i G~9T{HN(5IGU݇u#hYYCJUf`ޏkkǌ#*TltY%o]8ߨs\ү	.bۃ;I̻&hTmcj40o|tSp暘E?ĐBW@=<ˬ%`e [g#zFRAGӨN M`mJf}tO_in4cS؊ׯ6UU,*Ĥ.FYhs沁Sl^:0rNJ2y)g~؀)DX^6p-5$\=ΎZ\QvPMp*W2o+G:~^%DbEXYa]^UMYS_Ic?2YW )2VpΆR*>\f窗xms4L*S2TcM)րT%jƝd]@&s$F܄}^gc}3ܤ4	NDKR99T"xO_͡;lT<ϒI4vGB)e%ǄNz2$>xp'Pm'd1cIKsЫh%ӫpcluF(IMwa9!Wɸ]VfZ(ͳ#G1X{Z~BqSPpߪP샊dKЍOa55uM.Y^\B3A1r*=Ifm,D|A)r>&kZ\)׌Caak0<'Kk;Q !j>J
-5[SD¶CF7#t܎BU18z.K>31j,o=q%:tO+#Du#E	Ƈ`:k0qtm`TCsk+[Ûf?Z^;oWnl/rr!Wbu=?zvPͽ,8Oul!o筚'w"M
-sY%?m^?1ڵUzaɘR-2HM#AbZM4L(GꅝrM  h52G+JΊU\.zQjV_Um%F`KPdi4Ӷ
-ۅED.U#/Œq%'PܲCi])C4j,Բ66jGLc,:-=#%hq'L'B[awi'HzN@2:onH,bCJI52/Hba;}΀l6[CWnlew	+$I[993	5jFɂlQkz%zCuz$2zEըuat+(e}1gajtw=j
-!(s1"pL=j_yS?
-#*2B(x	G#8Kw*
-be{(r̿WwcTRh헀q|R_+N!yWwiu0D3(ю17d_B{mzXͶ-l',qƪ[AUֲLdE@5)ǼĻZ,9>5\I:bHIbkj2xxL42']F"+b; Tf@S#>b݄M'$ܝ_u{=Yִ4vFTOXpɌ^ԥ@*lD
-<+N%+mē`aހ`X+fODD|&'&LªeG{xvH/Z6&ǩ%<[<;t"A[kHQhlc@~`#ԯx;fʞȊp:bD3kş:04ǋmi*0ʽzͬ{{)*yEl/S(NNK?"	:>r<~Cg|^׏))"&zYNh/9kx5? =d6٥^<6@p	DCbZd^:4\Ds%jOz%APc>.UI3Ek!fA|WeL	K@(iQRLqg:34#PԳ<
-*P曘ڱW\xw0|nHWpE4(ؠC.=T8UWf[%HȮ	^1t0O!ˋ2Ņ慁Kj)|k<٥r6HF!WWKrҙ+b(_$L!_*WaѺF\O.-I
-Eւ4@	\7a3?K9j!Ex7Xh}`	a`eq@c,<]ӆH\?C؎-]J3M+$yg^I/%ddٖI\1m]z$9
-qYӣ]|\"?w]΍kcTANkϰ`ޒWa+&C)NY]$M	R<ꍔ";/ϏrZBv1vtCr9R
-ݖȽQz}U'{CH!Nit<´8A$~$bpƾ?Wh&""D}ZDD}DdLߏhD4vܸ ?|ѵ'h#.p ĝIPB)LR),O\bA(T29kOCrA2D\	i'xS@O)Z
-c157B3	T(IUACRx !G+rigC{j3{qFXܮϥziˬndl:*Oam/pi}>)ט
-n%]9g'xtst&ý5`䥲}OP/t0iEg&.DWϽ,3fZߧ#MR80H6tGWaެIGI'A$@qih!nFqZ|D
-#Sk\n:lݥ
-Y129rWD3./u:y	"B?*hpֳs3%gp9A{n<gĳ3$;ǦBRTZ|p^xS!eQ
->XD\HvatRfz:?:=՜ȺCTZ|(hcv}@gx6~@cBۂ\ECINSXϐf'4-Մ"r?_6;&Ƌ3GY;=8X^p`ՄqۥY:-ۈݾgyHQΕT5nw(>^65ެ*N^_"V8v8Eܑa$BLMRvm~|rR(2w*YB㣢»lDrCj=T-K2owx>ZR *Yn
-AɾWm3i{åw%!ղ$,+-Y+ULj3,8=(bن֜=JLFml=jCuܼIMY`/߰C;ug4,Hp`3vzCYH˾pQX$הD|&І?!?xg2u%R!3MIQ[/E8.,6B>S8xmsUg&5>hqŴ6l]+%{Ȏ8]H8~tsFaQT!wO:ǑGңT`JuVP4N:\v8+"u̲'BJ]sd%_ZNڑT]V8 A|»& +(5~KM\:@P$gAR..=/.%	*)GtD/gᄋF27B)~(Ps%hUN|]rW8o.+1#svNVOVܬ#FG':b5ן"YC֞"TѦ־\}\>m"|˅Wj5vpjk1MD][u67jsewin\,Lkj(!>6Ey|BOU[(%4YD6nZ^Y樏kx]5"Ed9Ν\IG:ƨ9Q߯ގ޽db'$:i,Z;ޥw=n/_\6vkzg;Eǿ+K(.P-w=˺0@)[_n]jBS/z)x$\%rḶsyrqhG@WG\ԍ\XmFi	>hOCO/r[dÝlzjbd:|#qEZ6Ai9w!j.+Bk;wBupglNߣ<_ފvGHmUNT;<udW6#)R>EF*AE@{[;g\;'H8gqU͆&lrԴEXmo5V6+HiS`/ۚN4w2ygAA-S;j{4}'<V*K	Aל%;w~\%irS*^,עQi(.ཊzR(YCtASkr:Qcq|d +Ѝ7iDTI(NbrB2!-$g5q
-!b#Ƙ'=Z<y;@uy(C<śAq.6'v셡c+9iTղ$E/9tykxLޝ;cHFAS3̾<MD?\m|e=(lnVZw,1)<gޢt6qfl(2*_&x#Iu9;L-{c'-mJ_ EK4<ȲS
-#SX?bMICM1[0,^]TWp3k>ԫҚ9NX=J!Eqp3qH
-1Tǿ'fC$-YqS%jWi˨(5Zu2>8b3`?*@_h ToI	ned$mB' 8yiw3l0gN	fb(Q}g:KԂ	D%6S;ba>I<hZ	i,]R+]%Vbg`H~>8Xafd8]Lz_m.~t"bU;xƢVG"~6譈}߯.t`v.ՍIha;w\,4X:vx{w/(Dxa09U%Tq^M`~1ȁ	]D|V$>xMOX	ԪLJY\<vD\>j|PgrA4M]ւ`Tj"#}"%a[}ڊYTPg	JaթҲra
-_f,ks8Z(ز>/Xitq"	5SQ5	YH{^.7HnMl:0v"~9W]Ru7_Wf7LÐUCK|	JåEqx
-%#EKx^)1ãϴk\e*a6l#rg`KLS5{n&k~TxZW:b2&&e͜}RH~U@e2gJ6٠<U"aVpeVͩgi7K,TN3Eqzpu>].G`f{MDݛ	E.tq|r(b/ǳ 2~*
-p83~db&0wVvp|#@EVl?knbL1Xqȷw6U&`voÚ8Lѝqm*ooٷ}_ڪ~7o0l|?@oۿ5?gߪ3!qlo?cUי@ڻ̈́o_oohU5˯fL7_ۿOf:|F/W?_Ư?ox`{si.dn4R@0/</:4c6o:2?y/><< Q{?1MF_惡oJ毷>W惣Pz#hZV~JBvG15HX7u'Ɠ.Y(ēO?7,>tNjғFd'/OzHdIlOKd'ϟOX^*͂KH2Lk/D\ߊS)sV!NeT(A)$KƁhh<$'(J3,(yB{(fє(b3Rf^!רfX9hX,AhL".F ᾀ` >#<=G̙rB@ȕi[,$}Գ±E|-и?}<A#54]}Vs9(4t~}M"(m4^86ՌMoSJbN>_LHE!I{'SךlDx"y I~&ۺk2<YD!Sf"_D'6.cq^^z5"%S^ALo?ǏJR'
-Q".Ҕ,T,!;
-VD,e>fȉJkjZg
-,]Zd^Z̤l"31BHRu"f\ʦYFɎ(a-B*N>556fP5l5`N$6Ze7'l2Bufh^fw6-7Px}ky5Ne^x}y LJ_rAN/|si+4Laa.vݲ2,n(b,EL!o~'q/+ Jb.`9!SN7C#6s
-G3y&(}{UPӵN$}
-]S[iKOfYiMIh
-mȩ¡rAn42dQ9[=e۬])T71}U8G#SwJFQ'oxS(*Z^gVk
-C=iFIz>hޛtGAe7_YLH8-)*EO!*]ҿ\Ϩ/&]٥#iz-,
-ۏDb,H1)Mq\ԗǛ)QeDJ+dd;|%tZ	D|2lm5x!ZwA}7/8G_=zTzF:U Vڛbo=햇M'l*jU(4GX$kzewN	~و6XY\fiˢLZ>.!1t	"Sb9❤ws=0Ba䥿"@rE4#SFvA(}Q4.UAJBUļ/SW.נx>&,RP93y@J,q,yKq'0r!C,_i[#Jnm-e~<cCtOx&r5Щ"T*[⢐lJF7zą12	~5q',VR_x?=%V ^6-b!ɍ99GomBĭfQgc`"*]G6ǈ{!;I7Z~Vw/3}clʩ5m6kpPLp{Sy5
-9B>|T<*.#Lə9Qupoja;hx<i!{1>qIlcׇs'&*y$l|$.w$IF\:n>L}C
-`!r9HFJoff1ruenT"tL=ee]˸*La}I=	5@inؼBx5qW]ǗvqqӂO.nPklm>6w72TjK@AyE*#V9#uEB'IGFl|dL|UrK4^#Ɂ
-Bp]wx[qto}הHF"y&vc]ȇ0WqG~}X14Ĥ]$`yPꞖs!]^H9JK+5+)|Ix9T}VlHڟr@t+!]M@ACO6ezBngl9zA*^"H;DG^rΞqG0Y.^[ni	Q45nZthPI`4`8ˈUM̂ҟ\Pe@0s,#RH-q-\`7D.y BC'd`ï*U*y|Ό7y>J
-K*wN|ĳIR0zRY0>9RbD2GI3"O%g21a<f12VɖAL0{{eYF}a>Р+h.֎؇Р*uBy3Kda[V)3XHkwL7gl1e&9h"@۶M!*Đ((_~#G3hrNK(jT~<]־I6kQ
-HI'(m%Բ$؛dNj_(I?r\-yakX M3r <UlvRܚZ%r#K`8j3#3i!@F?|&,;)ұwɔ=rqɤqi
-.͵]NHGìb4kB	mȧ&QSY DDl2qeV`}<b@ԱY*9l|&wyajr,+4ʲ{rÃ'wB(hgRWڢM][4UQa
-VasE\xE^qj34֫q^T.['Pj\A$-Ut!ncx6ݕގuhUq4_S-*_2#@EMw1T|+:2[/S#cKUޘ^tm6ؠa3%Ec7k))\*[vzwmp.%R=:(H/"	!z)
-.S|q	?ʕ>y
-x˸j_.s8
-Wx\ϓ`=M`d}ܡpH,FEޒCWF'bs8f9w%2	!"OQ8D	5k1ѽ$f.Oܟr
- 		PY'>b1*7cDա|
-"!~sT%B=i7Deq'^d/假`NdNpBKشbeCqbLW@g68WaSsV?uKnݺ%,br-'T[ڒjZnfg?~A`8:ڼuKP,@9[YݧC
-)(Ffo<@Ghm3b(/<fhT%r|#(x2dΔ~Z2e`@$OpO~A6l\hpJEC{Өzgf;7غ$@@Ļ*P0=QҎ`I>7+OǎOHO{k!rz.9J8եQ@\B?2ez}+լC}=gNs W>+05uUiF^l$1P^}ھ7)Rp%9,mJi
-3KLGNU=032.2/ZSį"|{cB^0`g븕 
-H[C.eq$8#td("kY6aD-
-h֧]N7y#onAYsG,1ҳΧK?#k/z`<^	
-ueɘ쭗FP׷iiRY~-HWidekp/na')@8:7'c.8^p/&EZk9.ە!2qLtr@y%݁.{3&]`"Q{rGC
-;aOvV.F^OY)`=MgIW@ү
-(}0
-CPĈ2qX∥	); ҩ㤑'FXyza9-\];9ǋ꓏4nzAxOD18gJ+iքLڄV`~ G;/
-M`AZ_ɊD#hQ:,ɳB	<'`sQ{er)c%,"RȊk@J-eIXf.{
-}f7\=7GdWCm!S^ʮZu$?<ǈSBWpLK#=m'MSfkd%}բ0c\O8l܋c1#i=|Y=Txp3]8nH%&a35B\XZǲ:9m&	CLckcGoxp=AԜnX	UFJ˭? @ztQr}o]J.Ze\'J0<_qaQT4#p:P}'	~[!{8]&0"I&VBvVTۉ[\(׾7.NH/8[o@'"+,.X'HA*+WOQ=DhC>a=[ǆrرb¹=
-1L+(}=nhWK񉥟zAq}I3HoSAp^CzZjA=*̆QcdYFG]{ӵVSaa]*Ya=I@wsd+@'Kc _,Y,8|caZc1*$mE `a	c^9&n|dQP:
-=ȥ{[wv8<M3+xVp\!LՑsXzQl$w6Xt J_cKܕI*={l~gnA&>v]lpѕ%)l_\<@a\=0;pR'<@HR^%ˡ:L{%.2"(KNn
-)	d~*42Ұn9y@dȂnA9.|ҽf$ۍu-Oԋ0n
-/(8*"7G<EGa@F6/N^Bwэ'
-\M`KѢ'K"i0)Fq^)ʀwqn\V_,H20Pbgz=du ]+nԇik x.M,8~/euPKAo$T<&A~2<۹C+k1ZV
-A^!g-חT!-?VD{m=G=]ָ;YRv!sw~4}oTWni*veqa^\%#}pA"PHJʔAkSv9Ne `
-]\V>Zt}{E8t2ELT@nwH$n|'/v|W';x"!8;>z#ǦW[wQX󽐸։)LYq#"Ԥ\V^]TT]_b-
-1:ѳi2.jWBK	pGZNPDE;ڞL:>
-!aPř㗍xd2僳'vш"2$^ "X^	4Z_"N˻3r`<lA[W峝S<%+I	YYGQa7{EΉs7'=u8`laGCʠ݌rmWí\DF$NT169S
-%Pk8;OӸ0Gv$
-i!{ѰWr20FL ~[Z""+okx7mq++^9[Zi7_=C0 0/7ўW㵴(;M#fRKK'%0a~8	;vGS\<3\>{uQa^"5TUE2+fPdVQF0x#CME''"#j<;#6A
-lki,qZdKٛY/6FBwӵndkv5 H/)Q͓Zf^l֞*;ܵ)QR.	E@%cך||n3v&t@p]--=VlSiAy9%qط(s#q!TL4Ct"Nȴ@5YA-~z;qHe뢘fxs|_ h5š  )=7ܕbQd W\,jD`ڕF͈0=1tfqSke@tFs{P:3hu^侎K1߽;8\̈6Fpf/;Q9~	]s'x)cĢ|~/CSmF~QdC6,Azqq	rpaA1VFAUS5)W#+WKEɛW]8<H18"	1Z6Y(KP?_F VW!4c@9|7
-&::s2Ga3j]HS(_hf˙R*Ì98}љpxB!z[\wm0iʉ+g	tC=|eAͭ#oB=tL^f3J
-2 4^9V2򿞡L<(:#="	33+|<!@Q&^yYyC$րlW)taAxYy 2-ub/{3|lrd_j'AD" -yQ=.{LGIsH_dTT(.E>Ox/2fdM#dkASVܙ,4sf9p&qUl,7/̖:AؤTah
-{cL29y_gJ3bq-Bʮ%9((LݒfPhB/݋NCKX	8
-";:2Qқ,g3J[XC#NȢ'eDJ>ЩPK."0F{/?q\	t?t5n2ȉHgB=#2ghX975E$gQ0;o*lANnjC1H(C"
-)-/SŌ"2h#@,)zNG:DsMG4[> X|Bݒ8Tu錼<0Τ
-WJ=A#f *śARb@kXB@ԙH|(e(}R;s&5٠v>qq/knLHL1:-+V՞@2ZA#A6LŦz E)́רf	/`'VybȼAsƔah8xhSץF$iZbjEPvj#(4+mz|Ml^xqύpI䒦݇hGpBœ]#M	ڔtIYaf+>	n`pPG:QA(AUfGv8Eʸ2AJ0Ch"л=1zi`J'<RM(Av8a<?</7DL5e0FeLĉ~BÃ6*Oa٣A(vQBFBPu߽wyHqǑ;S?SY=aW޽ޔN=ɐg߹s;-}ndI_W21^7ťǯe̔*f/oV&9i4Np	X<0#&@)VG!Ji@flMr_$L27fɱXb/:dNd, s8 Sd<R-\%ϤFY *2fA4iu=Pv(N|3^9+"T)LE*Dܶ?sOY.LX=w`E}ZJF'7Ib9Utl6L'$tVAU(CV&`r-=NKYY5%Dc96t7d.koY?V*l7Y^oއHgLVI?[⊥+׬Ip::AeBQ D
-F-w9u5R؃h
-M@Q#$ֻ;MMRմ6Ɉ<&tߑj;nC-2z1Κ12RX`ǲvP;`b,Ӿ0Yj$^K(ƪY頕
-cj8}(R)ݽmP*18e[h2P	hx6804#)3NGra]GHcE(!w4:QА'YNDzi̟18bg)&.kɁ`slJFHVd/}$Xr8F#.hmȩ-L0J#S&bej1sB7P`M+@,%ؘCsS)"I!.WrJ
-G$:ߘC_̍RX*oa)5Y0ܧQ1*95T	Mi~c{=Iy
-iؘ^GpI7F,ҍRfƜm1tc<[9~ژwicE1}FRvu920]mܖ޽>>[t3y1K,RW2[X- jK개-0Mtx.OS[.+||"JXCA>_8l)Vg/2B/Hvh`dg|s2wd/)q>:{t(SPQT)Gtl{}~/#
-x59|c"9l}ݩ^$np"FD7te\j:"GNNeD2@ၱm]
-m,x=K\+?<:	ކ/~s3A86-v~ 9?
-o{frv4aO[vC;\)]v	hY瑸zdr9Pqp&OpF+́u{Y9L$N''l{mnft|%= N偆JDBI'ʗ/:Zm$]8S&ɤ]8'+NFQGע>rt\i|i$pF꩸tGHgM?<Y]wҩ C<~~^$L$FBAe/!$Pi6Y[lWW5Ƀx0L1B\?u"`?${TxK1 $gS^f܄?',IrO"wzIə=LRQgJ~Hax=`0'#|ݎȿM c*ˋ?Cc,?
-[Q/)K#0yō'SwE}(;v*$	"OLS@*lzj|LJ"$r% O_Ȁvp(4&8׹|f͵NlS\Y͙5y欩GΖ*5_/eޝ`MfrKq@34\!x	!C3{3ߩ|iC@[KK]Jn0٭5:k+pqcc?їf4n^JXHYRj\FC9^k8_7j\NS㲉)<_ך:Z`!1ZB6@
-[~'PFBL/j_N!B5~K.YoV|/kǵl|io[Cė!:?U*cʫWsmi.<E~%ODQ\tQ=0ig)yheY.fӄWRKOU}$%<MHGҩBǵ(#DBnag"6bUϜ&XfuuXLf_+bjHٰ1O֚W/ x,0{les"^JtY:O7Veolr kst܂y,ނ2@l%ZG}>|rAPdhkT36	=}m~7P02*'،C;d11pkz(PqU+%aWmQTR߽fk
-ʒsh?p=ҍ=Bvtm=6,Ei".9\N"/lr2Ɣ#}x\ZsL(pa6d=شHrV5=<ߩD/Bf\KCw:tv9Νh0Yеfsvtqt
-%.
-&1nt>͎^=qg
-O>8-SֿQYczt%D)%n #	RN,rp܅{e\cƗ2A7d<uA+n'z}Ў
-{!a;$^niS&Czjy*lb\/jPxd^K1<Da&4L(^m]{8SB!Z
-ec>]h!N3Q.<H
-S-0Bo65AU˧b)[y`=bd %Yɩ'Bbmf~cͯmL(HaIUCXDVì#؃u6Q00Mr'Z%aVMJ TwBUos
-ߍnuj"vD[ؤɦUN7ktMYwk#UeE,ZP$-wYD|ʊEBCbmb]$"[2dhp#[s`RsB~+`D^(HM.b!ӂqNCOc-
-%)kAO,ߒQM}Uh<ِ=a	֞_EZ_zKtٟܛl#JH=v(ƸӒƓ@5r#i;`FvbcJr%aQd["EfF$\JLaX$J7񧇖*(H:;M#KďY}J#^S.{.P;Ypu>n8v`o&<	☆J>BL֏լpjuq7\܃0KtBvafpZԀݓĂ0=ϛXGr{GJ@MЪFJBjb!s̹hR˄_GGC|%~a)x8s$9	L[R8)l?R+XW[mpE$$K,D(iAz'$HeLS2z'߈i@F"5ȫKKE-(z zɽa`%%NWd%~f?J4+p,Fj\QBXpӤH܏ʂ'b 1=0Q/d`pgwiz%ݶm	hDPŝ(!祢1XǖmgvvԪCL7S(#73{(0I'[n"j$Vb#u,IH%L˄%Ѱ`u:FPC])*\֥Gn sq)P锐8e҃Os%lpPP'M흣bܵE}:IgƇረlոϱ1\<}]0ǥ1Nopd0@wApŭÓ!ryB?5c"PKw(FR]9kw:̓xˬΜyFn:NGl>U^u gPoE%cAJ?DŢ&^rs,*ADoy.!r,>˴Sܰgm"+++hS7ŏ)-`N`me8Bygz"K^iMe*Dv^PuF\pKF0ߙ{-nZ?4JOq@	,v}bD1qIIyvk>A2ѱ	t~bzk
-rSvCX(NڃߣȚ~'[^qRҩВ[T&sxQ3+/ˬ|$|MrOC黔ӈ2W\#BlEM6VCLj9f}OtRЖU@ӢC9HDeˑxYfpLyX|Tqg(hٟ=e"@錯ЧBhcT~Yvc=
-@sL
-fn:N
-V1;sLl8E(yBJ&o+fuH_&A4n#>bZ%PaKqZVeϱ	ϐ|WM
-p+ZU2&g[j8!LK8`{C_nK_48Fs>Vc"c2$Rd?cpbÎS0ks
-#=#bn!'zg1OO=چN\ɇz."	ft8G␄'k14-1ԢVRuJy8y;PsJ_;yu򂎂HJJiI(.\yII8߇b:WZEVwƞzMBlnC$\DGGpsWt3ܩa֯i|,Z?jMj/&BjPVxS>pĄeSLChAJ༈ٱ{5|ʃ8qfn`R]H`ZGd1E0|IP:䚀NrP&g9cWLa`hŵGG;P+;},|R9K8cQv..?i9
-&cXzkO˙S:%,:"N--ʦ?xkP,D%c,L=36O
- š;Y\2p e'h)Hڟgx@0!5m@|8=ONg;QT;lݍscoJk6́3A#I_;&1T^.$Z&r&IW$Bۗ˄-fCu)))뺚WwS$lVhs!t^A<8i6PfE߄f-)◲p#5Ut,%&]:`U7w^qemWʚ"5M*$iskY9'y)_ilaYThRav`@ciK;(=K#\j.%ڧ֬#:>&[+bO}f0L(kꏊYicObC9iq99fb
-S07\][RHgт1#1dFNSVc}4Tm$YjpSBl#V6qyfw#PMf&Fޣ-&\Sn۷ZA"oZdYc'<%Qk$M[Ëٝ JaKvt]\z.e.-wQ.lfM}l2+.eUʦ}*io+w~*r
-nR]UDEWWw뒵ɏ2K{v^X,e(C6|Gv@M?gŃ;?5ʑumI抍jҲq'ː==!NWXŲζUO9FK;:FzB݅6AIǈvE#dD*.?jWjqIs
-Eo1guPV	ܔ+.U/Pf`d(k~`EyPa_%\B7A]N3
-$cHlLn#0BL	\'"{:E,]F|)#ɣ!re&s]j#}jfbq6i؍@hZH.ش~8r$u7maUVVVɓsweL!`e/?WmhxDd[a-qVA'sC[+'3杣_)F>KǸ`S9Q@	F;cߖOy VwBDԝQNŧiyk<{! bj`w,e](LtqHUˉ0;92Rv=2OAtDFϨ<lz:}jpllh%/fC.rMN$`\VrፕF~whxy/	.uA@'~n|JS<3hDcjL:z  雾y:NwdGI[\n4Qw4X738#犑+==>Xz젊qG2%߳FNM1pWc'c/OEirGZIil9j_a~P;saTW_;G@`I]sP5ۗkɮ;ґXvZܸ@}y|W%WO>vGr~tH]44'<%B !CȨO!L@,`7,cMSLG8լt~לxfDT$;-B(Qxwɵm:AF!g=.!#.7@	!<clGϊێ.&01+i`q:[h~KUkKn{51}JcAJ6ES]Xɀ9Yܭ|2l AI(lm[852#hr|)Ǯ<c89N&z3vwɓz&	|>u0e<҉B"h	l=?uvHyۆ1#x5k:hW-.V8W#<"*sMpx7뒇.fUtE?4wDZ".eHkD_v`QJsOYSCs0*ނm{AѿvpO]Rn萼xi\
-"ST'@!^ӠJItޯHʰ;(/R7-}lDD, NPHv`q40!RgXNr8E *>>",d:VywF;t ݜs'Z.Dc{3l
-m~f@HF#tCqr8U
- UbݠذbH~$~dh]KPqddDFҎ(ϿdNGLW6=<ETUkѷ{TB.=v鍳=,/yn	l.3^w;TRi0QCԬ'^)zY{qwMR9LvYΕe/<#OUOÒqwQ22QU^DAq?"%"ڢ1y J&a9k@Bњs=g!=FZ/8qPՌI`*l1fY]Ǘ>V%탧~7lWVvVwjv:R􇴘:h"Vdfax;j`EOv-zsQ%4RDZǠkB3wYG~q3`ʶwlwĩ%Jdx+miH?VܕvQz"u|LEBPEj_҃5Png""2;-b`y%:QsF9}+r[/EaˎTU
-	+M-mK RJ*A׈]RaUTRV8ir=Zh\EnXl'=4Y.Fxi`6%|yޅd۹jWQyM;]?N-V8`x}1C>wO8co(ޟ{anQܶ+8鰲">AbO"u0OgʞB΅;EieiB7;5};		+U)Kl+ĺbdcJ|"x.`<\5c
-wZuр$oD]bL H1@u12ѲL/\AS<uW;_aʓXNQOIUxx˱t{_o8uHsMө-5bF𜨼2s[$bG";	#J9;\/Cv|zn	!l cY0b҇ZiڧǺdiMDb#b }eF^ң, rVEDnencjѿQ-%iD>%w(թ"*L\|D)A~usSYʴpxL``ɐRMɛ\uʘV~Q9*S*N^02""{C8WGKOKLQf妺1S;
-	}!O[UK
-_+
-IvYlDgtC2tSe7-O84	W!fbC[QtœwDܤG\S!2gԤ%n\N$2XG56;t}r(z]Jj8ks5|ФHk"xd"\&da$ (T_#gyb{MWZU(߭j(ŵ4^wO*IV$>B_i6-iUas_Y07|*<֟nVMC(U0KӍ@튝ZrqZ^̖iRIImMDcSRiek쵪,G9MűG%UZnmUze
-=@m
-)Aҡ#_-#٪͆ցjTm,2kՋyʓ%F	ыt4z-ٜ3r+ڪyjZǢ*M̛7C~=fmy\crHSP#hT5bz*#0UsuK^xTjZK
-#X\_Œ2+`u=k,	KUk
--brm䚴$IZLTZZJPʼ	&ȁ9*<F<iݽfQ|MwFr|=\KتA]iG-r1ٕ?? \7)C_lJ<K?[FdT}؃O<q6:*+orȸ^ڥvUQf՘ٷ7ѼM6懁[9,~څ6uVaYsx5ïQc3x5sAoϟJgǕy)4s?ǇqZ"o[Mȶ'h;u^*-+,?ͮ+B,&>_ Sa֨ho(Yge}yZ}fdLzLEt-k4wv[Do7UO]PMᑭِ%dԳZr
-Vqb+p{`erAg*h]\'LC^{ιk^LB<tyP52ѢUsaLA^sDp<Q>.0FPXc%n4zQ_<^W"PGxطѲM?jxm>zYxAd}9ڇ.wq ^PgņذŲ=dG!0©▹?G׳nMmr{yrA`Uܸ_-߈W6K|QZR9!7kd,֖>gj鍆AwjOnq8!Wz9Tn'/v-@eX~|U-i.ԭFM^"-ui	CϳQMa.dsTNsmT\;3G*tVf=('Lv:}ewZ,wN
-PQי^MOu2v˺+|QegݑxNi;2)X	궰`؈FቼG\}װD33"'GtnrRi^}ۦ/΍@QjWN,|HAkS	@+[Jǋ[N|fln:/d񄠦xlIل5CE+g[ʞsanh$KF;K3d|`􂔲?X(IWASwCEzJ}PpбNF'/_]J(SC{fe/1d}8Bz7*7#{;s;hi̐bm)o܏o6ank4ZsNh@A^ooгP`H)XWW;kyc}OÊߔr}?RlQn9]:`}1
-O7q.2J5|L<Yl!nlfyf%q=;3zO/}F|XR>ic9W{:TH>s2⋵ve"ܟݏ7zQiFX7ٓTh\@oH@BxËVBqFo_jQAzX;/籩)&6}sASBn]D*VkSU	Sء1Ykmh\ƈRsS'PeB32mL#/͇dj4iݚb@K">:5~o3wi	*8gq_GGDԑ׏УD!x9jF[LWCLSez8̠Ω%$pl|?kdx
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-c37k36qc">\<head\>\<style\>
+  html[data-i18n-pending="true"] main,
+  html[data-i18n-pending="true"] footer,
+  html[data-i18n-pending="true"] nav.sidebar,
+  html[data-i18n-pending="true"] .right-sidebar,
+  html[data-i18n-pending="true"] [data-header] nav,
+  html[data-i18n-pending="true"] [data-header] .download-button,
+  html[data-i18n-pending="true"] [data-header] .cta-button,
+  html[data-i18n-pending="true"] .docs-nav-links,
+  html[data-i18n-pending="true"] .header-download-btn,
+  html[data-i18n-pending="true"] .header-cta-btn,
+  html[data-i18n-pending="true"] .rc-pill,
+  html[data-i18n-pending="true"] .subnav-bar,
+  html[data-i18n-pending="true"] site-search button > span {
+    opacity: 0 !important;
+  }
+</style>\<script\>
+  if (window.location.hostname === 'www.antigravity.google') {
+    window.location.replace(
+      `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
+    );
+  }
+  try {
+    var __agyLoc = window.localStorage.getItem('antigravity_locale');
+    var __agyNonDefault = [
+      'en-GB', 'en-CA', 'hi', 'ja', 'ko', 'zh-CN', 'zh-TW',
+      'id', 'th', 'de', 'fr-FR', 'it', 'pl', 'pt-BR', 'es-ES', 'es-MX'
+    ];
+    if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
+      document.documentElement.lang = __agyLoc;
+      document.documentElement.setAttribute('data-i18n-pending', 'true');
+      window.__agyI18nTimer = window.setTimeout(function () {
+        document.documentElement.removeAttribute('data-i18n-pending');
+      }, 350);
+    }
+  } catch (e) {}
+</script><script type="module" src="/_astro/HeadOverride.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script><script type="speculationrules">
+  {
+    "prefetch": [
+      {
+        "where": {
+          "and": [
+            { "href_matches": "/*" },
+            { "not": { "href_matches": "/api/*" } },
+            { "not": { "selector_matches": "[download], [target=_blank]" } }
+          ]
+        },
+        "eagerness": "moderate"
+      }
+    ]
+  }
+</script><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>Build with Google | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/build-with-google/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap" media="print" onload="this.media='all'"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="Build with Google | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/build-with-google/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="The Antigravity App makes it seamless to build with popular Google technology stacks. We've partnered with teams across Google to create curated bundles of…"/><meta property="og:description" content="The Antigravity App makes it seamless to build with popular Google technology stacks. We've partnered with teams across Google to create curated bundles of…"/><meta name="twitter:title" content="Build with Google | Google Antigravity Docs"/><meta name="twitter:description" content="The Antigravity App makes it seamless to build with popular Google technology stacks. We've partnered with teams across Google to create curated bundles of…"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Build with Google","description":"The Antigravity App makes it seamless to build with popular Google technology stacks. We've partnered with teams across Google to create curated bundles of…","url":"https://antigravity.google/docs/build-with-google/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/build-with-google/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/overview/"},{"@type":"ListItem","position":2,"name":"Build with Google","item":"https://antigravity.google/docs/build-with-google/"}]}]}</script><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'">\<script\>
+  window.dataLayer = window.dataLayer || [];
+  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
+  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
 
+  var __agySegmentMql =
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia(
+          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
+        )
+      : null;
+  var __agyUa =
+    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  var __agyIsFoldableUA =
+    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
+  var __agyIsIpad =
+    /ipad/i.test(__agyUa) ||
+    (typeof navigator !== 'undefined' &&
+      navigator.maxTouchPoints > 0 &&
+      /macintosh/i.test(__agyUa));
+  var __agyOs = 'unknown';
+  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
+  else if (__agyIsIpad) __agyOs = 'ipad';
+  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
+  else if (/android/i.test(__agyUa)) __agyOs = 'android';
+  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
+  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
+  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
+
+  function __agyDetectViewport() {
+    const width = Math.round(
+      window.innerWidth ||
+        (document.documentElement && document.documentElement.clientWidth) ||
+        1440
+    );
+    const height = Math.round(
+      window.innerHeight ||
+        (document.documentElement && document.documentElement.clientHeight) ||
+        900
+    );
+    const orientation = width >= height ? 'landscape' : 'portrait';
+    const minDim = Math.min(width, height);
+    const maxDim = Math.max(width, height);
+    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
+
+    const hasSegments =
+      Boolean(
+        window.visualViewport &&
+          window.visualViewport.segments &&
+          window.visualViewport.segments.length > 1
+      ) ||
+      Boolean(
+        typeof navigator !== 'undefined' &&
+          navigator.devicePosture &&
+          navigator.devicePosture.type === 'folded'
+      ) ||
+      Boolean(__agySegmentMql && __agySegmentMql.matches);
+    const isFoldableUnfolded =
+      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
+    const isFoldableCover =
+      (width >= 320 &&
+        width <= 368 &&
+        height >= 700 &&
+        height / width >= 2.0) ||
+      (height >= 320 &&
+        height <= 368 &&
+        width >= 700 &&
+        width / height >= 2.0);
+
+    let viewportCategory = 'desktop';
+    if (
+      hasSegments ||
+      __agyIsFoldableUA ||
+      isFoldableUnfolded ||
+      isFoldableCover
+    ) {
+      viewportCategory = 'foldable';
+    } else if (width < 600) {
+      viewportCategory = 'mobile';
+    } else if (width <= 1024 || __agyIsIpad) {
+      viewportCategory = 'tablet';
+    }
+
+    return {
+      viewportCategory: viewportCategory,
+      formFactor: viewportCategory,
+      viewportWidth: width,
+      viewportHeight: height,
+      orientation: orientation,
+      operatingSystem: __agyOs,
+    };
+  }
+
+  function __agyRecordPageView() {
+    const currentPath = window.location.pathname || '/';
+    if (window.__agyLastPageViewPath === currentPath) return;
+
+    if (
+      window.agyAnalytics &&
+      typeof window.agyAnalytics.trackPageView === 'function'
+    ) {
+      window.agyAnalytics.trackPageView();
+      return;
+    }
+
+    window.__agyLastPageViewPath = currentPath;
+    const vp = __agyDetectViewport();
+    const eventParams = {
+      pagePath: currentPath,
+      locale: document.documentElement.lang || 'en-US',
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+    };
+    if (document.title) {
+      eventParams.pageTitle = document.title;
+    }
+    if (document.referrer) {
+      eventParams.referrer = document.referrer;
+    }
+    try {
+      const sp = new URLSearchParams(window.location.search || '');
+      const utmSource = sp.get('utm_source');
+      const utmMedium = sp.get('utm_medium');
+      const utmCampaign = sp.get('utm_campaign');
+      const utmTerm = sp.get('utm_term');
+      const utmContent = sp.get('utm_content');
+      if (utmSource) {
+        eventParams.utm_source = utmSource;
+        eventParams.utmSource = utmSource;
+      }
+      if (utmMedium) {
+        eventParams.utm_medium = utmMedium;
+        eventParams.utmMedium = utmMedium;
+      }
+      if (utmCampaign) {
+        eventParams.utm_campaign = utmCampaign;
+        eventParams.utmCampaign = utmCampaign;
+      }
+      if (utmTerm) {
+        eventParams.utm_term = utmTerm;
+        eventParams.utmTerm = utmTerm;
+      }
+      if (utmContent) {
+        eventParams.utm_content = utmContent;
+        eventParams.utmContent = utmContent;
+      }
+    } catch (_err) {
+      // Ignore URLSearchParams errors
+    }
+
+    const entry = {
+      event: 'page_view',
+      pagePath: currentPath,
+      viewportCategory: vp.viewportCategory,
+      formFactor: vp.formFactor,
+      viewportWidth: vp.viewportWidth,
+      viewportHeight: vp.viewportHeight,
+      orientation: vp.orientation,
+      operatingSystem: vp.operatingSystem,
+      eventParams: eventParams,
+    };
+    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
+    if (eventParams.referrer) entry.referrer = eventParams.referrer;
+    if (eventParams.utm_source) {
+      entry.utm_source = eventParams.utm_source;
+      entry.utmSource = eventParams.utmSource;
+    }
+    if (eventParams.utm_medium) {
+      entry.utm_medium = eventParams.utm_medium;
+      entry.utmMedium = eventParams.utmMedium;
+    }
+    if (eventParams.utm_campaign) {
+      entry.utm_campaign = eventParams.utm_campaign;
+      entry.utmCampaign = eventParams.utmCampaign;
+    }
+    if (eventParams.utm_term) {
+      entry.utm_term = eventParams.utm_term;
+      entry.utmTerm = eventParams.utmTerm;
+    }
+    if (eventParams.utm_content) {
+      entry.utm_content = eventParams.utm_content;
+      entry.utmContent = eventParams.utmContent;
+    }
+
+    window.dataLayer.push(entry);
+    window.dataLayer.push({ eventParams: undefined });
+  }
+
+  __agyRecordPageView();
+
+  window.glueCookieNotificationBarLoaded = function () {
+    if (window.__agyGtmLoaded) return;
+    window.__agyGtmLoaded = true;
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js',
+      });
+      const f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
+    __agyRecordPageView();
+  };
+
+  document.addEventListener('astro:page-load', function () {
+    __agyRecordPageView();
+  });
+</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.BtyBE0kN.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.CDMXz1pZ.css">\<style\>@layer starlight.components{svg:where(.astro-jlnlh7vs){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
+</style><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
+</style><script type="module" src="/_astro/page.LAbJoB63.js"></script>\<style\>.resources-cards-grid:where(.astro-7nm2vpxn){grid-template-columns:repeat(var(--card-cols,3), minmax(0, 1fr));gap:14px;margin:1.5rem 0 2.5rem;font-family:Google Sans Flex,-apple-system,BlinkMacSystemFont,sans-serif;display:grid}@media (width<=960px){.resources-cards-grid:where(.astro-7nm2vpxn){grid-template-columns:repeat(2,minmax(0,1fr))}}@media (width<=640px){.resources-cards-grid:where(.astro-7nm2vpxn){grid-template-columns:1fr}}.resource-card:where(.astro-7nm2vpxn){color:inherit;background:#fff;border:1px solid #dadce0;border-radius:12px;flex-direction:column;padding:16px 18px;text-decoration:none;transition:all .15s;display:flex;box-shadow:0 1px 3px #3c40430f}.resource-card:where(.astro-7nm2vpxn):hover{border-color:#202124;transform:translateY(-2px);box-shadow:0 4px 12px #00000014}.resource-card:where(.astro-7nm2vpxn):hover .resource-title:where(.astro-7nm2vpxn){color:#202124}.card-header:where(.astro-7nm2vpxn){justify-content:space-between;align-items:center;margin-bottom:10px;display:flex}.card-header:where(.astro-7nm2vpxn) .resource-icon:where(.astro-7nm2vpxn){color:#202124;background:#f1f3f4;border-radius:8px;padding:6px;font-size:22px}.card-header:where(.astro-7nm2vpxn) .resource-tag:where(.astro-7nm2vpxn){color:#5f6368;text-transform:uppercase;letter-spacing:.04em;background:#f1f3f4;border-radius:4px;padding:2px 7px;font-size:.6875rem;font-weight:600}.resource-title:where(.astro-7nm2vpxn){color:#202124;margin-bottom:4px;font-size:1rem;font-weight:600}.resource-body:where(.astro-7nm2vpxn){color:#5f6368;margin:0;font-size:.8125rem;line-height:1.45}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn){background:#202124;border-color:#ffffff1f}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn):hover{background:#282a2d;border-color:#e8eaed}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn):hover .resource-title:where(.astro-7nm2vpxn){color:#fff}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn) .card-header:where(.astro-7nm2vpxn) .resource-icon:where(.astro-7nm2vpxn){color:#e8eaed;background:#ffffff14}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn) .card-header:where(.astro-7nm2vpxn) .resource-tag:where(.astro-7nm2vpxn){color:#bdc1c6;background:#ffffff14}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn) .resource-title:where(.astro-7nm2vpxn){color:#e8eaed}:root[data-theme=dark] .resource-card:where(.astro-7nm2vpxn) .resource-body:where(.astro-7nm2vpxn){color:#9aa0a6}
+</style><link rel="stylesheet" href="/_astro/build-with-google.D_fWvIvr.css"></head><body class="astro-c37k36qc"><a class="sl-skip-link astro-kgjdphe6" href="#_top">Skip to content</a><div class="page sl-flex astro-mruzmsw7"><header class="header astro-mruzmsw7"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-3woganpc"><img class="light:sl-hidden print:hidden astro-3woganpc" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-3woganpc" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-3woganpc" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search id="doc-search-root" class="agy-hybrid-search" data-i18n-ignore="true" data-index-version="6d6ec5be"><button type="button" data-open-modal id="doc-search-trigger" class="agy-search-trigger" aria-label="Search documentation" aria-keyshortcuts="Control+K Meta+K /"><span class="agy-search-trigger__left"><svg class="agy-search-trigger__icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="agy-search-trigger__text">Search<span class="agy-search-trigger__text-suffix"> docs...</span></span></span><kbd class="agy-search-trigger__kbd" aria-hidden="true">⌘K</kbd></button><dialog id="doc-search-modal" class="agy-search-dialog" aria-label="Search"><div class="dialog-frame sl-flex"><div id="starlight__search" class="agy-search-container"><div class="agy-search-header"><div class="agy-search-input-wrap"><svg class="agy-search-input-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="doc-search-input" class="pagefind-ui__search-input" type="search" placeholder="Search documentation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search documentation" aria-controls="doc-search-results-list"><button type="button" class="agy-search-clear" data-clear-search hidden aria-label="Clear search query" title="Clear search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></button></div><div class="agy-search-header__actions"><button type="button" class="agy-shortcuts-toggle agy-search-help-btn" data-toggle-shortcuts aria-expanded="false" aria-controls="doc-search-shortcuts-panel" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><span aria-hidden="true">?</span></button><button type="button" data-close-modal class="agy-search-close" aria-label="Close search"><span class="agy-search-close__kbd" aria-hidden="true">ESC</span><span class="agy-search-close__touch" aria-hidden="true">Cancel</span></button></div></div><div class="agy-search-filters" role="toolbar" aria-label="Filter results by product surface"><button type="button" class="agy-surface-pill active" data-surface-filter="all" data-surface-label="All" aria-pressed="true"><span class="agy-surface-pill__label">All</span></button><button type="button" class="agy-surface-pill" data-surface-filter="2-0" data-surface-label="Antigravity App" aria-pressed="false"><span class="agy-surface-pill__label">App</span><span class="agy-surface-pill__mute" data-exclude-surface="2-0" aria-hidden="true" title="Exclude Antigravity App from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="cli" data-surface-label="Antigravity CLI" aria-pressed="false"><span class="agy-surface-pill__label">CLI</span><span class="agy-surface-pill__mute" data-exclude-surface="cli" aria-hidden="true" title="Exclude Antigravity CLI from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="antigravity-ide" data-surface-label="Antigravity IDE" aria-pressed="false"><span class="agy-surface-pill__label">IDE</span><span class="agy-surface-pill__mute" data-exclude-surface="antigravity-ide" aria-hidden="true" title="Exclude Antigravity IDE from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="ide" data-surface-label="IDE Extensions" aria-pressed="false"><span class="agy-surface-pill__label">Extensions</span><span class="agy-surface-pill__mute" data-exclude-surface="ide" aria-hidden="true" title="Exclude IDE Extensions from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="sdk" data-surface-label="Antigravity SDK" aria-pressed="false"><span class="agy-surface-pill__label">SDK</span><span class="agy-surface-pill__mute" data-exclude-surface="sdk" aria-hidden="true" title="Exclude Antigravity SDK from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="blog" data-surface-label="Blog" aria-pressed="false"><span class="agy-surface-pill__label">Blog</span><span class="agy-surface-pill__mute" data-exclude-surface="blog" aria-hidden="true" title="Exclude Blog from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="releases" data-surface-label="Releases" aria-pressed="false"><span class="agy-surface-pill__label">Releases</span><span class="agy-surface-pill__mute" data-exclude-surface="releases" aria-hidden="true" title="Exclude Releases from results">×</span></button></div><div id="doc-search-status" class="agy-search-status" data-search-status data-i18n-ignore="true" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="doc-search-results" class="pagefind-ui__results-area agy-search-results-area" data-results-container data-i18n-ignore="true"><div class="agy-search-suggestions" data-search-suggestions><p class="agy-search-suggestions__heading" data-discovery-heading>Explore Antigravity</p><div class="agy-discover-grid" data-discovery-grid><a class="agy-discover-card agy-search-card" data-doc-card="getting-started" href="/docs/getting-started/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Getting Started</span><span class="agy-discover-card__desc agy-search-card-desc">Install & launch your first agent</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="remote-control" href="/docs/remote-control/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Remote Control</span><span class="agy-discover-card__desc agy-search-card-desc">Drive desktop & CLI sessions from any browser</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="skills" href="/docs/skills/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Agent Skills & Rules</span><span class="agy-discover-card__desc agy-search-card-desc">Reusable workflows & workspace instructions</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="subagents" href="/docs/subagents/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Subagents & Teamwork</span><span class="agy-discover-card__desc agy-search-card-desc">Parallel multi-agent orchestration</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="sdk" href="/docs/sdk/overview/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Antigravity SDK</span><span class="agy-discover-card__desc agy-search-card-desc">Build custom Python agents & hooks</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="permissions" href="/docs/permissions/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Permissions & Sandbox</span><span class="agy-discover-card__desc agy-search-card-desc">File access controls & safe execution</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a></div><div class="agy-try-searching"><span class="agy-try-searching__label" data-try-searching-label>Try searching</span><div class="agy-try-searching__chips" data-suggestion-chips><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="Remote Control" data-query="Remote Control">Remote Control</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="agent skills" data-query="agent skills">Agent skills</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="custom subagents" data-query="custom subagents">Custom subagents</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="IDE extensions" data-query="IDE extensions">IDE extensions</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="sandbox permissions" data-query="sandbox permissions">Sandbox permissions</button></div></div></div><ol id="doc-search-results-list" class="pagefind-ui__results agy-search-results-list" data-results-list data-i18n-ignore="true"></ol></div><div class="agy-related-topics" data-related-topics data-i18n-ignore="true" hidden></div><div id="doc-search-shortcuts-panel" class="agy-search-footer agy-search-help-popover" data-shortcuts-panel hidden><div class="agy-search-footer__hints"><span class="agy-footer-hint">\<kbd\>↑</kbd>\<kbd\>↓</kbd><span data-footer-hint="navigate">Navigate</span></span><span class="agy-footer-hint">\<kbd\>↵</kbd> <span data-footer-hint="open">Open</span></span><span class="agy-footer-hint">\<kbd\>esc</kbd> <span data-footer-hint="close">Close</span></span></div></div></div></div></dialog></site-search><script type="module" src="/_astro/SearchOverride.astro_astro_type_script_index_0_lang.B8vV1dU8.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}function l(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),document.addEventListener(`astro:page-load`,()=>{c()})}l();</script></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div><div class="sl-flex print:hidden docs-lang-wrapper astro-mtusqnhg"><div class="language-selector docs-language-selector astro-mtusqnhg astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
+  (function () {
+    try {
+      var valid = [
+        'en-US',
+        'id',
+        'de',
+        'en-CA',
+        'en-GB',
+        'es-ES',
+        'es-MX',
+        'fr-FR',
+        'it',
+        'pl',
+        'pt-BR',
+        'hi',
+        'th',
+        'ja',
+        'zh-CN',
+        'zh-TW',
+        'ko',
+      ];
+      var shortLabels = {
+        'en-US': 'EN',
+        'en-GB': 'EN-GB',
+        'en-CA': 'EN-CA',
+        hi: 'HI',
+        ja: 'JA',
+        ko: 'KO',
+        'zh-CN': 'ZH-CN',
+        'zh-TW': 'ZH-TW',
+        id: 'ID',
+        th: 'TH',
+        de: 'DE',
+        'fr-FR': 'FR',
+        it: 'IT',
+        pl: 'PL',
+        'pt-BR': 'PT',
+        'es-ES': 'ES',
+        'es-MX': 'ES-MX',
+      };
+      var active = window.__agyActiveLocale;
+      if (!active) {
+        var stored = window.localStorage.getItem('antigravity_locale');
+        active = 'en-US';
+        if (stored !== null) {
+          if (valid.indexOf(stored) !== -1) {
+            active = stored;
+          } else {
+            window.localStorage.setItem('antigravity_locale', 'en-US');
+            active = 'en-US';
+          }
+        } else {
+          var langs =
+            navigator.languages && navigator.languages.length
+              ? navigator.languages
+              : [navigator.language || 'en-US'];
+          for (var i = 0; i < langs.length; i++) {
+            var raw = String(langs[i] || '')
+              .trim()
+              .replace(/_/g, '-');
+            if (!raw) continue;
+            var lower = raw.toLowerCase();
+            var exactIdx = -1;
+            for (var j = 0; j < valid.length; j++) {
+              if (valid[j].toLowerCase() === lower) {
+                exactIdx = j;
+                break;
+              }
+            }
+            if (exactIdx !== -1) {
+              active = valid[exactIdx];
+              break;
+            }
+            var parts = lower.split('-');
+            var base = parts[0];
+            var subtag = parts[1] || '';
+            var region = parts[2] || subtag;
+            if (base === 'zh') {
+              active =
+                subtag === 'tw' ||
+                subtag === 'hk' ||
+                subtag === 'mo' ||
+                subtag === 'hant' ||
+                region === 'tw' ||
+                region === 'hk' ||
+                region === 'mo'
+                  ? 'zh-TW'
+                  : 'zh-CN';
+              break;
+            }
+            if (base === 'id' || base === 'in') {
+              active = 'id';
+              break;
+            }
+            if (base === 'th') {
+              active = 'th';
+              break;
+            }
+            if (base === 'it') {
+              active = 'it';
+              break;
+            }
+            if (base === 'pl') {
+              active = 'pl';
+              break;
+            }
+            if (base === 'es') {
+              active = subtag === 'es' ? 'es-ES' : 'es-MX';
+              break;
+            }
+            if (base === 'pt') {
+              active = 'pt-BR';
+              break;
+            }
+            if (base === 'fr') {
+              active = 'fr-FR';
+              break;
+            }
+            if (base === 'de') {
+              active = 'de';
+              break;
+            }
+            if (base === 'ja') {
+              active = 'ja';
+              break;
+            }
+            if (base === 'ko') {
+              active = 'ko';
+              break;
+            }
+            if (base === 'hi') {
+              active = 'hi';
+              break;
+            }
+            if (base === 'en') {
+              active =
+                subtag === 'gb' ||
+                subtag === 'uk' ||
+                subtag === 'au' ||
+                subtag === 'nz' ||
+                subtag === 'ie'
+                  ? 'en-GB'
+                  : subtag === 'ca'
+                    ? 'en-CA'
+                    : 'en-US';
+              break;
+            }
+          }
+          if (active !== 'en-US') {
+            window.localStorage.setItem('antigravity_locale', active);
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'language_auto_detect',
+              eventParams: {
+                locale: active,
+                browserLanguage: langs[0] || '',
+                pagePath: window.location.pathname,
+              },
+            });
+            window.dataLayer.push({ eventParams: undefined });
+          }
+        }
+        window.__agyActiveLocale = active;
+      }
+      if (document.documentElement.lang !== active) {
+        document.documentElement.lang = active;
+      }
+      var selects = document.querySelectorAll('select[data-language-select]');
+      for (var k = 0; k < selects.length; k++) {
+        if (selects[k].value !== active) {
+          selects[k].value = active;
+        }
+      }
+      var codes = document.querySelectorAll('[data-language-code]');
+      var shortCode = shortLabels[active] || 'EN';
+      for (var m = 0; m < codes.length; m++) {
+        if (codes[m].textContent !== shortCode) {
+          codes[m].textContent = shortCode;
+        }
+      }
+    } catch (e) {
+      document.documentElement.lang = 'en-US';
+    }
+  })();
+</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/overview/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Get Started</a><a href="/docs/features/" class="subnav-pill astro-mtusqnhg">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav><!-- Row 3: Dismissible Top Banners under Docs Menu --><div class="docs-top-banner-slot print:hidden astro-mtusqnhg" data-docs-announcement-slot="top-banner"><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.kU0csqlr.js"></script><div class="announcement-pill announcement-pill--surface-docs announcement-pill--host-docs announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-mtusqnhg astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="docs" data-pill-host-surface="docs" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_docs" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="docs_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
+        (() => {
+          try {
+            const pills = document.querySelectorAll(
+              '[data-announcement-pill]:not([data-prechecked])',
+            );
+            pills.forEach((pill) => {
+              pill.setAttribute('data-prechecked', 'true');
+              const key = pill.getAttribute('data-pill-storage-key');
+              const fp = pill.getAttribute('data-pill-fingerprint');
+              if (!key) return;
+              const raw = window.localStorage.getItem(key);
+              if (!raw) return;
+              const parsed = JSON.parse(raw);
+              if (
+                parsed &&
+                parsed.fingerprint === fp &&
+                typeof parsed.expiresAt === 'number' &&
+                Date.now() < parsed.expiresAt
+              ) {
+                pill.hidden = true;
+                pill.setAttribute('data-pill-dismissed', 'true');
+              }
+            });
+
+            const homeSlot = document.querySelector('[data-home-banner-slot]');
+            if (homeSlot) {
+              const visibleHome = homeSlot.querySelectorAll(
+                '[data-announcement-pill]:not([hidden])',
+              );
+              if (visibleHome.length === 0) {
+                document.documentElement.style.setProperty(
+                  '--home-banner-offset',
+                  '0px',
+                );
+              } else {
+                const slotHeightPx = Math.ceil(
+                  homeSlot.getBoundingClientRect().height,
+                );
+                if (slotHeightPx > 0) {
+                  document.documentElement.style.setProperty(
+                    '--home-banner-offset',
+                    `${slotHeightPx}px`,
+                  );
+                }
+              }
+            }
+
+            const docsSlot = document.querySelector(
+              '[data-docs-announcement-slot="top-banner"]',
+            );
+            const docsHeader = document.querySelector('header.header');
+            if (docsSlot && docsHeader) {
+              const visibleDocs = docsSlot.querySelectorAll(
+                '[data-announcement-pill]:not([hidden])',
+              );
+              if (visibleDocs.length === 0) {
+                document.documentElement.style.removeProperty(
+                  '--sl-nav-height',
+                );
+              } else {
+                const headerHeightPx = Math.ceil(
+                  docsHeader.getBoundingClientRect().height,
+                );
+                if (headerHeightPx > 0) {
+                  document.documentElement.style.setProperty(
+                    '--sl-nav-height',
+                    `${headerHeightPx}px`,
+                    'important',
+                  );
+                }
+              }
+            }
+          } catch {}
+        })();
+      </script></div></div></header><nav class="sidebar print:hidden astro-mruzmsw7" aria-label="Main"><starlight-menu-button class="print:hidden astro-mwbvl5vk"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-mwbvl5vk"><svg aria-hidden="true" class="open-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-mruzmsw7"><div class="sidebar-content sl-flex astro-mruzmsw7"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="get-started" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="0jnks46" class="astro-guximn66"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Get Started</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/getting-started/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/install/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Authenticate</span></a></li><li class="astro-stlrkwvc"><a href="/docs/models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Choose a model</span></a></li><li class="astro-stlrkwvc"><a href="/docs/build-with-google/" aria-current="page" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Build with Google</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">IDE Extensions</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/vscode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio Code</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/visual-studio/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/jetbrains/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">JetBrains IDEs</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/zed/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Zed</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/xcode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Xcode</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI reference</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/reference/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI commands</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI features</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/using/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI settings and tips</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/troubleshooting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI troubleshooting</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/best-practices/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI best practices</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI AI credits</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Migrations</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/gcli-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Gemini CLI</span></a></li><li class="astro-stlrkwvc"><a href="/docs/firebase-studio-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Firebase Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/migration/workflows-to-skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Workflows to Skills</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Resources</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/plans/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plans</span></a></li><li class="astro-stlrkwvc"><a href="/docs/enterprise/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Enterprise Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/faq/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">FAQ</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/remote-control/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Remote Control</span></a></li><li class="astro-stlrkwvc"><a href="/docs/marketplace/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Marketplace</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plugins/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plugins</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sandbox/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal sandbox</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/review-changes-editor/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Review changes</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Terminal</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/modes/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Execution modes</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/headless/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Headless mode</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line customization</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal title customization</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Browser</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/browser-recordings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser recordings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/allowlist-denylist/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Allowlist and denylist</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/separate-chrome-profile/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Artifacts</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/implementation-plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Implementation plan</span></a></li><li class="astro-stlrkwvc"><a href="/docs/walkthrough/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Walkthrough</span></a></li><li class="astro-stlrkwvc"><a href="/docs/screenshots/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual screenshots</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Projects</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/projects/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/prompting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Prompting and interaction</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/conversations/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Managing conversations</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Permissions</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Editor features</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/tab/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tab completion</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/agent-side-panel/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent side panel</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Task groups</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Settings</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent-settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent settings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/artifact-review/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Artifact review</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/vim-editor-mode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/slash-commands/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/agents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agents (/agents)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/boost/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Boost (/boost)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser (/browser)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/btw/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Side question (/btw)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/changelog/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Changelog (/changelog)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/codesearch/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Code search (/codesearch)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/context/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Context (/context)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">AI credits (/credits)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/diff/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Diff (/diff)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/effort/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reasoning effort (/effort)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/goal/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Goal (/goal)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/learn/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Learn (/learn)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Permissions (/permissions)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plan (/plan)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/resume/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Resume (/resume)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/schedule/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Schedule (/schedule)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line (/statusline)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/teamwork/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Teamwork (/teamwork-preview)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Window title (/title)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/usage/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Model quotas (/usage)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/voice/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Voice dictation (/voice)</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Skills</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/rules/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Rules</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/workflows/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">IDE workflows</span></a></li></ul></details></li><li class="astro-stlrkwvc"><a href="/docs/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Custom subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/hooks/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle hooks</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sidecars/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/sdk/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview and quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/local-models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Local models</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/personas/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Personas</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tools and skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/policies/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Policies</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/structured-output/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Structured output</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/lifecycle/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-vpdi4hhg"><div class="social-icons astro-vpdi4hhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></div></nav><div class="main-frame astro-mruzmsw7"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-ro3y4cfw"><aside class="right-sidebar-container print:hidden astro-ro3y4cfw"><div class="right-sidebar astro-ro3y4cfw"><div class="lg:sl-hidden astro-cnunmcpo"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
+             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
+             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
+             1.002 0 0 0 0-1.42Z
+            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#how-to-enable" class="astro-sgnutmzh"><span class="astro-sgnutmzh">How to enable</span></a></li><li class="astro-sgnutmzh"><a href="#available-bundles" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Available bundles</span></a></li><li class="astro-sgnutmzh"><a href="#next-steps" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Next steps</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){if(e===this._current)return;this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=this.querySelector(`details`),t=()=>{e&&e.open&&(e.open=!1)};if(e){let n=n=>{e.open&&(e.contains(n.target)||t())},r=n=>{n.key===`Escape`&&e.open&&(t(),e.querySelector(`summary`)?.focus())};window.addEventListener(`click`,n,{passive:!0}),window.addEventListener(`keydown`,r),this._cleanup.push(()=>{window.removeEventListener(`click`,n),window.removeEventListener(`keydown`,r)})}let n=Array.from(this.querySelectorAll(`a`));if(!n.length)return;let r=[],i=new Map,a=document.getElementById(`_top`);if(a){let e=n.find(e=>e.hash===`#_top`);if(e){i.set(`_top`,e);let t=e.closest(`li`);t&&r.push({link:e,li:t,heading:a,tabpanel:null,surfacePane:null})}}n.forEach(e=>{let t=decodeURIComponent(e.hash.slice(1));if(!t||t===`_top`)return;let n=document.getElementById(t),a=e.closest(`li`);if(n&&a){i.set(t,e);let o=n.closest(`[role="tabpanel"]`),s=n.closest(`.surface-pane`);r.push({link:e,li:a,heading:n,tabpanel:o,surfacePane:s})}});let o=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,s=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},c=!1,l=()=>{c||(c=!0,requestAnimationFrame(u))},u=()=>{c=!1;let e=r.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!o(e.tabpanel)&&!s(e.surfacePane));if(!e.length)return;let t=e[0];if(window.scrollY>10)for(let n of e)if(n.heading.getBoundingClientRect().top<=130)t=n;else break;let n=i.get(t.heading.id);n&&(this.current=n)},d=(e=!1)=>{r.forEach(e=>{let t=o(e.tabpanel)||s(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?u():l()},f=e=>{let n=e.target?.closest(`a`);if(!n||!this.contains(n))return;t();let r=decodeURIComponent(n.hash.slice(1));if(!r)return;let i=document.getElementById(r);if(i){let e=i.closest(`.surface-pane[data-surface-pane]`);if(e&&s(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{d()}))}let t=i.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{d()}))}}}};this.addEventListener(`click`,f),this._cleanup.push(()=>{this.removeEventListener(`click`,f)});let p=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(p.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{d()},0)})};this._observer=new MutationObserver(n),p.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=l,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),d(!0)}};customElements.get(`mobile-starlight-toc`)||customElements.define(`mobile-starlight-toc`,e);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-cnunmcpo"><div class="sl-container astro-cnunmcpo"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#how-to-enable"><span>How to enable</span></a></li>\<li\><a href="#available-bundles"><span>Available bundles</span></a></li>\<li\><a href="#next-steps"><span>Next steps</span></a></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null,surfacePane:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`),s=i.closest(`.surface-pane`);t.push({link:e,li:a,heading:i,tabpanel:o,surfacePane:s})}});let i=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,a=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},o=!1,s=()=>{o||(o=!0,requestAnimationFrame(c))},c=()=>{if(o=!1,window.innerWidth<800||this.offsetParent===null)return;let e=t.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!i(e.tabpanel)&&!a(e.surfacePane));if(!e.length)return;let r=e[0];if(window.scrollY>10)for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let s=n.get(r.heading.id);s&&(this.current=s)},l=(e=!1)=>{window.innerWidth<800||(t.forEach(e=>{let t=i(e.tabpanel)||a(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?c():s())},u=e=>{let t=e.target?.closest(`a`);if(!t||!this.contains(t))return;let n=decodeURIComponent(t.hash.slice(1));if(!n)return;let r=document.getElementById(n);if(r){let e=r.closest(`.surface-pane[data-surface-pane]`);if(e&&a(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{l()}))}let t=r.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{l()}))}}}};this.addEventListener(`click`,u),this._cleanup.push(()=>{this.removeEventListener(`click`,u)});let d=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(d.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{l()},0)})};this._observer=new MutationObserver(n),d.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=s,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),l(!0)}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-ro3y4cfw"><main data-pagefind-body class="astro-c37k36qc" lang="en" dir="ltr"><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="pagefind-search-meta sr-only astro-hkwnjoai" data-i18n-ignore="true"><span data-pagefind-meta="title" class="astro-hkwnjoai">Build with Google</span><span data-pagefind-meta="surface" class="astro-hkwnjoai">2-0</span><span data-pagefind-meta="surfaceLabel" class="astro-hkwnjoai">Antigravity App</span><span data-pagefind-meta="section" class="astro-hkwnjoai">Get Started</span><span data-pagefind-weight="6" class="astro-hkwnjoai">Build with Google Antigravity App Get Started</span><span data-pagefind-filter="surface:2-0" class="astro-hkwnjoai">Antigravity App</span></div><div class="breadcrumbs-row astro-hkwnjoai" data-pagefind-ignore><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Get Started">Get Started</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="Build with Google">Build with Google</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/build-with-google/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div><script type="module">function e(){document.querySelectorAll(`.markdown-dropdown-wrapper`).forEach(e=>{if(e.dataset.mdInitialized===`true`)return;e.dataset.mdInitialized=`true`;let t=e.querySelector(`.markdown-trigger-btn, .button`),n=e.querySelector(`[data-md-menu]`),r=e.querySelector(`[data-copy-md]`),i=e.querySelector(`[data-view-md-link]`),a=`${(e.dataset.pathname||window.location.pathname).replace(/\/$/,``)}.md`;i&&(i.href=a),!(!t||!n)&&(t.addEventListener(`click`,e=>{e.stopPropagation(),n.hasAttribute(`hidden`)?(n.removeAttribute(`hidden`),t.setAttribute(`aria-expanded`,`true`)):(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),document.addEventListener(`click`,r=>{n.hasAttribute(`hidden`)||e.contains(r.target)||(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))},{passive:!0}),r&&r.addEventListener(`click`,async e=>{e.stopPropagation();let i=r.querySelector(`.item-label`),o=i?.textContent||`Copy Markdown`;try{i&&(i.textContent=`Fetching...`);let e=await fetch(a);if(!e.ok)throw Error(`Failed to fetch markdown: ${e.status}`);let r=await e.text(),s=new DOMParser().parseFromString(r,`text/html`).querySelector(`pre`),c=s?s.textContent||``:r;await navigator.clipboard.writeText(c),i&&(i.textContent=`Copied!`,setTimeout(()=>{i.textContent=o,n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`)},1200))}catch(e){console.error(`Error copying markdown:`,e),i&&(i.textContent=`Error copying`),setTimeout(()=>{i&&(i.textContent=o)},2e3)}}))})}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,e):e(),document.addEventListener(`astro:page-load`,e);</script></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.D8WSbctB.js"></script></div></div><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="build-with-google">Build with Google</h1><a class="sl-anchor-link" href="#build-with-google"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Build with Google”</span></a></div>
+<p>The Antigravity App makes it seamless to build with popular Google technology stacks. We’ve partnered with teams across Google to create curated bundles of primitives, including skills, MCP servers, and editor extensions, that are pre-configured for specific ecosystems.</p>
+<p>Instead of searching for individual tools, you can enable these bundles to instantly empower your agents with deep knowledge of Google platforms.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="how-to-enable">How to enable</h2><a class="sl-anchor-link" href="#how-to-enable"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “How to enable”</span></a></div>
+<p>You can enable Build with Google integrations at two points:</p>
+\<ul\>
+\<li\><strong>During onboarding</strong>: Select the checkboxes for the stacks you plan to use.</li>
+\<li\><strong>In settings</strong>: Navigate to <strong>Settings</strong> > <strong>Customizations</strong> > <strong>Build with Google Plugins</strong> to add or remove integrations at any time.</li>
+</ul>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="available-bundles">Available bundles</h2><a class="sl-anchor-link" href="#available-bundles"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Available bundles”</span></a></div>
+<p>The following curated bundles are available in the Antigravity App:</p>
+<div class="not-content bwg-explorer astro-ockdxelz" data-bwg-explorer><!-- Interactive Filter & Search Controls --><div class="bwg-toolbar astro-ockdxelz"><div class="bwg-category-pills astro-ockdxelz" role="tablist" aria-label="Filter Google bundles by category"><button type="button" class="bwg-cat-btn active astro-ockdxelz" data-bwg-cat="all" role="tab" aria-selected="true"><span class="astro-ockdxelz">All bundles</span><span class="cat-count astro-ockdxelz">10</span></button><button type="button" class="bwg-cat-btn astro-ockdxelz" data-bwg-cat="web" role="tab" aria-selected="false"><span class="symbol cat-icon astro-ockdxelz" translate="no">language</span><span class="astro-ockdxelz">Web & Chrome</span></button><button type="button" class="bwg-cat-btn astro-ockdxelz" data-bwg-cat="cloud" role="tab" aria-selected="false"><span class="symbol cat-icon astro-ockdxelz" translate="no">cloud</span><span class="astro-ockdxelz">Cloud & Data</span></button><button type="button" class="bwg-cat-btn astro-ockdxelz" data-bwg-cat="mobile" role="tab" aria-selected="false"><span class="symbol cat-icon astro-ockdxelz" translate="no">phone_android</span><span class="astro-ockdxelz">Mobile & Maps</span></button><button type="button" class="bwg-cat-btn astro-ockdxelz" data-bwg-cat="ai" role="tab" aria-selected="false"><span class="symbol cat-icon astro-ockdxelz" translate="no">psychology</span><span class="astro-ockdxelz">AI & Science</span></button></div><div class="bwg-toolbar-right astro-ockdxelz"><div class="bwg-search-box astro-ockdxelz"><span class="symbol search-icon astro-ockdxelz" translate="no">search</span><input type="search" class="bwg-search-input astro-ockdxelz" placeholder="Search bundles..." aria-label="Search Build with Google bundles" data-bwg-search></div><div class="bwg-view-toggle astro-ockdxelz" role="group" aria-label="Toggle bundle density"><button type="button" class="bwg-density-btn active astro-ockdxelz" data-bwg-density="expanded" title="Show all details"><span class="symbol astro-ockdxelz" translate="no">view_agenda</span></button><button type="button" class="bwg-density-btn astro-ockdxelz" data-bwg-density="compact" title="Compact cards"><span class="symbol astro-ockdxelz" translate="no">grid_view</span></button></div></div></div><!-- Bundle Cards Grid --><div class="bwg-cards-grid astro-ockdxelz" data-bwg-grid><article id="modern-web-guidance" class="bwg-card astro-ockdxelz" data-bwg-card data-category="web"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">language</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Web & Chrome</span><h3 class="bwg-card-title astro-ockdxelz">Modern Web Guidance</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Keep your coding agent up to date with the latest web best practices.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of evergreen and expert-vetted skills for the modern web.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Build accessible, performant, and secure web experiences using injected guidance.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://goo.gle/modern-web-guidance" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Read the Modern Web Guidance</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="firebase-bundle" class="bwg-card astro-ockdxelz" data-bwg-card data-category="cloud"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">local_fire_department</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Cloud & Data</span><h3 class="bwg-card-title astro-ockdxelz">Firebase Bundle</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Transform your AI coding agent into a specialized Firebase expert that can write code, configure Firebase Security Rules, and manage live resources.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of agent skills for core Firebase services, including Firestore, Authentication, App Hosting, and more.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Take action:</strong> Go beyond writing code. Your agent can initialize services, manage Authentication users, deploy new Firebase Security Rules, and work directly with your Cloud Firestore data.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Stay up to date:</strong> Use official, version-aware prompts to guide your agent through setup tasks.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Improve accuracy:</strong> Access your project&#39;s environment and schemas to provide more relevant and accurate help.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://firebase.google.com/docs/ai-assistance/agent-skills" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore the Firebase Agent Skills Guide</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="google-antigravity-sdk" class="bwg-card astro-ockdxelz" data-bwg-card data-category="ai"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">code_blocks</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">AI & Science</span><h3 class="bwg-card-title astro-ockdxelz">Google Antigravity SDK</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Use the Antigravity Python SDK to build autonomous AI agents.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">An agent skill containing architecture references, getting-started examples, and configuration guides for the Antigravity Python SDK (google-antigravity).</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Build agents:</strong> Your agent can scaffold new Antigravity agents, configure models, register custom Python tools, and connect MCP servers using SDK best practices.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Stay safe:</strong> Use official guidance to implement declarative safety policies, including deny-by-default templates and argument-level predicates.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Go deeper:</strong> Access reference material for lifecycle hooks, multi-agent delegation, structured output, multimodal input, and token usage observability.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="/docs/sdk/overview" class="bwg-learn-more-link astro-ockdxelz"><span class="astro-ockdxelz">Explore the Antigravity SDK Documentation</span><span class="symbol link-arrow astro-ockdxelz" translate="no">arrow_forward</span></a></div></article><article id="android-cli" class="bwg-card astro-ockdxelz" data-bwg-card data-category="mobile"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">phone_android</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Mobile & Maps</span><h3 class="bwg-card-title astro-ockdxelz">Android CLI</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Core tools and knowledge required to develop for Android.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Android CLI and Android skills for core development tasks, including making your UI edge-to-edge and adaptive, creating a testing framework, analyzing your R8 configuration to optimize performance, and more.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Enable the agent to build high-quality Android apps.</li><li class="astro-ockdxelz">Create new projects.</li><li class="astro-ockdxelz">Deploy your app on an Android virtual device.</li><li class="astro-ockdxelz">Test your app using natural language instructions.</li><li class="astro-ockdxelz">Migrate to the latest versions of libraries and plugins.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://developer.android.com/tools/agents" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore the Android Agent Developer Tools</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="science" class="bwg-card astro-ockdxelz" data-bwg-card data-category="ai"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">science</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">AI & Science</span><h3 class="bwg-card-title astro-ockdxelz">Science</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Curated collection of agent skills for scientific computing and research workflows.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">A curated bundle of scientific skills.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Improve agent performance across scientific workflows.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://github.com/google-deepmind/science-skills" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Review the DeepMind Science Skills Repository</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="chrome-devtools" class="bwg-card astro-ockdxelz" data-bwg-card data-category="web"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">bug_report</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Web & Chrome</span><h3 class="bwg-card-title astro-ockdxelz">Chrome DevTools</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Reliable automation, in-depth debugging, and performance analysis in Chrome using Chrome DevTools and Puppeteer.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of agent skills for Chrome DevTools and Puppeteer.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Debug accessibility (a11y) issues, audit Core Web Vitals (LCP/INP), run visual automation tests, and diagnose memory leaks.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://github.com/ChromeDevTools/chrome-devtools-mcp" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore the Chrome DevTools Repository</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="dart-and-flutter" class="bwg-card astro-ockdxelz" data-bwg-card data-category="mobile"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">flutter_dash</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Mobile & Maps</span><h3 class="bwg-card-title astro-ockdxelz">Dart and Flutter</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">The official Dart and Flutter plugin for building natively compiled applications for mobile, web, desktop, and embedded devices from a single codebase.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of agent skills for common Dart and Flutter workflows, plus a Dart MCP server to interact with your development environment and running Dart or Flutter applications.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Enhance developer experience:</strong> Leverage static analysis tools, package management routines via pub, code formatting, and automated code-renaming capabilities.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Multiplatform development:</strong> Build high-quality apps across mobile, web, and desktop from one codebase.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Improve accuracy:</strong> Provide structured instructions for agents to complete common developer tasks, such as building adaptive layouts.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://docs.flutter.dev/ai/create-with-ai" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore Flutter Agentic Tools</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="data-agent-kit-starter-pack" class="bwg-card astro-ockdxelz" data-bwg-card data-category="cloud"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">database</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Cloud & Data</span><h3 class="bwg-card-title astro-ockdxelz">Data Agent Kit Starter Pack</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Specialized suite of skills and MCP tools for data engineers and database practitioners building end-to-end analytics, ETL, and AI workflows on Google Cloud.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Curated domain skills for BigQuery SQL & ML, dbt transformations, Apache Spark, Dataflow, Cloud Spanner, BigLake Iceberg catalogs, and workflow orchestration.</li><li class="astro-ockdxelz">Integration with Google Cloud data MCP servers for database introspection, query execution, and pipeline troubleshooting.</li><li class="astro-ockdxelz">Notebook, dashboard (Streamlit), and semantic modeling guidance.</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">End-to-end medallion pipelines:</strong> Prompt your agent in natural language to ingest raw data from Cloud Storage, transform it through bronze, silver, and gold layers with dbt or Spark, and serve it via BigQuery or Spanner.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">SQL & ML code generation:</strong> Write optimized BigQuery SQL, train BigQuery ML models (XGBoost, K-Means), or build interactive LookML and Streamlit data apps.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Pipeline orchestration & debugging:</strong> Automatically scaffold orchestration workflows and debug failed Dataflow or Dataproc jobs across the Google Cloud data ecosystem.</li></ul></div></div></article><article id="google-maps-platform" class="bwg-card astro-ockdxelz" data-bwg-card data-category="mobile"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">map</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Mobile & Maps</span><h3 class="bwg-card-title astro-ockdxelz">Google Maps Platform</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Equip your AI coding agent with Google Maps Platform knowledge and workflows to design, build, and deploy location-aware features across Web, Android, iOS, and web services.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of agent skills covering core Google Maps Platform APIs and SDKs—including Maps (2D/3D, Street View, Static, Styling, Clustering), Places, Address Validation, Geocoding, Routes & ETA (including eco-friendly routing), Geofencing, Heatmaps, and Environmental APIs (Air Quality, Pollen, Solar, Weather).</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Build location-rich experiences:</strong> Write production-ready code for interactive mapping, place lookup, route optimization, geofencing, and environmental insights across mobile, web, and backend services.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Low-friction prototyping:</strong> Get started using a Maps Demo Key without immediate billing setup, with guided prompts to create an account and restrict your API key when transitioning to production.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://github.com/googlemaps/agent-skills" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore the Google Maps Platform Agent Skills Repository</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article><article id="google-cloud" class="bwg-card astro-ockdxelz" data-bwg-card data-category="cloud"><div class="bwg-card-header astro-ockdxelz"><div class="bwg-card-title-group astro-ockdxelz"><div class="bwg-icon-box astro-ockdxelz" aria-hidden="true"><span class="symbol bwg-icon astro-ockdxelz" translate="no">cloud</span></div><div class="bwg-title-stack astro-ockdxelz"><span class="bwg-category-badge astro-ockdxelz">Cloud & Data</span><h3 class="bwg-card-title astro-ockdxelz">Google Cloud</h3></div></div><button type="button" class="bwg-expand-toggle astro-ockdxelz" data-bwg-card-toggle aria-expanded="true" title="Toggle bundle details"><span class="toggle-text astro-ockdxelz">Details</span><span class="symbol toggle-chevron astro-ockdxelz" translate="no">expand_less</span></button></div><p class="bwg-card-summary astro-ockdxelz">Equip your AI coding agent with Google Cloud knowledge and workflows to design, build, deploy, and manage scalable cloud infrastructure and services directly from Antigravity.</p><!-- Collapsible Detail Body --><div class="bwg-card-details astro-ockdxelz" data-bwg-details><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">inventory_2</span><span class="astro-ockdxelz">What's included</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz">Package of agent skills covering core Google Cloud services, architecture design, and deployment workflows, including Compute (Cloud Run, GKE, Compute Engine), Serverless & Eventing (Cloud Functions, Eventarc, Pub/Sub), Storage & Databases (Cloud Storage, Cloud SQL, Firestore, Spanner, AlloyDB), AI & Data (Gemini platform, BigQuery), Identity & Security (IAM, Secret Manager), and Infrastructure as Code (Terraform, gcloud CLI).</li></ul></div><div class="bwg-detail-section astro-ockdxelz"><h4 class="bwg-detail-heading astro-ockdxelz"><span class="symbol detail-icon astro-ockdxelz" translate="no">bolt</span><span class="astro-ockdxelz">Key capabilities</span></h4><ul class="bwg-detail-list astro-ockdxelz"><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Build and deploy cloud-native applications:</strong> Enable your agent to write production-ready service architectures, container definitions, IaC configurations, and client library integrations across multiple runtimes (Node.js, Python, Go, Java).</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Guided setup & infrastructure management:</strong> Streamline project provisioning, service enablement, IAM permissioning, and resource configuration with best-practice templates and automated gcloud workflows.</li><li class="astro-ockdxelz"><strong class="astro-ockdxelz">Intelligent troubleshooting & observability:</strong> Diagnose deployment errors, inspect Cloud Logging and Cloud Monitoring telemetry, and optimize configurations for cost, security, and performance.</li></ul></div></div><div class="bwg-card-footer astro-ockdxelz"><a href="https://g.dev/ai/skills" class="bwg-learn-more-link astro-ockdxelz" target="_blank" rel="noopener noreferrer"><span class="astro-ockdxelz">Explore the Google Cloud Agent Skills Repository</span><span class="symbol link-arrow astro-ockdxelz" translate="no">open_in_new</span></a></div></article></div><!-- Empty state when search matches 0 bundles --><div class="bwg-empty-state astro-ockdxelz" data-bwg-empty hidden><span class="symbol empty-icon astro-ockdxelz" translate="no">search_off</span><p class="astro-ockdxelz">No Google bundles match your filter. Try clearing the search or selecting <strong class="astro-ockdxelz">All bundles</strong>.</p><button type="button" class="bwg-reset-btn astro-ockdxelz" data-bwg-reset>Reset filters</button></div></div><script type="module">function e(){document.querySelectorAll(`[data-bwg-explorer]`).forEach(e=>{if(e.dataset.bound===`true`)return;e.dataset.bound=`true`;let t=e.querySelectorAll(`[data-bwg-cat]`),n=e.querySelector(`[data-bwg-search]`),r=e.querySelectorAll(`[data-bwg-density]`),i=e.querySelector(`[data-bwg-grid]`),a=e.querySelectorAll(`[data-bwg-card]`),o=e.querySelector(`[data-bwg-empty]`),s=e.querySelector(`[data-bwg-reset]`),c=`all`,l=``;function u(e){c=e,t.forEach(t=>{let n=t.getAttribute(`data-bwg-cat`)===e;t.classList.toggle(`active`,n),t.setAttribute(`aria-selected`,n?`true`:`false`)})}function d(e=!1){let t=0,n=l.trim().toLowerCase();if(a.forEach(e=>{let r=e.getAttribute(`data-category`)||``,i=c===`all`||r===c,a=!n||(e.textContent||``).toLowerCase().includes(n),o=i&&a;e.style.display=o?`flex`:`none`,o&&t++}),e&&n&&t===0&&c!==`all`&&Array.from(a).some(e=>(e.textContent||``).toLowerCase().includes(n))){u(`all`),d(!1);return}o&&(o.hidden=t>0)}t.forEach(e=>{e.addEventListener(`click`,()=>{u(e.getAttribute(`data-bwg-cat`)||`all`),d(!1)})});let f=()=>{l=n?.value||``,d(!0)};if(n?.addEventListener(`input`,f),n?.addEventListener(`search`,f),s?.addEventListener(`click`,()=>{l=``,n&&(n.value=``),u(`all`),d(!1)}),r.forEach(e=>{e.addEventListener(`click`,()=>{let t=e.getAttribute(`data-bwg-density`)||`expanded`;r.forEach(t=>t.classList.toggle(`active`,t===e));let n=t===`compact`;i?.classList.toggle(`is-compact-grid`,n),a.forEach(e=>{e.classList.toggle(`is-collapsed`,n),e.querySelector(`[data-bwg-card-toggle]`)?.setAttribute(`aria-expanded`,n?`false`:`true`)})})}),a.forEach(e=>{let t=e.querySelector(`[data-bwg-card-toggle]`);t?.addEventListener(`click`,()=>{let n=e.classList.toggle(`is-collapsed`);t.setAttribute(`aria-expanded`,n?`false`:`true`)})}),window.location.hash){let t=decodeURIComponent(window.location.hash.slice(1)),n=e.querySelector(`#${CSS.escape(t)}`);n&&n.hasAttribute(`data-bwg-card`)&&(n.classList.remove(`is-collapsed`),n.classList.add(`is-highlighted`),setTimeout(()=>n.classList.remove(`is-highlighted`),2500))}})}document.readyState!==`loading`&&e(),document.addEventListener(`DOMContentLoaded`,e),document.addEventListener(`astro:page-load`,e);</script>
+\<hr\>
+<div class="sl-heading-wrapper level-h2"><h2 id="next-steps">Next steps</h2><a class="sl-anchor-link" href="#next-steps"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Next steps”</span></a></div>
+<div class="not-content resources-cards-grid astro-7nm2vpxn" style="--card-cols: 3;"><a href="/docs/plugins" class="resource-card astro-7nm2vpxn"><div class="card-header astro-7nm2vpxn"><span class="symbol resource-icon astro-7nm2vpxn" translate="no">extension</span><span class="resource-tag astro-7nm2vpxn">Extensibility</span></div><span class="resource-title astro-7nm2vpxn">Agent Marketplace & Plugins</span><p class="resource-body astro-7nm2vpxn">Discover, install, and manage agent plugins across Antigravity surfaces.</p></a><a href="/docs/mcp" class="resource-card astro-7nm2vpxn"><div class="card-header astro-7nm2vpxn"><span class="symbol resource-icon astro-7nm2vpxn" translate="no">hub</span><span class="resource-tag astro-7nm2vpxn">Integrations</span></div><span class="resource-title astro-7nm2vpxn">Model Context Protocol (MCP)</span><p class="resource-body astro-7nm2vpxn">Connect custom MCP servers and external tools to your agent workspace.</p></a><a href="/docs/sdk/overview" class="resource-card astro-7nm2vpxn"><div class="card-header astro-7nm2vpxn"><span class="symbol resource-icon astro-7nm2vpxn" translate="no">code_blocks</span><span class="resource-tag astro-7nm2vpxn">Python SDK</span></div><span class="resource-title astro-7nm2vpxn">Antigravity SDK</span><p class="resource-body astro-7nm2vpxn">Build custom programmatic agents with the Antigravity Python SDK.</p></a></div></div><footer class="sl-flex docs-footer docs-footer-wrapper astro-4mgpquaz" data-pagefind-ignore><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-qs5fwxza" dir="ltr"><a href="/docs/models/" rel="prev" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-qs5fwxza">Previous<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Choose a model</span></span></a><a href="/docs/ide/extensions/" rel="next" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-qs5fwxza">Next<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Overview</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav></footer></div></div></main></div></div></div></div></body></html>

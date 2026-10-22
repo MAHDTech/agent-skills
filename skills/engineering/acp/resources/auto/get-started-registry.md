@@ -174,7 +174,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Tencent Cloud's official intelligent coding tool
 
-    **2.168.2**
+    **2.169.0**
   </Card>
 
   <Card
@@ -335,7 +335,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Reduces API costs by more than 50%, produces better and faster work. Uses Hash anchored parallel edits, AST manipulation and a whole lot of neat optimizations. Fully Open Source.
 
-    **0.5.21**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
+    **0.5.22**, <a href="https://github.com/dirac-run/dirac"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -733,7 +733,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Harn runs .harn agent pipelines as a native ACP coding agent over stdio.
 
-    **0.10.168**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
+    **0.10.171**, <a href="https://github.com/burin-labs/harn"><Icon icon="github" /></a>
   </Card>
 
   <Card
@@ -1056,7 +1056,7 @@ Visit [the registry repository on GitHub](https://github.com/agentclientprotocol
   >
     Local-first coding agent. Runs entirely on your machine with optional on-device LLM inference via Onde.
 
-    **1.7.0**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
+    **1.7.1**, <a href="https://github.com/getsigit/sigit"><Icon icon="github" /></a>
   </Card>
 
   <Card

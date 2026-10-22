@@ -7,759 +7,157 @@ mermaid = false
 skill_name = "antigravity"
 +++
 
-<!DOCTYPE html><html lang="en">\<head\><meta charset="utf-8">\<style\>
-    html[data-i18n-pending="true"] main,
-    html[data-i18n-pending="true"] footer,
-    html[data-i18n-pending="true"] nav.sidebar,
-    html[data-i18n-pending="true"] .right-sidebar,
-    html[data-i18n-pending="true"] [data-header] nav,
-    html[data-i18n-pending="true"] [data-header] .download-button,
-    html[data-i18n-pending="true"] [data-header] .cta-button,
-    html[data-i18n-pending="true"] .docs-nav-links,
-    html[data-i18n-pending="true"] .header-download-btn,
-    html[data-i18n-pending="true"] .header-cta-btn,
-    html[data-i18n-pending="true"] .rc-pill,
-    html[data-i18n-pending="true"] .subnav-bar,
-    html[data-i18n-pending="true"] site-search button > span {
-      opacity: 0 !important;
-    }
-  </style>\<script\>
-    if (window.location.hostname === 'www.antigravity.google') {
-      window.location.replace(
-        `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
-      );
-    }
-    try {
-      var __agyNonDefault = [
-        'en-GB', 'en-CA', 'hi', 'ja', 'ko', 'zh-CN', 'zh-TW',
-        'id', 'th', 'de', 'fr-FR', 'it', 'pl', 'pt-BR', 'es-ES', 'es-MX'
-      ];
-      var __agyParams = new URLSearchParams(window.location.search);
-      var __agyHl = __agyParams.get('hl') || __agyParams.get('lang');
-      if (__agyHl && (__agyHl === 'en-US' || __agyNonDefault.indexOf(__agyHl) !== -1)) {
-        window.localStorage.setItem('antigravity_locale', __agyHl);
-      }
-      var __agyLoc = window.localStorage.getItem('antigravity_locale');
-      if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
-        document.documentElement.lang = __agyLoc;
-        document.documentElement.setAttribute('data-i18n-pending', 'true');
-        window.__agyI18nTimer = window.setTimeout(function () {
-          document.documentElement.removeAttribute('data-i18n-pending');
-        }, 350);
-      }
-    } catch (e) {}
-  </script><script type="module" src="/_astro/BaseLayout.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script><script type="speculationrules">
-    {
-      "prefetch": [
-        {
-          "where": {
-            "and": [
-              { "href_matches": "/*" },
-              { "not": { "href_matches": "/api/*" } },
-              { "not": { "selector_matches": "[download], [target=_blank]" } }
-            ]
-          },
-          "eagerness": "moderate"
-        }
-      ]
-    }
-  </script>\<title\>Google Antigravity - Use Case: Why Marketers choose Google Antigravity</title><meta name="description" content="Google Antigravity removes the bottlenecks of daily work and speeds up execution. Build custom skills, run workflows in parallel, and steer agents with iterative feedback."><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="canonical" href="https://antigravity.google/use-cases/marketer/"><!-- Open Graph / Social Media Meta Tags --><meta property="og:type" content="website"><meta property="og:site_name" content="Google Antigravity"><meta property="og:url" content="https://antigravity.google/use-cases/marketer/"><meta property="og:title" content="Google Antigravity - Use Case: Why Marketers choose Google Antigravity"><meta property="og:description" content="Google Antigravity removes the bottlenecks of daily work and speeds up execution. Build custom skills, run workflows in parallel, and steer agents with iterative feedback."><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-default.png"><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-default.png"><!-- Twitter Card Meta Tags --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@antigravity"><meta name="twitter:title" content="Google Antigravity - Use Case: Why Marketers choose Google Antigravity"><meta name="twitter:description" content="Google Antigravity removes the bottlenecks of daily work and speeds up execution. Build custom skills, run workflows in parallel, and steer agents with iterative feedback."><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-default.png"><!-- RSS Feed --><link rel="alternate" type="application/rss+xml" title="Google Antigravity Blog RSS Feed" href="https://antigravity.google/blog/rss.xml"><!-- Cookie bar CSS --><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'"><link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any"><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap" media="print" onload="this.media='all'"><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"><link rel="stylesheet" href="/_astro/BaseLayout.D9vzMvRd.css"><link rel="stylesheet" href="/_astro/ModalYoutube.H7xdAfp8.css"><link rel="stylesheet" href="/_astro/SmoothScrollLayout.7wIyyZ3A.css"><link rel="stylesheet" href="/_astro/MobileDesktopJourney.C2AmVCQG.css">\<style\>.text-cards-container:where(.astro-sl7lswzu){z-index:1;justify-content:center;gap:var(--grid-gutter);border-bottom:1px solid var(--theme-outline-outline-variant,#2122260f);flex-wrap:wrap;padding-bottom:180px;display:flex;position:relative}@media (width<=1024px){.text-cards-container:where(.astro-sl7lswzu){padding-bottom:120px}}@media (width<=767px){.text-cards-container:where(.astro-sl7lswzu){flex-direction:column;row-gap:48px;padding-bottom:80px}}.text-card:where(.astro-sl7lswzu){flex:0 1 calc((100% - 2 * var(--grid-gutter)) / 3)}@media (width<=767px){.text-card:where(.astro-sl7lswzu){flex:100%}}.text-card:where(.astro-sl7lswzu) .card-icon:where(.astro-sl7lswzu){--symbol-font:56px}.text-card:where(.astro-sl7lswzu) .card-title:where(.astro-sl7lswzu){margin-block-end:var(--space-md)}.text-card:where(.astro-sl7lswzu) .sub-text:where(.astro-sl7lswzu){color:var(--theme-surface-on-surface-variant)}
-</style><link rel="stylesheet" href="/_astro/_id_.Bz8xPSl3.css"><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.download-section-wrapper{border-top:1px solid var(--divider);margin-top:var(--download-section-margin-top,180px);text-align:center;padding:72px 0 0}.download-section-wrapper h2{padding-bottom:40px}.download-section-wrapper .download-buttons{justify-content:center;align-items:center;gap:16px;display:flex}@media (width<=767px){.download-section-wrapper h2{padding-bottom:28px}.download-section-wrapper .download-buttons{flex-direction:column;gap:12px}}
-.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
-</style><script type="module" src="/_astro/page.LAbJoB63.js"></script></head><body>\<script\>
-  window.dataLayer = window.dataLayer || [];
-  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
-  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
-
-  var __agySegmentMql =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(
-          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
-        )
-      : null;
-  var __agyUa =
-    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-  var __agyIsFoldableUA =
-    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
-  var __agyIsIpad =
-    /ipad/i.test(__agyUa) ||
-    (typeof navigator !== 'undefined' &&
-      navigator.maxTouchPoints > 0 &&
-      /macintosh/i.test(__agyUa));
-  var __agyOs = 'unknown';
-  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
-  else if (__agyIsIpad) __agyOs = 'ipad';
-  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
-  else if (/android/i.test(__agyUa)) __agyOs = 'android';
-  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
-  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
-  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
-
-  function __agyDetectViewport() {
-    const width = Math.round(
-      window.innerWidth ||
-        (document.documentElement && document.documentElement.clientWidth) ||
-        1440
-    );
-    const height = Math.round(
-      window.innerHeight ||
-        (document.documentElement && document.documentElement.clientHeight) ||
-        900
-    );
-    const orientation = width >= height ? 'landscape' : 'portrait';
-    const minDim = Math.min(width, height);
-    const maxDim = Math.max(width, height);
-    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
-
-    const hasSegments =
-      Boolean(
-        window.visualViewport &&
-          window.visualViewport.segments &&
-          window.visualViewport.segments.length > 1
-      ) ||
-      Boolean(
-        typeof navigator !== 'undefined' &&
-          navigator.devicePosture &&
-          navigator.devicePosture.type === 'folded'
-      ) ||
-      Boolean(__agySegmentMql && __agySegmentMql.matches);
-    const isFoldableUnfolded =
-      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
-    const isFoldableCover =
-      (width >= 320 &&
-        width <= 368 &&
-        height >= 700 &&
-        height / width >= 2.0) ||
-      (height >= 320 &&
-        height <= 368 &&
-        width >= 700 &&
-        width / height >= 2.0);
-
-    let viewportCategory = 'desktop';
-    if (
-      hasSegments ||
-      __agyIsFoldableUA ||
-      isFoldableUnfolded ||
-      isFoldableCover
-    ) {
-      viewportCategory = 'foldable';
-    } else if (width < 600) {
-      viewportCategory = 'mobile';
-    } else if (width <= 1024 || __agyIsIpad) {
-      viewportCategory = 'tablet';
-    }
-
-    return {
-      viewportCategory: viewportCategory,
-      formFactor: viewportCategory,
-      viewportWidth: width,
-      viewportHeight: height,
-      orientation: orientation,
-      operatingSystem: __agyOs,
-    };
-  }
-
-  function __agyRecordPageView() {
-    const currentPath = window.location.pathname || '/';
-    if (window.__agyLastPageViewPath === currentPath) return;
-
-    if (
-      window.agyAnalytics &&
-      typeof window.agyAnalytics.trackPageView === 'function'
-    ) {
-      window.agyAnalytics.trackPageView();
-      return;
-    }
-
-    window.__agyLastPageViewPath = currentPath;
-    const vp = __agyDetectViewport();
-    const eventParams = {
-      pagePath: currentPath,
-      locale: document.documentElement.lang || 'en-US',
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-    };
-    if (document.title) {
-      eventParams.pageTitle = document.title;
-    }
-    if (document.referrer) {
-      eventParams.referrer = document.referrer;
-    }
-    try {
-      const sp = new URLSearchParams(window.location.search || '');
-      const utmSource = sp.get('utm_source');
-      const utmMedium = sp.get('utm_medium');
-      const utmCampaign = sp.get('utm_campaign');
-      const utmTerm = sp.get('utm_term');
-      const utmContent = sp.get('utm_content');
-      if (utmSource) {
-        eventParams.utm_source = utmSource;
-        eventParams.utmSource = utmSource;
-      }
-      if (utmMedium) {
-        eventParams.utm_medium = utmMedium;
-        eventParams.utmMedium = utmMedium;
-      }
-      if (utmCampaign) {
-        eventParams.utm_campaign = utmCampaign;
-        eventParams.utmCampaign = utmCampaign;
-      }
-      if (utmTerm) {
-        eventParams.utm_term = utmTerm;
-        eventParams.utmTerm = utmTerm;
-      }
-      if (utmContent) {
-        eventParams.utm_content = utmContent;
-        eventParams.utmContent = utmContent;
-      }
-    } catch (_err) {
-      // Ignore URLSearchParams errors
-    }
-
-    const entry = {
-      event: 'page_view',
-      pagePath: currentPath,
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-      eventParams: eventParams,
-    };
-    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
-    if (eventParams.referrer) entry.referrer = eventParams.referrer;
-    if (eventParams.utm_source) {
-      entry.utm_source = eventParams.utm_source;
-      entry.utmSource = eventParams.utmSource;
-    }
-    if (eventParams.utm_medium) {
-      entry.utm_medium = eventParams.utm_medium;
-      entry.utmMedium = eventParams.utmMedium;
-    }
-    if (eventParams.utm_campaign) {
-      entry.utm_campaign = eventParams.utm_campaign;
-      entry.utmCampaign = eventParams.utmCampaign;
-    }
-    if (eventParams.utm_term) {
-      entry.utm_term = eventParams.utm_term;
-      entry.utmTerm = eventParams.utmTerm;
-    }
-    if (eventParams.utm_content) {
-      entry.utm_content = eventParams.utm_content;
-      entry.utmContent = eventParams.utmContent;
-    }
-
-    window.dataLayer.push(entry);
-    window.dataLayer.push({ eventParams: undefined });
-  }
-
-  __agyRecordPageView();
-
-  window.glueCookieNotificationBarLoaded = function () {
-    if (window.__agyGtmLoaded) return;
-    window.__agyGtmLoaded = true;
-    (function (w, d, s, l, i) {
-      w[l] = w[l] || [];
-      w[l].push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js',
-      });
-      const f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != 'dataLayer' ? '&l=' + l : '';
-      j.async = true;
-      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-      f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
-    __agyRecordPageView();
-  };
-
-  document.addEventListener('astro:page-load', function () {
-    __agyRecordPageView();
-  });
-</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.BtyBE0kN.js"></script>\<main\><header data-analytics-nav="header" class="header   astro-nen7h5rs" data-scroll-reactive="true" data-opaque="false" data-header><div class="grid-container astro-nen7h5rs"><div class="main-content astro-nen7h5rs"><div class="logo-container astro-nen7h5rs"><a class="logo-link astro-nen7h5rs" href="/" aria-label="Google Antigravity" data-logo-link><svg class="logo astro-nen7h5rs" viewBox="0 0 1687 217" height="21" width="163.26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M301.141 177.959C288.865 177.84 277.662 174.8 267.532 168.841C257.461 162.823 249.506 154.689 243.666 144.439C237.886 134.19 234.996 122.927 234.996 110.652C234.996 98.1975 237.886 86.9052 243.666 76.7749C249.446 66.6446 257.402 58.6893 267.532 52.9091C277.662 47.0693 288.925 44.1493 301.319 44.1493C310.973 44.1493 319.822 45.7583 327.867 48.9761C335.911 52.194 342.764 57.14 348.425 63.8141L335.465 77.4006C330.399 72.2163 325.185 68.4919 319.822 66.2275C314.519 63.963 308.44 62.8308 301.588 62.8308C292.887 62.8308 285.022 64.7973 277.99 68.7302C270.958 72.6632 265.387 78.2944 261.275 85.624C257.223 92.894 255.197 101.326 255.197 110.92C255.197 120.276 257.223 128.648 261.275 136.037C265.327 143.367 270.869 149.087 277.901 153.199C284.932 157.311 292.828 159.367 301.588 159.367C309.394 159.367 316.366 157.996 322.504 155.255C328.701 152.454 333.707 148.283 337.52 142.741C341.334 137.199 343.628 130.465 344.403 122.54H300.873V104.037H362.906C363.502 107.97 363.8 111.546 363.8 114.764C363.8 127.277 361.207 138.361 356.023 148.015C350.839 157.609 343.479 165.028 333.945 170.272C324.47 175.516 313.535 178.078 301.141 177.959Z" fill="currentColor"></path><path d="M421.274 177.959C412.097 177.959 403.844 175.843 396.515 171.612C389.245 167.382 383.554 161.571 379.442 154.182C375.39 146.734 373.364 138.361 373.364 129.065C373.364 119.531 375.449 111.099 379.621 103.769C383.852 96.38 389.602 90.6594 396.872 86.6072C404.142 82.5551 412.276 80.5291 421.274 80.5291C430.391 80.5291 438.585 82.5849 445.855 86.6966C453.185 90.8083 458.935 96.5588 463.106 103.948C467.278 111.337 469.363 119.709 469.363 129.065C469.363 138.361 467.307 146.734 463.196 154.182C459.084 161.631 453.363 167.471 446.034 171.702C438.764 175.873 430.511 177.959 421.274 177.959ZM421.274 160.976C426.935 160.976 431.941 159.575 436.291 156.774C440.701 153.914 444.097 150.071 446.481 145.244C448.924 140.357 450.146 134.965 450.146 129.065C450.146 123.225 448.924 117.922 446.481 113.155C444.097 108.328 440.701 104.514 436.291 101.713C431.881 98.9126 426.876 97.5122 421.274 97.5122C416.03 97.5122 411.203 98.853 406.794 101.535C402.384 104.216 398.868 107.97 396.246 112.797C393.684 117.564 392.403 122.987 392.403 129.065C392.403 134.905 393.595 140.268 395.978 145.154C398.421 149.981 401.818 153.825 406.168 156.685C410.578 159.545 415.613 160.976 421.274 160.976Z" fill="currentColor"></path><path d="M525.229 177.959C516.052 177.959 507.799 175.843 500.469 171.612C493.199 167.382 487.508 161.571 483.397 154.182C479.345 146.734 477.319 138.361 477.319 129.065C477.319 119.531 479.404 111.099 483.576 103.769C487.806 96.38 493.557 90.6594 500.827 86.6072C508.097 82.5551 516.231 80.5291 525.229 80.5291C534.346 80.5291 542.54 82.5849 549.81 86.6966C557.139 90.8083 562.89 96.5588 567.061 103.948C571.232 111.337 573.318 119.709 573.318 129.065C573.318 138.361 571.262 146.734 567.151 154.182C563.039 161.631 557.318 167.471 549.989 171.702C542.719 175.873 534.465 177.959 525.229 177.959ZM525.229 160.976C530.89 160.976 535.896 159.575 540.246 156.774C544.655 153.914 548.052 150.071 550.436 145.244C552.879 140.357 554.1 134.965 554.1 129.065C554.1 123.225 552.879 117.922 550.436 113.155C548.052 108.328 544.655 104.514 540.246 101.713C535.836 98.9126 530.83 97.5122 525.229 97.5122C519.985 97.5122 515.158 98.853 510.749 101.535C506.339 104.216 502.823 107.97 500.201 112.797C497.639 117.564 496.358 122.987 496.358 129.065C496.358 134.905 497.549 140.268 499.933 145.154C502.376 149.981 505.773 153.825 510.123 156.685C514.533 159.545 519.568 160.976 525.229 160.976Z" fill="currentColor"></path><path d="M626.502 216.484C616.253 216.484 607.791 214.338 601.117 210.048C594.502 205.757 588.99 198.934 584.581 189.579L601.385 182.16C604.186 187.463 607.582 191.605 611.575 194.584C615.567 197.623 620.454 199.143 626.234 199.143C635.053 199.143 641.757 196.581 646.346 191.456C650.994 186.331 653.318 179.18 653.318 170.003V161.691H652.692C651.262 163.836 649.236 166.011 646.614 168.216C643.992 170.361 640.774 172.208 636.96 173.758C633.146 175.247 628.975 175.992 624.446 175.992C615.448 175.992 607.642 173.996 601.027 170.003C594.413 166.011 589.348 160.469 585.832 153.378C582.316 146.227 580.558 138.033 580.558 128.797C580.558 119.68 582.316 111.516 585.832 104.305C589.348 97.0355 594.353 91.3446 600.849 87.2329C607.404 83.1212 615.031 81.0654 623.731 81.0654C629.929 81.0654 635.619 82.287 640.804 84.7302C645.988 87.1733 650.04 90.6594 652.96 95.1882H653.318V83.8363H671.91V164.462C671.91 199.143 656.774 216.484 626.502 216.484ZM626.502 158.294C631.984 158.294 636.752 157.013 640.804 154.45C644.856 151.888 647.955 148.343 650.1 143.814C652.245 139.225 653.318 134.011 653.318 128.171C653.318 122.212 652.245 116.998 650.1 112.529C647.955 108 644.856 104.514 640.804 102.071C636.752 99.6277 632.014 98.4061 626.592 98.4061C621.288 98.4061 616.61 99.6575 612.558 102.16C608.506 104.603 605.348 108.089 603.083 112.618C600.819 117.147 599.687 122.361 599.687 128.261C599.687 134.458 600.819 139.821 603.083 144.35C605.407 148.879 608.595 152.335 612.648 154.719C616.7 157.102 621.318 158.294 626.502 158.294Z" fill="currentColor"></path><path d="M686.301 175.009V47.0097H705.787V175.009H686.301Z" fill="currentColor"></path><path d="M763.351 177.78C749.645 177.78 738.293 173.37 729.295 164.551C720.356 155.732 715.887 144.112 715.887 129.691C715.887 115.568 720.208 103.948 728.848 94.8307C737.548 85.6538 748.9 81.0654 762.904 81.0654C772.081 81.0654 780.006 83.4192 786.68 88.1268C793.414 92.8344 798.717 100.194 802.591 110.205C802.948 111.218 803.276 112.261 803.574 113.333C803.872 114.406 804.14 115.628 804.378 116.998L731.083 148.104L725.988 133.356L786.68 107.613L784.982 115.747C782.717 109.371 779.559 104.752 775.507 101.892C771.515 99.0318 767.075 97.6016 762.189 97.6016C753.846 97.6016 747.202 100.462 742.256 106.183C737.31 111.844 734.837 119.292 734.837 128.529C734.837 137.229 737.697 144.648 743.418 150.786C749.138 156.923 756.081 159.992 764.245 159.992C769.131 159.992 773.69 158.771 777.92 156.328C782.151 153.884 785.846 150.458 789.004 146.048L803.485 155.523C799.432 162.197 793.891 167.59 786.859 171.702C779.827 175.754 771.991 177.78 763.351 177.78Z" fill="currentColor"></path><path d="M841.06 175.009L889.953 47.0097H910.065L958.512 175.009H937.149L905.059 85.5346L900.054 69.8922H899.518L894.512 85.5346L862.065 175.009H841.06ZM862.78 143.277L868.769 126.831H927.495L933.663 143.277H862.78Z" fill="currentColor"></path><path d="M965.598 175.009V83.5682H984.19V100.015L981.688 96.9759H984.727C987.468 92.1491 991.609 88.2162 997.151 85.1771C1002.75 82.138 1008.56 80.6184 1014.58 80.6184C1025.13 80.6184 1033.35 83.7469 1039.25 90.0039C1045.21 96.2608 1048.19 104.842 1048.19 115.747V175.009H1028.7V119.501C1028.7 112.231 1026.95 106.749 1023.43 103.054C1019.97 99.2999 1014.85 97.4228 1008.06 97.4228C1001.56 97.4228 996.108 99.9852 991.699 105.11C987.289 110.235 985.084 116.402 985.084 123.613V175.009H965.598Z" fill="currentColor"></path><path d="M1097.09 177.959C1088.87 177.959 1082.32 175.575 1077.43 170.808C1072.54 165.981 1070.1 159.247 1070.1 150.607V58.0934H1089.5V146.853C1089.5 151.739 1090.48 155.374 1092.45 157.758C1094.41 160.082 1097.33 161.244 1101.21 161.244C1102.69 161.244 1104.3 161.065 1106.03 160.707C1107.82 160.29 1109.82 159.665 1112.02 158.83V175.367C1109.22 176.32 1106.69 176.976 1104.42 177.333C1102.16 177.75 1099.72 177.959 1097.09 177.959ZM1054.9 99.8362V83.5682H1111.66V99.8362H1054.9Z" fill="currentColor"></path><path d="M1124.59 175.009V83.5682H1143.99V175.009H1124.59ZM1134.34 66.1381C1131 66.1381 1128.14 64.9761 1125.76 62.652C1123.37 60.2685 1122.18 57.4081 1122.18 54.0711C1122.18 50.6745 1123.37 47.8439 1125.76 45.5795C1128.14 43.3151 1131 42.1829 1134.34 42.1829C1137.79 42.1829 1140.65 43.3151 1142.92 45.5795C1145.18 47.8439 1146.32 50.6745 1146.32 54.0711C1146.32 57.4081 1145.18 60.2685 1142.92 62.652C1140.65 64.9761 1137.79 66.1381 1134.34 66.1381Z" fill="currentColor"></path><path d="M1202.02 216.573C1191.59 216.573 1183.07 214.368 1176.46 209.959C1169.84 205.549 1164.36 198.815 1160.01 189.758L1177 182.249C1179.74 187.493 1183.07 191.635 1187.01 194.674C1190.94 197.772 1195.86 199.322 1201.75 199.322C1210.28 199.322 1216.95 196.789 1221.78 191.724C1226.6 186.659 1229.02 179.448 1229.02 170.093V161.78H1228.3C1225.74 165.475 1222.02 168.782 1217.13 171.702C1212.24 174.562 1206.52 175.992 1199.97 175.992C1186.86 175.992 1176.25 171.761 1168.15 163.3C1160.1 154.778 1156.08 143.277 1156.08 128.797C1156.08 114.495 1160.16 102.965 1168.32 94.205C1176.49 85.4453 1186.83 81.0654 1199.34 81.0654C1206.13 81.0654 1212.06 82.436 1217.13 85.1771C1222.25 87.9182 1226.04 91.2851 1228.48 95.2776H1231.97L1229.02 97.2441V83.8363H1247.52V164.551C1247.52 181.475 1243.86 194.376 1236.53 203.255C1229.2 212.134 1217.7 216.573 1202.02 216.573ZM1202.02 158.383C1209.95 158.383 1216.41 155.612 1221.42 150.071C1226.48 144.529 1229.02 137.259 1229.02 128.261C1229.02 119.143 1226.51 111.903 1221.51 106.54C1216.5 101.117 1210.04 98.4061 1202.11 98.4061C1194.37 98.4061 1187.96 101.088 1182.89 106.451C1177.83 111.814 1175.3 119.114 1175.3 128.35C1175.3 137.765 1177.83 145.125 1182.89 150.428C1188.02 155.732 1194.4 158.383 1202.02 158.383Z" fill="currentColor"></path><path d="M1262.59 175.009V83.5682H1281.18V100.462L1278.68 98.0485H1281.72C1283.44 93.1025 1286.78 88.961 1291.73 85.624C1296.73 82.287 1301.98 80.6184 1307.46 80.6184C1309.07 80.6184 1310.71 80.7674 1312.37 81.0654C1314.1 81.3037 1316.31 81.84 1318.99 82.6743V102.071C1315.23 100.879 1312.34 100.104 1310.32 99.7468C1308.35 99.3893 1306.65 99.2105 1305.22 99.2105C1298.73 99.2105 1293.25 101.713 1288.78 106.719C1284.31 111.724 1282.07 117.892 1282.07 125.222V175.009H1262.59Z" fill="currentColor"></path><path d="M1351.87 177.959C1341.92 177.959 1333.87 175.188 1327.74 169.646C1321.6 164.104 1318.53 156.864 1318.53 147.925C1318.53 138.451 1322.1 130.942 1329.26 125.4C1336.41 119.858 1345.67 117.088 1357.05 117.088C1362.06 117.088 1366.86 117.594 1371.45 118.607C1376.09 119.561 1379.85 120.752 1382.71 122.182V116.909C1382.71 110.652 1380.56 105.676 1376.27 101.981C1371.98 98.2273 1366.35 96.3502 1359.38 96.3502C1353.9 96.3502 1349.13 97.3632 1345.08 99.3893C1341.02 101.356 1337.12 104.425 1333.37 108.596L1321.75 97.8698C1327.88 91.5532 1333.9 87.1138 1339.8 84.5514C1345.76 81.989 1352.76 80.7078 1360.81 80.7078C1373.56 80.7078 1383.57 83.9257 1390.84 90.3614C1398.11 96.7375 1401.75 105.646 1401.75 117.088V175.009H1382.71V153.646L1388.07 161.691H1382.17C1379.55 166.398 1375.53 170.301 1370.1 173.4C1364.68 176.439 1358.6 177.959 1351.87 177.959ZM1356.7 162.227C1364.09 162.227 1370.25 159.724 1375.2 154.719C1380.21 149.653 1382.71 143.486 1382.71 136.216V136.037C1380.03 134.249 1376.75 132.879 1372.88 131.925C1369.06 130.912 1365.07 130.406 1360.9 130.406C1353.93 130.406 1348.35 131.806 1344.18 134.607C1340.01 137.348 1337.93 141.4 1337.93 146.763C1337.93 151.471 1339.68 155.225 1343.2 158.026C1346.72 160.827 1351.21 162.227 1356.7 162.227Z" fill="currentColor"></path><path d="M1438.37 175.009L1401.54 83.5682H1422.01L1446.05 147.389L1448.2 153.646H1448.82L1451.15 147.3L1475.28 83.5682H1495.22L1457.94 175.009H1438.37Z" fill="currentColor"></path><path d="M1501.96 175.009V83.5682H1521.36V175.009H1501.96ZM1511.7 66.1381C1508.37 66.1381 1505.51 64.9761 1503.12 62.652C1500.74 60.2685 1499.55 57.4081 1499.55 54.0711C1499.55 50.6745 1500.74 47.8439 1503.12 45.5795C1505.51 43.3151 1508.37 42.1829 1511.7 42.1829C1515.16 42.1829 1518.02 43.3151 1520.28 45.5795C1522.55 47.8439 1523.68 50.6745 1523.68 54.0711C1523.68 57.4081 1522.55 60.2685 1520.28 62.652C1518.02 64.9761 1515.16 66.1381 1511.7 66.1381Z" fill="currentColor"></path><path d="M1574.03 177.959C1565.8 177.959 1559.25 175.575 1554.36 170.808C1549.47 165.981 1547.03 159.247 1547.03 150.607V58.0934H1566.43V146.853C1566.43 151.739 1567.41 155.374 1569.38 157.758C1571.34 160.082 1574.26 161.244 1578.14 161.244C1579.63 161.244 1581.24 161.065 1582.96 160.707C1584.75 160.29 1586.75 159.665 1588.95 158.83V175.367C1586.15 176.32 1583.62 176.976 1581.35 177.333C1579.09 177.75 1576.65 177.959 1574.03 177.959ZM1531.84 99.8362V83.5682H1588.6V99.8362H1531.84Z" fill="currentColor"></path><path d="M1608.42 213.713L1631.57 163.389L1632.02 175.009L1591.43 83.5682H1611.99L1636.13 140.864L1638.54 148.015H1639.08L1641.67 140.685L1664.46 83.5682H1684.66L1628.71 213.713H1608.42Z" fill="currentColor"></path><path d="M175.277 181.636C185.19 189.071 200.06 184.115 186.429 170.484C145.536 130.83 154.211 21.7824 103.404 21.7824C52.5979 21.7824 61.2722 130.83 20.3793 170.484C5.50915 185.354 21.6185 189.071 31.5319 181.636C69.9464 155.614 67.4681 109.764 103.404 109.764C139.34 109.764 136.862 155.614 175.277 181.636Z" fill="white"/><mask id="agl_3fzjn_m" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="13" y="21" width="179" height="165"><path d="M175.277 181.636C185.19 189.071 200.06 184.115 186.429 170.484C145.536 130.83 154.211 21.7824 103.404 21.7824C52.5979 21.7824 61.2722 130.83 20.3793 170.484C5.50915 185.354 21.6185 189.071 31.5319 181.636C69.9464 155.614 67.4681 109.764 103.404 109.764C139.34 109.764 136.862 155.614 175.277 181.636Z" fill="white"/></mask><g mask="url(#agl_3fzjn_m)"><g filter="url(#agl_3fzjn_f0)"><ellipse cx="48.4073" cy="56.9522" rx="48.4073" ry="56.9522" transform="matrix(-0.112784 0.99362 -0.99362 -0.112781 125.452 -50.4013)" fill="#FFE432"/></g><g filter="url(#agl_3fzjn_f1)"><ellipse cx="189.699" cy="57.2113" rx="62.6685" ry="64.0462" transform="rotate(76.9243 189.699 57.2113)" fill="#FC413D"/></g><g filter="url(#agl_3fzjn_f2)"><ellipse cx="3.91232" cy="71.109" rx="65.4966" ry="84.8483" transform="rotate(74.1257 3.91232 71.109)" fill="#00B95C"/></g><g filter="url(#agl_3fzjn_f3)"><ellipse cx="3.91232" cy="71.109" rx="65.4966" ry="84.8483" transform="rotate(74.1257 3.91232 71.109)" fill="#00B95C"/></g><g filter="url(#agl_3fzjn_f4)"><ellipse cx="8.56518" cy="73.714" rx="64.1966" ry="70.6746" transform="rotate(45.6065 8.56518 73.714)" fill="#00B95C"/></g><g filter="url(#agl_3fzjn_f5)"><ellipse cx="145.653" cy="205.274" rx="61.6425" ry="59.3594" transform="rotate(76.9243 145.653 205.274)" fill="#3186FF"/></g><g filter="url(#agl_3fzjn_f6)"><ellipse cx="71.3047" cy="75.2095" rx="71.3047" ry="75.2095" transform="matrix(-0.409539 0.912293 -0.912294 -0.409537 199.817 -49.6212)" fill="#FBBC04"/></g><g filter="url(#agl_3fzjn_f7)"><path d="M-9.81405 300.598C-48.858 285.271 17.867 159.164 34.4593 116.899C51.0515 74.6342 96.1535 52.7971 135.197 68.1246C174.241 83.4522 220.519 167.874 203.927 210.139C187.335 252.404 29.2299 315.926 -9.81405 300.598Z" fill="#3186FF"/></g><g filter="url(#agl_3fzjn_f8)"><path d="M226.758 143.638C216.305 155.838 189.027 149.617 165.831 129.743C142.635 109.868 132.304 83.867 142.757 71.667C153.21 59.4669 180.488 65.6881 203.684 85.5624C226.88 105.437 237.211 131.438 226.758 143.638Z" fill="#749BFF"/></g><g filter="url(#agl_3fzjn_f9)"><ellipse cx="181.461" cy="33.1492" rx="93.9817" ry="58.4218" transform="rotate(34.0763 181.461 33.1492)" fill="#FC413D"/></g><g filter="url(#agl_3fzjn_f10)"><ellipse cx="34.6363" cy="45.4552" rx="50.3612" ry="29.2875" transform="rotate(112.516 34.6363 45.4552)" fill="#FFEE48"/></g></g>\<defs\><filter id="agl_3fzjn_f0" x="-9.66309" y="-73.4677" width="146.133" height="129.483" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="8.10535"/></filter><filter id="agl_3fzjn_f1" x="47.3386" y="-83.9129" width="284.721" height="282.248" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="39.1851"/></filter><filter id="agl_3fzjn_f2" x="-146.284" y="-62.6694" width="300.392" height="267.557" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="33.3112"/></filter><filter id="agl_3fzjn_f3" x="-146.284" y="-62.6694" width="300.392" height="267.557" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="33.3112"/></filter><filter id="agl_3fzjn_f4" x="-125.64" y="-60.3535" width="268.41" height="268.135" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="33.3112"/></filter><filter id="agl_3fzjn_f5" x="22.8499" y="80.4218" width="245.606" height="249.703" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="31.6554"/></filter><filter id="agl_3fzjn_f6" x="-29.9644" y="-144.74" width="263.932" height="258.738" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="28.6888"/></filter><filter id="agl_3fzjn_f7" x="-73.1261" y="11.9849" width="331.76" height="342.19" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="25.6203"/></filter><filter id="agl_3fzjn_f8" x="92.8272" y="19.5709" width="183.86" height="176.163" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="22.9254"/></filter><filter id="agl_3fzjn_f9" x="58.2661" y="-77.0932" width="246.39" height="220.485" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="19.3633"/></filter><filter id="agl_3fzjn_f10" x="-46.5222" y="-50.3416" width="162.317" height="191.594" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="23.9654"/></filter></defs></svg></a><div class="logo-context-menu astro-nen7h5rs" data-logo-context-menu aria-hidden="true"><button class="context-menu-item astro-nen7h5rs" data-context-action="copy-logo"><span class="item-icon astro-nen7h5rs"><svg class="astro-nen7h5rs" viewBox="0 0 180 180" height="18" width="18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M144.248 149.062C151.748 154.688 162.998 150.938 152.685 140.625C121.748 110.625 128.31 28.125 89.8727 28.125C51.4352 28.125 57.9977 110.625 27.0602 140.625C15.8102 151.875 27.9977 154.688 35.4977 149.062C64.5602 129.375 62.6852 94.6875 89.8727 94.6875C117.06 94.6875 115.185 129.375 144.248 149.062Z" fill="#3186FF"/><mask id="ag_yeaow_m" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="22" y="28" width="136" height="125"><path d="M144.248 149.062C151.748 154.688 162.998 150.938 152.685 140.625C121.748 110.625 128.31 28.125 89.8727 28.125C51.4352 28.125 57.9977 110.625 27.0602 140.625C15.8102 151.875 27.9977 154.688 35.4977 149.062C64.5602 129.375 62.6852 94.6875 89.8727 94.6875C117.06 94.6875 115.185 129.375 144.248 149.062Z" fill="white"/></mask><g mask="url(#ag_yeaow_m)"><g filter="url(#ag_yeaow_f0)"><ellipse cx="36.6225" cy="43.0872" rx="36.6225" ry="43.0872" transform="matrix(-0.112784 0.99362 -0.99362 -0.112781 106.557 -26.4847)" fill="#FFE432"/></g><g filter="url(#ag_yeaow_f1)"><ellipse cx="155.163" cy="54.9292" rx="47.4118" ry="48.4541" transform="rotate(76.9243 155.163 54.9292)" fill="#FC413D"/></g><g filter="url(#ag_yeaow_f2)"><ellipse cx="14.6006" cy="65.4425" rx="49.5515" ry="64.192" transform="rotate(74.1257 14.6006 65.4425)" fill="#00B95C"/></g><g filter="url(#ag_yeaow_f3)"><ellipse cx="14.6006" cy="65.4425" rx="49.5515" ry="64.192" transform="rotate(74.1257 14.6006 65.4425)" fill="#00B95C"/></g><g filter="url(#ag_yeaow_f4)"><ellipse cx="18.1226" cy="67.414" rx="48.5679" ry="53.4688" transform="rotate(45.6065 18.1226 67.414)" fill="#00B95C"/></g><g filter="url(#ag_yeaow_f5)"><ellipse cx="121.837" cy="166.945" rx="46.6356" ry="44.9084" transform="rotate(76.9243 121.837 166.945)" fill="#3186FF"/></g><g filter="url(#ag_yeaow_f6)"><ellipse cx="53.9456" cy="56.8997" rx="53.9456" ry="56.8997" transform="matrix(-0.409539 0.912293 -0.912294 -0.409537 162.811 -25.895)" fill="#FBBC04"/></g><g filter="url(#ag_yeaow_f7)"><path d="M4.21557 239.063C-25.3231 227.467 25.1577 132.061 37.7105 100.085C50.2634 68.1097 84.3853 51.5888 113.924 63.1848C143.463 74.7809 178.474 138.65 165.921 170.626C153.368 202.601 33.7543 250.659 4.21557 239.063Z" fill="#3186FF"/></g><g filter="url(#ag_yeaow_f8)"><path d="M183.197 120.315C175.289 129.545 154.652 124.839 137.102 109.803C119.553 94.7668 111.738 75.0955 119.646 65.8656C127.554 56.6357 148.191 61.3423 165.74 76.3782C183.289 91.414 191.105 111.085 183.197 120.315Z" fill="#749BFF"/></g><g filter="url(#ag_yeaow_f9)"><ellipse cx="148.928" cy="36.7252" rx="71.1018" ry="44.199" transform="rotate(34.0763 148.928 36.7252)" fill="#FC413D"/></g><g filter="url(#ag_yeaow_f10)"><ellipse cx="37.848" cy="46.0346" rx="38.1008" ry="22.1575" transform="rotate(112.516 37.848 46.0346)" fill="#FFEE48"/></g></g>\<defs\><filter id="ag_yeaow_f0" x="4.09591" y="-44.1761" width="111.037" height="98.4416" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="6.25234"/></filter><filter id="ag_yeaow_f1" x="46.2974" y="-53.0009" width="217.731" height="215.86" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="30.2268"/></filter><filter id="ag_yeaow_f2" x="-100.018" y="-36.7558" width="229.238" height="204.397" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="25.6957"/></filter><filter id="ag_yeaow_f3" x="-100.018" y="-36.7558" width="229.238" height="204.397" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="25.6957"/></filter><filter id="ag_yeaow_f4" x="-84.3985" y="-35.003" width="205.042" height="204.834" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="25.6957"/></filter><filter id="ag_yeaow_f5" x="27.9915" y="71.5493" width="187.691" height="190.791" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="24.4184"/></filter><filter id="ag_yeaow_f6" x="-11.8808" y="-98.7085" width="201.38" height="197.45" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="22.1301"/></filter><filter id="ag_yeaow_f7" x="-44.4432" y="19.9522" width="252.513" height="260.404" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="19.7631"/></filter><filter id="ag_yeaow_f8" x="81.1915" y="25.7722" width="140.46" height="134.637" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="17.6843"/></filter><filter id="ag_yeaow_f9" x="55.1499" y="-47.2531" width="187.555" height="167.957" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14.9365"/></filter><filter id="ag_yeaow_f10" x="-24.2633" y="-27.1515" width="124.223" height="146.372" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="18.4865"/></filter></defs></svg></span><span class="item-label astro-nen7h5rs">Copy Logo as SVG</span><span class="item-status astro-nen7h5rs">Copied!</span></button><div class="context-menu-divider astro-nen7h5rs"></div><a class="context-menu-item astro-nen7h5rs" href="/press"><span class="item-icon astro-nen7h5rs"><svg class="astro-nen7h5rs" viewBox="0 -960 960 960" width="20px" height="20px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M147.69-130q-23.5,0-40.6-17.1T90-187.69V-815.77l57,57l66-67l67,67l67-67l66,67l67-67l67,67l66-67l67,67l67-67l66,67l57-57v628.07q0,23.5-17.1,40.6T812.31-130H147.69Zm0-45.38H457.31V-464.62H135.38v276.92q0,5.39 3.46,8.85t8.85,3.46Zm355,0H812.31q5.39,0 8.85-3.46t3.46-8.85V-297.31H502.69v121.92Zm0-167.31H824.62V-464.62H502.69v121.92ZM135.38-510H824.62V-653.85H135.38V-510Z"></path></svg></span><span class="item-label astro-nen7h5rs">Press Guidelines</span></a></div></div><div class="header-actions astro-nen7h5rs"><nav class="call-to-action--nav nav astro-nen7h5rs"><div class="nav-item astro-nen7h5rs"><button type="button" class="call-to-action--nav button button-nav button-compact nav-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-controls="product" aria-label="Products" data-index="0" data-dropdown-trigger="product" class="astro-nen7h5rs"><span>Products</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}function l(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),document.addEventListener(`astro:page-load`,()=>{c()})}l();</script></div><div class="nav-item astro-nen7h5rs"><button type="button" class="call-to-action--nav button button-nav button-compact nav-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-controls="use-cases" aria-label="Use Cases" data-index="1" data-dropdown-trigger="use-cases" class="astro-nen7h5rs"><span>Use Cases</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button></div><div class="nav-item astro-nen7h5rs"><a href="/pricing" class="call-to-action--nav button button-nav button-compact nav-trigger-btn" aria-haspopup="false" aria-expanded="false" aria-label="Pricing" data-index="2" data-dropdown-trigger class="astro-nen7h5rs"><span>Pricing</span></a></div><div class="nav-item astro-nen7h5rs"><a href="/use-cases/enterprise" class="call-to-action--nav button button-nav button-compact nav-trigger-btn" aria-haspopup="false" aria-expanded="false" aria-label="Enterprise" data-index="3" data-dropdown-trigger class="astro-nen7h5rs"><span>Enterprise</span></a></div><div class="nav-item astro-nen7h5rs"><button type="button" class="call-to-action--nav button button-nav button-compact nav-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-controls="resources" aria-label="Resources" data-index="4" data-dropdown-trigger="resources" class="astro-nen7h5rs"><span>Resources</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button></div></nav><div class="header-cta-group astro-nen7h5rs"><a class="rocket-link astro-nen7h5rs" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" aria-label="Launch Remote Control">🚀<span class="tooltip astro-nen7h5rs" role="tooltip">Launch Remote Control</span></a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-nen7h5rs"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a></div></div><div class="header-actions-right astro-nen7h5rs"><a class="rocket-link mobile-rocket-link astro-nen7h5rs" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" aria-label="Launch Remote Control">🚀<span class="tooltip astro-nen7h5rs" role="tooltip">Launch Remote Control</span></a><button type="button" class="call-to-action--nav button button-primary button-compact menu-toggle astro-nen7h5rs" aria-label="Toggle navigation menu" data-mobile-menu-toggle><svg class="icon-menu astro-nen7h5rs" viewBox="0 -960 960 960" width="20px" height="20px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M140-254.62V-300H820v45.38H140Zm0-202.69v-45.38H820v45.38H140ZM140-660v-45.38H820V-660H140Z"></path></svg><svg class="icon-close astro-nen7h5rs" viewBox="0 -960 960 960" width="20px" height="20px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M250.92-218.92l-32-32L448-480L218.92-709.08l32-32L480-512L709.08-741.08l32,32L512-480L741.08-250.92l-32,32L480-448L250.92-218.92Z"></path></svg></button><div class="language-selector header-language-selector astro-nen7h5rs astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
-  (function () {
-    try {
-      var valid = [
-        'en-US',
-        'id',
-        'de',
-        'en-CA',
-        'en-GB',
-        'es-ES',
-        'es-MX',
-        'fr-FR',
-        'it',
-        'pl',
-        'pt-BR',
-        'hi',
-        'th',
-        'ja',
-        'zh-CN',
-        'zh-TW',
-        'ko',
-      ];
-      var shortLabels = {
-        'en-US': 'EN',
-        'en-GB': 'EN-GB',
-        'en-CA': 'EN-CA',
-        hi: 'HI',
-        ja: 'JA',
-        ko: 'KO',
-        'zh-CN': 'ZH-CN',
-        'zh-TW': 'ZH-TW',
-        id: 'ID',
-        th: 'TH',
-        de: 'DE',
-        'fr-FR': 'FR',
-        it: 'IT',
-        pl: 'PL',
-        'pt-BR': 'PT',
-        'es-ES': 'ES',
-        'es-MX': 'ES-MX',
-      };
-      var active = window.__agyActiveLocale;
-      if (!active) {
-        var stored = window.localStorage.getItem('antigravity_locale');
-        active = 'en-US';
-        if (stored !== null) {
-          if (valid.indexOf(stored) !== -1) {
-            active = stored;
-          } else {
-            window.localStorage.setItem('antigravity_locale', 'en-US');
-            active = 'en-US';
-          }
-        } else {
-          var langs =
-            navigator.languages && navigator.languages.length
-              ? navigator.languages
-              : [navigator.language || 'en-US'];
-          for (var i = 0; i < langs.length; i++) {
-            var raw = String(langs[i] || '')
-              .trim()
-              .replace(/_/g, '-');
-            if (!raw) continue;
-            var lower = raw.toLowerCase();
-            var exactIdx = -1;
-            for (var j = 0; j < valid.length; j++) {
-              if (valid[j].toLowerCase() === lower) {
-                exactIdx = j;
-                break;
-              }
-            }
-            if (exactIdx !== -1) {
-              active = valid[exactIdx];
-              break;
-            }
-            var parts = lower.split('-');
-            var base = parts[0];
-            var subtag = parts[1] || '';
-            var region = parts[2] || subtag;
-            if (base === 'zh') {
-              active =
-                subtag === 'tw' ||
-                subtag === 'hk' ||
-                subtag === 'mo' ||
-                subtag === 'hant' ||
-                region === 'tw' ||
-                region === 'hk' ||
-                region === 'mo'
-                  ? 'zh-TW'
-                  : 'zh-CN';
-              break;
-            }
-            if (base === 'id' || base === 'in') {
-              active = 'id';
-              break;
-            }
-            if (base === 'th') {
-              active = 'th';
-              break;
-            }
-            if (base === 'it') {
-              active = 'it';
-              break;
-            }
-            if (base === 'pl') {
-              active = 'pl';
-              break;
-            }
-            if (base === 'es') {
-              active = subtag === 'es' ? 'es-ES' : 'es-MX';
-              break;
-            }
-            if (base === 'pt') {
-              active = 'pt-BR';
-              break;
-            }
-            if (base === 'fr') {
-              active = 'fr-FR';
-              break;
-            }
-            if (base === 'de') {
-              active = 'de';
-              break;
-            }
-            if (base === 'ja') {
-              active = 'ja';
-              break;
-            }
-            if (base === 'ko') {
-              active = 'ko';
-              break;
-            }
-            if (base === 'hi') {
-              active = 'hi';
-              break;
-            }
-            if (base === 'en') {
-              active =
-                subtag === 'gb' ||
-                subtag === 'uk' ||
-                subtag === 'au' ||
-                subtag === 'nz' ||
-                subtag === 'ie'
-                  ? 'en-GB'
-                  : subtag === 'ca'
-                    ? 'en-CA'
-                    : 'en-US';
-              break;
-            }
-          }
-          if (active !== 'en-US') {
-            window.localStorage.setItem('antigravity_locale', active);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'language_auto_detect',
-              eventParams: {
-                locale: active,
-                browserLanguage: langs[0] || '',
-                pagePath: window.location.pathname,
-              },
-            });
-            window.dataLayer.push({ eventParams: undefined });
-          }
-        }
-        window.__agyActiveLocale = active;
-      }
-      if (document.documentElement.lang !== active) {
-        document.documentElement.lang = active;
-      }
-      var selects = document.querySelectorAll('select[data-language-select]');
-      for (var k = 0; k < selects.length; k++) {
-        if (selects[k].value !== active) {
-          selects[k].value = active;
-        }
-      }
-      var codes = document.querySelectorAll('[data-language-code]');
-      var shortCode = shortLabels[active] || 'EN';
-      for (var m = 0; m < codes.length; m++) {
-        if (codes[m].textContent !== shortCode) {
-          codes[m].textContent = shortCode;
-        }
-      }
-    } catch (e) {
-      document.documentElement.lang = 'en-US';
-    }
-  })();
-</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script></div></div><!-- Dropdowns container --><div class="dropdown astro-nen7h5rs" data-dropdowns-container><div class="grid-container astro-nen7h5rs"><div class="dropdown-panel-wrapper col-md-10 astro-nen7h5rs" data-dropdown-panel-id="product"><div class="dropdown-panel  astro-nz4fptcl" data-dropdown-id="product" data-analytics-menu="product"><div class="col-md-3 astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Explore our next generation products</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"><a class="call-to-action--nav nav-button  astro-nz4fptcl" href="/product">See overview</a></div></div><div class="col-md-4 subnav-column astro-nz4fptcl"><p class="caption subnav-label astro-nz4fptcl">Products</p><nav class="subnav astro-nz4fptcl" id="product" aria-labelledby="product" role="menu"><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-2" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M482.04-859.61Q557.08-860 597-803.84t70,127.77q25.23,61.92 49.23,137.5t50.93,151.03q26.3,72.47 57.65,137.05T897-139.62q6.46,8.08 6.46,16.96T897-107.69t-16.35,6.38t-17.1-6.11q-76.71-64.2-122.32-140.01T646.48-376.6q-34.64-38.4-74.56-61.21t-89.63-22.42q-49.72-0.38-89.89,22.42T317.82-376.6q-49.36,53.37-94.98,129.18T100.52-107.42q-7.21,6.42-16.91,6.11t-16.54-6.58q-6.46-5.88-6.27-14.77t6.65-16.96q40.46-45.92 71.81-110.69t57.65-137.24Q223.85-463 247.85-538.3t49.23-137.77q29.18-71.36 69.55-127.64t115.41-55.9Zm-87.46,93.88q-31.27,48.5-53.88,102.27q-35.31,81.54-60.92,169.19T222.31-326.61q24.73-33.65 48.21-62.32t48.87-51.52q36.15-31.54 75.31-48.35t87.35-16.81t87.35,16.81t75.69,48.35q25,22.85 48.48,51.52t48.21,62.32q-31.85-80-57.46-167.65T623.77-663.46q-23-53.77-54.27-102.27t-87.46-48.5t-87.46,48.5Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity App</span></a><a class="body subnav-link  astro-nz4fptcl" href="/docs/ide/extensions" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M194.23-183.08H728.08q3.85,0 6.35-2.69t2.5-6.54v-182l34.08-14q20.54-6.85 33.19-27.19t12.65-44.04q0-24.96-12.71-44.62T771-531.54l-34.08-14V-730q0-4.23-2.5-6.73t-6.35-2.5H542.85l-6.31-38.69q-5-29.69-26.21-50.31t-49.37-20.62q-29.73,0-50.88,20.62t-26.15,50.31l-6.69,38.69H194.46q-3.46,0-5.96,2.5T186-730v108.85q51.15,16.54 84.96,61.2t33.81,100.69q0,56.64-33.62,102.03t-85.77,57.92v107q0,3.85 2.5,6.54t6.35,2.69Zm7.92,45.38q-24.98,0-43.57-18.78T140-201.23V-331.77q50.85-3.38 85.12-39.58t34.27-88.18q0-50.09-34.46-87.55t-84.31-40.9v-134.1q0-26.72 17.83-44.63t44.32-17.91H339.15q6.25-46.18 40.31-77.9t80.82-31.72q45.8,0 80.29,31.72t41.35,77.9H720.15q26.34,0 44.24,17.91t17.91,44.63v146.23q36.5,14.48 58.21,44.66t21.71,71.65q0,40.69-21.71,70.88t-58.21,45.04v142.38q0,25.98-17.91,44.76t-44.24,18.78h-518Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity Extensions</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-cli" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M157.69-180q-23.53,0-40.61-17.08T100-237.69V-722.31q0-23.53 17.08-40.61T157.69-780H802.31q23.53,0 40.61,17.08T860-722.31v484.61q0,23.53-17.08,40.61T802.31-180H157.69Zm0-45.38H802.31q4.62,0 8.46-3.85t3.85-8.46V-651.77H145.39v414.08q0,4.62 3.85,8.46t8.46,3.85ZM300-303.15l-31.61-31.23l103-104l-104-104L300-574L435.61-438.38L300-303.15Zm197.31,7.46v-45.38H702.69v45.38H497.31Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity CLI</span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-ide" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M320-255.46L93.85-481.62L321.62-709l32.23,32.61L159.08-481.62L352.61-288.08L320-255.46Zm318.38,1.62l-32.23-32.61L800.92-481.23L607.39-675.15L640-707.77L866.15-481.62L638.38-253.85Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity IDE</span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-sdk" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.6,0-40.64-17.05T140-197.69V-701.15q0-7.11 2.15-13.74t7.62-12.03l55.85-70.92q4.92-6.08 11.24-9.12T230.54-810H730.08q7.35,0 13.68,3.04T755-797.84l56.23,70.92q3.46,5.69 6.12,12.23T820-701.15v503.46q0,23.6-17.05,40.64T762.31-140H197.69ZM203-721.15H758l-36.02-43.46H238.23L203-721.15Zm-5.31,535.77H762.31q5.39,0 8.85-3.46t3.46-8.85V-675.77H185.39v478.08q0,5.39 3.46,8.85t8.85,3.46Zm390-121.23L706.54-425.08L587.69-543.92l-30,30.38l88.46,88.46l-88.46,88.46l30,30Zm-215,2.85l30.38-30l-88.46-88.46l88.46-88.46l-30.38-30L254.23-422.23L372.69-303.77ZM185.39-185.39q0,0 0-3.85t0-8.46V-675.77v478.08q0,4.62 0,8.46t0,3.85Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity SDK</span></a></nav></div><div class="col-md-3 subnav-content-container astro-nz4fptcl"></div></div></div><div class="dropdown-panel-wrapper col-md-12 astro-nen7h5rs" data-dropdown-panel-id="use-cases"><div class="dropdown-panel dropdown-panel--multi-section astro-nz4fptcl" data-dropdown-id="use-cases" data-analytics-menu="use-cases"><div class="col-md-2 dropdown-intro-col astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Built for developers and teams in the agent-first era</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"><a class="call-to-action--nav nav-button  astro-nz4fptcl" href="/use-cases">See overview</a></div></div><div class="col-md-10 subnav-sections-grid astro-nz4fptcl"><div class="subnav-section astro-nz4fptcl" data-dropdown-section><p class="caption subnav-label astro-nz4fptcl" data-dropdown-section-title>Developer Use Cases</p><div class="subnav-section-columns astro-nz4fptcl" role="menu" aria-label="Developer Use Cases"><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Developer Use Cases"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/frontend" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Frontend Development</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/fullstack" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Full-Stack Development</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/legacy-migrations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Legacy & Codebase Migrations</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/tech-debt" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Technical Debt & Backlog Burndown</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/automated-testing" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Automated Testing & QA Verification</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/incident-triage" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Incident Triage & Root Cause Analysis</span></a></nav></div><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Developer Use Cases"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/data-pipelines" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Data Pipelines & SQL Engineering</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/onboarding-architecture" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Developer Onboarding & Architecture</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/fullstack-prototyping" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Full-Stack Prototyping</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/enterprise-architecture" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Enterprise Architecture & Strategy</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/daily-operations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Daily Operations & Code Reviews</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/specialized-engineering" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Specialized Systems Engineering</span></a></nav></div></div></div><div class="subnav-section astro-nz4fptcl" data-dropdown-section><p class="caption subnav-label astro-nz4fptcl" data-dropdown-section-title>Other Roles</p><div class="subnav-section-columns astro-nz4fptcl" role="menu" aria-label="Other Roles"><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Other Roles"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/product-management" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Product Management</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/technical-program-management" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Technical Program Management</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/sales-gtm" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Sales & GTM</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/finance" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Finance</span></a></nav></div><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Other Roles"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/business-operations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Business & Operations</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/design-ux" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Design & UX</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/science" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Science</span></a><a class="body subnav-link is-active astro-nz4fptcl" href="/use-cases/marketer" role="menuitem" aria-current="page"><span class="subnav-link-text astro-nz4fptcl">Marketer</span></a></nav></div></div></div></div></div></div><div class="dropdown-panel-wrapper col-md-10 astro-nen7h5rs" data-dropdown-panel-id="resources"><div class="dropdown-panel  astro-nz4fptcl" data-dropdown-id="resources" data-analytics-menu="resources"><div class="col-md-3 astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Everything you need to stay up-to-date and get help</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"></div></div><div class="col-md-4 subnav-column astro-nz4fptcl"><nav class="subnav astro-nz4fptcl" id="resources" aria-labelledby="resources" role="menu"><a class="body subnav-link  astro-nz4fptcl" href="/docs/overview" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="subnav-link-text astro-nz4fptcl">Documentation</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/blog" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Blog</span></a><a class="body subnav-link  astro-nz4fptcl" href="/docs/changelog" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="subnav-link-text astro-nz4fptcl">Changelog</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/newsletter" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Newsletter</span></a><a class="body subnav-link  astro-nz4fptcl" href="/support" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Support</span></a><a class="body subnav-link  astro-nz4fptcl" href="/press" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Press</span></a><a class="body subnav-link  astro-nz4fptcl" href="/releases" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Releases</span></a></nav></div><div class="col-md-3 subnav-content-container astro-nz4fptcl"></div></div></div></div></div><!-- Mobile menu --><div class="mobile-menu astro-nen7h5rs" data-mobile-menu data-analytics-nav="mobile_menu"><div class="mobile-menu-content astro-nen7h5rs"><div class="mobile-nav-section astro-nen7h5rs"><button class="heading-4 mobile-nav-item astro-nen7h5rs" data-mobile-dropdown-trigger="product" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-product">Products<span class="mobile-chevron astro-nen7h5rs"><svg class="astro-nen7h5rs" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="mobile-dropdown-section astro-nen7h5rs" id="mobile-product" data-mobile-dropdown-panel="product"><div class="dropdown-panel  astro-nz4fptcl" data-dropdown-id="product" data-analytics-menu="product"><div class="col-md-3 astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Explore our next generation products</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"><a class="call-to-action--nav nav-button  astro-nz4fptcl" href="/product">See overview</a></div></div><div class="col-md-4 subnav-column astro-nz4fptcl"><p class="caption subnav-label astro-nz4fptcl">Products</p><nav class="subnav astro-nz4fptcl" id="product" aria-labelledby="product" role="menu"><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-2" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M482.04-859.61Q557.08-860 597-803.84t70,127.77q25.23,61.92 49.23,137.5t50.93,151.03q26.3,72.47 57.65,137.05T897-139.62q6.46,8.08 6.46,16.96T897-107.69t-16.35,6.38t-17.1-6.11q-76.71-64.2-122.32-140.01T646.48-376.6q-34.64-38.4-74.56-61.21t-89.63-22.42q-49.72-0.38-89.89,22.42T317.82-376.6q-49.36,53.37-94.98,129.18T100.52-107.42q-7.21,6.42-16.91,6.11t-16.54-6.58q-6.46-5.88-6.27-14.77t6.65-16.96q40.46-45.92 71.81-110.69t57.65-137.24Q223.85-463 247.85-538.3t49.23-137.77q29.18-71.36 69.55-127.64t115.41-55.9Zm-87.46,93.88q-31.27,48.5-53.88,102.27q-35.31,81.54-60.92,169.19T222.31-326.61q24.73-33.65 48.21-62.32t48.87-51.52q36.15-31.54 75.31-48.35t87.35-16.81t87.35,16.81t75.69,48.35q25,22.85 48.48,51.52t48.21,62.32q-31.85-80-57.46-167.65T623.77-663.46q-23-53.77-54.27-102.27t-87.46-48.5t-87.46,48.5Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity App</span></a><a class="body subnav-link  astro-nz4fptcl" href="/docs/ide/extensions" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M194.23-183.08H728.08q3.85,0 6.35-2.69t2.5-6.54v-182l34.08-14q20.54-6.85 33.19-27.19t12.65-44.04q0-24.96-12.71-44.62T771-531.54l-34.08-14V-730q0-4.23-2.5-6.73t-6.35-2.5H542.85l-6.31-38.69q-5-29.69-26.21-50.31t-49.37-20.62q-29.73,0-50.88,20.62t-26.15,50.31l-6.69,38.69H194.46q-3.46,0-5.96,2.5T186-730v108.85q51.15,16.54 84.96,61.2t33.81,100.69q0,56.64-33.62,102.03t-85.77,57.92v107q0,3.85 2.5,6.54t6.35,2.69Zm7.92,45.38q-24.98,0-43.57-18.78T140-201.23V-331.77q50.85-3.38 85.12-39.58t34.27-88.18q0-50.09-34.46-87.55t-84.31-40.9v-134.1q0-26.72 17.83-44.63t44.32-17.91H339.15q6.25-46.18 40.31-77.9t80.82-31.72q45.8,0 80.29,31.72t41.35,77.9H720.15q26.34,0 44.24,17.91t17.91,44.63v146.23q36.5,14.48 58.21,44.66t21.71,71.65q0,40.69-21.71,70.88t-58.21,45.04v142.38q0,25.98-17.91,44.76t-44.24,18.78h-518Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity Extensions</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-cli" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M157.69-180q-23.53,0-40.61-17.08T100-237.69V-722.31q0-23.53 17.08-40.61T157.69-780H802.31q23.53,0 40.61,17.08T860-722.31v484.61q0,23.53-17.08,40.61T802.31-180H157.69Zm0-45.38H802.31q4.62,0 8.46-3.85t3.85-8.46V-651.77H145.39v414.08q0,4.62 3.85,8.46t8.46,3.85ZM300-303.15l-31.61-31.23l103-104l-104-104L300-574L435.61-438.38L300-303.15Zm197.31,7.46v-45.38H702.69v45.38H497.31Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity CLI</span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-ide" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M320-255.46L93.85-481.62L321.62-709l32.23,32.61L159.08-481.62L352.61-288.08L320-255.46Zm318.38,1.62l-32.23-32.61L800.92-481.23L607.39-675.15L640-707.77L866.15-481.62L638.38-253.85Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity IDE</span></a><a class="body subnav-link  astro-nz4fptcl" href="/product/antigravity-sdk" role="menuitem"><span class="link-icon astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="22px" height="22px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.6,0-40.64-17.05T140-197.69V-701.15q0-7.11 2.15-13.74t7.62-12.03l55.85-70.92q4.92-6.08 11.24-9.12T230.54-810H730.08q7.35,0 13.68,3.04T755-797.84l56.23,70.92q3.46,5.69 6.12,12.23T820-701.15v503.46q0,23.6-17.05,40.64T762.31-140H197.69ZM203-721.15H758l-36.02-43.46H238.23L203-721.15Zm-5.31,535.77H762.31q5.39,0 8.85-3.46t3.46-8.85V-675.77H185.39v478.08q0,5.39 3.46,8.85t8.85,3.46Zm390-121.23L706.54-425.08L587.69-543.92l-30,30.38l88.46,88.46l-88.46,88.46l30,30Zm-215,2.85l30.38-30l-88.46-88.46l88.46-88.46l-30.38-30L254.23-422.23L372.69-303.77ZM185.39-185.39q0,0 0-3.85t0-8.46V-675.77v478.08q0,4.62 0,8.46t0,3.85Z"></path></svg></span><span class="subnav-link-text astro-nz4fptcl">Antigravity SDK</span></a></nav></div><div class="col-md-3 subnav-content-container astro-nz4fptcl"></div></div></div></div><div class="mobile-nav-section astro-nen7h5rs"><button class="heading-4 mobile-nav-item astro-nen7h5rs" data-mobile-dropdown-trigger="use-cases" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-use-cases">Use Cases<span class="mobile-chevron astro-nen7h5rs"><svg class="astro-nen7h5rs" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="mobile-dropdown-section astro-nen7h5rs" id="mobile-use-cases" data-mobile-dropdown-panel="use-cases"><div class="dropdown-panel dropdown-panel--multi-section astro-nz4fptcl" data-dropdown-id="use-cases" data-analytics-menu="use-cases"><div class="col-md-2 dropdown-intro-col astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Built for developers and teams in the agent-first era</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"><a class="call-to-action--nav nav-button  astro-nz4fptcl" href="/use-cases">See overview</a></div></div><div class="col-md-10 subnav-sections-grid astro-nz4fptcl"><div class="subnav-section astro-nz4fptcl" data-dropdown-section><p class="caption subnav-label astro-nz4fptcl" data-dropdown-section-title>Developer Use Cases</p><div class="subnav-section-columns astro-nz4fptcl" role="menu" aria-label="Developer Use Cases"><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Developer Use Cases"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/frontend" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Frontend Development</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/fullstack" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Full-Stack Development</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/legacy-migrations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Legacy & Codebase Migrations</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/tech-debt" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Technical Debt & Backlog Burndown</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/automated-testing" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Automated Testing & QA Verification</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/incident-triage" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Incident Triage & Root Cause Analysis</span></a></nav></div><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Developer Use Cases"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/data-pipelines" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Data Pipelines & SQL Engineering</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/onboarding-architecture" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Developer Onboarding & Architecture</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/fullstack-prototyping" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Full-Stack Prototyping</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/enterprise-architecture" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Enterprise Architecture & Strategy</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/daily-operations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Daily Operations & Code Reviews</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/specialized-engineering" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Specialized Systems Engineering</span></a></nav></div></div></div><div class="subnav-section astro-nz4fptcl" data-dropdown-section><p class="caption subnav-label astro-nz4fptcl" data-dropdown-section-title>Other Roles</p><div class="subnav-section-columns astro-nz4fptcl" role="menu" aria-label="Other Roles"><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Other Roles"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/product-management" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Product Management</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/technical-program-management" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Technical Program Management</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/sales-gtm" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Sales & GTM</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/finance" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Finance</span></a></nav></div><div class="subnav-column subnav-column--section astro-nz4fptcl" data-dropdown-column><nav class="subnav astro-nz4fptcl" aria-label="Other Roles"><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/business-operations" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Business & Operations</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/design-ux" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Design & UX</span></a><a class="body subnav-link  astro-nz4fptcl" href="/use-cases/science" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Science</span></a><a class="body subnav-link is-active astro-nz4fptcl" href="/use-cases/marketer" role="menuitem" aria-current="page"><span class="subnav-link-text astro-nz4fptcl">Marketer</span></a></nav></div></div></div></div></div></div></div><div class="mobile-nav-section astro-nen7h5rs"><a class="heading-4 mobile-nav-item astro-nen7h5rs" href="/pricing">Pricing</a></div><div class="mobile-nav-section astro-nen7h5rs"><a class="heading-4 mobile-nav-item astro-nen7h5rs" href="/use-cases/enterprise">Enterprise</a></div><div class="mobile-nav-section astro-nen7h5rs"><button class="heading-4 mobile-nav-item astro-nen7h5rs" data-mobile-dropdown-trigger="resources" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-resources">Resources<span class="mobile-chevron astro-nen7h5rs"><svg class="astro-nen7h5rs" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="mobile-dropdown-section astro-nen7h5rs" id="mobile-resources" data-mobile-dropdown-panel="resources"><div class="dropdown-panel  astro-nz4fptcl" data-dropdown-id="resources" data-analytics-menu="resources"><div class="col-md-3 astro-nz4fptcl"><p class="heading-7 dropdown-title astro-nz4fptcl">Everything you need to stay up-to-date and get help</p><p class="caption dropdown-info astro-nz4fptcl"></p><div class="astro-nz4fptcl"></div></div><div class="col-md-4 subnav-column astro-nz4fptcl"><nav class="subnav astro-nz4fptcl" id="resources" aria-labelledby="resources" role="menu"><a class="body subnav-link  astro-nz4fptcl" href="/docs/overview" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="subnav-link-text astro-nz4fptcl">Documentation</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/blog" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Blog</span></a><a class="body subnav-link  astro-nz4fptcl" href="/docs/changelog" role="menuitem" target="_blank" rel="noopener noreferrer"><span class="subnav-link-text astro-nz4fptcl">Changelog</span><span class="link-arrow astro-nz4fptcl" translate="no"><svg class="astro-nz4fptcl" viewBox="0 -960 960 960" width="18px" height="18px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg></span></a><a class="body subnav-link  astro-nz4fptcl" href="/newsletter" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Newsletter</span></a><a class="body subnav-link  astro-nz4fptcl" href="/support" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Support</span></a><a class="body subnav-link  astro-nz4fptcl" href="/press" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Press</span></a><a class="body subnav-link  astro-nz4fptcl" href="/releases" role="menuitem"><span class="subnav-link-text astro-nz4fptcl">Releases</span></a></nav></div><div class="col-md-3 subnav-content-container astro-nz4fptcl"></div></div></div></div><div class="mobile-nav-section astro-nen7h5rs" data-mobile-menu-cta><a class="heading-4 mobile-nav-item mobile-download-button astro-nen7h5rs" href="/download" data-analytics-event="download-cta" data-module-name="header" data-page-position="mobile nav">Download</a></div><div class="mobile-language-selector astro-nen7h5rs"><div class="language-selector header-language-selector astro-nen7h5rs astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
-  (function () {
-    try {
-      var valid = [
-        'en-US',
-        'id',
-        'de',
-        'en-CA',
-        'en-GB',
-        'es-ES',
-        'es-MX',
-        'fr-FR',
-        'it',
-        'pl',
-        'pt-BR',
-        'hi',
-        'th',
-        'ja',
-        'zh-CN',
-        'zh-TW',
-        'ko',
-      ];
-      var shortLabels = {
-        'en-US': 'EN',
-        'en-GB': 'EN-GB',
-        'en-CA': 'EN-CA',
-        hi: 'HI',
-        ja: 'JA',
-        ko: 'KO',
-        'zh-CN': 'ZH-CN',
-        'zh-TW': 'ZH-TW',
-        id: 'ID',
-        th: 'TH',
-        de: 'DE',
-        'fr-FR': 'FR',
-        it: 'IT',
-        pl: 'PL',
-        'pt-BR': 'PT',
-        'es-ES': 'ES',
-        'es-MX': 'ES-MX',
-      };
-      var active = window.__agyActiveLocale;
-      if (!active) {
-        var stored = window.localStorage.getItem('antigravity_locale');
-        active = 'en-US';
-        if (stored !== null) {
-          if (valid.indexOf(stored) !== -1) {
-            active = stored;
-          } else {
-            window.localStorage.setItem('antigravity_locale', 'en-US');
-            active = 'en-US';
-          }
-        } else {
-          var langs =
-            navigator.languages && navigator.languages.length
-              ? navigator.languages
-              : [navigator.language || 'en-US'];
-          for (var i = 0; i < langs.length; i++) {
-            var raw = String(langs[i] || '')
-              .trim()
-              .replace(/_/g, '-');
-            if (!raw) continue;
-            var lower = raw.toLowerCase();
-            var exactIdx = -1;
-            for (var j = 0; j < valid.length; j++) {
-              if (valid[j].toLowerCase() === lower) {
-                exactIdx = j;
-                break;
-              }
-            }
-            if (exactIdx !== -1) {
-              active = valid[exactIdx];
-              break;
-            }
-            var parts = lower.split('-');
-            var base = parts[0];
-            var subtag = parts[1] || '';
-            var region = parts[2] || subtag;
-            if (base === 'zh') {
-              active =
-                subtag === 'tw' ||
-                subtag === 'hk' ||
-                subtag === 'mo' ||
-                subtag === 'hant' ||
-                region === 'tw' ||
-                region === 'hk' ||
-                region === 'mo'
-                  ? 'zh-TW'
-                  : 'zh-CN';
-              break;
-            }
-            if (base === 'id' || base === 'in') {
-              active = 'id';
-              break;
-            }
-            if (base === 'th') {
-              active = 'th';
-              break;
-            }
-            if (base === 'it') {
-              active = 'it';
-              break;
-            }
-            if (base === 'pl') {
-              active = 'pl';
-              break;
-            }
-            if (base === 'es') {
-              active = subtag === 'es' ? 'es-ES' : 'es-MX';
-              break;
-            }
-            if (base === 'pt') {
-              active = 'pt-BR';
-              break;
-            }
-            if (base === 'fr') {
-              active = 'fr-FR';
-              break;
-            }
-            if (base === 'de') {
-              active = 'de';
-              break;
-            }
-            if (base === 'ja') {
-              active = 'ja';
-              break;
-            }
-            if (base === 'ko') {
-              active = 'ko';
-              break;
-            }
-            if (base === 'hi') {
-              active = 'hi';
-              break;
-            }
-            if (base === 'en') {
-              active =
-                subtag === 'gb' ||
-                subtag === 'uk' ||
-                subtag === 'au' ||
-                subtag === 'nz' ||
-                subtag === 'ie'
-                  ? 'en-GB'
-                  : subtag === 'ca'
-                    ? 'en-CA'
-                    : 'en-US';
-              break;
-            }
-          }
-          if (active !== 'en-US') {
-            window.localStorage.setItem('antigravity_locale', active);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'language_auto_detect',
-              eventParams: {
-                locale: active,
-                browserLanguage: langs[0] || '',
-                pagePath: window.location.pathname,
-              },
-            });
-            window.dataLayer.push({ eventParams: undefined });
-          }
-        }
-        window.__agyActiveLocale = active;
-      }
-      if (document.documentElement.lang !== active) {
-        document.documentElement.lang = active;
-      }
-      var selects = document.querySelectorAll('select[data-language-select]');
-      for (var k = 0; k < selects.length; k++) {
-        if (selects[k].value !== active) {
-          selects[k].value = active;
-        }
-      }
-      var codes = document.querySelectorAll('[data-language-code]');
-      var shortCode = shortLabels[active] || 'EN';
-      for (var m = 0; m < codes.length; m++) {
-        if (codes[m].textContent !== shortCode) {
-          codes[m].textContent = shortCode;
-        }
-      }
-    } catch (e) {
-      document.documentElement.lang = 'en-US';
-    }
-  })();
-</script></div></div></div></div><div class="header-top-banner-slot astro-nen7h5rs" data-home-banner-slot><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.kU0csqlr.js"></script><div class="announcement-pill announcement-pill--surface-home announcement-pill--host-home announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-nen7h5rs astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="home" data-pill-host-surface="home" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_home" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="home_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
-        (() => {
-          try {
-            const pills = document.querySelectorAll(
-              '[data-announcement-pill]:not([data-prechecked])',
-            );
-            pills.forEach((pill) => {
-              pill.setAttribute('data-prechecked', 'true');
-              const key = pill.getAttribute('data-pill-storage-key');
-              const fp = pill.getAttribute('data-pill-fingerprint');
-              if (!key) return;
-              const raw = window.localStorage.getItem(key);
-              if (!raw) return;
-              const parsed = JSON.parse(raw);
-              if (
-                parsed &&
-                parsed.fingerprint === fp &&
-                typeof parsed.expiresAt === 'number' &&
-                Date.now() < parsed.expiresAt
-              ) {
-                pill.hidden = true;
-                pill.setAttribute('data-pill-dismissed', 'true');
-              }
-            });
-
-            const homeSlot = document.querySelector('[data-home-banner-slot]');
-            if (homeSlot) {
-              const visibleHome = homeSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleHome.length === 0) {
-                document.documentElement.style.setProperty(
-                  '--home-banner-offset',
-                  '0px',
-                );
-              } else {
-                const slotHeightPx = Math.ceil(
-                  homeSlot.getBoundingClientRect().height,
-                );
-                if (slotHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--home-banner-offset',
-                    `${slotHeightPx}px`,
-                  );
-                }
-              }
-            }
-
-            const docsSlot = document.querySelector(
-              '[data-docs-announcement-slot="top-banner"]',
-            );
-            const docsHeader = document.querySelector('header.header');
-            if (docsSlot && docsHeader) {
-              const visibleDocs = docsSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleDocs.length === 0) {
-                document.documentElement.style.removeProperty(
-                  '--sl-nav-height',
-                );
-              } else {
-                const headerHeightPx = Math.ceil(
-                  docsHeader.getBoundingClientRect().height,
-                );
-                if (headerHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--sl-nav-height',
-                    `${headerHeightPx}px`,
-                    'important',
-                  );
-                }
-              }
-            }
-          } catch {}
-        })();
-      </script></div></header><!-- Dropdown overlay (outside header so header bounds strictly match navigation and dropdown) --><div class="dropdown-overlay astro-nen7h5rs" data-dropdown-overlay></div><script type="module" src="/_astro/Header.astro_astro_type_script_index_0_lang.D0WJiRbO.js"></script><div id="smooth-wrapper"><div id="smooth-content" class="smooth-scroll-wrapper"><div class="grid-container use-cases-detail use-cases-detail--video-hero astro-3vkjp4vs"><div class="grid-row header-row   astro-3vkjp4vs" data-analytics-section="use_case_hero" data-analytics-module="use_case_hero"><div class="grid-col col-xs-4 col-sm-6 col-md-5 astro-3vkjp4vs"><div class="heading-container astro-3vkjp4vs"><h1 class="heading-4 astro-3vkjp4vs">Why Marketers choose Google Antigravity</h1></div></div><div class="grid-col col-xs-4 col-sm-6 col-md-7 heading-actions-col astro-3vkjp4vs"><div class="heading-actions astro-3vkjp4vs"><a href="/product" class="call-to-action button button-secondary" aria-haspopup="false" aria-expanded="false" class="astro-3vkjp4vs"><span>Explore product</span></a></div></div></div><section class="video-section-band astro-3vkjp4vs" data-analytics-section="use_case_video_hero" data-analytics-module="use_case_video_hero"><section class="landing-video-section astro-3vkjp4vs astro-4xhi77lm" id="youtube-video-section" data-youtube-video-section data-youtube-url="https://www.youtube.com/embed/1rF_SZZ3yWs" data-analytics-section="youtube_video_section" data-analytics-module="youtube_video_section"><dialog class="dialog youtube-dialog astro-mkgfivnz" id="youtube-video-section-modal" data-modal-youtube data-youtube-url="https://www.youtube.com/embed/1rF_SZZ3yWs"><div class="dialog-backdrop astro-mkgfivnz" data-close-btn></div><div class="dialog-inner astro-mkgfivnz"><div class="dialog-content astro-mkgfivnz"><button class="dialog-close-button astro-mkgfivnz" aria-label="Close video" data-close-btn translate="no"><svg class="astro-mkgfivnz" viewBox="0 -960 960 960" width="24px" height="24px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M250.92-218.92l-32-32L448-480L218.92-709.08l32-32L480-512L709.08-741.08l32,32L512-480L741.08-250.92l-32,32L480-448L250.92-218.92Z"></path></svg></button><div class="dialog-body astro-mkgfivnz" data-body></div><div class="youtube-controls-bar astro-mkgfivnz" data-youtube-controls-bar><button type="button" class="youtube-play-btn is-playing astro-mkgfivnz" data-youtube-play-btn aria-label="Pause video" title="Pause"><svg class="icon-play astro-mkgfivnz" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" class="astro-mkgfivnz"></path></svg><svg class="icon-pause astro-mkgfivnz" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" class="astro-mkgfivnz"></path></svg></button><input type="range" class="youtube-scrubber astro-mkgfivnz" data-youtube-scrubber min="0" max="100" step="0.1" value="0" aria-label="Seek video"><span class="youtube-time astro-mkgfivnz" data-youtube-time translate="no">0:00 / 0:00</span><button type="button" class="youtube-mute-btn astro-mkgfivnz" data-youtube-mute-btn aria-label="Mute video" title="Mute"><svg class="icon-unmuted astro-mkgfivnz" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" class="astro-mkgfivnz"></path></svg><svg class="icon-muted astro-mkgfivnz" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" class="astro-mkgfivnz"></path></svg></button><button type="button" class="youtube-fullscreen-btn astro-mkgfivnz" data-youtube-fullscreen-btn aria-label="Enter fullscreen" title="Fullscreen"><svg class="icon-enter-fullscreen astro-mkgfivnz" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" class="astro-mkgfivnz"></path></svg><svg class="icon-exit-fullscreen astro-mkgfivnz" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" class="astro-mkgfivnz"></path></svg></button></div></div></div></dialog><script type="module" src="/_astro/ModalYoutube.astro_astro_type_script_index_0_lang.DySPojBc.js"></script><div class="grid-container astro-4xhi77lm"><div class="grid-row astro-4xhi77lm"><div class="grid-col col-md-12 astro-4xhi77lm"><div class="video-wrapper astro-4xhi77lm" data-video-wrapper role="button" tabindex="0" aria-label="Play video"><div class="custom-cursor astro-4xhi77lm" data-cursor><div class="cursor-content astro-4xhi77lm"><svg class="astro-4xhi77lm" viewBox="0 -960 960 960" width="24px" height="24px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M340-238.39V-726.07L723.07-482.23L340-238.39Z"></path></svg><span class="call-to-action astro-4xhi77lm">Play video</span></div></div><div class="video-control-button astro-4xhi77lm" translate="no"><svg class="astro-4xhi77lm" viewBox="0 -960 960 960" width="24px" height="24px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M340-238.39V-726.07L723.07-482.23L340-238.39Z"></path></svg></div><video class="landing-video astro-4xhi77lm" data-video data-module-name="youtube_video_section" loop muted playsinline preload="metadata" width="1920" height="1080"><source src="/assets/video/use-cases/pmm/hero-bg-pmm.mp4" type="video/mp4" class="astro-4xhi77lm"></video></div></div></div></div></section><script type="module" src="/_astro/YoutubeVideoSection.astro_astro_type_script_index_0_lang.tcTrpJUt.js"></script><p class="body paragraph-description astro-3vkjp4vs">Google Antigravity removes the bottlenecks of daily work and speeds up execution. Build custom skills, run workflows in parallel, and steer agents with iterative feedback.</p></section><section class="cards-wrapper-section astro-3vkjp4vs" data-analytics-section="use_case_cards" data-analytics-module="use_case_cards"><div class="text-cards-container astro-sl7lswzu"><div class="text-card astro-sl7lswzu"><p class="card-icon astro-sl7lswzu" translate="no"><svg class="astro-sl7lswzu" viewBox="0 -960 960 960" width="56px" height="56px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M462.23-260.77q-85.61-7.31-143.92-69.77T260-480q0-92.05 63.97-156.02T480-700q87,0 149.46,58.11t69.77,144.34l-48.38-15q-11.35-61.31-58.71-101.69T480-654.61q-72.69,0-123.65,50.96T305.39-480q0,64.31 40.58,112.08t101.5,59.15l14.77,48Zm48,159.15q-7.56,1-15.12,1.31T480-100q-78.85,0-148.2-29.92T211.15-211.13T129.93-331.76T100-479.93t29.92-148.2t81.21-120.68t120.63-81.25T479.93-860t148.2,29.92t120.68,81.22T830.07-628.2T860-480q0,7.46-0.31,14.92t-1.31,14.92l-43.77-13.38V-480q0-139.69-97.46-237.15T480-814.61T242.85-717.15T145.39-480t97.46,237.15T480-145.39q4.23,0 8.04,0t8.42,0l13.77,43.77Zm295.38,7.38L624.23-276L580.77-144.62L480-480L815.38-379.23L684-335.77L865.77-154.39L805.61-94.23Z"></path></svg></p><p class="heading-9 card-title astro-sl7lswzu">Collaborative Steering</p><p class="body sub-text astro-sl7lswzu">Define the report, analysis, or content you need. Let the agent execute while you leave comments to steer the results.</p></div><div class="text-card astro-sl7lswzu"><p class="card-icon astro-sl7lswzu" translate="no"><svg class="astro-sl7lswzu" viewBox="0 -960 960 960" width="56px" height="56px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M143.39-305.39l-32.61-32.23L232.92-459.15l32.61,32L143.39-305.39ZM172-140l-32-32L377.08-409.08l32,32L172-140Zm404.2-89.38q-10.18-65.99-40.54-124.3T458.27-459.04T352.92-536.05T228.62-576.2v-53.49L670.85-811.15q29.31-12.46 60.92-5.73t54.83,29.48q23.79,22.75 30.59,54.62t-6.04,61.94L629.69-229.39H576.2ZM338-110.77l-32.61-32.61L427.54-264.54l32.61,31.61L338-110.77ZM608.69-299.38L768.85-687.69q7.38-18.15 3.58-36.38t-16.96-31.38t-32.08-16.96t-36.69,3.58L297.23-609.31q54.08,18.31 104.5,47.19t90.96,69.23T561.42-403t47.27,103.62Z"></path></svg></p><p class="heading-9 card-title astro-sl7lswzu">Parallel Agent Execution</p><p class="body sub-text astro-sl7lswzu">Offload research, sourcing, and drafting to specialized subagents running in parallel to accelerate work.</p></div><div class="text-card astro-sl7lswzu"><p class="card-icon astro-sl7lswzu" translate="no"><svg class="astro-sl7lswzu" viewBox="0 -960 960 960" width="56px" height="56px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M480-480Zm380,0q0,15.11-1.5,30.22T855-420.23q-10.54,0-21.16,0t-22.07,0Q813-444.69 813.81-457t0.81-23q0-27.75-4.42-54.13t-12.27-50.41l34.85-35.23q13.31,32.77 20.27,67.56T860-480Zm-760,0q0-78.85 29.92-148.2t81.22-120.65T331.8-830.07T480-860q67.18,0 126.87,21.78T715.38-778l-32,32.61q-42.08-32.31-93.99-50.77T480-814.61q-140.12,0-237.37,97.25T145.39-480q0,138.14 94.94,234.65t232.37,99.58q9.26,0 19.98-0.81t32.48-2.04q0,11.72 0,22.61t0,20.93q-11.85,2.04-24.36,3.56T475.77-100q-78-0.77-146.58-30.92T209.89-212.39T129.58-332.65T100-480ZM738.44-45.23q-5.81,0-7.74-5.73q-14.71-56.37-55.5-97.07t-97.16-55.4q-5.73-1.94-5.73-7.74q0-6.77 5.73-7.74q56.37-14.71 97.19-55.47t55.56-97.11q1.94-5.81 7.75-5.81q6.69,0 7.64,5.73q15.28,56.38 55.77,97.19t96.63,55.48q5.8,0.97 5.8,7.75q0,5.81-5.8,7.72q-56.3,14.52-97,55.3t-55.4,97.16q-0.97,5.73-7.74,5.73ZM421-311.46L860.61-751.08q-8.31-8.31-17.23-16.92t-17.61-16.92L421-380.15L302.54-498.61l-33.85,34.23L421-311.46Z"></path></svg></p><p class="heading-9 card-title astro-sl7lswzu">Automated Scheduled Task and Skills</p><p class="body sub-text astro-sl7lswzu">Deploy scheduled cron agents to run routine tasks like auditing sites, scanning docs for errors, or generating daily briefs. Create custom skills to automate workflows.</p></div></div></section><section class="card-group astro-3vkjp4vs" data-analytics-section="use_case_feature_cards" data-analytics-module="use_case_feature_cards"><h2 class="heading-4 astro-3vkjp4vs">Relevant Features for<br>Marketers</h2><div class="use-case-feature-cards astro-ni7z2qnz" data-use-case-feature-cards><article class="feature-interactive-card feature-interactive-card--aurora-ribbons astro-ni7z2qnz" data-feature-interactive-card data-bg-variant="aurora-ribbons" data-card-index="0"><div class="feature-card-backdrop astro-ni7z2qnz" aria-hidden="true"><canvas class="feature-card-canvas astro-ni7z2qnz" data-feature-canvas></canvas><div class="feature-card-spotlight astro-ni7z2qnz"></div><div class="feature-card-scrim astro-ni7z2qnz"></div></div><div class="feature-card-border-glow astro-ni7z2qnz" aria-hidden="true"></div><div class="feature-card-visual-stage astro-ni7z2qnz"><div class="feature-card-icon-badge astro-ni7z2qnz" translate="no"><span class="icon-badge-ring astro-ni7z2qnz" aria-hidden="true"></span><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="36px" height="36px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M225.39-185.39h40.92L734.85-653.31l-40.92-40.92L225.39-226.31v40.92ZM180-140V-244.54L741.92-806.61q5.69-5.69 14.37-9.23t18.01-3.54q8.79,0 16.85,3.54t15.15,9.23l40.92,40.92q6.69,6.69 9.73,15.19T860-733.69q0,8.69-3.54,17.69t-9.23,14.69L284.54-140H180ZM814.38-734.31l-39.46-39.08l39.46,39.08Zm-99.61,60.54l-20.85-20.46l40.92,40.92l-20.08-20.46ZM235.67-570.62q-5.61,0-7.54-5.73q-14.69-56.37-55.4-97.07t-97-55.4Q70-730.73 70-736.46q0-6 6-8q56.31-14.7 97.05-55.42t55.44-97.01q1.93-5.8 7.74-5.8q5.62,0 8,6.07q15.03,56.07 55.36,96.77t96.49,55.39q6,2 6,8.28q0,5.72-5.79,7.62q-56.17,14.47-96.78,55.11t-55.27,96.83q-2.4,6-8.56,6Z"></path></svg></div><div class="feature-card-watermark astro-ni7z2qnz" aria-hidden="true" translate="no"><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="148px" height="148px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M225.39-185.39h40.92L734.85-653.31l-40.92-40.92L225.39-226.31v40.92ZM180-140V-244.54L741.92-806.61q5.69-5.69 14.37-9.23t18.01-3.54q8.79,0 16.85,3.54t15.15,9.23l40.92,40.92q6.69,6.69 9.73,15.19T860-733.69q0,8.69-3.54,17.69t-9.23,14.69L284.54-140H180ZM814.38-734.31l-39.46-39.08l39.46,39.08Zm-99.61,60.54l-20.85-20.46l40.92,40.92l-20.08-20.46ZM235.67-570.62q-5.61,0-7.54-5.73q-14.69-56.37-55.4-97.07t-97-55.4Q70-730.73 70-736.46q0-6 6-8q56.31-14.7 97.05-55.42t55.44-97.01q1.93-5.8 7.74-5.8q5.62,0 8,6.07q15.03,56.07 55.36,96.77t96.49,55.39q6,2 6,8.28q0,5.72-5.79,7.62q-56.17,14.47-96.78,55.11t-55.27,96.83q-2.4,6-8.56,6Z"></path></svg></div></div><div class="feature-card-body astro-ni7z2qnz"><h3 class="heading-8 feature-card-title astro-ni7z2qnz">Collaborative Campaign Artifacts</h3><p class="body feature-card-description astro-ni7z2qnz">Draft launch messaging, creative briefs, and positioning matrices in interactive artifacts where you can leave targeted inline feedback.</p></div></article><article class="feature-interactive-card feature-interactive-card--flocking-boids astro-ni7z2qnz" data-feature-interactive-card data-bg-variant="flocking-boids" data-card-index="1"><div class="feature-card-backdrop astro-ni7z2qnz" aria-hidden="true"><canvas class="feature-card-canvas astro-ni7z2qnz" data-feature-canvas></canvas><div class="feature-card-spotlight astro-ni7z2qnz"></div><div class="feature-card-scrim astro-ni7z2qnz"></div></div><div class="feature-card-border-glow astro-ni7z2qnz" aria-hidden="true"></div><div class="feature-card-visual-stage astro-ni7z2qnz"><div class="feature-card-icon-badge astro-ni7z2qnz" translate="no"><span class="icon-badge-ring astro-ni7z2qnz" aria-hidden="true"></span><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="36px" height="36px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M182.56-332.31q-34.79,0-58.67-24.02T100-415.14t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67t-58.81,23.88ZM312.35-164.02q-23.88-24.02-23.88-58.81t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67T371.02-140t-58.67-24.02Zm0-384.61q-23.88-24.02-23.88-58.81t24.02-58.67T371.29-690t58.67,24.02t23.88,58.81T429.83-548.5t-58.81,23.88t-58.67-24.02ZM504.65-356.33q-23.88-24.02-23.88-58.81t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67t-58.81,23.88t-58.67-24.02ZM736.54-570.62q-5.81,0-7.72-5.8q-14.52-56.3-55.3-97t-97.16-55.4q-5.73-1.94-5.73-7.74q0-6.77 5.73-7.74q56.37-14.71 97.07-55.5t55.4-97.16q1.91-5.73 7.64-5.73q6.69,0 7.66,5.81q15.32,56.35 55.9,97.15t96.85,55.46q5.81,0.97 5.81,7.74q0,5.81-5.73,7.72q-56.38,14.7-97.16,55.41t-55.51,96.99q-0.97,5.8-7.75,5.8Z"></path></svg></div><div class="feature-card-watermark astro-ni7z2qnz" aria-hidden="true" translate="no"><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="148px" height="148px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M182.56-332.31q-34.79,0-58.67-24.02T100-415.14t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67t-58.81,23.88ZM312.35-164.02q-23.88-24.02-23.88-58.81t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67T371.02-140t-58.67-24.02Zm0-384.61q-23.88-24.02-23.88-58.81t24.02-58.67T371.29-690t58.67,24.02t23.88,58.81T429.83-548.5t-58.81,23.88t-58.67-24.02ZM504.65-356.33q-23.88-24.02-23.88-58.81t24.02-58.67t58.81-23.88t58.67,24.02t23.88,58.81t-24.02,58.67t-58.81,23.88t-58.67-24.02ZM736.54-570.62q-5.81,0-7.72-5.8q-14.52-56.3-55.3-97t-97.16-55.4q-5.73-1.94-5.73-7.74q0-6.77 5.73-7.74q56.37-14.71 97.07-55.5t55.4-97.16q1.91-5.73 7.64-5.73q6.69,0 7.66,5.81q15.32,56.35 55.9,97.15t96.85,55.46q5.81,0.97 5.81,7.74q0,5.81-5.73,7.72q-56.38,14.7-97.16,55.41t-55.51,96.99q-0.97,5.8-7.75,5.8Z"></path></svg></div></div><div class="feature-card-body astro-ni7z2qnz"><h3 class="heading-8 feature-card-title astro-ni7z2qnz">Parallel Subagent Research</h3><p class="body feature-card-description astro-ni7z2qnz">Dispatch parallel subagents to audit landing pages, synthesize competitor messaging, and validate localization strings simultaneously.</p></div></article><article class="feature-interactive-card feature-interactive-card--pendulum-harmonograph astro-ni7z2qnz" data-feature-interactive-card data-bg-variant="pendulum-harmonograph" data-card-index="2"><div class="feature-card-backdrop astro-ni7z2qnz" aria-hidden="true"><canvas class="feature-card-canvas astro-ni7z2qnz" data-feature-canvas></canvas><div class="feature-card-spotlight astro-ni7z2qnz"></div><div class="feature-card-scrim astro-ni7z2qnz"></div></div><div class="feature-card-border-glow astro-ni7z2qnz" aria-hidden="true"></div><div class="feature-card-visual-stage astro-ni7z2qnz"><div class="feature-card-icon-badge astro-ni7z2qnz" translate="no"><span class="icon-badge-ring astro-ni7z2qnz" aria-hidden="true"></span><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="36px" height="36px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"></path></svg></div><div class="feature-card-watermark astro-ni7z2qnz" aria-hidden="true" translate="no"><svg class="astro-ni7z2qnz" viewBox="0 -960 960 960" width="148px" height="148px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"></path></svg></div></div><div class="feature-card-body astro-ni7z2qnz"><h3 class="heading-8 feature-card-title astro-ni7z2qnz">Scheduled Content & Site Audits</h3><p class="body feature-card-description astro-ni7z2qnz">Configure recurring cron tasks and reusable Skills to monitor brand consistency, broken links, and campaign readiness.</p></div></article></div><script type="module" src="/_astro/UseCaseFeatureCards.astro_astro_type_script_index_0_lang.CvbWQBwf.js"></script></section><section class="stories-carousel-section astro-3vkjp4vs" data-analytics-section="use_case_stories" data-analytics-module="use_case_stories" data-use-case-stories><h2 class="heading-4 astro-3vkjp4vs">Relevant Stories</h2><div class="quotes-bento-gallery astro-prscy555" data-quotes-gallery data-blog-carousel data-total="2"><div class="quotes-bento-grid astro-prscy555" data-quotes-stream><article class="quote-bento-card quote-bento-card--cobalt quote-bento-card--slot-1 astro-prscy555" data-quote-card data-quote-index="0" data-quote-variant="cobalt"><div class="quote-card-glow astro-prscy555" aria-hidden="true"></div><header class="quote-bento-top astro-prscy555"><span class="company-badge astro-prscy555"><span class="astro-prscy555">Internal Content & Email Tooling</span></span><span class="quote-watermark astro-prscy555" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="astro-prscy555"><path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z" class="astro-prscy555"></path></svg></span></header><blockquote class="quote-card-body astro-prscy555"><p class="astro-prscy555">“Over the course of a day, we used Antigravity to build a web-based content formatting tool that connects to our email templates. It replaced fragile manual HTML editing with a simple visual editor that lets the team preview and publish drafts directly.”</p></blockquote><footer class="quote-card-footer astro-prscy555"><div class="author-details astro-prscy555"><span class="author-name astro-prscy555">Growth & Marketing Specialist</span><span class="author-title astro-prscy555">Growth & Digital Marketing</span></div></footer></article><article class="quote-bento-card quote-bento-card--ink quote-bento-card--slot-2 astro-prscy555" data-quote-card data-quote-index="1" data-quote-variant="ink"><div class="quote-card-glow astro-prscy555" aria-hidden="true"></div><header class="quote-bento-top astro-prscy555"><span class="company-badge astro-prscy555"><span class="astro-prscy555">Template Auditing & Copy QA</span></span><span class="quote-watermark astro-prscy555" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="astro-prscy555"><path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z" class="astro-prscy555"></path></svg></span></header><blockquote class="quote-card-body astro-prscy555"><p class="astro-prscy555">“We used Antigravity to audit historical customer emails and refine our core communication templates. Over two days of testing across hundreds of sample drafts, we streamlined average email copy length and added validation checks to eliminate unfilled template placeholders before send.”</p></blockquote><footer class="quote-card-footer astro-prscy555"><div class="author-details astro-prscy555"><span class="author-name astro-prscy555">Product Marketing Lead</span><span class="author-title astro-prscy555">Customer Communications</span></div></footer></article></div></div><script type="module" src="/_astro/UseCaseQuotesGallery.astro_astro_type_script_index_0_lang.o7P1y021.js"></script></section><section class="download-section-wrapper" id="download-section-compact" data-download-section-compact><h2 class="heading-4">Download Google Antigravity</h2><div class="download-buttons" data-cta-container><div class="mobile-journey-wrapper astro-56r3b3ue" data-mobile-journey-wrapper data-mobile-journey-enabled="true" data-mobile-journey-variant="share" data-mobile-journey-product="home"><div class="desktop-cta-slot astro-56r3b3ue" data-desktop-cta-slot><a href="/download" class="call-to-action button button-primary" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="Download section compact" data-page-position="body"><span>Download</span></a></div><div class="mobile-journey-container astro-56r3b3ue" data-mobile-journey data-analytics-module="product_hero_mobile_journey" role="region" aria-label="Download on desktop instructions"><div class="journey-variant journey-variant--share astro-56r3b3ue" data-journey-variant-panel="share"><div class="share-card astro-56r3b3ue"><div class="share-header astro-56r3b3ue"><div class="share-monitor-icon astro-56r3b3ue" aria-hidden="true"><svg viewBox="0 0 28 28" width="30" height="30" fill="none" aria-hidden="true" class="astro-56r3b3ue"><rect x="3" y="5" width="22" height="15" rx="2.2" stroke="currentColor" stroke-width="2" class="astro-56r3b3ue"></rect><path d="M11 20V23.5M17 20V23.5M9 23.5H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="astro-56r3b3ue"></path></svg></div><div class="share-copy astro-56r3b3ue"><p class="share-title astro-56r3b3ue">Download on Desktop</p><p class="share-subtitle astro-56r3b3ue">Available on macOS, Windows, Linux, and Googlebook</p></div></div><div class="share-card-actions astro-56r3b3ue" data-journey-cta-actions><button type="button" class="share-action-btn astro-56r3b3ue" data-mobile-share-btn data-default-label="Send link to desktop" data-copied-label="Link copied to clipboard!" data-share-title="Google Antigravity — Download on Desktop" data-share-url="https://antigravity.google/download" data-analytics-event="mobile-desktop-handoff" data-module-name="product_hero_mobile_journey" data-page-position="hero" data-pill-variant="share"><svg viewBox="0 0 20 20" width="17" height="17" fill="none" aria-hidden="true" class="astro-56r3b3ue"><path d="M10 12.5V3.5M10 3.5L6.5 7M10 3.5L13.5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-56r3b3ue"></path><path d="M4.5 10.5V15C4.5 15.8284 5.17157 16.5 6 16.5H14C14.8284 16.5 15.5 15.8284 15.5 15V10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="astro-56r3b3ue"></path></svg><span data-share-btn-label class="astro-56r3b3ue">Send link to desktop</span></button></div></div></div></div></div><script type="module" src="/_astro/MobileDesktopJourney.astro_astro_type_script_index_0_lang.DqdvYh3I.js"></script></div></section></div><footer class="footer astro-jo6i4kqk" data-analytics-nav="footer"><div class="footer-main-content astro-jo6i4kqk"><div class="grid-container astro-jo6i4kqk"><div class="grid-row footer-inner astro-jo6i4kqk"><div class="grid-col col-xs-4 col-sm-8 col-md-4 astro-jo6i4kqk"><p class="footer-title heading-5 astro-jo6i4kqk">Experience liftoff</p></div><div class="grid-col col-xs-4 col-sm-4 col-md-3 col-md-offset-2 astro-jo6i4kqk"><div class="footer-nav-section astro-jo6i4kqk"><p class="caption astro-jo6i4kqk">Product</p><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/product">Product</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/download">Download</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/product/antigravity-2">Antigravity App</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/docs/ide/extensions">Antigravity Extensions</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/product/antigravity-cli">Antigravity CLI</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/product/antigravity-ide">Antigravity IDE</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/product/antigravity-sdk">Antigravity SDK</a></div></div><div class="grid-col col-xs-4 col-sm-4 col-md-3  astro-jo6i4kqk"><div class="footer-nav-section astro-jo6i4kqk"><p class="caption astro-jo6i4kqk">Resources</p><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/docs/overview">Docs</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/docs/changelog">Changelog</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/releases">Releases</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/blog">Blog</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/newsletter">Newsletter</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/pricing">Pricing</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/use-cases">Use Cases</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/press">Press</a></div></div></div></div></div><div class="footer-img-container astro-jo6i4kqk"><div class="grid-container astro-jo6i4kqk"><div id="antigravity-footer-wrapper" data-antigravity-footer-wrapper class="astro-ipindhfc"><svg class="footer-antigravity astro-ipindhfc" width="1297" height="270" viewBox="0 0 1297 270" fill="none" xmlns="http://www.w3.org/2000/svg"><path id="letter-A" fill="#121317" d="M182.353 199.875H149.223L131.151 149.496H51.2012L33.1309 199.875H0L73.9268 3.83301H108.152L182.353 199.875ZM82.9629 61.6055L61.332 121.568H121.021L99.3906 61.6055L91.998 39.1533H90.3555L82.9629 61.6055Z" class="astro-ipindhfc"></path><path id="letter-N" fill="#121317" d="M268.954 55.8555C286.112 55.8556 298.98 60.9666 307.56 71.1885C316.139 81.2279 320.429 94.7353 320.429 111.711V199.876H291.132V115.544C291.132 104.227 288.302 96.0133 282.644 90.9023C276.985 85.6088 269.593 82.9619 260.466 82.9619C253.347 82.9619 247.141 84.9698 241.848 88.9854C236.554 92.8186 232.355 97.9296 229.252 104.318C226.331 110.707 224.871 117.552 224.871 124.854V199.876H195.301V60.2363H223.229V79.4023H224.871C228.887 72.6486 234.82 67.081 242.669 62.7002C250.7 58.137 259.462 55.8555 268.954 55.8555Z" class="astro-ipindhfc"></path><path id="letter-T" fill="#121317" d="M385.177 60.2363H419.401V85.9736H385.177V153.055C385.177 160.356 386.637 165.742 389.558 169.21C392.661 172.678 397.316 174.412 403.521 174.412C406.442 174.412 409.18 174.047 411.735 173.316C414.291 172.404 417.12 171.035 420.223 169.21V197.959C416.755 199.237 413.195 200.241 409.545 200.971C406.077 201.701 402.335 202.065 398.319 202.065C385.177 202.065 374.772 198.233 367.105 190.566C359.622 182.9 355.88 172.495 355.88 159.353V85.9736H331.237V60.2363H355.88V20.8086H385.177V60.2363Z" class="astro-ipindhfc"></path><path id="letter-I" fill="#121317" d="M466.406 199.876H436.835V60.2363H466.406V199.876Z" class="astro-ipindhfc"></path><path id="dot-I1" fill="#121317" d="M451.621 0C457.279 0.000108058 462.025 1.91688 465.858 5.75C469.692 9.40069 471.608 14.0553 471.608 19.7139C471.608 25.1898 469.691 29.9355 465.858 33.9512C462.025 37.7843 457.279 39.7011 451.621 39.7012C446.145 39.7012 441.399 37.7844 437.383 33.9512C433.55 29.9355 431.633 25.1898 431.633 19.7139C431.633 14.0554 433.55 9.40069 437.383 5.75C441.399 1.91677 446.145 0 451.621 0Z" class="astro-ipindhfc"></path><path id="letter-G" fill="#121317" data-letter-g d="M547.834 55.8555C557.873 55.8555 566.726 57.8633 574.393 61.8789C582.059 65.7121 588.083 71.006 592.464 77.7598H594.106V60.2363H622.309V192.482C622.309 207.633 619.296 220.502 613.272 231.089C607.431 241.676 599.309 249.708 588.904 255.184C578.5 260.66 566.453 263.397 552.763 263.397C540.533 263.397 529.945 261.39 521.001 257.374C512.239 253.541 505.121 248.521 499.645 242.314C494.169 236.291 490.244 230.085 487.871 223.696L515.252 212.196C518.172 219.498 522.827 225.431 529.216 229.994C535.787 234.74 543.636 237.112 552.763 237.112C565.722 237.112 575.853 233.279 583.154 225.613C590.456 217.947 594.106 207.085 594.106 193.03V179.614H592.464C588.083 186.003 582.059 191.205 574.393 195.221C566.726 199.236 557.873 201.244 547.834 201.244C535.969 201.244 525.017 198.233 514.978 192.209C505.121 186.185 497.181 177.789 491.157 167.02C485.316 156.067 482.396 143.289 482.396 128.687C482.396 113.901 485.316 101.124 491.157 90.3545C497.181 79.4025 505.121 70.9142 514.978 64.8906C525.017 58.867 535.969 55.8555 547.834 55.8555ZM553.036 82.6885C545.735 82.6885 538.89 84.4225 532.501 87.8906C526.295 91.3588 521.276 96.5609 517.442 103.497C513.609 110.251 511.692 118.647 511.692 128.687C511.692 138.543 513.609 146.941 517.442 153.877C521.276 160.631 526.295 165.742 532.501 169.21C538.89 172.678 545.735 174.412 553.036 174.412C560.338 174.412 567.092 172.678 573.298 169.21C579.687 165.559 584.706 160.356 588.356 153.603C592.19 146.666 594.106 138.361 594.106 128.687C594.106 118.465 592.19 109.977 588.356 103.224C584.706 96.4699 579.686 91.3588 573.298 87.8906C567.092 84.4225 560.338 82.6885 553.036 82.6885Z" class="astro-ipindhfc"></path><path id="letter-R" fill="#121317" d="M712.772 56.1289C716.606 56.1289 719.8 56.4026 722.355 56.9502C725.094 57.3153 727.558 57.9545 729.748 58.8672V89.5332C726.28 88.0729 722.72 86.8863 719.069 85.9736C715.601 85.0611 711.951 84.6045 708.118 84.6045C701.182 84.6045 694.975 86.5213 689.499 90.3545C684.206 94.0052 680.007 98.9335 676.904 105.14C673.801 111.346 672.25 118.282 672.25 125.948V199.875H642.679V60.2363H670.606V80.7715H672.25C674.44 76.0256 677.543 71.8265 681.559 68.1758C685.757 64.5251 690.503 61.6045 695.797 59.4141C701.273 57.2237 706.931 56.1289 712.772 56.1289Z" class="astro-ipindhfc"></path><path id="letter-A2" fill="#121317" d="M792.689 55.8555C812.768 55.8555 828.284 60.8756 839.236 70.915C850.188 80.7718 855.664 94.6441 855.664 112.532V199.876H827.188V182.626H825.546C822.99 186.277 819.613 189.745 815.415 193.03C811.399 196.316 806.654 198.963 801.178 200.971C795.702 203.161 789.587 204.257 782.833 204.257C772.611 204.257 763.666 202.248 756 198.232C748.334 194.217 742.219 188.741 737.655 181.805C733.274 174.686 731.084 166.563 731.084 157.437C731.084 147.397 733.64 138.909 738.751 131.973C744.044 125.036 750.98 119.742 759.56 116.092C768.321 112.441 777.996 110.616 788.583 110.616C794.607 110.616 800.082 111.073 805.011 111.985C809.939 112.715 814.320 113.627 818.153 114.723C821.986 115.818 824.998 117.005 827.188 118.282V110.89C827.188 101.763 823.903 94.4614 817.332 88.9854C810.761 83.5093 802.273 80.7715 791.868 80.7715C784.749 80.7715 777.996 82.4147 771.607 85.7002C765.219 88.8033 760.016 93.0924 756 98.5684L736.013 82.9619C740.028 77.3033 744.866 72.466 750.524 68.4502C756.365 64.4345 762.845 61.331 769.964 59.1406C777.083 56.9502 784.658 55.8555 792.689 55.8555ZM794.059 132.794C782.194 132.794 773.706 135.167 768.595 139.913C763.484 144.659 760.929 150.591 760.929 157.71C760.929 164.281 763.302 169.666 768.048 173.864C772.976 178.062 779.639 180.162 788.035 180.162C795.702 180.162 802.456 178.336 808.297 174.686C814.138 171.035 818.701 166.289 821.986 160.448C825.454 154.425 827.188 147.944 827.188 141.008C822.990 138.635 818.062 136.718 812.403 135.258C806.745 133.615 800.630 132.794 794.059 132.794Z" class="astro-ipindhfc"></path><path id="letter-V" fill="#121317" d="M926.642 161.816H928.011L967.986 60.2354H1000.29L941.975 199.875H912.404L854.632 60.2354H887.488L926.642 161.816Z" class="astro-ipindhfc"></path><path id="letter-I2" fill="#121317" data-letter-i d="M1039.73 199.876H1010.16V60.2363H1039.73V199.876Z" class="astro-ipindhfc"></path><path id="dot-I2" fill="#121317" data-letter-i-dot d="M1024.95 0C1030.61 0 1035.35 1.91677 1039.19 5.75C1043.02 9.40066 1044.93 14.0555 1044.93 19.7139C1044.93 25.1897 1043.02 29.9355 1039.19 33.9512C1035.35 37.7844 1030.61 39.7012 1024.95 39.7012C1019.47 39.7012 1014.73 37.7844 1010.71 33.9512C1006.88 29.9354 1004.96 25.1899 1004.96 19.7139C1004.96 14.0553 1006.88 9.40071 1010.71 5.75C1014.73 1.91685 1019.47 9.3676e-06 1024.95 0Z" class="astro-ipindhfc"></path><path id="letter-T2" fill="#121317" data-letter-t d="M1109.66 60.2363H1143.89V85.9736H1109.66V153.055C1109.66 160.356 1111.12 165.742 1114.04 169.21C1117.15 172.678 1121.8 174.412 1128.01 174.412C1130.93 174.412 1133.67 174.047 1136.22 173.316C1138.78 172.404 1141.61 171.035 1144.71 169.21V197.959C1141.24 199.237 1137.68 200.241 1134.03 200.971C1130.56 201.701 1126.82 202.065 1122.8 202.065C1109.66 202.065 1099.26 198.233 1091.59 190.566C1084.11 182.9 1080.37 172.495 1080.37 159.353V85.9736H1055.72V60.2363H1080.37V20.8086H1109.66V60.2363Z" class="astro-ipindhfc"></path><path id="letter-Y" fill="#121317" data-letter-y d="M1223.75 155.519H1225.12L1263.72 60.2354H1296.3L1224.02 226.707C1222.74 229.81 1221.28 233.096 1219.64 236.564C1218.18 240.032 1216.81 243.135 1215.53 245.873C1214.44 248.794 1213.62 250.893 1213.07 252.171C1212.52 253.449 1211.88 254.726 1211.15 256.004C1210.6 257.464 1210.24 258.468 1210.06 259.016H1178.57C1179.48 257.008 1180.76 254.179 1182.4 250.528C1184.23 246.878 1185.96 243.227 1187.61 239.576C1188.7 237.203 1189.8 234.647 1187.61 239.576C1188.7 237.203 1189.8 234.647 1190.89 231.909C1192.17 229.171 1193.45 226.342 1194.72 223.422C1196.18 220.501 1197.55 217.672 1198.83 214.934L1209.24 192.208L1150.92 60.2354H1183.77L1223.75 155.519Z" class="astro-ipindhfc"></path></svg></div><script type="module" src="/_astro/AntigravityFooter.astro_astro_type_script_index_0_lang.DQIYDjYp.js"></script></div></div><div class="footer-google-links astro-jo6i4kqk"><div class="grid-container astro-jo6i4kqk"><div class="grid-row astro-jo6i4kqk"><div class="grid-col col-xs-4 col-md-3 astro-jo6i4kqk"><a class="footer-google-logo astro-jo6i4kqk" href="https://www.google.com" aria-label="Google" target="_blank" rel="noopener noreferrer"><svg class="astro-jo6i4kqk" viewBox="0 0 75 24" height="24" width="75" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M52.0273 6.62988C53.4638 6.62988 54.6046 7.26571 55.1973 7.96973H55.2891V6.99219H57.7979V17.7559C57.7978 22.1827 55.175 23.9999 52.0732 24C49.1544 24 47.3984 22.047 46.7363 20.458L49.0391 19.5039C49.4499 20.4799 50.454 21.6377 52.0732 21.6377C54.0568 21.6376 55.2889 20.4128 55.2891 18.1191V17.2559H55.1973C54.6046 17.9829 53.4638 18.6182 52.0273 18.6182C49.017 18.618 46.2578 16.0074 46.2578 12.6465C46.2578 9.26356 49.017 6.63009 52.0273 6.62988ZM25.5879 6.63086C28.8576 6.63086 31.5225 9.15091 31.5225 12.625C31.5222 16.0758 28.8574 18.6191 25.5879 18.6191C22.3194 18.6191 19.6545 16.0758 19.6543 12.625C19.6543 9.15092 22.3192 6.63088 25.5879 6.63086ZM38.8906 6.63086C42.1603 6.63086 44.8252 9.15091 44.8252 12.625C44.825 16.0758 42.1601 18.6191 38.8906 18.6191C35.6211 18.6191 32.9573 16.0758 32.957 12.625C32.957 9.15092 35.621 6.63088 38.8906 6.63086ZM69.5723 6.62988C72.6961 6.62988 74.2252 9.10425 74.7266 10.4443L75 11.126L66.9492 14.4404C67.566 15.6435 68.5231 16.2568 69.8691 16.2568C71.214 16.2568 72.149 15.5985 72.833 14.5996L74.8867 15.9619C74.2257 16.9389 72.6283 18.6191 69.8691 18.6191C66.4489 18.6191 63.9778 15.9849 63.9775 12.625C63.9775 9.06005 66.4705 6.63008 69.5723 6.62988ZM9.4873 0C12.3391 0 14.3686 1.11239 15.8975 2.56543L14.0957 4.35938C13.0008 3.33735 11.5174 2.54297 9.4873 2.54297C5.72455 2.54311 2.78223 5.56356 2.78223 9.30957C2.7824 13.0554 5.72466 16.0751 9.4873 16.0752C11.9283 16.0752 13.319 15.0989 14.209 14.2129C14.938 13.487 15.4178 12.4423 15.5996 11.0127H9.4873V8.46875H18.0859C18.1773 8.92276 18.2236 9.46858 18.2236 10.0586C18.2236 11.9666 17.6982 14.3279 16.0107 16.0078C14.3684 17.7107 12.2696 18.6182 9.4873 18.6182C4.33341 18.618 0.000188594 14.4415 0 9.30957C0 4.17853 4.33329 0.000143406 9.4873 0ZM62.4326 18.2549H59.7871V0.635742H62.4326V18.2549ZM25.5879 8.99121C23.7969 8.99123 22.252 10.468 22.252 12.625C22.2522 14.7588 23.797 16.2578 25.5879 16.2578C27.3798 16.2578 28.9246 14.7588 28.9248 12.625C28.9248 10.4679 27.3799 8.99121 25.5879 8.99121ZM38.8906 8.99121C37.0996 8.99123 35.5537 10.468 35.5537 12.625C35.5539 14.7588 37.0997 16.2578 38.8906 16.2578C40.6825 16.2578 42.2273 14.7588 42.2275 12.625C42.2275 10.4679 40.6827 8.99121 38.8906 8.99121ZM52.2559 8.99023C50.4317 8.99023 48.9024 10.5355 48.9023 12.6465C48.9023 14.7355 50.4317 16.2568 52.2559 16.2568C54.0569 16.2568 55.4707 14.7355 55.4707 12.6465C55.4707 10.5355 54.0569 8.99031 52.2559 8.99023ZM69.6641 8.94531C68.3181 8.94531 66.4484 10.1264 66.5156 12.4424L71.8994 10.2178C71.6021 9.46876 70.7128 8.94532 69.6641 8.94531Z" fill="currentColor"></path></svg></a></div><div class="grid-col col-xs-4 col-md-6 col-md-offset-3 astro-jo6i4kqk"><nav class="footer-google-nav astro-jo6i4kqk"><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="call-to-action call-to-action--nav astro-jo6i4kqk" href="/terms">Terms</a><a aria-hidden="true" class="call-to-action--nav glue-cookie-notification-bar-control astro-jo6i4kqk"> Manage cookies </a></nav></div></div></div></div></footer></div></div></main><!-- Cookie Notification Bar --><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id="">
-  </script></body></html><script type="module" src="/_astro/SmoothScrollLayout.astro_astro_type_script_index_0_lang.BIBS_Ca_.js"></script>\<script\>
-  (() => {
-    const initVideoThumbnailGalleries = () => {
-      const galleries = document.querySelectorAll('[data-video-thumbnails-gallery]');
-      galleries.forEach((gallery) => {
-        if (gallery.dataset.initialized === 'true') return;
-        gallery.dataset.initialized = 'true';
-
-        const dialogModal = gallery.querySelector('[data-modal-youtube]');
-        const buttons = gallery.querySelectorAll('[data-video-thumbnail-btn]');
-        let modalHelper = null;
-
-        buttons.forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const youtubeUrl = btn.getAttribute('data-youtube-url') || '';
-            if (!dialogModal || !youtubeUrl) return;
-            if (!modalHelper && window.ModalYoutubeHelper) {
-              modalHelper = new window.ModalYoutubeHelper(dialogModal);
-            }
-            if (modalHelper) {
-              modalHelper.show(youtubeUrl, 'video_gallery');
-            }
-          });
-        });
-      });
-    };
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initVideoThumbnailGalleries);
-    } else {
-      initVideoThumbnailGalleries();
-    }
-    document.addEventListener('astro:page-load', initVideoThumbnailGalleries);
-  })();
-</script>
+[s\Iv>b7fN`~	Hݤ4=BUI4G?ؖ",Oղeٲ;b&²A۲#G}6șܙrʕ+Z2{?z[uR4\"u{7GI7;N(\:I6yqr:n|'MahF29E
+FI4PaY)ʗ&$|*G"A4"!VUꍞn/=I0bAm܋CQ|!Kamr1T}EELq0fɮrqIQwwX7x/h'A9x<M0f2_eޤ?N,!)F{ݤ?Gq2Gfp3FA6;]}ݽha_&8X_ӵPͲq؍_}[z4YwtN?oGݓAlS4a@?na_th_[~lGZbP{O>я~(<~ɲC}>N1l?4,`%#ALmA,Ư͐\NGL]~۰r
+%m	^|﫮Nae5 ȍa2t^,eG	׭Y\R_J}>/K;+8vcLڭς9ur	, 2iuXQbLI,ϬDE`45cz?&I/dedl&Yt&B)!ZPkv^HDJDN,YyRͥQd-dosi}'nmwOd>;cڎẝH]::ݧғu}	bC8;7E
+zji<#0^
++[z~M"
+uT6^K@9hm#XZ{KʵgKrQ"s*t}Sjq4Tqҝ0'6wv! d"S:F&$ZJ{0R~vYEql1OQFdֹnYENR/_/{aD\Xf0
+vG	X8np<MFU6zqp20Y$['A/;qkdhF?H Y@ITv$FD%:?}T<GϵK7{ѳ^M~w`HGͥp4쓱6'q1#:cIw|G{܏z.Ѣu hMͥghWf2v\١[dB~.p19ǷaٹpzgI7fYMu1^wҋ_ak`.Mō9v.	o֪&#&-3)5{;g[jC?>9fR4!vw,u
+s3#)Bņ-[ën3f|aL0wP+SzAf}qL3;w5/ w)/%R}k4:amP<+퍎'w8eqXC[C(bU;~\Yˬ`sفE{}SBd(D;=ʋBH.YHFv ar8d$FFy{0K&Cx\]~p|˩7$c4tsB`Q`"/!<j(G9ahVM0hsx>ۿ.*ZX)JjdV/lkS)c)M%PB'oU0ZeDbK4OwGP{k~ro
+kTj9RY"ޔ3=c<OzF
+iQ;-lݓݨtws~q:>g4;=v(>JF`7?ч$z`<GcXs=A՗_Pߨ\{?5U6MttV`8c36:ި_hCQL(d_޵V+jY_clϵq'~
+]&ކ^Ca`^azyO7+j}bQa*j_T6H'kPtTWN7A7`oe`U ?ZXssfSjx%1YHP+FIkTEpY=B#@B6<?^BMEm0l<>쫁0?NYyNSUŃHl>Q:=,~âT'.3isज़ʈy?ch2v@J0Q1^8VhU*ۼB*8uM)\ F!q\Qh\:A~#${;%۹:l5~Udҫ׌=2uJHB<@K2R)?'+vF,@pZѐcmG`y-g-Ek*ܧF(ڜtAV./V7*M%ᚡU7Iat-3c߷[eۋz<8kɄ
+v%.
+  lkT_3;/a@%J~^ZIA'fKbMBVǫJv%1ߎ6h
+EuuwQNLːNG=$6<{X}VZԆCf/u?׾n1YN>}P^$]>ߢ~hv q
+S,r_z^%wZxQ32,:A=OB^{|_"&jR%ٜnM,Zȿ!c{(v SgN
+Ed؂=~_~dʋ4T3'majwžۡN;ybS՗.2GN(m3ckb{s<Z<@E\hҶ`Q`0G(՜\҂v(nE7*7gz
+L)5E:鍨e-@=[-2Irլ)V2aMzWH)rʥL~qSJi.ӷRf)׀L3S/a~.q2O~0w7RBx$P@,A!AqsicB7j4V"M&݁UJ>?Ī1Z}Pag+^<=BMcl<S2GFYh~1 :"iQ7a9I(o,auZ_P4oM*u\KAyh0X/~v)=,ɟۙ^(/bLQOjqF=3d2B_|42,ORJlV0*q;)9P%j``( ?h
+R|*	Y2rх16LE@/S"oLF+!^tx᯼O0~y{gh欱q+g?}s7GuҼ;x@8Ee|l]a:arMx/i4wwq0|mbg< s
+L6p}(Lp0:P-"Őc1-+N!`ªkOTdm9k\0Auu-XbsQ͍`x,wn#0	Rଙ@6D4䦢C`*G{AOV7]/A_?~1[_t_>nAi~5z@܋ﱈ{}~O57D)3={}GH60s\f,])"p%p"+8n8bGAhUd-gE0lc'Mקv{Œ&m𯵗8jd?OWfeuej_(^;x]ǔC&o/|Ph[}B'W6Tq	x}ɏM){
+W\QJ{>S(c `cl.|բf}v8.VSr_`(hYDt	M׌	mQo}I5@nleM>rwh34̺Txw܍ϭhu/wIw*%cbͭ%"EDܠj26g1v-(TRS>ҟq1zfVY}B6fhHf,KTkЗ<s<)`VbZ5<hD5y9s2]M
+TKحd5rmYfsM9ƴ
+z0
+kuew3RH[r
+@S?LsMY<4R1^tt#?ı"X^`\JNa}?DyJKL@ps%;5]mc>^81CZXCnò7>7'7\"g8<xx=UJst~׳Pgo2:+|y=nNFAQu'wՑt[NZvq6|)_rw;;b%Ycs(V_qb34Ofyl5V_g,陭ei06k\zXcC+{\E;.M,>.eI_WteL+g?9F7ii&-jS"#rtG:f{6Ǧ:Öd>@AZ*\䞙a.$9~H՞=ҲOK+\xN.\%sj<& O_3A~T..-mɯ*l#UKZ[N~V~,8_ca۾Skj[j69[l-;g5+|¡nuMwY<AڀbIl-v^:1L&	#>S{_TF~RΈMEj`H^sZg{42| XbL2<צRAG`J(YZ3T*MuUfHETy_E0yshf	)||yIBI);<_Se֝@&˦4R7Uexdrk/OnN_e~l<xegihN3CNҽJIMu^Nw2B"6,r֟gPN%K'$%۷ǞnkhU
+Nȯz=4ľj<So)',};:\Gg]W>1%&SF0E.lB+n-?\OPO?ރXy-W'݃5lbsn3G+#p;ɭ!ZyJoU7	.(@G'?:5灖Կ#k["t3UkChpA/bJNo)}4g]DDA9mҀd>ɠNh:lL8Vg>G=BxD[lw<=tٰs-׉}I)sxcBQ^,nd{g
+g{i{XR`]kw7+\R8>;C,撶+v+VZ83~ͥje:z6*lVKv7prQznz^+&>uuZZqJPiJFgn͆IAfdVQ#դPUmJ&RZ#fPiKvtڤRZnK!Y:U:=k66[mv)7)VjOz3h6KMk+WF[؀CAs[rSSm`[mj[5j>GAQj5ڔ_EŚZQT*U:VZz*JKuc
+!<8q֮Irj(Q)OHlj\;:*^\=tnVC|FLWRK]ihZ2#Ѣ獶i6ajQQ.U;4SmVJ YjWiMUKINqjW[]\gWjR2.\!)5W{lhV,k!|0}IwL}h[2A;ͯ4)'MD.W~[5lzH?#m֊ISCz0D0b&KYݧ]bJVJ߭1d݀+ejAW|b4uS<Ґ9^M*\YEn-WG5Iwe_E1/שKBht|j4]ײ0{YA K"RAJLR¦xȦ(R~!rIjRjV)U%s֮6h18zhdަ<p:[$G$cMӈFMu3e*Ux4[.L5hrMƮ#9'v ؚeHZga4@haiGުYQP6XՑPiwͭf.áu$d150SEr;V"VKn&_3-X$M;iG=կakK;יeVNj
+?zuak+}+Ij_7)s`$8Im:*p"`ibMq3G72WzZWy$ HZQւE4	,fr+pV`3;w#?;`#Z ++iV0TɄIʥm"x͸Wfo@2TଁM
+W+]Z;K]h<\U T5˄xwvsxe$NWiawB|8
+ZY5RNA]!jc}k
+Xɦ/*,*"I0cIZgi!*p=_i+@%XXʽ#Rj~!rjxNiWڋaiw"0hX<Eo#vJEo({fxW^yx`pk0IjX2^r!=_FYz_|N~5$N~iG4䗩/-ؑV+eO/g;%;WCFKҟFu>W'xC$%Ojhfh9@\4_-bE'03H⫁֒g:RV6	\)d'ҖJ1s+	.30t<L.^nCh2'\f:|a
+VpO;	.tU\u6U	ЍVpi'TV0dw&
+.5_ӌsQư=ij\}Cͳg7\MirVSS҄UHpG|m	5!	iC4[_#"(dKT4,h$h%P%lz1CC,o5lDziW M氖h,*)7`މEyi,JK&sLo|qaY&s\HhC`M&Kɒt.Щ~*=a&c[Tn+&SR&5jbt:Gvn`T@]3	IoX$-!Z(I1cIX6O,ۊ˺Y-հ+LE}Q35TIJRY[5EeX5MfBHӰ.V &Spk.hbXa6	}"3Aw`&Y,#Pk6`_l$0~j":i>DPӫ*\8*M&n}  &yZOD4E=UXpg2n6Y:8F`&٬+i|+NjMNi!Bz4)-^LR&){6R.j~ 4*Gy7K0b}}dIi(3\\bp[RtS,Y`Q.͐2_SulEˠ7X>hHRgXqƿH5+?1Vr
+!pM, JZi}FgMC4k5_w-M0/adDcBaD5K;BFTyp,8䢊lSO 2\|&wݖ{~ו(&%
+=$R2h!0$8[L̪t~&V)ギĖ?KF&KSqB,-jфKX[-lHˡ`kɠKB`Vl:BÓةWŖV17XZu,b+h-Pơ^ldA"'+AZ1!Le(Yxg(ϤŝPafN/wIyT2ּ@Mh Vam{)EE$1ô UTG=Kp`JЌ&j!aEl!a !uf22_E7lOῪq|^>tU ]3CH i_f%{|F\F)
+Nj!ZXP)i_0%-?*|ZVsJ@Y!,4¼U;K^X2X_ѵ5u)ÕFCպc^b%̘h(@6MƦnE'6;&rbyHMl6'Zlc⣠1ikU|!wtQR˵2pSxhҴqL#]6p܎o۬xk]8u/\dl&k>2>Th	bݪp{|g37Bj6JTGbY1YDYf:řҨ.MڒO-rxeIqAP^~,@cɡDmi>mE@LSQJ2󘠚eH..о4$`Se|ܠwzazUrƂJSB]z>6&U\p|и*YRUNi2siBΥrC{QN4ӈV&ȖS&CT.FYb1G{EڨJ)i->c1&ND*0͍}jAJԴPRS>k-ViV
+I	@]}a1?@$[eYRL@v0F:,i9ot	+@3mKwuT.P#j$.\ۦ\*]N<$da>\:&fAJ)7dg;U~{W*ePY=V9Sk̔Rt͊DX9QF7Uq([+fEiT ͇uZ}Włgc7T45&	7[ulJtaˀda]u!).v:o᧴ge-!V+'!F0.Uqt'F]0hcGd<Ag@lk@Fܦ>S^'$lb!5f<#Pt&34r.(磡%*
+&+ ZSŦ$Ne)y-YŞJJ[fFXF7ь4Bc=#]>c`GdLS[˳dZ"*fȟREȺe5a-ͦTHxf.ѐ(.e4cy]ʹ3iZ
+(dܡڗ5!rh؉3'#5yU|7-Μ0}8ҤʀHG"RJ9Sm}z%3 >Mw3`B%M(U㘐413TLjG#&9b4j 
+xfʐ,L!D 6zbҪcCtWBOyǇj/L4mCBS_dBwj͕˅8)$I`ϻKQŧakKfM&E\-PơM*%\.9cdJ6su%
+)HT3KaH8_\"cqU6.vEtZpDgsQ >9RLeҁkG}W52>$aqiQ
+@N5Yu	TU8g0Hcg\𸩵E]f2iјM]$%c9DdQٴMbR^3
+iK\cOivWc?p)Mǥx5}>#$%$1y}Hs%LYȴB.Q[d{K!Fz2"^&X<G%zlmP4҇(,Q٦1S"b*]3c02HBy6fv vcd4麌4@2"2f'KEq<sG2NVbLgG@,e#٨'gУ=nZ%LbJ3<!RGq|9>Sld* Q) Cs"xDX<$	Ty&@fQHp#$~Z*if6Mq\#֊jPg*MGZ۽3"L^	K׿&-K1ގgڳۺ! 1g!m 1fgլeB'O4btn®&r.Ѧ-lmfQ@ANSٌ.6ifg S3Jffp[Iif & 0+
+IR\(>[	0%]:h閒.vT}TsЧbӐRQA=P'4$I-z7XR{eb_ƈ5$W:7=JxȻes]*a[
+i]iWQdEfP#QfRFm08cbgnCpkSXB2}vi:!E{.mKo܇.>6޴ioڥ<ڥԴt襦%@.hEYu`A͚C:Eϥ=]M^O߰S갤 3Y2i!.ĶN3Q%j8Hb8dJx"T]N8U4nhK3ٍɦ)/N*Oq80w<%DS(ϔ4Eiymϓ$4BG&Ie<O&4AIL,)DjxvҾ04]cדylsыl$ncزHkHY%Fz;L;FSA-S=tH}45DHKÒ GK?w͊1xQynye|EتD Aqo(7V"ks$Yp}16=Aaw-FZc>M2#PXejەiLԥK)ŸxYݡ#ǧⶵٮa`!U(CEҤ5_.[7>
+8==z29(#Kdb;vyc^#GGtC]X'J8hR[
+x71Ɏ 8JP75.n\?0XL+*t>yN1w1nZ=F{gI>'R/VBZU
+0YxYa7z5m~6$Ŏga^\9LVRD	0Gq76"KMk  FoUqCE*KSԡ!)9!d8@+FY|љx`VƌU`Hihgi,ojwة7Yc3XQ39xPCcDi&g,$H?iܤ3ja9Z
+LNlB36j4d:BJ(mnmPX@:V(׌Ueɧ@]cO-xN'9Y(NX:"H6" VkSCkDisO+K7hl;s~Jw/:=GE_BVgVTb)2SEIS7GTlisPV+\)v&.7i_Ǯ&RdP9~V-'nԄ3R"ld+)vNax,IȱK]G<rHm/(+3k,r:Qvαէhn1gcU8	c!ɶrܹÓnUȭv]RF#	PJC㡼Nt2ݡaɩdgVsjg.~E}o޽-n?{ǼVwkp2AosiӏpmiQ/mvm:"-Qg*r
+ϻ6{`D(jG0^Hq)E_5w;ylPݳʋP	U.#*avfKTt2&2CJnMm;'+-w/gsB<+hϖNNuJd xCaI;:_!ݎ5邢ZxnEHzVK;B.JJjBY	[=uC'0Tr(v d]/S_a#1|)pӺ=t5VzpJzM
+<~p2sYeN1=qOtj^1#`Ƨr4KKF4}+wZis
+ϓ%UICܗ9cJT<Ab1q}y\><*md3>Gm7IYNuZ}.^1(\]vp˺| Admkwȗw^SeGpi{mJ1
+iH+E.ZE5W}4mY9?i=nL7q!~Άj<ߍOe:1q|7uN`i}$͑AemsrYS_!.3$91=>L\f}5WK9b\b-I9iRSsO0-$n 96s=j3.L8|5\cX%#8̹0 #lƅkٌ[E:iY/N㴐e9fVgY@f\dL9Y=33VGaz0-$V$$L{fEM^,F4-r`qZ(N_z̋KmJTIth9^Բ?m#~`NI]gSfSPmو`&.=ɰf7`"1aWG+r+	rlN/pKƞ޲z8lURpMH8$A(c(at
+9+9F<Ƥغ8{1
+٢\>G 2gDA+Z"/)m`Z2Nю6F0̶-q_zΘ^NG:^ŉlyb]ciĝ\F6>TTЌ[4Rn""fQK]W;9.ZPM*,^A"n!^!d[tWP|СڑC51dq"#MRT\Nf}@v;vV30']\sb9nf>^CƏCUg$m'+ܶ4?>˿ѝ4Z8oFB930:CΉhc&JKze].$WƼ.bz>/!̈́@k̥ܳZƁ&7tJZ;HfS]@_a:7#s4rapu>3w>@]+$Gղ.IDkx<g{gJ@w߇Xvܖ#2t/Ax(kI_
+hy`z+p6r9^XMf;	TB/Jxu3-6W?<Cnٞ_ؓEW>ߠ~?竭[fcr\b8ɹq=dPIlڼ=aY&x<~1M1ָC
+W˯7ZN{IX+zʣNYXdàZkfok52Vh=SXj6MckjQ[*B0{1aq*pbeϸc@A\)%џ5%??檪]bj7Be'*[hj.kv۩}sdnIYu@O-qiA]äw&3e}︻v?L8><}Nv,Kۿ}uΨ(
+y\PPn<Hw㺹d'*ԝfZrӶ7)DD>Ao2%<8O{US	OFx1vyV췤M;|r@\%+qo03xÑ$޼E^OF.vȐN*TǠil{|Ns<ā'f/Ƣy-{%{kkÕK=9ټ9tOK7nn~9}_TOlwTIo+Mz{{bw=h]{+tmtעމvvѫ5AEw!"Hww5meTOlnƼvW)&+ZRKJH3QUwؼY'z^FL^}7u'v't$E+_r(00q+FRhyPˍ()͠(<BgtmsAWKM1Zs;heFxE}e5#=ۻ\EK'Ao+feu~Ѧ^Ϲˋ[V	6NJ]]vT[jv};ԁip%e)
+'W'c2".Uƻr{z;&'Rw<^D<Gk/c(gG_<vlD%G|4}hz"X+[FÕUړ_odȨjum7W=54?8}4$%n^ZBlƚ	՗I\&颞9|}lV+fa8f)Qt_;t%q#5L<09yu&_kHΕd`kXۊ{=Zsa9!%UU1oq
+K0Po~ia)ރ5jE-kcKȵܐC#d7}McD嚙K jukg5FQ+к±7&Ŀ=M`~68|&*\sjHIKd1u34yvi^:6poI=8l܃e.xfo@y~Q׷OʠHh2u>-UߞXwr[+-I_޼<%>>穉7*)RW6$qCNɮu$V|){(Gx3z'(	=\-J+YV8ͥ]^z?bYG<+׼.Dǣ*K7_F?Ӄtc.\HTtFχr@!`!n<?ϙLDR
+qt tL󊦶yBr<6Ur)7uq4" BDbLؙ+OvB?!4ؘ-_at)]Op8|vKP"gL%.7poY-{j[pQm"m.B\t8"
+n"..
+f?'i}d0G\<7sn.:?>+ޭ)
+g!8NCaV[& mS&l6˹ϔfevc"7;FSS.Eqwj-*%Oz.oۯ!'qGv9yk㻩g?BoPe]vYqb@A{`?8ыıѰ%?	g3dvTߏOLZǮ9uS/*KIH_NnUGvG##єxp9@q21eSAGqNi8s~X(9t:wnY1+vž#&][/
+`eC
+}qrdԇ{AgOGKDh@QjjH^ecVȐ3 O=T(МQ/-2si|4OalK|XqFX7Ng1ܩˈb6Сm9WCzW8l"/Bhwx	~"K!uzG6X*};0!T4rumj?3wV1{`%\/sL$1ߊ{٭2S{'(~_7:^-0;X\_,1ٟ|v~E@%:zk!`!0b<`LwnMqBT^?ǯׯo77oL?x}|>s!'8/؟|un}_?ٟ`,P~A?ӿ?Xh˟__nwBJ	Cz~ˉflMJ,Ṽ}^O3[S$L~Ox?ᰟO%ԓn>e~ã?D9ݍ1j#XQZӒ"5$]?2*)~^˓._~3_hė~+lS9tzI(J|vlrȗGws_z_n}Y'(Wp<˃ܗe#ʃ|pOE(tNo#"_gK)3P1PŇ>2&J9s)nd9j#67E0d]US>K皲PUcF9TZ3?=YENDciL:gΈ+gC좲
+N6|c:
+h`5nwߟtS	Z1]}´:PB+3_'{yK9ORV9[¦>9qpѼ{ARN	D9,r\B4x'EDKTRo'ɦ_}/,hؚH9N-x<'+㧒MΌJ|t"B'сj
+"mRF,l{j&ϗa3[xtnCBg`/|鐄R9y,Ev-y.8QgLLK6x6vVd_(g5@%OJMB?d)hUK?9Ndgٗl]Ⱦd(g5@%R9/@t\<ly\>؝+}ENݓs:H?'52f0u1"Zs ƌ
+\!n]N+>ȓ=5'VS
+t$>\y9E\I^Zd>rψ_{Нt)#DEմw'ܑ팁{)YMz8teH)oI
+pBФ16|"º3~93V)K߾"I;ĘI(t|/Z?
+u&i/B6~۳"3URhOG|jAy|E	$ZE4RƏʬOOPJog!<?[{ۡ,ǏgJcKcHaH	q<KS1SnaNj(Bw詴Gf,sPK)1@(µ"
+XF~f(s1~8utOX&T!݆hs!ðS#f&	P}0iTy4 6{\2]y*#бf=
+	`lV98\k{w9#fwnʝ`guQ<y@ivRB:\^(@ܑ4lsTB>qrnx=Uk|7LV"O}C:Bs:/`+ _l3uv	3,BBMUw7Q3#6sWAy{&l!(eٱX)z~k}~lRpޤŁ:a[^U~ĭfDmQ\ktz7mn	+F $~]SnHV o0eʍGm ٢f)w($<O_zf'P;wuoE\yro&R\yaPWCn;ōk$^TW-V7.8kI;k#.dBSk\PiC	H%5h^OLo"n/E?+F$?7?UvJ2EAZis̀.e$&?3?z/1a
+ia^]M0|zU땐+I F7ڠW	"_mETָE=Qٚ)tei.C1SnhBn>:T%O6w*P5(Ferk܆M L#j8OÅm$5PEv5dz99~AUޣ&k$M
+DBaIT\6(
+/$L7C؇M*/,juWXhh{"9FmZw[ϣTS5$ZB]pfgfb>0p^o:	V.U*ןˊ45Zһ|:g\_6ת%6(46&S{
+:OCCN*U1BSwL54LqcxwE
+&<!!LOQT7KQRHB3
+@Hɪ7(idtmbQG!EϏUf̈́	#N!w0j#WyZFT}e(IC4	f(by)T-EW*ר12H,FLW)ǅjf̐BfW实4?,jCo5&UO@[5)!BN$#B,]-Tk]ԞWBjPyDH36]YC7<<	]a]($ dXcyZi5ۼ{nuv'D^J	.i6J;,ԻPt͛#456қ2{-Kon%5)ȁ!n]x4ͮ20a5ɥ
+qﺆ->aJ c`rGiWff#4Vydu5;Zr"Ag6!w	As*j]eE<HgTawzo5|^ħed!
+F|jp6lDBML/c,8 ϸ2,3YyɀͮrbXd-(.z=4|QaڊfZ*J4߶
+6"y<mр!)-{Yx8/HWھۛA
+cԛ2sX.҇TX" /pD'3P\نRBdMAֶyn9DixSd26(B[g{}6{:k]/Ң% @iFA18PfmEP`HXڹ#uTUY?1@xy.
+Dd.mTr3uɺ:@'-<lʩ9;Ğ5fCoV{}]따:݂pY
+SkN^BCM	uz	u^s7B]W%Gݖ㨇)@G/{	X 3@B0%L0Ly*b~iZĞ|,`=j[E7stU>ǑF묻ZQk9u2[~S]7Yݝ>@{9z>z n(z^9?y~潷`sϼO%_s,W9Fߧ9/p+̸gBN&s!؊Hxss	ԤkC4'71\?R/Ktѩw`swnƦP	A|y)6Y;PSN͖♲9-燃6o
+ֽnMA47wvGd2j٘8Q^dDs1yH($ѻ@stNݺD^`~x|+]z[%T0:'.#B!~rNapd÷x(9a<]~t3,6#2<2F	w1߃3ywGYu_h~o|3ϸ?f_ȷ	xhpvdxc4u'&;;D(%'KI|6:r3ž!dD[drAm̜tWqK#l'g"nMӷՉ^?8uZtLa/r>G{}~h@W3ӘxѴ͛qL0'"/f-cI	"5+]o hE.Zn#<&^?zD B|[3XZQ$9Q)"֙9[9po͇-m.p,vX0ycv^Ʒ7vObqŅ8[a̜'+n6m-aՏc/AM\hMfgqa6*t=~#<wwnjn-/Q!vG>Mѷ	HIFD=NzɅ܆6 YG.7fB_,9gz(ќ$R	8q{pȡV?䷿MU,U,//hxCr;잻rm&=WD<]Ej"xr)杚yzɏRH]T|2s "s9\띗TÿCuY|Ho&7jY=kp:Jykn.؞>B<W쒷-Q96D\;Pt?*	
++-YPV*Їԃ\]mNcUzW(to6UK	:
+YaֻUy3rujnC7#we[	0=JS۔"
+Ta6A0 x.S"vV-4VmīSG	TY~Lg4VSӿ:y{u۷uKP[C]:y;qi4h6#8[s[T_u:W'oNޮ3mN^tcެe?۫W'o]߳{
+4.\`4=IyԢc;񳼐\`)#;LYOڒc*&ëSWsElngKI+y)Th|vIun!7vpvvpg۫WW6:m.TZgpqu8[,r6YQћ?Ffl./Ɩ_R}ǜ\ζ:ݟ+2~Vۛ?WWݳ:s[]l>ObtG_ԥwR{$E_J'Q;^{NKx{	KȊT	y+Y~zf^R[Fƫ{A7N8$)ҫ{U
+hq~e]^e8tu7nϞ#Nbe5x#e뒂p/ɿ7rѹ{0'lso7d$p0\jޕ9&AU%KwQ{)tkLtAwLºϖȄE0~TRie>힘7m.Үr Ǥk\*)7:편)p $\EqpvyQ~vx&;;}^mp6#|pAP߹Shu1yDS~?w~=R""6&&JQ·a>A\pV}/iTEmijPY#0x#_~?u>*+ΰz8ܑSy[óGmpWHJg5Vnm26NŜLKkM뤝(ǚ;yqyg+ɦڝ%^(#OXxgV~;8a>GӇP C3k4>3~[n7Jsu8=${٭A}buuς87totZatV3?/Xb?	?d!Xt~o8XϽh!~ȽܻCo~-1,`4w1UIxkqop!/ܚt`!*j`^?ǯׯo77oL?x}|>s!'ÿ?_+B _[-Wg';0X߿?;ԣ/yPO~:-'ws觤?W>@[98&qr;A2ϗ/h ,'<6*lZ˧zQ>eԇo>HL}39I>5R~>SO~p4JS_\sCԶ񊡕dVҚ|!arQOr_t2G#\e'>~ʡs6~n&|yt7ܗe;J| O~"`r<}Y6J<\|8|Fp^[s&[*tNo#f|~-j20ؑ%ǝx+aS"Z^qYx<ܬr0Zxos3K P3J@x_5Jt)5k)^0fKuQЫ^,"Bb
+4DLZL]HS#?si(av`^ѩ2f}Lg$ks"?=*?>CD>aZY^BD㕙h<E+;@-fؗfV\ǃsI6dfL^0z/(V#K'kY"/mtB<ɓ""ݝDݣH1%: 5fOM^Xz5rܝ$ZLKxOVfO%{vTk*@ g=XD2r|)hkYH<;~ZOibe"G9[|&_d6"`3!	-sX2[$\6-2JqУ$`lmh3mMȾdPjK6g5০؏b0O.l
+ZmO.fYE%@?/Y}TjK6%Of[vJ|}\(ï-ҏ	aͼ~<{ye1K8WĽ[W8c抹990&p)cLi|$^C;;=HB.SF
+Xik+q4T8ڰ7դg+l\lmKtW!IP>agrDJQXsxvǼS?}L2F}ufNxzSJ`lKP~*t4#L[3N-"(DFjQ
+N+<=C*ӿF_Llik3zl²(?))-)!#%,!LO"K%@IEi
+xY
+9xKe)Zaɮ2^_7phvhl{DMvOptKh
+xSd(bpv잙,A|;caGNyGRtiy/~:Kr)p`^]'},P?Lc+)ęrٱST$9x{)nID07UA}'	>Bwi632Qg(\xWT`j/u'C޵Fh!\:/γ4!%9O_Yr[q'O^?>qۙ&kd~i802g<6%@BCCp^q>|: "Ӭ|$	i\o?͙|㻂XaaݱsړLʂprîrѧhqdRx6e]I0ϜQϩ[ɦV֚͞	\a+ysb*͠'DGJ'2/hRcMLHJ O{ˤldm2*Z
+R39wR
+{r)6@@H2MrR7K>dNnI3)ۛ`:R7ιԐ3	)˿M1Pej9w>^L$h8h߭TK3b\1	rUot>/w6&r%@U](Ŷyb"Irx;{<wZ!G$TsO6r`[BUu~8/Ln]L@1Ŷv
+[؛7rOq/Bk@w?e.[; Oy}1%+6xj(}IVI|ENwpeEUQ%vn&heٮ,iKl	%c$3pf洗`0)Ay@r,r*dYyTV{~U f,((`t7~>R+43
+/):o ל#}Dlsk7ScyxrMջM[i8zw_=R
+5o&!eg0ɰEjۢ,I}(nCa2[x96Afl[{֏wEtiƃQ@Tϙꖒ33<2Sgߛ.bd^iC;NN8$3]~k̈́EE-}ENPEِlK&8ѡR$ P
+r+1g^O2[,({CLTNf=3O>Zc!üM_
+rqr57lػB>ȇd	n!t0g4p>dte:['/$8?wBeJ?_@xfxigqs&JAfwS
+xV=؞B0/+^lŊ;htXY]X
+nXNK]6 z?/ǧ~I&8cG+K>!Z%Ū ܕIҽo4}P2D-T{"lG7]Ή,\}`~ޠ}L%dD-h6ygN瓛|ȩB!|mȈCGEY-6p}|?qgVNq$m/"zg8x;o/L^_sx.I̎^q|L\9d΋k{.dk-H~risU.GG!GU?k:[-=Q)'ӸGq
+R}!¼75+?8Fe(\5/gti\5?:NFEKtPjd+9b_/^XkNqRty_gxoǮ_߿IvnJ\DO>Oz@GR!VGz?Z^Y>^`Z'OzI`	ϷibcSȺ?1~ۡrrkyv^/_7_hׁ2
+;Y)-۟L;OP}QׯN~cbzN9wYSLB	t̹FmԓgE=yt]Չ_,	Di0o?aWOhr1ܞCnka9k^RY,҆?^t㿝hb6xv׸NaL|^eq].o@=[=1vmQe`L;K= VgӂګEKchA䞁|kwwClPaU[G/7׾yG"Tk]Щ|(ðhi[NI5Ld3>3敃Ʒv$_^]MЗx0wLNί^9_/]<@7:E2k@~ȭ}|̭d;
+*8«o<,o3':?`,uo%VT$"	*g5BgxpQJ;KT]u}ڀWgj AGuu\Lʨ+v8M3&q:kI`ì٤a_7ä<du3KA~󴈨_gä:̆a6ejX3iTZ_\aM?@t5Cz6SVf1L^:Ɇf(x̕P?0mAn,tf
+n5,S>(K(La7-b5kyulij!cc-=<R3P`r"'$`L`"!MJhm8@(mT5LJ~C{B{sUN_-ۣu(Z |IuoXZZvHA;.:ζċr8GȢ>S1$Lvɗ|ɯs
+:d?Z!00pǍ~a:+r153)S:5CIu/2{{.g=itwnpygȠ32tmso\UYZiEPz!.G+|ŗ(E46.Q7Zן[rWtE=BEy^\gz&]n?Y]żͫ=[Uo,ZLފ^?@1k=~3iMLI<CףyXQ֮Yx)H2f'g.X18LsW]ۗ8i$hٟ8|eoun-h1q+j6Ɨ	&pofz<sO09?ܽ<ß+<,21qmcaٝdݳm͢8:ruL 7#G8oSN839;Ƹ:ʮuD]Lc""˫3+3tx2p2^f|!.9
+L܀W!_×y_ﲳphv5OAqz~ykfͥ0x7AA!v'\I=
+񚮂'^n%^(jW~آ}L0zpo=FQY`V]M9t2P]ۺHVHT)X"]$hâ*Ңń0/Ә5%<OZSUɁ×V'§*rUyR",vӈfrf2ij0-'X=u=(Ve5rf`} TS"5Ş՟|7<s,jJqQ
+&~j,/1,ַr*[4v<2`إjͤ	25J
+؜vyʓheKV/kam^vZFZI[A˻Y],b(t6H&	ֿ/OFTY]픍0_ŷ0BPTMi*ayXvaVb=Q;:YVk4<bs^45^k-<+lƆ	=xCEMއD`hgmq*5PE5T0pj2y.W#Aȱ._0(̪po9/x<ˊ$8eEp[Wt1_lbPMy+C/ۤKnWY\^Tu"k\@8y~>\h.`}u;1Gȟ.- 6#L͵8-`*)2`'e1Mw5^>`j;u%WMx̆	1q&AG91*AL}"QN{/Tx^0ƌT!tv[q#wKXI>'3i43k;S8A[zvW(OG"TnN8O«&0C]k#!tn+3_*xȥM뵋$/O& Q3,qI#r܈DX!iЊ!&ًڈx!zeؽ8H-6x9c4"g#(+6 H9< _ue:"Dr&[A+wrJ.h+mRa[1٭o-BY 0ݬmR͜g>\<2z Z,w_Ӊُy(LQ9kU&Jvm:Ҥsr}EV%k%\9PXl3Іwwf.^ʢC&t/0yE
+ښ2B0fQKDQY@rI%JV$.lA5kT)r=W5^6+B¸_0kje[J5\PsTu55t4 ez[xZu|s~|^,GQiy::!<Z[j&p.2\Z	zHADJYI?%l`/=G̙/̐}~paӛа-δw6.lW&1!ac"0''oݮ&6Eov1auԮ//N13ml?_1.>_sak`gJ~<W:"~}\kYm{ڟbל
+~IwCkْZB^?;.tǶv7Op8u޿mǰXˈ+t?b'6~[mzrk!W"lʡ{)7Ϯ9#<pkg9ǢEK^ZEt>թ	nSe"{Ur~[U,7ƯW6jݭqj_ n߆^LwuQ3.¦sRWkDʗH.K8)ޣs';ӓ*	aݿ;xZזm dGЕ sDh+I.`t"vLeMˁM뤱DrMe[SjdM20G$Z4ڐڝlsx_>j5j\΋~=Uŋ YZe|bV,ĽfCFHѤͦXh6|USE=zUѝ/4IL4L.Kݐ*.TQ3ОԘuEƠաԵԘ3UpQbFlk@oQ`lD0ŞCf=N$m޴4i>5莨 ׮ZW(V}"K-T?V	g.>C;o} /DxwމՎv԰5޲vzP0gyl}/1E!lAS^Dqb;N"1im!p,
+`_:G/wΉU#؆n-¾]'l2%7
+"[n_]nm.~e婿8>w4x社.rLc4;iڥD{~_s21ic8Qe%*|P?x*qzkvz:#zyAdךo&t٠?Z.t%~JTRi{fsB
+ud4UmMICQ]*MٖVʵ'U7M#.`t6[Q+o{u~TByeyw]Ve*m;!G5A8Sˡ>p_Sܧ]R𓭅nohwhpVE'zڴ6/.e^^G9fl):gjhs";`7-rdl<Mn6ޣ\ӳSF7ͰO>Yk8p(jGÆMT)[`J-tK wyܶWAհus~^?MebVVaBPTP5vrU
+{0(-kcH'ʳH^|6q?CTe>q\_A[1*i84Q5hUt.+PjGeqa䏑?o:JynNZ}uΫni)vu"r9YLmwBLe97w@/O$f4g,;8fJݬY۟gc;O?A]]|go_\Ǹ| .h1?o+9{kvGw<_vjʑ#w_oʲrݰwa>u^br,+l>2?]sm[#TmDbO2/Nvc>v'6\Gi ,q}W1xn*?,5gDP,/tu2;8hw:n9n~MԻ>F*~vM D?qfG|pzz+#a.\3~s{5uzHQ"6"{rI<ܤFVo*#A!	}NvjGE/׵Og@d6cx͏yv~J 6Taϴr.1#H+d;؟`2L)NX&4ᖟdG~ꛄ8:'h,:"ί.-ɧTJ76>cuWxqg|[>zh~9}7'ݱ5	8lv|k(Z|v)Hn3'VXfsAi2	Ҳe?7t--[&iX`(`*<Z2?XכsqݟwȌԍrWg=v۩xݵIKGm͢c"@e|ᅎvZvц:g8=lQ;-؟"ON$;QQO'`xGWzQy3Efu_9#sqNguiпwÌiezp_ci[E=`t+.hZh5.|[F'|_.vA4q="=îS/=2ߡ\o0H- 
+OKRƴ7>MJ^))3׷?;[Ks:Z$7Z$SN\~?1Zq.,I{\z75(c;te.E)qP#.V*ݕeb.vQ:Yo]o=J.[7J_)NX8
+gQHZI7&vWəNW`C1o%_лdAv7Yl5QF4Do8Q̲nԆ_S|e=7
+?KpaPl)G7Ptuߐ'ZXP}<e;mܟq르q[~\sz_ҹ+vacSW\epbk<Ƀ.Nb}&OЏAsrvsݹ#g9!j}!Jjwu0k<f=q͉}vHC@攔9gh^'PѿA'=Lq<ʗvش>hCTEgRb`WZpC9F_z)ϝliu%sUEx?m,3fiX{S-17NC5BwS"{vtqə0hZΟvذ}$fşqʲ3e|bOh{%a=?mѐ۸&b4{bn7z=>L~vqtqŪ:OpٝCnZo.#2.jYpܣ8|֒>Z*Qb*hoykuw䇴|O~8rjI|pAbP<z	JcAbL-A}EI_Nz\fu~k=ۉP^ZodP.Nߣ}[Q"ט-Cӿ}}}_]n "}y/~r_<ovϵ?/H(-rϽEmzyGF|4~ƚ>DzMCl`겼~I}x6~;ckWxE:G<~v:Sgvt1[[3R>b-V_>DK/};	6ӝ'x@Nc&:/}^/at;pO!W7}_ok㧡fi.[<FϹ}ŹMJp7S
+UVD@x+/p;U)ynҔ[nD"WD*)[`NUzYnۄ+ؾXŏ0Ϸ	|s cg+I7=Ӥ7q>	AֱSWf5&KWD'"PdUD"MSr
+2I[8GY/5ѯ,VLl/S#_43Iq$!WA#d @s\?OV+<IJp\e8PppQK|+҈Mm24E-1+lR%xGe{m֒&SVTfdaLոq#f(ץ,yH1I.m0lX0NsS!*!7V\&l'!73FWPCG@ϰL҂;nģHFR`d|nP1A,T4+Z6tUńjjQHp0pQAf+S)L3{$MhY7Zt',ʖZD(+Ϣ̂821mPED"T΃raKws}3Ôˠ\BeUrGppI($eź@Wl7IX6-_lhyfVetq~#8xz$#B$
+I)mbOQiż bwXXq[8@iQ/B"QH%m/>`LhD	V7y 
+Awi]0˧MCۮ{[0Cچz7zߺߵ+V w-:-HLKvh!Kxx/$Wɜ5ܖPgƓ2zPO@6uӎJ$)Y$ts&5K8NQ@}dZTBhUl/5b28e!x36r9aZA(
+Hj	V1.J""rMc+˰B믺$"_+/N$m2d	*	)tSU^@bRl4X.
+*'qVEK\*j_Vl\HH@%sH샐R.1۶8?EugfsIe*~.=*.f4ٗ|XQ	2(HԶNHEH\! CfD󈕢dx, ,G\Mŀ>mGK	YAp(L$<(!4& E/sI>K&J?GQLCZk>n%B}#n<#@׽i\\nSDt;zvkY/_Vt=v	HUThU;%KèvP+iz)ճ$&-A$0
+ @0JT	<!KKoEk}Դm)Fт/(F~(>=ar^ĐP9"$
+)^UCx꼄Wb-fJQAr<{<C{anB>sH$UGojg3ԣ	Chw
+4K-\~f,cλ?)4)F5jb%LO0$Gͤ[Ĩ09)0ZHSőG'=zY0	EY8,,AYR\:L:P00ΤJDȨEaZ<|~ʵğ}iH	hFDo4h	"Dha$kR*/Ϥ+̨b+5(]LM[4^+!C=uɊ؀)
+Cr[!"0^Ei]69a-'
+6^K2blHLz:1r/ûcS;lPgkiqKF"W"DYD`|5,RBaŰ.79AFNޞ*H˄FxHdn#[I]A <+EDn8C$K+j`{ө֤EeN#&0"X5	fݣ|%q$Rh5&O(-'GL:*@_DZQQ0F
+VitQJZH(┗G>KʚE$	Sl$
+VL]Ґ`lT^,82*eT){eҲ`w+xؚAB!'`^Wš4Q#^ja#ZtƦĘJM|E(@?:	6!ml?Rd4]n;g4-\u5aY#Vim b8j.'&ʹ5ZhxpȹRVLeApOJYWÇQC5lkBӳ.YvBT`>'/X`TA:.X*
+	Y៥$Qq鵐#	g(4%0d3LAe@WDj>zi*aZZ;7	~ZB]RJ48AKyW\j K>dOpkW BOQa(0F%NDa&Bl(߃  ʷq`E-aɚ"N'[}U/r(-pY׵FZmH|EG2zx'kwPMM;M0HJJ\?qD&xGXi(0= `guB)S1P R&(1%@V<lJ!r4}}RCBH*lAӴ/˛g[|oE]}״R$I#W7 Vr|7>׺Of-?5q7y+iE"`Nfp"y}jrvR/iF$*8y47F&D~Ē`11
+eֺ|
+&E=XפijO^QKfuV8dJd* r~kE\r_,N4pvN+?qP{B:s_3$WHRi@<mA67#5~X85JhLF!ƀ`ʳz;_w:;JL[Dl	?%z>CRfH0dp!]H6ѹȗ6!NyW	]8Bp<xF}\KwxzfJk
+'"(G3[/f)$$$LtZN
+mɓɨGCP=)&L@tYzRˤԨѐlYM"J>,xH.I2_"SėлGEem9*hchnۀFq7AN*/Wibf.$#U3e&ʴt<~ '0{g~gx/y7盏_ZGgI^xL>=nr;%iתugy5t[N>W]!wm
+ޝۡoF?pa:xoUDg{œ":fߥ+WSi.I',lEU8<P::O㠗	]~_J1mIɭmҨl{9xLR+E/P
+E+SN<ma]cPɶxl#f膐*܁oS=Hm1&c¥q*I6ZZ>{F @5Ky#a㆑)+hiF}Z߲.)ҨM>tr,Gȅ\<#|h`V8i%_&)ݥUSpdǌ4PS$x|ę\KKY!zUucrh	zҿ6xSNH\նфhPE壮6cǑ0WJhO<Ix!`%BHBع$NI# E#%DhyK#вPQ@3Atإq*d>88ҭ6ۖr̘%"(I
+hP\z4!t3E"-$$J>%UҟėϥgBkn,9,ޒahc%ivO`*4N@*ρ'ۮI'-$jaP:O۞/ʐnzѹ#2
+KC.)}m@i٬CjAPs_FB̂-$Q
+iђn {|I#cAqe78iΧADNS~4#Mg=Xߤf~m=X}GJP/͊_r&e뉐.Z>6Ps갡rl`<6mQx\
+.km=9hoٶ/
+,)$K,F0
+U)S]f&Jڄy9lJ cni[WhMR]3߮zl=&?Л1L>7.㒆sM`t,(vx\VRF?(KѸkݼsZIn4<_+i6QaہK?1csR}N$ꇴo;kK``w7\Sv y>6h^Za<4.@#sԘpЀ:ӧ~gvط]i#lXiEň#nh:J]2?}|U~,0K8>KI[=y.SUQI0k-wN	vH<?m2s8x?'g_W4[\O8L6ož՘7'DQCK|qID#	AM՛E6nrJr8WqLx[(1yGhvybO h4[`CȞwӼ^r?]+<+&G)6cjɿḐ2(9NߜӬ]ZMַF[/Nh fdϣ97>ߎ]qnx0ѣOO3b݉5AWgDscq/j.FWz~xqE:$fZM,t?AE]{C}xtVBPT?~8XW>/.B'7ZQ-O_?鱇fya#o3jƽcMr3ϘB,=pϮ&쾫lLF߆Dq۱Gsǃe܇qR3F
+=}lkD`%??^,B?բ*_/RX7nݬ|q\52ZQK]+?vkNGA6~A~^tp7/Bњz8#u4x#qj#061O£P&8Ƃ@'j"N"1

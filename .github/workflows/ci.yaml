@@ -23,7 +23,12 @@ concurrency:
 jobs:
   validate:
     name: CI Validation
-    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@53e74ce24b0b16306c57f66786a85122904406e5 # v3.7.0
+    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@a39f4a8dec126d41daa8dcec6b075e9acf81fdab # v3.8.1
     with:
       job-name: validate
       lint-command: prek run --all-files
+      cleanup-android: true
+      cleanup-dotnet: true
+      cleanup-haskell: true
+      cleanup-boost: true
+      cleanup-swift: true

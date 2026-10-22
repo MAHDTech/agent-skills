@@ -1,880 +1,150 @@
-<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-c37k36qc">\<head\>\<style\>
-  html[data-i18n-pending="true"] main,
-  html[data-i18n-pending="true"] footer,
-  html[data-i18n-pending="true"] nav.sidebar,
-  html[data-i18n-pending="true"] .right-sidebar,
-  html[data-i18n-pending="true"] [data-header] nav,
-  html[data-i18n-pending="true"] [data-header] .download-button,
-  html[data-i18n-pending="true"] [data-header] .cta-button,
-  html[data-i18n-pending="true"] .docs-nav-links,
-  html[data-i18n-pending="true"] .header-download-btn,
-  html[data-i18n-pending="true"] .header-cta-btn,
-  html[data-i18n-pending="true"] .rc-pill,
-  html[data-i18n-pending="true"] .subnav-bar,
-  html[data-i18n-pending="true"] site-search button > span {
-    opacity: 0 !important;
-  }
-</style>\<script\>
-  if (window.location.hostname === 'www.antigravity.google') {
-    window.location.replace(
-      `https://antigravity.google${window.location.pathname}${window.location.search}${window.location.hash}`
-    );
-  }
-  try {
-    var __agyLoc = window.localStorage.getItem('antigravity_locale');
-    var __agyNonDefault = [
-      'en-GB', 'en-CA', 'hi', 'ja', 'ko', 'zh-CN', 'zh-TW',
-      'id', 'th', 'de', 'fr-FR', 'it', 'pl', 'pt-BR', 'es-ES', 'es-MX'
-    ];
-    if (__agyLoc && __agyNonDefault.indexOf(__agyLoc) !== -1) {
-      document.documentElement.lang = __agyLoc;
-      document.documentElement.setAttribute('data-i18n-pending', 'true');
-      window.__agyI18nTimer = window.setTimeout(function () {
-        document.documentElement.removeAttribute('data-i18n-pending');
-      }, 350);
-    }
-  } catch (e) {}
-</script><script type="module" src="/_astro/HeadOverride.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script><script type="speculationrules">
-  {
-    "prefetch": [
-      {
-        "where": {
-          "and": [
-            { "href_matches": "/*" },
-            { "not": { "href_matches": "/api/*" } },
-            { "not": { "selector_matches": "[download], [target=_blank]" } }
-          ]
-        },
-        "eagerness": "moderate"
-      }
-    ]
-  }
-</script><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>\<title\>Enterprise | Google Antigravity Docs</title><link rel="canonical" href="https://antigravity.google/docs/enterprise/"/><link rel="sitemap" href="/sitemap-index.xml"/><link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48"/><link rel="icon" type="image/png" href="/apple-touch-icon.png" sizes="180x180"/><link rel="icon" type="image/png" href="/assets/image/antigravity-logo.png" sizes="276x276"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"/><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" sizes="180x180"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Symbols:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100&display=block" media="print" onload="this.media='all'"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,slnt,wdth,wght,ROND@8..144,-10..0,25..150,400..500,0..100&display=swap" media="print" onload="this.media='all'"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.2.9"/><meta name="generator" content="Starlight v0.41.5"/><meta property="og:title" content="Enterprise | Google Antigravity Docs"/><meta property="og:type" content="article"/><meta property="og:url" content="https://antigravity.google/docs/enterprise/"/><meta property="og:locale" content="en"/><meta property="og:site_name" content="Google Antigravity Docs"/><meta property="og:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta property="og:image:secure_url" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:image" content="https://antigravity.google/assets/image/sitecards/sitecard-documentation.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Card, CardGrid, LinkCard, Steps, Tabs, TabItem, } from '@astrojs/starlight/components';"/><meta property="og:description" content="Card, CardGrid, LinkCard, Steps, Tabs, TabItem, } from '@astrojs/starlight/components';"/><meta name="twitter:title" content="Enterprise | Google Antigravity Docs"/><meta name="twitter:description" content="Card, CardGrid, LinkCard, Steps, Tabs, TabItem, } from '@astrojs/starlight/components';"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Enterprise","description":"Card, CardGrid, LinkCard, Steps, Tabs, TabItem, } from '@astrojs/starlight/components';","url":"https://antigravity.google/docs/enterprise/","mainEntityOfPage":{"@type":"WebPage","@id":"https://antigravity.google/docs/enterprise/"},"author":{"@type":"Organization","name":"Google Antigravity","url":"https://antigravity.google/"},"publisher":{"@type":"Organization","name":"Google","url":"https://www.google.com/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Docs","item":"https://antigravity.google/docs/overview/"},{"@type":"ListItem","position":2,"name":"Enterprise","item":"https://antigravity.google/docs/enterprise/"}]}]}</script><link href="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.css" rel="stylesheet" media="print" onload="this.media='all'">\<script\>
-  window.dataLayer = window.dataLayer || [];
-  window.__agyGtmLoaded = window.__agyGtmLoaded || false;
-  window.__agyLastPageViewPath = window.__agyLastPageViewPath || '';
-
-  var __agySegmentMql =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(
-          '(horizontal-viewport-segments: 2), (vertical-viewport-segments: 2)'
-        )
-      : null;
-  var __agyUa =
-    typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-  var __agyIsFoldableUA =
-    /Pixel Fold|SM-F9|SM-F7|Galaxy Z Fold|Surface Duo/i.test(__agyUa);
-  var __agyIsIpad =
-    /ipad/i.test(__agyUa) ||
-    (typeof navigator !== 'undefined' &&
-      navigator.maxTouchPoints > 0 &&
-      /macintosh/i.test(__agyUa));
-  var __agyOs = 'unknown';
-  if (/iphone|ipod/i.test(__agyUa)) __agyOs = 'iphone';
-  else if (__agyIsIpad) __agyOs = 'ipad';
-  else if (/googlebook|cros/i.test(__agyUa)) __agyOs = 'googlebook';
-  else if (/android/i.test(__agyUa)) __agyOs = 'android';
-  else if (/windows/i.test(__agyUa)) __agyOs = 'windows';
-  else if (/macintosh|mac os x/i.test(__agyUa)) __agyOs = 'mac';
-  else if (/linux/i.test(__agyUa)) __agyOs = 'linux';
-
-  function __agyDetectViewport() {
-    const width = Math.round(
-      window.innerWidth ||
-        (document.documentElement && document.documentElement.clientWidth) ||
-        1440
-    );
-    const height = Math.round(
-      window.innerHeight ||
-        (document.documentElement && document.documentElement.clientHeight) ||
-        900
-    );
-    const orientation = width >= height ? 'landscape' : 'portrait';
-    const minDim = Math.min(width, height);
-    const maxDim = Math.max(width, height);
-    const aspectRatio = minDim > 0 ? maxDim / minDim : 1;
-
-    const hasSegments =
-      Boolean(
-        window.visualViewport &&
-          window.visualViewport.segments &&
-          window.visualViewport.segments.length > 1
-      ) ||
-      Boolean(
-        typeof navigator !== 'undefined' &&
-          navigator.devicePosture &&
-          navigator.devicePosture.type === 'folded'
-      ) ||
-      Boolean(__agySegmentMql && __agySegmentMql.matches);
-    const isFoldableUnfolded =
-      minDim >= 600 && maxDim <= 1150 && aspectRatio <= 1.3;
-    const isFoldableCover =
-      (width >= 320 &&
-        width <= 368 &&
-        height >= 700 &&
-        height / width >= 2.0) ||
-      (height >= 320 &&
-        height <= 368 &&
-        width >= 700 &&
-        width / height >= 2.0);
-
-    let viewportCategory = 'desktop';
-    if (
-      hasSegments ||
-      __agyIsFoldableUA ||
-      isFoldableUnfolded ||
-      isFoldableCover
-    ) {
-      viewportCategory = 'foldable';
-    } else if (width < 600) {
-      viewportCategory = 'mobile';
-    } else if (width <= 1024 || __agyIsIpad) {
-      viewportCategory = 'tablet';
-    }
-
-    return {
-      viewportCategory: viewportCategory,
-      formFactor: viewportCategory,
-      viewportWidth: width,
-      viewportHeight: height,
-      orientation: orientation,
-      operatingSystem: __agyOs,
-    };
-  }
-
-  function __agyRecordPageView() {
-    const currentPath = window.location.pathname || '/';
-    if (window.__agyLastPageViewPath === currentPath) return;
-
-    if (
-      window.agyAnalytics &&
-      typeof window.agyAnalytics.trackPageView === 'function'
-    ) {
-      window.agyAnalytics.trackPageView();
-      return;
-    }
-
-    window.__agyLastPageViewPath = currentPath;
-    const vp = __agyDetectViewport();
-    const eventParams = {
-      pagePath: currentPath,
-      locale: document.documentElement.lang || 'en-US',
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-    };
-    if (document.title) {
-      eventParams.pageTitle = document.title;
-    }
-    if (document.referrer) {
-      eventParams.referrer = document.referrer;
-    }
-    try {
-      const sp = new URLSearchParams(window.location.search || '');
-      const utmSource = sp.get('utm_source');
-      const utmMedium = sp.get('utm_medium');
-      const utmCampaign = sp.get('utm_campaign');
-      const utmTerm = sp.get('utm_term');
-      const utmContent = sp.get('utm_content');
-      if (utmSource) {
-        eventParams.utm_source = utmSource;
-        eventParams.utmSource = utmSource;
-      }
-      if (utmMedium) {
-        eventParams.utm_medium = utmMedium;
-        eventParams.utmMedium = utmMedium;
-      }
-      if (utmCampaign) {
-        eventParams.utm_campaign = utmCampaign;
-        eventParams.utmCampaign = utmCampaign;
-      }
-      if (utmTerm) {
-        eventParams.utm_term = utmTerm;
-        eventParams.utmTerm = utmTerm;
-      }
-      if (utmContent) {
-        eventParams.utm_content = utmContent;
-        eventParams.utmContent = utmContent;
-      }
-    } catch (_err) {
-      // Ignore URLSearchParams errors
-    }
-
-    const entry = {
-      event: 'page_view',
-      pagePath: currentPath,
-      viewportCategory: vp.viewportCategory,
-      formFactor: vp.formFactor,
-      viewportWidth: vp.viewportWidth,
-      viewportHeight: vp.viewportHeight,
-      orientation: vp.orientation,
-      operatingSystem: vp.operatingSystem,
-      eventParams: eventParams,
-    };
-    if (eventParams.pageTitle) entry.pageTitle = eventParams.pageTitle;
-    if (eventParams.referrer) entry.referrer = eventParams.referrer;
-    if (eventParams.utm_source) {
-      entry.utm_source = eventParams.utm_source;
-      entry.utmSource = eventParams.utmSource;
-    }
-    if (eventParams.utm_medium) {
-      entry.utm_medium = eventParams.utm_medium;
-      entry.utmMedium = eventParams.utmMedium;
-    }
-    if (eventParams.utm_campaign) {
-      entry.utm_campaign = eventParams.utm_campaign;
-      entry.utmCampaign = eventParams.utmCampaign;
-    }
-    if (eventParams.utm_term) {
-      entry.utm_term = eventParams.utm_term;
-      entry.utmTerm = eventParams.utmTerm;
-    }
-    if (eventParams.utm_content) {
-      entry.utm_content = eventParams.utm_content;
-      entry.utmContent = eventParams.utmContent;
-    }
-
-    window.dataLayer.push(entry);
-    window.dataLayer.push({ eventParams: undefined });
-  }
-
-  __agyRecordPageView();
-
-  window.glueCookieNotificationBarLoaded = function () {
-    if (window.__agyGtmLoaded) return;
-    window.__agyGtmLoaded = true;
-    (function (w, d, s, l, i) {
-      w[l] = w[l] || [];
-      w[l].push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js',
-      });
-      const f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != 'dataLayer' ? '&l=' + l : '';
-      j.async = true;
-      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-      f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-M4N2ZKXQ');
-    __agyRecordPageView();
-  };
-
-  document.addEventListener('astro:page-load', function () {
-    __agyRecordPageView();
-  });
-</script><script type="module" src="/_astro/AnalyticsBootstrap.astro_astro_type_script_index_0_lang.BtyBE0kN.js"></script><script defer src="https://www.gstatic.com/glue/cookienotificationbar/cookienotificationbar.min.js" data-glue-cookie-notification-bar-category="2A" data-glue-cookie-notification-bar-language="" data-glue-cookie-notification-bar-site-id=""></script>\<script\>
-	window.StarlightThemeProvider = (() => {
-		const storedTheme =
-			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
-		const theme =
-			storedTheme ||
-			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
-		return {
-			updatePickers(theme = storedTheme || 'auto') {
-				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
-					const select = picker.querySelector('select');
-					if (select) select.value = theme;
-					/** @type {HTMLTemplateElement | null} */
-					const tmpl = document.querySelector(`#theme-icons`);
-					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
-					if (newIcon) {
-						const oldIcon = picker.querySelector('svg.label-icon');
-						if (oldIcon) {
-							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
-						}
-					}
-				});
-			},
-		};
-	})();
-</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/index.CDMXz1pZ.css">\<style\>@layer starlight.components{svg:where(.astro-jlnlh7vs){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
-</style><link rel="stylesheet" href="/_astro/AnnouncementPill.ubgfVsjK.css">\<style\>.button{font-size:var(--base-size);line-height:var(--cta-line-height);letter-spacing:var(--cta-letter-spacing);border-radius:var(--shape-corner-rounded,999px);cursor:pointer;text-align:center;border:1px solid #0000;justify-content:center;align-self:flex-start;align-items:center;height:fit-content;padding:10px 24px;font-family:Google Sans Flex,sans-serif;font-weight:450;text-decoration:none;transition:all .15s ease-out;display:inline-flex}.button span{text-decoration:none}.button .icon{color:currentColor;margin:0 var(--space-sm) 0 0;flex-shrink:0;align-items:center;line-height:0;display:inline-flex}.button:disabled{cursor:not-allowed}.button-primary{background:var(--theme-primary-primary,#1a73e8);color:var(--theme-primary-on-primary,#fff)}.button-primary:hover,.button-primary:focus-visible{background:var(--theme-button-states-primary-hovered,#1557b0);outline:none}.button-primary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-primary-inverse{background:var(--palette-grey-0);color:var(--palette-grey-1200)}.button-primary-inverse:hover,.button-primary-inverse:focus-visible{background:var(--theme-surface-surface-container-high);outline:none}.button-primary-inverse:active{background:var(--theme-surface-surface-container-high)}.button-primary-inverse:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary{color:var(--theme-surface-on-surface);background:var(--theme-secondary-button);backdrop-filter:blur(6px);border:1px solid var(--theme-outline-variant)}.button-secondary:hover,.button-secondary:focus-visible{background:var(--theme-button-secondary-hover);outline:none}.button-secondary:disabled{background:var(--theme-button-states-disabled);color:var(--theme-button-states-on-disabled)}.button-secondary-inverse{color:var(--theme-surface-surface);background:var(--theme-nav-button-hover);backdrop-filter:blur(8px);border:1px solid var(--theme-inverse-outline-variant)}.button-secondary-inverse:hover,.button-secondary-inverse:focus-visible{background:var(--theme-button-secondary-inverse-hover);outline:none}.button-secondary-inverse:disabled{background:var(--palette-grey-1100);color:var(--palette-grey-50-20)}.button-text,.button-nav{background:0 0}.button-text{color:var(--theme-text-on-text)}.button-text:hover,.button-text:focus-visible{background:var(--theme-button-states-hovered);outline:none}.button-text:active{background:var(--theme-button-states-pressed)}.button-text:disabled{color:var(--theme-button-states-on-disabled)}.button-compact{min-block-size:36px;padding:6px 16px}.download-button,.button-nav{font-size:var(--cta-sm-size);line-height:var(--cta-sm-line-height);letter-spacing:var(--cta-sm-letter-spacing);font-weight:450}.button-nav{color:var(--theme-surface-on-surface-variant)}.button-nav:hover,.button-nav:focus-visible{color:#000;background:var(--theme-nav-button-hover);outline:none}@media (width<=767px){.button-nav{width:100%}}.dropdown-nav{padding-right:8px}.dropdown-icon,.play-icon{letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizelegibility;font-feature-settings:"liga";-webkit-font-feature-settings:"liga";font-variation-settings:"FILL" 0, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48;margin:0 0 0 var(--space-xs);transition:transform .3s all;direction:ltr;flex-shrink:0;justify-content:center;align-items:center;font-family:Google Symbols;font-size:1.5em;font-weight:300;line-height:1;display:inline-flex}.dropdown-icon svg,.play-icon svg{fill:currentColor;display:block}.button.dropdown-open .dropdown-icon,.button[aria-expanded=true] .dropdown-icon,.dropdown-open>.dropdown-icon{transform:rotate(-180deg)}.play-icon{font-variation-settings:"FILL" 1, "wght" 300, "GRAD" 0, "ROND" 50, "opsz" 48}@media (width<=1024px){.nav-button{padding:var(--space-md);width:100%}}
-</style><script type="module" src="/_astro/page.LAbJoB63.js"></script>\<style\>@layer starlight.components{.card:where(.astro-tjfwtz2t){--sl-card-border:var(--sl-color-purple);--sl-card-bg:var(--sl-color-purple-low);border:1px solid var(--sl-color-gray-5);background-color:var(--sl-color-black);flex-direction:column;gap:clamp(.5rem,.125rem + 1vw,1rem);padding:clamp(1rem,.125rem + 3vw,2.5rem)}.card:where(.astro-tjfwtz2t):nth-child(4n+1){--sl-card-border:var(--sl-color-orange);--sl-card-bg:var(--sl-color-orange-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+3){--sl-card-border:var(--sl-color-green);--sl-card-bg:var(--sl-color-green-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+4){--sl-card-border:var(--sl-color-red);--sl-card-bg:var(--sl-color-red-low)}.card:where(.astro-tjfwtz2t):nth-child(4n+5){--sl-card-border:var(--sl-color-blue);--sl-card-bg:var(--sl-color-blue-low)}.title:where(.astro-tjfwtz2t){font-weight:600;font-size:var(--sl-text-h4);color:var(--sl-color-white);line-height:var(--sl-line-height-headings);align-items:center;gap:1rem}.card:where(.astro-tjfwtz2t) .icon:where(.astro-tjfwtz2t){border:1px solid var(--sl-card-border);background-color:var(--sl-card-bg);border-radius:.25rem;flex-shrink:0;padding:.2em}.card:where(.astro-tjfwtz2t) .body:where(.astro-tjfwtz2t){font-size:clamp(var(--sl-text-sm), calc(.5rem + 1vw), var(--sl-text-body));margin:0}}
-</style>\<style\>@layer starlight.components{.card-grid:where(.astro-5njella6){grid-template-columns:100%;gap:1rem;display:grid}.card-grid:where(.astro-5njella6)>*{margin-top:0!important}@media (width>=50rem){.card-grid:where(.astro-5njella6){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-5njella6){--stagger-height:5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-5njella6)>:nth-child(2n){transform:translateY(var(--stagger-height))}}}
-</style>\<style\>@layer starlight.components{.sl-link-card:where(.astro-3i5abahx){border:1px solid var(--sl-color-gray-5);box-shadow:var(--sl-shadow-sm);border-radius:.5rem;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;display:grid;position:relative}a:where(.astro-3i5abahx){line-height:var(--sl-line-height-headings);text-decoration:none}a:where(.astro-3i5abahx):before{content:"";position:absolute;inset:0}.stack:where(.astro-3i5abahx){flex-direction:column;gap:.5rem}.title:where(.astro-3i5abahx){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-3i5abahx){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-3i5abahx){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-3i5abahx):hover{background:var(--sl-color-gray-7,var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-3i5abahx):hover .icon:where(.astro-3i5abahx){color:var(--sl-color-white)}}
-</style>\<style\>.models-table-container:where(.astro-ok2r3nzx){margin-bottom:var(--space-xl,24px)}.models-table-container:where(.astro-ok2r3nzx) table:where(.astro-ok2r3nzx).markdown-table td:where(.astro-ok2r3nzx) a:where(.astro-ok2r3nzx):not(.button){color:inherit;text-underline-offset:3px;text-decoration:underline;transition:opacity .2s}.models-table-container:where(.astro-ok2r3nzx) table:where(.astro-ok2r3nzx).markdown-table td:where(.astro-ok2r3nzx) a:where(.astro-ok2r3nzx):not(.button):hover{color:inherit;opacity:.8;text-decoration:underline}.models-table-container:where(.astro-ok2r3nzx) .model-unavailable-dash:where(.astro-ok2r3nzx){color:var(--theme-surface-on-surface-variant,var(--palette-grey-700,#5f6368))}.models-table-container:where(.astro-ok2r3nzx) .model-footnote-marker:where(.astro-ok2r3nzx){color:var(--palette-grey-700,#5f6368);vertical-align:super;margin-left:2px;font-size:.85em;line-height:0}.models-table-container:where(.astro-ok2r3nzx) .models-footnotes:where(.astro-ok2r3nzx){margin-top:12px}.models-table-container:where(.astro-ok2r3nzx) .models-footnotes:where(.astro-ok2r3nzx) .footnote-text:where(.astro-ok2r3nzx){color:var(--theme-surface-on-surface-variant,var(--palette-grey-700,#5f6368));margin:0;font-size:.875rem;line-height:1.5}.models-table-container:where(.astro-ok2r3nzx) .models-footnotes:where(.astro-ok2r3nzx) .footnote-text:where(.astro-ok2r3nzx)+.footnote-text:where(.astro-ok2r3nzx){margin-top:4px}.models-table-container:where(.astro-ok2r3nzx) .models-footnotes:where(.astro-ok2r3nzx) .footnote-text:where(.astro-ok2r3nzx) a:where(.astro-ok2r3nzx){color:inherit;text-underline-offset:2px;text-decoration:underline}.models-table-container:where(.astro-ok2r3nzx) .models-footnotes:where(.astro-ok2r3nzx) .footnote-text:where(.astro-ok2r3nzx) sup:where(.astro-ok2r3nzx){vertical-align:super;font-size:.85em;line-height:0}
-</style>\<style\>@layer starlight.components{.sl-steps{--bullet-size:calc(var(--sl-line-height) * 1rem);--bullet-margin:.375rem;counter-reset:steps-counter var(--sl-steps-start,0);padding-inline-start:0;list-style:none}.sl-steps>li{counter-increment:steps-counter;padding-inline-start:calc(var(--bullet-size) + 1rem);min-height:calc(var(--bullet-size) + var(--bullet-margin));padding-bottom:1px;position:relative}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);top:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);box-shadow:inset 0 0 0 1px var(--sl-color-gray-5);border-radius:99rem;font-weight:600;position:absolute;inset-inline-start:0}.sl-steps>li:after{--guide-width:1px;content:"";top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);width:var(--guide-width);background-color:var(--sl-color-hairline-light);position:absolute;inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2)}}@layer starlight.content{.sl-steps>li>:first-child{--lh:calc(1em * var(--sl-line-height));--shift-y:calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh:calc(1em * var(--sl-line-height-headings))}@supports (--prop:1lh){.sl-steps>li>:first-child{--lh:1lh}}}
-</style>\<style\>@layer starlight.components{starlight-tabs:where(.astro-53dtxyig){display:block}.tablist-wrapper:where(.astro-53dtxyig){overflow-x:auto}:where(.astro-53dtxyig)[role=tablist]{border-bottom:2px solid var(--sl-color-gray-5);padding:0;list-style:none;display:flex}.tab:where(.astro-53dtxyig){display:flex}.tab:where(.astro-53dtxyig)>:where(.astro-53dtxyig)[role=tab]{--sl-tab-color-border:var(--sl-color-gray-5);line-height:var(--sl-line-height-headings);box-shadow:0 2px 0 var(--sl-tab-color-border);color:var(--sl-color-gray-3);outline-offset:var(--sl-outline-offset-inside);overflow-wrap:initial;align-items:center;gap:.5rem;padding:.275rem 1.25rem;text-decoration:none;display:flex}.tab:where(.astro-53dtxyig) :where(.astro-53dtxyig)[role=tab][aria-selected=true]{--sl-tab-color-border:var(--sl-color-text-accent);color:var(--sl-color-white);font-weight:600}.tablist-wrapper:where(.astro-53dtxyig)~[role=tabpanel]{margin-top:1rem}}
-</style></head><body class="astro-c37k36qc"><a class="sl-skip-link astro-kgjdphe6" href="#_top">Skip to content</a><div class="page sl-flex astro-mruzmsw7"><header class="header astro-mruzmsw7"><div class="header-stack astro-mtusqnhg" data-analytics-nav="docs_header"><!-- Row 1: Logo and Search / Controls --><div class="header-main astro-mtusqnhg"><div class="title-wrapper sl-flex astro-mtusqnhg"><a href="/" class="site-title sl-flex astro-3woganpc"><img class="light:sl-hidden print:hidden astro-3woganpc" alt src="/_astro/antigravity_product_lockup_dark.YcYY_PSr.svg" width="1687" height="217"><img class="dark:sl-hidden print:block astro-3woganpc" alt src="/_astro/antigravity_product_lockup_full_color.cUD_Se6a.svg" width="1687" height="217"><span class="sr-only astro-3woganpc" translate="no">Google Antigravity Docs</span></a></div><div class="sl-flex search-wrapper print:hidden astro-mtusqnhg"><site-search id="doc-search-root" class="agy-hybrid-search" data-i18n-ignore="true" data-index-version="6d6ec5be"><button type="button" data-open-modal id="doc-search-trigger" class="agy-search-trigger" aria-label="Search documentation" aria-keyshortcuts="Control+K Meta+K /"><span class="agy-search-trigger__left"><svg class="agy-search-trigger__icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="agy-search-trigger__text">Search<span class="agy-search-trigger__text-suffix"> docs...</span></span></span><kbd class="agy-search-trigger__kbd" aria-hidden="true">⌘K</kbd></button><dialog id="doc-search-modal" class="agy-search-dialog" aria-label="Search"><div class="dialog-frame sl-flex"><div id="starlight__search" class="agy-search-container"><div class="agy-search-header"><div class="agy-search-input-wrap"><svg class="agy-search-input-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="doc-search-input" class="pagefind-ui__search-input" type="search" placeholder="Search documentation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search documentation" aria-controls="doc-search-results-list"><button type="button" class="agy-search-clear" data-clear-search hidden aria-label="Clear search query" title="Clear search"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></button></div><div class="agy-search-header__actions"><button type="button" class="agy-shortcuts-toggle agy-search-help-btn" data-toggle-shortcuts aria-expanded="false" aria-controls="doc-search-shortcuts-panel" aria-label="Keyboard shortcuts" title="Keyboard shortcuts"><span aria-hidden="true">?</span></button><button type="button" data-close-modal class="agy-search-close" aria-label="Close search"><span class="agy-search-close__kbd" aria-hidden="true">ESC</span><span class="agy-search-close__touch" aria-hidden="true">Cancel</span></button></div></div><div class="agy-search-filters" role="toolbar" aria-label="Filter results by product surface"><button type="button" class="agy-surface-pill active" data-surface-filter="all" data-surface-label="All" aria-pressed="true"><span class="agy-surface-pill__label">All</span></button><button type="button" class="agy-surface-pill" data-surface-filter="2-0" data-surface-label="Antigravity App" aria-pressed="false"><span class="agy-surface-pill__label">App</span><span class="agy-surface-pill__mute" data-exclude-surface="2-0" aria-hidden="true" title="Exclude Antigravity App from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="cli" data-surface-label="Antigravity CLI" aria-pressed="false"><span class="agy-surface-pill__label">CLI</span><span class="agy-surface-pill__mute" data-exclude-surface="cli" aria-hidden="true" title="Exclude Antigravity CLI from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="antigravity-ide" data-surface-label="Antigravity IDE" aria-pressed="false"><span class="agy-surface-pill__label">IDE</span><span class="agy-surface-pill__mute" data-exclude-surface="antigravity-ide" aria-hidden="true" title="Exclude Antigravity IDE from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="ide" data-surface-label="IDE Extensions" aria-pressed="false"><span class="agy-surface-pill__label">Extensions</span><span class="agy-surface-pill__mute" data-exclude-surface="ide" aria-hidden="true" title="Exclude IDE Extensions from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="sdk" data-surface-label="Antigravity SDK" aria-pressed="false"><span class="agy-surface-pill__label">SDK</span><span class="agy-surface-pill__mute" data-exclude-surface="sdk" aria-hidden="true" title="Exclude Antigravity SDK from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="blog" data-surface-label="Blog" aria-pressed="false"><span class="agy-surface-pill__label">Blog</span><span class="agy-surface-pill__mute" data-exclude-surface="blog" aria-hidden="true" title="Exclude Blog from results">×</span></button><button type="button" class="agy-surface-pill" data-surface-filter="releases" data-surface-label="Releases" aria-pressed="false"><span class="agy-surface-pill__label">Releases</span><span class="agy-surface-pill__mute" data-exclude-surface="releases" aria-hidden="true" title="Exclude Releases from results">×</span></button></div><div id="doc-search-status" class="agy-search-status" data-search-status data-i18n-ignore="true" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="doc-search-results" class="pagefind-ui__results-area agy-search-results-area" data-results-container data-i18n-ignore="true"><div class="agy-search-suggestions" data-search-suggestions><p class="agy-search-suggestions__heading" data-discovery-heading>Explore Antigravity</p><div class="agy-discover-grid" data-discovery-grid><a class="agy-discover-card agy-search-card" data-doc-card="getting-started" href="/docs/getting-started/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Getting Started</span><span class="agy-discover-card__desc agy-search-card-desc">Install & launch your first agent</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="remote-control" href="/docs/remote-control/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Remote Control</span><span class="agy-discover-card__desc agy-search-card-desc">Drive desktop & CLI sessions from any browser</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="skills" href="/docs/skills/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Agent Skills & Rules</span><span class="agy-discover-card__desc agy-search-card-desc">Reusable workflows & workspace instructions</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="subagents" href="/docs/subagents/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Subagents & Teamwork</span><span class="agy-discover-card__desc agy-search-card-desc">Parallel multi-agent orchestration</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="sdk" href="/docs/sdk/overview/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Antigravity SDK</span><span class="agy-discover-card__desc agy-search-card-desc">Build custom Python agents & hooks</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a><a class="agy-discover-card agy-search-card" data-doc-card="permissions" href="/docs/permissions/"><span class="agy-discover-card__body"><span class="agy-discover-card__title agy-search-card-title">Permissions & Sandbox</span><span class="agy-discover-card__desc agy-search-card-desc">File access controls & safe execution</span></span><span class="agy-discover-card__arrow" aria-hidden="true">→</span></a></div><div class="agy-try-searching"><span class="agy-try-searching__label" data-try-searching-label>Try searching</span><div class="agy-try-searching__chips" data-suggestion-chips><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="Remote Control" data-query="Remote Control">Remote Control</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="agent skills" data-query="agent skills">Agent skills</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="custom subagents" data-query="custom subagents">Custom subagents</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="IDE extensions" data-query="IDE extensions">IDE extensions</button><button type="button" class="agy-suggestion-chip agy-search-chip" data-search-suggestion="sandbox permissions" data-query="sandbox permissions">Sandbox permissions</button></div></div></div><ol id="doc-search-results-list" class="pagefind-ui__results agy-search-results-list" data-results-list data-i18n-ignore="true"></ol></div><div class="agy-related-topics" data-related-topics data-i18n-ignore="true" hidden></div><div id="doc-search-shortcuts-panel" class="agy-search-footer agy-search-help-popover" data-shortcuts-panel hidden><div class="agy-search-footer__hints"><span class="agy-footer-hint">\<kbd\>↑</kbd>\<kbd\>↓</kbd><span data-footer-hint="navigate">Navigate</span></span><span class="agy-footer-hint">\<kbd\>↵</kbd> <span data-footer-hint="open">Open</span></span><span class="agy-footer-hint">\<kbd\>esc</kbd> <span data-footer-hint="close">Close</span></span></div></div></div></div></dialog></site-search><script type="module" src="/_astro/SearchOverride.astro_astro_type_script_index_0_lang.B8vV1dU8.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-mtusqnhg"><div class="header-cta-group astro-mtusqnhg"><a class="top-nav-btn remote-control-btn astro-mtusqnhg" href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" title="Launch Remote Control"><span class="btn-icon astro-mtusqnhg" aria-hidden="true">🚀</span> Remote Control</a><a href="/download" class="call-to-action--nav button button-primary button-compact download-button dropdown-nav" aria-haspopup="false" aria-expanded="false" data-analytics-event="download-cta" data-module-name="header" data-page-position="main nav" class="astro-mtusqnhg"><span>Download</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.979 19.804 4.588 19.413C4.196 19.021 4.00067 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.804 19.021 19.413 19.413C19.021 19.804 18.55 20 18 20H6Z"></path></svg></span></a></div><div class="sl-flex social-icons astro-mtusqnhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div><div class="sl-flex print:hidden docs-lang-wrapper astro-mtusqnhg"><div class="language-selector docs-language-selector astro-mtusqnhg astro-fe4j42sm" data-language-selector data-custom-select-wrapper="language" data-custom-select-open="false" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language"><span class="language-selector__icon astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><circle cx="12" cy="12" r="10" class="astro-fe4j42sm"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" class="astro-fe4j42sm"></path><path d="M2 12h20" class="astro-fe4j42sm"></path></svg></span><span class="language-selector__code astro-fe4j42sm" data-language-code aria-hidden="true" translate="no">EN</span><span class="language-selector__chevron astro-fe4j42sm" aria-hidden="true" translate="no"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="astro-fe4j42sm"><polyline points="6 9 12 15 18 9" class="astro-fe4j42sm"></polyline></svg></span><select class="language-selector__select astro-fe4j42sm" data-language-select tabindex="-1" aria-label="Select language" title="English (United States)"><option value="en-US" selected class="astro-fe4j42sm">English (United States)</option><option value="id" class="astro-fe4j42sm">Bahasa Indonesia (Indonesia)</option><option value="de" class="astro-fe4j42sm">Deutsch (Deutschland)</option><option value="en-CA" class="astro-fe4j42sm">English (Canada)</option><option value="en-GB" class="astro-fe4j42sm">English (United Kingdom)</option><option value="es-ES" class="astro-fe4j42sm">Español (España)</option><option value="es-MX" class="astro-fe4j42sm">Español (México)</option><option value="fr-FR" class="astro-fe4j42sm">Français (France)</option><option value="it" class="astro-fe4j42sm">Italiano (Italia)</option><option value="pl" class="astro-fe4j42sm">Polski (Polska)</option><option value="pt-BR" class="astro-fe4j42sm">Português (Brasil)</option><option value="hi" class="astro-fe4j42sm">हिन्दी (भारत)</option><option value="th" class="astro-fe4j42sm">ไทย (ประเทศไทย)</option><option value="ja" class="astro-fe4j42sm">日本語 (日本)</option><option value="zh-CN" class="astro-fe4j42sm">简体中文 (中国)</option><option value="zh-TW" class="astro-fe4j42sm">繁體中文 (台灣)</option><option value="ko" class="astro-fe4j42sm">한국어 (대한민국)</option></select></div>\<script\>
-  (function () {
-    try {
-      var valid = [
-        'en-US',
-        'id',
-        'de',
-        'en-CA',
-        'en-GB',
-        'es-ES',
-        'es-MX',
-        'fr-FR',
-        'it',
-        'pl',
-        'pt-BR',
-        'hi',
-        'th',
-        'ja',
-        'zh-CN',
-        'zh-TW',
-        'ko',
-      ];
-      var shortLabels = {
-        'en-US': 'EN',
-        'en-GB': 'EN-GB',
-        'en-CA': 'EN-CA',
-        hi: 'HI',
-        ja: 'JA',
-        ko: 'KO',
-        'zh-CN': 'ZH-CN',
-        'zh-TW': 'ZH-TW',
-        id: 'ID',
-        th: 'TH',
-        de: 'DE',
-        'fr-FR': 'FR',
-        it: 'IT',
-        pl: 'PL',
-        'pt-BR': 'PT',
-        'es-ES': 'ES',
-        'es-MX': 'ES-MX',
-      };
-      var active = window.__agyActiveLocale;
-      if (!active) {
-        var stored = window.localStorage.getItem('antigravity_locale');
-        active = 'en-US';
-        if (stored !== null) {
-          if (valid.indexOf(stored) !== -1) {
-            active = stored;
-          } else {
-            window.localStorage.setItem('antigravity_locale', 'en-US');
-            active = 'en-US';
-          }
-        } else {
-          var langs =
-            navigator.languages && navigator.languages.length
-              ? navigator.languages
-              : [navigator.language || 'en-US'];
-          for (var i = 0; i < langs.length; i++) {
-            var raw = String(langs[i] || '')
-              .trim()
-              .replace(/_/g, '-');
-            if (!raw) continue;
-            var lower = raw.toLowerCase();
-            var exactIdx = -1;
-            for (var j = 0; j < valid.length; j++) {
-              if (valid[j].toLowerCase() === lower) {
-                exactIdx = j;
-                break;
-              }
-            }
-            if (exactIdx !== -1) {
-              active = valid[exactIdx];
-              break;
-            }
-            var parts = lower.split('-');
-            var base = parts[0];
-            var subtag = parts[1] || '';
-            var region = parts[2] || subtag;
-            if (base === 'zh') {
-              active =
-                subtag === 'tw' ||
-                subtag === 'hk' ||
-                subtag === 'mo' ||
-                subtag === 'hant' ||
-                region === 'tw' ||
-                region === 'hk' ||
-                region === 'mo'
-                  ? 'zh-TW'
-                  : 'zh-CN';
-              break;
-            }
-            if (base === 'id' || base === 'in') {
-              active = 'id';
-              break;
-            }
-            if (base === 'th') {
-              active = 'th';
-              break;
-            }
-            if (base === 'it') {
-              active = 'it';
-              break;
-            }
-            if (base === 'pl') {
-              active = 'pl';
-              break;
-            }
-            if (base === 'es') {
-              active = subtag === 'es' ? 'es-ES' : 'es-MX';
-              break;
-            }
-            if (base === 'pt') {
-              active = 'pt-BR';
-              break;
-            }
-            if (base === 'fr') {
-              active = 'fr-FR';
-              break;
-            }
-            if (base === 'de') {
-              active = 'de';
-              break;
-            }
-            if (base === 'ja') {
-              active = 'ja';
-              break;
-            }
-            if (base === 'ko') {
-              active = 'ko';
-              break;
-            }
-            if (base === 'hi') {
-              active = 'hi';
-              break;
-            }
-            if (base === 'en') {
-              active =
-                subtag === 'gb' ||
-                subtag === 'uk' ||
-                subtag === 'au' ||
-                subtag === 'nz' ||
-                subtag === 'ie'
-                  ? 'en-GB'
-                  : subtag === 'ca'
-                    ? 'en-CA'
-                    : 'en-US';
-              break;
-            }
-          }
-          if (active !== 'en-US') {
-            window.localStorage.setItem('antigravity_locale', active);
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'language_auto_detect',
-              eventParams: {
-                locale: active,
-                browserLanguage: langs[0] || '',
-                pagePath: window.location.pathname,
-              },
-            });
-            window.dataLayer.push({ eventParams: undefined });
-          }
-        }
-        window.__agyActiveLocale = active;
-      }
-      if (document.documentElement.lang !== active) {
-        document.documentElement.lang = active;
-      }
-      var selects = document.querySelectorAll('select[data-language-select]');
-      for (var k = 0; k < selects.length; k++) {
-        if (selects[k].value !== active) {
-          selects[k].value = active;
-        }
-      }
-      var codes = document.querySelectorAll('[data-language-code]');
-      var shortCode = shortLabels[active] || 'EN';
-      for (var m = 0; m < codes.length; m++) {
-        if (codes[m].textContent !== shortCode) {
-          codes[m].textContent = shortCode;
-        }
-      }
-    } catch (e) {
-      document.documentElement.lang = 'en-US';
-    }
-  })();
-</script><script type="module" src="/_astro/LanguageSelector.astro_astro_type_script_index_0_lang.Ckg9YHql.js"></script></div></div><!-- Row 2: Subnav Bar below logo and controls (Get Started, Features, etc.) --><nav class="subnav-bar print:hidden astro-mtusqnhg" aria-label="Documentation sections"><div class="subnav-container astro-mtusqnhg"><div class="subnav-left astro-mtusqnhg"><a href="/docs/overview/" class="subnav-pill active astro-mtusqnhg" aria-current="page">Get Started</a><a href="/docs/features/" class="subnav-pill astro-mtusqnhg">Features</a><a href="/docs/sdk/overview/" class="subnav-pill astro-mtusqnhg">SDK</a></div><div class="subnav-right astro-mtusqnhg"><a href="/docs/changelog/" class="subnav-pill astro-mtusqnhg">Changelog</a><a href="/blog/" class="subnav-pill external-link blog-link astro-mtusqnhg">Blog <span class="arrow astro-mtusqnhg" aria-hidden="true">↗</span></a></div></div></nav><!-- Row 3: Dismissible Top Banners under Docs Menu --><div class="docs-top-banner-slot print:hidden astro-mtusqnhg" data-docs-announcement-slot="top-banner"><script type="module" src="/_astro/AnnouncementPill.astro_astro_type_script_index_0_lang.kU0csqlr.js"></script><div class="announcement-pill announcement-pill--surface-docs announcement-pill--host-docs announcement-pill--placement-top-banner announcement-pill--dark is-interactive astro-mtusqnhg astro-pyiv6lj6" role="region" aria-label="New announcement" data-announcement-pill data-pill-surface="docs" data-pill-host-surface="docs" data-pill-placement="top-banner" data-pill-variant="dark" data-pill-icon-name="spark" data-pill-badge="New" data-cta-text="Learn more" data-destination="/blog/gemini-4-argon-in-google-antigravity" data-pill-storage-key="agy_announcement_dismissed_docs" data-pill-fingerprint="New|Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity|/blog/gemini-4-argon-in-google-antigravity" data-pill-ttl-ms="604800000" data-analytics-event="announcement-pill" data-module-name="docs_top_banner" data-page-position="top-banner"><a href="/blog/gemini-4-argon-in-google-antigravity" class="pill-main-link astro-pyiv6lj6" data-pill-link><span class="pill-badge astro-pyiv6lj6" data-pill-badge><span class="pill-icon astro-pyiv6lj6" data-pill-icon aria-hidden="true"><svg class="pill-spark-icon astro-pyiv6lj6" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M8 0.5C8.5 4.6 11.4 7.5 15.5 8C11.4 8.5 8.5 11.4 8 15.5C7.5 11.4 4.6 8.5 0.5 8C4.6 7.5 7.5 4.6 8 0.5Z" fill="currentColor" class="astro-pyiv6lj6"></path></svg></span><span class="pill-badge-label astro-pyiv6lj6" data-pill-badge-label>New</span></span><span class="pill-text astro-pyiv6lj6" data-pill-text>Gemini 4 Argon available for Google AI Pro and Ultra in Google Antigravity</span><span class="pill-cta astro-pyiv6lj6" data-pill-cta><span class="pill-cta-label astro-pyiv6lj6" data-pill-cta-label>Learn more</span><svg class="pill-arrow astro-pyiv6lj6" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="astro-pyiv6lj6"></path></svg></span></a><button type="button" class="pill-dismiss astro-pyiv6lj6" data-pill-dismiss data-analytics-event="" aria-label="Dismiss New announcement" title="Dismiss announcement"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true" class="astro-pyiv6lj6"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="astro-pyiv6lj6"></path></svg></button></div>\<script\>
-        (() => {
-          try {
-            const pills = document.querySelectorAll(
-              '[data-announcement-pill]:not([data-prechecked])',
-            );
-            pills.forEach((pill) => {
-              pill.setAttribute('data-prechecked', 'true');
-              const key = pill.getAttribute('data-pill-storage-key');
-              const fp = pill.getAttribute('data-pill-fingerprint');
-              if (!key) return;
-              const raw = window.localStorage.getItem(key);
-              if (!raw) return;
-              const parsed = JSON.parse(raw);
-              if (
-                parsed &&
-                parsed.fingerprint === fp &&
-                typeof parsed.expiresAt === 'number' &&
-                Date.now() < parsed.expiresAt
-              ) {
-                pill.hidden = true;
-                pill.setAttribute('data-pill-dismissed', 'true');
-              }
-            });
-
-            const homeSlot = document.querySelector('[data-home-banner-slot]');
-            if (homeSlot) {
-              const visibleHome = homeSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleHome.length === 0) {
-                document.documentElement.style.setProperty(
-                  '--home-banner-offset',
-                  '0px',
-                );
-              } else {
-                const slotHeightPx = Math.ceil(
-                  homeSlot.getBoundingClientRect().height,
-                );
-                if (slotHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--home-banner-offset',
-                    `${slotHeightPx}px`,
-                  );
-                }
-              }
-            }
-
-            const docsSlot = document.querySelector(
-              '[data-docs-announcement-slot="top-banner"]',
-            );
-            const docsHeader = document.querySelector('header.header');
-            if (docsSlot && docsHeader) {
-              const visibleDocs = docsSlot.querySelectorAll(
-                '[data-announcement-pill]:not([hidden])',
-              );
-              if (visibleDocs.length === 0) {
-                document.documentElement.style.removeProperty(
-                  '--sl-nav-height',
-                );
-              } else {
-                const headerHeightPx = Math.ceil(
-                  docsHeader.getBoundingClientRect().height,
-                );
-                if (headerHeightPx > 0) {
-                  document.documentElement.style.setProperty(
-                    '--sl-nav-height',
-                    `${headerHeightPx}px`,
-                    'important',
-                  );
-                }
-              }
-            }
-          } catch {}
-        })();
-      </script></div></div></header><nav class="sidebar print:hidden astro-mruzmsw7" aria-label="Main"><starlight-menu-button class="print:hidden astro-mwbvl5vk"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-mwbvl5vk"><svg aria-hidden="true" class="open-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-mwbvl5vk astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-mruzmsw7"><div class="sidebar-content sl-flex astro-mruzmsw7"><div class="sidebar-wrapper astro-s3sbtxwf" data-default-section="get-started" data-analytics-nav="docs_sidebar"><sl-sidebar-state-persist data-hash="0jnks46" class="astro-guximn66"><script aria-hidden="true">
-		(() => {
-			try {
-				if (!matchMedia('(min-width: 50em)').matches) return;
-				/** @type {HTMLElement | null} */
-				const target = document.querySelector('sl-sidebar-state-persist');
-				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
-				if (!target || !state || target.dataset.hash !== state.hash) return;
-				window._starlightScrollRestore = state.scroll;
-				customElements.define(
-					'sl-sidebar-restore',
-					class SidebarRestore extends HTMLElement {
-						connectedCallback() {
-							try {
-								const idx = parseInt(this.dataset.index || '');
-								const details = this.closest('details');
-								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
-							} catch {}
-						}
-					}
-				);
-			} catch {}
-		})();
-	</script><div class="sidebar-sections is-active astro-s3sbtxwf" data-sidebar-section="get-started"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Get Started</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/getting-started/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/install/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Authenticate</span></a></li><li class="astro-stlrkwvc"><a href="/docs/models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Choose a model</span></a></li><li class="astro-stlrkwvc"><a href="/docs/build-with-google/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Build with Google</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">IDE Extensions</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/vscode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio Code</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/visual-studio/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/jetbrains/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">JetBrains IDEs</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/zed/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Zed</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/extensions/xcode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Xcode</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">CLI reference</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/reference/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI commands</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI features</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/using/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI settings and tips</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/troubleshooting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI troubleshooting</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/best-practices/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI best practices</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">CLI AI credits</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Migrations</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/gcli-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Gemini CLI</span></a></li><li class="astro-stlrkwvc"><a href="/docs/firebase-studio-migration/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Firebase Studio</span></a></li><li class="astro-stlrkwvc"><a href="/docs/migration/workflows-to-skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Workflows to Skills</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">Resources</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/plans/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plans</span></a></li><li class="astro-stlrkwvc"><a href="/docs/enterprise/" aria-current="page" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Enterprise Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/faq/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">FAQ</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="features"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">LEARN</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/features/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/remote-control/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Remote Control</span></a></li><li class="astro-stlrkwvc"><a href="/docs/marketplace/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Marketplace</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plugins/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plugins</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sandbox/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal sandbox</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/review-changes-editor/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Review changes</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Terminal</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/cli/modes/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Execution modes</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/headless/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Headless mode</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line customization</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Terminal title customization</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Browser</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/browser-recordings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser recordings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/allowlist-denylist/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Allowlist and denylist</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/separate-chrome-profile/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Separate Chrome profile</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Artifacts</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/implementation-plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Implementation plan</span></a></li><li class="astro-stlrkwvc"><a href="/docs/walkthrough/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Walkthrough</span></a></li><li class="astro-stlrkwvc"><a href="/docs/screenshots/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Visual screenshots</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/artifacts/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reviewing artifacts (CLI)</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Projects</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/projects/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/prompting/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Prompting and interaction</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/conversations/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Managing conversations</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Permissions</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Editor features</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/ide/tab/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tab completion</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/agent-side-panel/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent side panel</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Task groups</span></a></li></ul></details></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Settings</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="6"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/agent-settings/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent settings</span></a></li><li class="astro-stlrkwvc"><a href="/docs/artifact-review/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Artifact review</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/vim-editor-mode/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Vim editor mode</span></a></li></ul></details></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">SLASH COMMANDS</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/slash-commands/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/agents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agents (/agents)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/boost/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Boost (/boost)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/browser/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Browser (/browser)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/btw/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Side question (/btw)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/changelog/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Changelog (/changelog)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/codesearch/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Code search (/codesearch)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/context/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Context (/context)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/credits/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">AI credits (/credits)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/diff/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Diff (/diff)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/effort/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Reasoning effort (/effort)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/goal/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Goal (/goal)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/learn/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Learn (/learn)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/permissions/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Permissions (/permissions)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/plan/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Plan (/plan)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/resume/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Resume (/resume)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/commands/schedule/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Schedule (/schedule)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/statusline/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Status line (/statusline)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/teamwork/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Teamwork (/teamwork-preview)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/title/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Window title (/title)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/usage/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Model quotas (/usage)</span></a></li><li class="astro-stlrkwvc"><a href="/docs/cli/commands/voice/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Voice dictation (/voice)</span></a></li></ul></section><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">EXTEND</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><details class="astro-stlrkwvc"><summary class="astro-stlrkwvc"><span class="group-label astro-stlrkwvc"><span class="large astro-stlrkwvc">Skills</span></span><svg aria-hidden="true" class="caret astro-stlrkwvc astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="7"></sl-sidebar-restore><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/skills/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Agent skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/rules/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Rules</span></a></li><li class="astro-stlrkwvc"><a href="/docs/ide/workflows/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">IDE workflows</span></a></li></ul></details></li><li class="astro-stlrkwvc"><a href="/docs/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Custom subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/hooks/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle hooks</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sidecars/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Sidecars</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="sdk"><section class="sidebar-group-section astro-s3sbtxwf"><h2 class="sidebar-section-heading astro-s3sbtxwf">ANTIGRAVITY SDK</h2><ul class="astro-stlrkwvc"><li class="astro-stlrkwvc"><a href="/docs/sdk/overview/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Overview and quickstart</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/local-models/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Local models</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/personas/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Personas</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/tools/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Tools and skills</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/mcp/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">MCP</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/policies/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Policies</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/subagents/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Subagents</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/structured-output/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Structured output</span></a></li><li class="astro-stlrkwvc"><a href="/docs/sdk/lifecycle/" class="astro-stlrkwvc"><span class="astro-stlrkwvc">Lifecycle and hooks</span></a></li></ul></section></div><div class="sidebar-sections astro-s3sbtxwf" data-sidebar-section="changelog"></div><script aria-hidden="true">
-		(() => {
-			const scroller = document.getElementById('starlight__sidebar');
-			if (!window._starlightScrollRestore || !scroller) return;
-			scroller.scrollTop = window._starlightScrollRestore;
-			delete window._starlightScrollRestore;
-		})();
-	</script></sl-sidebar-state-persist><div class="md:sl-hidden astro-s3sbtxwf"><div class="mobile-preferences sl-flex astro-vpdi4hhg"><div class="social-icons astro-vpdi4hhg"></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-ebngfqm6"><span class="sr-only astro-ebngfqm6">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-ebngfqm6"><option value="dark" class="astro-ebngfqm6">Dark</option><option value="light" class="astro-ebngfqm6">Light</option><option value="auto" selected class="astro-ebngfqm6">Auto</option></select><svg aria-hidden="true" class="icon caret astro-ebngfqm6 astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select>\<script\>
-	StarlightThemeProvider.updatePickers();
-</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></div></div></div></nav><div class="main-frame astro-mruzmsw7"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-ro3y4cfw"><aside class="right-sidebar-container print:hidden astro-ro3y4cfw"><div class="right-sidebar astro-ro3y4cfw"><div class="lg:sl-hidden astro-cnunmcpo"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-sgnutmzh"><nav aria-labelledby="starlight__on-this-page--mobile" data-analytics-nav="docs_toc" class="astro-sgnutmzh"><details id="starlight__mobile-toc" class="astro-sgnutmzh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-sgnutmzh"><span class="toggle sl-flex astro-sgnutmzh">On this page<svg aria-hidden="true" class="caret astro-sgnutmzh" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="
-             m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1
-             1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002
-             1.002 0 0 0 0-1.42Z
-            " class="astro-sgnutmzh"></path></svg></span><span class="display-current astro-sgnutmzh"></span></summary><div class="dropdown astro-sgnutmzh"><ul class="isMobile astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#_top" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview</span></a></li><li class="astro-sgnutmzh"><a href="#overview-and-key-benefits" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Overview and key benefits</span></a></li><li class="astro-sgnutmzh"><a href="#sign-in-and-license-selection" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Sign in and license selection</span></a></li><li class="astro-sgnutmzh"><a href="#sign-in-workflow" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Sign-in workflow</span></a></li><li class="astro-sgnutmzh"><a href="#configuring-bring-your-own-identity-byoid" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Configuring Bring Your Own Identity (BYOID)</span></a></li><li class="astro-sgnutmzh"><a href="#setting-up-application-default-credentials-adc" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Setting up Application Default Credentials (ADC)</span></a></li><li class="astro-sgnutmzh"><a href="#how-adc-resolves-credentials-project-and-location" class="astro-sgnutmzh"><span class="astro-sgnutmzh">How ADC resolves credentials, project, and location</span></a></li><li class="astro-sgnutmzh"><a href="#supported-models-in-gemini-enterprise" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Supported models in Gemini Enterprise</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#selecting-models-and-thinking-levels" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Selecting models and thinking levels</span></a></li><li class="astro-sgnutmzh"><a href="#architectural-transparency-hybrid-execution" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Architectural transparency: Hybrid execution</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#autonomous-tool-permissions-and-human-in-the-loop-controls" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Autonomous tool permissions and human-in-the-loop controls</span></a></li><li class="astro-sgnutmzh"><a href="#administrator-setup-guide" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Administrator setup guide</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#gemini-enterprise-subscription-setup" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Gemini Enterprise subscription setup</span></a></li><li class="astro-sgnutmzh"><a href="#google-cloud-project-and-api-setup" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Google Cloud project and API setup</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#regional-endpoints-and-network-allowlists" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Regional endpoints and network allowlists</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#regional-endpoints" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Regional endpoints</span></a></li><li class="astro-sgnutmzh"><a href="#network-allowlists-and-mtls-endpoints" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Network allowlists and mTLS endpoints</span></a></li><li class="astro-sgnutmzh"><a href="#private-service-connect-psc-for-regional-endpoints" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Private Service Connect (PSC) for regional endpoints</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#security-and-governance" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Security and governance</span></a></li><li class="astro-sgnutmzh"><a href="#troubleshooting-and-diagnostics" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Troubleshooting and diagnostics</span></a><ul class="astro-sgnutmzh"><li class="astro-sgnutmzh"><a href="#common-sign-in-and-license-issues" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Common sign-in and license issues</span></a></li><li class="astro-sgnutmzh"><a href="#important-api-provisioning-advisory" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Important API provisioning advisory</span></a></li><li class="astro-sgnutmzh"><a href="#sharing-diagnostics-with-support" class="astro-sgnutmzh"><span class="astro-sgnutmzh">Sharing diagnostics with support</span></a></li></ul></li><li class="astro-sgnutmzh"><a href="#whats-next" class="astro-sgnutmzh"><span class="astro-sgnutmzh">What’s next</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){if(e===this._current)return;this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e;let t=this.querySelector(`.display-current`);t&&(t.textContent=e.textContent)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=this.querySelector(`details`),t=()=>{e&&e.open&&(e.open=!1)};if(e){let n=n=>{e.open&&(e.contains(n.target)||t())},r=n=>{n.key===`Escape`&&e.open&&(t(),e.querySelector(`summary`)?.focus())};window.addEventListener(`click`,n,{passive:!0}),window.addEventListener(`keydown`,r),this._cleanup.push(()=>{window.removeEventListener(`click`,n),window.removeEventListener(`keydown`,r)})}let n=Array.from(this.querySelectorAll(`a`));if(!n.length)return;let r=[],i=new Map,a=document.getElementById(`_top`);if(a){let e=n.find(e=>e.hash===`#_top`);if(e){i.set(`_top`,e);let t=e.closest(`li`);t&&r.push({link:e,li:t,heading:a,tabpanel:null,surfacePane:null})}}n.forEach(e=>{let t=decodeURIComponent(e.hash.slice(1));if(!t||t===`_top`)return;let n=document.getElementById(t),a=e.closest(`li`);if(n&&a){i.set(t,e);let o=n.closest(`[role="tabpanel"]`),s=n.closest(`.surface-pane`);r.push({link:e,li:a,heading:n,tabpanel:o,surfacePane:s})}});let o=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,s=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},c=!1,l=()=>{c||(c=!0,requestAnimationFrame(u))},u=()=>{c=!1;let e=r.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!o(e.tabpanel)&&!s(e.surfacePane));if(!e.length)return;let t=e[0];if(window.scrollY>10)for(let n of e)if(n.heading.getBoundingClientRect().top<=130)t=n;else break;let n=i.get(t.heading.id);n&&(this.current=n)},d=(e=!1)=>{r.forEach(e=>{let t=o(e.tabpanel)||s(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?u():l()},f=e=>{let n=e.target?.closest(`a`);if(!n||!this.contains(n))return;t();let r=decodeURIComponent(n.hash.slice(1));if(!r)return;let i=document.getElementById(r);if(i){let e=i.closest(`.surface-pane[data-surface-pane]`);if(e&&s(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{d()}))}let t=i.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{d()}))}}}};this.addEventListener(`click`,f),this._cleanup.push(()=>{this.removeEventListener(`click`,f)});let p=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(p.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{d()},0)})};this._observer=new MutationObserver(n),p.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=l,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),d(!0)}};customElements.get(`mobile-starlight-toc`)||customElements.define(`mobile-starlight-toc`,e);</script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-cnunmcpo"><div class="sl-container astro-cnunmcpo"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page" data-analytics-nav="docs_toc"><h2 id="starlight__on-this-page">On this page</h2><ul class="starlight-toc-list">\<li\><a href="#_top"><span>Overview</span></a></li>\<li\><a href="#overview-and-key-benefits"><span>Overview and key benefits</span></a></li>\<li\><a href="#sign-in-and-license-selection"><span>Sign in and license selection</span></a></li>\<li\><a href="#sign-in-workflow"><span>Sign-in workflow</span></a></li>\<li\><a href="#configuring-bring-your-own-identity-byoid"><span>Configuring Bring Your Own Identity (BYOID)</span></a></li>\<li\><a href="#setting-up-application-default-credentials-adc"><span>Setting up Application Default Credentials (ADC)</span></a></li>\<li\><a href="#how-adc-resolves-credentials-project-and-location"><span>How ADC resolves credentials, project, and location</span></a></li>\<li\><a href="#supported-models-in-gemini-enterprise"><span>Supported models in Gemini Enterprise</span></a>\<ul\>\<li\><a href="#selecting-models-and-thinking-levels"><span>Selecting models and thinking levels</span></a></li>\<li\><a href="#architectural-transparency-hybrid-execution"><span>Architectural transparency: Hybrid execution</span></a></li></ul></li>\<li\><a href="#autonomous-tool-permissions-and-human-in-the-loop-controls"><span>Autonomous tool permissions and human-in-the-loop controls</span></a></li>\<li\><a href="#administrator-setup-guide"><span>Administrator setup guide</span></a>\<ul\>\<li\><a href="#gemini-enterprise-subscription-setup"><span>Gemini Enterprise subscription setup</span></a></li>\<li\><a href="#google-cloud-project-and-api-setup"><span>Google Cloud project and API setup</span></a></li></ul></li>\<li\><a href="#regional-endpoints-and-network-allowlists"><span>Regional endpoints and network allowlists</span></a>\<ul\>\<li\><a href="#regional-endpoints"><span>Regional endpoints</span></a></li>\<li\><a href="#network-allowlists-and-mtls-endpoints"><span>Network allowlists and mTLS endpoints</span></a></li>\<li\><a href="#private-service-connect-psc-for-regional-endpoints"><span>Private Service Connect (PSC) for regional endpoints</span></a></li></ul></li>\<li\><a href="#security-and-governance"><span>Security and governance</span></a></li>\<li\><a href="#troubleshooting-and-diagnostics"><span>Troubleshooting and diagnostics</span></a>\<ul\>\<li\><a href="#common-sign-in-and-license-issues"><span>Common sign-in and license issues</span></a></li>\<li\><a href="#important-api-provisioning-advisory"><span>Important API provisioning advisory</span></a></li>\<li\><a href="#sharing-diagnostics-with-support"><span>Sharing diagnostics with support</span></a></li></ul></li>\<li\><a href="#whats-next"><span>What’s next</span></a></li></ul></nav></starlight-toc><script type="module">var e=class extends HTMLElement{_current=null;_onScroll=null;_observer=null;_cleanup=[];set current(e){e!==this._current&&(this._current&&this._current.removeAttribute(`aria-current`),e.setAttribute(`aria-current`,`true`),this._current=e)}connectedCallback(){this.init()}disconnectedCallback(){this._onScroll&&=(window.removeEventListener(`scroll`,this._onScroll),null),this._observer&&=(this._observer.disconnect(),null),this._cleanup.forEach(e=>e()),this._cleanup=[]}init=()=>{let e=Array.from(this.querySelectorAll(`a`));if(!e.length)return;let t=[],n=new Map,r=document.getElementById(`_top`);if(r){let i=e.find(e=>e.hash===`#_top`);if(i){n.set(`_top`,i);let e=i.closest(`li`);e&&t.push({link:i,li:e,heading:r,tabpanel:null,surfacePane:null})}}e.forEach(e=>{let r=decodeURIComponent(e.hash.slice(1));if(!r||r===`_top`)return;let i=document.getElementById(r),a=e.closest(`li`);if(i&&a){n.set(r,e);let o=i.closest(`[role="tabpanel"]`),s=i.closest(`.surface-pane`);t.push({link:e,li:a,heading:i,tabpanel:o,surfacePane:s})}});let i=e=>e?e.hidden||e.hasAttribute(`hidden`)||e.style.display===`none`:!1,a=e=>{if(!e)return!1;if(e.hidden||e.hasAttribute(`hidden`))return!0;if(e.style.display)return e.style.display===`none`;let t=e.getAttribute(`data-surface-pane`);return t?t!==`hub`:getComputedStyle(e).display===`none`},o=!1,s=()=>{o||(o=!0,requestAnimationFrame(c))},c=()=>{if(o=!1,window.innerWidth<800||this.offsetParent===null)return;let e=t.filter(e=>e.heading.id===`_top`||!e.heading.hidden&&e.heading.style.display!==`none`&&!i(e.tabpanel)&&!a(e.surfacePane));if(!e.length)return;let r=e[0];if(window.scrollY>10)for(let t of e)if(t.heading.getBoundingClientRect().top<=130)r=t;else break;let s=n.get(r.heading.id);s&&(this.current=s)},l=(e=!1)=>{window.innerWidth<800||(t.forEach(e=>{let t=i(e.tabpanel)||a(e.surfacePane),n=t?`none`:``;e.li.style.display!==n&&(e.li.style.display=n),t?e.li.getAttribute(`data-tab-hidden`)!==`true`&&e.li.setAttribute(`data-tab-hidden`,`true`):e.li.hasAttribute(`data-tab-hidden`)&&e.li.removeAttribute(`data-tab-hidden`)}),e?c():s())},u=e=>{let t=e.target?.closest(`a`);if(!t||!this.contains(t))return;let n=decodeURIComponent(t.hash.slice(1));if(!n)return;let r=document.getElementById(n);if(r){let e=r.closest(`.surface-pane[data-surface-pane]`);if(e&&a(e)){let t=e.getAttribute(`data-surface-pane`);t&&(document.querySelector(`.surface-card-btn[data-surface-id="${t}"]`)?.click(),requestAnimationFrame(()=>{l()}))}let t=r.closest(`starlight-tabs [role="tabpanel"]`);if(t){let e=t.closest(`starlight-tabs`);if(e){let n=Array.from(e.querySelectorAll(`:scope > [role="tabpanel"]`)).indexOf(t);n!==-1&&(e.querySelectorAll(`[role="tab"]`)[n]?.click(),requestAnimationFrame(()=>{l()}))}}}};this.addEventListener(`click`,u),this._cleanup.push(()=>{this.removeEventListener(`click`,u)});let d=document.querySelectorAll(`[role="tabpanel"], .surface-pane`);if(d.length>0){let e=0,t,n=()=>{e||=requestAnimationFrame(()=>{e=0,clearTimeout(t),t=setTimeout(()=>{l()},0)})};this._observer=new MutationObserver(n),d.forEach(e=>{this._observer?.observe(e,{attributes:!0,attributeFilter:[`hidden`,`style`,`class`]})}),document.addEventListener(`ag-surface-changed`,n),this._cleanup.push(()=>{document.removeEventListener(`ag-surface-changed`,n)})}this._onScroll=s,window.addEventListener(`scroll`,this._onScroll,{passive:!0}),l(!0)}};customElements.get(`starlight-toc`)||customElements.define(`starlight-toc`,e);</script></div></div></div></aside><div class="main-pane astro-ro3y4cfw"><main data-pagefind-body class="astro-c37k36qc" lang="en" dir="ltr"><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="pagefind-search-meta sr-only astro-hkwnjoai" data-i18n-ignore="true"><span data-pagefind-meta="title" class="astro-hkwnjoai">Enterprise</span><span data-pagefind-meta="surface" class="astro-hkwnjoai">2-0</span><span data-pagefind-meta="surfaceLabel" class="astro-hkwnjoai">Antigravity App</span><span data-pagefind-meta="section" class="astro-hkwnjoai">Get Started</span><span data-pagefind-weight="6" class="astro-hkwnjoai">Enterprise Antigravity App Get Started</span><span data-pagefind-filter="surface:2-0" class="astro-hkwnjoai">Antigravity App</span></div><div class="breadcrumbs-row astro-hkwnjoai" data-pagefind-ignore><nav aria-label="Breadcrumb" class="starlight-breadcrumbs astro-hkwnjoai"><span class="breadcrumb-item  astro-hkwnjoai" title="Get Started">Get Started</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item  astro-hkwnjoai" title="Resources">Resources</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="breadcrumb-separator astro-hkwnjoai" aria-hidden="true"><polyline points="9 18 15 12 9 6" class="astro-hkwnjoai"></polyline></svg><span class="breadcrumb-item breadcrumb-last astro-hkwnjoai" title="Enterprise Overview">Enterprise Overview</span></nav><div id="md-actions-root" class="markdown-dropdown-wrapper astro-pyacvpuh" data-pathname="/docs/enterprise/"><button type="button" class="call-to-action--nav button button-primary button-compact markdown-trigger-btn dropdown-nav" aria-haspopup="true" aria-expanded="false" aria-label="Markdown Options" class="astro-pyacvpuh"><span>Markdown</span><span class="dropdown-icon" translate="no"><svg class viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 15L7.05 10.05L8.45 8.65L12 12.2L15.55 8.65L16.95 10.05L12 15Z"></path></svg></span></button><div class="markdown-dropdown-menu astro-pyacvpuh" data-md-menu hidden><button type="button" class="markdown-menu-item astro-pyacvpuh" data-copy-md><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M318.46-230.77q-23.53,0-40.61-17.08t-17.08-40.61V-802.31q0-23.53 17.08-40.61T318.46-860H712.31q23.53,0 40.61,17.08T770-802.31v513.84q0,23.53-17.08,40.61t-40.61,17.08H318.46Zm0-45.38H712.31q4.62,0 8.46-3.85t3.85-8.46V-802.31q0-4.62-3.85-8.46t-8.46-3.85H318.46q-4.62,0-8.46,3.85t-3.85,8.46v513.84q0,4.62 3.85,8.46t8.46,3.85ZM207.69-120q-23.53,0-40.61-17.08T150-177.7V-736.92h45.38V-177.7q0,4.62 3.85,8.46t8.46,3.85H646.92V-120H207.69Zm98.46-156.15q0,0 0-3.85t0-8.46V-802.31q0-4.62 0-8.46t0-3.85q0,0 0,3.85t0,8.46v513.84q0,4.62 0,8.46t0,3.85Z"></path></svg><span class="item-label astro-pyacvpuh">Copy Markdown</span></button><a href="#" data-view-md-link target="_blank" rel="noopener noreferrer" class="markdown-menu-item astro-pyacvpuh"><svg class="icon astro-pyacvpuh" viewBox="0 -960 960 960" width="16px" height="16px" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M197.69-140q-23.53,0-40.61-17.08T140-197.69V-762.31q0-23.53 17.08-40.61T197.69-820H449.38v45.38H197.69q-4.62,0-8.46,3.85t-3.85,8.46v564.61q0,4.62 3.85,8.46t8.46,3.85H762.31q4.62,0 8.46-3.85t3.85-8.46V-449.38H820v251.69q0,23.53-17.08,40.61T762.31-140H197.69ZM384.31-351.69l-32-32.61L742.62-774.61H530.15V-820H820v289.84H774.61V-742L384.31-351.69Z"></path></svg><span class="item-label astro-pyacvpuh">View Markdown</span></a></div></div><script type="module">function e(){document.querySelectorAll(`.markdown-dropdown-wrapper`).forEach(e=>{if(e.dataset.mdInitialized===`true`)return;e.dataset.mdInitialized=`true`;let t=e.querySelector(`.markdown-trigger-btn, .button`),n=e.querySelector(`[data-md-menu]`),r=e.querySelector(`[data-copy-md]`),i=e.querySelector(`[data-view-md-link]`),a=`${(e.dataset.pathname||window.location.pathname).replace(/\/$/,``)}.md`;i&&(i.href=a),!(!t||!n)&&(t.addEventListener(`click`,e=>{e.stopPropagation(),n.hasAttribute(`hidden`)?(n.removeAttribute(`hidden`),t.setAttribute(`aria-expanded`,`true`)):(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))}),document.addEventListener(`click`,r=>{n.hasAttribute(`hidden`)||e.contains(r.target)||(n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`))},{passive:!0}),r&&r.addEventListener(`click`,async e=>{e.stopPropagation();let i=r.querySelector(`.item-label`),o=i?.textContent||`Copy Markdown`;try{i&&(i.textContent=`Fetching...`);let e=await fetch(a);if(!e.ok)throw Error(`Failed to fetch markdown: ${e.status}`);let r=await e.text(),s=new DOMParser().parseFromString(r,`text/html`).querySelector(`pre`),c=s?s.textContent||``:r;await navigator.clipboard.writeText(c),i&&(i.textContent=`Copied!`,setTimeout(()=>{i.textContent=o,n.setAttribute(`hidden`,``),t.setAttribute(`aria-expanded`,`false`)},1200))}catch(e){console.error(`Error copying markdown:`,e),i&&(i.textContent=`Error copying`),setTimeout(()=>{i&&(i.textContent=o)},2e3)}}))})}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,e):e(),document.addEventListener(`astro:page-load`,e);</script></div><script type="module" src="/_astro/StarlightPageTitleOverride.astro_astro_type_script_index_0_lang.D8WSbctB.js"></script></div></div><div class="content-panel astro-7iy7a7c3"><div class="sl-container astro-7iy7a7c3"><div class="sl-markdown-content"><div class="sl-heading-wrapper level-h1"><h1 id="antigravity-in-gemini-enterprise">Antigravity in Gemini Enterprise</h1><a class="sl-anchor-link" href="#antigravity-in-gemini-enterprise"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Antigravity in Gemini Enterprise”</span></a></div>
-<p>To deploy Google Antigravity using models hosted directly within your organization’s Google
-Cloud infrastructure, you can integrate with Gemini Enterprise. Every session runs under
-Google Cloud’s enterprise security controls, data residency guarantees, and the Google Cloud
-Terms of Service.</p>
-<p>Supported products: <a href="/product/antigravity-2" class="chip">Antigravity App</a> <a href="/product/antigravity-cli" class="chip">Antigravity CLI</a> <a href="/docs/ide/extensions/vscode" class="chip">Visual Studio Code</a> <a href="/docs/ide/extensions/visual-studio" class="chip">Visual Studio</a> <a href="/docs/ide/extensions/jetbrains" class="chip">JetBrains (Preview)</a> <a href="/docs/ide/extensions/zed" class="chip">Zed (Preview)</a> <a href="/docs/ide/extensions/xcode" class="chip">Xcode (Preview)</a></p>
-<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p>Enterprise integration is supported for the Antigravity App, Antigravity CLI, and Antigravity IDE extensions. <strong>Antigravity IDE</strong> (standalone) is not supported for enterprise deployments, and legacy <strong>Gemini Code Assist</strong> IDE extensions support only first-party Gemini models.</p></div></aside>
-<div class="card-grid astro-5njella6"><div class="sl-link-card astro-3i5abahx"><span class="sl-flex stack astro-3i5abahx"><a href="#sign-in-and-license-selection" class="astro-3i5abahx"><span class="title astro-3i5abahx">Developer sign-in and models</span></a><span class="description astro-3i5abahx">Sign in with Google Cloud SSO, Workforce Identity Federation (WIF), or ADC and select enterprise models.</span></span><svg aria-hidden="true" class="icon rtl:flip astro-3i5abahx astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg></div><div class="sl-link-card astro-3i5abahx"><span class="sl-flex stack astro-3i5abahx"><a href="#administrator-setup-guide" class="astro-3i5abahx"><span class="title astro-3i5abahx">Administrator and network setup</span></a><span class="description astro-3i5abahx">Provision a Google Cloud project, enable third-party models, and configure firewall and mTLS allowlists.</span></span><svg aria-hidden="true" class="icon rtl:flip astro-3i5abahx astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg></div></div>
-<div class="sl-heading-wrapper level-h2"><h2 id="overview-and-key-benefits">Overview and key benefits</h2><a class="sl-anchor-link" href="#overview-and-key-benefits"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Overview and key benefits”</span></a></div>
-<p>You can connect Antigravity to Gemini Enterprise in two ways:</p>
-\<ul\>
-\<li\><strong>Google Cloud project and API</strong>: Connect directly using a Google Cloud project with an invoiced Cloud Billing account and the <code dir="auto">roles/discoveryengine.agentspaceUser</code> Identity and Access Management (IAM) role for consumption-based billing.</li>
-\<li\><strong>Gemini Enterprise license</strong>: Connect with your <strong>Gemini Enterprise Standard</strong> or <strong>Gemini Enterprise Plus</strong> seat license to get access to included first-party quotas, managed overages, and centralized administrative controls across the Antigravity App, Antigravity CLI (<code dir="auto">agy</code>), and Antigravity IDE extensions. No separate per-user Antigravity license is required.</li>
-</ul>
-<p>By connecting Google Antigravity to your Google Cloud project, your organization gains:</p>
-<div class="horizontal-cards"><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M10 5a1 1 0 1 0 1 1 1 1 0 0 0-1-1M6 5a1 1 0 1 0 1 1 1 1 0 0 0-1-1m8 0a1 1 0 1 0 1 1 1 1 0 0 0-1-1m6-4H4a3 3 0 0 0-3 3v16a3 3 0 0 0 3 3h16a3 3 0 0 0 3-3V4a3 3 0 0 0-3-3m1 19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9h18Zm0-11H3V4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1Z"/></svg><span class="astro-tjfwtz2t">Enterprise governance</span></p><div class="body astro-tjfwtz2t"><p>Operates under your existing Google Cloud Terms of Service with centralized administrative controls.</p></div></article><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M12 13a1.5 1.5 0 0 0-1 2.6V17a1 1 0 0 0 2 0v-1.4a1.5 1.5 0 0 0-1-2.6m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg><span class="astro-tjfwtz2t">Data residency and security</span></p><div class="body astro-tjfwtz2t"><p>Satisfies private networking (VPC Service Controls). Regional data residency constraints apply to first-party Gemini models; third-party model inference runs in <code dir="auto">global</code>, <code dir="auto">us</code>, and <code dir="auto">eu</code> locations (in-country regions are not supported; see Anthropic’s <a href="https://www.anthropic.com/supported-countries" target="_blank" rel="noopener noreferrer">Supported countries and regions</a>).</p></div></article></div>
-<div class="sl-heading-wrapper level-h2"><h2 id="sign-in-and-license-selection">Sign in and license selection</h2><a class="sl-anchor-link" href="#sign-in-and-license-selection"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Sign in and license selection”</span></a></div>
-<p>After installing the <a href="/docs/getting-started">Antigravity App</a>, the <a href="/docs/cli/install">Antigravity CLI (<code dir="auto">agy</code>)</a>, or a supported <a href="/docs/ide/extensions">IDE extension</a>, choose your organization’s authentication method to connect to Gemini Enterprise:</p>
-\<script\>
-(() => {
-	class StarlightTabsRestore extends HTMLElement {
-		connectedCallback() {
-			const starlightTabs = this.closest('starlight-tabs');
-			if (!(starlightTabs instanceof HTMLElement) || typeof localStorage === 'undefined') return;
-			const syncKey = starlightTabs.dataset.syncKey;
-			if (!syncKey) return;
-			const label = localStorage.getItem(`starlight-synced-tabs__${syncKey}`);
-			if (!label) return;
-			const tabs = [...starlightTabs?.querySelectorAll('[role="tab"]')];
-			const tabIndexToRestore = tabs.findIndex(
-				(tab) => tab instanceof HTMLAnchorElement && tab.textContent?.trim() === label
-			);
-			const panels = starlightTabs?.querySelectorAll(':scope > [role="tabpanel"]');
-			const newTab = tabs[tabIndexToRestore];
-			const newPanel = panels[tabIndexToRestore];
-			if (tabIndexToRestore < 1 || !newTab || !newPanel) return;
-			tabs[0]?.setAttribute('aria-selected', 'false');
-			tabs[0]?.setAttribute('tabindex', '-1');
-			panels?.[0]?.setAttribute('hidden', 'true');
-			newTab.removeAttribute('tabindex');
-			newTab.setAttribute('aria-selected', 'true');
-			newPanel.removeAttribute('hidden');
-		}
-	}
-	customElements.define('starlight-tabs-restore', StarlightTabsRestore);
-})()
-</script><starlight-tabs data-sync-key="enterprise-auth" class="astro-53dtxyig"><div class="tablist-wrapper not-content astro-53dtxyig"><ul role="tablist" class="astro-53dtxyig"><li role="presentation" class="tab astro-53dtxyig"><a role="tab" href="#tab-panel-72" id="tab-72" aria-selected="true" tabindex="0" class="astro-53dtxyig">Google Cloud SSO</a></li><li role="presentation" class="tab astro-53dtxyig"><a role="tab" href="#tab-panel-73" id="tab-73" aria-selected="false" tabindex="-1" class="astro-53dtxyig">BYOID and WIF</a></li><li role="presentation" class="tab astro-53dtxyig"><a role="tab" href="#tab-panel-74" id="tab-74" aria-selected="false" tabindex="-1" class="astro-53dtxyig">ADC (Headless)</a></li></ul></div><div id="tab-panel-72" aria-labelledby="tab-72" role="tabpanel"><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-1" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">Google Cloud SSO</h3><a class="sl-anchor-link" href="#sr-tab-1"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “Google Cloud SSO”</span></a></div><div class="sl-heading-wrapper level-h3"><h3 id="sign-in-workflow">Sign-in workflow</h3><a class="sl-anchor-link" href="#sign-in-workflow"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “Sign-in workflow”</span></a></div><p>Google Antigravity uses a single sign-on (SSO) flow that automatically detects your assigned license tier:</p><ol role="list" class="sl-steps">
-\<li\>Launch the <strong>Antigravity App</strong>, run <code dir="auto">agy</code> (or <code dir="auto">/login</code>) in the <strong>Antigravity CLI</strong>, or open your <strong><a href="/docs/ide/extensions">IDE extension</a></strong>.</li>
-\<li\>Select <strong>Sign in</strong> to open the browser authentication flow.</li>
-\<li\>Choose <strong>Business account</strong> <em>(subject to the Google Cloud Terms of Service)</em>.</li>
-\<li\>Select <strong>Continue with Google Cloud</strong> and complete authentication in your browser.</li>
-\<li\>In the <strong>License Selector</strong>, confirm the Google Cloud project linked to your license and select it. Alternatively, select <strong>Other</strong> to self-assign a license by entering your project ID and selecting a location (<code dir="auto">global</code>, <code dir="auto">us</code>, or <code dir="auto">eu</code>; saved to <code dir="auto">~/.gemini/antigravity-cli/settings.json</code> in the CLI), or pass <code dir="auto">agy --project PROJECT_ID</code> when launching the CLI.</li>
-</ol><aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p><strong>Data-sharing and project logging notice</strong>: Your customer telemetry and model interactions are logged directly to the Google Cloud project corresponding to the license you select. You can maintain <strong>one license per project and location</strong>.</p></div></aside></div><div id="tab-panel-73" aria-labelledby="tab-73" role="tabpanel" hidden><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-2" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">BYOID and WIF</h3><a class="sl-anchor-link" href="#sr-tab-2"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “BYOID and WIF”</span></a></div><a id="bring-your-own-identity-byoid-and-wif"></a><div class="sl-heading-wrapper level-h3"><h3 id="configuring-bring-your-own-identity-byoid">Configuring Bring Your Own Identity (BYOID)</h3><a class="sl-anchor-link" href="#configuring-bring-your-own-identity-byoid"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Configuring Bring Your Own Identity (BYOID)”</span></a></div><p>Bring Your Own Identity (BYOID) uses Workforce Identity Federation (WIF) to let your organization authenticate through an external identity provider, such as Okta, instead of a standard Google Account:</p><ol role="list" class="sl-steps">
-\<li\>In Antigravity, select <strong>Business account</strong>.</li>
-\<li\>Select <strong>Advanced WIF Configuration</strong>.</li>
-\<li\>Enter the <strong>WIF Configuration String</strong> (for example, <code dir="auto">locations/global/workforcePools/POOL_ID/providers/PROVIDER_ID</code>) provided by your organization’s administrator.</li>
-\<li\>Complete sign-in through your federated identity provider.</li>
-\<li\>Select or self-assign a license from the <strong>License Selector</strong>.</li>
-</ol><aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p>If the same email address exists across multiple identity providers, sign in with the identity that matches your Gemini Enterprise license.</p></div></aside></div><div id="tab-panel-74" aria-labelledby="tab-74" role="tabpanel" hidden><div class="sl-heading-wrapper level-h3"><h3 id="sr-tab-3" class="sr-only" data-pagefind-ignore="" data-sr-tab-heading="true">ADC (Headless)</h3><a class="sl-anchor-link" href="#sr-tab-3"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">Section titled “ADC (Headless)”</span></a></div><a id="application-default-credentials-adc"></a><div class="sl-heading-wrapper level-h3"><h3 id="setting-up-application-default-credentials-adc">Setting up Application Default Credentials (ADC)</h3><a class="sl-anchor-link" href="#setting-up-application-default-credentials-adc"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “Setting up Application Default Credentials (ADC)”</span></a></div><p>For headless environments and automated terminal workflows, Antigravity supports authentication using Google Cloud <a href="https://docs.cloud.google.com/docs/authentication/application-default-credentials" target="_blank" rel="noopener noreferrer">Application Default Credentials</a> (ADC) across the <strong>Antigravity CLI</strong>, <strong>Antigravity App</strong>, and <strong>Antigravity IDE</strong>.</p><ol role="list" class="sl-steps">
-\<li\>
-<p>Generate local Application Default Credentials for your project using the Google Cloud SDK:</p>
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">gcloud</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> auth</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> application-default</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> login</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --project</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> {GCP_PROJECT}</span></span></code></pre>
-</li>
-\<li\>
-<p>Verify that your credentials file exists (on Linux and macOS, <code dir="auto">~/.config/gcloud/application_default_credentials.json</code>).</p>
-</li>
-\<li\>
-<p>Enable ADC for your surface:</p>
-\<ul\>
-\<li\><strong>Antigravity CLI</strong>: Export <code dir="auto">AGY_ADC_AUTH=true</code> before running <code dir="auto">agy</code> (run <code dir="auto">unset AGY_ADC_AUTH</code> to sign out):
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">export</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> AGY_ADC_AUTH</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">true</span></span></code></pre>
-</li>
-\<li\><strong>Antigravity App and IDE</strong>: Launch from a terminal with <code dir="auto">AGY_ADC_AUTH=true</code>, or set <code dir="auto">"enableAdc": true</code> in <code dir="auto">~/.gemini/config/config.json</code>:
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="json" dir="ltr"><code><span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">  "userSettings"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
-<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    "enableAdc"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">: </span><span style="color:#005CC5;--shiki-dark:#79B8FF">true</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
-<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
-</li>
-</ul>
-</li>
-</ol><div class="sl-heading-wrapper level-h3"><h3 id="how-adc-resolves-credentials-project-and-location">How ADC resolves credentials, project, and location</h3><a class="sl-anchor-link" href="#how-adc-resolves-credentials-project-and-location"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="">Section titled “How ADC resolves credentials, project, and location”</span></a></div>\<ul\>
-\<li\><strong>Credentials</strong>: Resolved using the <a href="https://docs.cloud.google.com/docs/authentication/application-default-credentials#order" target="_blank" rel="noopener noreferrer">standard ADC search order</a>.</li>
-\<li\><strong>Project ID</strong>: Resolved in order from (1) <code dir="auto">quota_project_id</code> in the ADC file, (2) <code dir="auto">GOOGLE_CLOUD_QUOTA_PROJECT</code> environment variable <em>(CLI only)</em>, or (3) the metadata server project ID (for service accounts).</li>
-\<li\><strong>Location</strong>: Resolved from <code dir="auto">GOOGLE_CLOUD_LOCATION</code> <em>(CLI)</em> or the <code dir="auto">location</code> field in the ADC file <em>(Antigravity App / IDE)</em>, defaulting to <code dir="auto">global</code>.</li>
-</ul><aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p>When authenticating with ADC, models older than Gemini 3 Flash are not supported, and image generation is not available in <code dir="auto">eu</code> and <code dir="auto">us</code> locations.</p></div></aside></div><starlight-tabs-restore class="astro-53dtxyig"></starlight-tabs-restore></starlight-tabs><script type="module">var e=class e extends HTMLElement{static#e=new Map;tabs;panels;#t;#n=`starlight-synced-tabs__`;constructor(){super();let t=this.querySelector(`[role="tablist"]`);if(this.tabs=[...t.querySelectorAll(`[role="tab"]`)],this.panels=[...this.querySelectorAll(`:scope > [role="tabpanel"]`)],this.#t=this.dataset.syncKey,this.#t){let t=e.#e.get(this.#t)??[];t.push(this),e.#e.set(this.#t,t)}this.tabs.forEach((e,n)=>{e.addEventListener(`click`,e=>{e.preventDefault();let r=t.querySelector(`[aria-selected="true"]`);e.currentTarget!==r&&this.switchTab(e.currentTarget,n)}),e.addEventListener(`keydown`,e=>{let t=this.tabs.indexOf(e.currentTarget),n=e.key===`ArrowLeft`?t-1:e.key===`ArrowRight`?t+1:e.key===`Home`?0:e.key===`End`?this.tabs.length-1:null;n!==null&&this.tabs[n]&&(e.preventDefault(),this.switchTab(this.tabs[n],n))})})}switchTab(t,n,r=!0){if(!t)return;let i=r?this.getBoundingClientRect().top:0;this.tabs.forEach(e=>{e.setAttribute(`aria-selected`,`false`),e.setAttribute(`tabindex`,`-1`)}),this.panels.forEach(e=>{e.hidden=!0});let a=this.panels[n];a&&(a.hidden=!1),t.removeAttribute(`tabindex`),t.setAttribute(`aria-selected`,`true`),r&&(t.focus(),e.#i(this,t),window.scrollTo({top:window.scrollY+(this.getBoundingClientRect().top-i),behavior:`instant`}))}#r(e){!this.#t||typeof localStorage>`u`||localStorage.setItem(this.#n+this.#t,e)}static#i(t,n){let r=t.#t,i=e.#a(n);if(!r||!i)return;let a=e.#e.get(r);if(a){for(let n of a){if(n===t)continue;let r=n.tabs.findIndex(t=>e.#a(t)===i);r!==-1&&n.switchTab(n.tabs[r],r,!1)}t.#r(i)}}static#a(e){return e.textContent?.trim()}};customElements.define(`starlight-tabs`,e);</script>
-<div class="sl-heading-wrapper level-h2"><h2 id="supported-models-in-gemini-enterprise">Supported models in Gemini Enterprise</h2><a class="sl-anchor-link" href="#supported-models-in-gemini-enterprise"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Supported models in Gemini Enterprise”</span></a></div>
-<p>Antigravity in Gemini Enterprise supports included first-party Gemini models and
-administrator-enabled third-party partner models:</p>
-<div class="models-table-container astro-ok2r3nzx"><table class="markdown-table no-responsive-cards astro-ok2r3nzx"><thead class="astro-ok2r3nzx"><tr class="astro-ok2r3nzx"><th style="text-align: left;" class="astro-ok2r3nzx">Model</th><th class="text-center astro-ok2r3nzx" style="text-align: center;">CLI / API Identifier</th><th class="text-center astro-ok2r3nzx" style="text-align: center;">Enterprise</th></tr></thead><tbody class="astro-ok2r3nzx"><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="/blog/gemini-4-argon-in-google-antigravity" class="astro-ok2r3nzx">Gemini 4 Argon</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">gemini-4-argon</code></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="/blog/gemini-3-8-flash-in-google-antigravity" class="astro-ok2r3nzx">Gemini 3.8 Flash</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">gemini-3.8-flash</code></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="/blog/gemini-3-7-flash-in-google-antigravity" class="astro-ok2r3nzx">Gemini 3.7 Flash</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">gemini-3.7-flash</code></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="/blog/gemini-3-6-flash-in-google-antigravity" class="astro-ok2r3nzx">Gemini 3.6 Flash</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">gemini-3.6-flash</code></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="/blog/gemini-3-1-pro-in-google-antigravity" class="astro-ok2r3nzx">Gemini 3.1 Pro</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">gemini-3.1-pro-preview</code></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/sonnet-5-5" class="astro-ok2r3nzx">Claude Sonnet 5.5 (thinking)</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">claude-sonnet-5-5-\<level\></code><sup class="model-footnote-marker astro-ok2r3nzx">*</sup></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅<sup class="model-footnote-marker astro-ok2r3nzx">**</sup></td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx"><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/opus-5-5" class="astro-ok2r3nzx">Claude Opus 5.5 (thinking)</a></td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><code class="astro-ok2r3nzx">claude-opus-5-5-\<level\></code><sup class="model-footnote-marker astro-ok2r3nzx">*</sup></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">✅<sup class="model-footnote-marker astro-ok2r3nzx">**</sup></td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx">Claude Sonnet 4.6 (thinking)</td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><span class="model-unavailable-dash astro-ok2r3nzx">—</span></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">❌</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx">Claude Opus 4.6 (thinking)</td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><span class="model-unavailable-dash astro-ok2r3nzx">—</span></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">❌</td></tr><tr class="astro-ok2r3nzx"><td style="text-align: left;" class="astro-ok2r3nzx">GPT-OSS-120b</td><td class="text-center astro-ok2r3nzx" style="text-align: center;"><span class="model-unavailable-dash astro-ok2r3nzx">—</span></td><td class="text-center astro-ok2r3nzx" style="text-align: center;">❌</td></tr></tbody></table><div class="models-footnotes astro-ok2r3nzx"><p class="footnote-text astro-ok2r3nzx"><sup class="astro-ok2r3nzx">*</sup> Available at four thinking levels (\<level\>): low, medium (default), high, and max (for example, claude-opus-5-5-high or claude-sonnet-5-5-max).</p><p class="footnote-text astro-ok2r3nzx"><sup class="astro-ok2r3nzx">**</sup> Third-party partner models require <a href="https://cloud.google.com/gemini/enterprise/docs/ai-developer-tools-settings#enable-third-party-models" class="astro-ok2r3nzx">administrator opt-in</a> in the Google Cloud Console and are billed by token consumption. First-party Gemini models are enabled by default and draw from pooled edition seat credits ($10/month Standard, $15/month Plus).</p></div></div>
-<div class="sl-heading-wrapper level-h3"><h3 id="selecting-models-and-thinking-levels">Selecting models and thinking levels</h3><a class="sl-anchor-link" href="#selecting-models-and-thinking-levels"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Selecting models and thinking levels”</span></a></div>
-<p>Once enabled for your project, models appear in your client shortly after your administrator enables them:</p>
-\<ul\>
-\<li\><strong>Antigravity App and IDE extensions</strong>: Open the <strong>Model picker</strong> in the chat composer and select your preferred model (third-party models appear under <strong>Other Models</strong>). <strong>Anthropic Claude Opus 5.5</strong> and <strong>Anthropic Claude Sonnet 5.5</strong> are available at four thinking levels—<code dir="auto">Low</code>, <code dir="auto">Medium</code> (default), <code dir="auto">High</code>, and <code dir="auto">Max</code>—and each level appears as a separate entry in the model picker (for example, <strong>Claude Opus 5.5 (High)</strong>). Higher levels give the model more room to reason on complex tasks, but use more tokens.</li>
-\<li\><strong>Antigravity CLI (<code dir="auto">agy</code>)</strong>: Start a session with <code dir="auto">--model</code> or switch mid-session with the <code dir="auto">/model</code> slash command:
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">agy</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --model</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> claude-opus-5-5-medium</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">agy</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --model</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> claude-sonnet-5-5-medium</span></span></code></pre>
-You can also specify a base model ID and use the <code dir="auto">--effort</code> flag (or <code dir="auto">/effort</code> mid-session, requires <code dir="auto">agy</code> <code dir="auto">v1.2.11</code> or later) to set the reasoning level (<code dir="auto">low</code>, <code dir="auto">medium</code>, <code dir="auto">high</code>, <code dir="auto">max</code>):
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">agy</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --model</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> claude-opus-5-5-medium</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --effort</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> high</span></span>
-<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">agy</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --model</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> claude-sonnet-5-5-medium</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --effort</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> max</span></span></code></pre>
-</li>
-</ul>
-<div class="sl-heading-wrapper level-h3"><h3 id="architectural-transparency-hybrid-execution">Architectural transparency: Hybrid execution</h3><a class="sl-anchor-link" href="#architectural-transparency-hybrid-execution"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Architectural transparency: Hybrid execution”</span></a></div>
-<p>When you select <strong>Anthropic Claude Opus 5.5</strong> or <strong>Anthropic Claude Sonnet 5.5</strong> in
-Antigravity, your selected third-party model executes all primary reasoning,
-planning, tool orchestration, and code generation turns.</p>
-<p>Antigravity uses a hybrid execution architecture: lightweight first-party
-Gemini models continue to run in the background to handle
-high-frequency client-side coordination—such as context management and
-summaries. These background models consume first-party tokens, which can incur
-charges.</p>
-<div class="sl-heading-wrapper level-h2"><h2 id="autonomous-tool-permissions-and-human-in-the-loop-controls">Autonomous tool permissions and human-in-the-loop controls</h2><a class="sl-anchor-link" href="#autonomous-tool-permissions-and-human-in-the-loop-controls"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Autonomous tool permissions and human-in-the-loop controls”</span></a></div>
-<p>Autonomous tool execution in Antigravity supports <strong>human-in-the-loop</strong>
-confirmation when using either first-party Gemini models or administrator-enabled
-third-party Anthropic models (<code dir="auto">claude-opus-5-5</code> and <code dir="auto">claude-sonnet-5-5</code>):</p>
-\<ul\>
-\<li\><strong>Antigravity App</strong>: Keep <strong>Default</strong> (isolated terminal sandbox) or <strong>Request Review</strong> enabled in <strong>Settings > General > Permission Settings</strong> so unsandboxed shell commands, external file modifications, and MCP tool calls require explicit developer approval. Use unrestricted auto-approval (<strong>Turbo</strong> / <strong>Always proceed</strong>) only in isolated development containers or disposable branches.</li>
-\<li\><strong>Antigravity CLI (<code dir="auto">agy</code>)</strong>: Keep interactive tool permissions and <code dir="auto">--sandbox=true</code> enabled (<code dir="auto">seatbelt</code> on macOS, <code dir="auto">bubblewrap</code> on Linux), or use read-only plan mode (<code dir="auto">--mode plan</code>) before approving edits. Configure policies with <code dir="auto">/permissions</code> or <code dir="auto">/config</code>.</li>
-</ul>
-<div class="card-grid astro-5njella6"><div class="sl-link-card astro-3i5abahx"><span class="sl-flex stack astro-3i5abahx"><a href="/docs/permissions" class="astro-3i5abahx"><span class="title astro-3i5abahx">Agent permissions</span></a><span class="description astro-3i5abahx">Configure allow, ask, and deny rules and permission presets in the Antigravity App and the CLI.</span></span><svg aria-hidden="true" class="icon rtl:flip astro-3i5abahx astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg></div><div class="sl-link-card astro-3i5abahx"><span class="sl-flex stack astro-3i5abahx"><a href="/docs/sandbox" class="astro-3i5abahx"><span class="title astro-3i5abahx">Terminal sandbox</span></a><span class="description astro-3i5abahx">Learn how OS-level sandboxing isolates shell commands and network access.</span></span><svg aria-hidden="true" class="icon rtl:flip astro-3i5abahx astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg></div></div>
-<div class="sl-heading-wrapper level-h2"><h2 id="administrator-setup-guide">Administrator setup guide</h2><a class="sl-anchor-link" href="#administrator-setup-guide"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Administrator setup guide”</span></a></div>
-<div class="sl-heading-wrapper level-h3"><h3 id="gemini-enterprise-subscription-setup">Gemini Enterprise subscription setup</h3><a class="sl-anchor-link" href="#gemini-enterprise-subscription-setup"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Gemini Enterprise subscription setup”</span></a></div>
-<p>To set up Gemini Enterprise subscriptions, follow the official Google Cloud onboarding guide.</p>
-<a href="https://docs.cloud.google.com/gemini/enterprise/docs/ai-developer-tools-overview" class="call-to-action button button-primary" target="_blank" rel="noopener noreferrer" aria-haspopup="false" aria-expanded="false"><span>Gemini Enterprise Documentation</span></a><script type="module">var e=/^\d+\.\d+\.\d+$/,t=/^\d+$/;function n(n){let r=Array.isArray(n)?n:n&&typeof n==`object`&&Array.isArray(n.versions)?n.versions:null;if(!r||r.length===0)return null;let i=r[0];if(!i||typeof i!=`object`)return null;let{version:a,execution_id:o}=i;return typeof a!=`string`||!e.test(a)||typeof o!=`string`||!t.test(o)?null:{version:a,executionId:o}}function r(e,t,n){let r=`https://storage.googleapis.com/antigravity-public/antigravity-hub/${e}-${t}`;return n===`darwin-arm`||n===`darwin-x64`?`${r}/${n}/Antigravity.dmg`:n===`windows-x64`?`${r}/windows-x64/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-x64.exe`}`:n===`windows-arm64`?`${r}/windows-arm/${e===`2.0.0`?`Antigravity.exe`:`Antigravity-arm64.exe`}`:n===`linux-x64`?`${r}/linux-x64/Antigravity.tar.gz`:n===`linux-arm`?`${r}/linux-arm/Antigravity.tar.gz`:`${r}/${n}/Antigravity.dmg`}var i=null,a=null;async function o(){return i&&Date.now()-i.fetchedAt<3e5?i.build:a||(a=(async()=>{let e=new AbortController,t=setTimeout(()=>e.abort(),8e3);try{let t=await fetch(`https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases`,{cache:`no-store`,signal:e.signal});if(!t.ok)return null;let r=n(await t.json());return r&&(i={build:r,fetchedAt:Date.now()}),r}catch{return null}finally{clearTimeout(t),a=null}})(),a)}function s(e,t=document){t.querySelectorAll(`a[data-hub-platform]`).forEach(t=>{let n=t.getAttribute(`data-hub-platform`);n&&(t.href=r(e.version,e.executionId,n),t.setAttribute(`data-hub-version`,e.version))}),t.querySelectorAll(`[data-hub-latest-version]`).forEach(t=>{t.textContent=`v${e.version}`})}async function c(){if(!document.querySelector(`a[data-hub-platform]`))return;let e=await o();e&&s(e)}function l(){document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>{c()}):c(),document.addEventListener(`astro:page-load`,()=>{c()})}l();</script>
-<a id="google-cloud-project--api-setup"></a>
-<div class="sl-heading-wrapper level-h3"><h3 id="google-cloud-project-and-api-setup">Google Cloud project and API setup</h3><a class="sl-anchor-link" href="#google-cloud-project-and-api-setup"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Google Cloud project and API setup”</span></a></div>
-<aside aria-label="New to Gemini Enterprise Agent Platform?" class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path fill-rule="evenodd" d="M1.44 8.855v-.001l3.527-3.516c.34-.344.802-.541 1.285-.548h6.649l.947-.947c3.07-3.07 6.207-3.072 7.62-2.868a1.821 1.821 0 0 1 1.557 1.557c.204 1.413.203 4.55-2.868 7.62l-.946.946v6.649a1.845 1.845 0 0 1-.549 1.286l-3.516 3.528a1.844 1.844 0 0 1-3.11-.944l-.858-4.275-4.52-4.52-2.31-.463-1.964-.394A1.847 1.847 0 0 1 .98 10.693a1.843 1.843 0 0 1 .46-1.838Zm5.379 2.017-3.873-.776L6.32 6.733h4.638l-4.14 4.14Zm8.403-5.655c2.459-2.46 4.856-2.463 5.89-2.33.134 1.035.13 3.432-2.329 5.891l-6.71 6.71-3.561-3.56 6.71-6.711Zm-1.318 15.837-.776-3.873 4.14-4.14v4.639l-3.364 3.374Z" clip-rule="evenodd"></path><path d="M9.318 18.345a.972.972 0 0 0-1.86-.561c-.482 1.435-1.687 2.204-2.934 2.619a8.22 8.22 0 0 1-1.23.302c.062-.365.157-.79.303-1.229.415-1.247 1.184-2.452 2.62-2.935a.971.971 0 1 0-.62-1.842c-.12.04-.236.084-.35.13-2.02.828-3.012 2.588-3.493 4.033a10.383 10.383 0 0 0-.51 2.845l-.001.016v.063c0 .536.434.972.97.972H2.24a7.21 7.21 0 0 0 .878-.065c.527-.063 1.248-.19 2.02-.447 1.445-.48 3.205-1.472 4.033-3.494a5.828 5.828 0 0 0 .147-.407Z"></path></svg>New to Gemini Enterprise Agent Platform?</p><div class="starlight-aside__content"><p>If you are a new customer connecting via API, you will need an API key to authenticate. Visit the <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/api-keys?usertype=expressmode" target="_blank" rel="noopener noreferrer">API Key Quickstart Guide</a> to create your key first.</p></div></aside>
-<p>Complete the following steps to provision your Google Cloud project and enable API access:</p>
-<ol role="list" class="sl-steps">
-\<li\>
-<p><strong>Select or create a Google Cloud project</strong>: Select an existing project or create a dedicated project for your team’s Antigravity workloads.</p>
-<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p><strong>Project switching note</strong>: To switch to a different Google Cloud project or location, log out of the Antigravity CLI or the Antigravity App, then log back in to select your new project or region.</p></div></aside>
-<a href="https://console.cloud.google.com/projectselector2" class="call-to-action button button-primary" target="_blank" rel="noopener noreferrer" aria-haspopup="false" aria-expanded="false"><span>Go to GCP Project Selector</span></a>
-</li>
-\<li\>
-<p><strong>Verify Cloud Billing</strong>: Ensure that Cloud Billing is active for your selected Google Cloud project. You can inspect your project’s billing status in the Google Cloud Console.</p>
-<a href="https://console.cloud.google.com/billing" class="call-to-action button button-primary" target="_blank" rel="noopener noreferrer" aria-haspopup="false" aria-expanded="false"><span>Open Google Cloud Billing Console</span></a>
-</li>
-\<li\>
-<p><strong>Enable the API</strong>: Enable the Gemini Enterprise API (<code dir="auto">aiplatform.googleapis.com</code>) to allow Antigravity clients to connect to your project’s model endpoints.</p>
-<a href="https://console.cloud.google.com/apis/library/aiplatform.googleapis.com" class="call-to-action button button-primary" target="_blank" rel="noopener noreferrer" aria-haspopup="false" aria-expanded="false"><span>Enable API in Cloud Console</span></a>
-</li>
-\<li\>
-<p><strong>Enable third-party partner models (optional)</strong>: To allow developers to use <strong>Anthropic Claude Opus 5.5</strong> or <strong>Anthropic Claude Sonnet 5.5</strong>, <a href="https://cloud.google.com/gemini/enterprise/docs/ai-developer-tools-settings#enable-third-party-models" target="_blank" rel="noopener noreferrer">enable third-party models</a> in <strong>Gemini Enterprise > Settings > AI developer tools</strong> in the Google Cloud Console.</p>
-</li>
-</ol>
-<div class="sl-heading-wrapper level-h2"><h2 id="regional-endpoints-and-network-allowlists">Regional endpoints and network allowlists</h2><a class="sl-anchor-link" href="#regional-endpoints-and-network-allowlists"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Regional endpoints and network allowlists”</span></a></div>
-<div class="sl-heading-wrapper level-h3"><h3 id="regional-endpoints">Regional endpoints</h3><a class="sl-anchor-link" href="#regional-endpoints"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Regional endpoints”</span></a></div>
-<p>Antigravity CLI, the Antigravity App, and IDE extensions support multi-region deployment endpoints to satisfy regional data residency requirements:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th align="left">Region</th><th align="left">Location ID</th><th align="left">Supported capabilities</th></tr></thead>\<tbody\><tr><td align="left"><strong>Global</strong></td><td align="left"><code dir="auto">global</code></td><td align="left">Text generation, code inference, multimodal, image generation</td></tr><tr><td align="left"><strong>US</strong> (Multi-region)</td><td align="left"><code dir="auto">us</code></td><td align="left">Text generation, code inference, multimodal</td></tr><tr><td align="left"><strong>EU</strong> (Multi-region)</td><td align="left"><code dir="auto">eu</code></td><td align="left">Text generation, code inference, multimodal</td></tr></tbody></table>
-<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p>Image generation capabilities are currently available exclusively on <strong><code dir="auto">global</code></strong> deployment endpoints.</p></div></aside>
-<p>For full endpoint specifications, consult the <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations#global" target="_blank" rel="noopener noreferrer">Deployment endpoints documentation</a>.</p>
-<div class="sl-heading-wrapper level-h3"><h3 id="network-allowlists-and-mtls-endpoints">Network allowlists and mTLS endpoints</h3><a class="sl-anchor-link" href="#network-allowlists-and-mtls-endpoints"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Network allowlists and mTLS endpoints”</span></a></div>
-<p>If your organization restricts outbound developer traffic using corporate
-firewalls, proxies, or context-aware access rules, allowlist the following
-endpoints over TCP port <code dir="auto">443</code> for the Antigravity App, Antigravity CLI (<code dir="auto">agy</code>),
-and Antigravity for IDEs:</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th align="left">Service and protocol</th><th align="left">Allowed hostnames (TCP port 443)</th></tr></thead>\<tbody\><tr><td align="left"><strong>AI Developer Tools Orchestration — Global, US, EU</strong> (Standard HTTPS)</td><td align="left"><code dir="auto">businessaicode.googleapis.com</code><br><code dir="auto">businessaicode.us.rep.googleapis.com</code><br><code dir="auto">businessaicode.eu.rep.googleapis.com</code></td></tr><tr><td align="left"><strong>AI Developer Tools Orchestration</strong> (Mutual TLS)</td><td align="left"><code dir="auto">businessaicode.mtls.googleapis.com</code></td></tr><tr><td align="left"><strong>Vertex AI / Gemini Enterprise API — Global, US, EU</strong> (Standard HTTPS)</td><td align="left"><code dir="auto">aiplatform.googleapis.com</code><br><code dir="auto">aiplatform.us.rep.googleapis.com</code><br><code dir="auto">aiplatform.eu.rep.googleapis.com</code></td></tr><tr><td align="left"><strong>Vertex AI / Gemini Enterprise API</strong> (Mutual TLS)</td><td align="left"><code dir="auto">aiplatform.mtls.googleapis.com</code></td></tr><tr><td align="left"><strong>Discovery Engine — Global, US, EU</strong> (Standard HTTPS)</td><td align="left"><code dir="auto">discoveryengine.googleapis.com</code><br><code dir="auto">us-discoveryengine.googleapis.com</code><br><code dir="auto">eu-discoveryengine.googleapis.com</code></td></tr><tr><td align="left"><strong>Discovery Engine — Global, US, EU</strong> (Mutual TLS)</td><td align="left"><code dir="auto">discoveryengine.mtls.googleapis.com</code><br><code dir="auto">us-discoveryengine.mtls.googleapis.com</code><br><code dir="auto">eu-discoveryengine.mtls.googleapis.com</code></td></tr><tr><td align="left"><strong>Cloud Code Telemetry &#x26; Client Services</strong> (Standard HTTPS)</td><td align="left"><code dir="auto">cloudcode-pa.googleapis.com</code></td></tr></tbody></table>
-<aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1Zm.38-3.92a1 1 0 0 0-.76 0 1 1 0 0 0-.33.21 1.15 1.15 0 0 0-.21.33 1 1 0 0 0 .21 1.09c.097.088.209.16.33.21A1 1 0 0 0 13 8a1.05 1.05 0 0 0-.29-.71 1 1 0 0 0-.33-.21ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16.001A8 8 0 0 1 12 20Z"></path></svg>Note</p><div class="starlight-aside__content"><p><strong>Global endpoints required across all regions</strong>: Even when using the <code dir="auto">us</code> or
-<code dir="auto">eu</code> multi-region location, the client connects to the global endpoints
-(<code dir="auto">businessaicode.googleapis.com</code> and <code dir="auto">cloudcode-pa.googleapis.com</code>) during
-sign-in to discover assigned licenses and load the model catalog before routing
-inference traffic to <code dir="auto">*.&#x3C;location>.rep.googleapis.com</code>. Ensure both global
-endpoints remain reachable for all regions.</p></div></aside>
-<div class="sl-heading-wrapper level-h3"><h3 id="private-service-connect-psc-for-regional-endpoints">Private Service Connect (PSC) for regional endpoints</h3><a class="sl-anchor-link" href="#private-service-connect-psc-for-regional-endpoints"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Private Service Connect (PSC) for regional endpoints”</span></a></div>
-<p>When you select the <code dir="auto">us</code> or <code dir="auto">eu</code> location, Antigravity connects to
-multi-regional endpoints (<code dir="auto">*.&#x3C;location>.rep.googleapis.com</code>), such as
-<code dir="auto">businessaicode.us.rep.googleapis.com</code> and <code dir="auto">aiplatform.us.rep.googleapis.com</code>.</p>
-<p>Global Private Google Access VIPs (<code dir="auto">private.googleapis.com</code> and
-<code dir="auto">restricted.googleapis.com</code>) and global Private Service Connect (PSC) endpoints
-serve a single-level wildcard TLS certificate for <code dir="auto">*.googleapis.com</code> that does
-not match multi-level <code dir="auto">*.&#x3C;location>.rep.googleapis.com</code> subdomains. If your
-network routes Google APIs privately through PSC, Private Google Access, or VPC
-Service Controls in the <code dir="auto">us</code> or <code dir="auto">eu</code> locations, complete the following steps:</p>
-<ol role="list" class="sl-steps">
-\<li\><strong>Create a PSC regional endpoint</strong>: Configure a
-<a href="https://docs.cloud.google.com/vpc/docs/access-regional-google-apis-endpoints" target="_blank" rel="noopener noreferrer">Private Service Connect regional endpoint</a>
-in your VPC for each multi-regional API you use in your selected region
-(<code dir="auto">businessaicode.&#x3C;location>.rep.googleapis.com</code>, and
-<code dir="auto">aiplatform.&#x3C;location>.rep.googleapis.com</code> when using pay-as-you-go billing
-or Application Default Credentials).</li>
-\<li\><strong>Configure a private Cloud DNS zone</strong>: Create a private Cloud DNS zone for
-each regional hostname (for example, <code dir="auto">businessaicode.us.rep.googleapis.com.</code>)
-with an <code dir="auto">A</code> record pointing to the reserved internal regional PSC IP address.</li>
-\<li\><strong>Keep global endpoints routed through your global endpoint</strong>: Route
-<code dir="auto">businessaicode.googleapis.com</code> and <code dir="auto">cloudcode-pa.googleapis.com</code> through
-your <a href="https://docs.cloud.google.com/vpc/docs/configure-private-service-connect-apis" target="_blank" rel="noopener noreferrer">global PSC endpoint</a>
-or Private Google Access configuration so initial license discovery and
-model catalog requests succeed.</li>
-</ol>
-<div class="sl-heading-wrapper level-h2"><h2 id="security-and-governance">Security and governance</h2><a class="sl-anchor-link" href="#security-and-governance"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Security and governance”</span></a></div>
-<div class="horizontal-cards"><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M15.1 12.6 13 11.4V7a1 1 0 0 0-2 0v5a1 1 0 0 0 .5.9l2.6 1.5a1 1 0 1 0 1-1.8M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8"/></svg><span class="astro-tjfwtz2t">Request and response logging</span></p><div class="body astro-tjfwtz2t"><p>Audit model interactions and maintain enterprise compliance records for your Gemini Enterprise instance. <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/request-response-logging" target="_blank" rel="noopener noreferrer">Learn more</a></p></div></article><article class="card sl-flex astro-tjfwtz2t"><p class="title sl-flex astro-tjfwtz2t"><svg aria-hidden="true" class="icon astro-tjfwtz2t astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.333em;"><path d="M12 13a1.5 1.5 0 0 0-1 2.6V17a1 1 0 0 0 2 0v-1.4a1.5 1.5 0 0 0-1-2.6m5-4V7A5 5 0 0 0 7 7v2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7a3 3 0 0 0-3-3M9 7a3 3 0 0 1 6 0v2H9Zm9 12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1Z"/></svg><span class="astro-tjfwtz2t">VPC Service Controls (VPC-SC)</span></p><div class="body astro-tjfwtz2t"><p>Enforce private networking security perimeters by adding the Business AI Code API (<code dir="auto">businessaicode.googleapis.com</code>) and Gemini Enterprise API (<code dir="auto">aiplatform.googleapis.com</code>) to your VPC-SC perimeter. <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/general/vpc-service-controls" target="_blank" rel="noopener noreferrer">Learn more</a></p></div></article></div>
-<div class="sl-heading-wrapper level-h2"><h2 id="troubleshooting-and-diagnostics">Troubleshooting and diagnostics</h2><a class="sl-anchor-link" href="#troubleshooting-and-diagnostics"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Troubleshooting and diagnostics”</span></a></div>
-<div class="sl-heading-wrapper level-h3"><h3 id="common-sign-in-and-license-issues">Common sign-in and license issues</h3><a class="sl-anchor-link" href="#common-sign-in-and-license-issues"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Common sign-in and license issues”</span></a></div>
-<p>Review the following solutions for common sign-in and license issues:</p>
-\<ul\>
-\<li\><strong>No licenses appear during setup</strong>: Licenses are assigned by your organization’s Google Cloud administrator. If the License Selector is empty, contact your administrator to ensure your account has been granted access to a Gemini Enterprise Standard or Plus license.</li>
-\<li\><strong>Missing BYOID sign-in option</strong>: Ensure you are running the latest release of the <strong><a href="/download">Antigravity App</a></strong>, the <strong><a href="/docs/cli/install">Antigravity CLI</a></strong>, or your <strong><a href="/docs/ide/extensions">IDE extension</a></strong>, as enterprise authentication and BYOID support are included natively in all recent releases.</li>
-\<li\><strong>TLS certificate or connection errors in <code dir="auto">us</code> or <code dir="auto">eu</code> regions</strong>: Global Private Google Access VIPs (<code dir="auto">private.googleapis.com</code> and <code dir="auto">restricted.googleapis.com</code>) serve a single-level <code dir="auto">*.googleapis.com</code> wildcard certificate that does not match <code dir="auto">*.&#x3C;location>.rep.googleapis.com</code> subdomains. If connecting to <code dir="auto">us</code> or <code dir="auto">eu</code> fails with an <code dir="auto">x509</code> certificate mismatch or connection error, ensure <code dir="auto">businessaicode.googleapis.com</code> and the regional <code dir="auto">*.rep.googleapis.com</code> domains are allowlisted, and that the regional domains are routed through a Private Service Connect regional endpoint (with <code dir="auto">businessaicode.googleapis.com</code> routed through your global endpoint). See <a href="#private-service-connect-psc-for-regional-endpoints">Private Service Connect (PSC) for regional endpoints</a>.</li>
-</ul>
-<div class="sl-heading-wrapper level-h3"><h3 id="important-api-provisioning-advisory">Important API provisioning advisory</h3><a class="sl-anchor-link" href="#important-api-provisioning-advisory"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Important API provisioning advisory”</span></a></div>
-<aside aria-label="Caution" class="starlight-aside starlight-aside--caution"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 16a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm10.67 1.47-8.05-14a3 3 0 0 0-5.24 0l-8 14A3 3 0 0 0 3.94 22h16.12a3 3 0 0 0 2.61-4.53Zm-1.73 2a1 1 0 0 1-.88.51H3.94a1 1 0 0 1-.88-.51 1 1 0 0 1 0-1l8-14a1 1 0 0 1 1.78 0l8.05 14a1 1 0 0 1 .05 1.02v-.02ZM12 8a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V9a1 1 0 0 0-1-1Z"></path></svg>Caution</p><div class="starlight-aside__content"><p><strong>Enable required APIs before purchasing licenses</strong>: New Gemini Enterprise license purchases can fail or fail to provision if the <strong>Gemini Enterprise API</strong> (<code dir="auto">aiplatform.googleapis.com</code>) is not enabled first. Enable the API in the Google Cloud Console and wait approximately five minutes for propagation before completing license purchases.</p></div></aside>
-<div class="sl-heading-wrapper level-h3"><h3 id="sharing-diagnostics-with-support">Sharing diagnostics with support</h3><a class="sl-anchor-link" href="#sharing-diagnostics-with-support"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Sharing diagnostics with support”</span></a></div>
-<p>When contacting Google Cloud Support, include the diagnostic log file from your most recent session:</p>
-\<ul\>
-\<li\><strong>Antigravity CLI (Linux and macOS)</strong>:
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">~</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/.gemini/antigravity-cli/cli.log</span></span></code></pre>
-</li>
-\<li\><strong>Antigravity App (macOS)</strong>:
-<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="bash" dir="ltr"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">~</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/Library/Logs/Antigravity/language_server.log</span></span></code></pre>
-</li>
-</ul>
-<div class="sl-heading-wrapper level-h2"><h2 id="whats-next">What’s next</h2><a class="sl-anchor-link" href="#whats-next"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “What’s next”</span></a></div>
-<p>Explore the following resources to learn more:</p>
-\<ul\>
-\<li\>Explore supported model architectures in the <a href="/docs/models">Models guide</a>.</li>
-\<li\>Learn more about enterprise privacy and compliance in <a href="#security-and-governance">Security and governance</a>.</li>
-\<li\>Check the <a href="/docs/cli/reference">Antigravity CLI reference</a> for headless automation commands.</li>
-</ul></div><footer class="sl-flex docs-footer docs-footer-wrapper astro-4mgpquaz" data-pagefind-ignore><div class="meta sl-flex astro-4mgpquaz"></div><div class="pagination-links print:hidden astro-qs5fwxza" dir="ltr"><a href="/docs/plans/" rel="prev" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-qs5fwxza">Previous<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">Plans</span></span></a><a href="/docs/faq/" rel="next" class="astro-qs5fwxza"><svg aria-hidden="true" class="astro-qs5fwxza astro-jlnlh7vs" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-qs5fwxza">Next<br class="astro-qs5fwxza"><span class="link-title astro-qs5fwxza">FAQ</span></span></a></div><nav class="docs-legal-nav print:hidden astro-4mgpquaz" data-analytics-nav="docs_footer" aria-label="Google legal and cookie links"><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/" target="_blank" rel="noopener noreferrer">About Google</a><a class="docs-footer-link astro-4mgpquaz" href="https://about.google/products/" target="_blank" rel="noopener noreferrer">Google Products</a><a class="docs-footer-link astro-4mgpquaz" href="https://policies.google.com/privacy?hl=en-US" target="_blank" rel="noopener noreferrer">Privacy</a><a class="docs-footer-link astro-4mgpquaz" href="/terms">Terms</a><a aria-hidden="true" class="docs-footer-link glue-cookie-notification-bar-control astro-4mgpquaz">Manage cookies</a></nav></footer></div></div></main></div></div></div></div></body></html>
+{I'wϧ̱dzDqEv;d7!Edՙztdsf?'I'JdN'2ә͚?拴I:LA?xdB=3D>~_=$z{>Ev[%X lqo^9qROՓ9-_ӏ(^(}/Z%/Ñ^:]]Bٽŗ}G[}ͰN@//V;b?\;svàۋu {B]7ݸ#OxHӍmu\;r躲wNgcX팃~1|@(}'PbWDco(iB^;/&>Q{.^]ުd{Q;11pp"pEjsn}VqkeE^jOu^ܣd^`qx;T><O1[jB]?~!т:I0P>'ޤk|`*}֣}~s?S_^~BLzI|1};9	<
+y#4}sG;(21שi21M+$Qc]7|{qO?IHM_xI2a2`GOF|2KE9{&?3Q	Rk5femF_FI/(lJd>C'.?/Ρ<"C"̪馢ߞyh3Ai'>-5g7gx<CoرJS9@ h)J?-6܊,åWU)~3nou션cҭ|+Џkz_REeuh=y!XU'viu?&Q*9Iђh1fCtt^mU8NDU' qCKxJ8"_{<[e2&B*hXIxJ*LJ'hxcgUv܋A?]<@7K(zg(L|COZ߾Xg%ጇ]7}^vRAo.o^)x0Z[鏺gѹYP&f{8;SڅR!@fhhLEέŐ/m((FP#aHz(j?A%g.ǣ~oPS<y鋽獚oW5ݪժS:Pj;`|D8.[XN !2
+}ZW+^	kE7~I߿øz!!F׫N]UQS6{Ӭ]C=$7:<k/x3%,$@G=ɷG!q6}ڄ^w7Lq8a|*M~V+)ZYcjuBd5
++w<NDl@%{HkUvʺPͪ<ulbH@߰TI-6#(0ݖo\ycMk~$X&^BQRr(ф;TؠZ*S(U˻|v*^z U(9'h V~[@G+wA!M[49J0*vFݫY^\@5X5y๣[~]*k%	r/voOɡjБE"Pm]MD7}aW-bs(fһc~L,Z&1*a0A	GۗZO&HvRVKդBh;QlWuN=bP_S5릓P$!MOaD17_9em?=aj%:j?!Fcp&l]OA0t06VԄ`5-e!S6)$޽ل
+xfL!2QG>CO!iJ|yV@5ବ3Ӂ%˳ŻW%mV&@tVl=
+޴?#	q?F[h3R;WхqQ2ZԴE*ͦN}"^#v]R-s}OfgΝD~-4L#dBY`DX}\}A\<s\>ϭwz}RRo&	d*pV|j`ٝ;>;.^fRZ;GQ/d#0t;Htko4Q労ɊlV8zI\rsM%e3@`
+Gl<ULMUe25uEb&(7]K-}1+;&T(|ŶCGzª9`~ť+kM>k%0C*9aZc>TPZ<b	9	-N91tDݖP8+#v`+$H;A@K`_p&^AIs.](6~Ajf}x̪~uj5<gTx0}o,?gA4QBT̓.jInv'bLD4>'
+[4zS
+ԔtY@caOCkޒd3ۿSc$PaDjKlH끽uy]y/O,يXya-4mHq<*lVbUD[Ʈ4^ے8䛒WSM)0)}ww0lNXHf瀑*j*!z
+1đT4
+kaI54AFZc{_TLiuMKВ2$nh(|7fz+⺦d!]_{̂F]sSX?{!݃Vk#6
+3U }}v\2Vj<95|܊"i[^s"e\,GS!%ǔSJ
+HW/+B
+'iwҖOgcQ&MV}KgLZz8xF_Mӕv>/2-cW+pnS[Ifu|ZΈYM,ŭ zЖpEwwIG@fı-1ebO?A&aZ{iYyoBNT<JlF\(\g?LBLiNHK`2((tmK?BtgA˧	d
+dG52Ғ4djV%f*I'[*_ʹ>]=1m]x}YmӀJ@Trj2_,־Ýw)@.LmT+,,6q+IIw8>FaČ	9fWghsH"H"^W-<lړ2'	kDvE0S2k-5RTH"i֑X%o2kM#l2BIrm3Tʞ"<TUUrxє)/в&UKXeoaD%2Pq%2e֕*B eM}#25!;D2RK\3)\\s5{fw+g_g/_٥-	rBX$%7>ϒA8*j0pRn<pɿb!
+)XkYh=U4}622_Rcda>;A|_у˗^3xQuM-lw0$;p|>L
+h
+e+w3Ҿj-,/ߛ" VtxDǋb٣'u?0; 'ŴфG"~cVŉa
+@BQk3gWjp
+aܧ^vX-S@ND<rӡę-|1Ƌ>/<~V
+?]=:G+uЬuұ}p(VHyڍN@Vir〱J\H>Rs@y))!6`;\>HxO~,y0Q7'edv0Q-ocya:G!`+M++mN9Oqd%\:arBB	
+N"uÀd(}QYCJK aħP#/|W2T^
+v\sKfNĸi"_'#b?Pq峧/!TE19cOW%TIBSяˍ+LP<B`M!FyKi(+-"
+uq3bo4TGꉫΣ~캮j/HIiݨm*C#GC;4s|+>$K	os?T)3d:brTD/[VwL=]J58`6n	!d\=i"2bt[%ǉ$pȺ?*QoxuQ0ϩ;kojW~.6w[ji(LQ
+%/6B}ճzClXKu!jgvjʛp][-mFwPmTj΂CL$d}n.'kL`b5Pse[shAKZoILabc&m1rN?̈5
+ĎOu_򉄲E !S#F#h/bJ̛>|OӢQgm>iԝ5wmg!<۠ml8k7=Ć$@e'a=5=j^W6Ƶ8s[i4wk{]Ob6PqXwgH0#b0Ě켳=Nkg[c.n$5PsW_8kgNFnz)@k%"ש5/1mxWdSǴ7ٲWY}@~Z#Aud61##	?|oWF9^IN"
+ɧr`VMDYՉUR_UUb1*kl+$*;vP]RCDִps{e޹xUchc.DN[OQħ v'tURph`SiNuggg|Qgsc
+û;Ta	Y_h:5w$B%ΦKsUfO'8РwStAݓ  "0ν75X_qG~*xgdFD;Em;͡mOO32	k5r|,	iJ)bH[xzj(ÇA$PgN"YRM#_~J'6h$q8G˫cx=^b׽5B`arHTM5{RUte'nD<9kX:1NbJ<¹Ut9݆.]tI6C9*G:1n_:@ݦk]grpij.DH:/aDC87%zgݔܤA뿙&Q-a1d84B=L%`U [gRNȂF;RA6I6'M`m*fv,чLO/4ut2	lMU]:ಃ9iV3ڌ70SC{J#4,z@F༁3m!`ZlzR7-F6pnfS1@F_QKrZ*aife ;Tema0Rg]0:>NU}V$0T//fhT0drseƚPSB(K8̌;=IL4I:	~r!^kks3ʦj'Sj+:	a'q6*^$x}JcR'=iB<8/9xzι|
+5YNit6z5؎$4z5[3#wJPc
+%(^n)y|h#%Q"=hΡOzI(9XNb2	%PZ!p"Z0!Mdʨ3$w&$ʉڼ6kb01byEfjABM|J8}C'k݄m]orEFh7Hv]Ⱥ&31z,oqMENzɹ>;у͵2CmN"'7r*(N1t_ƓiJ*wrz:K5G|hta7SChL7v!`n0.HoTuOKZ׊Yd9zf[C Osvׇ?'6r2L46ql"7mz}~nnf7Cl*i8`IR3!Hrzi-06E0t`U)2ciI#\<Y\>sq{=,Z6|<\NÙ˖iTE~[v9(]W*fqlݝ+"a2rrc/ݛ$ "XjYOY wz%-l5n֒LfQpz<~KxI(dwMAO]#,,<Z<!@TAH٠w-Vr6r}!>ѵ`;zPgL0Zwi7D3vk) g,P	Ma>i$L;,ƲiꅍJ	VH܂iw)(,nb׌oNCqR@>'#%OfKCEewB+4LbVXKx(x
++LJ<!۪=݄8^bqME(ZytVQ~꺔d~ʈi#\~$eZ^}ѯ~}3bS=s)g߸6%冗X=ltrBgv4mnzb\9tub^w{zWo'9//@pSFF5RDJ㍓M9`܈]?|,
+J:&7t|FSZL_'q}`dV"MGv#FkKCEP\&Ѷ#oLknodWug*X3ߑ*TՌ҄ZOs09͕i싊eAoq1a}b*<X[?Ү^U<Dy/u%[3zaW[G0?C&[Y#ᚻ.	8-AImôeuB{Gy-T.C}PbK(Sˬz[Nfe"Z$+:5jc`Ò^	x)rUQ4Rms4R}HcP=d*LE`Sm2טRzS/"@1Z	;aĚ"Z{"M#'5VSR[@i0Jל_\Q"BE"u~W66OsM a'Ʉ@43aNbREOZc
+*	J^5&7z.WWZ^mT{,ңdK]9$;S('nenh >f}SFXAr,W;\4Bq=Z
++59@;鹬9og2zoz7o0̐hJι)-,fgbdA'77Ŝ̭ܠ6.ѐ5r.Aq=UY'IӺ}i*QYk\Kן<֣]#iMBbеLw-؋7i1cC,օI]A^Di0zT4imgNJ?>ĒS=@1q[vu3hA8fo`dը%JYdaA<%98**P8BCY}8\ԛ)
+K>,;pTTXW@7*FA-}Njx~H=M	\;Sk|c*tuqMTO~H♊N\I;tN'C:_>?]8ЭcM[F*b"r@9tź/\0ԄBW
+\p0s4vU^/`U`j5GT8f°'9E^E-Z44.ɍ#_+[2cL<;5ZΦ81F2tA>PM@pIa48JCx"GS2R5~*0ǋnBTGl)*EˣㅣSَOn<*[%N=~|^;qŁhD`JUOz⢎FRhЙBwsWT$ONZ yҞWhrr\vihHNԟά?~qoodOer%jO
+z%APkd2*AsѨڢ5Ӡ-4+ղ:'RbE2v">8C39g	B{S"ʪp|sf#aGA0<A@Տs'aP8YiƋ2ݢ*AEGzM#]AC)</!^<o^B+tY͓}*|=!(Jjxtfz:	Sם ?,Z7ɢ%%"IaFKH9\cIw.1](Rc8.!B@'	]Lf!癚o+lxaJ)x<7+$Pbӄ9Aj#ľVhэ+N[kg)cwžaY"O
+d("(N~§^۔8VzBa+uFn?2P_q'v>n`o٣L|[A]Tѧ쁷e6ZFƸ+܋>ksbxx8@Bǿh'**B#LDKG|B-/Rc_ݟiD""|"?}r+"}y"27#" Dv. ;,|ѭ'h8|N%(!hS9zY=YLcA(u=3X/nEJԿ=4:hF/mPN"8xД@Py{i ^|
+VS13VA%`76]Kso>&`LhBHꊌ}&H;Gijl:'^?3jCR{qANFޮϕz˴nl:6A&0Z"UUH,yȞyPX&7̱(1Ѿ[9>w_b*PM+\L?[%d	cb2ѭf^YSK`)%8ȟ.1i3-uai	rb!`'.EG-t3$3yț}<K?(Xo12QUkW6ÌGt'jư<!2
+/jpHg=K
+;ox)AldMp~~BU%9#}!K6/&[SjyO8=S7V8!٥I71ftsjt^ހ(}h}-;0S~^Zt?1mAjtNWiQ$Ç"i8< w(AVفx~[m٧i'LḯB1^|!y`f	uLtUmDpHT"n6JZGܬ(歃ڴvUy}:42.H/MVv)q-=0Z0H)]4L,|V T9v&HT/+Rovxɕ>ZJDzIS-vw_
+"SH%M̻2(TK@vW9Q.EAߪ7EZ{+1Gӷd8[##S>pvӮ=a5^χq<ӲEv.J8KN.IM 
+ŋ>٪8.y5b>SߴTz[MB!0Lv?獁cO;tb2fw
+YeXBYIZ`9Fk!ϾwtX%:ȁ8Nh2O.)֔fB;ނ#Qc0:ﯰ<2©>>e%S0=(
+OgO"frl_ZHDH3C!NS z{H#",D)!)g3m9͸nvK.gOwQtAU]L*|J7:2l񷌇Yߎ	=]ā&YT:%ys.qb"xJۜ$5
+4H_|4.exurq}K-zٺQp7w|Fuwc{~&!:69sƆ@/H]~,6jm
+-!jCjS+tJrbg;j#,gY/YCՉr:`J3Hݰ ߨsTAc3y$tx=z%oNPK,!CuJCT??tߞrRDCM0,|uڧC*+d+2Na.JчfvZ=J Xs;ឌ$ᗷtScܜI2_wq
+}},T ApCA	na]ʓ9"*ENPne3E*.H	ui֮+޽Č;7~toa\iM)RiDsXXF*HJd޽ytTu̻SL~j+U}(I]:7UޚrWC4r}sw{^J#s5ħn,ǭ;H#!DRH؏rSf?*2F[,8?gp]:\P?`	 r
+Ep-U~9jI>*w1x	gJ,OpZgBoQ><N
+承vA'`54}V4V.*Kh8Gwp;"~<#lQ"yS;	l'.ǆHB$=/\zW_<qdB;;bǧ2!fiCD
+p!}gCL#(ROȷj"23ZEM-Ҙiʙ&X7|ęK>\w`oUC,p.nijEjbm
+H
+d)_$(瘒Mh7K8aB'_NsӪqi*nG7B^ϋ<dپ(D|LGaS='1neL)LqLx|`>E_CGi8Adu*rr8~_`I|b*Ow _}mS	ڴp}B紼Cߦ(<@tc<ǑIw<(OE)|7Ƿgooעo毾o{ao7o鷿o}_N)͟Jש@9Mo_oo/ɿWAD_O:ņ|J?_E_׿7<@QIz[;-t4d=`-:E:y_,|2>}z@ /<9AlS_o=}˯#덼c]R=ZOI@+M?F
+w?ԔA~dAZ?O2#<V'<~|y7^"Xy*cIî<|d=Yǟb*8֓Ws
+.gqc&l+Oa,ԍ|b#&p,L,K)Y_(4`XatѰ.i6Pۚvn.]
+-$9˼+\ީK[MbIK^1}/	=ETYW^r=cH"6(@i2WYnuݸ-pcxLx/$޽}4.yK]'W~]蝣RVeR Р{..v1[/pR0ƦR8Հt9<)iZ|ҹ@i~mV- S]6O_}n]{Mt4"	Q/1_u/Li=rxZ.n|	r~$\u-@P"uBSa[a5.L͂X#{Z)g-2-Cf\XHwy6v)EMC$Th):YK\fD.d4z	d`ጁa-BO>=-6ePf5׷lf5`O$6ZS[?MA:ݲpVfw6-5Px}joY-NeVx}Y$'lJ_d&s[$0ͼ!mr6mx[-@0
+[Zt[I+J:֧oK}NdY}ʗP'Q|	R$ZC?$7aޜ]^O:w+3}rTdK?u4MIj
+=M{CA.92(+[:>T$1JNǎHWO vPXu?9ixS:Zc=x.={)S+Қz&٪)atiz@UE^n)]F*QM
+f4=UӿLϨ/& %I+k9EaiH1! O.zӉf'j<lWQiL,׸6,&7GRB{]eY/
+;Ig~vO
+90rXCҞa?X`iXeZm4}[>d:*:&[8ÈN3W'jԨ*V8+APFX' RQSrZ=T|LknY1
+.!If2_ΊŁ\VΥ,}HU>dF3B++	%a!ήq טsg(L*1l霵}P̀7>נxߢw	X4rvv2"1g/pXBɐC·Ulx)-@%R?+"Ҥ'd
+\YGiWC\P(Hy4",8֎qaMf_z*2O{ɹ)"^6AdF^_gH-kH3FUU!A#w^Nr"H}ǽt/5\p4uPp)GEߛ~wuG7t0h!lP`W#'Via  ]4{L
+d?Í6*d<,FMCds	wizϘ0>žGs[u'y(3+=	*Ar=36ki;aYALRC9u׉TL6VWf
+:kaKǄٹ\+郰y&7GjVԚ|C16Z*T"L߬18c@Aآp|lozI~e0բ^?~C_$$63bp ++yycʘ:%i0Frc:jl0&;D3e=E"INrƁ`b5]L<׈q#F~}m?`be1rsN:͔S=GDjR4*JW_X/?Y_=ZZ睔csBȓ6|A0d	9 yⰍե\֮eL!hD7{oj+rWoS7||,DＩY=cqk`keC*^t/H2-K)ÉlPoJ7G2.Lr2Re@010OabKJT[YRnl]Y BC'`ï2U*y|Δ7yvP\!	E$|{1XN~RT!ջ9%A)mӑWI[Yw?h JؚlD&[$[f
+19?m4`Y2*h-l]CwYvDS'dL!JLuI,,ǻZ$6SͩC?|m#(-_ڎcM^fCz+E7$0t&9~<mAEEB~Lw־I\qSc9dtH]QH&$'W6R㋣|o
+;}Uh&jLpiMe S[7zX^5}.3Y*+(6@V1?3R!)=g=s4XNΏ9VƢ6=MLԝG:"fmi S&(W,.Y$q(,|/޳]H2ͿoK`B[}2؁qۈ'm68?>o**6<0nu}RcQ
+ܖX>:NKj+:Mշ=$+aoWsouOj\iԜJlBq5SeD$<8+.Yy(sQ|\P'Jz=%ء%5T٦|&CŧQϪCy(CR0<<T}jedA6$uex*:\-;<es-:zڧ48w<!wp.B:~\#$4߹$M#x|md|TaG.FTSa	O6j,G Cʲ:{p_JvG)	vT=؄A]J8dȪ[j1>ZsG.fໟե褶8EHS8ƞ;CnnEG7DEk@="($$f(k&@eyVum;ܴ]*Z]85BE-(3Gkq|qx!+.oU\$`^HY0aQ(@nl"L	G@{8gvx♲u'`ɹ~(裏a죏>1|-'T[)gڊjXnO*~Nqe|H?]E}$v( Ȍ-ӎ!Ô~RwH)l$ZD|$Ѩio^|,A|fRleK?dYFRCR#x+BLa	G6hD?\S\0uO.OŞJGF5#bvom	Y(A.Ħ<J4$L!zؔUx˧cǧaFo5*8.05%Q@K\KB?RezQY[N}3USȔOKo	FO]]SjD
+
+!W$j{o ~xz~F2649XO+R5kB8WZ?ILt$	r#L(=fӒ UNh9yjSyK85!PG☲C'{*.bI|d6sr(N(׬b7җXRXjR4pWܙ9	>'`::`,^~ka)0,;Fp/iIK4?}w$+ވsqn%a=IS=|B>K[o>I>F*_Es"D&\B U(>[1.I`oXt}r 6{&nBt;H0ķf,0&3?Kw4%PťaȵmdrjO<
+,XBs`,I̽RHV9'Fna2?>CLҪs\4GO1*}ds&*nx_/Di0YM$`LzUNCY>{TK,Iۏs6%^^@\'1uXg	.<;Iw]sY{7KR%܅cPBYͅ>pm")0pI^0,`/m=MY:>M}oK{n
+"$kЗ>kl%e׭)߹k`߅ԑ^pR~uH\ØҴ}!>>`rj7.
+f']ITDΔGYۃNZnUXtI%#}o+"|]ֲ<Vù7τ	!&]R
+0qe՘KšKtTeDo7μS¾N⏒OU.%*ǒjC"_qaeԀaSsJȇK	q[4!.SxCR|8$VA,CWqp\Q#4w)#l}Rm0˰iI\ 	WϽi=Dh ǅ6n%-)c=Q93&?\oyGɱC7kߥ	$oiO!Ug$qBzZDV$=YKWa6҉&IAňcrLk}ow*,^r:LK#~$3V]N%'Kc,7nŢ1KAnT$H&K[MѭCcD/kRzE]AGW@.l\N}g)ŷh6/lrS2pI482#64zYlow6g@9r".җ@H{HRg,ӽbg>{xd>Γ4]wITH0/0##򪄒7%-88I{xtR%ϫ:%,2"R2&f:522remt	g?xO)ޑҒ0o[Ew'݄0''K
+·
+?eGE!$&;tG޲OQ	zd*ø2Q{m['@(-P9nV3dX<oGe`$'θLPՁtlnz1d@τtb{Z"7x#qRu1+}g;\XL5.IgвFȠl_K%)}OG|資o5hԳ7P8d|Meߛl;51%7B	X57Ms>pI"P#Jj,I3Ȓs Pa0&8|=Ne0 "ŃLT=@fz_pf:y'_	}+Fm`䨔Csxi7QSc犅!CFCoYXFHGBۊs"S+	&FH%%6&m\w$O+!#$Q%,(xQd'NqPn&+DNUd??S"96E>e7ٌU<98'_ "\~J4[v嗗t\{h<rb<lAqvF\2<ۿKV2R 1:rnp⇔M'ʤ<w^Evk-8fT) Nk]_ÕHx=p96PJ|7A&<|=|ց(tFB!)$ܰWRWp1P/?g{N-oMLΚ8[m:k$5PsW_8kgN#9Vԝg3<ޫx-Fg5x#)JΨYʫ,Y*H	0q3?AQy`C¿*+KWy?$U%dq3(n82ȊGx;ԙÎ3շĎ[OXI㘵Qeov}JMǺq\ǵsA xAl2E@bGK3>æ$t'cdI#$Mk٣\&POJ"]>\ smmuFy'!pR&化ǣAy|ɓ@Hl]D3\7m#uU{qJ鬃ǱK7TM!g(k==U˔wHZ^~	_̓[(5&]RdrQf';֮$h$ô)N*aKHI14,[,(>leUV!!ڇoA+o2Rw"k4[S.	+9jW˽0. V܉92R_]Wג!fPtͰ*&,Azv}	r*c䒒릮S (cUVٯƚ";!#:~AyXyʔO!20#!\1'L21<lH?Tp@2(s	f@>>+wF4EՐfv|UUZ0#NCtƜ=^^03ժ6'}BMpv>9nq*ws鐛sN.a)Ƭp2^yvkf(e:ʧ3S+|N7=\x?RBaSmJ
+]XP(<ޖXd̬3;Z}&& 9H~>Ds[1̥H/oTj.]
+|0@h/1$Lv-h;s,}!$4F݁*U`:R^RκaiDt
+5MU.׼j%Y˃sxLθL!mW1]<=svG(h|_͎T?YЅ1.=9Az>REA3'ܰZP1C[+ɠ@@
+IY/xi(KU$NHmpc(,~^< W/>Ǵx_}aAPadx1FG7P8u~Όbd9Qb2{I⡼E'm:a8h?C6uu'hx<F(	pDl*
+U)3JVW-VUr0J]ZS	4#45UGt"nb0ID/+$ZHOY?uKu4)$d&,$d#ŗ9LA.!B+Y]bw_8[=\4'ĨHwE}Mh8&Q<zFJ?#G䠐J'=akU."Th7hb_Cu'K	g#w	\JrǏ}X4Yv;B3I2cfbj\toM1qx	tm1I$P+"oSr̒Fraȓ)<2,gr,22u/$_
+iXCm0Gm1"l\vāl[`"	Ҍ݌mZ'yC,-tO-E-_'/ӗ00P[N;:Eҹ` 8,,{$	\D> M6>=%Gr"yXx)ZPG)Ex9l$TD36I)9To6{֓!T-W_ Spfe7" ;/_%j~dPe`u}.%R?ID@?o8pŲrgoϩ0e\yǹuW}'䫉I嵢ݖ[7cI;J]:ܞ# W@gC5@N-b(zNKd3wbp	$_L=`\Խ#5KSO[
+r3s[,>10$u_of<1/%'K׼^\!uC;|p!I<TN@5TtJTF10D'b.;Ϩ|0CF3qm_n$!
+Ug\Vp[$ T|rerݾ?==,_?ϼ1|XT<9d~)+5`{,Geҝ$MrjPWH{}W)7}ӫ"~Il^&!tUpk樸`_,S4ds庢K"eSNiԈu4:ױ2~ݣ.q"'OPfPf"KD4Wӿ޽cXRy0 E)I?t;j~\DXb#_us5Y<Մz'lhn,عԽQh'P lr}!})ޕV}L(J'7?U=baoS3Afw>sIo\?Ig߹񈝿8uQ\pj^`Yxlb[
+H`4Ҽ2//Wpo^Vĭ]|q)`
+dCAnZ/i2hׁ[D?X	DT߽v}Œ&@1l}Ѣ</$LFG"?_ND`gתEBd*R9].ƿ?)W}yRk·xa3cIor TX$1yڋD0uU@/A"4{{, Wd}Z
+F'3I3b9ڕLpv\ n\?IgUx /+m&7BRHt\O [Z_x!oBw]EUd(*39uVRb(	D775VhR8
+s2]⊅֬qp::AMUq'c%wkzjD޵fߪUI!_)4YH0G"Ibmj"~ToT)0JmGЕ#Vj~}«LVUsaY;qpRɑ#AirP7u$^K*j Z10:|Ż)*_ߕȧW-4LYx*q!K8iWMo{dvA
+,C dH1*豠 _zȬ<s9A=|=|&pǎ)Be2F@#<N	;#ª1=!`s,E9sWiB|&`>`A,'0O*,ZpӋ5nﴷpw^~&95n*LߺVnV7Oq嬱2ރv寮źatofZXۺ{jS4?j:]d>3!lY-}szR!"F{ZXMswY0y2l0Yƛfueji9G\,gIR j~&V'mΟ_<-qI sIt|h(7pIf5j#0-1ie'SK(783%KvILea<V8YF%{ާ$JYh~cs|%{񢦸bF%!{&.	ÉEHT%aȚWRagMLuIAۻ$[K"\=%&D[D (*Ľ{۵\dfS*9olAƙ-pfƙ! /f;3p`0 _Ô3#vfD:|Fڙ1pde6޽˒';
+>X倯6刍CH
+h;Ef~
+8RR1h 9x80?Xyꜥp(JpLY˕cj'h5y( z8:߹ݏ7ptRN:o#?aMQ{k#]ȧ9GS')9	.垰;+yNȐs<\Ӷʝu5QVNJ8=#ڇ[喷զ^/W'vz÷#/P.-+)' u<ʮj=΄oxr[ }
+Դjg*=b<|@Tx"pyJ3ֹOiZ%NM/Ƞe4!#mp]12-hD،BY:p28\&A:i~V遁bJ&D;Ee--sTJJIJs1V{jVy9Ɏ$;O?NI1{)&RGQXHWnGCqH!N8pc牠{!)(Q)Hvo<z0yUmQުI頺}Vu1yiJk|pRq.SX|J]yLѓ x,#IF`ryQ쯣S8!NI7k'=P2!b	[UصU,*V |`J#aL8f:RX8%P@b.ea0DPI%SRh<#p_'8ߍi9Yt麜N&=>i$O)KiHQHp(Md@mK{AS/& HOdJOgl67Tm; |%Xc~̸
+:Qmhr8a)r3&fΠcU<pjlք.kdw16kuJ4jnUkzD?v,G_:۵V&
+."߽T7k\Je_nmud;U.Kc	xmk٨8k@1}8M*oE̟[Aڑ`E*I0B^rW-wsǩ7j{Y@껭-wKgkq'ioSqlV^vxn}u\Fv4/i,ⲋɇqMv,;lCjÉSkw3"RLUD;MjN*c;tZ>2:aК3VLdil62ͩsPˬ`)#aM"tTS<dYcxRrWֶ!X5w0k@:4-BU}6w B˷zi
+PnXc٘r?'!<.orJiAGI.
+/pZ(oLx|8B&\_*) nc,D*CL۲-:ɕk{:ٌIYyGg'UdԻRAvJcփ9|p4}͑dtf4~dY^ϳ?+q$wFAƙj%|vRi8:386;Y/D4OI]&P9s'>^t9l)(7Y@Q+Z'Pk1BIbOj]uO~{A,NMٓGHp(qJ;V)~<œZHQX0\i;?o#gg8f9j/!(2Got݊G^5û^p\xs92/	6)O5@||T"3,|]S'sFR:
+vDV(OfB#З*亐εF1'k%Lz2fg-yyܗۧ(_ibay‶M2"mUrE+mlyJG΋^16HLԀ,v_C	퐓>?p4=.3xiͺI'
+@c>TN: Ĩ[k׶xg)Khi?zeB:+h~<i[y;/5WK=.5sXy}ڡ6e=?(K%/wp[cO7(Cx㭻r][A d&
+ 6:r#A8ƍHQq!0/T)=O0N2`'87D^(HmNGʳ.[mj၃'HsGДހ浤'59+\9ƆPTr^HxG>oi=Gƻ/Gkt)>Q6I"dp'ǥ13:
+ؽa+ZC>g
+'!I-yJ6r"ߴ#pW {*9't?BsUa'7Ve%'ܓK.[.}.g?zlpרE.LXD$K tС)Ul'-(d\J	,Sys `c{ȳj`++z
+J'NRZ$*_AēN0B$D\)W
+qHjΟ ##2uny~	"Hf9mg8&0Y0l*;fLCͯ9rq)ZE,8EG jEa4E{632ʷ	#qqęc=J0]`MEnm'9.ݠPuZqdNۭRv5܄A5Ee*dU3Hn,ATRm/~ 7j[£mZk|U7,hl;fd$tF#ieKiHjDkv)1Gj䰛G(EB>e0"̕k	}AVl'#_&N4f7aDq!Ĺ!D#|Y87o~ߣJ(Vׂ]mlȩAs*j,]:cշy!e15L%EİWvRǗ?QI}˩88*BHDr':'Hz՚zIe*O!]v' ZyΖ07O͠~3,S]\,|\]qE"7~hmm-s\P갇B`G)" cg-Kxş$в\\Cq.!MV.~]k\P4Al-k	'J#iDX4&^">9PEL2R:λZO{Ǹ.RlHQ$`>YN8ctNģ?{Ú<Rz6N8-
+3 G;Zx0CLi\QD)EVQ#K8.܉M؛ӱfQ)-7D$g5jgd6i(^dT6ZKs?X8Ӵ͐~̗Rq2j \Xw2#h{Tk7Qhk#.7s¤agy?!##9p3vRXs@4i(QTZfC\#"yӋ?OiU˱c݅tW0l'0Ӳj_OFV6 jt_Ԧ =;WwdG6KcBX`%ʹQj$jȸb(dL0)NR8Kq3JKlƢA\8ׁR<FELϦuNtޢ&I<Hۃy
+
+{m=D<AYpC^[@O>צ%d3`2P~aغՁZtVߴoaS/S5p@|kbtNMXc`J{d7m$SdA-t:/
+eOeLyVW}5&AZؔo}7s7s3kͼ\?ȃ@`V0dFDq> H%Ehs .)GC'_s.8Vkvr#ۍ95yω/F)==ܪ׫!j\eFo$`ݳ%CJ5۵F`kڅXd:^wHcdO~$1'lEy9\ړ}<6fHD`_>n'x0Fn/ΘnA_2:-Xe/uFRې$]G56;4dy;7XwF]{-\r王q^>`4Ma15`N7,U;ƠsVش"#ҁuy.%s3FNtzncQj^Ar{ö}xt7I7|a&A$ȇ,A^{&I;!o<2ʛEDbU0ɎlNWr Cf::uv~;%EpX@|~ԎxycsoՁI\9)
+/h`k;4;e:~O,<]5ҌFj~e1И<&t+lɭDvƋ_oCG_-mJq@VHR,C龡εW+ 8-];J0E'
+2[4& ](#}OAq'GM|B՟phۓyɤ1vJjgo̴BݢBfQzE_sQ)=J!DeɆb	t8Ҥy(q(L|H&@۝brD҃g{y
+nL*.{0R5b;EZ4j'ZuΦ\R_;	ux}R<زK0RZ<myߜWqf}l:nWovC۽+(PT*Ԇqfɴ殖`íKc|X09XBXb=2:Qk?^vN_xDL6["o2->KqD֙Z@FS/m%5.N|0UG \õH4\.ԏ{H+;\::Dg~F\&+{}W[v4gtYR.>UnM~-هkzȓUZjSۻ5MF,83ipk:$jHf7v~#nv]F[`C>.vJh? 	t=98:ٺMn"ĿP;&aੋ FR4ڙ	3OUvc|v5lGNd8 rbh3TK%Ԓ11ָ;_ܱB88ueDQX?uϗEת&v`Q,Yq^Ld?hK0]6H( b3NbU~U5i6qILEsH|>3
+Y]p-~#x1[zE2xY'R$9k*ӢLwQwzmcRJ>*X!EAqzz^8P?&,? yPƫj 6	]θHVge5S|TB=[?'5zxi9H_sxDnjY4uкܦ)hǖ,х{YF"TЅhbE7"s6	{p8$}U]O1]B`O\+PڐC/S$ݺ]^51[3:C,:ز̦x q:X-dhQ0q"F5LLZ6?KQ@ǜ]tXt#+	Tb=gj`X"*{%M(4E$PKJpEO/"
+ZV%/x8e9_N3
+'#:;CNtEFt<Mt8ϑ3J~<Q^@+xɌ~jr!,#9N:l2<wC(jZeN~gH$/`OsQ9́ŷgLt@<b_6ǣz
+T"MxAzH5G-HK]ȍ-z\>ߏepIxh-ȅ 'M}wZ[a_2IR眜;SaQsle7YvH8 3\Qو}eUdJ^/$F^g'߿~`:KNN+#,+jSκM"[j`r1@>Y(лFgs5ƶ0T{qpnF"Bq>%9wNE~0:ΉyU*=:E'?5Ҙ31^ܳ4|lpe1̬vZ3Ī.3kĎ3Ƞddq,y4#˹2 .!K:QҘUNͭ0Our n=(n)n{P
+O`1:dkXYl'8hIE~J'Tun|Mt[G'	S]rQNGSeCkoy).exIpK(IK놦9mY$`j<u&ǯ1]Pɯ!u(O;?o9$R\)ŇDwIG}'B^mVۛ/ЮMssqC^3p
+dj?󅞫'`|Vv^qZe<7J	?܉vw$.Oe?˄b-An>Ww+m,|SkVo~gdJl|ͳgz^9s[ya0V0֚߬0bK읿ݽw֌{Zq|fKqļm;ىۑT"&/ hlj7LF[6wz}7\L`aD7]tY|RⓤA?Gd?v~%~mfN<Wh)tye߾kZ!>^`!ftnCWv̑z\k#^bll(1}t^.lf^'ܲzF{t#[ދ<.*'BdKQ |A<{K,?>17>s]mH榼Wy\h}'n#mzּ{箩y~JA掿V3mڻkh!T[),*j	w/ڣ~2jv֖
+\i@*MgC_fϙp\
+"Y̱V
+ y9na&Y.(^IbB@L"a4"gf8=&1h@RQw\<gWIj9Xo_\>}O;NsxB,/ܩH;(l|W[-HcEZNL༌[QAhID73/nt`^;7e[խn.nt&ӌߗPeA+saOݢ5fqߙe+Xx\͠p@L[Ԃg_UA
+0>$EQZLu)]`;WQ$*1p@kxڍ&|RêB]-hF:_@5e~I۾#ߕ6v|ښU4ؔnmjhsaۚ[qUpH~A:OH+N=2i<
+"E&Y|vK@-\XcqԛZ$ԷdЈ6&dd8KďLr-48곥e-Bx*Yp[Ҭt$SĪ'FjmvV[aj2Q"J$mx_/HҦqNC25΁Ejo7~NS
+tLI26x-S|@zR~}x><&F?^y}x%)ע,lR)MλÓ_OI.e',m2qT`$QҕzGN/V>S2$3bc|#ݹ6w&{#F&|@2Ld5S^.AMBrD2
+ʜÐbuSnFPTr*00܅&LR324!C碣gl>B~LQ`5svۧ"t`ma(iY AdEmK!H&XyLluR]YJ.5B3[#J(PDKВ/ʶ9wTS1^jԡVlp
+DxkIK,ma#r'Tip
+\t|gGd)5!Ejţr KIcWqM^` Y^M皺3Le`TS"0}$%`٣H\+OK2cH~x˪[Oj?4VT%)n8ErhNg4O{}a8l@y""̿:u~j'~ xJD0<>㧮V`JnpUo㋐QOOcbkZ,(]W	Cz|͔n\7!l+xzP/I/8vփlp2xu-7aJ}-0]u\!Gmq4b{}_a	V?o	VQK`A߸+*DYE$eD^Ѫ؍Hgeە-h2'i\8nMrMwdFKR
+KKt7L>ꎑyt2FVSar[Ӟ9ߣ=A؃!Չߔ-R45uut^ZMс9?).s{='s&;LҿGSoiS0D)ALvo?|MX~{¿ll̤U̵_pDdE+yV{3;IcArp,*`ɤ%T3ۭYh]@w;żd̿gzc,e"SD~|.}2X9L){!ԡPxFcG N\D,qS.2Ia\	O/y0ǰ/c<YiZkT[mƿhheW_VVFX}&Yڴ`((	Ԕ!9DgbL"]C]%*ρ%1;ydߛY4fmј<L2h&/yP4a8Hq97TA&MԠgp*E'?:ycO7r__  {nsߑD	,qа9fhy"gKJ8$Ir*k_NF9ȈL25يND2x"{ 1+Lǅ3;IA+_fsr66WG[n\#Оbi.G\VnY 3Z)!,Deft
+-<`,Ws"Ije4/pC}Xu#.V:̸^@\WM+k=ܐ@&;4[ΤqOKU-ta5J#W{^|ÜHkXĐkuDQ x,mxv⮮~Eôކ"アB}$aQ ɼ-=rQ鴞݈y-zhz#{#bs-^TJRQ!/%T͐0q07D6OlMoԎ,)x-NLL\0;T7hEo;(eҷ=Eј!|uC-G%P}t.J	N
+oϵ4-=DEI"F!;qؓjn\VN-[;9OVZ*x9!m=E'iEXY0($FY~Y5!B;`r( :!*Jcrb*}h<Osi<WْlDVM`U}}c($:O'p_2h,	_`i@9<wdm1.xMHG|z>C]B|iS>ؑeiBTgr1D{zN5uU%zO;q]^]Uʸ	uѿVoN9}]A_w>;i-j5O\ݕ;k+ɸL&{2mPyE@d*٨E~W&w3'ZC-(lt7?ۃƴ!`mރyѡ% ^֞eqEXd4JlnbRL4cLz0U:2:msZu!׎d?p6fslky)jwmI8r	bgNEP}-?pW$bw9X}6Վp|xסo9NCt9Xv[YZi<zgʥZF|!=jzu$P~%{?`-aj
+C}
++Ğ&0tJ-R&@mZbי5Kqބv0ˆ+Vz;XlSJBU\30Ara9A._*W
+$Ԁ[iDѩ̨-Jw	ʀu$_J`B$l0)#aW)7ε&f]L
+Fvm
+[vsrAlZ=I9Wp-k$v#٣50ٴnw;XRõ랮]&|e<~GQyMݭy3+1)wajZp*kf5TJըRZYyAHWT{/JN]~&H\m>_K٥kFچTYYB[U<X5i1h6ͮ~9~a;\?Η5b{sK>g;|cVn_bk[5*^զ{iU,rp7n)|4:B@?9'-BJ*)eJ%-DƙxiֹۣbBawu7rPUKE#%͎Y=qKi~IZ!`$g9&8Q"!9	~~3(̃.B]4.82q:tߛ١|ȇrP|>+VُQ(Ot~ﰏ$ކ0Ey3M4}`yGQ9MdBl!rQ-bRH?8l+
+мynoa"=yG4Jq!?ZeyyϾ,o\]{XRgqoLeJAJq%t	(ȓ\igA|/[F+_mu6-uD+vl|$g4^S}a;Qx&Z`ܞ/04'Y,CG$(}~i|u"BR	3?Z?x|U{WeOB.N6c^i|T>R-Vho>H%yzi%}qvk+Q{?H/O̖AakJ:
+D?gw]#2KťS:nKZS:<t[ѯ.F[̢!0`};y'RD-Yl	R 7)z۪oE"TxF	VPi+͕JmL JVJ$t(=+1<ԧ#<h`n,K
+02R+gOkբXqBHAPT'3-x6Ymxu$
+$ټI*}.Ffj:EB!K2{;H$:Q.н.ha ymj@A9L;ų{""i1zt6V-Kb;1~
+4ml}Ro\p]W`]e6[VZ˓ˇLkml?z"xKҥiQ^<VB+g8~/|F҂UgN_-ms@FWtB3,\Fi	x܃!f!$jjJ/t0~˩,i	
+S&S|k&$-&Dq17E,%Hm$~=^<-Cu	McÐ\(8w԰bISE1aݡlC^{'^(Vy,~E1:`h\bm4kX	գR͡^/TR.:րF}tZovKZ(?jj5#WI[ZJSK{f~Qί
+JF&U~WB~jc)oUt+HeRnKi괺XGU]k!1~TK5WkhŚ24 }zPY)6kǬ#C:k?5Jf]Y_՗[Zںh*u^x^Fi8&rրX5FSƠ5BE*ݐTKU-+?ZdդwօtXV|VQGgT06k5MlFTjU:KbZ_eV+Gj1adtjU*?̊dzTZajL@C'=^Wl(ikWYͶlִK,33diBJ*,_G^jIgVuhEKuޔ]Rc7jlXBIv+{cF];"h5Ԯ:7s_0q:WGzF:^I@ui}]+2:3}~#.ۃڿ]W~b$Iٴb$mҜDGA/Z_	mWoM̰Q޴qA<+x!VV"_I_X|$}LZNwGqRaFꑸB+-	նopwcTeꗤ*0kT-E9%!҄H"^rU^0-h42v"KidunzMԹ˘x]0ÈҪ=Ǣr+iNFOK9@q;:Q1Ll;_NXoyz׼^DCًzw0iKNl+Wь+,2)<rr\e~;t1.tSω㋔>7tI!u[=hD9/xذ}(0Y;Z@ms+a5>X@WwOE~Qu>koX_oi|"1*cɔ."*\
+\(ڕӪM`Wq[ǨTcvy%϶LARC/|o^&ESKy7Uwq:N/QǾU?&B/b^Xىz8X}5+P⼳,L\=12yq ^'-]j697_(#NN|@\Q7e f}b_`]q8ug#Bs4xLcDq#*iY`7~MKl.8vܫ*>jS(Ct:Tϯ\[Ds'G|?%3=9.vNwu/3CVN}2ʟ9]qV|I^TK	*	$T"₳CFyW 4,b/`#GF%47?&p6H0=hyɳN:`&JKpq7Bd[uK;4u iÈ.V	E#&Hq+Ooٗi6#2*M:=ȀulJӤ_y;8o1){q>{ſP5tmy%(LUA;fUX*bㇵ~T%2VnkW4KlbR]V9~Xy]Q(0`|~ϪLʏg<[1h+!.c{Q&)@lWG ٢:)Ѭ\fYZVHu{g(qRD׊
+jƜ,ލ5Vn	v*;Eh6V'E7β\<o˦eH-Ơ."w.t+U<&R1g팿uQl-g15!f4@-4BxsMH@KQ8zܞd`$)VhIApiFvgXi]lJ{ Qq^s1Ws(+ol]S'in&NЧH5fk?'ISh܋^)1bd >(}L[ؗ,)vEｙ>>Mַ!DVT<cyPl~(4}){|$NYi@Q'_~ŞhnJ^d=,sY+WIgt$ToqrL1 e<.w>tv36;kvʩeuMMQǂGXÔe0NZbpMcIg#[#LϜ~MS6(.=Ѱ?2F)^`-pXX-<{Ҋe'qxp~jaO>\"W'_-jc7ԥu.s8a8	<%&HJD$L#jÂQ("z]VAs}	UtS=+qqGaݹ6Oc	S\x"Z~9u8d(⛔
+Dx֢LG~IG].Tl`"wLI2S<d%]N$IGFʞO	ewj9eh@oTL)-f8d.d1`ȯ'\WbL:!e{(=r߰TQnZVq%9]g&M_c:'4[*D%U*=(B#pi<SsC}qwqmۣ9ܛx$.r+M}	N/w0V8g5zr+u{!zEas<r,ޫ㢺d{;͝6;\}>hӂnaplޮ`\rN[,lxЖѴ(#QR'%ȾTӺfZݯ102	(2E\D)ٰ\؍4{3/96THIM $t4dI_g
+JӨ-.oy1GsYf~q;'sS`h|&]dKz@N~v-(Um/)*=a=gfrA)QqO`E!a|3Y)䝮UVq]ӮMir4WVT龍]@Lf}qwܐf[lg'_Œ&oŴ|		v@PݺAxDagXD=0zc_+6~1VgbLxbǄ]_,YxZvYЀ(F5_ǁ?*wЩ/ƿT53Mۜn	L9q%Po=P,ivJy]-\reWUZ;-ӎscRW&NKx+@/KPU7Q[BH`Ns[jѧ16a2O{JU{ni䎐`>-(	G `="{[D\xd[ʾPW:pf.ҹi%[\os2;0+!|ΓO@VVc9Nْ.vmZvQ@,ߐ.֒y^;EkaU3Hѭ>oxՓT<LuNnX߰"3)'3t![ʧ=zc-Lc\`9(8dhSoWwq8rר/򧺸EO*5rfV!#u@A	HWٸqwp׾2\
+XmRElR>ՉNzt2{cxoʌ1ñތ8.4Ç(ZbH
+:r'XEP+`pRd:_ى|'ƓP|&/E7BqkNلjiDۀڴES@VJ9{Yq;~x/ȩC/"\&`|)(-ZR<D	1)>zRL3cʥ<DG{C$&7~MzG܂6>tJc\@~J")õqǂ= EHXv)IQQ_ʐn30r	-Yt=:N\fb=((LvL0O[sU~W 3*Rrg-z"F\{8ZN>}Wo{|mbb{֙$sflS @[cȵ<G|'ZU>6Vΰ⏎Tl[KHh(IS{FPd'j5.2tMRmőo4uDbdXpf>#cFZ*A=(IҰ7RNv$CѨ		1*a?B$Q0cgڌ14]hׅz#[acP;pU"5V8SY]';-$\bwb/@MPDqM3sMAjnF$as~hq9	K7Gvx/lzUдN_ۦ0uLEY.ra_#&Wn5>'y9*l]\03	/"/F|Y麓oUp,4ݬFH> ,N.1(~{H	aXTE I(l#`-HKRF;H͠TM͙T!S(zP8zƋ"Ж;wv>sP|uڪWHEHJD躤Uv?3ڃ3.b8QLP5:)it1auloFI^_Cțb@*${0$77IN}y	hxxPW-bKm,+z{}S#		?n{ǎ#\sMcFpkPlC<ɤMF
+DL蔇!M!zbd8\Vh|)-lv65t6Ղ:ާO+OOˤmg%\Ώ<Fw`qy_ZݗK;Hpp<(졍~EcU0˟әrk}v?k='O?k),~bBylDۙյ2
+x!qkiq%~X=Q}K27TT0^qw]gzwO`˼MHN()ڿ_aC	V1xD$1-6	fV9Ertm;oO
+#|T_y)?S?;<2|9J1qNHJS$!kQoaq5?|%Jqn=&5Ͻ~iL&Ln/Lr.n;n{v`EYfJ"p;B7aM-)	j;R䧀I$FW!wؽ4@)Z4+Y:;yG$hft)AQ],cU9cz6̀ߡה{3;WtbWϰ7{UgkgA\GvDȎ䣒ɖ[}%,t0Yfg&I|I+vIW6l5W[kSnlOzхJ|)AeHaURּgȩ,hKM=v^iA)bfOfMIlg{XH]sg~Vo})$V|jܦo{uty>oS-L.+6&!T,a4(a7;_!OPLh52;)w[-x3'b]
