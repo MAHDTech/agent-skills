@@ -108,7 +108,7 @@ dependencies = [
 
 [[package]]
 name = "ask-cli"
-version = "0.1.52"
+version = "0.1.53"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -2802,7 +2802,7 @@ checksum = "8ee5873ec9cce0195efcb7a4e9507a04cd49aec9c83d0389df45b1ef7ba2e649"
 
 [[package]]
 name = "skills-core"
-version = "0.1.52"
+version = "0.1.53"
 dependencies = [
  "chrono",
  "dirs",
@@ -2821,7 +2821,7 @@ dependencies = [
 
 [[package]]
 name = "skills-tui"
-version = "0.1.52"
+version = "0.1.53"
 dependencies = [
  "color-eyre",
  "crossterm",
