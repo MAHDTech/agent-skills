@@ -10,7 +10,6 @@ default-members = ["crates/ask-cli"]
 [workspace.package]
 version = "0.1.52"
 edition = "2024"
-rust-version = "1.85.0"
 authors = ["MAHDTech"]
 license = "MIT"
 repository = "https://github.com/MAHDTech/agent-skills"
@@ -23,44 +22,44 @@ skills-core = { path = "crates/skills-core", version = "0.1.52" }
 skills-tui = { path = "crates/skills-tui", version = "0.1.52" }
 
 # Serialization and data models
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
 serde_yaml = "0.9.34"
-chrono = { version = "0.4.38", features = ["serde"] }
+chrono = { version = "0.4.45", features = ["serde"] }
 typed-builder = "0.23.2"
 
 # Async runtime and networking
-tokio = { version = "1.40.0", features = ["full"] }
-reqwest = { version = "0.12.7", default-features = false, features = ["json", "rustls-tls", "stream"] }
+tokio = { version = "1.54.1", features = ["full"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "stream"] }
 futures = "0.3.34"
 
 # CLI and Terminal UI
-clap = { version = "4.5.17", features = ["derive", "cargo", "env"] }
+clap = { version = "4.6.7", features = ["derive", "cargo", "env"] }
 ratatui = { version = "0.30.2", features = ["all-widgets", "crossterm"] }
 crossterm = { version = "0.29.0", features = ["event-stream"] }
-comfy-table = "8.0.0"
+comfy-table = "8.0.1"
 colored = "3.1.1"
-color-eyre = "0.6.3"
+color-eyre = "0.6.5"
 
 # Logging and Diagnostics
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
 
 # Error Handling
-thiserror = "2.0.20"
-anyhow = "1.0.87"
+thiserror = "2.0.21"
+anyhow = "1.0.104"
 
 # Filesystem and System Utilities
 walkdir = "2.5.0"
 dirs = "7.0.0"
-sha2 = "0.10.8"
+sha2 = "0.11.1"
 
 # Test and Development Dependencies
-assert_cmd = "2.0.16"
+assert_cmd = "2.2.2"
 cargo-crap = "0.9.0"
-predicates = "3.1.2"
-tempfile = "3.12.0"
-wiremock = "0.6.2"
+predicates = "3.1.4"
+tempfile = "3.27.0"
+wiremock = "0.6.5"
 
 [workspace.lints.rust]
 missing_debug_implementations = "warn"

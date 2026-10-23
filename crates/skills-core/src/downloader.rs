@@ -651,7 +651,7 @@ impl SkillDownloader {
     pub fn compute_sha256(data: &[u8]) -> String {
         let mut hasher = Sha256::new();
         hasher.update(data);
-        format!("{:x}", hasher.finalize())
+        crate::hashing::encode_hex(&hasher.finalize())
     }
 
     /// Validates SHA-256 digest of input bytes.

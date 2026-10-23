@@ -9,6 +9,7 @@ pub mod artifacts;
 pub mod dashboard;
 pub mod downloader;
 pub mod error;
+mod hashing;
 pub mod installer;
 pub mod lint;
 pub mod models;
