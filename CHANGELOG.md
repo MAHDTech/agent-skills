@@ -1,9 +1,17 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.52](https://github.com/MAHDTech/agent-skills/compare/v0.1.51...3f4edbfccc295866e6cbaebdaf12c65a3f76bf96) (2026-10-23)
+## [v0.1.53](https://github.com/MAHDTech/agent-skills/compare/v0.1.52...10f4d6c17e77a4a5dd30ec3398d422235348c5e5) (2026-10-23)
 
 ### Fixes
+
+* upgrade Rust dependencies and support sha2 0.11 (#238)
+([10f4d6c](https://github.com/MAHDTech/agent-skills/commit/10f4d6c17e77a4a5dd30ec3398d422235348c5e5)),
+closes [#238](https://github.com/MAHDTech/agent-skills/issues/238)
+
+### [v0.1.52](https://github.com/MAHDTech/agent-skills/compare/v0.1.51...v0.1.52) (2026-10-23)
+
+#### Fixes
 
 * refresh Spacetime skill and prune obsolete installations (#236)
 ([4fedaf9](https://github.com/MAHDTech/agent-skills/commit/4fedaf990a6f80055e68597f63ce2aaa053140b6)),
