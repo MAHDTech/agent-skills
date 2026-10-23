@@ -80,6 +80,10 @@ ask skills sync --dry-run
 
 Sync reconciles the live catalog with all three standard targets. It installs missing skills, updates managed installations, and regenerates derived repository files and dashboard content. On Unix, installation uses symlinks; other platforms default to copies. It does not auto-detect installed agent applications.
 
+The same command removes obsolete installations sourced from this repository's live or archived catalogs. Renaming `spacetimedb` to `spacetime`, for example, installs the new skill and removes the old installation and registry entry. Cleanup also finds old symlinks that are missing from the registry, including dangling links and relative symlinks. Removed installations are backed up under the target's `.backups/` directory.
+
+Sync preserves untracked directories such as `~/.agents/skills/test1/`, installations from other catalogs, and symlinks pointing outside this repository. A manual skill whose name matches a live repository skill still follows the existing conflict policy: the repository version replaces it with a backup. Use `--dry-run` to inspect installations, updates, and removals without changing files.
+
 The current target resolver uses these locations:
 
 | Target                  | Directory                                                              |
