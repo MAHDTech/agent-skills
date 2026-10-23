@@ -1946,7 +1946,7 @@ impl SkillInstaller {
 pub fn compute_sha256(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    format!("{:x}", hasher.finalize())
+    crate::hashing::encode_hex(&hasher.finalize())
 }
 
 /// Computes hex SHA-256 digest of a file on disk.
@@ -1967,7 +1967,7 @@ pub fn compute_file_sha256(path: &Path) -> Result<String, InstallerError> {
         }
         hasher.update(&buffer[..bytes_read]);
     }
-    Ok(format!("{:x}", hasher.finalize()))
+    Ok(crate::hashing::encode_hex(&hasher.finalize()))
 }
 
 /// Computes cumulative hex SHA-256 checksum over sorted file entries.
@@ -1983,7 +1983,7 @@ pub fn compute_dir_checksum(entries: &[SkillFileEntry]) -> String {
         hasher.update(entry.sha256.as_bytes());
         hasher.update(b"\n");
     }
-    format!("{:x}", hasher.finalize())
+    crate::hashing::encode_hex(&hasher.finalize())
 }
 
 /// Recursively scans directory and collects file entries with SHA-256 digests.
