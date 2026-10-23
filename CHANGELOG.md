@@ -1,9 +1,17 @@
 <!-- markdownlint-disable MD024 -->
 # Changelog
 
-## [v0.1.51](https://github.com/MAHDTech/agent-skills/compare/v0.1.50...ceabb451b8b0baaef97ed3929a945f9d9ff3d6bb) (2026-10-22)
+## [v0.1.52](https://github.com/MAHDTech/agent-skills/compare/v0.1.51...3f4edbfccc295866e6cbaebdaf12c65a3f76bf96) (2026-10-23)
 
-### Features
+### Fixes
+
+* refresh Spacetime skill and prune obsolete installations (#236)
+([4fedaf9](https://github.com/MAHDTech/agent-skills/commit/4fedaf990a6f80055e68597f63ce2aaa053140b6)),
+closes [#236](https://github.com/MAHDTech/agent-skills/issues/236)
+
+### [v0.1.51](https://github.com/MAHDTech/agent-skills/compare/v0.1.50...v0.1.51) (2026-10-22)
+
+#### Features
 
 * **skills:** add oak, jj, and delta skills, add tars category, and archive
 retired skills (#232)
@@ -16,7 +24,7 @@ closes [#174](https://github.com/MAHDTech/agent-skills/issues/174)
 [#174](https://github.com/MAHDTech/agent-skills/issues/174)
 [#174](https://github.com/MAHDTech/agent-skills/issues/174)
 
-### Fixes
+#### Fixes
 
 * **skills:** track opening code fence char and length for nested fences
 (#156) (#225)
